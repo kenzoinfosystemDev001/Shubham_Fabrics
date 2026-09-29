@@ -1,0 +1,14 @@
+{
+  "name": "@subham/types",
+  "version": "1.0.0",
+  "description": "Shared TypeScript domain contracts and interfaces for Subham Fabrics MES",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2"
+  }
+}

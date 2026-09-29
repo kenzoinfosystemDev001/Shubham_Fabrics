@@ -1,0 +1,44 @@
+name: MES CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  validate:
+    name: Build, Lint & Test Pipeline
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+
+      - name: Install Monorepo Dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npm run db:generate
+
+      - name: Compile Packages
+        run: |
+          npm run build --workspace=@subham/types
+          npm run build --workspace=@subham/validation
+          npm run build --workspace=@subham/config
+          npm run build --workspace=@subham/database
+
+      - name: Run Backend Tests
+        run: npm run test --workspace=@subham/api
+
+      - name: Build Next.js Web App
+        run: npm run build --workspace=@subham/web
+
+      - name: Build NestJS API Gateway
+        run: npm run build --workspace=@subham/api

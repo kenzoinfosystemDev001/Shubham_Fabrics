@@ -1,0 +1,31 @@
+{
+  "name": "subham-fabrics-mes",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Production-grade Garment Manufacturing Execution System (MES)",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "dev:api": "npm run dev --workspace=@subham/api",
+    "dev:web": "npm run dev --workspace=@subham/web",
+    "dev:worker": "npm run dev --workspace=@subham/worker",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "db:generate": "npm run generate --workspace=@subham/database",
+    "db:push": "npm run push --workspace=@subham/database",
+    "db:seed": "npm run seed --workspace=@subham/database"
+  },
+  "keywords": [
+    "mes",
+    "garment",
+    "textile",
+    "manufacturing",
+    "traceability",
+    "challan"
+  ],
+  "author": "Subham Fabrics Engineering",
+  "license": "UNLICENSED"
+}

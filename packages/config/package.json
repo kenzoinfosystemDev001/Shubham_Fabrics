@@ -1,0 +1,17 @@
+{
+  "name": "@subham/config",
+  "version": "1.0.0",
+  "description": "Shared configurations, constants and factory parameters",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@subham/types": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2"
+  }
+}

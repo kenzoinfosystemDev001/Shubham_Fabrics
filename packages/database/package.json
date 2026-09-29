@@ -1,0 +1,25 @@
+{
+  "name": "@subham/database",
+  "version": "1.0.0",
+  "description": "Database schema, migrations, seeders, and Prisma client for Subham Fabrics MES",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "generate": "prisma generate",
+    "push": "prisma db push",
+    "seed": "node dist/seed.js",
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.4.1",
+    "@subham/types": "*",
+    "bcryptjs": "^3.0.2"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^22.13.9",
+    "prisma": "^6.4.1",
+    "typescript": "^5.8.2"
+  }
+}

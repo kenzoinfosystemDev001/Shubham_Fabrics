@@ -1,0 +1,21 @@
+{
+  "name": "@subham/worker",
+  "version": "1.0.0",
+  "description": "Background Queue & Event Worker for Subham Fabrics MES",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/main.js",
+    "dev": "ts-node-dev --respawn src/main.ts"
+  },
+  "dependencies": {
+    "@subham/config": "*",
+    "@subham/database": "*",
+    "@subham/types": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.9",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.8.2"
+  }
+}
