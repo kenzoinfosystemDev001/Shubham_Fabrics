@@ -22,6 +22,15 @@ export class QualityController {
     return this.qualityService.recordInspection(validated, inspectorId);
   }
 
+  @Post('comprehensive-inspect')
+  @Roles(UserRole.SUPER_ADMIN, UserRole.QC_INSPECTOR, UserRole.PRODUCTION_MANAGER)
+  async recordComprehensiveInspection(
+    @Body() body: any,
+    @CurrentUser('id') inspectorId: string,
+  ) {
+    return this.qualityService.recordComprehensiveInspection(body, inspectorId);
+  }
+
   @Get('inspections')
   async getInspections(
     @Query('challanId') challanId?: string,

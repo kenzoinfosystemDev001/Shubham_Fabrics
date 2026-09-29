@@ -381,3 +381,95 @@ export function validateProductionBalance(accounting: {
   }
   return { isValid: true, expectedInput: totalAccounted };
 }
+
+// ==========================================
+// PHASE 2 ENGINE TYPES & ENUMS
+// ==========================================
+
+export enum StockLedgerEntryType {
+  RECEIPT = 'RECEIPT',
+  ISSUE = 'ISSUE',
+  RETURN = 'RETURN',
+  CONSUMPTION = 'CONSUMPTION',
+  ADJUSTMENT = 'ADJUSTMENT',
+}
+
+export enum ChallanAction {
+  CREATE = 'CREATE',
+  SUBMIT = 'SUBMIT',
+  ISSUE = 'ISSUE',
+  RECEIVE = 'RECEIVE',
+  START = 'START',
+  COMPLETE = 'COMPLETE',
+  HOLD = 'HOLD',
+  RESUME = 'RESUME',
+  QC = 'QC',
+  HANDOVER = 'HANDOVER',
+  CLOSE = 'CLOSE',
+  CANCEL = 'CANCEL',
+}
+
+export enum DefectStatus {
+  OPEN = 'OPEN',
+  UNDER_REVIEW = 'UNDER_REVIEW',
+  REWORK = 'REWORK',
+  RECUT = 'RECUT',
+  SCRAP = 'SCRAP',
+  RELEASED = 'RELEASED',
+  CLOSED = 'CLOSED',
+}
+
+export enum ReworkStatus {
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  SCRAPPED = 'SCRAPPED',
+}
+
+export enum RecutStatus {
+  REQUESTED = 'REQUESTED',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+  COMPLETED = 'COMPLETED',
+}
+
+export enum FabricRollStatus {
+  RECEIVED = 'RECEIVED',
+  ISSUED = 'ISSUED',
+  IN_INSPECTION = 'IN_INSPECTION',
+  CUT = 'CUT',
+  DEPLETED = 'DEPLETED',
+}
+
+export enum BundleStatus {
+  CREATED = 'CREATED',
+  IN_TRANSIT = 'IN_TRANSIT',
+  IN_PROCESS = 'IN_PROCESS',
+  COMPLETED = 'COMPLETED',
+  REWORK = 'REWORK',
+  REJECTED = 'REJECTED',
+  PACKED = 'PACKED',
+}
+
+export enum CartonStatus {
+  PACKED = 'PACKED',
+  IN_FG_STORE = 'IN_FG_STORE',
+  STAGED_FOR_DISPATCH = 'STAGED_FOR_DISPATCH',
+  DISPATCHED = 'DISPATCHED',
+}
+
+export enum DispatchStatus {
+  DRAFT = 'DRAFT',
+  APPROVED = 'APPROVED',
+  DISPATCHED = 'DISPATCHED',
+  DELIVERED = 'DELIVERED',
+  CANCELLED = 'CANCELLED',
+}
+
+export enum QCResultStatus {
+  PASS = 'PASS',
+  PASS_WITH_OBSERVATION = 'PASS_WITH_OBSERVATION',
+  REWORK = 'REWORK',
+  HOLD = 'HOLD',
+  REJECT = 'REJECT',
+}
+

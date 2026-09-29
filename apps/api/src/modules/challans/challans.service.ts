@@ -36,14 +36,14 @@ export class ChallansService {
     if (params?.status) where.status = params.status;
     if (params?.programId) where.programId = params.programId;
 
-    return this.prisma.challan.findMany({
+    const challans = await this.prisma.challan.findMany({
       where,
       include: {
         program: {
           select: {
             id: true,
             programNumber: true,
-            buyer: true,
+            buyerName: true,
             styleCode: true,
             orderNumber: true,
             designName: true,
@@ -60,6 +60,16 @@ export class ChallansService {
       },
       orderBy: { createdAt: 'desc' },
     });
+
+    return challans.map((ch) => ({
+      ...ch,
+      program: ch.program
+        ? {
+            ...ch.program,
+            buyer: ch.program.buyerName,
+          }
+        : null,
+    }));
   }
 
   async findOne(id: string) {
@@ -69,7 +79,11 @@ export class ChallansService {
         program: {
           include: {
             fabrics: true,
-            routeSteps: { orderBy: { sequenceOrder: 'asc' } },
+            routes: {
+              include: {
+                steps: { orderBy: { sequenceOrder: 'asc' } },
+              },
+            },
           },
         },
         fromDeptRel: true,
@@ -105,6 +119,12 @@ export class ChallansService {
             inspector: { select: { username: true, fullName: true } },
           },
           orderBy: { inspectedAt: 'desc' },
+        },
+        events: {
+          include: {
+            actor: { select: { id: true, username: true, fullName: true } },
+          },
+          orderBy: { createdAt: 'desc' },
         },
       },
     });
@@ -175,6 +195,18 @@ export class ChallansService {
         },
       });
 
+      // Record Challan Creation Event
+      await tx.challanEvent.create({
+        data: {
+          challanId: created.id,
+          fromStatus: 'NONE',
+          toStatus: ChallanStatus.DRAFT,
+          action: 'CREATE',
+          actorId,
+          notes: 'Challan created in DRAFT status',
+        },
+      });
+
       await tx.auditLog.create({
         data: {
           actorId,
@@ -191,7 +223,7 @@ export class ChallansService {
       });
 
       return created;
-    });
+    }, { maxWait: 15000, timeout: 60000 });
 
     return challan;
   }
@@ -203,6 +235,11 @@ export class ChallansService {
     notes?: string,
   ) {
     const challan = await this.findOne(id);
+
+    // Idempotent: If already in target status, return current challan
+    if (challan.status === newStatus) {
+      return challan;
+    }
 
     // Validate legal transitions
     const validTransitions: Record<string, string[]> = {
@@ -247,6 +284,18 @@ export class ChallansService {
         data: updateData,
       });
 
+      // Record immutable Challan Event
+      await tx.challanEvent.create({
+        data: {
+          challanId: id,
+          fromStatus: challan.status,
+          toStatus: newStatus,
+          action: `TRANSITION_TO_${newStatus}`,
+          actorId,
+          notes: notes || null,
+        },
+      });
+
       await tx.auditLog.create({
         data: {
           actorId,
@@ -259,9 +308,42 @@ export class ChallansService {
       });
 
       return res;
-    });
+    }, { maxWait: 15000, timeout: 60000 });
 
     return updated;
+  }
+
+  /**
+   * Action-Driven State Engine:
+   * Maps factory operations (Submit, Issue, Receive, Start, Complete, Hold, Resume, QC, Handover, Close, Cancel)
+   * to strictly validated state transitions.
+   */
+  async executeAction(
+    id: string,
+    action: string,
+    actorId: string,
+    payload?: { reason?: string; notes?: string; metadata?: any },
+  ) {
+    const actionToStatusMap: Record<string, ChallanStatus> = {
+      SUBMIT: ChallanStatus.SUBMITTED,
+      ISSUE: ChallanStatus.ISSUED,
+      RECEIVE: ChallanStatus.RECEIVED,
+      START: ChallanStatus.IN_PROCESS,
+      COMPLETE: ChallanStatus.COMPLETED,
+      QC: ChallanStatus.QC_PENDING,
+      HANDOVER: ChallanStatus.HANDED_OVER,
+      CLOSE: ChallanStatus.CLOSED,
+      HOLD: ChallanStatus.ON_HOLD,
+      RESUME: ChallanStatus.IN_PROCESS,
+      CANCEL: ChallanStatus.CANCELLED,
+    };
+
+    const targetStatus = actionToStatusMap[action];
+    if (!targetStatus) {
+      throw new BadRequestException(`Unrecognized factory action '${action}'. Allowed: [${Object.keys(actionToStatusMap).join(', ')}]`);
+    }
+
+    return this.transitionStatus(id, targetStatus, actorId, payload?.notes || payload?.reason);
   }
 
   async getGenealogy(id: string) {

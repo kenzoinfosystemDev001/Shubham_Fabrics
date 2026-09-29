@@ -16,6 +16,21 @@ export class AuthService {
       where: {
         OR: [{ username: input.usernameOrEmail }, { email: input.usernameOrEmail }],
       },
+      include: {
+        userRoles: {
+          include: {
+            role: {
+              include: {
+                rolePerms: {
+                  include: {
+                    permission: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!user) {
@@ -32,10 +47,23 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials provided');
     }
 
+    const roles = user.userRoles.map((ur) => ur.role.code);
+    const primaryRole = roles[0] || 'VIEWER';
+    const permissions = Array.from(
+      new Set(
+        user.userRoles.flatMap((ur) =>
+          ur.role.rolePerms.map(
+            (rp) => `${rp.permission.module}.${rp.permission.resource}.${rp.permission.action}`,
+          ),
+        ),
+      ),
+    );
+
     const payload = {
       sub: user.id,
       username: user.username,
-      role: user.role,
+      role: primaryRole,
+      roles,
       departmentCode: user.departmentCode,
     };
 
@@ -48,7 +76,7 @@ export class AuthService {
         action: 'LOGIN',
         entity: 'User',
         entityId: user.id,
-        afterState: JSON.stringify({ username: user.username, role: user.role }),
+        afterState: JSON.stringify({ username: user.username, roles }),
         ipAddress,
         userAgent,
       },
@@ -61,7 +89,9 @@ export class AuthService {
         username: user.username,
         fullName: user.fullName,
         email: user.email,
-        role: user.role,
+        role: primaryRole,
+        roles,
+        permissions,
         departmentCode: user.departmentCode,
       },
     };
@@ -78,54 +108,79 @@ export class AuthService {
       throw new BadRequestException('A user with this username or email already exists');
     }
 
-    const passwordHash = await bcrypt.hash(input.password, 10);
-    const user = await this.prisma.user.create({
-      data: {
-        username: input.username,
-        email: input.email,
-        fullName: input.fullName,
-        passwordHash,
-        role: input.role,
-        departmentCode: input.departmentCode,
-      },
-      select: {
-        id: true,
-        username: true,
-        fullName: true,
-        email: true,
-        role: true,
-        departmentCode: true,
-        isActive: true,
-        createdAt: true,
-      },
+    const role = await this.prisma.role.findUnique({
+      where: { code: input.roleCode },
+    });
+    if (!role) {
+      throw new BadRequestException(`Role code '${input.roleCode}' does not exist`);
+    }
+
+    const hashFn = (bcrypt as any).hash || (bcrypt as any).default?.hash;
+    const passwordHash = await hashFn(input.password, 10);
+
+    const user = await this.prisma.$transaction(async (tx) => {
+      const createdUser = await tx.user.create({
+        data: {
+          username: input.username,
+          email: input.email,
+          fullName: input.fullName,
+          passwordHash,
+          departmentCode: input.departmentCode,
+        },
+      });
+
+      await tx.userRole.create({
+        data: {
+          userId: createdUser.id,
+          roleId: role.id,
+        },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          actorId,
+          action: 'USER_CREATED',
+          entity: 'User',
+          entityId: createdUser.id,
+          afterState: JSON.stringify({ username: createdUser.username, role: role.code }),
+        },
+      });
+
+      return createdUser;
     });
 
-    await this.prisma.auditLog.create({
-      data: {
-        actorId,
-        action: 'USER_CREATED',
-        entity: 'User',
-        entityId: user.id,
-        afterState: JSON.stringify({ username: user.username, role: user.role }),
-      },
-    });
-
-    return user;
+    return {
+      id: user.id,
+      username: user.username,
+      fullName: user.fullName,
+      email: user.email,
+      role: role.code,
+      departmentCode: user.departmentCode,
+      isActive: user.isActive,
+      createdAt: user.createdAt,
+    };
   }
 
   async getAllUsers() {
-    return this.prisma.user.findMany({
-      select: {
-        id: true,
-        username: true,
-        fullName: true,
-        email: true,
-        role: true,
-        departmentCode: true,
-        isActive: true,
-        createdAt: true,
+    const users = await this.prisma.user.findMany({
+      include: {
+        userRoles: {
+          include: { role: true },
+        },
       },
       orderBy: { username: 'asc' },
     });
+
+    return users.map((u) => ({
+      id: u.id,
+      username: u.username,
+      fullName: u.fullName,
+      email: u.email,
+      role: u.userRoles[0]?.role.code || 'VIEWER',
+      roles: u.userRoles.map((ur) => ur.role.code),
+      departmentCode: u.departmentCode,
+      isActive: u.isActive,
+      createdAt: u.createdAt,
+    }));
   }
 }

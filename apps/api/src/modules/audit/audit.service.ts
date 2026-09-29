@@ -27,7 +27,14 @@ export class AuditService {
       this.prisma.auditLog.findMany({
         where,
         include: {
-          actor: { select: { id: true, username: true, fullName: true, role: true } },
+          actor: {
+            select: {
+              id: true,
+              username: true,
+              fullName: true,
+              userRoles: { include: { role: true } },
+            },
+          },
         },
         orderBy: { createdAt: 'desc' },
         take: limit,
@@ -35,6 +42,16 @@ export class AuditService {
       }),
     ]);
 
-    return { total, limit, offset, records };
+    const formatted = records.map((r) => ({
+      ...r,
+      actor: {
+        id: r.actor.id,
+        username: r.actor.username,
+        fullName: r.actor.fullName,
+        role: r.actor.userRoles?.[0]?.role?.code || 'USER',
+      },
+    }));
+
+    return { total, limit, offset, records: formatted };
   }
 }

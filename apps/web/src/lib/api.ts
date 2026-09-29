@@ -213,6 +213,195 @@ class ApiClient {
     return this.request<{ total: number; records: any[] }>(`/audit?${query.toString()}`);
   }
 
+  // Masters
+  async getMasters(resource: string, params?: { search?: string }) {
+    const query = new URLSearchParams();
+    if (params?.search) query.append('search', params.search);
+    return this.request<any[]>(`/masters/${resource}?${query.toString()}`);
+  }
+
+  async createMaster(resource: string, data: any) {
+    return this.request<any>(`/masters/${resource}`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateMaster(resource: string, id: string, data: any) {
+    return this.request<any>(`/masters/${resource}/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteMaster(resource: string, id: string) {
+    return this.request<any>(`/masters/${resource}/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Floor Board & Real-Time Engine
+  async getFloorBoardState() {
+    return this.request<any>('/floorboard/state');
+  }
+
+  // Inventory & Stock Ledger
+  async getStockLedger(params?: { departmentCode?: string; itemCode?: string; rollNumber?: string }) {
+    const query = new URLSearchParams();
+    if (params?.departmentCode) query.append('departmentCode', params.departmentCode);
+    if (params?.itemCode) query.append('itemCode', params.itemCode);
+    if (params?.rollNumber) query.append('rollNumber', params.rollNumber);
+    return this.request<any[]>(`/inventory/ledger?${query.toString()}`);
+  }
+
+  async getStockSummary(departmentCode?: string) {
+    const query = new URLSearchParams();
+    if (departmentCode) query.append('departmentCode', departmentCode);
+    return this.request<any[]>(`/inventory/summary?${query.toString()}`);
+  }
+
+  async getFabricRolls(params?: { programId?: string; status?: string }) {
+    const query = new URLSearchParams();
+    if (params?.programId) query.append('programId', params.programId);
+    if (params?.status) query.append('status', params.status);
+    return this.request<any[]>(`/inventory/rolls?${query.toString()}`);
+  }
+
+  async registerFabricRoll(data: any) {
+    return this.request<any>('/inventory/rolls', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async issueFabricRoll(data: { rollNumber: string; targetDepartment: string; challanId: string }) {
+    return this.request<any>('/inventory/rolls/issue', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  // Bundles
+  async getBundles(params?: { programId?: string; currentDepartment?: string; status?: string; search?: string }) {
+    const query = new URLSearchParams();
+    if (params?.programId) query.append('programId', params.programId);
+    if (params?.currentDepartment) query.append('currentDepartment', params.currentDepartment);
+    if (params?.status) query.append('status', params.status);
+    if (params?.search) query.append('search', params.search);
+    return this.request<any[]>(`/bundles?${query.toString()}`);
+  }
+
+  async createBundles(data: any) {
+    return this.request<any>('/bundles', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async transferBundle(id: string, departmentCode: string, status: string) {
+    return this.request<any>(`/bundles/${id}/transfer`, {
+      method: 'PATCH',
+      body: JSON.stringify({ departmentCode, status }),
+    });
+  }
+
+  // Defects & Rework
+  async getDefects(params?: { programId?: string; departmentCode?: string; status?: string }) {
+    const query = new URLSearchParams();
+    if (params?.programId) query.append('programId', params.programId);
+    if (params?.departmentCode) query.append('departmentCode', params.departmentCode);
+    if (params?.status) query.append('status', params.status);
+    return this.request<any[]>(`/defects?${query.toString()}`);
+  }
+
+  async createDefect(data: any) {
+    return this.request<any>('/defects', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateDefectStatus(id: string, status: string, resolutionNotes?: string) {
+    return this.request<any>(`/defects/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status, resolutionNotes }),
+    });
+  }
+
+  async createRework(data: any) {
+    return this.request<any>('/defects/reworks', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async getRecuts(params?: { programId?: string; status?: string }) {
+    const query = new URLSearchParams();
+    if (params?.programId) query.append('programId', params.programId);
+    if (params?.status) query.append('status', params.status);
+    return this.request<any[]>(`/defects/recuts?${query.toString()}`);
+  }
+
+  async createRecut(data: any) {
+    return this.request<any>('/defects/recuts', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async approveRecut(id: string) {
+    return this.request<any>(`/defects/recuts/${id}/approve`, {
+      method: 'POST',
+    });
+  }
+
+  // Packing & FG
+  async getCartons(params?: { programId?: string; status?: string; search?: string }) {
+    const query = new URLSearchParams();
+    if (params?.programId) query.append('programId', params.programId);
+    if (params?.status) query.append('status', params.status);
+    if (params?.search) query.append('search', params.search);
+    return this.request<any[]>(`/packing/cartons?${query.toString()}`);
+  }
+
+  async packCarton(data: any) {
+    return this.request<any>('/packing/cartons', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  // Dispatch
+  async getDispatches(params?: { status?: string; search?: string }) {
+    const query = new URLSearchParams();
+    if (params?.status) query.append('status', params.status);
+    if (params?.search) query.append('search', params.search);
+    return this.request<any[]>(`/dispatch?${query.toString()}`);
+  }
+
+  async createDispatch(data: any) {
+    return this.request<any>('/dispatch', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  // Challan Action
+  async executeChallanAction(id: string, action: string, payload?: { reason?: string; notes?: string }) {
+    return this.request<any>(`/challans/${id}/action`, {
+      method: 'POST',
+      body: JSON.stringify({ action, ...payload }),
+    });
+  }
+
+  // Comprehensive QC
+  async recordComprehensiveQC(data: any) {
+    return this.request<any>('/quality/comprehensive-inspect', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
   // Health
   async getHealth() {
     return this.request<any>('/health');

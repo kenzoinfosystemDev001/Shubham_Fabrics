@@ -13,17 +13,23 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: { sub: string; username: string; role: string }) {
+  async validate(payload: { sub: string; username: string }) {
     const user = await this.prisma.user.findUnique({
       where: { id: payload.sub },
-      select: {
-        id: true,
-        username: true,
-        fullName: true,
-        email: true,
-        role: true,
-        departmentCode: true,
-        isActive: true,
+      include: {
+        userRoles: {
+          include: {
+            role: {
+              include: {
+                rolePerms: {
+                  include: {
+                    permission: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
 
@@ -31,6 +37,28 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException('User account inactive or not found');
     }
 
-    return user;
+    const roles = user.userRoles.map((ur) => ur.role.code);
+    const primaryRole = roles[0] || 'VIEWER';
+    const permissions = Array.from(
+      new Set(
+        user.userRoles.flatMap((ur) =>
+          ur.role.rolePerms.map(
+            (rp) => `${rp.permission.module}.${rp.permission.resource}.${rp.permission.action}`,
+          ),
+        ),
+      ),
+    );
+
+    return {
+      id: user.id,
+      username: user.username,
+      fullName: user.fullName,
+      email: user.email,
+      role: primaryRole,
+      roles,
+      permissions,
+      departmentCode: user.departmentCode,
+      isActive: user.isActive,
+    };
   }
 }

@@ -14,41 +14,67 @@ export class ProgramsService {
     }
     if (params?.search) {
       where.OR = [
-        { programNumber: { contains: params.search } },
-        { buyer: { contains: params.search } },
-        { orderNumber: { contains: params.search } },
-        { styleCode: { contains: params.search } },
-        { designName: { contains: params.search } },
+        { programNumber: { contains: params.search, mode: 'insensitive' } },
+        { buyerName: { contains: params.search, mode: 'insensitive' } },
+        { orderNumber: { contains: params.search, mode: 'insensitive' } },
+        { styleCode: { contains: params.search, mode: 'insensitive' } },
+        { designName: { contains: params.search, mode: 'insensitive' } },
       ];
     }
 
-    return this.prisma.program.findMany({
+    const programs = await this.prisma.program.findMany({
       where,
       include: {
+        customer: true,
+        design: true,
         createdBy: { select: { id: true, username: true, fullName: true } },
         approvedBy: { select: { id: true, username: true, fullName: true } },
         fabrics: true,
-        sizeMatrix: true,
-        colorMatrix: true,
-        routeSteps: { orderBy: { sequenceOrder: 'asc' } },
-        _count: { select: { challans: true, productionRecords: true } },
+        sizes: true,
+        colours: true,
+        routes: {
+          include: {
+            steps: { orderBy: { sequenceOrder: 'asc' } },
+          },
+        },
+        _count: { select: { challans: true, productionLogs: true } },
       },
       orderBy: { createdAt: 'desc' },
     });
+
+    // Provide friendly aliases for UI compatibility
+    return programs.map((p) => ({
+      ...p,
+      buyer: p.buyerName,
+      sizeMatrix: p.sizes,
+      colorMatrix: p.colours,
+      routeSteps: p.routes?.[0]?.steps || [],
+    }));
   }
 
   async findOne(id: string) {
-    const program = await this.prisma.program.findUnique({
+    const p = await this.prisma.program.findUnique({
       where: { id },
       include: {
+        customer: true,
+        design: true,
         createdBy: { select: { id: true, username: true, fullName: true } },
         approvedBy: { select: { id: true, username: true, fullName: true } },
         fabrics: true,
-        measurements: true,
-        sizeMatrix: true,
-        colorMatrix: true,
-        bomItems: true,
-        routeSteps: { orderBy: { sequenceOrder: 'asc' } },
+        specifications: true,
+        sizes: true,
+        colours: true,
+        bomItems: {
+          include: { supplier: true },
+        },
+        routes: {
+          include: {
+            steps: {
+              include: { operation: true },
+              orderBy: { sequenceOrder: 'asc' },
+            },
+          },
+        },
         challans: {
           include: {
             items: true,
@@ -58,7 +84,7 @@ export class ProgramsService {
           },
           orderBy: { createdAt: 'desc' },
         },
-        productionRecords: {
+        productionLogs: {
           include: {
             operator: { select: { username: true, fullName: true } },
           },
@@ -67,11 +93,18 @@ export class ProgramsService {
       },
     });
 
-    if (!program) {
+    if (!p) {
       throw new NotFoundException(`Program with ID '${id}' not found`);
     }
 
-    return program;
+    return {
+      ...p,
+      buyer: p.buyerName,
+      measurements: p.specifications,
+      sizeMatrix: p.sizes,
+      colorMatrix: p.colours,
+      routeSteps: p.routes?.[0]?.steps || [],
+    };
   }
 
   async create(data: CreateProgramInput, actorId: string) {
@@ -87,42 +120,40 @@ export class ProgramsService {
         data: {
           programNumber: data.programNumber,
           programDate: new Date(data.programDate),
-          buyer: data.buyer,
+          customerId: data.customerId || null,
+          buyerName: data.buyerName,
           orderNumber: data.orderNumber,
-          designNumber: data.designNumber,
+          designId: data.designId || null,
           designName: data.designName,
-          designVersion: data.designVersion || 'v1.0',
-          patternNumber: data.patternNumber,
           styleCode: data.styleCode,
           productCategory: data.productCategory,
-          description: data.description,
-          referenceImageUrl: data.referenceImageUrl || null,
-          technicalDrawingUrl: data.technicalDrawingUrl || null,
-          specificationSheetUrl: data.specificationSheetUrl || null,
           targetQuantity: data.targetQuantity,
           deliveryDate: new Date(data.deliveryDate),
           priority: data.priority,
           status: ProgramStatus.DRAFT,
+          remarks: data.remarks || null,
           createdById: actorId,
 
           fabrics: {
             create: data.fabrics.map((f) => ({
+              fabricId: f.fabricId || null,
               fabricCode: f.fabricCode,
               fabricName: f.fabricName,
-              fabricType: f.fabricType,
               composition: f.composition,
               widthInInches: f.widthInInches,
               gsm: f.gsm,
+              colourId: f.colourId || null,
               colour: f.colour,
-              shade: f.shade,
+              shade: f.shade || null,
               requiredQuantity: f.requiredQuantity,
               tolerancePercentage: f.tolerancePercentage,
-              supplier: f.supplier,
+              wastagePercentage: f.wastagePercentage,
             })),
           },
 
-          measurements: {
+          specifications: {
             create: data.measurements.map((m) => ({
+              sizeId: m.sizeId || null,
               size: m.size,
               length: m.length,
               chest: m.chest,
@@ -133,28 +164,31 @@ export class ProgramsService {
               neck: m.neck,
               bottom: m.bottom,
               otherSpecs: m.otherSpecs ? JSON.stringify(m.otherSpecs) : null,
+              toleranceMm: m.toleranceMm || 5.0,
             })),
           },
 
-          sizeMatrix: {
+          sizes: {
             create: data.sizeMatrix.map((s) => ({
+              sizeId: s.sizeId || null,
               size: s.size,
               targetQuantity: s.targetQuantity,
             })),
           },
 
-          colorMatrix: {
+          colours: {
             create: data.colorMatrix.map((c) => ({
+              colourId: c.colourId || null,
               colorCode: c.colorCode,
               colorName: c.colorName,
-              pantoneReference: c.pantoneReference || null,
-              shade: c.shade,
+              shade: c.shade || null,
               targetQuantity: c.targetQuantity,
             })),
           },
 
           bomItems: {
             create: data.bomItems.map((b) => ({
+              itemId: b.itemId || null,
               itemCode: b.itemCode,
               itemName: b.itemName,
               category: b.category,
@@ -162,27 +196,40 @@ export class ProgramsService {
               uom: b.uom,
               wastagePercentage: b.wastagePercentage,
               totalRequiredQuantity: b.totalRequiredQuantity,
-              supplier: b.supplier || null,
+              supplierId: b.supplierId || null,
             })),
           },
 
-          routeSteps: {
-            create: data.routeSteps.map((r) => ({
-              sequenceOrder: r.sequenceOrder,
-              departmentCode: r.departmentCode,
-              standardCycleTimeMinutes: r.standardCycleTimeMinutes || null,
-              isMandatory: r.isMandatory ?? true,
-              requiresQCGate: r.requiresQCGate ?? false,
-            })),
+          routes: {
+            create: [
+              {
+                routeName: 'Configured Shop Floor Route',
+                steps: {
+                  create: data.routeSteps.map((r) => ({
+                    sequenceOrder: r.sequenceOrder,
+                    departmentCode: r.departmentCode,
+                    operationId: r.operationId || null,
+                    isMandatory: r.isMandatory ?? true,
+                    requiresQCGate: r.requiresQCGate ?? false,
+                    expectedDurationMinutes: r.expectedDurationMinutes || 45.0,
+                    inputType: r.inputType || 'CUT_PANEL',
+                    outputType: r.outputType || 'PIECE',
+                    reworkAllowed: r.reworkAllowed ?? true,
+                    skipAllowed: r.skipAllowed ?? false,
+                    isParallel: r.isParallel ?? false,
+                  })),
+                },
+              },
+            ],
           },
         },
         include: {
           fabrics: true,
-          measurements: true,
-          sizeMatrix: true,
-          colorMatrix: true,
+          specifications: true,
+          sizes: true,
+          colours: true,
           bomItems: true,
-          routeSteps: { orderBy: { sequenceOrder: 'asc' } },
+          routes: { include: { steps: true } },
         },
       });
 
@@ -201,13 +248,29 @@ export class ProgramsService {
       });
 
       return created;
-    });
+    }, { maxWait: 15000, timeout: 60000 });
 
     return program;
   }
 
   async updateStatus(id: string, newStatus: ProgramStatus, actorId: string) {
     const program = await this.findOne(id);
+
+    // Validate legal transition
+    const validTransitions: Record<string, string[]> = {
+      [ProgramStatus.DRAFT]: [ProgramStatus.SUBMITTED, ProgramStatus.CANCELLED],
+      [ProgramStatus.SUBMITTED]: [ProgramStatus.APPROVED, ProgramStatus.DRAFT, ProgramStatus.CANCELLED],
+      [ProgramStatus.APPROVED]: [ProgramStatus.IN_PRODUCTION, ProgramStatus.ON_HOLD, ProgramStatus.CANCELLED],
+      [ProgramStatus.IN_PRODUCTION]: [ProgramStatus.COMPLETED, ProgramStatus.ON_HOLD, ProgramStatus.CANCELLED],
+      [ProgramStatus.ON_HOLD]: [ProgramStatus.IN_PRODUCTION, ProgramStatus.APPROVED, ProgramStatus.CANCELLED],
+    };
+
+    const allowed = validTransitions[program.status] || [];
+    if (!allowed.includes(newStatus)) {
+      throw new BadRequestException(
+        `Cannot transition Program from '${program.status}' to '${newStatus}'. Allowed: [${allowed.join(', ')}]`,
+      );
+    }
 
     const updated = await this.prisma.$transaction(async (tx) => {
       const dataToUpdate: any = { status: newStatus };
@@ -233,7 +296,7 @@ export class ProgramsService {
       });
 
       return res;
-    });
+    }, { maxWait: 15000, timeout: 60000 });
 
     return updated;
   }

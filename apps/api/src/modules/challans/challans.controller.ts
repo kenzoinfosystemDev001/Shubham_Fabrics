@@ -60,4 +60,17 @@ export class ChallansController {
   ) {
     return this.challansService.transitionStatus(id, status, actorId, notes);
   }
+
+  @Post(':id/action')
+  async executeAction(
+    @Param('id') id: string,
+    @Body() body: any,
+    @CurrentUser('id') actorId: string,
+  ) {
+    return this.challansService.executeAction(id, body.action, actorId, {
+      reason: body.reason,
+      notes: body.notes,
+      metadata: body.metadata,
+    });
+  }
 }

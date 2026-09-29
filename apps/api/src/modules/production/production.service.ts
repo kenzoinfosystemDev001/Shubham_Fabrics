@@ -97,7 +97,7 @@ export class ProductionService {
       });
 
       return created;
-    });
+    }, { maxWait: 15000, timeout: 60000 });
 
     return record;
   }
@@ -112,14 +112,19 @@ export class ProductionService {
     if (params?.departmentCode) where.departmentCode = params.departmentCode;
     if (params?.operatorId) where.operatorId = params.operatorId;
 
-    return this.prisma.productionTransaction.findMany({
+    const transactions = await this.prisma.productionTransaction.findMany({
       where,
       include: {
         operator: { select: { id: true, username: true, fullName: true } },
-        program: { select: { programNumber: true, styleCode: true, buyer: true } },
+        program: { select: { programNumber: true, styleCode: true, buyerName: true } },
         challan: { select: { challanNumber: true, fromDepartment: true, toDepartment: true } },
       },
       orderBy: { recordedAt: 'desc' },
     });
+
+    return transactions.map((t) => ({
+      ...t,
+      program: t.program ? { ...t.program, buyer: t.program.buyerName } : null,
+    }));
   }
 }

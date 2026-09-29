@@ -99,7 +99,7 @@ describe('Subham Fabrics MES - Business Critical Workflow Tests', () => {
       const programPayload = {
         programNumber: 'PRG-2026-9999',
         programDate: '2026-09-30',
-        buyer: 'Marks & Spencer',
+        buyerName: 'Marks & Spencer',
         orderNumber: 'PO-MS-1234',
         designNumber: 'DES-881',
         designName: 'Classic Crew Tee',

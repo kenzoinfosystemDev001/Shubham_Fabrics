@@ -6,23 +6,74 @@ export class DashboardService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getMetrics() {
+    const now = new Date();
+    const thirtyDaysFromNow = new Date();
+    thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+
     const [
-      totalPrograms,
       activePrograms,
-      totalChallans,
-      activeChallans,
+      programsAwaitingApproval,
+      activeProductionPrograms,
+      wipChallans,
+      qcHolds,
+      openRework,
+      upcomingDeliveries,
+      recentActivity,
       productionStats,
-      inspections,
-      recentAuditLogs,
     ] = await Promise.all([
-      this.prisma.program.count(),
+      // Active Programs (Approved or in production)
       this.prisma.program.count({
         where: { status: { in: ['APPROVED', 'IN_PRODUCTION'] } },
       }),
-      this.prisma.challan.count(),
-      this.prisma.challan.count({
-        where: { status: { in: ['ISSUED', 'RECEIVED', 'IN_PROCESS', 'QC_PENDING', 'REWORK'] } },
+      // Programs Awaiting Approval (Submitted)
+      this.prisma.program.count({
+        where: { status: 'SUBMITTED' },
       }),
+      // Active Production
+      this.prisma.program.count({
+        where: { status: 'IN_PRODUCTION' },
+      }),
+      // WIP Challans
+      this.prisma.challan.count({
+        where: { status: { in: ['RECEIVED', 'IN_PROCESS'] } },
+      }),
+      // QC Holds
+      this.prisma.challan.count({
+        where: { status: { in: ['QC_PENDING', 'ON_HOLD'] } },
+      }),
+      // Open Rework
+      this.prisma.challan.count({
+        where: { status: 'REWORK' },
+      }),
+      // Upcoming Deliveries within next 30 days
+      this.prisma.program.findMany({
+        where: {
+          deliveryDate: { gte: now, lte: thirtyDaysFromNow },
+          status: { notIn: ['COMPLETED', 'CANCELLED'] },
+        },
+        select: {
+          id: true,
+          programNumber: true,
+          designName: true,
+          buyerName: true,
+          styleCode: true,
+          targetQuantity: true,
+          deliveryDate: true,
+          status: true,
+          priority: true,
+        },
+        orderBy: { deliveryDate: 'asc' },
+        take: 5,
+      }),
+      // Recent Audit Trail
+      this.prisma.auditLog.findMany({
+        take: 10,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          actor: { select: { username: true, fullName: true } },
+        },
+      }),
+      // Aggregate Production stats
       this.prisma.productionTransaction.aggregate({
         _sum: {
           inputQuantity: true,
@@ -33,18 +84,6 @@ export class DashboardService {
         },
         _count: { id: true },
       }),
-      this.prisma.qualityInspection.findMany({
-        take: 10,
-        orderBy: { inspectedAt: 'desc' },
-        include: { defects: true },
-      }),
-      this.prisma.auditLog.findMany({
-        take: 8,
-        orderBy: { createdAt: 'desc' },
-        include: {
-          actor: { select: { username: true, fullName: true, role: true } },
-        },
-      }),
     ]);
 
     const totalInput = productionStats._sum.inputQuantity || 0;
@@ -53,27 +92,34 @@ export class DashboardService {
     const totalRework = productionStats._sum.reworkQuantity || 0;
     const totalWaste = productionStats._sum.wasteQuantity || 0;
 
-    const rejectionRate = totalInput > 0 ? ((totalReject / totalInput) * 100).toFixed(2) : '0.00';
-    const reworkRate = totalInput > 0 ? ((totalRework / totalInput) * 100).toFixed(2) : '0.00';
-    const overallYield = totalInput > 0 ? ((totalGood / totalInput) * 100).toFixed(2) : '100.00';
+    const yieldPct = totalInput > 0 ? ((totalGood / totalInput) * 100).toFixed(1) : '100.0';
+    const rejectPct = totalInput > 0 ? ((totalReject / totalInput) * 100).toFixed(1) : '0.0';
 
     return {
-      kpi: {
-        totalPrograms,
+      cards: {
         activePrograms,
-        totalChallans,
-        activeChallans,
+        programsAwaitingApproval,
+        activeProduction: activeProductionPrograms,
+        wipChallans,
+        qcHolds,
+        openRework,
+      },
+      productionTotals: {
         totalInput,
         totalGood,
         totalReject,
         totalRework,
         totalWaste,
-        overallYield: `${overallYield}%`,
-        rejectionRate: `${rejectionRate}%`,
-        reworkRate: `${reworkRate}%`,
+        yieldPercentage: `${yieldPct}%`,
+        rejectionRate: `${rejectPct}%`,
       },
-      recentInspections: inspections,
-      recentActivity: recentAuditLogs,
+      upcomingDeliveries,
+      recentActivity,
+      needsAttention: [
+        ...(qcHolds > 0 ? [{ type: 'QC_HOLD', message: `${qcHolds} Challan(s) currently awaiting Quality Inspection clearance` }] : []),
+        ...(openRework > 0 ? [{ type: 'REWORK', message: `${openRework} Station Challan(s) flagged for rework resolution` }] : []),
+        ...(programsAwaitingApproval > 0 ? [{ type: 'APPROVAL', message: `${programsAwaitingApproval} Program File(s) awaiting Production Manager authorization` }] : []),
+      ],
     };
   }
 }

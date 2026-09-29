@@ -34,7 +34,12 @@ export class DepartmentsService {
           }),
           this.prisma.user.findMany({
             where: { departmentCode: dept.code, isActive: true },
-            select: { id: true, username: true, fullName: true, role: true },
+            select: {
+              id: true,
+              username: true,
+              fullName: true,
+              userRoles: { include: { role: true } },
+            },
           }),
         ]);
 
@@ -43,7 +48,12 @@ export class DepartmentsService {
           incomingCount,
           wipCount,
           completedCount,
-          assignedUsers,
+          assignedUsers: assignedUsers.map((u) => ({
+            id: u.id,
+            username: u.username,
+            fullName: u.fullName,
+            role: u.userRoles?.[0]?.role?.code || 'USER',
+          })),
         };
       }),
     );
