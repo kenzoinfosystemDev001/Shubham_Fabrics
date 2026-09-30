@@ -226,7 +226,7 @@ export class AnalyticsService {
       where: { status: { in: ['APPROVED', 'IN_PRODUCTION'] } },
       include: {
         customer: true,
-        challans: { include: { productionTransactions: true } },
+        challans: { include: { productionLogs: true } },
       },
     });
 
@@ -236,7 +236,7 @@ export class AnalyticsService {
       let lastTxDate: Date | null = null;
 
       for (const ch of prog.challans) {
-        for (const pt of ch.productionTransactions) {
+        for (const pt of ch.productionLogs) {
           if (ch.challanType.includes('PACKING') || ch.challanType.includes('FG')) {
             completedPieces += pt.goodQuantity;
           }

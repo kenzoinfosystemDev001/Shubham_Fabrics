@@ -2,265 +2,361 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+
+interface NavItem {
+  id: string;
+  label: string;
+  href: string;
+  icon: string;
+  requiredRole?: string[]; // RBAC restriction
+}
 
 interface NavGroup {
   title: string;
-  icon: string;
-  items: {
-    label: string;
-    href: string;
-    isLive?: boolean;
-  }[];
+  items: NavItem[];
 }
 
-const NAVIGATION_GROUPS: NavGroup[] = [
+const NAVIGATION_TAXONOMY: NavGroup[] = [
   {
-    title: 'Overview',
-    icon: '📊',
+    title: 'OVERVIEW',
     items: [
-      { label: 'Executive Dashboard', href: '/', isLive: true },
+      { id: 'overview', label: 'Overview', href: '/', icon: '📊' },
+      { id: 'my-work', label: 'My work', href: '/my-work', icon: '📝' },
+      { id: 'floor-board', label: 'Floor board', href: '/shopfloor', icon: '🖥️' },
+      { id: 'floor-flow', label: 'Floor flow', href: '/floor-flow', icon: '🔀' },
+      { id: 'designs', label: 'Designs', href: '/programs', icon: '🎨' },
     ],
   },
   {
-    title: 'Production',
-    icon: '📋',
+    title: 'STORE',
     items: [
-      { label: 'Program Files', href: '/programs', isLive: true },
-      { label: 'Floor Board & WIP', href: '/shopfloor', isLive: true },
-      { label: 'Cut Bundles & Pieces', href: '/bundles', isLive: true },
-      { label: 'Challan System', href: '/challans', isLive: true },
-      { label: 'FG & Dispatch Logistics', href: '/dispatch', isLive: true },
+      { id: 'stock', label: 'Stock', href: '/store', icon: '📦' },
+      { id: 'receive', label: 'Receive', href: '/store', icon: '📥' },
+      { id: 'trims', label: 'Trims', href: '/store', icon: '🧵' },
+      { id: 'issue-challan', label: 'Issue challan', href: '/challans', icon: '📄' },
+      { id: 'defected-shelf', label: 'Defected shelf', href: '/store', icon: '⚠️' },
     ],
   },
   {
-    title: 'Store',
-    icon: '📦',
+    title: 'INSIGHTS',
     items: [
-      { label: 'Fabric Rolls & Stock', href: '/store', isLive: true },
-      { label: 'Immutable Stock Ledger', href: '/store', isLive: true },
-      { label: 'Receive Inward', href: '/challans', isLive: true },
-      { label: 'Trims Catalog', href: '/masters', isLive: true },
-      { label: 'Issue Challan', href: '/challans', isLive: true },
+      { id: 'reports', label: 'Reports', href: '/reports', icon: '📈' },
     ],
   },
   {
-    title: 'Quality',
-    icon: '🔍',
+    title: 'ADMIN',
     items: [
-      { label: 'QC Queue & Gates', href: '/quality', isLive: true },
-      { label: 'Inspections', href: '/quality', isLive: true },
-      { label: 'Defect Registry', href: '/masters', isLive: true },
-      { label: 'Rework Queue', href: '/quality', isLive: true },
-      { label: 'Rejections Log', href: '/quality', isLive: true },
-    ],
-  },
-  {
-    title: 'Insights',
-    icon: '📈',
-    items: [
-      { label: 'Production Reports', href: '/future?module=Production+Reports&phase=Phase+3' },
-      { label: 'Quality Analytics', href: '/future?module=Quality+Analytics&phase=Phase+3' },
-      { label: 'Inventory Analytics', href: '/future?module=Inventory+Analytics&phase=Phase+3' },
-      { label: 'Department Performance', href: '/future?module=Department+Performance&phase=Phase+3' },
-    ],
-  },
-  {
-    title: 'Administration',
-    icon: '⚙️',
-    items: [
-      { label: 'Master Data Hub', href: '/masters', isLive: true },
-      { label: 'Departments & Routes', href: '/masters', isLive: true },
-      { label: 'Audit Trail & Traceability', href: '/audit', isLive: true },
-      { label: 'Users & Roles', href: '/future?module=User+Directory&phase=Phase+1' },
-      { label: 'System Configuration', href: '/future?module=MES+Settings&phase=Phase+1' },
+      { id: 'setup', label: 'Setup', href: '/admin/setup', icon: '⚙️', requiredRole: ['SUPER_ADMIN', 'ADMIN'] },
+      { id: 'users', label: 'Users', href: '/admin/users', icon: '👥', requiredRole: ['SUPER_ADMIN', 'ADMIN'] },
+      { id: 'departments', label: 'Departments', href: '/masters', icon: '🏭', requiredRole: ['SUPER_ADMIN', 'ADMIN', 'PRODUCTION_MANAGER'] },
+      { id: 'masters', label: 'Masters', href: '/masters', icon: '🗄️', requiredRole: ['SUPER_ADMIN', 'ADMIN', 'PRODUCTION_MANAGER'] },
+      { id: 'what-changed', label: 'What changed', href: '/audit', icon: '🛡️' },
     ],
   },
 ];
 
 export function Navigation() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  // If on login page, hide navigation
+  if (pathname === '/login') {
+    return null;
+  }
+
   const [currentUser, setCurrentUser] = useState<any>({
-    fullName: 'Sujal Kumar',
-    username: 'admin',
-    role: 'SUPER_ADMIN',
+    fullName: 'jitender saini',
+    username: 'jitender',
+    role: 'STORE_MANAGER',
     departmentCode: 'STORE',
   });
-  const [systemHealth, setSystemHealth] = useState<'checking' | 'healthy' | 'offline'>('checking');
-  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
-    Overview: true,
-    Production: true,
-    Store: false,
-    Quality: true,
-    Insights: false,
-    Administration: true,
-  });
+  const [theme, setTheme] = useState<'Auto' | 'Light' | 'Dark'>('Light');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
   useEffect(() => {
-    const init = async () => {
-      try {
-        const health = await api.getHealth();
-        setSystemHealth(health.status === 'ok' ? 'healthy' : 'offline');
+    // Check saved session
+    if (typeof window !== 'undefined') {
+      const savedUser = localStorage.getItem('subham_mes_user');
+      if (savedUser) {
+        try {
+          setCurrentUser(JSON.parse(savedUser));
+        } catch {}
+      }
+    }
 
-        if (!api.getToken()) {
-          const authRes = await api.login({
-            usernameOrEmail: 'admin',
-            password: 'Admin@12345',
-          });
-          setCurrentUser(authRes.user);
-        } else {
-          try {
-            const profile = await api.getProfile();
-            setCurrentUser(profile);
-          } catch {
-            const authRes = await api.login({
-              usernameOrEmail: 'admin',
-              password: 'Admin@12345',
-            });
-            setCurrentUser(authRes.user);
+    const syncUser = async () => {
+      try {
+        if (api.getToken()) {
+          const profile = await api.getProfile();
+          setCurrentUser(profile);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('subham_mes_user', JSON.stringify(profile));
           }
         }
-      } catch (err) {
-        console.error('API connection check failed:', err);
-        setSystemHealth('offline');
+      } catch {
+        // Fallback to demo default if offline
       }
     };
-    init();
+    syncUser();
   }, []);
-
-  const toggleSection = (title: string) => {
-    setOpenSections((prev) => ({ ...prev, [title]: !prev[title] }));
-  };
 
   const handleRoleSwitch = async (username: string) => {
     try {
-      const res = await api.login({
-        usernameOrEmail: username,
-        password: 'Admin@12345',
-      });
+      const pin = username === 'admin' ? 'Admin@12345' : '1234';
+      const res = await api.login({ usernameOrEmail: username, password: pin });
       setCurrentUser(res.user);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('subham_mes_token', res.accessToken);
+        localStorage.setItem('subham_mes_user', JSON.stringify(res.user));
+      }
+      setUserDropdownOpen(false);
       window.location.reload();
-    } catch (err) {
-      alert(`Role switch error: ${err}`);
+    } catch (err: any) {
+      alert(`Role switch error: ${err.message || err}`);
     }
   };
 
+  const handleLogout = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('subham_mes_token');
+      localStorage.removeItem('subham_mes_user');
+    }
+    router.push('/login');
+  };
+
+  const userInitials = (currentUser?.fullName || 'JS')
+    .split(' ')
+    .map((n: string) => n[0])
+    .join('')
+    .substring(0, 2)
+    .toUpperCase();
+
+  const isUserAdmin = currentUser?.role === 'SUPER_ADMIN' || currentUser?.role === 'ADMIN';
+
   return (
-    <aside className="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between h-screen sticky top-0 shrink-0 no-print overflow-hidden">
-      <div className="flex flex-col h-full overflow-hidden">
-        {/* Brand Header */}
-        <div className="p-4 border-b border-slate-800 shrink-0 flex items-center justify-between">
-          <div>
-            <h1 className="text-sm font-bold tracking-wider text-slate-100 flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              SUBHAM FABRICS
-            </h1>
-            <p className="text-[11px] text-slate-400 font-mono mt-0.5">Garment MES Enterprise</p>
+    <>
+      {/* ========================================================= */}
+      {/* TOP HEADER BAR - Matching Image 2 exactly */}
+      {/* ========================================================= */}
+      <header className="fixed top-0 left-0 right-0 h-14 bg-[#142340] border-b border-[#1E3258] z-40 flex items-center justify-between px-4 text-white">
+        {/* Left Brand Identifier */}
+        <div className="flex items-center gap-6">
+          <Link href="/" className="flex items-center gap-2.5 group">
+            {/* SF Badge */}
+            <div className="w-8 h-8 rounded bg-[#1E3A8A] border border-[#2D4E96] flex items-center justify-center font-serif font-black text-amber-300 text-sm shadow-sm group-hover:scale-105 transition-transform">
+              SF
+            </div>
+            <div className="flex flex-col">
+              <span className="font-bold text-xs tracking-wide text-white font-sans leading-none">
+                Shubham Fabrics
+              </span>
+              <span className="text-[9px] font-mono uppercase tracking-wider text-blue-300/80 leading-tight mt-0.5">
+                PRODUCTION · MES
+              </span>
+            </div>
+          </Link>
+
+          {/* Active Breadcrumb */}
+          <div className="hidden sm:flex items-center text-xs font-medium text-slate-300 pl-4 border-l border-slate-700/60">
+            <span>Overview</span>
           </div>
-          <div className="text-right">
-            <span
-              className={`text-[9px] font-mono px-2 py-0.5 rounded border ${
-                systemHealth === 'healthy'
-                  ? 'bg-emerald-950/80 text-emerald-400 border-emerald-800'
-                  : 'bg-rose-950/80 text-rose-400 border-rose-800'
-              }`}
-            >
-              {systemHealth === 'healthy' ? 'ONLINE' : 'CONNECTING'}
+        </div>
+
+        {/* Center Search Pill - Matching Image 2 */}
+        <div className="flex-1 max-w-md mx-4 hidden md:block">
+          <div className="relative">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && searchQuery.trim()) {
+                  router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+                }
+              }}
+              placeholder="Find a lot or design"
+              className="w-full bg-[#1C2F52] border border-[#2B4370] text-xs text-white placeholder-slate-400 rounded-md pl-8 pr-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-400 font-sans"
+            />
+            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs">
+              🔍
             </span>
           </div>
         </div>
 
-        {/* Scrollable Navigation Groups */}
-        <nav className="flex-1 overflow-y-auto p-3 space-y-3 custom-scrollbar">
-          {NAVIGATION_GROUPS.map((group) => {
-            const isOpen = openSections[group.title] ?? true;
-            return (
-              <div key={group.title} className="space-y-1">
-                <button
-                  type="button"
-                  onClick={() => toggleSection(group.title)}
-                  className="w-full flex items-center justify-between px-2 py-1.5 text-[11px] font-bold text-slate-400 hover:text-slate-200 uppercase tracking-wider transition rounded hover:bg-slate-850"
-                >
-                  <span className="flex items-center gap-1.5">
-                    <span>{group.icon}</span>
-                    <span>{group.title}</span>
-                  </span>
-                  <span className="text-[10px] text-slate-500 font-mono">{isOpen ? '▾' : '▸'}</span>
-                </button>
+        {/* Right Section: Theme Toggle + User Badge */}
+        <div className="flex items-center gap-3">
+          {/* Theme Segmented Switch: Auto | Light | Dark */}
+          <div className="hidden lg:flex items-center bg-[#1A2C4D] border border-[#263E69] rounded p-0.5 text-[11px] font-medium">
+            {(['Auto', 'Light', 'Dark'] as const).map((t) => (
+              <button
+                key={t}
+                onClick={() => setTheme(t)}
+                className={`px-2.5 py-0.5 rounded transition ${
+                  theme === t
+                    ? 'bg-white text-slate-900 font-semibold shadow-xs'
+                    : 'text-slate-300 hover:text-white'
+                }`}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
 
-                {isOpen && (
-                  <div className="pl-3 space-y-0.5 border-l border-slate-800 ml-2">
-                    {group.items.map((item) => {
-                      const isActive =
-                        pathname === item.href ||
-                        (item.href !== '/' && item.href.startsWith('/programs') && pathname.startsWith('/programs')) ||
-                        (item.href !== '/' && item.href.startsWith('/challans') && pathname.startsWith('/challans')) ||
-                        (item.href !== '/' && item.href.startsWith('/masters') && pathname.startsWith('/masters')) ||
-                        (item.href !== '/' && item.href.startsWith('/quality') && pathname.startsWith('/quality')) ||
-                        (item.href !== '/' && item.href.startsWith('/audit') && pathname.startsWith('/audit')) ||
-                        (item.href !== '/' && item.href.startsWith('/shopfloor') && pathname.startsWith('/shopfloor'));
-
-                      return (
-                        <Link
-                          key={item.label}
-                          href={item.href}
-                          className={`flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium transition ${
-                            isActive
-                              ? 'bg-blue-600 text-white font-semibold shadow-sm'
-                              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-                          }`}
-                        >
-                          <span className="truncate">{item.label}</span>
-                          {item.isLive ? (
-                            <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">
-                              LIVE
-                            </span>
-                          ) : (
-                            <span className="text-[9px] font-mono text-slate-500">
-                              ROADMAP
-                            </span>
-                          )}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                )}
+          {/* User Profile Avatar & Badge - Matching Image 2 */}
+          <div className="relative">
+            <button
+              onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+              className="flex items-center gap-2.5 py-1 px-2 rounded hover:bg-[#1D325A] transition"
+            >
+              {/* Circular Avatar */}
+              <div className="w-7 h-7 rounded-full bg-[#B88746] text-[#142340] font-bold text-xs flex items-center justify-center shadow-xs">
+                {userInitials}
               </div>
-            );
-          })}
-        </nav>
+              <div className="text-left hidden sm:block">
+                <span className="text-xs font-semibold text-white block leading-none">
+                  {currentUser?.fullName || 'jitender saini'}
+                </span>
+                <span className="text-[10px] text-slate-300 block capitalize leading-tight mt-0.5">
+                  {currentUser?.departmentCode ? currentUser.departmentCode.toLowerCase() : 'Store'}
+                </span>
+              </div>
+              <span className="text-[10px] text-slate-400">▾</span>
+            </button>
 
-        {/* Operator Session & Role Switcher */}
-        <div className="p-3 border-t border-slate-800 bg-slate-950/70 shrink-0">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Persona Identity</span>
-            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">
-              {currentUser?.departmentCode || 'CENTRAL'}
-            </span>
-          </div>
-          <p className="text-xs font-semibold text-slate-100 truncate">{currentUser?.fullName}</p>
-          <p className="text-[10px] text-emerald-400 font-mono">{currentUser?.role}</p>
+            {/* User Dropdown Menu */}
+            {userDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-56 bg-white text-slate-800 rounded-lg shadow-xl border border-slate-200 py-2 z-50 animate-fade-in text-xs">
+                <div className="px-3 py-2 border-b border-slate-100">
+                  <p className="font-semibold text-slate-900">{currentUser?.fullName}</p>
+                  <p className="text-[11px] text-slate-500 font-mono">{currentUser?.role}</p>
+                  <p className="text-[10px] text-blue-600 font-mono mt-0.5">
+                    Affinity: {currentUser?.departmentCode || 'CENTRAL'}
+                  </p>
+                </div>
 
-          <div className="mt-2">
-            <select
-              className="w-full bg-slate-900 border border-slate-700 text-slate-200 text-[11px] rounded px-2 py-1 focus:outline-none focus:border-blue-500 font-mono"
-              value={currentUser?.username}
-              onChange={(e) => handleRoleSwitch(e.target.value)}
-            >
-              <option value="admin">Sujal Kumar (SUPER_ADMIN)</option>
-              <option value="prod_manager">Rajesh Sharma (PROD_MANAGER)</option>
-              <option value="store_sup">Mohan Verma (STORE_SUP)</option>
-              <option value="cut_sup">Arun Patel (CUTTING_SUP)</option>
-              <option value="stitch_sup">Suresh Nair (STITCHING_SUP)</option>
-              <option value="qc_insp">Vikram Singh (QC_INSPECTOR)</option>
-              <option value="finish_sup">Dinesh Yadav (FINISHING_SUP)</option>
-              <option value="pack_sup">Manoj Gupta (PACKING_SUP)</option>
-              <option value="dispatch_mgr">Karan Mehta (DISPATCH_MGR)</option>
-            </select>
+                <div className="py-1">
+                  <span className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                    Switch Persona
+                  </span>
+                  <button
+                    onClick={() => handleRoleSwitch('jitender')}
+                    className="w-full text-left px-3 py-1.5 hover:bg-slate-50 flex items-center justify-between"
+                  >
+                    <span>jitender saini</span>
+                    <span className="text-[10px] text-slate-400">Store</span>
+                  </button>
+                  <button
+                    onClick={() => handleRoleSwitch('admin')}
+                    className="w-full text-left px-3 py-1.5 hover:bg-slate-50 flex items-center justify-between"
+                  >
+                    <span>Sujal Kumar</span>
+                    <span className="text-[10px] text-slate-400">Super Admin</span>
+                  </button>
+                  <button
+                    onClick={() => handleRoleSwitch('prod_manager')}
+                    className="w-full text-left px-3 py-1.5 hover:bg-slate-50 flex items-center justify-between"
+                  >
+                    <span>Rajesh Sharma</span>
+                    <span className="text-[10px] text-slate-400">Planning</span>
+                  </button>
+                  <button
+                    onClick={() => handleRoleSwitch('qc_insp')}
+                    className="w-full text-left px-3 py-1.5 hover:bg-slate-50 flex items-center justify-between"
+                  >
+                    <span>Vikram Singh</span>
+                    <span className="text-[10px] text-slate-400">QC Inspector</span>
+                  </button>
+                </div>
+
+                <div className="border-t border-slate-100 pt-1">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-3 py-1.5 text-rose-600 hover:bg-rose-50 flex items-center gap-1.5"
+                  >
+                    <span>🚪</span> Sign out
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
-      </div>
-    </aside>
+      </header>
+
+      {/* ========================================================= */}
+      {/* LEFT SIDEBAR - Matching Image 2 exactly (Deep Navy #142340) */}
+      {/* ========================================================= */}
+      <aside className="w-56 bg-[#142340] border-r border-[#1E3258] flex flex-col justify-between fixed top-14 bottom-0 left-0 z-30 select-none overflow-y-auto no-scrollbar">
+        <div className="py-4 px-3 space-y-6">
+          {NAVIGATION_TAXONOMY.map((group) => (
+            <div key={group.title} className="space-y-1">
+              {/* Category Header */}
+              <span className="px-2 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400 block mb-1">
+                {group.title}
+              </span>
+
+              {/* Navigation Items */}
+              <div className="space-y-0.5">
+                {group.items.map((item) => {
+                  const isActive =
+                    (item.href === '/' && pathname === '/') ||
+                    (item.href !== '/' && pathname.startsWith(item.href));
+
+                  // Role check for RBAC
+                  const isRestricted =
+                    item.requiredRole &&
+                    !isUserAdmin &&
+                    !item.requiredRole.includes(currentUser?.role);
+
+                  if (isRestricted) {
+                    return (
+                      <div
+                        key={item.id}
+                        title={`Restricted: Requires ${item.requiredRole?.join(' or ')} permission`}
+                        className="flex items-center justify-between px-2.5 py-1.5 rounded text-xs text-slate-500 opacity-60 cursor-not-allowed"
+                      >
+                        <span className="flex items-center gap-2">
+                          <span className="text-sm">{item.icon}</span>
+                          <span>{item.label}</span>
+                        </span>
+                        <span className="text-[10px]">🔒</span>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <Link
+                      key={item.id}
+                      href={item.href}
+                      className={`flex items-center justify-between px-2.5 py-1.5 rounded text-xs transition ${
+                        isActive
+                          ? 'bg-[#1E3A8A] text-white font-semibold shadow-xs'
+                          : 'text-slate-300 hover:bg-[#1A2C4D] hover:text-white'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2">
+                        <span className="text-sm">{item.icon}</span>
+                        <span>{item.label}</span>
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Bottom Station Status Pill */}
+        <div className="p-3 border-t border-[#1E3258] bg-[#111D36]/80 text-[10px] font-mono text-slate-400 flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>LEDGER SYNCED</span>
+          </div>
+          <span className="text-blue-300 uppercase">{currentUser?.departmentCode || 'STN-01'}</span>
+        </div>
+      </aside>
+    </>
   );
 }

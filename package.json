@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "build": "npm run build --workspaces --if-present",
+    "start:api": "node apps/api/dist/main.js",
     "dev:api": "npm run dev --workspace=@subham/api",
     "dev:web": "npm run dev --workspace=@subham/web",
     "dev:worker": "npm run dev --workspace=@subham/worker",

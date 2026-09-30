@@ -149,6 +149,7 @@ async function main() {
 
   const usersList = [
     { username: 'admin', email: 'admin@subhamfabrics.com', fullName: 'Sujal Kumar', roleCode: 'SUPER_ADMIN', departmentCode: 'STORE' },
+    { username: 'jitender', email: 'jitender.saini@subhamfabrics.com', fullName: 'jitender saini', roleCode: 'STORE_MANAGER', departmentCode: 'STORE' },
     { username: 'prod_manager', email: 'rajesh.sharma@subhamfabrics.com', fullName: 'Rajesh Sharma', roleCode: 'PRODUCTION_MANAGER', departmentCode: 'STITCHING' },
     { username: 'store_mgr', email: 'mohan.verma@subhamfabrics.com', fullName: 'Mohan Verma', roleCode: 'STORE_MANAGER', departmentCode: 'STORE' },
     { username: 'cut_sup', email: 'arun.patel@subhamfabrics.com', fullName: 'Arun Patel', roleCode: 'CUTTING_OPERATOR', departmentCode: 'CUTTING' },
