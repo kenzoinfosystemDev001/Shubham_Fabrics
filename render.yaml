@@ -1,0 +1,24 @@
+services:
+  # ── NestJS API ────────────────────────────────────────────────────────────
+  - type: web
+    name: subham-fabrics-api
+    env: node
+    region: singapore
+    plan: free
+    rootDir: .
+    buildCommand: "npm install && npm run build:render"
+    startCommand: node apps/api/dist/main.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: CORS_ORIGIN
+        sync: false
