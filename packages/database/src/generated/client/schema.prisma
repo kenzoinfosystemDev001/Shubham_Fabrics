@@ -1,0 +1,1094 @@
+// Subham Fabrics MES - Enterprise PostgreSQL Schema (Neon Cloud)
+
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../src/generated/client"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// 1. AUTHENTICATION & DATA-DRIVEN RBAC
+// ==========================================
+
+model User {
+  id             String   @id @default(uuid())
+  username       String   @unique
+  email          String   @unique
+  fullName       String
+  passwordHash   String
+  departmentCode String? // Primary station affinity
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  userRoles          UserRole[]
+  createdPrograms    Program[]               @relation("ProgramCreator")
+  approvedPrograms   Program[]               @relation("ProgramApprover")
+  auditLogs          AuditLog[]
+  attachments        Attachment[]
+  createdChallans    Challan[]               @relation("ChallanCreator")
+  issuedChallans     Challan[]               @relation("ChallanIssuer")
+  receivedChallans   Challan[]               @relation("ChallanReceiver")
+  approvedChallans   Challan[]               @relation("ChallanApprover")
+  productionRecords  ProductionTransaction[] @relation("OperatorProduction")
+  inspections        QualityInspection[]     @relation("InspectorQuality")
+  challanEvents      ChallanEvent[]
+  stockLedgerEntries StockLedgerEntry[]
+  dispatchesApproved DispatchOrder[]         @relation("DispatchApprover")
+  dispatchesOperated DispatchOrder[]         @relation("DispatchOperator")
+  defectsDetected    DefectRecord[]          @relation("DefectDetector")
+  reworkOperations   ReworkTransaction[]     @relation("ReworkOperator")
+  recutsRequested    RecutRequest[]          @relation("RecutRequester")
+  recutsApproved     RecutRequest[]          @relation("RecutApprover")
+
+  @@index([username])
+  @@index([email])
+}
+
+model Role {
+  id          String   @id @default(uuid())
+  code        String   @unique // e.g. SUPER_ADMIN, PRODUCTION_MANAGER, STORE_MANAGER, etc.
+  name        String
+  description String?
+  isSystem    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userRoles UserRole[]
+  rolePerms RolePermission[]
+
+  @@index([code])
+}
+
+model Permission {
+  id          String   @id @default(uuid())
+  module      String // PROGRAM, CHALLAN, INVENTORY, MASTER_DATA, QUALITY, AUDIT
+  resource    String // PROGRAM_FILE, ROUTE, BOM, SUPPLIER, FABRIC, etc.
+  action      String // CREATE, READ, UPDATE, DELETE, APPROVE, ISSUE, RECEIVE
+  description String?
+  createdAt   DateTime @default(now())
+
+  rolePerms RolePermission[]
+
+  @@unique([module, resource, action])
+  @@index([module, resource])
+}
+
+model RolePermission {
+  id           String     @id @default(uuid())
+  roleId       String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permissionId String
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+
+  @@unique([roleId, permissionId])
+}
+
+model UserRole {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roleId     String
+  role       Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  assignedAt DateTime @default(now())
+
+  @@unique([userId, roleId])
+}
+
+// ==========================================
+// 2. PLANT INFRASTRUCTURE & MASTERS
+// ==========================================
+
+model Department {
+  id            String   @id @default(uuid())
+  code          String   @unique // STORE, DYEING, QC1, CUTTING, etc.
+  name          String
+  sequenceOrder Int
+  description   String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  workCenters  WorkCenter[]
+  operations   Operation[]
+  defectCodes  DefectCode[]
+  fromChallans Challan[]    @relation("FromDepartment")
+  toChallans   Challan[]    @relation("ToDepartment")
+
+  @@index([code])
+}
+
+model WorkCenter {
+  id              String     @id @default(uuid())
+  code            String     @unique
+  name            String
+  departmentId    String
+  department      Department @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+  capacityPerHour Float?     @default(0)
+  isActive        Boolean    @default(true)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  machines Machine[]
+
+  @@index([code])
+}
+
+model Machine {
+  id           String     @id @default(uuid())
+  code         String     @unique
+  name         String
+  machineType  String // AUTO_CUTTER, SEWING_SINGLE_NEEDLE, OVERLOCK, SPREADER, etc.
+  workCenterId String
+  workCenter   WorkCenter @relation(fields: [workCenterId], references: [id], onDelete: Restrict)
+  serialNumber String?
+  status       String     @default("OPERATIONAL") // OPERATIONAL, MAINTENANCE, BREAKDOWN
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([code])
+}
+
+model Shift {
+  id            String   @id @default(uuid())
+  code          String   @unique // SHIFT_A, SHIFT_B, SHIFT_C
+  name          String
+  startTime     String // e.g. "08:00"
+  endTime       String // e.g. "16:30"
+  durationHours Float    @default(8.0)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ==========================================
+// 3. COMMERCIAL PARTNERS MASTERS
+// ==========================================
+
+model Supplier {
+  id            String   @id @default(uuid())
+  code          String   @unique
+  name          String
+  contactPerson String?
+  email         String?
+  phone         String?
+  address       String?
+  taxNumber     String? // GSTIN / VAT
+  paymentTerms  String?
+  rating        Float?   @default(5.0)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  fabrics     Fabric[]
+  trims       Trim[]
+  bomItems    ProgramBOM[]
+  fabricRolls FabricRoll[]
+
+  @@index([code])
+}
+
+model Customer {
+  id            String   @id @default(uuid())
+  code          String   @unique
+  name          String
+  contactPerson String?
+  email         String?
+  phone         String?
+  address       String?
+  country       String   @default("India")
+  buyerGroup    String?
+  currency      String   @default("INR")
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  designs    Design[]
+  programs   Program[]
+  dispatches DispatchOrder[]
+
+  @@index([code])
+}
+
+// ==========================================
+// 4. MATERIAL & STYLE CATALOG MASTERS
+// ==========================================
+
+model Item {
+  id            String   @id @default(uuid())
+  code          String   @unique
+  name          String
+  itemType      String // FABRIC, TRIM, PACKAGING, CONSUMABLE
+  uom           String // MTR, KG, PCS, YDS, ROLL
+  currentStock  Float    @default(0)
+  minStockAlert Float    @default(10)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  bomItems ProgramBOM[]
+
+  @@index([code])
+}
+
+model Fabric {
+  id            String    @id @default(uuid())
+  code          String    @unique
+  name          String
+  fabricType    String // KNIT_PIQUE, SINGLE_JERSEY, FLEECE, RIB, WOVEN_TWILL
+  composition   String // 100% Cotton, 95% Cotton 5% Spandex, etc.
+  widthInInches Float
+  gsm           Float
+  weaveType     String?
+  supplierId    String?
+  supplier      Supplier? @relation(fields: [supplierId], references: [id])
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  programFabrics ProgramFabric[]
+
+  @@index([code])
+}
+
+model Trim {
+  id            String    @id @default(uuid())
+  code          String    @unique
+  name          String
+  trimCategory  String // BUTTON, ZIP, THREAD, LABEL, TAG, BAG, CARTON, INTERLINING
+  specification String?
+  uom           String
+  supplierId    String?
+  supplier      Supplier? @relation(fields: [supplierId], references: [id])
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([code])
+}
+
+model Design {
+  id            String    @id @default(uuid())
+  code          String    @unique
+  name          String
+  designVersion String    @default("v1.0")
+  season        String? // Spring/Summer 2026, Autumn/Winter 2026
+  patternNumber String
+  category      String // POLO, TSHIRT, HOODIE, SHIRT, TROUSER
+  description   String?
+  customerId    String?
+  customer      Customer? @relation(fields: [customerId], references: [id])
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  programs Program[]
+
+  @@index([code])
+}
+
+model Colour {
+  id          String   @id @default(uuid())
+  code        String   @unique
+  name        String
+  hexCode     String?
+  pantoneCode String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  programFabrics ProgramFabric[]
+  programColours ProgramColour[]
+
+  @@index([code])
+}
+
+model Size {
+  id        String   @id @default(uuid())
+  code      String   @unique // XS, S, M, L, XL, XXL, etc.
+  name      String
+  sortOrder Int      @default(1)
+  sizeGroup String   @default("ADULT") // ADULT, YOUTH, INFANT
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  programSizes   ProgramSize[]
+  specifications ProgramSpecification[]
+
+  @@index([code])
+}
+
+// ==========================================
+// 5. OPERATIONS & DEFECT TAXONOMY MASTERS
+// ==========================================
+
+model Operation {
+  id                       String     @id @default(uuid())
+  code                     String     @unique
+  name                     String
+  departmentId             String
+  department               Department @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+  standardCycleTimeSeconds Float      @default(60)
+  difficultyLevel          String     @default("STANDARD") // SIMPLE, STANDARD, COMPLEX
+  pieceRate                Float?     @default(0)
+  isActive                 Boolean    @default(true)
+  createdAt                DateTime   @default(now())
+  updatedAt                DateTime   @updatedAt
+
+  routeSteps ProgramRouteStep[]
+
+  @@index([code])
+}
+
+model DefectCode {
+  id           String      @id @default(uuid())
+  code         String      @unique
+  name         String
+  category     String // WEAVING, DYEING, CUTTING, STITCHING, EMBROIDERY, FINISHING
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id])
+  severity     String      @default("MAJOR") // MINOR, MAJOR, CRITICAL
+  isActive     Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([code])
+}
+
+// ==========================================
+// 6. PROGRAM FILE MANAGEMENT
+// ==========================================
+
+model Program {
+  id              String    @id @default(uuid())
+  programNumber   String    @unique // e.g. PRG-2026-0001
+  programDate     DateTime  @default(now())
+  customerId      String?
+  customer        Customer? @relation(fields: [customerId], references: [id])
+  buyerName       String // Fallback if ad-hoc
+  orderNumber     String
+  designId        String?
+  design          Design?   @relation(fields: [designId], references: [id])
+  designName      String
+  styleCode       String
+  productCategory String
+  targetQuantity  Int
+  deliveryDate    DateTime
+  priority        String    @default("NORMAL") // LOW, NORMAL, HIGH, URGENT
+  status          String    @default("DRAFT") // DRAFT, SUBMITTED, APPROVED, IN_PRODUCTION, ON_HOLD, COMPLETED, CANCELLED
+  remarks         String?
+
+  createdById  String
+  createdBy    User      @relation("ProgramCreator", fields: [createdById], references: [id])
+  approvedById String?
+  approvedBy   User?     @relation("ProgramApprover", fields: [approvedById], references: [id])
+  approvedAt   DateTime?
+
+  // Shubham Fabrics Production Sheet Specific Fields
+  programSerialNo          String?
+  startDate                DateTime?
+  designNumber             String?
+  clientName               String?
+  clientPriority           String?
+  mainStyle                String?
+  subStyle                 String?
+  pattern                  String?
+  baseDesignType           String?
+  baseDesignPhoto          String?
+  wilcomDesignNumber       String?
+  wilcomDesignPhoto        String?
+  embroideryDesign         String?
+  embroideryDesignSize     String?
+  fabricName               String?
+  fabricType               String?
+  fabricWidth              String?
+  fabricWidthInches        Float?
+  fabricColor              String?
+  fabricColorAvailable     String?
+  fabricAverage            Float?
+  fabricAverageType        String?
+  fabricAverageMeasurement String?
+  fabricDyeingRequired     Boolean   @default(false)
+  fabricIssuedToDyeing     Float?
+  fabricSentToDyeing       Float?
+  colorQuantity            Int?
+  quantityMeasurement      String?
+  specialMaterial          String?
+  specialMaterialQuantity  String?
+  productionDesignDate     DateTime?
+  productionEndDate        DateTime?
+  piecesRejection          Int?      @default(0)
+  rejectionReason          String?
+  comments                 String?
+  metadataJson             String?   @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  fabrics            ProgramFabric[]
+  colours            ProgramColour[]
+  sizes              ProgramSize[]
+  specifications     ProgramSpecification[]
+  bomItems           ProgramBOM[]
+  routes             ProgramRoute[]
+  challans           Challan[]
+  productionLogs     ProductionTransaction[]
+  rolls              FabricRoll[]
+  bundles            Bundle[]
+  cartons            Carton[]
+  defects            DefectRecord[]
+  stockLedgerEntries StockLedgerEntry[]
+  reworkTransactions ReworkTransaction[]
+  recutRequests      RecutRequest[]
+
+  @@index([programNumber])
+  @@index([status])
+}
+
+model ProgramFabric {
+  id                  String   @id @default(uuid())
+  programId           String
+  program             Program  @relation(fields: [programId], references: [id], onDelete: Cascade)
+  fabricId            String?
+  fabric              Fabric?  @relation(fields: [fabricId], references: [id])
+  fabricCode          String
+  fabricName          String
+  composition         String
+  widthInInches       Float
+  gsm                 Float
+  colourId            String?
+  colourRel           Colour?  @relation(fields: [colourId], references: [id])
+  colour              String
+  shade               String?
+  requiredQuantity    Float
+  uom                 String   @default("KG")
+  tolerancePercentage Float    @default(5.0)
+  wastagePercentage   Float    @default(3.0)
+  createdAt           DateTime @default(now())
+}
+
+model ProgramColour {
+  id             String   @id @default(uuid())
+  programId      String
+  program        Program  @relation(fields: [programId], references: [id], onDelete: Cascade)
+  colourId       String?
+  colourRel      Colour?  @relation(fields: [colourId], references: [id])
+  colorCode      String
+  colorName      String
+  shade          String?
+  targetQuantity Int
+  createdAt      DateTime @default(now())
+}
+
+model ProgramSize {
+  id             String   @id @default(uuid())
+  programId      String
+  program        Program  @relation(fields: [programId], references: [id], onDelete: Cascade)
+  sizeId         String?
+  sizeRel        Size?    @relation(fields: [sizeId], references: [id])
+  size           String
+  targetQuantity Int
+  createdAt      DateTime @default(now())
+}
+
+model ProgramSpecification {
+  id           String   @id @default(uuid())
+  programId    String
+  program      Program  @relation(fields: [programId], references: [id], onDelete: Cascade)
+  sizeId       String?
+  sizeRel      Size?    @relation(fields: [sizeId], references: [id])
+  size         String
+  length       Float
+  chest        Float
+  waist        Float
+  shoulder     Float
+  sleeveLength Float
+  armhole      Float
+  neck         Float
+  bottom       Float
+  otherSpecs   String? // JSON structured additional points of measure
+  toleranceMm  Float    @default(5.0)
+  createdAt    DateTime @default(now())
+}
+
+model ProgramBOM {
+  id                       String    @id @default(uuid())
+  programId                String
+  program                  Program   @relation(fields: [programId], references: [id], onDelete: Cascade)
+  itemId                   String?
+  item                     Item?     @relation(fields: [itemId], references: [id])
+  itemCode                 String
+  itemName                 String
+  category                 String // MAIN_FABRIC, LINING, THREAD, BUTTON, ZIP, LABEL, TAG, BAG, CARTON
+  requiredQuantityPerPiece Float
+  uom                      String
+  wastagePercentage        Float     @default(2.0)
+  totalRequiredQuantity    Float
+  supplierId               String?
+  supplier                 Supplier? @relation(fields: [supplierId], references: [id])
+  createdAt                DateTime  @default(now())
+}
+
+model ProgramRoute {
+  id          String   @id @default(uuid())
+  programId   String
+  program     Program  @relation(fields: [programId], references: [id], onDelete: Cascade)
+  routeName   String   @default("Standard Garment Flow")
+  description String?
+  isDefault   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  steps ProgramRouteStep[]
+}
+
+model ProgramRouteStep {
+  id                      String       @id @default(uuid())
+  programRouteId          String
+  programRoute            ProgramRoute @relation(fields: [programRouteId], references: [id], onDelete: Cascade)
+  sequenceOrder           Int
+  departmentCode          String
+  operationId             String?
+  operation               Operation?   @relation(fields: [operationId], references: [id])
+  isMandatory             Boolean      @default(true)
+  requiresQCGate          Boolean      @default(false)
+  expectedDurationMinutes Float?       @default(45.0)
+  inputType               String       @default("FABRIC_ROLL") // FABRIC_ROLL, CUT_PANEL, BUNDLE, PIECE, CARTON
+  outputType              String       @default("CUT_PANEL")
+  reworkAllowed           Boolean      @default(true)
+  skipAllowed             Boolean      @default(false)
+  isParallel              Boolean      @default(false)
+  createdAt               DateTime     @default(now())
+
+  @@unique([programRouteId, sequenceOrder])
+}
+
+// ==========================================
+// 7. AUDIT TRAIL & ATTACHMENTS
+// ==========================================
+
+model Attachment {
+  id           String   @id @default(uuid())
+  entityType   String // Program, Design, Challan, QualityInspection
+  entityId     String
+  fileName     String
+  fileType     String
+  fileUrl      String
+  fileSize     Int
+  uploadedById String
+  uploadedBy   User     @relation(fields: [uploadedById], references: [id])
+  createdAt    DateTime @default(now())
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  actorId     String
+  actor       User     @relation(fields: [actorId], references: [id])
+  action      String // PROGRAM_CREATED, PROGRAM_APPROVED, MASTER_CREATED, USER_ROLE_ASSIGNED, etc.
+  entity      String // Program, Supplier, Fabric, User, Role, etc.
+  entityId    String
+  beforeState String? // JSON stringified snapshot
+  afterState  String? // JSON stringified snapshot
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@index([entity, entityId])
+  @@index([actorId])
+  @@index([createdAt])
+}
+
+// ==========================================
+// 8. CHALLAN & PRODUCTION (MES EXECUTION)
+// ==========================================
+
+model Challan {
+  id              String    @id @default(uuid())
+  challanNumber   String    @unique
+  challanType     String // FABRIC_ISSUE, INTER_DEPARTMENT, etc.
+  programId       String
+  program         Program   @relation(fields: [programId], references: [id])
+  parentChallanId String?
+  parentChallan   Challan?  @relation("ChallanGenealogy", fields: [parentChallanId], references: [id])
+  childChallans   Challan[] @relation("ChallanGenealogy")
+
+  fromDepartment String
+  fromDeptRel    Department @relation("FromDepartment", fields: [fromDepartment], references: [code])
+  toDepartment   String
+  toDeptRel      Department @relation("ToDepartment", fields: [toDepartment], references: [code])
+
+  status   String @default("DRAFT")
+  priority String @default("NORMAL")
+
+  issuedDate    DateTime?
+  receivedDate  DateTime?
+  completedDate DateTime?
+
+  createdById  String
+  createdBy    User    @relation("ChallanCreator", fields: [createdById], references: [id])
+  issuedById   String?
+  issuedBy     User?   @relation("ChallanIssuer", fields: [issuedById], references: [id])
+  receivedById String?
+  receivedBy   User?   @relation("ChallanReceiver", fields: [receivedById], references: [id])
+  approvedById String?
+  approvedBy   User?   @relation("ChallanApprover", fields: [approvedById], references: [id])
+
+  remarks   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items          ChallanItem[]
+  productionLogs ProductionTransaction[]
+  inspections    QualityInspection[]
+  events         ChallanEvent[]
+  bundles        Bundle[]
+  defects        DefectRecord[]
+}
+
+model ChallanItem {
+  id              String  @id @default(uuid())
+  challanId       String
+  challan         Challan @relation(fields: [challanId], references: [id], onDelete: Cascade)
+  itemDescription String
+  fabricCode      String?
+  colour          String?
+  shade           String?
+  size            String?
+  unitType        String
+  rollNumber      String?
+  lotNumber       String?
+  bundleNumber    String?
+  barcode         String?
+  quantity        Float
+  grossWeightKg   Float?
+  netWeightKg     Float?
+  uom             String
+  remarks         String?
+
+  sourceLotId    String?
+  sourceRollId   String?
+  sourceBundleId String?
+  createdAt      DateTime @default(now())
+}
+
+model ProductionTransaction {
+  id             String  @id @default(uuid())
+  programId      String
+  program        Program @relation(fields: [programId], references: [id])
+  challanId      String
+  challan        Challan @relation(fields: [challanId], references: [id])
+  departmentCode String
+  operationName  String
+  operatorId     String
+  operator       User    @relation("OperatorProduction", fields: [operatorId], references: [id])
+  machineId      String?
+  shift          String?
+
+  inputQuantity   Float
+  goodQuantity    Float
+  reworkQuantity  Float  @default(0)
+  rejectQuantity  Float  @default(0)
+  wasteQuantity   Float  @default(0)
+  balanceQuantity Float  @default(0)
+  unitOfMeasure   String
+
+  reworkReason String?
+  rejectReason String?
+  wasteReason  String?
+  notes        String?
+  recordedAt   DateTime @default(now())
+}
+
+model QualityInspection {
+  id             String   @id @default(uuid())
+  challanId      String
+  challan        Challan  @relation(fields: [challanId], references: [id])
+  programId      String
+  departmentCode String
+  inspectorId    String
+  inspector      User     @relation("InspectorQuality", fields: [inspectorId], references: [id])
+  sampleSize     Int
+  status         String
+  notes          String?
+  inspectedAt    DateTime @default(now())
+
+  defects    DefectLog[]
+  parameters QualityInspectionParameter[]
+}
+
+model DefectLog {
+  id           String            @id @default(uuid())
+  inspectionId String
+  inspection   QualityInspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+  defectType   String
+  count        Int
+  severity     String
+  createdAt    DateTime          @default(now())
+}
+
+model InventoryStock {
+  id              String   @id @default(uuid())
+  departmentCode  String
+  itemType        String
+  identifier      String
+  description     String
+  currentQuantity Float
+  uom             String
+  programId       String?
+  lastChallanId   String?
+  updatedAt       DateTime @updatedAt
+  createdAt       DateTime @default(now())
+
+  @@unique([departmentCode, identifier])
+}
+
+// ==========================================
+// 9. PHASE 2 — REAL EXECUTION ENGINE MODELS
+// ==========================================
+
+model ChallanEvent {
+  id         String   @id @default(uuid())
+  challanId  String
+  challan    Challan  @relation(fields: [challanId], references: [id], onDelete: Cascade)
+  fromStatus String
+  toStatus   String
+  action     String // CREATE, SUBMIT, ISSUE, RECEIVE, START, COMPLETE, HOLD, RESUME, QC, HANDOVER, CLOSE, CANCEL
+  actorId    String
+  actor      User     @relation(fields: [actorId], references: [id])
+  reason     String?
+  notes      String?
+  metadata   String? // JSON string
+  createdAt  DateTime @default(now())
+
+  @@index([challanId])
+  @@index([actorId])
+  @@index([createdAt])
+}
+
+model StockLedgerEntry {
+  id             String   @id @default(uuid())
+  entryType      String // RECEIPT, ISSUE, RETURN, CONSUMPTION, ADJUSTMENT
+  departmentCode String
+  itemCode       String
+  itemName       String
+  batchNumber    String?
+  lotNumber      String?
+  rollNumber     String?
+  colour         String?
+  shade          String?
+  location       String?
+  quantity       Float // signed: + for additions, - for deductions
+  weightKg       Float?
+  uom            String
+  referenceType  String // CHALLAN, PRODUCTION, DISPATCH, ADJUSTMENT, INITIAL
+  referenceId    String?
+  programId      String?
+  program        Program? @relation(fields: [programId], references: [id])
+  actorId        String
+  actor          User     @relation(fields: [actorId], references: [id])
+  balanceAfter   Float
+  notes          String?
+  createdAt      DateTime @default(now())
+
+  @@index([departmentCode, itemCode])
+  @@index([batchNumber])
+  @@index([lotNumber])
+  @@index([rollNumber])
+  @@index([programId])
+}
+
+model FabricRoll {
+  id               String    @id @default(uuid())
+  rollNumber       String    @unique // e.g. ROLL-001
+  lotNumber        String?
+  fabricCode       String
+  fabricName       String
+  colour           String
+  shade            String?
+  initialLengthMtr Float
+  currentLengthMtr Float
+  initialWeightKg  Float
+  currentWeightKg  Float
+  status           String    @default("RECEIVED") // RECEIVED, ISSUED, IN_INSPECTION, CUT, DEPLETED
+  location         String? // RACK-A-01
+  programId        String?
+  program          Program?  @relation(fields: [programId], references: [id])
+  supplierId       String?
+  supplier         Supplier? @relation(fields: [supplierId], references: [id])
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  bundles Bundle[]
+
+  @@index([rollNumber])
+  @@index([programId])
+  @@index([status])
+}
+
+model Bundle {
+  id                String      @id @default(uuid())
+  bundleNumber      String      @unique // e.g. BND-2026-0001
+  programId         String
+  program           Program     @relation(fields: [programId], references: [id])
+  challanId         String?
+  challan           Challan?    @relation(fields: [challanId], references: [id])
+  rollId            String?
+  roll              FabricRoll? @relation(fields: [rollId], references: [id])
+  rollNumber        String?
+  layNumber         String?
+  markerNumber      String?
+  patternNumber     String?
+  size              String
+  colour            String
+  shade             String?
+  quantity          Int
+  remainingQuantity Int
+  currentDepartment String      @default("CUTTING")
+  status            String      @default("CREATED") // CREATED, IN_TRANSIT, IN_PROCESS, COMPLETED, REWORK, REJECTED, PACKED
+  barcode           String?     @unique
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  defects        DefectRecord[]
+  cartonItems    CartonBundle[]
+  recutRequests  RecutRequest[] @relation("OriginalBundleRecuts")
+  replacementFor RecutRequest[] @relation("ReplacementBundleRecuts")
+
+  @@index([bundleNumber])
+  @@index([programId])
+  @@index([currentDepartment])
+  @@index([status])
+}
+
+model Carton {
+  id               String   @id @default(uuid())
+  cartonNumber     String   @unique // e.g. CTN-2026-0001
+  programId        String
+  program          Program  @relation(fields: [programId], references: [id])
+  packingChallanId String?
+  size             String
+  colour           String
+  quantity         Int
+  grossWeightKg    Float?
+  netWeightKg      Float?
+  status           String   @default("PACKED") // PACKED, IN_FG_STORE, STAGED_FOR_DISPATCH, DISPATCHED
+  locationRack     String?
+  locationShelf    String?
+  barcode          String?  @unique
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  bundles         CartonBundle[]
+  dispatchCartons DispatchCarton[]
+
+  @@index([cartonNumber])
+  @@index([programId])
+  @@index([status])
+}
+
+model CartonBundle {
+  id        String   @id @default(uuid())
+  cartonId  String
+  carton    Carton   @relation(fields: [cartonId], references: [id], onDelete: Cascade)
+  bundleId  String
+  bundle    Bundle   @relation(fields: [bundleId], references: [id])
+  quantity  Int
+  createdAt DateTime @default(now())
+
+  @@unique([cartonId, bundleId])
+}
+
+model DispatchOrder {
+  id              String    @id @default(uuid())
+  dispatchNumber  String    @unique // e.g. DSP-2026-0001
+  customerId      String?
+  customer        Customer? @relation(fields: [customerId], references: [id])
+  orderNumber     String
+  invoiceNumber   String?
+  transporterName String
+  vehicleNumber   String
+  lrNumber        String? // Lorry Receipt
+  destination     String
+  totalCartons    Int
+  totalQuantity   Int
+  totalWeightKg   Float?
+  status          String    @default("DRAFT") // DRAFT, APPROVED, DISPATCHED, DELIVERED, CANCELLED
+  approvedById    String?
+  approvedBy      User?     @relation("DispatchApprover", fields: [approvedById], references: [id])
+  dispatchedById  String?
+  dispatchedBy    User?     @relation("DispatchOperator", fields: [dispatchedById], references: [id])
+  dispatchedAt    DateTime?
+  notes           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  cartons DispatchCarton[]
+
+  @@index([dispatchNumber])
+  @@index([status])
+}
+
+model DispatchCarton {
+  id         String        @id @default(uuid())
+  dispatchId String
+  dispatch   DispatchOrder @relation(fields: [dispatchId], references: [id], onDelete: Cascade)
+  cartonId   String
+  carton     Carton        @relation(fields: [cartonId], references: [id])
+  createdAt  DateTime      @default(now())
+
+  @@unique([dispatchId, cartonId])
+}
+
+model DefectRecord {
+  id              String    @id @default(uuid())
+  defectCode      String // e.g. DEF-ST-01
+  programId       String
+  program         Program   @relation(fields: [programId], references: [id])
+  challanId       String?
+  challan         Challan?  @relation(fields: [challanId], references: [id])
+  departmentCode  String
+  bundleId        String?
+  bundle          Bundle?   @relation(fields: [bundleId], references: [id])
+  itemDescription String
+  severity        String // MINOR, MAJOR, CRITICAL
+  quantity        Int
+  reason          String
+  detectedById    String
+  detectedBy      User      @relation("DefectDetector", fields: [detectedById], references: [id])
+  status          String    @default("OPEN") // OPEN, UNDER_REVIEW, REWORK, RE-CUT, SCRAP, RELEASED, CLOSED
+  resolutionNotes String?
+  resolvedAt      DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  reworks       ReworkTransaction[]
+  recutRequests RecutRequest[]
+
+  @@index([defectCode])
+  @@index([programId])
+  @@index([departmentCode])
+  @@index([status])
+}
+
+model ReworkTransaction {
+  id                   String       @id @default(uuid())
+  defectId             String
+  defect               DefectRecord @relation(fields: [defectId], references: [id])
+  programId            String
+  program              Program      @relation(fields: [programId], references: [id])
+  sourceTransactionId  String?
+  departmentCode       String
+  operationName        String
+  operatorId           String
+  operator             User         @relation("ReworkOperator", fields: [operatorId], references: [id])
+  inputQuantity        Int
+  outputGoodQuantity   Int
+  outputRejectQuantity Int          @default(0)
+  status               String       @default("IN_PROGRESS") // IN_PROGRESS, COMPLETED, SCRAPPED
+  notes                String?
+  createdAt            DateTime     @default(now())
+  completedAt          DateTime?
+
+  @@index([defectId])
+  @@index([programId])
+  @@index([status])
+}
+
+model RecutRequest {
+  id                  String       @id @default(uuid())
+  recutNumber         String       @unique // e.g. REC-2026-0001
+  programId           String
+  program             Program      @relation(fields: [programId], references: [id])
+  defectId            String
+  defect              DefectRecord @relation(fields: [defectId], references: [id])
+  originalBundleId    String?
+  originalBundle      Bundle?      @relation("OriginalBundleRecuts", fields: [originalBundleId], references: [id])
+  size                String
+  colour              String
+  requestedQuantity   Int
+  reason              String
+  requestedById       String
+  requestedBy         User         @relation("RecutRequester", fields: [requestedById], references: [id])
+  approvedById        String?
+  approvedBy          User?        @relation("RecutApprover", fields: [approvedById], references: [id])
+  status              String       @default("REQUESTED") // REQUESTED, APPROVED, REJECTED, COMPLETED
+  replacementBundleId String?
+  replacementBundle   Bundle?      @relation("ReplacementBundleRecuts", fields: [replacementBundleId], references: [id])
+  notes               String?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  @@index([recutNumber])
+  @@index([programId])
+  @@index([status])
+}
+
+model QualityInspectionParameter {
+  id            String            @id @default(uuid())
+  inspectionId  String
+  inspection    QualityInspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+  parameterName String // Width, GSM, Shrinkage, StitchDensity, ChestSize, etc.
+  expectedValue String?
+  measuredValue String
+  tolerance     String?
+  uom           String?
+  status        String // PASS, FAIL, OBSERVATION
+  comments      String?
+  createdAt     DateTime          @default(now())
+
+  @@index([inspectionId])
+}
+
+// ==========================================
+// 10. PHASE 3: RESILIENCE, INTEGRITY & ALERTS
+// ==========================================
+
+model IdempotencyRecord {
+  id           String   @id @default(uuid())
+  key          String   @unique
+  endpoint     String
+  method       String
+  statusCode   Int
+  responseBody String   @db.Text
+  createdAt    DateTime @default(now())
+
+  @@index([key])
+}
+
+model Notification {
+  id         String    @id @default(uuid())
+  title      String
+  message    String
+  category   String // CHALLAN_PENDING, QC_PENDING, QC_FAILED, MATERIAL_SHORTAGE, STALLED_PRODUCTION, OVERDUE_HANDOFF, PROGRAM_RISK, REWORK_PENDING, DISPATCH_PENDING
+  severity   String // INFO, WARNING, CRITICAL
+  entityType String? // PROGRAM, CHALLAN, BUNDLE, DEFECT, etc.
+  entityId   String?
+  isRead     Boolean   @default(false)
+  readAt     DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([category])
+  @@index([isRead])
+  @@index([createdAt])
+}
+
+model IntegrityScanResult {
+  id           String    @id @default(uuid())
+  scanType     String // FULL_AUDIT, INVENTORY_LEDGER, CHALLAN_GENEALOGY, PRODUCTION_BALANCE
+  issuesFound  Int
+  detailsJson  String    @db.Text
+  status       String // CLEAN, ISSUES_DETECTED, RECONCILED
+  remediatedAt DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@index([status])
+  @@index([createdAt])
+}

@@ -16,7 +16,7 @@ build/
 *.tsbuildinfo
 
 # Prisma
-packages/database/src/generated/
+packages/database/src/generated/client/*.node
 *.db
 *.db-journal
 

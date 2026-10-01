@@ -1,8 +1,9 @@
 // Subham Fabrics MES - Enterprise PostgreSQL Schema (Neon Cloud)
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../src/generated/client"
+  provider      = "prisma-client-js"
+  output        = "../src/generated/client"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
