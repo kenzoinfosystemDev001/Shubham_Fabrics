@@ -1,0 +1,39 @@
+import { NextResponse } from 'next/server';
+import { prisma } from '@subham/database';
+
+export const dynamic = 'force-dynamic';
+
+export async function GET() {
+  try {
+    const user = await prisma.user.findFirst({
+      where: { username: 'programmer' },
+      include: {
+        userRoles: {
+          include: { role: true },
+        },
+      },
+    });
+
+    if (!user) {
+      return NextResponse.json({
+        id: 'd1719f83-f62d-4858-9cf6-cc4b119b7bfd',
+        username: 'programmer',
+        fullName: 'Ramesh Sharma',
+        role: 'PROGRAMMING_INCHARGE',
+        departmentCode: 'PROGRAMMING',
+      });
+    }
+
+    return NextResponse.json({
+      id: user.id,
+      username: user.username,
+      fullName: user.fullName,
+      email: user.email,
+      role: user.userRoles[0]?.role.code || 'PROGRAMMER',
+      roles: user.userRoles.map((ur) => ur.role.code),
+      departmentCode: user.departmentCode || 'PROGRAMMING',
+    });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}

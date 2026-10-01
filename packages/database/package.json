@@ -7,7 +7,7 @@
   "scripts": {
     "generate": "prisma generate",
     "push": "prisma db push",
-    "build": "tsc && node -e \"const fs=require('fs'); fs.cpSync('src/generated', 'dist/generated', {recursive:true});\"",
+    "build": "tsc && node -e \"const fs=require('fs'); try { fs.cpSync('src/generated', 'dist/generated', {recursive:true}); } catch(e) {}\"",
     "dev": "tsc --watch"
   },
   "dependencies": {

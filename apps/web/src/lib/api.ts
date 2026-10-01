@@ -1,4 +1,10 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+const getBaseUrl = () => {
+  if (typeof window !== 'undefined') return '/api';
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}/api`;
+  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+};
+
+const API_BASE_URL = getBaseUrl();
 
 class ApiClient {
   private token: string | null = null;
