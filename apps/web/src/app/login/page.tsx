@@ -80,6 +80,7 @@ export default function LoginPage() {
               <input
                 type="text"
                 required
+                autoComplete="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="e.g. jitender"
@@ -94,6 +95,7 @@ export default function LoginPage() {
               <input
                 type="password"
                 required
+                autoComplete="current-password"
                 value={pin}
                 onChange={(e) => setPin(e.target.value)}
                 placeholder="••••"

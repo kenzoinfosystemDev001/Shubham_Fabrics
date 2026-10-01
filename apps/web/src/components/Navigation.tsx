@@ -60,9 +60,14 @@ const NAVIGATION_TAXONOMY: NavGroup[] = [
 export function Navigation() {
   const pathname = usePathname();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
 
-  // If on login page, hide navigation
-  if (pathname === '/login') {
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // If not mounted or on login page, hide navigation
+  if (!mounted || pathname === '/login') {
     return null;
   }
 
