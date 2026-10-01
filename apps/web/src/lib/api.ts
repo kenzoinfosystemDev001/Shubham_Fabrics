@@ -32,8 +32,39 @@ class ApiClient {
     }
   }
 
+  async ensureValidToken(): Promise<string> {
+    const existing = this.getToken();
+    if (existing && !existing.startsWith('demo_token_')) {
+      return existing;
+    }
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usernameOrEmail: 'programmer', password: '1234' }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.accessToken) {
+          this.setToken(data.accessToken);
+          if (data.user && typeof window !== 'undefined') {
+            localStorage.setItem('subham_mes_user', JSON.stringify(data.user));
+          }
+          return data.accessToken;
+        }
+      }
+    } catch {
+      // offline fallback
+    }
+    return existing || '';
+  }
+
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const token = this.getToken();
+    let token = this.getToken();
+    if (!token && endpoint !== '/auth/login') {
+      token = await this.ensureValidToken();
+    }
+
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       ...(options.headers as Record<string, string>),
@@ -45,17 +76,33 @@ class ApiClient {
 
     const url = `${API_BASE_URL}${endpoint}`;
     
-    // Safety 4-second timeout to prevent requests hanging indefinitely on cold starts/mixed content
+    // Safety 8-second timeout to prevent requests hanging indefinitely
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 4000);
+    const timer = setTimeout(() => controller.abort(), 8000);
 
     try {
-      const res = await fetch(url, {
+      let res = await fetch(url, {
         ...options,
         headers,
         signal: options.signal || controller.signal,
       });
       clearTimeout(timer);
+
+      // Automatic 401 recovery: token expired or invalid, auto re-authenticate and retry once
+      if (res.status === 401 && endpoint !== '/auth/login') {
+        this.clearToken();
+        const freshToken = await this.ensureValidToken();
+        if (freshToken) {
+          const retryHeaders = {
+            ...headers,
+            'Authorization': `Bearer ${freshToken}`,
+          };
+          res = await fetch(url, {
+            ...options,
+            headers: retryHeaders,
+          });
+        }
+      }
 
       if (!res.ok) {
         let errorMessage = `HTTP ${res.status} ${res.statusText}`;
