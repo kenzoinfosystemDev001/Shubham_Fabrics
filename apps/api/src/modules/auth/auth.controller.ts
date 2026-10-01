@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Req, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Body, Req, UseGuards, BadRequestException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginSchema, CreateUserSchema } from '@subham/validation';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -14,10 +14,18 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() body: any, @Req() req: Request) {
-    const validated = LoginSchema.parse(body);
-    const ip = req.ip || req.socket.remoteAddress;
-    const ua = req.headers['user-agent'];
-    return this.authService.login(validated, ip, ua);
+    try {
+      const validated = LoginSchema.parse(body);
+      const ip = req.ip || req.socket.remoteAddress;
+      const ua = req.headers['user-agent'];
+      return await this.authService.login(validated, ip, ua);
+    } catch (err: any) {
+      if (err?.name === 'ZodError') {
+        const msg = err.errors?.[0]?.message || 'Validation error';
+        throw new BadRequestException(msg);
+      }
+      throw err;
+    }
   }
 
   @Get('me')

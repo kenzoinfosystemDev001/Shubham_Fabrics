@@ -26,7 +26,7 @@ import {
 
 export const LoginSchema = z.object({
   usernameOrEmail: z.string().min(3, 'Username or Email is required').max(100),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: z.string().min(4, 'PIN or Password must be at least 4 characters'),
 });
 export type LoginInput = z.infer<typeof LoginSchema>;
 

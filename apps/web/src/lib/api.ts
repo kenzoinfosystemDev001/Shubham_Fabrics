@@ -7,13 +7,18 @@ class ApiClient {
     this.token = token;
     if (typeof window !== 'undefined') {
       sessionStorage.setItem('mes_auth_token', token);
+      localStorage.setItem('subham_mes_token', token);
     }
   }
 
   getToken(): string | null {
     if (this.token) return this.token;
     if (typeof window !== 'undefined') {
-      return sessionStorage.getItem('mes_auth_token');
+      const stored = localStorage.getItem('subham_mes_token') || sessionStorage.getItem('mes_auth_token');
+      if (stored) {
+        this.token = stored;
+        return stored;
+      }
     }
     return null;
   }
@@ -22,6 +27,8 @@ class ApiClient {
     this.token = null;
     if (typeof window !== 'undefined') {
       sessionStorage.removeItem('mes_auth_token');
+      localStorage.removeItem('subham_mes_token');
+      localStorage.removeItem('subham_mes_user');
     }
   }
 
