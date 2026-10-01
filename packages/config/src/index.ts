@@ -32,6 +32,8 @@ export const STANDARD_FACTORY_ROUTE: DepartmentCode[] = [
 ];
 
 export const DEPARTMENT_LABELS: Record<DepartmentCode, string> = {
+  [DepartmentCode.PROGRAMMING]: 'Programming Department',
+  [DepartmentCode.PRG]: 'Programming Department',
   [DepartmentCode.STORE]: 'Raw Material & Fabric Store',
   [DepartmentCode.DYEING]: 'Dyeing & Fabric Processing',
   [DepartmentCode.QC1]: 'Fabric Quality Gate (QC1)',

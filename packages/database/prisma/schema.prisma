@@ -391,6 +391,44 @@ model Program {
   approvedBy      User?                  @relation("ProgramApprover", fields: [approvedById], references: [id])
   approvedAt      DateTime?
 
+  // Shubham Fabrics Production Sheet Specific Fields
+  programSerialNo          String?
+  startDate                DateTime?
+  designNumber             String?
+  clientName               String?
+  clientPriority           String?
+  mainStyle                String?
+  subStyle                 String?
+  pattern                  String?
+  baseDesignType           String?
+  baseDesignPhoto          String?
+  wilcomDesignNumber       String?
+  wilcomDesignPhoto        String?
+  embroideryDesign         String?
+  embroideryDesignSize     String?
+  fabricName               String?
+  fabricType               String?
+  fabricWidth              String?
+  fabricWidthInches        Float?
+  fabricColor              String?
+  fabricColorAvailable     String?
+  fabricAverage            Float?
+  fabricAverageType        String?
+  fabricAverageMeasurement String?
+  fabricDyeingRequired     Boolean   @default(false)
+  fabricIssuedToDyeing     Float?
+  fabricSentToDyeing       Float?
+  colorQuantity            Int?
+  quantityMeasurement      String?
+  specialMaterial          String?
+  specialMaterialQuantity  String?
+  productionDesignDate     DateTime?
+  productionEndDate        DateTime?
+  piecesRejection          Int?      @default(0)
+  rejectionReason          String?
+  comments                 String?
+  metadataJson             String?   @db.Text
+
   createdAt       DateTime               @default(now())
   updatedAt       DateTime               @updatedAt
 

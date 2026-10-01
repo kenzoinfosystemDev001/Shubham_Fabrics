@@ -258,9 +258,12 @@ export class ProgramsService {
 
     // Validate legal transition
     const validTransitions: Record<string, string[]> = {
-      [ProgramStatus.DRAFT]: [ProgramStatus.SUBMITTED, ProgramStatus.CANCELLED],
+      [ProgramStatus.DRAFT]: [ProgramStatus.IN_PROGRESS, ProgramStatus.READY_FOR_ISSUE, ProgramStatus.SUBMITTED, ProgramStatus.CANCELLED],
+      [ProgramStatus.IN_PROGRESS]: [ProgramStatus.READY_FOR_ISSUE, ProgramStatus.DRAFT, ProgramStatus.CANCELLED],
+      [ProgramStatus.READY_FOR_ISSUE]: [ProgramStatus.ISSUED, ProgramStatus.IN_PROGRESS, ProgramStatus.CANCELLED],
+      [ProgramStatus.ISSUED]: [ProgramStatus.IN_PRODUCTION, ProgramStatus.COMPLETED, ProgramStatus.ON_HOLD],
       [ProgramStatus.SUBMITTED]: [ProgramStatus.APPROVED, ProgramStatus.DRAFT, ProgramStatus.CANCELLED],
-      [ProgramStatus.APPROVED]: [ProgramStatus.IN_PRODUCTION, ProgramStatus.ON_HOLD, ProgramStatus.CANCELLED],
+      [ProgramStatus.APPROVED]: [ProgramStatus.IN_PRODUCTION, ProgramStatus.READY_FOR_ISSUE, ProgramStatus.ON_HOLD, ProgramStatus.CANCELLED],
       [ProgramStatus.IN_PRODUCTION]: [ProgramStatus.COMPLETED, ProgramStatus.ON_HOLD, ProgramStatus.CANCELLED],
       [ProgramStatus.ON_HOLD]: [ProgramStatus.IN_PRODUCTION, ProgramStatus.APPROVED, ProgramStatus.CANCELLED],
     };
@@ -274,7 +277,7 @@ export class ProgramsService {
 
     const updated = await this.prisma.$transaction(async (tx) => {
       const dataToUpdate: any = { status: newStatus };
-      if (newStatus === ProgramStatus.APPROVED) {
+      if (newStatus === ProgramStatus.APPROVED || newStatus === ProgramStatus.ISSUED) {
         dataToUpdate.approvedById = actorId;
         dataToUpdate.approvedAt = new Date();
       }
@@ -287,11 +290,227 @@ export class ProgramsService {
       await tx.auditLog.create({
         data: {
           actorId,
-          action: newStatus === ProgramStatus.APPROVED ? 'PROGRAM_APPROVED' : 'PROGRAM_STATUS_CHANGED',
+          action: newStatus === ProgramStatus.ISSUED ? 'PRODUCTION_SHEET_ISSUED' : (newStatus === ProgramStatus.APPROVED ? 'PROGRAM_APPROVED' : 'PROGRAM_STATUS_CHANGED'),
           entity: 'Program',
           entityId: id,
           beforeState: JSON.stringify({ status: program.status }),
           afterState: JSON.stringify({ status: newStatus }),
+        },
+      });
+
+      return res;
+    }, { maxWait: 15000, timeout: 60000 });
+
+    return updated;
+  }
+
+  async generateNextProgramNumber(): Promise<string> {
+    const year = new Date().getFullYear();
+    const prefix = `PRG-${year}-`;
+    const count = await this.prisma.program.count({
+      where: { programNumber: { startsWith: prefix } },
+    });
+    const nextSeq = String(count + 1).padStart(5, '0');
+    return `${prefix}${nextSeq}`;
+  }
+
+  async createProductionSheet(data: any, actorId: string) {
+    const programNumber = data.programNumber || data.programSerialNo || await this.generateNextProgramNumber();
+    const existing = await this.prisma.program.findUnique({
+      where: { programNumber },
+    });
+    if (existing) {
+      throw new BadRequestException(`Production Sheet / Program number '${programNumber}' already exists`);
+    }
+
+    const startDate = data.startDate || data.programStartDate ? new Date(data.startDate || data.programStartDate) : new Date();
+    const deliveryDate = data.deliveryDate || data.clientDeliveryDate ? new Date(data.deliveryDate || data.clientDeliveryDate) : new Date(Date.now() + 14 * 86400000);
+    const prodDesignDate = data.productionDesignDate ? new Date(data.productionDesignDate) : null;
+    const prodEndDate = data.productionEndDate ? new Date(data.productionEndDate) : null;
+
+    const targetQty = Number(data.targetQuantity || data.colorQuantity || 1);
+
+    const program = await this.prisma.$transaction(async (tx) => {
+      const created = await tx.program.create({
+        data: {
+          programNumber,
+          programSerialNo: data.programSerialNo || programNumber,
+          programDate: startDate,
+          startDate,
+          deliveryDate,
+          designNumber: data.designNumber || data.programDesignNo || 'DSG-001',
+          clientName: data.clientName || data.buyerName || 'Standard Client',
+          buyerName: data.clientName || data.buyerName || 'Standard Client',
+          clientPriority: data.clientPriority || data.priority || 'NORMAL',
+          priority: data.clientPriority || data.priority || 'NORMAL',
+          orderNumber: data.orderNumber || `ORD-${programNumber}`,
+          designName: data.embroideryDesign || data.designName || 'Standard Embroidery',
+          styleCode: data.mainStyle || data.styleCode || 'STYLE-01',
+          productCategory: data.productCategory || 'GARMENT',
+          targetQuantity: targetQty,
+          status: data.status || ProgramStatus.DRAFT,
+          remarks: data.comments || data.remarks || null,
+          createdById: actorId,
+
+          // Style Info
+          mainStyle: data.mainStyle || null,
+          subStyle: data.subStyle || null,
+          pattern: data.pattern || null,
+          baseDesignType: data.baseDesignType || null,
+          baseDesignPhoto: data.baseDesignPhoto || null,
+
+          // Design Info
+          wilcomDesignNumber: data.wilcomDesignNumber || null,
+          wilcomDesignPhoto: data.wilcomDesignPhoto || null,
+          embroideryDesign: data.embroideryDesign || null,
+          embroideryDesignSize: data.embroideryDesignSize || null,
+
+          // Fabric Info
+          fabricName: data.fabricName || data.fabric || null,
+          fabricType: data.fabricType || null,
+          fabricWidth: data.fabricWidth || null,
+          fabricWidthInches: data.fabricWidthInches ? parseFloat(data.fabricWidthInches) : null,
+          fabricColor: data.fabricColor || null,
+          fabricColorAvailable: data.fabricColorAvailable || null,
+          fabricAverage: data.fabricAverage ? parseFloat(data.fabricAverage) : null,
+          fabricAverageType: data.fabricAverageType || null,
+          fabricAverageMeasurement: data.fabricAverageMeasurement || null,
+
+          // Dyeing Info
+          fabricDyeingRequired: Boolean(data.fabricDyeingRequired),
+          fabricIssuedToDyeing: data.fabricIssuedToDyeing ? parseFloat(data.fabricIssuedToDyeing) : null,
+          fabricSentToDyeing: data.fabricSentToDyeing ? parseFloat(data.fabricSentToDyeing) : null,
+
+          // Quantity Info
+          colorQuantity: data.colorQuantity ? parseInt(data.colorQuantity, 10) : targetQty,
+          quantityMeasurement: data.quantityMeasurement || data.programQtyMeasurement || 'PCS',
+          specialMaterial: data.specialMaterial || null,
+          specialMaterialQuantity: data.specialMaterialQuantity ? String(data.specialMaterialQuantity) : null,
+
+          // Production Dates
+          productionDesignDate: prodDesignDate,
+          productionEndDate: prodEndDate,
+
+          // Rejection & Remarks
+          piecesRejection: data.piecesRejection ? parseInt(data.piecesRejection, 10) : 0,
+          rejectionReason: data.rejectionReason || null,
+          comments: data.comments || null,
+          metadataJson: data.metadataJson ? JSON.stringify(data.metadataJson) : null,
+
+          fabrics: {
+            create: [
+              {
+                fabricCode: data.fabricName ? data.fabricName.replace(/\s+/g, '-').toUpperCase().slice(0, 30) : 'FAB-001',
+                fabricName: data.fabricName || 'Cotton Base',
+                composition: data.fabricType || '100% Cotton',
+                widthInInches: data.fabricWidthInches ? parseFloat(data.fabricWidthInches) : 58.0,
+                gsm: 180.0,
+                colour: data.fabricColor || 'Natural',
+                shade: 'Standard',
+                requiredQuantity: targetQty * (data.fabricAverage ? parseFloat(data.fabricAverage) : 1.2),
+                tolerancePercentage: 5.0,
+                wastagePercentage: 3.0,
+              },
+            ],
+          },
+          colours: {
+            create: [
+              {
+                colorCode: data.fabricColor ? data.fabricColor.substring(0, 3).toUpperCase() : 'CLR',
+                colorName: data.fabricColor || 'Natural',
+                targetQuantity: targetQty,
+              },
+            ],
+          },
+          sizes: {
+            create: [
+              {
+                size: 'FREE',
+                targetQuantity: targetQty,
+              },
+            ],
+          },
+        },
+        include: {
+          fabrics: true,
+          colours: true,
+          sizes: true,
+          createdBy: { select: { id: true, username: true, fullName: true } },
+        },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          actorId,
+          action: 'PRODUCTION_SHEET_CREATED',
+          entity: 'Program',
+          entityId: created.id,
+          afterState: JSON.stringify({
+            programNumber: created.programNumber,
+            programSerialNo: created.programSerialNo,
+            clientName: created.clientName,
+            status: created.status,
+          }),
+        },
+      });
+
+      return created;
+    }, { maxWait: 15000, timeout: 60000 });
+
+    return program;
+  }
+
+  async updateProductionSheet(id: string, data: any, actorId: string) {
+    const existing = await this.findOne(id);
+    if (existing.status === ProgramStatus.ISSUED) {
+      throw new BadRequestException('Production Sheet has already been ISSUED and cannot be silently edited. Please contact administrator.');
+    }
+
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const updateData: any = {};
+      const fields = [
+        'programSerialNo', 'clientName', 'clientPriority', 'mainStyle', 'subStyle',
+        'pattern', 'baseDesignType', 'baseDesignPhoto', 'wilcomDesignNumber',
+        'wilcomDesignPhoto', 'embroideryDesign', 'embroideryDesignSize', 'fabricName',
+        'fabricType', 'fabricWidth', 'fabricColor', 'fabricColorAvailable',
+        'fabricAverageType', 'fabricAverageMeasurement', 'fabricDyeingRequired',
+        'quantityMeasurement', 'specialMaterial', 'specialMaterialQuantity',
+        'rejectionReason', 'comments', 'status'
+      ];
+
+      for (const f of fields) {
+        if (data[f] !== undefined) updateData[f] = data[f];
+      }
+
+      if (data.clientName) updateData.buyerName = data.clientName;
+      if (data.clientPriority) updateData.priority = data.clientPriority;
+      if (data.mainStyle) updateData.styleCode = data.mainStyle;
+      if (data.embroideryDesign) updateData.designName = data.embroideryDesign;
+      if (data.fabricWidthInches !== undefined) updateData.fabricWidthInches = parseFloat(data.fabricWidthInches);
+      if (data.fabricAverage !== undefined) updateData.fabricAverage = parseFloat(data.fabricAverage);
+      if (data.fabricIssuedToDyeing !== undefined) updateData.fabricIssuedToDyeing = parseFloat(data.fabricIssuedToDyeing);
+      if (data.fabricSentToDyeing !== undefined) updateData.fabricSentToDyeing = parseFloat(data.fabricSentToDyeing);
+      if (data.colorQuantity !== undefined) updateData.colorQuantity = parseInt(data.colorQuantity, 10);
+      if (data.targetQuantity !== undefined) updateData.targetQuantity = parseInt(data.targetQuantity, 10);
+      if (data.piecesRejection !== undefined) updateData.piecesRejection = parseInt(data.piecesRejection, 10);
+      if (data.deliveryDate) updateData.deliveryDate = new Date(data.deliveryDate);
+      if (data.startDate) updateData.startDate = new Date(data.startDate);
+      if (data.productionDesignDate) updateData.productionDesignDate = new Date(data.productionDesignDate);
+      if (data.productionEndDate) updateData.productionEndDate = new Date(data.productionEndDate);
+      if (data.metadataJson) updateData.metadataJson = JSON.stringify(data.metadataJson);
+
+      const res = await tx.program.update({
+        where: { id },
+        data: updateData,
+      });
+
+      await tx.auditLog.create({
+        data: {
+          actorId,
+          action: 'PRODUCTION_SHEET_UPDATED',
+          entity: 'Program',
+          entityId: id,
+          afterState: JSON.stringify(updateData),
         },
       });
 

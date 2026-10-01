@@ -12,6 +12,12 @@ import { UserRole, ProgramStatus } from '@subham/types';
 export class ProgramsController {
   constructor(private readonly programsService: ProgramsService) {}
 
+  @Get('next-number')
+  async getNextNumber() {
+    const nextNumber = await this.programsService.generateNextProgramNumber();
+    return { nextNumber };
+  }
+
   @Get()
   async getPrograms(
     @Query('status') status?: string,
@@ -25,18 +31,65 @@ export class ProgramsController {
     return this.programsService.findOne(id);
   }
 
+  @Post('production-sheet')
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.ADMIN,
+    UserRole.PRODUCTION_MANAGER,
+    UserRole.PROGRAMMING_INCHARGE,
+    UserRole.PROGRAMMER,
+  )
+  async createProductionSheet(
+    @Body() body: any,
+    @CurrentUser('id') actorId: string,
+  ) {
+    return this.programsService.createProductionSheet(body, actorId);
+  }
+
+  @Patch(':id/production-sheet')
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.ADMIN,
+    UserRole.PRODUCTION_MANAGER,
+    UserRole.PROGRAMMING_INCHARGE,
+    UserRole.PROGRAMMER,
+  )
+  async updateProductionSheet(
+    @Param('id') id: string,
+    @Body() body: any,
+    @CurrentUser('id') actorId: string,
+  ) {
+    return this.programsService.updateProductionSheet(id, body, actorId);
+  }
+
   @Post()
-  @Roles(UserRole.SUPER_ADMIN, UserRole.PRODUCTION_MANAGER)
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.ADMIN,
+    UserRole.PRODUCTION_MANAGER,
+    UserRole.PROGRAMMING_INCHARGE,
+    UserRole.PROGRAMMER,
+  )
   async createProgram(
     @Body() body: any,
     @CurrentUser('id') actorId: string,
   ) {
+    // If request contains production sheet specific fields, route to production sheet creator
+    if (body.wilcomDesignNumber || body.fabricWidthInches || body.programSerialNo || !body.fabrics) {
+      return this.programsService.createProductionSheet(body, actorId);
+    }
     const validated = CreateProgramSchema.parse(body);
     return this.programsService.create(validated, actorId);
   }
 
   @Patch(':id/status')
-  @Roles(UserRole.SUPER_ADMIN, UserRole.PRODUCTION_MANAGER)
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.ADMIN,
+    UserRole.PRODUCTION_MANAGER,
+    UserRole.PROGRAMMING_INCHARGE,
+    UserRole.PROGRAMMER,
+  )
   async updateStatus(
     @Param('id') id: string,
     @Body('status') status: ProgramStatus,

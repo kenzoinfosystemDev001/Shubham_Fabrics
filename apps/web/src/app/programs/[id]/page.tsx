@@ -2,18 +2,28 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
+import { 
+  ArrowLeft, 
+  Send, 
+  Printer, 
+  CheckCircle2, 
+  Clock, 
+  Layers, 
+  FileText, 
+  Scissors, 
+  AlertCircle,
+  Calendar,
+  Sparkles
+} from 'lucide-react';
 import { api } from '@/lib/api';
-import { StatusBadge } from '@/components/StatusBadge';
-import { DEPARTMENT_LABELS } from '@subham/config';
-import { DepartmentCode } from '@subham/types';
 
 export default function ProgramDetailPage() {
   const { id } = useParams() as { id: string };
+  const router = useRouter();
   const [program, setProgram] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'specs' | 'route' | 'bom' | 'challans'>('specs');
 
   const loadProgram = async () => {
     try {
@@ -21,7 +31,7 @@ export default function ProgramDetailPage() {
       const data = await api.getProgram(id);
       setProgram(data);
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || 'Failed to load Production Sheet');
     } finally {
       setLoading(false);
     }
@@ -31,320 +41,317 @@ export default function ProgramDetailPage() {
     if (id) loadProgram();
   }, [id]);
 
-  const handleApprove = async () => {
-    if (!confirm('Authorize this Program for factory shop floor execution?')) return;
+  const handleUpdateStatus = async (newStatus: string) => {
     try {
-      await api.updateProgramStatus(id, 'APPROVED');
+      await api.updateProgramStatus(id, newStatus);
       await loadProgram();
-      alert('Program APPROVED! Factory departments may now issue/receive Challans for this order.');
     } catch (err: any) {
-      alert(`Approval failed: ${err.message}`);
+      alert(`Status update failed: ${err.message}`);
     }
   };
 
   if (loading) {
-    return <div className="p-8 text-center text-slate-400 font-mono text-xs">Loading Program Specification...</div>;
-  }
-
-  if (error || !program) {
     return (
-      <div className="p-8 text-center text-rose-400">
-        <p>Error: {error || 'Program not found'}</p>
-        <Link href="/programs" className="text-xs text-blue-400 underline mt-2 block">
-          ← Back to Programs
-        </Link>
+      <div className="min-h-screen bg-[#F8FAFC] pl-64 flex items-center justify-center">
+        <div className="text-xs text-slate-500 font-mono animate-pulse">
+          Loading Production Sheet...
+        </div>
       </div>
     );
   }
 
-  return (
-    <div className="p-6 space-y-6 max-w-[1600px] w-full mx-auto">
-      {/* Breadcrumb & Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-mono text-slate-400 mb-1">
-            <Link href="/programs" className="hover:text-slate-200">
-              Programs
-            </Link>
-            <span>/</span>
-            <span className="text-slate-200">{program.programNumber}</span>
-          </div>
-          <h1 className="text-xl font-bold text-white flex items-center gap-2">
-            <span>{program.designName}</span>
-            <StatusBadge status={program.status} />
-            <StatusBadge status={program.priority} type="priority" />
-          </h1>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {program.status === 'DRAFT' && (
-            <button
-              onClick={handleApprove}
-              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded shadow transition-colors"
-            >
-              ✓ Authorize & Approve Program
-            </button>
-          )}
+  if (error || !program) {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] pl-64 p-8">
+        <div className="max-w-xl mx-auto p-6 bg-rose-50 border border-rose-200 rounded-xl text-center space-y-3">
+          <AlertCircle className="w-8 h-8 text-rose-600 mx-auto" />
+          <h2 className="text-sm font-bold text-rose-900">Error Loading Sheet</h2>
+          <p className="text-xs text-rose-700">{error || 'Production Sheet not found'}</p>
           <Link
-            href={`/challans?programId=${program.id}`}
-            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono rounded border border-slate-700"
+            href="/"
+            className="inline-flex items-center gap-2 px-3.5 py-2 bg-rose-900 text-white rounded text-xs font-semibold"
           >
-            View Active Challans ({program.challans?.length || 0})
+            ← Return to Dashboard
           </Link>
         </div>
       </div>
+    );
+  }
 
-      {/* Program Summary Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
-        <div className="bg-slate-900 border border-slate-800 rounded p-3 text-xs">
-          <span className="text-slate-500 font-mono block">BUYER / CLIENT</span>
-          <span className="font-semibold text-slate-200 mt-1 block">{program.buyer}</span>
-        </div>
-        <div className="bg-slate-900 border border-slate-800 rounded p-3 text-xs">
-          <span className="text-slate-500 font-mono block">ORDER / PO #</span>
-          <span className="font-mono text-slate-200 mt-1 block">{program.orderNumber}</span>
-        </div>
-        <div className="bg-slate-900 border border-slate-800 rounded p-3 text-xs">
-          <span className="text-slate-500 font-mono block">STYLE CODE</span>
-          <span className="font-mono text-slate-200 mt-1 block">{program.styleCode}</span>
-        </div>
-        <div className="bg-slate-900 border border-slate-800 rounded p-3 text-xs">
-          <span className="text-slate-500 font-mono block">TARGET QUANTITY</span>
-          <span className="font-mono font-bold text-slate-200 mt-1 block">
-            {program.targetQuantity.toLocaleString()} pcs
-          </span>
-        </div>
-        <div className="bg-slate-900 border border-slate-800 rounded p-3 text-xs">
-          <span className="text-slate-500 font-mono block">DELIVERY DUE</span>
-          <span className="font-mono text-slate-200 mt-1 block">
-            {new Date(program.deliveryDate).toLocaleDateString()}
-          </span>
-        </div>
-        <div className="bg-slate-900 border border-slate-800 rounded p-3 text-xs">
-          <span className="text-slate-500 font-mono block">APPROVED BY</span>
-          <span className="text-slate-200 mt-1 block">
-            {program.approvedBy ? program.approvedBy.fullName : 'Pending Approval'}
-          </span>
-        </div>
-      </div>
+  const isDraft = program.status === 'DRAFT';
+  const isReady = program.status === 'READY_FOR_ISSUE' || program.status === 'APPROVED';
+  const isIssued = program.status === 'ISSUED' || program.status === 'IN_PRODUCTION';
 
-      {/* Navigation Tabs */}
-      <div className="border-b border-slate-800 flex gap-4 text-xs font-mono">
-        <button
-          onClick={() => setActiveTab('specs')}
-          className={`pb-2 border-b-2 font-semibold transition-colors ${
-            activeTab === 'specs' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          Fabric & Measurements Spec
-        </button>
-        <button
-          onClick={() => setActiveTab('route')}
-          className={`pb-2 border-b-2 font-semibold transition-colors ${
-            activeTab === 'route' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          Configurable Route ({program.routeSteps?.length || 0} Stages)
-        </button>
-        <button
-          onClick={() => setActiveTab('bom')}
-          className={`pb-2 border-b-2 font-semibold transition-colors ${
-            activeTab === 'bom' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          Bill of Materials (BOM)
-        </button>
-        <button
-          onClick={() => setActiveTab('challans')}
-          className={`pb-2 border-b-2 font-semibold transition-colors ${
-            activeTab === 'challans' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          Challans & Handoffs ({program.challans?.length || 0})
-        </button>
-      </div>
-
-      {/* Tab 1: Specs */}
-      {activeTab === 'specs' && (
-        <div className="space-y-6">
-          {/* Fabric Specifications */}
-          <div className="bg-slate-900 border border-slate-800 rounded-lg p-4">
-            <h3 className="text-xs font-bold text-slate-200 uppercase font-mono mb-3">Fabric Components</h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs text-left">
-                <thead className="bg-slate-950 font-mono text-slate-400 border-b border-slate-800">
-                  <tr>
-                    <th className="p-2.5">Code</th>
-                    <th className="p-2.5">Fabric Name</th>
-                    <th className="p-2.5">Composition</th>
-                    <th className="p-2.5">Width</th>
-                    <th className="p-2.5">GSM</th>
-                    <th className="p-2.5">Colour / Shade</th>
-                    <th className="p-2.5">Req. Qty</th>
-                    <th className="p-2.5">Tolerance</th>
-                    <th className="p-2.5">Supplier</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-800">
-                  {program.fabrics?.map((f: any) => (
-                    <tr key={f.id} className="hover:bg-slate-800/30 font-sans">
-                      <td className="p-2.5 font-mono text-blue-400 font-semibold">{f.fabricCode}</td>
-                      <td className="p-2.5 text-slate-200">{f.fabricName}</td>
-                      <td className="p-2.5 text-slate-300">{f.composition}</td>
-                      <td className="p-2.5 font-mono text-slate-300">{f.widthInInches}&quot;</td>
-                      <td className="p-2.5 font-mono text-slate-300">{f.gsm} gsm</td>
-                      <td className="p-2.5 text-slate-300">{f.colour} ({f.shade})</td>
-                      <td className="p-2.5 font-mono font-bold text-slate-200">{f.requiredQuantity} KG</td>
-                      <td className="p-2.5 font-mono text-slate-400">±{f.tolerancePercentage}%</td>
-                      <td className="p-2.5 text-slate-300">{f.supplier}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Size & Color Matrix */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-slate-900 border border-slate-800 rounded-lg p-4">
-              <h3 className="text-xs font-bold text-slate-200 uppercase font-mono mb-3">Size Distribution</h3>
-              <div className="space-y-1.5">
-                {program.sizeMatrix?.map((s: any) => (
-                  <div key={s.id} className="flex justify-between items-center text-xs p-2 bg-slate-950 rounded border border-slate-800">
-                    <span className="font-mono font-bold text-slate-300">Size: {s.size}</span>
-                    <span className="font-mono text-blue-400 font-bold">{s.targetQuantity} pcs</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="bg-slate-900 border border-slate-800 rounded-lg p-4">
-              <h3 className="text-xs font-bold text-slate-200 uppercase font-mono mb-3">Color Breakdown</h3>
-              <div className="space-y-1.5">
-                {program.colorMatrix?.map((c: any) => (
-                  <div key={c.id} className="flex justify-between items-center text-xs p-2 bg-slate-950 rounded border border-slate-800">
-                    <div>
-                      <span className="font-semibold text-slate-200">{c.colorName}</span>
-                      <span className="text-[10px] text-slate-400 font-mono block">{c.pantoneReference || c.shade}</span>
-                    </div>
-                    <span className="font-mono text-emerald-400 font-bold">{c.targetQuantity} pcs</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Tab 2: Configurable Route */}
-      {activeTab === 'route' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-lg p-4">
-          <h3 className="text-xs font-bold text-slate-200 uppercase font-mono mb-4">
-            Custom Manufacturing Route for {program.programNumber}
-          </h3>
-          <div className="space-y-2">
-            {program.routeSteps?.map((step: any) => (
-              <div
-                key={step.id}
-                className="flex items-center justify-between p-3 bg-slate-950 border border-slate-800 rounded text-xs font-mono"
+  return (
+    <div className="min-h-screen bg-[#F8FAFC] pl-64 pb-20">
+      {/* HEADER */}
+      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-8 py-4 flex items-center justify-between shadow-xs">
+        <div className="flex items-center gap-4">
+          <Link
+            href="/"
+            className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-md transition"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </Link>
+          <div>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A66E22] block">
+              SHUBHAM FABRICS · PRODUCTION SHEET
+            </span>
+            <div className="flex items-center gap-3">
+              <h1 className="text-xl font-bold font-mono text-slate-900">
+                {program.programSerialNo || program.programNumber}
+              </h1>
+              <span
+                className={`px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                  isDraft
+                    ? 'bg-amber-100 text-amber-900'
+                    : isReady
+                    ? 'bg-indigo-100 text-indigo-900'
+                    : isIssued
+                    ? 'bg-emerald-100 text-emerald-900'
+                    : 'bg-blue-100 text-blue-900'
+                }`}
               >
-                <div className="flex items-center gap-3">
-                  <span className="w-6 h-6 rounded bg-slate-800 text-slate-300 font-bold flex items-center justify-center text-[11px]">
-                    {step.sequenceOrder}
-                  </span>
-                  <div>
-                    <span className="font-bold text-slate-200">{step.departmentCode}</span>
-                    <span className="text-slate-400 text-[11px] block">
-                      {DEPARTMENT_LABELS[step.departmentCode as DepartmentCode] || step.departmentCode}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4 text-[11px]">
-                  <span className="text-slate-400">Cycle Time: {step.standardCycleTimeMinutes || 45} mins</span>
-                  {step.requiresQCGate && (
-                    <span className="px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800">
-                      🛡️ QC Quality Gate
-                    </span>
-                  )}
-                  <span className="text-emerald-400">Mandatory</span>
-                </div>
-              </div>
-            ))}
+                {program.status}
+              </span>
+            </div>
           </div>
         </div>
-      )}
 
-      {/* Tab 3: BOM */}
-      {activeTab === 'bom' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-lg p-4">
-          <h3 className="text-xs font-bold text-slate-200 uppercase font-mono mb-3">Bill of Materials (BOM)</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs text-left">
-              <thead className="bg-slate-950 font-mono text-slate-400 border-b border-slate-800">
-                <tr>
-                  <th className="p-2.5">Code</th>
-                  <th className="p-2.5">Item Name</th>
-                  <th className="p-2.5">Category</th>
-                  <th className="p-2.5">Per Piece</th>
-                  <th className="p-2.5">Wastage %</th>
-                  <th className="p-2.5">Total Required</th>
-                  <th className="p-2.5">UOM</th>
-                  <th className="p-2.5">Supplier</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800 font-sans">
-                {program.bomItems?.map((b: any) => (
-                  <tr key={b.id} className="hover:bg-slate-800/30">
-                    <td className="p-2.5 font-mono text-blue-400 font-semibold">{b.itemCode}</td>
-                    <td className="p-2.5 text-slate-200 font-medium">{b.itemName}</td>
-                    <td className="p-2.5 text-slate-300 font-mono text-[11px]">{b.category}</td>
-                    <td className="p-2.5 font-mono text-slate-300">{b.requiredQuantityPerPiece}</td>
-                    <td className="p-2.5 font-mono text-slate-400">{b.wastagePercentage}%</td>
-                    <td className="p-2.5 font-mono font-bold text-slate-200">{b.totalRequiredQuantity}</td>
-                    <td className="p-2.5 font-mono text-slate-300">{b.uom}</td>
-                    <td className="p-2.5 text-slate-400">{b.supplier || 'N/A'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => window.print()}
+            className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-md border border-slate-300 transition"
+          >
+            <Printer className="w-3.5 h-3.5" />
+            <span>Print Sheet</span>
+          </button>
 
-      {/* Tab 4: Challans */}
-      {activeTab === 'challans' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-lg p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-slate-200 uppercase font-mono">Associated Movement Challans</h3>
-            <Link
-              href="/challans"
-              className="text-xs text-blue-400 hover:text-blue-300 font-mono"
+          {isDraft && (
+            <button
+              onClick={() => handleUpdateStatus('READY_FOR_ISSUE')}
+              className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-md shadow-xs transition"
             >
-              Issue New Challan →
-            </Link>
+              Mark Ready for Issue
+            </button>
+          )}
+
+          <Link
+            href={`/my-work/issue-challan?programId=${program.id}`}
+            className="flex items-center gap-1.5 px-4 py-2 bg-[#163767] hover:bg-[#0F264A] text-white text-xs font-semibold rounded-md shadow-xs transition"
+          >
+            <Send className="w-3.5 h-3.5" />
+            <span>Issue Challan</span>
+          </Link>
+        </div>
+      </header>
+
+      {/* BODY CONTENT - 8 SECTIONS */}
+      <main className="p-8 max-w-5xl mx-auto space-y-6">
+        
+        {/* SUMMARY STRIP */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-5 bg-white border border-slate-200/90 rounded-xl shadow-xs text-xs">
+          <div>
+            <span className="text-slate-400 block text-[10px] font-semibold uppercase tracking-wider">Client</span>
+            <span className="font-bold text-slate-900 text-sm">{program.clientName || program.buyerName || 'Standard Client'}</span>
           </div>
-          <div className="space-y-2">
-            {program.challans?.map((ch: any) => (
-              <Link
-                key={ch.id}
-                href={`/challans/${ch.id}`}
-                className="block p-3 bg-slate-950 border border-slate-800 hover:border-slate-700 rounded transition-colors text-xs font-mono"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="font-bold text-blue-400">{ch.challanNumber}</span>
-                    <span className="text-slate-400">
-                      {ch.fromDepartment} ➔ {ch.toDepartment}
-                    </span>
-                    <StatusBadge status={ch.status} />
-                  </div>
-                  <span className="text-slate-500">{new Date(ch.createdAt).toLocaleDateString()}</span>
-                </div>
-              </Link>
-            ))}
+          <div>
+            <span className="text-slate-400 block text-[10px] font-semibold uppercase tracking-wider">Main Style</span>
+            <span className="font-bold text-slate-900 text-sm">{program.mainStyle || program.styleCode || '—'}</span>
+          </div>
+          <div>
+            <span className="text-slate-400 block text-[10px] font-semibold uppercase tracking-wider">Target Quantity</span>
+            <span className="font-bold font-mono text-slate-900 text-sm">
+              {program.colorQuantity || program.targetQuantity} {program.quantityMeasurement || 'PCS'}
+            </span>
+          </div>
+          <div>
+            <span className="text-slate-400 block text-[10px] font-semibold uppercase tracking-wider">Delivery Target</span>
+            <span className="font-bold text-rose-700 text-sm">
+              {program.deliveryDate ? new Date(program.deliveryDate).toLocaleDateString() : '—'}
+            </span>
           </div>
         </div>
-      )}
+
+        {/* 8-SECTION SPECIFICATION CARDS */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          {/* SEC 1: PROGRAM INFORMATION */}
+          <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-3">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-blue-900 bg-blue-50 px-2 py-0.5 rounded">
+              Section 1 · Program Identification
+            </span>
+            <div className="grid grid-cols-2 gap-3 text-xs pt-1">
+              <div>
+                <span className="text-slate-400 block text-[11px]">Program Serial #</span>
+                <span className="font-mono font-bold text-slate-900">{program.programSerialNo || program.programNumber}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 block text-[11px]">Design Number</span>
+                <span className="font-semibold text-slate-900">{program.designNumber || '—'}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 block text-[11px]">Start Date</span>
+                <span className="text-slate-700">{program.startDate ? new Date(program.startDate).toLocaleDateString() : '—'}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 block text-[11px]">Client Priority</span>
+                <span className="font-bold text-amber-700">{program.clientPriority || program.priority || 'NORMAL'}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* SEC 2: STYLE INFORMATION */}
+          <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-3">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-900 bg-amber-50 px-2 py-0.5 rounded">
+              Section 2 · Style &amp; Pattern
+            </span>
+            <div className="grid grid-cols-2 gap-3 text-xs pt-1">
+              <div>
+                <span className="text-slate-400 block text-[11px]">Main Style</span>
+                <span className="font-semibold text-slate-900">{program.mainStyle || program.styleCode}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 block text-[11px]">Sub Style</span>
+                <span className="text-slate-700">{program.subStyle || 'Standard'}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 block text-[11px]">Pattern Ref #</span>
+                <span className="font-mono text-slate-700">{program.pattern || '—'}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 block text-[11px]">Base Design Type</span>
+                <span className="text-slate-700">{program.baseDesignType || 'Standard'}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* SEC 3: WILCOM & EMBROIDERY */}
+          <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-3">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-purple-900 bg-purple-50 px-2 py-0.5 rounded">
+              Section 3 · Wilcom &amp; Embroidery
+            </span>
+            <div className="grid grid-cols-2 gap-3 text-xs pt-1">
+              <div>
+                <span className="text-slate-400 block text-[11px]">Wilcom Design #</span>
+                <span className="font-mono font-bold text-purple-950">{program.wilcomDesignNumber || 'WLC-N/A'}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 block text-[11px]">Embroidery Design</span>
+                <span className="text-slate-700">{program.embroideryDesign || 'Standard Embroidery'}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 block text-[11px]">Design Size</span>
+                <span className="text-slate-700">{program.embroideryDesignSize || 'Standard Size'}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 block text-[11px]">Wilcom Artwork</span>
+                <span className="text-slate-500 italic">{program.wilcomDesignPhoto ? 'Attached' : 'No photo uploaded'}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* SEC 4: FABRIC SPECIFICATIONS */}
+          <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-3">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-900 bg-emerald-50 px-2 py-0.5 rounded">
+              Section 4 · Fabric Specifications
+            </span>
+            <div className="grid grid-cols-2 gap-3 text-xs pt-1">
+              <div>
+                <span className="text-slate-400 block text-[11px]">Fabric Name</span>
+                <span className="font-semibold text-slate-900">{program.fabricName || 'Cotton'}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 block text-[11px]">Fabric Type</span>
+                <span className="text-slate-700">{program.fabricType || 'Woven'}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 block text-[11px]">Fabric Width</span>
+                <span className="font-mono text-slate-800">{program.fabricWidthInches || '58'} Inches</span>
+              </div>
+              <div>
+                <span className="text-slate-400 block text-[11px]">Fabric Color</span>
+                <span className="font-semibold text-slate-900">{program.fabricColor || 'Natural'}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 block text-[11px]">Fabric Average</span>
+                <span className="font-mono text-slate-800">{program.fabricAverage || '1.25'} {program.fabricAverageType || 'Mtr/Pc'}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 block text-[11px]">Color Availability</span>
+                <span className="font-semibold text-emerald-700">{program.fabricColorAvailable || 'IN_STOCK'}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* SEC 5: DYEING */}
+          <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-3">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-rose-900 bg-rose-50 px-2 py-0.5 rounded">
+              Section 5 · Dyeing Requirements
+            </span>
+            <div className="grid grid-cols-2 gap-3 text-xs pt-1">
+              <div>
+                <span className="text-slate-400 block text-[11px]">Dyeing Required?</span>
+                <span className={`font-bold ${program.fabricDyeingRequired ? 'text-rose-700' : 'text-slate-700'}`}>
+                  {program.fabricDyeingRequired ? 'YES (Undyed / Kora)' : 'NO (Pre-Dyed / Direct)'}
+                </span>
+              </div>
+              <div>
+                <span className="text-slate-400 block text-[11px]">Sent to Dyeing</span>
+                <span className="font-mono text-slate-700">{program.fabricSentToDyeing || 0} Mtr</span>
+              </div>
+            </div>
+          </div>
+
+          {/* SEC 6: PRODUCTION QUANTITY & TRIMS */}
+          <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-3">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-900 bg-indigo-50 px-2 py-0.5 rounded">
+              Section 6 · Quantities &amp; Special Materials
+            </span>
+            <div className="grid grid-cols-2 gap-3 text-xs pt-1">
+              <div>
+                <span className="text-slate-400 block text-[11px]">Total Color Qty</span>
+                <span className="font-mono font-bold text-slate-900">{program.colorQuantity || program.targetQuantity} {program.quantityMeasurement || 'PCS'}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 block text-[11px]">Special Material</span>
+                <span className="text-slate-700">{program.specialMaterial || 'None'}</span>
+              </div>
+              <div className="col-span-2">
+                <span className="text-slate-400 block text-[11px]">Special Material Quantity</span>
+                <span className="text-slate-700">{program.specialMaterialQuantity || '—'}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* SEC 7 & 8: DATES & REJECTION REMARKS */}
+          <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-3 md:col-span-2">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-900 bg-slate-100 px-2 py-0.5 rounded">
+              Sections 7 &amp; 8 · Schedule, Quality Tolerances &amp; Comments
+            </span>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs pt-1">
+              <div>
+                <span className="text-slate-400 block text-[11px]">Production Design Date</span>
+                <span className="text-slate-800">{program.productionDesignDate ? new Date(program.productionDesignDate).toLocaleDateString() : '—'}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 block text-[11px]">Projected End Date</span>
+                <span className="text-slate-800">{program.productionEndDate ? new Date(program.productionEndDate).toLocaleDateString() : '—'}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 block text-[11px]">Pieces Rejection Tolerance</span>
+                <span className="font-mono font-bold text-rose-700">{program.piecesRejection || 0} PCS</span>
+              </div>
+              <div className="sm:col-span-3">
+                <span className="text-slate-400 block text-[11px]">Comments &amp; Operator Instructions</span>
+                <p className="text-slate-700 font-serif italic mt-0.5">{program.comments || program.remarks || 'No special comments noted.'}</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </main>
     </div>
   );
 }

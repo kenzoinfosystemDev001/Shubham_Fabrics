@@ -7,13 +7,14 @@ import { ChallanStatus, DepartmentCode } from '@subham/types';
 export class ChallansService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async generateNextChallanNumber(deptCode: DepartmentCode): Promise<string> {
+  async generateNextChallanNumber(deptCode: DepartmentCode | string): Promise<string> {
     const year = new Date().getFullYear();
-    const prefix = `CH-${deptCode}-${year}-`;
+    const normalizedCode = deptCode === 'PROGRAMMING' || deptCode === DepartmentCode.PROGRAMMING ? 'PRG' : deptCode;
+    const prefix = `CH-${normalizedCode}-${year}-`;
     const count = await this.prisma.challan.count({
       where: { challanNumber: { startsWith: prefix } },
     });
-    const nextSeq = String(count + 1).padStart(6, '0');
+    const nextSeq = String(count + 1).padStart(5, '0');
     return `${prefix}${nextSeq}`;
   }
 

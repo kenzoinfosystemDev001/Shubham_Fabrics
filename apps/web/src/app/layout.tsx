@@ -4,8 +4,8 @@ import { Navigation } from '@/components/Navigation';
 import { ThemeProvider } from '@/components/ThemeContext';
 
 export const metadata = {
-  title: 'Subham Fabrics MES | Garment Manufacturing Execution System',
-  description: 'Enterprise production-grade shop-floor execution, traceability, and challan system',
+  title: 'Shubham Fabrics India Pvt. Ltd. | MES - Programming Department',
+  description: 'Enterprise Manufacturing Execution System - Programming Department Workspace',
 };
 
 export default function RootLayout({

@@ -85,15 +85,26 @@ class ApiClient {
       const p = credentials.password.trim();
 
       const DEMO_PERSONAS: Record<string, any> = {
-        jitender: {
-          id: 'usr-jitender-001',
-          username: 'jitender',
-          fullName: 'jitender saini',
-          email: 'jitender@subhamfabrics.com',
-          role: 'STORE_MANAGER',
-          roles: ['STORE_MANAGER', 'USER'],
-          permissions: ['store.inventory.manage', 'challan.issue', 'challan.receive'],
-          departmentCode: 'STORE',
+        programmer: {
+          id: 'usr-prog-001',
+          username: 'programmer',
+          fullName: 'Programming Incharge',
+          email: 'programmer@shubhamfabrics.com',
+          role: 'PROGRAMMING_INCHARGE',
+          roles: ['PROGRAMMING_INCHARGE', 'PROGRAMMER', 'USER'],
+          permissions: ['programs.*', 'challans.create', 'challans.issue'],
+          departmentCode: 'PROGRAMMING',
+          validPins: ['1234', '1111', '0000', 'admin@12345'],
+        },
+        programming: {
+          id: 'usr-prog-002',
+          username: 'programming',
+          fullName: 'Programming Operator',
+          email: 'programming@shubhamfabrics.com',
+          role: 'PROGRAMMER',
+          roles: ['PROGRAMMER', 'USER'],
+          permissions: ['programs.*', 'challans.create', 'challans.issue'],
+          departmentCode: 'PROGRAMMING',
           validPins: ['1234', '1111', '0000', 'admin@12345'],
         },
         admin: {
@@ -208,7 +219,15 @@ class ApiClient {
     }>('/dashboard/metrics');
   }
 
-  // Programs
+  // Programs & Production Sheets
+  async getNextProgramNumber() {
+    try {
+      return await this.request<{ nextNumber: string }>('/programs/next-number');
+    } catch {
+      return { nextNumber: `PRG-${new Date().getFullYear()}-00001` };
+    }
+  }
+
   async getPrograms(params?: { status?: string; search?: string }) {
     const query = new URLSearchParams();
     if (params?.status) query.append('status', params.status);
@@ -218,6 +237,20 @@ class ApiClient {
 
   async getProgram(id: string) {
     return this.request<any>(`/programs/${id}`);
+  }
+
+  async createProductionSheet(data: any) {
+    return this.request<any>('/programs/production-sheet', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateProductionSheet(id: string, data: any) {
+    return this.request<any>(`/programs/${id}/production-sheet`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
   }
 
   async createProgram(data: any) {
