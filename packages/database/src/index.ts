@@ -14,20 +14,16 @@ if (!process.env.DATABASE_URL) {
   process.env.DATABASE_URL = NEON_DATABASE_URL;
 }
 
-export function getPrismaClient(): PrismaClient {
-  if (process.env.NODE_ENV === 'production') {
-    return new PrismaClient({
-      datasources: { db: { url: dbUrl } }
-    });
-  }
+const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefined };
 
-  if (!global.__prismaClient) {
-    global.__prismaClient = new PrismaClient({
+export function getPrismaClient(): PrismaClient {
+  if (!globalForPrisma.prisma) {
+    globalForPrisma.prisma = new PrismaClient({
       datasources: { db: { url: dbUrl } },
       log: ['error', 'warn'],
     });
   }
-  return global.__prismaClient;
+  return globalForPrisma.prisma;
 }
 
 export const prisma = getPrismaClient();

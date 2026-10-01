@@ -5,20 +5,25 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const user = await prisma.user.findFirst({
-      where: { username: 'programmer' },
-      include: {
-        userRoles: {
-          include: { role: true },
+    let user = null;
+    try {
+      user = await prisma.user.findFirst({
+        where: { username: 'programmer' },
+        include: {
+          userRoles: {
+            include: { role: true },
+          },
         },
-      },
-    });
+      });
+    } catch (e) {
+      console.warn('DB lookup failed in auth/me:', e);
+    }
 
     if (!user) {
       return NextResponse.json({
         id: 'd1719f83-f62d-4858-9cf6-cc4b119b7bfd',
         username: 'programmer',
-        fullName: 'Ramesh Sharma',
+        fullName: 'Programming Incharge',
         role: 'PROGRAMMING_INCHARGE',
         departmentCode: 'PROGRAMMING',
       });

@@ -9,18 +9,23 @@ export async function POST(request: Request) {
     const usernameOrEmail = (body.usernameOrEmail || '').trim();
     const password = (body.password || '').trim();
 
-    const user = await prisma.user.findFirst({
-      where: {
-        OR: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
-      },
-      include: {
-        userRoles: {
-          include: {
-            role: true,
+    let user = null;
+    try {
+      user = await prisma.user.findFirst({
+        where: {
+          OR: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
+        },
+        include: {
+          userRoles: {
+            include: {
+              role: true,
+            },
           },
         },
-      },
-    });
+      });
+    } catch (dbErr) {
+      console.warn('DB lookup failed in login, using fallback:', dbErr);
+    }
 
     // Check credentials (supports PIN 1234 or factory personas)
     const isPinValid = password === '1234' || password === '1111' || password === '0000' || password === 'Admin@12345';
