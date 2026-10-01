@@ -36,9 +36,14 @@ jobs:
 
       - name: Run Backend Tests
         run: npm run test --workspace=@subham/api
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://neondb_owner:npg_AwabUI89igpN@ep-red-bread-b4ddqxah-pooler.c-6.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require' }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET || 'SubhamFabricsEnterpriseMESSecretKey2026SuperSecure_NoLeaks' }}
+          NODE_ENV: test
 
       - name: Build Next.js Web App
         run: npm run build --workspace=@subham/web
 
       - name: Build NestJS API Gateway
         run: npm run build --workspace=@subham/api
+
