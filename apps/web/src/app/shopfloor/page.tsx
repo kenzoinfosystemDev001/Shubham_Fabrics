@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
 import { StatusBadge } from '@/components/StatusBadge';
@@ -31,7 +33,7 @@ export default function FloorBoardPage() {
     { lot: 'SF-3201-NEW-2609-01', from: 'Dyeing', to: 'QC 1 (Checking)', time: '2d 13h', tag: 'Started' },
     { lot: 'SF-100-NEW-2609-01', from: 'Dyeing', to: 'Cutting', time: '17h 27m', tag: 'Started' },
   ]);
-  const [stageCards, setStageCards] = useState([
+  const [stageCards, setStageCards] = useState<{ name: string; count: number; cards: { id: string; code: string; status: string; time: string; sub?: string }[] }[]>([
     { name: 'Dyeing', count: 1, cards: [{ id: 'd1', code: 'SF-AB579...', status: 'Started', time: '2d 13h' }] },
     { name: 'QC 1 (Checking)', count: 1, cards: [{ id: 'q1', code: 'SF-100-NEW...', status: 'Started', time: '17h 27m', sub: 'Quality control' }] },
     { name: 'Cutting', count: 0, cards: [] },

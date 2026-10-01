@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { useTheme } from '@/components/ThemeContext';
 
 interface NavItem {
   id: string;
@@ -22,9 +23,11 @@ const NAVIGATION_TAXONOMY: NavGroup[] = [
   {
     title: 'OVERVIEW',
     items: [
-      { id: 'overview', label: 'Overview', href: '/', icon: '📊' },
+      { id: 'overview', label: 'Dashboard', href: '/', icon: '📊' },
       { id: 'my-work', label: 'My work', href: '/my-work', icon: '📝' },
       { id: 'floor-board', label: 'Floor board', href: '/shopfloor', icon: '🖥️' },
+      { id: 'admin-dash', label: 'Admin console', href: '/admin/dashboard', icon: '◈', requiredRole: ['SUPER_ADMIN', 'ADMIN', 'PRODUCTION_MANAGER'] },
+      { id: 'store-dash', label: 'Store console', href: '/store/dashboard', icon: '📦', requiredRole: ['SUPER_ADMIN', 'ADMIN', 'STORE_MANAGER'] },
       { id: 'floor-flow', label: 'Floor flow', href: '/floor-flow', icon: '🔀' },
       { id: 'designs', label: 'Designs', href: '/programs', icon: '🎨' },
     ],
@@ -61,28 +64,18 @@ export function Navigation() {
   const pathname = usePathname();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // If not mounted or on login page, hide navigation
-  if (!mounted || pathname === '/login') {
-    return null;
-  }
-
   const [currentUser, setCurrentUser] = useState<any>({
     fullName: 'jitender saini',
     username: 'jitender',
     role: 'STORE_MANAGER',
     departmentCode: 'STORE',
   });
-  const [theme, setTheme] = useState<'Auto' | 'Light' | 'Dark'>('Light');
+  const { theme, setTheme } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
   useEffect(() => {
-    // Check saved session
+    setMounted(true);
     if (typeof window !== 'undefined') {
       const savedUser = localStorage.getItem('subham_mes_user');
       if (savedUser) {
@@ -107,6 +100,11 @@ export function Navigation() {
     };
     syncUser();
   }, []);
+
+  // If not mounted or on login page, hide navigation
+  if (!mounted || pathname === '/login') {
+    return null;
+  }
 
   const handleRoleSwitch = async (username: string) => {
     try {
