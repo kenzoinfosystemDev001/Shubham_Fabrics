@@ -7,6 +7,8 @@ import {
   ArrowLeft, 
   Send, 
   Printer, 
+  Download,
+  Eye,
   CheckCircle2, 
   Clock, 
   Layers, 
@@ -17,6 +19,11 @@ import {
   Sparkles
 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
+import { 
+  downloadProductionSheetHtml, 
+  printProductionSheet 
+} from '@/lib/download-production-sheet';
 
 export default function ProgramDetailPage() {
   const { id } = useParams() as { id: string };
@@ -24,6 +31,7 @@ export default function ProgramDetailPage() {
   const [program, setProgram] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showPrintModal, setShowPrintModal] = useState(false);
 
   const loadProgram = async () => {
     try {
@@ -118,27 +126,46 @@ export default function ProgramDetailPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <button
-            onClick={() => window.print()}
-            className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-md border border-slate-300 transition"
+            onClick={() => setShowPrintModal(true)}
+            className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-md border border-slate-300 transition cursor-pointer"
+            title="Preview Full A4 Traveler"
+          >
+            <Eye className="w-3.5 h-3.5" />
+            <span>Preview</span>
+          </button>
+
+          <button
+            onClick={() => printProductionSheet(program)}
+            className="flex items-center gap-1.5 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-900 text-xs font-semibold rounded-md border border-blue-200 transition cursor-pointer"
+            title="Print Production Sheet on A4 Paper"
           >
             <Printer className="w-3.5 h-3.5" />
             <span>Print Sheet</span>
           </button>
 
+          <button
+            onClick={() => downloadProductionSheetHtml(program)}
+            className="flex items-center gap-1.5 px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 text-xs font-semibold rounded-md border border-emerald-200 transition cursor-pointer"
+            title="Download Standalone HTML/PDF File"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Download</span>
+          </button>
+
           {isDraft && (
             <button
               onClick={() => handleUpdateStatus('READY_FOR_ISSUE')}
-              className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-md shadow-xs transition"
+              className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-md shadow-xs transition cursor-pointer"
             >
-              Mark Ready for Issue
+              Mark Ready
             </button>
           )}
 
           <Link
             href={`/my-work/issue-challan?programId=${program.id}`}
-            className="flex items-center gap-1.5 px-4 py-2 bg-[#163767] hover:bg-[#0F264A] text-white text-xs font-semibold rounded-md shadow-xs transition"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-[#163767] hover:bg-[#0F264A] text-white text-xs font-semibold rounded-md shadow-xs transition"
           >
             <Send className="w-3.5 h-3.5" />
             <span>Issue Challan</span>
@@ -352,6 +379,13 @@ export default function ProgramDetailPage() {
         </div>
 
       </main>
+
+      {/* PRINT & DOWNLOAD MODAL */}
+      <ProductionSheetPrintModal
+        program={program}
+        isOpen={showPrintModal}
+        onClose={() => setShowPrintModal(false)}
+      />
     </div>
   );
 }

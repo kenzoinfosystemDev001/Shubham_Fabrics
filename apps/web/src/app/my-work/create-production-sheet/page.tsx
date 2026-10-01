@@ -17,9 +17,18 @@ import {
   Calendar, 
   MessageSquare,
   Sparkles,
-  RefreshCw
+  RefreshCw,
+  Printer,
+  Download,
+  Eye,
+  ExternalLink
 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
+import { 
+  downloadProductionSheetHtml, 
+  printProductionSheet 
+} from '@/lib/download-production-sheet';
 
 export default function CreateProductionSheetPage() {
   const router = useRouter();
@@ -27,6 +36,7 @@ export default function CreateProductionSheetPage() {
   const [fetchingNumber, setFetchingNumber] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<any | null>(null);
+  const [showPrintModal, setShowPrintModal] = useState(false);
 
   // FORM STATE - All 8 Sections of Shubham Fabrics Production Sheet
   const [formData, setFormData] = useState({
@@ -229,16 +239,52 @@ export default function CreateProductionSheetPage() {
             <p className="text-xs text-emerald-800 leading-relaxed font-serif">
               Status is marked as <strong className="font-bold">{success.status}</strong>. You can now immediately issue a Challan for downstream factory movement or return to the dashboard.
             </p>
-            <div className="pt-2 flex items-center gap-3">
+            <div className="pt-2 flex flex-wrap items-center gap-2.5">
+              <button
+                type="button"
+                onClick={() => printProductionSheet(success)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-md shadow-xs transition cursor-pointer"
+              >
+                <Printer className="w-3.5 h-3.5" />
+                <span>Print Sheet (A4)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => downloadProductionSheetHtml(success)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-md shadow-xs transition cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Download File (.html / PDF)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowPrintModal(true)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-emerald-300 text-emerald-800 text-xs font-semibold rounded-md hover:bg-emerald-100/60 transition cursor-pointer"
+              >
+                <Eye className="w-3.5 h-3.5" />
+                <span>Preview Document</span>
+              </button>
+
+              <Link
+                href={`/programs/${success.id}`}
+                className="inline-flex items-center gap-1 px-3 py-2 bg-white border border-slate-300 text-slate-700 text-xs font-semibold rounded-md hover:bg-slate-50 transition"
+              >
+                <span>View Details</span>
+                <ExternalLink className="w-3 h-3" />
+              </Link>
+
               <Link
                 href={`/my-work/issue-challan?programId=${success.id}`}
-                className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-md shadow-xs transition"
+                className="px-3.5 py-2 bg-[#163767] hover:bg-[#0F264A] text-white text-xs font-semibold rounded-md shadow-xs transition"
               >
                 Proceed to Issue Challan →
               </Link>
+
               <Link
                 href="/"
-                className="px-4 py-2 bg-white border border-emerald-300 text-emerald-800 text-xs font-semibold rounded-md hover:bg-emerald-100/50 transition"
+                className="px-3 py-2 bg-white border border-slate-200 text-slate-600 text-xs font-medium rounded-md hover:bg-slate-50 transition"
               >
                 Go to Dashboard
               </Link>
@@ -891,6 +937,13 @@ export default function CreateProductionSheetPage() {
         </div>
 
       </main>
+
+      {/* PRINT & DOWNLOAD MODAL */}
+      <ProductionSheetPrintModal
+        program={success}
+        isOpen={showPrintModal}
+        onClose={() => setShowPrintModal(false)}
+      />
     </div>
   );
 }

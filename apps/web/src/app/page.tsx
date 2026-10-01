@@ -14,9 +14,15 @@ import {
   RefreshCw,
   Calendar,
   Layers,
-  Sparkles
+  Sparkles,
+  Printer,
+  Download
 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { 
+  downloadProductionSheetHtml, 
+  printProductionSheet 
+} from '@/lib/download-production-sheet';
 
 export default function ProgrammingDashboardPage() {
   const router = useRouter();
@@ -295,7 +301,25 @@ export default function ProgrammingDashboardPage() {
                                 {prog.status}
                               </span>
                             </td>
-                            <td className="py-3 px-4 text-right space-x-2">
+                            <td className="py-3 px-4 text-right space-x-1.5">
+                              <button
+                                type="button"
+                                onClick={() => printProductionSheet(prog)}
+                                title="Print Production Sheet (A4)"
+                                className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 hover:text-blue-900 bg-slate-100 hover:bg-blue-50 px-2 py-1 rounded transition cursor-pointer"
+                              >
+                                <Printer className="w-3 h-3 text-slate-500" />
+                                <span>Print</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => downloadProductionSheetHtml(prog)}
+                                title="Download File (.html / PDF)"
+                                className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 hover:text-emerald-900 bg-slate-100 hover:bg-emerald-50 px-2 py-1 rounded transition cursor-pointer"
+                              >
+                                <Download className="w-3 h-3 text-slate-500" />
+                                <span>Download</span>
+                              </button>
                               {isReady && (
                                 <Link
                                   href={`/my-work/issue-challan?programId=${prog.id}`}
@@ -306,7 +330,7 @@ export default function ProgrammingDashboardPage() {
                               )}
                               <Link
                                 href={`/programs/${prog.id}`}
-                                className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 px-2 py-1 rounded transition"
+                                className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded transition"
                               >
                                 <span>View</span>
                               </Link>
