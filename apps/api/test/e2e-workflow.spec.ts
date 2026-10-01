@@ -167,7 +167,8 @@ describe('MES Phase 1 End-to-End Workflow Integration Test (Neon PostgreSQL)', (
     const programs = await programsService.findAll({ search: 'PRG-2026-0001' });
     expect(programs.length).toBeGreaterThan(0);
 
-    const program = await programsService.findOne(programs[0].id);
+    const target = programs.find((p) => p.programNumber === 'PRG-2026-0001') || programs[0];
+    const program = await programsService.findOne(target.id);
     expect(program.programNumber).toBe('PRG-2026-0001');
     expect(program.routeSteps.length).toBeGreaterThanOrEqual(17);
     expect(program.targetQuantity).toBe(1200);
@@ -177,7 +178,8 @@ describe('MES Phase 1 End-to-End Workflow Integration Test (Neon PostgreSQL)', (
 
   it('5. should enforce strict mathematical production accounting identity', async () => {
     const programs = await programsService.findAll({ search: 'PRG-2026-0001' });
-    const programId = programs[0].id;
+    const target = programs.find((p) => p.programNumber === 'PRG-2026-0001') || programs[0];
+    const programId = target.id;
     const challans = await challansService.findAll({ programId });
 
     if (challans.length > 0) {

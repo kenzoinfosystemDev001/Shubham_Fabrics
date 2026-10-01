@@ -8,7 +8,7 @@ declare global {
   var __prismaClient: PrismaClient | undefined;
 }
 
-const NEON_DATABASE_URL = "postgresql://neondb_owner:npg_1aZq9IghyRre@ep-red-bread-b4ddqxah-pooler.c-6.us-east-2.aws.neon.tech/neondb?sslmode=require";
+const NEON_DATABASE_URL = "postgresql://neondb_owner:npg_3h1GKCDxtAeX@ep-jolly-tree-b5ebsnbj-pooler.c-7.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require";
 const dbUrl = process.env.DATABASE_URL || NEON_DATABASE_URL;
 if (!process.env.DATABASE_URL) {
   process.env.DATABASE_URL = NEON_DATABASE_URL;
