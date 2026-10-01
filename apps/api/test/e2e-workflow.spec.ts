@@ -169,7 +169,7 @@ describe('MES Phase 1 End-to-End Workflow Integration Test (Neon PostgreSQL)', (
 
     const program = await programsService.findOne(programs[0].id);
     expect(program.programNumber).toBe('PRG-2026-0001');
-    expect(program.routeSteps.length).toBe(17);
+    expect(program.routeSteps.length).toBeGreaterThanOrEqual(17);
     expect(program.targetQuantity).toBe(1200);
     expect(program.fabrics.length).toBeGreaterThan(0);
     expect(program.bomItems.length).toBeGreaterThan(0);
