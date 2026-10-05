@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000",
-    "prebuild": "npm run build --workspace=@subham/types && npm run build --workspace=@subham/config && npm run build --workspace=@subham/database && npm run build --workspace=@subham/validation",
+    "prebuild": "npm run build --workspace=@subham/types && npm run build --workspace=@subham/config && npm run build --workspace=@subham/database && npm run build --workspace=@subham/validation && node -e \"const fs=require('fs'); fs.mkdirSync('src/generated', {recursive:true}); try { fs.cpSync('../../packages/database/src/generated/client', 'src/generated/client', {recursive:true}); } catch(e) {}\"",
     "build": "next build",
     "start": "next start -p 3000",
     "lint": "next lint"

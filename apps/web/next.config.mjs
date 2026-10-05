@@ -3,9 +3,9 @@ const nextConfig = {
   serverExternalPackages: ['@subham/database', '@prisma/client', 'prisma'],
   outputFileTracingIncludes: {
     '/api/**/*': [
-      '../../packages/database/dist/generated/client/**/*',
+      './src/generated/client/**/*',
       '../../packages/database/src/generated/client/**/*',
-      './node_modules/@subham/database/dist/generated/client/**/*',
+      './node_modules/@subham/database/**/*',
     ],
   },
 };

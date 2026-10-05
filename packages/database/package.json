@@ -5,7 +5,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "generate": "node -e \"if(!process.env.DATABASE_URL) process.env.DATABASE_URL='postgresql://neondb_owner:npg_3h1GKCDxtAeX@ep-jolly-tree-b5ebsnbj-pooler.c-7.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require'; require('child_process').execSync('npx prisma generate', {stdio:'inherit', env:process.env});\"",
+    "generate": "node -e \"if(!process.env.DATABASE_URL) process.env.DATABASE_URL='postgresql://neondb_owner:npg_3h1GKCDxtAeX@ep-jolly-tree-b5ebsnbj-pooler.c-7.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require'; try { require('child_process').execSync('npx prisma generate', {stdio:'inherit', env:process.env}); } catch(e) { console.warn('Using existing client:', e.message); }\"",
     "push": "prisma db push",
     "prebuild": "npm run generate",
     "build": "tsc && node -e \"const fs=require('fs'); try { fs.cpSync('src/generated', 'dist/generated', {recursive:true}); } catch(e) {}\"",
