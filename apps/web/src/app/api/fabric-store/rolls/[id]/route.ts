@@ -45,7 +45,7 @@ export async function GET(
   }
 }
 
-// PATCH /api/fabric-store/rolls/[id]/location → move to new location
+// PATCH /api/fabric-store/rolls/[id] → move location, update quarantine status, or write off
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -53,19 +53,11 @@ export async function PATCH(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { locationId } = body;
+    const { locationId, status, qcStatus, qcRemarks } = body;
 
     const roll = await prisma.fabricStoreRoll.findUnique({ where: { id } });
     if (!roll) {
       return NextResponse.json({ error: 'Roll not found' }, { status: 404 });
-    }
-
-    // Business rule: Can only move rolls that are IN_STOCK or QC_PASSED
-    if (!['IN_STOCK', 'QC_PASSED', 'RECEIVED', 'QC_HOLD'].includes(roll.status)) {
-      return NextResponse.json(
-        { error: `Cannot move roll in status ${roll.status}` },
-        { status: 422 }
-      );
     }
 
     const actor = await prisma.user.findFirst({
@@ -73,12 +65,18 @@ export async function PATCH(
     });
 
     await prisma.$transaction(async (tx) => {
+      const updateData: any = {};
+      if (locationId !== undefined) updateData.locationId = locationId || null;
+      if (status) updateData.status = status;
+      if (qcStatus) updateData.qcStatus = qcStatus;
+      if (qcRemarks) updateData.qcRemarks = qcRemarks;
+
       await tx.fabricStoreRoll.update({
         where: { id },
-        data: { locationId: locationId || null },
+        data: updateData,
       });
 
-      // Ledger entry for transfer
+      // Ledger entry for action if applicable
       if (actor) {
         const year = new Date().getFullYear();
         const slePrefix = `SLE-${year}-`;
@@ -90,28 +88,37 @@ export async function PATCH(
           ? parseInt(latestSLE.entryNumber.split('-').pop() || '0', 10) + 1
           : 1;
 
-        await tx.fabricStockLedger.create({
-          data: {
-            entryNumber: `${slePrefix}${String(sleSeq).padStart(4, '0')}`,
-            rollId: roll.id,
-            batchId: roll.batchId,
-            transactionType: 'TRANSFER',
-            quantity: roll.length,
-            referenceType: 'LOCATION_TRANSFER',
-            referenceId: roll.id,
-            fromLocationId: roll.locationId || null,
-            toLocationId: locationId || null,
-            transactedById: actor.id,
-            transactedAt: new Date(),
-            remarks: `Roll transferred to new location`,
-          },
-        });
+        const isWriteOff = status === 'QC_REJECTED' || qcStatus === 'FAILED';
+        const isTransfer = locationId !== undefined && locationId !== roll.locationId;
+        const isRelease = status === 'IN_STOCK' && roll.status === 'QC_HOLD';
+
+        if (isWriteOff || isTransfer || isRelease) {
+          await tx.fabricStockLedger.create({
+            data: {
+              entryNumber: `${slePrefix}${String(sleSeq).padStart(4, '0')}`,
+              rollId: roll.id,
+              batchId: roll.batchId,
+              transactionType: isWriteOff ? 'WRITE_OFF' : isTransfer ? 'TRANSFER' : 'ADJUSTMENT',
+              quantity: roll.length,
+              referenceType: isWriteOff ? 'SCRAP_QUARANTINE' : isTransfer ? 'LOCATION_TRANSFER' : 'QC_RELEASE',
+              referenceId: roll.id,
+              fromLocationId: roll.locationId || null,
+              toLocationId: locationId || roll.locationId || null,
+              transactedById: actor.id,
+              transactedAt: new Date(),
+              remarks: qcRemarks || (isWriteOff ? 'Quarantine scrap/write-off' : isRelease ? 'Released from QC hold' : 'Location transfer'),
+            },
+          });
+        }
       }
     });
 
     const updated = await prisma.fabricStoreRoll.findUnique({
       where: { id },
-      include: { location: { select: { locationCode: true, locationName: true } } },
+      include: {
+        location: { select: { locationCode: true, locationName: true } },
+        batch: true,
+      },
     });
 
     return NextResponse.json({ data: updated });

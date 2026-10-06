@@ -14,7 +14,7 @@ import {
   ShieldCheck,
   ArrowRight,
   Package,
-  RotateCcw,
+  Send,
 } from 'lucide-react';
 
 export default function FabricStoreDashboard() {
@@ -107,6 +107,13 @@ export default function FabricStoreDashboard() {
           >
             <ArrowUpFromLine className="w-4 h-4" />
             <span>Issue Material</span>
+          </Link>
+          <Link
+            href="/fabric-store/my-work/issue-challan"
+            className="flex items-center gap-2 px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-md shadow-xs transition"
+          >
+            <Send className="w-4 h-4" />
+            <span>Issue Challan</span>
           </Link>
         </div>
       </header>
@@ -260,7 +267,8 @@ export default function FabricStoreDashboard() {
                   { href: '/fabric-store/my-work/material-receipt/create', icon: PackageCheck, label: 'Receive Fabric (GRN)', color: 'teal' },
                   { href: '/fabric-store/my-work/qc-inspections', icon: ClipboardCheck, label: 'Conduct QC', color: 'amber' },
                   { href: '/fabric-store/my-work/material-issue', icon: ArrowUpFromLine, label: 'Issue Material', color: 'blue' },
-                  { href: '/fabric-store/my-work/material-return', icon: RotateCcw, label: 'Accept Return', color: 'purple' },
+                  { href: '/fabric-store/my-work/issue-challan', icon: Send, label: 'Issue Challan (Dyeing / Embroidery)', color: 'emerald' },
+                  { href: '/fabric-store/inventory/defected-shelf', icon: AlertTriangle, label: 'Defected Shelf (Quarantine)', color: 'rose' },
                   { href: '/fabric-store/inventory/stock', icon: Layers, label: 'View Inventory', color: 'slate' },
                 ].map((action) => (
                   <Link
@@ -270,7 +278,8 @@ export default function FabricStoreDashboard() {
                       action.color === 'teal' ? 'bg-teal-50/70 hover:bg-teal-100/70 border-teal-200/60 text-teal-950' :
                       action.color === 'amber' ? 'bg-amber-50/70 hover:bg-amber-100/70 border-amber-200/60 text-amber-950' :
                       action.color === 'blue' ? 'bg-blue-50/70 hover:bg-blue-100/70 border-blue-200/60 text-blue-950' :
-                      action.color === 'purple' ? 'bg-purple-50/70 hover:bg-purple-100/70 border-purple-200/60 text-purple-950' :
+                      action.color === 'emerald' ? 'bg-emerald-50/70 hover:bg-emerald-100/70 border-emerald-200/60 text-emerald-950' :
+                      action.color === 'rose' ? 'bg-rose-50/70 hover:bg-rose-100/70 border-rose-200/60 text-rose-950' :
                       'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-800'
                     }`}
                   >
@@ -295,10 +304,10 @@ export default function FabricStoreDashboard() {
                   <strong>{kpis.pendingQC}</strong> roll(s) are waiting for QC inspection.
                 </p>
                 <Link
-                  href="/fabric-store/quality/qc-queue"
+                  href="/fabric-store/my-work/qc-inspections"
                   className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-800 hover:text-amber-900"
                 >
-                  Go to QC Queue →
+                  Conduct QC Inspection →
                 </Link>
               </div>
             )}

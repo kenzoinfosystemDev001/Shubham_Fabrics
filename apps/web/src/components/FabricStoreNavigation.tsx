@@ -10,20 +10,17 @@ import {
   ClipboardCheck,
   ArrowDownToLine,
   ArrowUpFromLine,
-  RotateCcw,
   ChevronDown,
   ChevronRight,
   LogOut,
   UserCircle,
   Boxes,
-  MapPin,
   BookOpen,
-  ShieldCheck,
   ListChecks,
-  PauseCircle,
-  XCircle,
   Kanban,
   Building2,
+  Send,
+  AlertTriangle,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 
@@ -33,7 +30,6 @@ export function FabricStoreNavigation() {
   const [mounted, setMounted] = useState(false);
   const [myWorkOpen, setMyWorkOpen] = useState(true);
   const [inventoryOpen, setInventoryOpen] = useState(false);
-  const [qualityOpen, setQualityOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>({
     fullName: 'Store Incharge',
     username: 'store_mgr',
@@ -67,7 +63,6 @@ export function FabricStoreNavigation() {
     // Auto-expand sections based on current path
     if (pathname.includes('/fabric-store/my-work')) setMyWorkOpen(true);
     if (pathname.includes('/fabric-store/inventory')) setInventoryOpen(true);
-    if (pathname.includes('/fabric-store/quality')) setQualityOpen(true);
   }, [pathname]);
 
   const handleSignOut = () => {
@@ -115,7 +110,6 @@ export function FabricStoreNavigation() {
 
   const myWorkActive = pathname.includes('/fabric-store/my-work');
   const inventoryActive = pathname.includes('/fabric-store/inventory');
-  const qualityActive = pathname.includes('/fabric-store/quality');
 
   return (
     <aside className="w-64 bg-[#0F172A] text-slate-300 flex flex-col fixed inset-y-0 left-0 z-50 border-r border-slate-800 select-none">
@@ -185,9 +179,9 @@ export function FabricStoreNavigation() {
                 <ArrowUpFromLine className="w-3.5 h-3.5 text-blue-400/80" />
                 <span>Material Issue</span>
               </Link>
-              <Link href="/fabric-store/my-work/material-return" className={subLinkClass('/fabric-store/my-work/material-return')}>
-                <RotateCcw className="w-3.5 h-3.5 text-purple-400/80" />
-                <span>Material Return</span>
+              <Link href="/fabric-store/my-work/issue-challan" className={subLinkClass('/fabric-store/my-work/issue-challan')}>
+                <Send className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="font-semibold text-emerald-300">Issue Challan</span>
               </Link>
             </div>
           )}
@@ -209,41 +203,13 @@ export function FabricStoreNavigation() {
                 <ListChecks className="w-3.5 h-3.5 text-slate-400" />
                 <span>Rolls</span>
               </Link>
-              <Link href="/fabric-store/inventory/locations" className={subLinkClass('/fabric-store/inventory/locations')}>
-                <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                <span>Locations</span>
+              <Link href="/fabric-store/inventory/defected-shelf" className={subLinkClass('/fabric-store/inventory/defected-shelf')}>
+                <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+                <span className="text-rose-300 font-medium">Defected Shelf</span>
               </Link>
               <Link href="/fabric-store/inventory/stock-ledger" className={subLinkClass('/fabric-store/inventory/stock-ledger')}>
                 <BookOpen className="w-3.5 h-3.5 text-slate-400" />
                 <span>Stock Ledger</span>
-              </Link>
-            </div>
-          )}
-        </div>
-
-        {/* Quality */}
-        <div>
-          <div className="flex items-center gap-3 px-3 py-2.5">
-            <ShieldCheck className="w-4 h-4 text-slate-400" />
-            {sectionHeader('Quality', qualityOpen, () => setQualityOpen(!qualityOpen), qualityActive)}
-          </div>
-          {qualityOpen && (
-            <div className="ml-4 pl-3 border-l border-slate-700/80 my-1 space-y-0.5">
-              <Link href="/fabric-store/quality/qc-queue" className={subLinkClass('/fabric-store/quality/qc-queue')}>
-                <ClipboardCheck className="w-3.5 h-3.5 text-amber-400/80" />
-                <span>QC Queue</span>
-              </Link>
-              <Link href="/fabric-store/quality/inspections" className={subLinkClass('/fabric-store/quality/inspections')}>
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400/70" />
-                <span>Inspections</span>
-              </Link>
-              <Link href="/fabric-store/quality/holds" className={subLinkClass('/fabric-store/quality/holds')}>
-                <PauseCircle className="w-3.5 h-3.5 text-amber-500/80" />
-                <span>Holds</span>
-              </Link>
-              <Link href="/fabric-store/quality/rejections" className={subLinkClass('/fabric-store/quality/rejections')}>
-                <XCircle className="w-3.5 h-3.5 text-red-400/80" />
-                <span>Rejections</span>
               </Link>
             </div>
           )}
