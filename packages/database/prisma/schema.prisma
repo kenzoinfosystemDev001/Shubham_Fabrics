@@ -46,6 +46,13 @@ model User {
   recutsRequested    RecutRequest[]  @relation("RecutRequester")
   recutsApproved     RecutRequest[]  @relation("RecutApprover")
 
+  // Fabric Store back-relations
+  fabricBatchesCreated FabricBatch[]      @relation("FabricBatchCreator")
+  grnReceived          MaterialReceipt[]  @relation("GRNReceiver")
+  fabricRollsInspected FabricStoreRoll[]  @relation("FabricRollQCInspector")
+  fabricQCInspections  FabricQCInspection[] @relation("FabricQCInspector")
+  fabricLedgerEntries  FabricStockLedger[]  @relation("FabricLedgerTransactor")
+
   @@index([username])
   @@index([email])
 }
@@ -448,6 +455,10 @@ model Program {
   stockLedgerEntries StockLedgerEntry[]
   reworkTransactions ReworkTransaction[]
   recutRequests   RecutRequest[]
+
+  // Fabric Store back-relations
+  fabricBatches   FabricBatch[]
+  fabricStoreRolls FabricStoreRoll[] @relation("FabricRollIssuedToProgram")
 
   @@index([programNumber])
   @@index([status])
@@ -1093,4 +1104,235 @@ model IntegrityScanResult {
   @@index([createdAt])
 }
 
+// ==========================================
+// 11. FABRIC STORE DEPARTMENT
+// ==========================================
 
+enum InventoryLocationType {
+  RACK
+  BIN
+  FLOOR
+  QUARANTINE
+  DISPATCH
+}
+
+model InventoryLocation {
+  id           String                @id @default(uuid())
+  locationCode String                @unique // e.g. "RACK-A1", "BIN-B3"
+  locationName String
+  locationType InventoryLocationType @default(RACK)
+  isActive     Boolean               @default(true)
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+
+  rolls        FabricStoreRoll[]     @relation("RollLocation")
+  fromLedger   FabricStockLedger[]   @relation("LedgerFromLocation")
+  toLedger     FabricStockLedger[]   @relation("LedgerToLocation")
+
+  @@index([locationCode])
+  @@index([isActive])
+}
+
+enum FabricBatchStatus {
+  PENDING_RECEIPT
+  PARTIALLY_RECEIVED
+  RECEIVED
+  IN_STOCK
+  PARTIALLY_ISSUED
+  FULLY_ISSUED
+  REJECTED
+}
+
+model FabricBatch {
+  id                 String            @id @default(uuid())
+  batchNumber        String            @unique // auto-generated "BATCH-YYYY-NNNN"
+  programId          String?
+  program            Program?          @relation(fields: [programId], references: [id])
+  supplierId         String?           // supplier name or reference
+  fabricType         String            // "KORA", "DYED", "WOVEN", "BLENDED"
+  fabricDescription  String
+  colorCode          String?
+  colorName          String?
+  totalRolls         Int               @default(0)
+  totalMeters        Decimal           @default(0) @db.Decimal(10, 2)
+  status             FabricBatchStatus @default(PENDING_RECEIPT)
+  receivedAt         DateTime?
+  createdById        String
+  createdBy          User              @relation("FabricBatchCreator", fields: [createdById], references: [id])
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  rolls              FabricStoreRoll[]
+  receipts           MaterialReceipt[]
+  ledgerEntries      FabricStockLedger[]
+
+  @@index([batchNumber])
+  @@index([status])
+  @@index([programId])
+}
+
+enum FabricRollStatus {
+  RECEIVED
+  QC_HOLD
+  QC_PASSED
+  QC_REJECTED
+  IN_STOCK
+  ISSUED
+  RETURNED
+  CONSUMED
+}
+
+enum FabricQCStatus {
+  PENDING
+  PASSED
+  FAILED
+  ON_HOLD
+}
+
+model FabricStoreRoll {
+  id                 String          @id @default(uuid())
+  rollNumber         String          @unique // auto-generated "ROLL-YYYY-NNNN"
+  batchId            String
+  batch              FabricBatch     @relation(fields: [batchId], references: [id])
+  locationId         String?
+  location           InventoryLocation? @relation("RollLocation", fields: [locationId], references: [id])
+  length             Decimal         @db.Decimal(10, 2) // meters
+  width              Decimal?        @db.Decimal(10, 2) // cm
+  weight             Decimal?        @db.Decimal(10, 3) // kg
+  status             FabricRollStatus @default(RECEIVED)
+  qcStatus           FabricQCStatus  @default(PENDING)
+  qcInspectedById    String?
+  qcInspectedBy      User?           @relation("FabricRollQCInspector", fields: [qcInspectedById], references: [id])
+  qcInspectedAt      DateTime?
+  qcRemarks          String?
+  programIssuedToId  String?
+  programIssuedTo    Program?        @relation("FabricRollIssuedToProgram", fields: [programIssuedToId], references: [id])
+  issuedAt           DateTime?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  receiptItems       MaterialReceiptItem[]
+  qcInspections      FabricQCInspection[]
+  ledgerEntries      FabricStockLedger[]
+
+  @@index([rollNumber])
+  @@index([batchId])
+  @@index([status])
+  @@index([qcStatus])
+}
+
+enum GRNStatus {
+  DRAFT
+  CONFIRMED
+  QC_PENDING
+  QC_COMPLETE
+  CLOSED
+}
+
+model MaterialReceipt {
+  id                  String       @id @default(uuid())
+  grnNumber           String       @unique // auto-generated "GRN-YYYY-NNNN"
+  batchId             String
+  batch               FabricBatch  @relation(fields: [batchId], references: [id])
+  challanId           String?      // optional incoming delivery challan
+  receivedById        String
+  receivedBy          User         @relation("GRNReceiver", fields: [receivedById], references: [id])
+  receivedAt          DateTime
+  vehicleNumber       String?
+  supplierName        String
+  totalRollsReceived  Int          @default(0)
+  totalMetersReceived Decimal      @default(0) @db.Decimal(10, 2)
+  status              GRNStatus    @default(DRAFT)
+  remarks             String?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  items               MaterialReceiptItem[]
+
+  @@index([grnNumber])
+  @@index([status])
+  @@index([batchId])
+}
+
+model MaterialReceiptItem {
+  id              String          @id @default(uuid())
+  receiptId       String
+  receipt         MaterialReceipt @relation(fields: [receiptId], references: [id], onDelete: Cascade)
+  rollId          String
+  roll            FabricStoreRoll @relation(fields: [rollId], references: [id])
+  measuredLength  Decimal         @db.Decimal(10, 2)
+  measuredWeight  Decimal?        @db.Decimal(10, 3)
+  remarks         String?
+  createdAt       DateTime        @default(now())
+
+  @@index([receiptId])
+  @@index([rollId])
+}
+
+enum InspectionType {
+  RECEIPT_QC
+  RETURN_QC
+  RANDOM_QC
+}
+
+enum InspectionResult {
+  PASS
+  HOLD
+  REJECT
+}
+
+model FabricQCInspection {
+  id               String          @id @default(uuid())
+  inspectionNumber String          @unique // auto-generated "QCI-YYYY-NNNN"
+  rollId           String
+  roll             FabricStoreRoll @relation(fields: [rollId], references: [id])
+  inspectedById    String
+  inspectedBy      User            @relation("FabricQCInspector", fields: [inspectedById], references: [id])
+  inspectionType   InspectionType  @default(RECEIPT_QC)
+  result           InspectionResult
+  defects          Json?           // array of defect objects
+  remarks          String?
+  inspectedAt      DateTime
+  createdAt        DateTime        @default(now())
+
+  @@index([inspectionNumber])
+  @@index([rollId])
+  @@index([result])
+}
+
+enum StockTransactionType {
+  RECEIPT
+  ISSUE
+  RETURN
+  ADJUSTMENT
+  WRITE_OFF
+  TRANSFER
+}
+
+model FabricStockLedger {
+  id              String               @id @default(uuid())
+  entryNumber     String               @unique // auto-generated "SLE-YYYY-NNNN"
+  rollId          String
+  roll            FabricStoreRoll      @relation(fields: [rollId], references: [id])
+  batchId         String
+  batch           FabricBatch          @relation(fields: [batchId], references: [id])
+  transactionType StockTransactionType
+  quantity        Decimal              @db.Decimal(10, 2) // meters moved
+  referenceType   String               // "GRN", "ISSUE_CHALLAN", "RETURN_CHALLAN", "QC_HOLD"
+  referenceId     String               // the relevant document ID
+  fromLocationId  String?
+  fromLocation    InventoryLocation?   @relation("LedgerFromLocation", fields: [fromLocationId], references: [id])
+  toLocationId    String?
+  toLocation      InventoryLocation?   @relation("LedgerToLocation", fields: [toLocationId], references: [id])
+  transactedById  String
+  transactedBy    User                 @relation("FabricLedgerTransactor", fields: [transactedById], references: [id])
+  transactedAt    DateTime
+  remarks         String?
+  createdAt       DateTime             @default(now())
+
+  @@index([entryNumber])
+  @@index([rollId])
+  @@index([batchId])
+  @@index([transactionType])
+  @@index([transactedAt])
+}
