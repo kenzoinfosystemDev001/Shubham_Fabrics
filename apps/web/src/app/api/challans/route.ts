@@ -58,12 +58,15 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    // Default operator
-    let programmer = await prisma.user.findFirst({
-      where: { username: 'programmer' },
+    // Default operator guaranteed in database
+    let user = await prisma.user.findFirst({
+      where: { OR: [{ username: 'programmer' }, { username: 'admin' }] },
+      select: { id: true },
     });
-    if (!programmer) programmer = await prisma.user.findFirst();
-    const actorId = programmer?.id || 'd1719f83-f62d-4858-9cf6-cc4b119b7bfd';
+    if (!user) {
+      user = await prisma.user.findFirst({ select: { id: true } });
+    }
+    const actorId = user?.id || '490dd663-4a29-4245-946f-e5b98850d85b';
 
     let challanNumber = body.challanNumber;
     if (!challanNumber) {

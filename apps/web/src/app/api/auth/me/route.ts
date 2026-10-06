@@ -21,7 +21,7 @@ export async function GET() {
 
     if (!user) {
       return NextResponse.json({
-        id: 'd1719f83-f62d-4858-9cf6-cc4b119b7bfd',
+        id: 'b88c0139-8ce6-4d87-8aff-421eb2ef6365',
         username: 'programmer',
         fullName: 'Programming Incharge',
         role: 'PROGRAMMING_INCHARGE',
