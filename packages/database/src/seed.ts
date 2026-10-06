@@ -204,6 +204,7 @@ async function main() {
 
   // 5. Seed Departments, Work Centers, Machines & Shifts
   const depts = [
+    { code: 'PROGRAMMING', name: 'Programming Department', sequenceOrder: 0, description: 'CAD, Wilcom embroidery design, specs & production sheet authoring' },
     { code: 'STORE', name: 'Raw Material & Fabric Store', sequenceOrder: 1, description: 'Yarn, fabric rolls and trims inventory' },
     { code: 'DYEING', name: 'Dyeing & Processing Unit', sequenceOrder: 2, description: 'Batch dyeing, stenter, and shade matching' },
     { code: 'QC1', name: 'Fabric Inspection (4-Point)', sequenceOrder: 3, description: 'Greige and dyed fabric inspection table' },
