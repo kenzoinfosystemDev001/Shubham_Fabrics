@@ -6,11 +6,12 @@ export const dynamic = 'force-dynamic';
 // PATCH /api/fabric-store/grn/[id]/confirm
 export async function PATCH(
   _request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const grn = await prisma.materialReceipt.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { _count: { select: { items: true } } },
     });
 
@@ -35,7 +36,7 @@ export async function PATCH(
 
     // Confirm GRN and move to QC_PENDING
     const updated = await prisma.materialReceipt.update({
-      where: { id: params.id },
+      where: { id },
       data: { status: 'QC_PENDING' },
     });
 

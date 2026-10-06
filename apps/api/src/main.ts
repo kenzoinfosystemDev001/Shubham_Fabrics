@@ -24,8 +24,8 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // Global prefix
-  app.setGlobalPrefix('api');
+  // Global prefix (excluding root path for cloud health checks)
+  app.setGlobalPrefix('api', { exclude: ['/'] });
 
   // Unified Error Envelope
   app.useGlobalFilters(new AllExceptionsFilter());

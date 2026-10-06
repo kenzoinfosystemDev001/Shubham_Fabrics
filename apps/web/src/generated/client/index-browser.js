@@ -870,9 +870,118 @@ exports.Prisma.IntegrityScanResultScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.InventoryLocationScalarFieldEnum = {
+  id: 'id',
+  locationCode: 'locationCode',
+  locationName: 'locationName',
+  locationType: 'locationType',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.FabricBatchScalarFieldEnum = {
+  id: 'id',
+  batchNumber: 'batchNumber',
+  programId: 'programId',
+  supplierId: 'supplierId',
+  fabricType: 'fabricType',
+  fabricDescription: 'fabricDescription',
+  colorCode: 'colorCode',
+  colorName: 'colorName',
+  totalRolls: 'totalRolls',
+  totalMeters: 'totalMeters',
+  status: 'status',
+  receivedAt: 'receivedAt',
+  createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.FabricStoreRollScalarFieldEnum = {
+  id: 'id',
+  rollNumber: 'rollNumber',
+  batchId: 'batchId',
+  locationId: 'locationId',
+  length: 'length',
+  width: 'width',
+  weight: 'weight',
+  status: 'status',
+  qcStatus: 'qcStatus',
+  qcInspectedById: 'qcInspectedById',
+  qcInspectedAt: 'qcInspectedAt',
+  qcRemarks: 'qcRemarks',
+  programIssuedToId: 'programIssuedToId',
+  issuedAt: 'issuedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.MaterialReceiptScalarFieldEnum = {
+  id: 'id',
+  grnNumber: 'grnNumber',
+  batchId: 'batchId',
+  challanId: 'challanId',
+  receivedById: 'receivedById',
+  receivedAt: 'receivedAt',
+  vehicleNumber: 'vehicleNumber',
+  supplierName: 'supplierName',
+  totalRollsReceived: 'totalRollsReceived',
+  totalMetersReceived: 'totalMetersReceived',
+  status: 'status',
+  remarks: 'remarks',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.MaterialReceiptItemScalarFieldEnum = {
+  id: 'id',
+  receiptId: 'receiptId',
+  rollId: 'rollId',
+  measuredLength: 'measuredLength',
+  measuredWeight: 'measuredWeight',
+  remarks: 'remarks',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.FabricQCInspectionScalarFieldEnum = {
+  id: 'id',
+  inspectionNumber: 'inspectionNumber',
+  rollId: 'rollId',
+  inspectedById: 'inspectedById',
+  inspectionType: 'inspectionType',
+  result: 'result',
+  defects: 'defects',
+  remarks: 'remarks',
+  inspectedAt: 'inspectedAt',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.FabricStockLedgerScalarFieldEnum = {
+  id: 'id',
+  entryNumber: 'entryNumber',
+  rollId: 'rollId',
+  batchId: 'batchId',
+  transactionType: 'transactionType',
+  quantity: 'quantity',
+  referenceType: 'referenceType',
+  referenceId: 'referenceId',
+  fromLocationId: 'fromLocationId',
+  toLocationId: 'toLocationId',
+  transactedById: 'transactedById',
+  transactedAt: 'transactedAt',
+  remarks: 'remarks',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.QueryMode = {
@@ -885,6 +994,75 @@ exports.Prisma.NullsOrder = {
   last: 'last'
 };
 
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
+exports.InventoryLocationType = exports.$Enums.InventoryLocationType = {
+  RACK: 'RACK',
+  BIN: 'BIN',
+  FLOOR: 'FLOOR',
+  QUARANTINE: 'QUARANTINE',
+  DISPATCH: 'DISPATCH'
+};
+
+exports.FabricBatchStatus = exports.$Enums.FabricBatchStatus = {
+  PENDING_RECEIPT: 'PENDING_RECEIPT',
+  PARTIALLY_RECEIVED: 'PARTIALLY_RECEIVED',
+  RECEIVED: 'RECEIVED',
+  IN_STOCK: 'IN_STOCK',
+  PARTIALLY_ISSUED: 'PARTIALLY_ISSUED',
+  FULLY_ISSUED: 'FULLY_ISSUED',
+  REJECTED: 'REJECTED'
+};
+
+exports.FabricRollStatus = exports.$Enums.FabricRollStatus = {
+  RECEIVED: 'RECEIVED',
+  QC_HOLD: 'QC_HOLD',
+  QC_PASSED: 'QC_PASSED',
+  QC_REJECTED: 'QC_REJECTED',
+  IN_STOCK: 'IN_STOCK',
+  ISSUED: 'ISSUED',
+  RETURNED: 'RETURNED',
+  CONSUMED: 'CONSUMED'
+};
+
+exports.FabricQCStatus = exports.$Enums.FabricQCStatus = {
+  PENDING: 'PENDING',
+  PASSED: 'PASSED',
+  FAILED: 'FAILED',
+  ON_HOLD: 'ON_HOLD'
+};
+
+exports.GRNStatus = exports.$Enums.GRNStatus = {
+  DRAFT: 'DRAFT',
+  CONFIRMED: 'CONFIRMED',
+  QC_PENDING: 'QC_PENDING',
+  QC_COMPLETE: 'QC_COMPLETE',
+  CLOSED: 'CLOSED'
+};
+
+exports.InspectionType = exports.$Enums.InspectionType = {
+  RECEIPT_QC: 'RECEIPT_QC',
+  RETURN_QC: 'RETURN_QC',
+  RANDOM_QC: 'RANDOM_QC'
+};
+
+exports.InspectionResult = exports.$Enums.InspectionResult = {
+  PASS: 'PASS',
+  HOLD: 'HOLD',
+  REJECT: 'REJECT'
+};
+
+exports.StockTransactionType = exports.$Enums.StockTransactionType = {
+  RECEIPT: 'RECEIPT',
+  ISSUE: 'ISSUE',
+  RETURN: 'RETURN',
+  ADJUSTMENT: 'ADJUSTMENT',
+  WRITE_OFF: 'WRITE_OFF',
+  TRANSFER: 'TRANSFER'
+};
 
 exports.Prisma.ModelName = {
   User: 'User',
@@ -936,7 +1114,14 @@ exports.Prisma.ModelName = {
   QualityInspectionParameter: 'QualityInspectionParameter',
   IdempotencyRecord: 'IdempotencyRecord',
   Notification: 'Notification',
-  IntegrityScanResult: 'IntegrityScanResult'
+  IntegrityScanResult: 'IntegrityScanResult',
+  InventoryLocation: 'InventoryLocation',
+  FabricBatch: 'FabricBatch',
+  FabricStoreRoll: 'FabricStoreRoll',
+  MaterialReceipt: 'MaterialReceipt',
+  MaterialReceiptItem: 'MaterialReceiptItem',
+  FabricQCInspection: 'FabricQCInspection',
+  FabricStockLedger: 'FabricStockLedger'
 };
 
 /**

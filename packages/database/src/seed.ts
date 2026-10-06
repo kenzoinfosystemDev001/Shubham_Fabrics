@@ -63,6 +63,7 @@ async function main() {
     { code: 'PACKING_OPERATOR', name: 'Packing Supervisor', description: 'Carton and packing operator' },
     { code: 'DISPATCH_OPERATOR', name: 'Dispatch Logistics Manager', description: 'Gate pass and shipping' },
     { code: 'SUPERVISOR', name: 'General Floor Supervisor', description: 'Line monitoring' },
+    { code: 'FABRIC_STORE', name: 'Fabric Store Incharge', description: 'Fabric store material receiving, QC, and issues' },
     { code: 'VIEWER', name: 'Auditor / Read-Only Viewer', description: 'Read-only telemetry access' },
   ];
 
@@ -113,6 +114,15 @@ async function main() {
     { module: 'QUALITY', resource: 'INSPECTION', action: 'CREATE', description: 'Record inspection audit' },
     { module: 'QUALITY', resource: 'INSPECTION', action: 'READ', description: 'View inspection reports' },
     { module: 'AUDIT', resource: 'LOGS', action: 'READ', description: 'View immutable audit trail' },
+    // Fabric Store Department
+    { module: 'FABRIC_STORE', resource: 'STORE', action: 'VIEW', description: 'View fabric store dashboard and inventory' },
+    { module: 'FABRIC_STORE', resource: 'GRN', action: 'RECEIVE', description: 'Create GRN and inward fabric rolls' },
+    { module: 'FABRIC_STORE', resource: 'ROLL', action: 'QC', description: 'Conduct quality inspections and audit rolls' },
+    { module: 'FABRIC_STORE', resource: 'MATERIAL', action: 'ISSUE', description: 'Issue fabric rolls to production programs' },
+    { module: 'FABRIC_STORE', resource: 'MATERIAL', action: 'RETURN', description: 'Accept fabric returns from shop floor' },
+    { module: 'FABRIC_STORE', resource: 'LOCATION', action: 'MANAGE', description: 'Configure inventory racks and storage zones' },
+    { module: 'FABRIC_STORE', resource: 'LEDGER', action: 'VIEW', description: 'Access immutable stock movement ledger' },
+    { module: 'FABRIC_STORE', resource: 'REPORT', action: 'EXPORT', description: 'Generate and export fabric inventory reports' },
   ];
 
   const createdPerms: Record<string, any> = {};
@@ -133,6 +143,16 @@ async function main() {
     });
   }
 
+  // Link Fabric Store permissions to FABRIC_STORE role
+  for (const permKey of Object.keys(createdPerms)) {
+    const p = createdPerms[permKey];
+    if (p.module === 'FABRIC_STORE') {
+      await prisma.rolePermission.create({
+        data: { roleId: createdRoles.FABRIC_STORE.id, permissionId: p.id },
+      });
+    }
+  }
+
   // Production Manager gets Program, Route, BOM, Master reads
   for (const permKey of Object.keys(createdPerms)) {
     const p = createdPerms[permKey];
@@ -149,6 +169,7 @@ async function main() {
 
   const usersList = [
     { username: 'admin', email: 'admin@subhamfabrics.com', fullName: 'Sujal Kumar', roleCode: 'SUPER_ADMIN', departmentCode: 'STORE' },
+    { username: 'programmer', email: 'programmer@subhamfabrics.com', fullName: 'Programming Incharge', roleCode: 'SUPER_ADMIN', departmentCode: 'PROGRAMMING' },
     { username: 'jitender', email: 'jitender.saini@subhamfabrics.com', fullName: 'jitender saini', roleCode: 'STORE_MANAGER', departmentCode: 'STORE' },
     { username: 'prod_manager', email: 'rajesh.sharma@subhamfabrics.com', fullName: 'Rajesh Sharma', roleCode: 'PRODUCTION_MANAGER', departmentCode: 'STITCHING' },
     { username: 'store_mgr', email: 'mohan.verma@subhamfabrics.com', fullName: 'Mohan Verma', roleCode: 'STORE_MANAGER', departmentCode: 'STORE' },

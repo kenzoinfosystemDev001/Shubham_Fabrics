@@ -263,6 +263,167 @@ export type Notification = $Result.DefaultSelection<Prisma.$NotificationPayload>
  * 
  */
 export type IntegrityScanResult = $Result.DefaultSelection<Prisma.$IntegrityScanResultPayload>
+/**
+ * Model InventoryLocation
+ * 
+ */
+export type InventoryLocation = $Result.DefaultSelection<Prisma.$InventoryLocationPayload>
+/**
+ * Model FabricBatch
+ * 
+ */
+export type FabricBatch = $Result.DefaultSelection<Prisma.$FabricBatchPayload>
+/**
+ * Model FabricStoreRoll
+ * 
+ */
+export type FabricStoreRoll = $Result.DefaultSelection<Prisma.$FabricStoreRollPayload>
+/**
+ * Model MaterialReceipt
+ * 
+ */
+export type MaterialReceipt = $Result.DefaultSelection<Prisma.$MaterialReceiptPayload>
+/**
+ * Model MaterialReceiptItem
+ * 
+ */
+export type MaterialReceiptItem = $Result.DefaultSelection<Prisma.$MaterialReceiptItemPayload>
+/**
+ * Model FabricQCInspection
+ * 
+ */
+export type FabricQCInspection = $Result.DefaultSelection<Prisma.$FabricQCInspectionPayload>
+/**
+ * Model FabricStockLedger
+ * 
+ */
+export type FabricStockLedger = $Result.DefaultSelection<Prisma.$FabricStockLedgerPayload>
+
+/**
+ * Enums
+ */
+export namespace $Enums {
+  export const InventoryLocationType: {
+  RACK: 'RACK',
+  BIN: 'BIN',
+  FLOOR: 'FLOOR',
+  QUARANTINE: 'QUARANTINE',
+  DISPATCH: 'DISPATCH'
+};
+
+export type InventoryLocationType = (typeof InventoryLocationType)[keyof typeof InventoryLocationType]
+
+
+export const FabricBatchStatus: {
+  PENDING_RECEIPT: 'PENDING_RECEIPT',
+  PARTIALLY_RECEIVED: 'PARTIALLY_RECEIVED',
+  RECEIVED: 'RECEIVED',
+  IN_STOCK: 'IN_STOCK',
+  PARTIALLY_ISSUED: 'PARTIALLY_ISSUED',
+  FULLY_ISSUED: 'FULLY_ISSUED',
+  REJECTED: 'REJECTED'
+};
+
+export type FabricBatchStatus = (typeof FabricBatchStatus)[keyof typeof FabricBatchStatus]
+
+
+export const FabricRollStatus: {
+  RECEIVED: 'RECEIVED',
+  QC_HOLD: 'QC_HOLD',
+  QC_PASSED: 'QC_PASSED',
+  QC_REJECTED: 'QC_REJECTED',
+  IN_STOCK: 'IN_STOCK',
+  ISSUED: 'ISSUED',
+  RETURNED: 'RETURNED',
+  CONSUMED: 'CONSUMED'
+};
+
+export type FabricRollStatus = (typeof FabricRollStatus)[keyof typeof FabricRollStatus]
+
+
+export const FabricQCStatus: {
+  PENDING: 'PENDING',
+  PASSED: 'PASSED',
+  FAILED: 'FAILED',
+  ON_HOLD: 'ON_HOLD'
+};
+
+export type FabricQCStatus = (typeof FabricQCStatus)[keyof typeof FabricQCStatus]
+
+
+export const GRNStatus: {
+  DRAFT: 'DRAFT',
+  CONFIRMED: 'CONFIRMED',
+  QC_PENDING: 'QC_PENDING',
+  QC_COMPLETE: 'QC_COMPLETE',
+  CLOSED: 'CLOSED'
+};
+
+export type GRNStatus = (typeof GRNStatus)[keyof typeof GRNStatus]
+
+
+export const InspectionType: {
+  RECEIPT_QC: 'RECEIPT_QC',
+  RETURN_QC: 'RETURN_QC',
+  RANDOM_QC: 'RANDOM_QC'
+};
+
+export type InspectionType = (typeof InspectionType)[keyof typeof InspectionType]
+
+
+export const InspectionResult: {
+  PASS: 'PASS',
+  HOLD: 'HOLD',
+  REJECT: 'REJECT'
+};
+
+export type InspectionResult = (typeof InspectionResult)[keyof typeof InspectionResult]
+
+
+export const StockTransactionType: {
+  RECEIPT: 'RECEIPT',
+  ISSUE: 'ISSUE',
+  RETURN: 'RETURN',
+  ADJUSTMENT: 'ADJUSTMENT',
+  WRITE_OFF: 'WRITE_OFF',
+  TRANSFER: 'TRANSFER'
+};
+
+export type StockTransactionType = (typeof StockTransactionType)[keyof typeof StockTransactionType]
+
+}
+
+export type InventoryLocationType = $Enums.InventoryLocationType
+
+export const InventoryLocationType: typeof $Enums.InventoryLocationType
+
+export type FabricBatchStatus = $Enums.FabricBatchStatus
+
+export const FabricBatchStatus: typeof $Enums.FabricBatchStatus
+
+export type FabricRollStatus = $Enums.FabricRollStatus
+
+export const FabricRollStatus: typeof $Enums.FabricRollStatus
+
+export type FabricQCStatus = $Enums.FabricQCStatus
+
+export const FabricQCStatus: typeof $Enums.FabricQCStatus
+
+export type GRNStatus = $Enums.GRNStatus
+
+export const GRNStatus: typeof $Enums.GRNStatus
+
+export type InspectionType = $Enums.InspectionType
+
+export const InspectionType: typeof $Enums.InspectionType
+
+export type InspectionResult = $Enums.InspectionResult
+
+export const InspectionResult: typeof $Enums.InspectionResult
+
+export type StockTransactionType = $Enums.StockTransactionType
+
+export const StockTransactionType: typeof $Enums.StockTransactionType
 
 /**
  * ##  Prisma Client ʲˢ
@@ -881,6 +1042,76 @@ export class PrismaClient<
     * ```
     */
   get integrityScanResult(): Prisma.IntegrityScanResultDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.inventoryLocation`: Exposes CRUD operations for the **InventoryLocation** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more InventoryLocations
+    * const inventoryLocations = await prisma.inventoryLocation.findMany()
+    * ```
+    */
+  get inventoryLocation(): Prisma.InventoryLocationDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.fabricBatch`: Exposes CRUD operations for the **FabricBatch** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more FabricBatches
+    * const fabricBatches = await prisma.fabricBatch.findMany()
+    * ```
+    */
+  get fabricBatch(): Prisma.FabricBatchDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.fabricStoreRoll`: Exposes CRUD operations for the **FabricStoreRoll** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more FabricStoreRolls
+    * const fabricStoreRolls = await prisma.fabricStoreRoll.findMany()
+    * ```
+    */
+  get fabricStoreRoll(): Prisma.FabricStoreRollDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.materialReceipt`: Exposes CRUD operations for the **MaterialReceipt** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more MaterialReceipts
+    * const materialReceipts = await prisma.materialReceipt.findMany()
+    * ```
+    */
+  get materialReceipt(): Prisma.MaterialReceiptDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.materialReceiptItem`: Exposes CRUD operations for the **MaterialReceiptItem** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more MaterialReceiptItems
+    * const materialReceiptItems = await prisma.materialReceiptItem.findMany()
+    * ```
+    */
+  get materialReceiptItem(): Prisma.MaterialReceiptItemDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.fabricQCInspection`: Exposes CRUD operations for the **FabricQCInspection** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more FabricQCInspections
+    * const fabricQCInspections = await prisma.fabricQCInspection.findMany()
+    * ```
+    */
+  get fabricQCInspection(): Prisma.FabricQCInspectionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.fabricStockLedger`: Exposes CRUD operations for the **FabricStockLedger** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more FabricStockLedgers
+    * const fabricStockLedgers = await prisma.fabricStockLedger.findMany()
+    * ```
+    */
+  get fabricStockLedger(): Prisma.FabricStockLedgerDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1371,7 +1602,14 @@ export namespace Prisma {
     QualityInspectionParameter: 'QualityInspectionParameter',
     IdempotencyRecord: 'IdempotencyRecord',
     Notification: 'Notification',
-    IntegrityScanResult: 'IntegrityScanResult'
+    IntegrityScanResult: 'IntegrityScanResult',
+    InventoryLocation: 'InventoryLocation',
+    FabricBatch: 'FabricBatch',
+    FabricStoreRoll: 'FabricStoreRoll',
+    MaterialReceipt: 'MaterialReceipt',
+    MaterialReceiptItem: 'MaterialReceiptItem',
+    FabricQCInspection: 'FabricQCInspection',
+    FabricStockLedger: 'FabricStockLedger'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1390,7 +1628,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "role" | "permission" | "rolePermission" | "userRole" | "department" | "workCenter" | "machine" | "shift" | "supplier" | "customer" | "item" | "fabric" | "trim" | "design" | "colour" | "size" | "operation" | "defectCode" | "program" | "programFabric" | "programColour" | "programSize" | "programSpecification" | "programBOM" | "programRoute" | "programRouteStep" | "attachment" | "auditLog" | "challan" | "challanItem" | "productionTransaction" | "qualityInspection" | "defectLog" | "inventoryStock" | "challanEvent" | "stockLedgerEntry" | "fabricRoll" | "bundle" | "carton" | "cartonBundle" | "dispatchOrder" | "dispatchCarton" | "defectRecord" | "reworkTransaction" | "recutRequest" | "qualityInspectionParameter" | "idempotencyRecord" | "notification" | "integrityScanResult"
+      modelProps: "user" | "role" | "permission" | "rolePermission" | "userRole" | "department" | "workCenter" | "machine" | "shift" | "supplier" | "customer" | "item" | "fabric" | "trim" | "design" | "colour" | "size" | "operation" | "defectCode" | "program" | "programFabric" | "programColour" | "programSize" | "programSpecification" | "programBOM" | "programRoute" | "programRouteStep" | "attachment" | "auditLog" | "challan" | "challanItem" | "productionTransaction" | "qualityInspection" | "defectLog" | "inventoryStock" | "challanEvent" | "stockLedgerEntry" | "fabricRoll" | "bundle" | "carton" | "cartonBundle" | "dispatchOrder" | "dispatchCarton" | "defectRecord" | "reworkTransaction" | "recutRequest" | "qualityInspectionParameter" | "idempotencyRecord" | "notification" | "integrityScanResult" | "inventoryLocation" | "fabricBatch" | "fabricStoreRoll" | "materialReceipt" | "materialReceiptItem" | "fabricQCInspection" | "fabricStockLedger"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -5094,6 +5332,524 @@ export namespace Prisma {
           }
         }
       }
+      InventoryLocation: {
+        payload: Prisma.$InventoryLocationPayload<ExtArgs>
+        fields: Prisma.InventoryLocationFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.InventoryLocationFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InventoryLocationPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.InventoryLocationFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InventoryLocationPayload>
+          }
+          findFirst: {
+            args: Prisma.InventoryLocationFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InventoryLocationPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.InventoryLocationFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InventoryLocationPayload>
+          }
+          findMany: {
+            args: Prisma.InventoryLocationFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InventoryLocationPayload>[]
+          }
+          create: {
+            args: Prisma.InventoryLocationCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InventoryLocationPayload>
+          }
+          createMany: {
+            args: Prisma.InventoryLocationCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.InventoryLocationCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InventoryLocationPayload>[]
+          }
+          delete: {
+            args: Prisma.InventoryLocationDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InventoryLocationPayload>
+          }
+          update: {
+            args: Prisma.InventoryLocationUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InventoryLocationPayload>
+          }
+          deleteMany: {
+            args: Prisma.InventoryLocationDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.InventoryLocationUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.InventoryLocationUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InventoryLocationPayload>[]
+          }
+          upsert: {
+            args: Prisma.InventoryLocationUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$InventoryLocationPayload>
+          }
+          aggregate: {
+            args: Prisma.InventoryLocationAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateInventoryLocation>
+          }
+          groupBy: {
+            args: Prisma.InventoryLocationGroupByArgs<ExtArgs>
+            result: $Utils.Optional<InventoryLocationGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.InventoryLocationCountArgs<ExtArgs>
+            result: $Utils.Optional<InventoryLocationCountAggregateOutputType> | number
+          }
+        }
+      }
+      FabricBatch: {
+        payload: Prisma.$FabricBatchPayload<ExtArgs>
+        fields: Prisma.FabricBatchFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.FabricBatchFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricBatchPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.FabricBatchFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricBatchPayload>
+          }
+          findFirst: {
+            args: Prisma.FabricBatchFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricBatchPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.FabricBatchFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricBatchPayload>
+          }
+          findMany: {
+            args: Prisma.FabricBatchFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricBatchPayload>[]
+          }
+          create: {
+            args: Prisma.FabricBatchCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricBatchPayload>
+          }
+          createMany: {
+            args: Prisma.FabricBatchCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.FabricBatchCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricBatchPayload>[]
+          }
+          delete: {
+            args: Prisma.FabricBatchDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricBatchPayload>
+          }
+          update: {
+            args: Prisma.FabricBatchUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricBatchPayload>
+          }
+          deleteMany: {
+            args: Prisma.FabricBatchDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.FabricBatchUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.FabricBatchUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricBatchPayload>[]
+          }
+          upsert: {
+            args: Prisma.FabricBatchUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricBatchPayload>
+          }
+          aggregate: {
+            args: Prisma.FabricBatchAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateFabricBatch>
+          }
+          groupBy: {
+            args: Prisma.FabricBatchGroupByArgs<ExtArgs>
+            result: $Utils.Optional<FabricBatchGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.FabricBatchCountArgs<ExtArgs>
+            result: $Utils.Optional<FabricBatchCountAggregateOutputType> | number
+          }
+        }
+      }
+      FabricStoreRoll: {
+        payload: Prisma.$FabricStoreRollPayload<ExtArgs>
+        fields: Prisma.FabricStoreRollFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.FabricStoreRollFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStoreRollPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.FabricStoreRollFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStoreRollPayload>
+          }
+          findFirst: {
+            args: Prisma.FabricStoreRollFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStoreRollPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.FabricStoreRollFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStoreRollPayload>
+          }
+          findMany: {
+            args: Prisma.FabricStoreRollFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStoreRollPayload>[]
+          }
+          create: {
+            args: Prisma.FabricStoreRollCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStoreRollPayload>
+          }
+          createMany: {
+            args: Prisma.FabricStoreRollCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.FabricStoreRollCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStoreRollPayload>[]
+          }
+          delete: {
+            args: Prisma.FabricStoreRollDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStoreRollPayload>
+          }
+          update: {
+            args: Prisma.FabricStoreRollUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStoreRollPayload>
+          }
+          deleteMany: {
+            args: Prisma.FabricStoreRollDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.FabricStoreRollUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.FabricStoreRollUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStoreRollPayload>[]
+          }
+          upsert: {
+            args: Prisma.FabricStoreRollUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStoreRollPayload>
+          }
+          aggregate: {
+            args: Prisma.FabricStoreRollAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateFabricStoreRoll>
+          }
+          groupBy: {
+            args: Prisma.FabricStoreRollGroupByArgs<ExtArgs>
+            result: $Utils.Optional<FabricStoreRollGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.FabricStoreRollCountArgs<ExtArgs>
+            result: $Utils.Optional<FabricStoreRollCountAggregateOutputType> | number
+          }
+        }
+      }
+      MaterialReceipt: {
+        payload: Prisma.$MaterialReceiptPayload<ExtArgs>
+        fields: Prisma.MaterialReceiptFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MaterialReceiptFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialReceiptPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MaterialReceiptFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialReceiptPayload>
+          }
+          findFirst: {
+            args: Prisma.MaterialReceiptFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialReceiptPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MaterialReceiptFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialReceiptPayload>
+          }
+          findMany: {
+            args: Prisma.MaterialReceiptFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialReceiptPayload>[]
+          }
+          create: {
+            args: Prisma.MaterialReceiptCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialReceiptPayload>
+          }
+          createMany: {
+            args: Prisma.MaterialReceiptCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.MaterialReceiptCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialReceiptPayload>[]
+          }
+          delete: {
+            args: Prisma.MaterialReceiptDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialReceiptPayload>
+          }
+          update: {
+            args: Prisma.MaterialReceiptUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialReceiptPayload>
+          }
+          deleteMany: {
+            args: Prisma.MaterialReceiptDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MaterialReceiptUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.MaterialReceiptUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialReceiptPayload>[]
+          }
+          upsert: {
+            args: Prisma.MaterialReceiptUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialReceiptPayload>
+          }
+          aggregate: {
+            args: Prisma.MaterialReceiptAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMaterialReceipt>
+          }
+          groupBy: {
+            args: Prisma.MaterialReceiptGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MaterialReceiptGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MaterialReceiptCountArgs<ExtArgs>
+            result: $Utils.Optional<MaterialReceiptCountAggregateOutputType> | number
+          }
+        }
+      }
+      MaterialReceiptItem: {
+        payload: Prisma.$MaterialReceiptItemPayload<ExtArgs>
+        fields: Prisma.MaterialReceiptItemFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MaterialReceiptItemFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialReceiptItemPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MaterialReceiptItemFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialReceiptItemPayload>
+          }
+          findFirst: {
+            args: Prisma.MaterialReceiptItemFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialReceiptItemPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MaterialReceiptItemFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialReceiptItemPayload>
+          }
+          findMany: {
+            args: Prisma.MaterialReceiptItemFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialReceiptItemPayload>[]
+          }
+          create: {
+            args: Prisma.MaterialReceiptItemCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialReceiptItemPayload>
+          }
+          createMany: {
+            args: Prisma.MaterialReceiptItemCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.MaterialReceiptItemCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialReceiptItemPayload>[]
+          }
+          delete: {
+            args: Prisma.MaterialReceiptItemDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialReceiptItemPayload>
+          }
+          update: {
+            args: Prisma.MaterialReceiptItemUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialReceiptItemPayload>
+          }
+          deleteMany: {
+            args: Prisma.MaterialReceiptItemDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MaterialReceiptItemUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.MaterialReceiptItemUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialReceiptItemPayload>[]
+          }
+          upsert: {
+            args: Prisma.MaterialReceiptItemUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MaterialReceiptItemPayload>
+          }
+          aggregate: {
+            args: Prisma.MaterialReceiptItemAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMaterialReceiptItem>
+          }
+          groupBy: {
+            args: Prisma.MaterialReceiptItemGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MaterialReceiptItemGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MaterialReceiptItemCountArgs<ExtArgs>
+            result: $Utils.Optional<MaterialReceiptItemCountAggregateOutputType> | number
+          }
+        }
+      }
+      FabricQCInspection: {
+        payload: Prisma.$FabricQCInspectionPayload<ExtArgs>
+        fields: Prisma.FabricQCInspectionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.FabricQCInspectionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricQCInspectionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.FabricQCInspectionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricQCInspectionPayload>
+          }
+          findFirst: {
+            args: Prisma.FabricQCInspectionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricQCInspectionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.FabricQCInspectionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricQCInspectionPayload>
+          }
+          findMany: {
+            args: Prisma.FabricQCInspectionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricQCInspectionPayload>[]
+          }
+          create: {
+            args: Prisma.FabricQCInspectionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricQCInspectionPayload>
+          }
+          createMany: {
+            args: Prisma.FabricQCInspectionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.FabricQCInspectionCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricQCInspectionPayload>[]
+          }
+          delete: {
+            args: Prisma.FabricQCInspectionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricQCInspectionPayload>
+          }
+          update: {
+            args: Prisma.FabricQCInspectionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricQCInspectionPayload>
+          }
+          deleteMany: {
+            args: Prisma.FabricQCInspectionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.FabricQCInspectionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.FabricQCInspectionUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricQCInspectionPayload>[]
+          }
+          upsert: {
+            args: Prisma.FabricQCInspectionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricQCInspectionPayload>
+          }
+          aggregate: {
+            args: Prisma.FabricQCInspectionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateFabricQCInspection>
+          }
+          groupBy: {
+            args: Prisma.FabricQCInspectionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<FabricQCInspectionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.FabricQCInspectionCountArgs<ExtArgs>
+            result: $Utils.Optional<FabricQCInspectionCountAggregateOutputType> | number
+          }
+        }
+      }
+      FabricStockLedger: {
+        payload: Prisma.$FabricStockLedgerPayload<ExtArgs>
+        fields: Prisma.FabricStockLedgerFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.FabricStockLedgerFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockLedgerPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.FabricStockLedgerFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockLedgerPayload>
+          }
+          findFirst: {
+            args: Prisma.FabricStockLedgerFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockLedgerPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.FabricStockLedgerFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockLedgerPayload>
+          }
+          findMany: {
+            args: Prisma.FabricStockLedgerFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockLedgerPayload>[]
+          }
+          create: {
+            args: Prisma.FabricStockLedgerCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockLedgerPayload>
+          }
+          createMany: {
+            args: Prisma.FabricStockLedgerCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.FabricStockLedgerCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockLedgerPayload>[]
+          }
+          delete: {
+            args: Prisma.FabricStockLedgerDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockLedgerPayload>
+          }
+          update: {
+            args: Prisma.FabricStockLedgerUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockLedgerPayload>
+          }
+          deleteMany: {
+            args: Prisma.FabricStockLedgerDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.FabricStockLedgerUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.FabricStockLedgerUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockLedgerPayload>[]
+          }
+          upsert: {
+            args: Prisma.FabricStockLedgerUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockLedgerPayload>
+          }
+          aggregate: {
+            args: Prisma.FabricStockLedgerAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateFabricStockLedger>
+          }
+          groupBy: {
+            args: Prisma.FabricStockLedgerGroupByArgs<ExtArgs>
+            result: $Utils.Optional<FabricStockLedgerGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.FabricStockLedgerCountArgs<ExtArgs>
+            result: $Utils.Optional<FabricStockLedgerCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -5240,6 +5996,13 @@ export namespace Prisma {
     idempotencyRecord?: IdempotencyRecordOmit
     notification?: NotificationOmit
     integrityScanResult?: IntegrityScanResultOmit
+    inventoryLocation?: InventoryLocationOmit
+    fabricBatch?: FabricBatchOmit
+    fabricStoreRoll?: FabricStoreRollOmit
+    materialReceipt?: MaterialReceiptOmit
+    materialReceiptItem?: MaterialReceiptItemOmit
+    fabricQCInspection?: FabricQCInspectionOmit
+    fabricStockLedger?: FabricStockLedgerOmit
   }
 
   /* Types for Logging */
@@ -5339,6 +6102,11 @@ export namespace Prisma {
     reworkOperations: number
     recutsRequested: number
     recutsApproved: number
+    fabricBatchesCreated: number
+    grnReceived: number
+    fabricRollsInspected: number
+    fabricQCInspections: number
+    fabricLedgerEntries: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5361,6 +6129,11 @@ export namespace Prisma {
     reworkOperations?: boolean | UserCountOutputTypeCountReworkOperationsArgs
     recutsRequested?: boolean | UserCountOutputTypeCountRecutsRequestedArgs
     recutsApproved?: boolean | UserCountOutputTypeCountRecutsApprovedArgs
+    fabricBatchesCreated?: boolean | UserCountOutputTypeCountFabricBatchesCreatedArgs
+    grnReceived?: boolean | UserCountOutputTypeCountGrnReceivedArgs
+    fabricRollsInspected?: boolean | UserCountOutputTypeCountFabricRollsInspectedArgs
+    fabricQCInspections?: boolean | UserCountOutputTypeCountFabricQCInspectionsArgs
+    fabricLedgerEntries?: boolean | UserCountOutputTypeCountFabricLedgerEntriesArgs
   }
 
   // Custom InputTypes
@@ -5505,6 +6278,41 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountRecutsApprovedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: RecutRequestWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountFabricBatchesCreatedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FabricBatchWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountGrnReceivedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MaterialReceiptWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountFabricRollsInspectedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FabricStoreRollWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountFabricQCInspectionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FabricQCInspectionWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountFabricLedgerEntriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FabricStockLedgerWhereInput
   }
 
 
@@ -6008,6 +6816,8 @@ export namespace Prisma {
     stockLedgerEntries: number
     reworkTransactions: number
     recutRequests: number
+    fabricBatches: number
+    fabricStoreRolls: number
   }
 
   export type ProgramCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6026,6 +6836,8 @@ export namespace Prisma {
     stockLedgerEntries?: boolean | ProgramCountOutputTypeCountStockLedgerEntriesArgs
     reworkTransactions?: boolean | ProgramCountOutputTypeCountReworkTransactionsArgs
     recutRequests?: boolean | ProgramCountOutputTypeCountRecutRequestsArgs
+    fabricBatches?: boolean | ProgramCountOutputTypeCountFabricBatchesArgs
+    fabricStoreRolls?: boolean | ProgramCountOutputTypeCountFabricStoreRollsArgs
   }
 
   // Custom InputTypes
@@ -6142,6 +6954,20 @@ export namespace Prisma {
    */
   export type ProgramCountOutputTypeCountRecutRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: RecutRequestWhereInput
+  }
+
+  /**
+   * ProgramCountOutputType without action
+   */
+  export type ProgramCountOutputTypeCountFabricBatchesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FabricBatchWhereInput
+  }
+
+  /**
+   * ProgramCountOutputType without action
+   */
+  export type ProgramCountOutputTypeCountFabricStoreRollsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FabricStoreRollWhereInput
   }
 
 
@@ -6502,6 +7328,184 @@ export namespace Prisma {
 
 
   /**
+   * Count Type InventoryLocationCountOutputType
+   */
+
+  export type InventoryLocationCountOutputType = {
+    rolls: number
+    fromLedger: number
+    toLedger: number
+  }
+
+  export type InventoryLocationCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    rolls?: boolean | InventoryLocationCountOutputTypeCountRollsArgs
+    fromLedger?: boolean | InventoryLocationCountOutputTypeCountFromLedgerArgs
+    toLedger?: boolean | InventoryLocationCountOutputTypeCountToLedgerArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * InventoryLocationCountOutputType without action
+   */
+  export type InventoryLocationCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InventoryLocationCountOutputType
+     */
+    select?: InventoryLocationCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * InventoryLocationCountOutputType without action
+   */
+  export type InventoryLocationCountOutputTypeCountRollsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FabricStoreRollWhereInput
+  }
+
+  /**
+   * InventoryLocationCountOutputType without action
+   */
+  export type InventoryLocationCountOutputTypeCountFromLedgerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FabricStockLedgerWhereInput
+  }
+
+  /**
+   * InventoryLocationCountOutputType without action
+   */
+  export type InventoryLocationCountOutputTypeCountToLedgerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FabricStockLedgerWhereInput
+  }
+
+
+  /**
+   * Count Type FabricBatchCountOutputType
+   */
+
+  export type FabricBatchCountOutputType = {
+    rolls: number
+    receipts: number
+    ledgerEntries: number
+  }
+
+  export type FabricBatchCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    rolls?: boolean | FabricBatchCountOutputTypeCountRollsArgs
+    receipts?: boolean | FabricBatchCountOutputTypeCountReceiptsArgs
+    ledgerEntries?: boolean | FabricBatchCountOutputTypeCountLedgerEntriesArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * FabricBatchCountOutputType without action
+   */
+  export type FabricBatchCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricBatchCountOutputType
+     */
+    select?: FabricBatchCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * FabricBatchCountOutputType without action
+   */
+  export type FabricBatchCountOutputTypeCountRollsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FabricStoreRollWhereInput
+  }
+
+  /**
+   * FabricBatchCountOutputType without action
+   */
+  export type FabricBatchCountOutputTypeCountReceiptsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MaterialReceiptWhereInput
+  }
+
+  /**
+   * FabricBatchCountOutputType without action
+   */
+  export type FabricBatchCountOutputTypeCountLedgerEntriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FabricStockLedgerWhereInput
+  }
+
+
+  /**
+   * Count Type FabricStoreRollCountOutputType
+   */
+
+  export type FabricStoreRollCountOutputType = {
+    receiptItems: number
+    qcInspections: number
+    ledgerEntries: number
+  }
+
+  export type FabricStoreRollCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    receiptItems?: boolean | FabricStoreRollCountOutputTypeCountReceiptItemsArgs
+    qcInspections?: boolean | FabricStoreRollCountOutputTypeCountQcInspectionsArgs
+    ledgerEntries?: boolean | FabricStoreRollCountOutputTypeCountLedgerEntriesArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * FabricStoreRollCountOutputType without action
+   */
+  export type FabricStoreRollCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStoreRollCountOutputType
+     */
+    select?: FabricStoreRollCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * FabricStoreRollCountOutputType without action
+   */
+  export type FabricStoreRollCountOutputTypeCountReceiptItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MaterialReceiptItemWhereInput
+  }
+
+  /**
+   * FabricStoreRollCountOutputType without action
+   */
+  export type FabricStoreRollCountOutputTypeCountQcInspectionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FabricQCInspectionWhereInput
+  }
+
+  /**
+   * FabricStoreRollCountOutputType without action
+   */
+  export type FabricStoreRollCountOutputTypeCountLedgerEntriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FabricStockLedgerWhereInput
+  }
+
+
+  /**
+   * Count Type MaterialReceiptCountOutputType
+   */
+
+  export type MaterialReceiptCountOutputType = {
+    items: number
+  }
+
+  export type MaterialReceiptCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    items?: boolean | MaterialReceiptCountOutputTypeCountItemsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * MaterialReceiptCountOutputType without action
+   */
+  export type MaterialReceiptCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceiptCountOutputType
+     */
+    select?: MaterialReceiptCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * MaterialReceiptCountOutputType without action
+   */
+  export type MaterialReceiptCountOutputTypeCountItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MaterialReceiptItemWhereInput
+  }
+
+
+  /**
    * Models
    */
 
@@ -6720,6 +7724,11 @@ export namespace Prisma {
     reworkOperations?: boolean | User$reworkOperationsArgs<ExtArgs>
     recutsRequested?: boolean | User$recutsRequestedArgs<ExtArgs>
     recutsApproved?: boolean | User$recutsApprovedArgs<ExtArgs>
+    fabricBatchesCreated?: boolean | User$fabricBatchesCreatedArgs<ExtArgs>
+    grnReceived?: boolean | User$grnReceivedArgs<ExtArgs>
+    fabricRollsInspected?: boolean | User$fabricRollsInspectedArgs<ExtArgs>
+    fabricQCInspections?: boolean | User$fabricQCInspectionsArgs<ExtArgs>
+    fabricLedgerEntries?: boolean | User$fabricLedgerEntriesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -6780,6 +7789,11 @@ export namespace Prisma {
     reworkOperations?: boolean | User$reworkOperationsArgs<ExtArgs>
     recutsRequested?: boolean | User$recutsRequestedArgs<ExtArgs>
     recutsApproved?: boolean | User$recutsApprovedArgs<ExtArgs>
+    fabricBatchesCreated?: boolean | User$fabricBatchesCreatedArgs<ExtArgs>
+    grnReceived?: boolean | User$grnReceivedArgs<ExtArgs>
+    fabricRollsInspected?: boolean | User$fabricRollsInspectedArgs<ExtArgs>
+    fabricQCInspections?: boolean | User$fabricQCInspectionsArgs<ExtArgs>
+    fabricLedgerEntries?: boolean | User$fabricLedgerEntriesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -6807,6 +7821,11 @@ export namespace Prisma {
       reworkOperations: Prisma.$ReworkTransactionPayload<ExtArgs>[]
       recutsRequested: Prisma.$RecutRequestPayload<ExtArgs>[]
       recutsApproved: Prisma.$RecutRequestPayload<ExtArgs>[]
+      fabricBatchesCreated: Prisma.$FabricBatchPayload<ExtArgs>[]
+      grnReceived: Prisma.$MaterialReceiptPayload<ExtArgs>[]
+      fabricRollsInspected: Prisma.$FabricStoreRollPayload<ExtArgs>[]
+      fabricQCInspections: Prisma.$FabricQCInspectionPayload<ExtArgs>[]
+      fabricLedgerEntries: Prisma.$FabricStockLedgerPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -7231,6 +8250,11 @@ export namespace Prisma {
     reworkOperations<T extends User$reworkOperationsArgs<ExtArgs> = {}>(args?: Subset<T, User$reworkOperationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReworkTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     recutsRequested<T extends User$recutsRequestedArgs<ExtArgs> = {}>(args?: Subset<T, User$recutsRequestedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RecutRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     recutsApproved<T extends User$recutsApprovedArgs<ExtArgs> = {}>(args?: Subset<T, User$recutsApprovedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RecutRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    fabricBatchesCreated<T extends User$fabricBatchesCreatedArgs<ExtArgs> = {}>(args?: Subset<T, User$fabricBatchesCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricBatchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    grnReceived<T extends User$grnReceivedArgs<ExtArgs> = {}>(args?: Subset<T, User$grnReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MaterialReceiptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    fabricRollsInspected<T extends User$fabricRollsInspectedArgs<ExtArgs> = {}>(args?: Subset<T, User$fabricRollsInspectedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStoreRollPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    fabricQCInspections<T extends User$fabricQCInspectionsArgs<ExtArgs> = {}>(args?: Subset<T, User$fabricQCInspectionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricQCInspectionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    fabricLedgerEntries<T extends User$fabricLedgerEntriesArgs<ExtArgs> = {}>(args?: Subset<T, User$fabricLedgerEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStockLedgerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8110,6 +9134,126 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: RecutRequestScalarFieldEnum | RecutRequestScalarFieldEnum[]
+  }
+
+  /**
+   * User.fabricBatchesCreated
+   */
+  export type User$fabricBatchesCreatedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricBatch
+     */
+    select?: FabricBatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricBatch
+     */
+    omit?: FabricBatchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricBatchInclude<ExtArgs> | null
+    where?: FabricBatchWhereInput
+    orderBy?: FabricBatchOrderByWithRelationInput | FabricBatchOrderByWithRelationInput[]
+    cursor?: FabricBatchWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FabricBatchScalarFieldEnum | FabricBatchScalarFieldEnum[]
+  }
+
+  /**
+   * User.grnReceived
+   */
+  export type User$grnReceivedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceipt
+     */
+    select?: MaterialReceiptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialReceipt
+     */
+    omit?: MaterialReceiptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialReceiptInclude<ExtArgs> | null
+    where?: MaterialReceiptWhereInput
+    orderBy?: MaterialReceiptOrderByWithRelationInput | MaterialReceiptOrderByWithRelationInput[]
+    cursor?: MaterialReceiptWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MaterialReceiptScalarFieldEnum | MaterialReceiptScalarFieldEnum[]
+  }
+
+  /**
+   * User.fabricRollsInspected
+   */
+  export type User$fabricRollsInspectedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStoreRoll
+     */
+    select?: FabricStoreRollSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStoreRoll
+     */
+    omit?: FabricStoreRollOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStoreRollInclude<ExtArgs> | null
+    where?: FabricStoreRollWhereInput
+    orderBy?: FabricStoreRollOrderByWithRelationInput | FabricStoreRollOrderByWithRelationInput[]
+    cursor?: FabricStoreRollWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FabricStoreRollScalarFieldEnum | FabricStoreRollScalarFieldEnum[]
+  }
+
+  /**
+   * User.fabricQCInspections
+   */
+  export type User$fabricQCInspectionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricQCInspection
+     */
+    select?: FabricQCInspectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricQCInspection
+     */
+    omit?: FabricQCInspectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricQCInspectionInclude<ExtArgs> | null
+    where?: FabricQCInspectionWhereInput
+    orderBy?: FabricQCInspectionOrderByWithRelationInput | FabricQCInspectionOrderByWithRelationInput[]
+    cursor?: FabricQCInspectionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FabricQCInspectionScalarFieldEnum | FabricQCInspectionScalarFieldEnum[]
+  }
+
+  /**
+   * User.fabricLedgerEntries
+   */
+  export type User$fabricLedgerEntriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockLedger
+     */
+    select?: FabricStockLedgerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockLedger
+     */
+    omit?: FabricStockLedgerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockLedgerInclude<ExtArgs> | null
+    where?: FabricStockLedgerWhereInput
+    orderBy?: FabricStockLedgerOrderByWithRelationInput | FabricStockLedgerOrderByWithRelationInput[]
+    cursor?: FabricStockLedgerWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FabricStockLedgerScalarFieldEnum | FabricStockLedgerScalarFieldEnum[]
   }
 
   /**
@@ -29612,6 +30756,8 @@ export namespace Prisma {
     stockLedgerEntries?: boolean | Program$stockLedgerEntriesArgs<ExtArgs>
     reworkTransactions?: boolean | Program$reworkTransactionsArgs<ExtArgs>
     recutRequests?: boolean | Program$recutRequestsArgs<ExtArgs>
+    fabricBatches?: boolean | Program$fabricBatchesArgs<ExtArgs>
+    fabricStoreRolls?: boolean | Program$fabricStoreRollsArgs<ExtArgs>
     _count?: boolean | ProgramCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["program"]>
 
@@ -29821,6 +30967,8 @@ export namespace Prisma {
     stockLedgerEntries?: boolean | Program$stockLedgerEntriesArgs<ExtArgs>
     reworkTransactions?: boolean | Program$reworkTransactionsArgs<ExtArgs>
     recutRequests?: boolean | Program$recutRequestsArgs<ExtArgs>
+    fabricBatches?: boolean | Program$fabricBatchesArgs<ExtArgs>
+    fabricStoreRolls?: boolean | Program$fabricStoreRollsArgs<ExtArgs>
     _count?: boolean | ProgramCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ProgramIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -29858,6 +31006,8 @@ export namespace Prisma {
       stockLedgerEntries: Prisma.$StockLedgerEntryPayload<ExtArgs>[]
       reworkTransactions: Prisma.$ReworkTransactionPayload<ExtArgs>[]
       recutRequests: Prisma.$RecutRequestPayload<ExtArgs>[]
+      fabricBatches: Prisma.$FabricBatchPayload<ExtArgs>[]
+      fabricStoreRolls: Prisma.$FabricStoreRollPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -30329,6 +31479,8 @@ export namespace Prisma {
     stockLedgerEntries<T extends Program$stockLedgerEntriesArgs<ExtArgs> = {}>(args?: Subset<T, Program$stockLedgerEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StockLedgerEntryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     reworkTransactions<T extends Program$reworkTransactionsArgs<ExtArgs> = {}>(args?: Subset<T, Program$reworkTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReworkTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     recutRequests<T extends Program$recutRequestsArgs<ExtArgs> = {}>(args?: Subset<T, Program$recutRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RecutRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    fabricBatches<T extends Program$fabricBatchesArgs<ExtArgs> = {}>(args?: Subset<T, Program$fabricBatchesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricBatchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    fabricStoreRolls<T extends Program$fabricStoreRollsArgs<ExtArgs> = {}>(args?: Subset<T, Program$fabricStoreRollsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStoreRollPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -31224,6 +32376,54 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: RecutRequestScalarFieldEnum | RecutRequestScalarFieldEnum[]
+  }
+
+  /**
+   * Program.fabricBatches
+   */
+  export type Program$fabricBatchesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricBatch
+     */
+    select?: FabricBatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricBatch
+     */
+    omit?: FabricBatchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricBatchInclude<ExtArgs> | null
+    where?: FabricBatchWhereInput
+    orderBy?: FabricBatchOrderByWithRelationInput | FabricBatchOrderByWithRelationInput[]
+    cursor?: FabricBatchWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FabricBatchScalarFieldEnum | FabricBatchScalarFieldEnum[]
+  }
+
+  /**
+   * Program.fabricStoreRolls
+   */
+  export type Program$fabricStoreRollsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStoreRoll
+     */
+    select?: FabricStoreRollSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStoreRoll
+     */
+    omit?: FabricStoreRollOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStoreRollInclude<ExtArgs> | null
+    where?: FabricStoreRollWhereInput
+    orderBy?: FabricStoreRollOrderByWithRelationInput | FabricStoreRollOrderByWithRelationInput[]
+    cursor?: FabricStoreRollWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FabricStoreRollScalarFieldEnum | FabricStoreRollScalarFieldEnum[]
   }
 
   /**
@@ -67898,6 +69098,8694 @@ export namespace Prisma {
 
 
   /**
+   * Model InventoryLocation
+   */
+
+  export type AggregateInventoryLocation = {
+    _count: InventoryLocationCountAggregateOutputType | null
+    _min: InventoryLocationMinAggregateOutputType | null
+    _max: InventoryLocationMaxAggregateOutputType | null
+  }
+
+  export type InventoryLocationMinAggregateOutputType = {
+    id: string | null
+    locationCode: string | null
+    locationName: string | null
+    locationType: $Enums.InventoryLocationType | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type InventoryLocationMaxAggregateOutputType = {
+    id: string | null
+    locationCode: string | null
+    locationName: string | null
+    locationType: $Enums.InventoryLocationType | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type InventoryLocationCountAggregateOutputType = {
+    id: number
+    locationCode: number
+    locationName: number
+    locationType: number
+    isActive: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type InventoryLocationMinAggregateInputType = {
+    id?: true
+    locationCode?: true
+    locationName?: true
+    locationType?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type InventoryLocationMaxAggregateInputType = {
+    id?: true
+    locationCode?: true
+    locationName?: true
+    locationType?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type InventoryLocationCountAggregateInputType = {
+    id?: true
+    locationCode?: true
+    locationName?: true
+    locationType?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type InventoryLocationAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which InventoryLocation to aggregate.
+     */
+    where?: InventoryLocationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of InventoryLocations to fetch.
+     */
+    orderBy?: InventoryLocationOrderByWithRelationInput | InventoryLocationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: InventoryLocationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` InventoryLocations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` InventoryLocations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned InventoryLocations
+    **/
+    _count?: true | InventoryLocationCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: InventoryLocationMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: InventoryLocationMaxAggregateInputType
+  }
+
+  export type GetInventoryLocationAggregateType<T extends InventoryLocationAggregateArgs> = {
+        [P in keyof T & keyof AggregateInventoryLocation]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateInventoryLocation[P]>
+      : GetScalarType<T[P], AggregateInventoryLocation[P]>
+  }
+
+
+
+
+  export type InventoryLocationGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: InventoryLocationWhereInput
+    orderBy?: InventoryLocationOrderByWithAggregationInput | InventoryLocationOrderByWithAggregationInput[]
+    by: InventoryLocationScalarFieldEnum[] | InventoryLocationScalarFieldEnum
+    having?: InventoryLocationScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: InventoryLocationCountAggregateInputType | true
+    _min?: InventoryLocationMinAggregateInputType
+    _max?: InventoryLocationMaxAggregateInputType
+  }
+
+  export type InventoryLocationGroupByOutputType = {
+    id: string
+    locationCode: string
+    locationName: string
+    locationType: $Enums.InventoryLocationType
+    isActive: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: InventoryLocationCountAggregateOutputType | null
+    _min: InventoryLocationMinAggregateOutputType | null
+    _max: InventoryLocationMaxAggregateOutputType | null
+  }
+
+  type GetInventoryLocationGroupByPayload<T extends InventoryLocationGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<InventoryLocationGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof InventoryLocationGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], InventoryLocationGroupByOutputType[P]>
+            : GetScalarType<T[P], InventoryLocationGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type InventoryLocationSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    locationCode?: boolean
+    locationName?: boolean
+    locationType?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    rolls?: boolean | InventoryLocation$rollsArgs<ExtArgs>
+    fromLedger?: boolean | InventoryLocation$fromLedgerArgs<ExtArgs>
+    toLedger?: boolean | InventoryLocation$toLedgerArgs<ExtArgs>
+    _count?: boolean | InventoryLocationCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["inventoryLocation"]>
+
+  export type InventoryLocationSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    locationCode?: boolean
+    locationName?: boolean
+    locationType?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["inventoryLocation"]>
+
+  export type InventoryLocationSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    locationCode?: boolean
+    locationName?: boolean
+    locationType?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["inventoryLocation"]>
+
+  export type InventoryLocationSelectScalar = {
+    id?: boolean
+    locationCode?: boolean
+    locationName?: boolean
+    locationType?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type InventoryLocationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "locationCode" | "locationName" | "locationType" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["inventoryLocation"]>
+  export type InventoryLocationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    rolls?: boolean | InventoryLocation$rollsArgs<ExtArgs>
+    fromLedger?: boolean | InventoryLocation$fromLedgerArgs<ExtArgs>
+    toLedger?: boolean | InventoryLocation$toLedgerArgs<ExtArgs>
+    _count?: boolean | InventoryLocationCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type InventoryLocationIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type InventoryLocationIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+
+  export type $InventoryLocationPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "InventoryLocation"
+    objects: {
+      rolls: Prisma.$FabricStoreRollPayload<ExtArgs>[]
+      fromLedger: Prisma.$FabricStockLedgerPayload<ExtArgs>[]
+      toLedger: Prisma.$FabricStockLedgerPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      locationCode: string
+      locationName: string
+      locationType: $Enums.InventoryLocationType
+      isActive: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["inventoryLocation"]>
+    composites: {}
+  }
+
+  type InventoryLocationGetPayload<S extends boolean | null | undefined | InventoryLocationDefaultArgs> = $Result.GetResult<Prisma.$InventoryLocationPayload, S>
+
+  type InventoryLocationCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<InventoryLocationFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: InventoryLocationCountAggregateInputType | true
+    }
+
+  export interface InventoryLocationDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['InventoryLocation'], meta: { name: 'InventoryLocation' } }
+    /**
+     * Find zero or one InventoryLocation that matches the filter.
+     * @param {InventoryLocationFindUniqueArgs} args - Arguments to find a InventoryLocation
+     * @example
+     * // Get one InventoryLocation
+     * const inventoryLocation = await prisma.inventoryLocation.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends InventoryLocationFindUniqueArgs>(args: SelectSubset<T, InventoryLocationFindUniqueArgs<ExtArgs>>): Prisma__InventoryLocationClient<$Result.GetResult<Prisma.$InventoryLocationPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one InventoryLocation that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {InventoryLocationFindUniqueOrThrowArgs} args - Arguments to find a InventoryLocation
+     * @example
+     * // Get one InventoryLocation
+     * const inventoryLocation = await prisma.inventoryLocation.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends InventoryLocationFindUniqueOrThrowArgs>(args: SelectSubset<T, InventoryLocationFindUniqueOrThrowArgs<ExtArgs>>): Prisma__InventoryLocationClient<$Result.GetResult<Prisma.$InventoryLocationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first InventoryLocation that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InventoryLocationFindFirstArgs} args - Arguments to find a InventoryLocation
+     * @example
+     * // Get one InventoryLocation
+     * const inventoryLocation = await prisma.inventoryLocation.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends InventoryLocationFindFirstArgs>(args?: SelectSubset<T, InventoryLocationFindFirstArgs<ExtArgs>>): Prisma__InventoryLocationClient<$Result.GetResult<Prisma.$InventoryLocationPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first InventoryLocation that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InventoryLocationFindFirstOrThrowArgs} args - Arguments to find a InventoryLocation
+     * @example
+     * // Get one InventoryLocation
+     * const inventoryLocation = await prisma.inventoryLocation.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends InventoryLocationFindFirstOrThrowArgs>(args?: SelectSubset<T, InventoryLocationFindFirstOrThrowArgs<ExtArgs>>): Prisma__InventoryLocationClient<$Result.GetResult<Prisma.$InventoryLocationPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more InventoryLocations that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InventoryLocationFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all InventoryLocations
+     * const inventoryLocations = await prisma.inventoryLocation.findMany()
+     * 
+     * // Get first 10 InventoryLocations
+     * const inventoryLocations = await prisma.inventoryLocation.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const inventoryLocationWithIdOnly = await prisma.inventoryLocation.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends InventoryLocationFindManyArgs>(args?: SelectSubset<T, InventoryLocationFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InventoryLocationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a InventoryLocation.
+     * @param {InventoryLocationCreateArgs} args - Arguments to create a InventoryLocation.
+     * @example
+     * // Create one InventoryLocation
+     * const InventoryLocation = await prisma.inventoryLocation.create({
+     *   data: {
+     *     // ... data to create a InventoryLocation
+     *   }
+     * })
+     * 
+     */
+    create<T extends InventoryLocationCreateArgs>(args: SelectSubset<T, InventoryLocationCreateArgs<ExtArgs>>): Prisma__InventoryLocationClient<$Result.GetResult<Prisma.$InventoryLocationPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many InventoryLocations.
+     * @param {InventoryLocationCreateManyArgs} args - Arguments to create many InventoryLocations.
+     * @example
+     * // Create many InventoryLocations
+     * const inventoryLocation = await prisma.inventoryLocation.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends InventoryLocationCreateManyArgs>(args?: SelectSubset<T, InventoryLocationCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many InventoryLocations and returns the data saved in the database.
+     * @param {InventoryLocationCreateManyAndReturnArgs} args - Arguments to create many InventoryLocations.
+     * @example
+     * // Create many InventoryLocations
+     * const inventoryLocation = await prisma.inventoryLocation.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many InventoryLocations and only return the `id`
+     * const inventoryLocationWithIdOnly = await prisma.inventoryLocation.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends InventoryLocationCreateManyAndReturnArgs>(args?: SelectSubset<T, InventoryLocationCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InventoryLocationPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a InventoryLocation.
+     * @param {InventoryLocationDeleteArgs} args - Arguments to delete one InventoryLocation.
+     * @example
+     * // Delete one InventoryLocation
+     * const InventoryLocation = await prisma.inventoryLocation.delete({
+     *   where: {
+     *     // ... filter to delete one InventoryLocation
+     *   }
+     * })
+     * 
+     */
+    delete<T extends InventoryLocationDeleteArgs>(args: SelectSubset<T, InventoryLocationDeleteArgs<ExtArgs>>): Prisma__InventoryLocationClient<$Result.GetResult<Prisma.$InventoryLocationPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one InventoryLocation.
+     * @param {InventoryLocationUpdateArgs} args - Arguments to update one InventoryLocation.
+     * @example
+     * // Update one InventoryLocation
+     * const inventoryLocation = await prisma.inventoryLocation.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends InventoryLocationUpdateArgs>(args: SelectSubset<T, InventoryLocationUpdateArgs<ExtArgs>>): Prisma__InventoryLocationClient<$Result.GetResult<Prisma.$InventoryLocationPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more InventoryLocations.
+     * @param {InventoryLocationDeleteManyArgs} args - Arguments to filter InventoryLocations to delete.
+     * @example
+     * // Delete a few InventoryLocations
+     * const { count } = await prisma.inventoryLocation.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends InventoryLocationDeleteManyArgs>(args?: SelectSubset<T, InventoryLocationDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more InventoryLocations.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InventoryLocationUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many InventoryLocations
+     * const inventoryLocation = await prisma.inventoryLocation.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends InventoryLocationUpdateManyArgs>(args: SelectSubset<T, InventoryLocationUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more InventoryLocations and returns the data updated in the database.
+     * @param {InventoryLocationUpdateManyAndReturnArgs} args - Arguments to update many InventoryLocations.
+     * @example
+     * // Update many InventoryLocations
+     * const inventoryLocation = await prisma.inventoryLocation.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more InventoryLocations and only return the `id`
+     * const inventoryLocationWithIdOnly = await prisma.inventoryLocation.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends InventoryLocationUpdateManyAndReturnArgs>(args: SelectSubset<T, InventoryLocationUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InventoryLocationPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one InventoryLocation.
+     * @param {InventoryLocationUpsertArgs} args - Arguments to update or create a InventoryLocation.
+     * @example
+     * // Update or create a InventoryLocation
+     * const inventoryLocation = await prisma.inventoryLocation.upsert({
+     *   create: {
+     *     // ... data to create a InventoryLocation
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the InventoryLocation we want to update
+     *   }
+     * })
+     */
+    upsert<T extends InventoryLocationUpsertArgs>(args: SelectSubset<T, InventoryLocationUpsertArgs<ExtArgs>>): Prisma__InventoryLocationClient<$Result.GetResult<Prisma.$InventoryLocationPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of InventoryLocations.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InventoryLocationCountArgs} args - Arguments to filter InventoryLocations to count.
+     * @example
+     * // Count the number of InventoryLocations
+     * const count = await prisma.inventoryLocation.count({
+     *   where: {
+     *     // ... the filter for the InventoryLocations we want to count
+     *   }
+     * })
+    **/
+    count<T extends InventoryLocationCountArgs>(
+      args?: Subset<T, InventoryLocationCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], InventoryLocationCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a InventoryLocation.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InventoryLocationAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends InventoryLocationAggregateArgs>(args: Subset<T, InventoryLocationAggregateArgs>): Prisma.PrismaPromise<GetInventoryLocationAggregateType<T>>
+
+    /**
+     * Group by InventoryLocation.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {InventoryLocationGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends InventoryLocationGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: InventoryLocationGroupByArgs['orderBy'] }
+        : { orderBy?: InventoryLocationGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, InventoryLocationGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetInventoryLocationGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the InventoryLocation model
+   */
+  readonly fields: InventoryLocationFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for InventoryLocation.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__InventoryLocationClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    rolls<T extends InventoryLocation$rollsArgs<ExtArgs> = {}>(args?: Subset<T, InventoryLocation$rollsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStoreRollPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    fromLedger<T extends InventoryLocation$fromLedgerArgs<ExtArgs> = {}>(args?: Subset<T, InventoryLocation$fromLedgerArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStockLedgerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    toLedger<T extends InventoryLocation$toLedgerArgs<ExtArgs> = {}>(args?: Subset<T, InventoryLocation$toLedgerArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStockLedgerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the InventoryLocation model
+   */
+  interface InventoryLocationFieldRefs {
+    readonly id: FieldRef<"InventoryLocation", 'String'>
+    readonly locationCode: FieldRef<"InventoryLocation", 'String'>
+    readonly locationName: FieldRef<"InventoryLocation", 'String'>
+    readonly locationType: FieldRef<"InventoryLocation", 'InventoryLocationType'>
+    readonly isActive: FieldRef<"InventoryLocation", 'Boolean'>
+    readonly createdAt: FieldRef<"InventoryLocation", 'DateTime'>
+    readonly updatedAt: FieldRef<"InventoryLocation", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * InventoryLocation findUnique
+   */
+  export type InventoryLocationFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InventoryLocation
+     */
+    select?: InventoryLocationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InventoryLocation
+     */
+    omit?: InventoryLocationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InventoryLocationInclude<ExtArgs> | null
+    /**
+     * Filter, which InventoryLocation to fetch.
+     */
+    where: InventoryLocationWhereUniqueInput
+  }
+
+  /**
+   * InventoryLocation findUniqueOrThrow
+   */
+  export type InventoryLocationFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InventoryLocation
+     */
+    select?: InventoryLocationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InventoryLocation
+     */
+    omit?: InventoryLocationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InventoryLocationInclude<ExtArgs> | null
+    /**
+     * Filter, which InventoryLocation to fetch.
+     */
+    where: InventoryLocationWhereUniqueInput
+  }
+
+  /**
+   * InventoryLocation findFirst
+   */
+  export type InventoryLocationFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InventoryLocation
+     */
+    select?: InventoryLocationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InventoryLocation
+     */
+    omit?: InventoryLocationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InventoryLocationInclude<ExtArgs> | null
+    /**
+     * Filter, which InventoryLocation to fetch.
+     */
+    where?: InventoryLocationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of InventoryLocations to fetch.
+     */
+    orderBy?: InventoryLocationOrderByWithRelationInput | InventoryLocationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for InventoryLocations.
+     */
+    cursor?: InventoryLocationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` InventoryLocations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` InventoryLocations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of InventoryLocations.
+     */
+    distinct?: InventoryLocationScalarFieldEnum | InventoryLocationScalarFieldEnum[]
+  }
+
+  /**
+   * InventoryLocation findFirstOrThrow
+   */
+  export type InventoryLocationFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InventoryLocation
+     */
+    select?: InventoryLocationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InventoryLocation
+     */
+    omit?: InventoryLocationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InventoryLocationInclude<ExtArgs> | null
+    /**
+     * Filter, which InventoryLocation to fetch.
+     */
+    where?: InventoryLocationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of InventoryLocations to fetch.
+     */
+    orderBy?: InventoryLocationOrderByWithRelationInput | InventoryLocationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for InventoryLocations.
+     */
+    cursor?: InventoryLocationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` InventoryLocations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` InventoryLocations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of InventoryLocations.
+     */
+    distinct?: InventoryLocationScalarFieldEnum | InventoryLocationScalarFieldEnum[]
+  }
+
+  /**
+   * InventoryLocation findMany
+   */
+  export type InventoryLocationFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InventoryLocation
+     */
+    select?: InventoryLocationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InventoryLocation
+     */
+    omit?: InventoryLocationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InventoryLocationInclude<ExtArgs> | null
+    /**
+     * Filter, which InventoryLocations to fetch.
+     */
+    where?: InventoryLocationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of InventoryLocations to fetch.
+     */
+    orderBy?: InventoryLocationOrderByWithRelationInput | InventoryLocationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing InventoryLocations.
+     */
+    cursor?: InventoryLocationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` InventoryLocations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` InventoryLocations.
+     */
+    skip?: number
+    distinct?: InventoryLocationScalarFieldEnum | InventoryLocationScalarFieldEnum[]
+  }
+
+  /**
+   * InventoryLocation create
+   */
+  export type InventoryLocationCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InventoryLocation
+     */
+    select?: InventoryLocationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InventoryLocation
+     */
+    omit?: InventoryLocationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InventoryLocationInclude<ExtArgs> | null
+    /**
+     * The data needed to create a InventoryLocation.
+     */
+    data: XOR<InventoryLocationCreateInput, InventoryLocationUncheckedCreateInput>
+  }
+
+  /**
+   * InventoryLocation createMany
+   */
+  export type InventoryLocationCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many InventoryLocations.
+     */
+    data: InventoryLocationCreateManyInput | InventoryLocationCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * InventoryLocation createManyAndReturn
+   */
+  export type InventoryLocationCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InventoryLocation
+     */
+    select?: InventoryLocationSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the InventoryLocation
+     */
+    omit?: InventoryLocationOmit<ExtArgs> | null
+    /**
+     * The data used to create many InventoryLocations.
+     */
+    data: InventoryLocationCreateManyInput | InventoryLocationCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * InventoryLocation update
+   */
+  export type InventoryLocationUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InventoryLocation
+     */
+    select?: InventoryLocationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InventoryLocation
+     */
+    omit?: InventoryLocationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InventoryLocationInclude<ExtArgs> | null
+    /**
+     * The data needed to update a InventoryLocation.
+     */
+    data: XOR<InventoryLocationUpdateInput, InventoryLocationUncheckedUpdateInput>
+    /**
+     * Choose, which InventoryLocation to update.
+     */
+    where: InventoryLocationWhereUniqueInput
+  }
+
+  /**
+   * InventoryLocation updateMany
+   */
+  export type InventoryLocationUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update InventoryLocations.
+     */
+    data: XOR<InventoryLocationUpdateManyMutationInput, InventoryLocationUncheckedUpdateManyInput>
+    /**
+     * Filter which InventoryLocations to update
+     */
+    where?: InventoryLocationWhereInput
+    /**
+     * Limit how many InventoryLocations to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * InventoryLocation updateManyAndReturn
+   */
+  export type InventoryLocationUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InventoryLocation
+     */
+    select?: InventoryLocationSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the InventoryLocation
+     */
+    omit?: InventoryLocationOmit<ExtArgs> | null
+    /**
+     * The data used to update InventoryLocations.
+     */
+    data: XOR<InventoryLocationUpdateManyMutationInput, InventoryLocationUncheckedUpdateManyInput>
+    /**
+     * Filter which InventoryLocations to update
+     */
+    where?: InventoryLocationWhereInput
+    /**
+     * Limit how many InventoryLocations to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * InventoryLocation upsert
+   */
+  export type InventoryLocationUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InventoryLocation
+     */
+    select?: InventoryLocationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InventoryLocation
+     */
+    omit?: InventoryLocationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InventoryLocationInclude<ExtArgs> | null
+    /**
+     * The filter to search for the InventoryLocation to update in case it exists.
+     */
+    where: InventoryLocationWhereUniqueInput
+    /**
+     * In case the InventoryLocation found by the `where` argument doesn't exist, create a new InventoryLocation with this data.
+     */
+    create: XOR<InventoryLocationCreateInput, InventoryLocationUncheckedCreateInput>
+    /**
+     * In case the InventoryLocation was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<InventoryLocationUpdateInput, InventoryLocationUncheckedUpdateInput>
+  }
+
+  /**
+   * InventoryLocation delete
+   */
+  export type InventoryLocationDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InventoryLocation
+     */
+    select?: InventoryLocationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InventoryLocation
+     */
+    omit?: InventoryLocationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InventoryLocationInclude<ExtArgs> | null
+    /**
+     * Filter which InventoryLocation to delete.
+     */
+    where: InventoryLocationWhereUniqueInput
+  }
+
+  /**
+   * InventoryLocation deleteMany
+   */
+  export type InventoryLocationDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which InventoryLocations to delete
+     */
+    where?: InventoryLocationWhereInput
+    /**
+     * Limit how many InventoryLocations to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * InventoryLocation.rolls
+   */
+  export type InventoryLocation$rollsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStoreRoll
+     */
+    select?: FabricStoreRollSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStoreRoll
+     */
+    omit?: FabricStoreRollOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStoreRollInclude<ExtArgs> | null
+    where?: FabricStoreRollWhereInput
+    orderBy?: FabricStoreRollOrderByWithRelationInput | FabricStoreRollOrderByWithRelationInput[]
+    cursor?: FabricStoreRollWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FabricStoreRollScalarFieldEnum | FabricStoreRollScalarFieldEnum[]
+  }
+
+  /**
+   * InventoryLocation.fromLedger
+   */
+  export type InventoryLocation$fromLedgerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockLedger
+     */
+    select?: FabricStockLedgerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockLedger
+     */
+    omit?: FabricStockLedgerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockLedgerInclude<ExtArgs> | null
+    where?: FabricStockLedgerWhereInput
+    orderBy?: FabricStockLedgerOrderByWithRelationInput | FabricStockLedgerOrderByWithRelationInput[]
+    cursor?: FabricStockLedgerWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FabricStockLedgerScalarFieldEnum | FabricStockLedgerScalarFieldEnum[]
+  }
+
+  /**
+   * InventoryLocation.toLedger
+   */
+  export type InventoryLocation$toLedgerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockLedger
+     */
+    select?: FabricStockLedgerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockLedger
+     */
+    omit?: FabricStockLedgerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockLedgerInclude<ExtArgs> | null
+    where?: FabricStockLedgerWhereInput
+    orderBy?: FabricStockLedgerOrderByWithRelationInput | FabricStockLedgerOrderByWithRelationInput[]
+    cursor?: FabricStockLedgerWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FabricStockLedgerScalarFieldEnum | FabricStockLedgerScalarFieldEnum[]
+  }
+
+  /**
+   * InventoryLocation without action
+   */
+  export type InventoryLocationDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InventoryLocation
+     */
+    select?: InventoryLocationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InventoryLocation
+     */
+    omit?: InventoryLocationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InventoryLocationInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model FabricBatch
+   */
+
+  export type AggregateFabricBatch = {
+    _count: FabricBatchCountAggregateOutputType | null
+    _avg: FabricBatchAvgAggregateOutputType | null
+    _sum: FabricBatchSumAggregateOutputType | null
+    _min: FabricBatchMinAggregateOutputType | null
+    _max: FabricBatchMaxAggregateOutputType | null
+  }
+
+  export type FabricBatchAvgAggregateOutputType = {
+    totalRolls: number | null
+    totalMeters: Decimal | null
+  }
+
+  export type FabricBatchSumAggregateOutputType = {
+    totalRolls: number | null
+    totalMeters: Decimal | null
+  }
+
+  export type FabricBatchMinAggregateOutputType = {
+    id: string | null
+    batchNumber: string | null
+    programId: string | null
+    supplierId: string | null
+    fabricType: string | null
+    fabricDescription: string | null
+    colorCode: string | null
+    colorName: string | null
+    totalRolls: number | null
+    totalMeters: Decimal | null
+    status: $Enums.FabricBatchStatus | null
+    receivedAt: Date | null
+    createdById: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FabricBatchMaxAggregateOutputType = {
+    id: string | null
+    batchNumber: string | null
+    programId: string | null
+    supplierId: string | null
+    fabricType: string | null
+    fabricDescription: string | null
+    colorCode: string | null
+    colorName: string | null
+    totalRolls: number | null
+    totalMeters: Decimal | null
+    status: $Enums.FabricBatchStatus | null
+    receivedAt: Date | null
+    createdById: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FabricBatchCountAggregateOutputType = {
+    id: number
+    batchNumber: number
+    programId: number
+    supplierId: number
+    fabricType: number
+    fabricDescription: number
+    colorCode: number
+    colorName: number
+    totalRolls: number
+    totalMeters: number
+    status: number
+    receivedAt: number
+    createdById: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type FabricBatchAvgAggregateInputType = {
+    totalRolls?: true
+    totalMeters?: true
+  }
+
+  export type FabricBatchSumAggregateInputType = {
+    totalRolls?: true
+    totalMeters?: true
+  }
+
+  export type FabricBatchMinAggregateInputType = {
+    id?: true
+    batchNumber?: true
+    programId?: true
+    supplierId?: true
+    fabricType?: true
+    fabricDescription?: true
+    colorCode?: true
+    colorName?: true
+    totalRolls?: true
+    totalMeters?: true
+    status?: true
+    receivedAt?: true
+    createdById?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FabricBatchMaxAggregateInputType = {
+    id?: true
+    batchNumber?: true
+    programId?: true
+    supplierId?: true
+    fabricType?: true
+    fabricDescription?: true
+    colorCode?: true
+    colorName?: true
+    totalRolls?: true
+    totalMeters?: true
+    status?: true
+    receivedAt?: true
+    createdById?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FabricBatchCountAggregateInputType = {
+    id?: true
+    batchNumber?: true
+    programId?: true
+    supplierId?: true
+    fabricType?: true
+    fabricDescription?: true
+    colorCode?: true
+    colorName?: true
+    totalRolls?: true
+    totalMeters?: true
+    status?: true
+    receivedAt?: true
+    createdById?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type FabricBatchAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FabricBatch to aggregate.
+     */
+    where?: FabricBatchWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricBatches to fetch.
+     */
+    orderBy?: FabricBatchOrderByWithRelationInput | FabricBatchOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: FabricBatchWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricBatches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricBatches.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned FabricBatches
+    **/
+    _count?: true | FabricBatchCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: FabricBatchAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: FabricBatchSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: FabricBatchMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: FabricBatchMaxAggregateInputType
+  }
+
+  export type GetFabricBatchAggregateType<T extends FabricBatchAggregateArgs> = {
+        [P in keyof T & keyof AggregateFabricBatch]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateFabricBatch[P]>
+      : GetScalarType<T[P], AggregateFabricBatch[P]>
+  }
+
+
+
+
+  export type FabricBatchGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FabricBatchWhereInput
+    orderBy?: FabricBatchOrderByWithAggregationInput | FabricBatchOrderByWithAggregationInput[]
+    by: FabricBatchScalarFieldEnum[] | FabricBatchScalarFieldEnum
+    having?: FabricBatchScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: FabricBatchCountAggregateInputType | true
+    _avg?: FabricBatchAvgAggregateInputType
+    _sum?: FabricBatchSumAggregateInputType
+    _min?: FabricBatchMinAggregateInputType
+    _max?: FabricBatchMaxAggregateInputType
+  }
+
+  export type FabricBatchGroupByOutputType = {
+    id: string
+    batchNumber: string
+    programId: string | null
+    supplierId: string | null
+    fabricType: string
+    fabricDescription: string
+    colorCode: string | null
+    colorName: string | null
+    totalRolls: number
+    totalMeters: Decimal
+    status: $Enums.FabricBatchStatus
+    receivedAt: Date | null
+    createdById: string
+    createdAt: Date
+    updatedAt: Date
+    _count: FabricBatchCountAggregateOutputType | null
+    _avg: FabricBatchAvgAggregateOutputType | null
+    _sum: FabricBatchSumAggregateOutputType | null
+    _min: FabricBatchMinAggregateOutputType | null
+    _max: FabricBatchMaxAggregateOutputType | null
+  }
+
+  type GetFabricBatchGroupByPayload<T extends FabricBatchGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<FabricBatchGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof FabricBatchGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], FabricBatchGroupByOutputType[P]>
+            : GetScalarType<T[P], FabricBatchGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type FabricBatchSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    batchNumber?: boolean
+    programId?: boolean
+    supplierId?: boolean
+    fabricType?: boolean
+    fabricDescription?: boolean
+    colorCode?: boolean
+    colorName?: boolean
+    totalRolls?: boolean
+    totalMeters?: boolean
+    status?: boolean
+    receivedAt?: boolean
+    createdById?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    program?: boolean | FabricBatch$programArgs<ExtArgs>
+    createdBy?: boolean | UserDefaultArgs<ExtArgs>
+    rolls?: boolean | FabricBatch$rollsArgs<ExtArgs>
+    receipts?: boolean | FabricBatch$receiptsArgs<ExtArgs>
+    ledgerEntries?: boolean | FabricBatch$ledgerEntriesArgs<ExtArgs>
+    _count?: boolean | FabricBatchCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["fabricBatch"]>
+
+  export type FabricBatchSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    batchNumber?: boolean
+    programId?: boolean
+    supplierId?: boolean
+    fabricType?: boolean
+    fabricDescription?: boolean
+    colorCode?: boolean
+    colorName?: boolean
+    totalRolls?: boolean
+    totalMeters?: boolean
+    status?: boolean
+    receivedAt?: boolean
+    createdById?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    program?: boolean | FabricBatch$programArgs<ExtArgs>
+    createdBy?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["fabricBatch"]>
+
+  export type FabricBatchSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    batchNumber?: boolean
+    programId?: boolean
+    supplierId?: boolean
+    fabricType?: boolean
+    fabricDescription?: boolean
+    colorCode?: boolean
+    colorName?: boolean
+    totalRolls?: boolean
+    totalMeters?: boolean
+    status?: boolean
+    receivedAt?: boolean
+    createdById?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    program?: boolean | FabricBatch$programArgs<ExtArgs>
+    createdBy?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["fabricBatch"]>
+
+  export type FabricBatchSelectScalar = {
+    id?: boolean
+    batchNumber?: boolean
+    programId?: boolean
+    supplierId?: boolean
+    fabricType?: boolean
+    fabricDescription?: boolean
+    colorCode?: boolean
+    colorName?: boolean
+    totalRolls?: boolean
+    totalMeters?: boolean
+    status?: boolean
+    receivedAt?: boolean
+    createdById?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type FabricBatchOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "batchNumber" | "programId" | "supplierId" | "fabricType" | "fabricDescription" | "colorCode" | "colorName" | "totalRolls" | "totalMeters" | "status" | "receivedAt" | "createdById" | "createdAt" | "updatedAt", ExtArgs["result"]["fabricBatch"]>
+  export type FabricBatchInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    program?: boolean | FabricBatch$programArgs<ExtArgs>
+    createdBy?: boolean | UserDefaultArgs<ExtArgs>
+    rolls?: boolean | FabricBatch$rollsArgs<ExtArgs>
+    receipts?: boolean | FabricBatch$receiptsArgs<ExtArgs>
+    ledgerEntries?: boolean | FabricBatch$ledgerEntriesArgs<ExtArgs>
+    _count?: boolean | FabricBatchCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type FabricBatchIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    program?: boolean | FabricBatch$programArgs<ExtArgs>
+    createdBy?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type FabricBatchIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    program?: boolean | FabricBatch$programArgs<ExtArgs>
+    createdBy?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $FabricBatchPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "FabricBatch"
+    objects: {
+      program: Prisma.$ProgramPayload<ExtArgs> | null
+      createdBy: Prisma.$UserPayload<ExtArgs>
+      rolls: Prisma.$FabricStoreRollPayload<ExtArgs>[]
+      receipts: Prisma.$MaterialReceiptPayload<ExtArgs>[]
+      ledgerEntries: Prisma.$FabricStockLedgerPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      batchNumber: string
+      programId: string | null
+      supplierId: string | null
+      fabricType: string
+      fabricDescription: string
+      colorCode: string | null
+      colorName: string | null
+      totalRolls: number
+      totalMeters: Prisma.Decimal
+      status: $Enums.FabricBatchStatus
+      receivedAt: Date | null
+      createdById: string
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["fabricBatch"]>
+    composites: {}
+  }
+
+  type FabricBatchGetPayload<S extends boolean | null | undefined | FabricBatchDefaultArgs> = $Result.GetResult<Prisma.$FabricBatchPayload, S>
+
+  type FabricBatchCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<FabricBatchFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: FabricBatchCountAggregateInputType | true
+    }
+
+  export interface FabricBatchDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['FabricBatch'], meta: { name: 'FabricBatch' } }
+    /**
+     * Find zero or one FabricBatch that matches the filter.
+     * @param {FabricBatchFindUniqueArgs} args - Arguments to find a FabricBatch
+     * @example
+     * // Get one FabricBatch
+     * const fabricBatch = await prisma.fabricBatch.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends FabricBatchFindUniqueArgs>(args: SelectSubset<T, FabricBatchFindUniqueArgs<ExtArgs>>): Prisma__FabricBatchClient<$Result.GetResult<Prisma.$FabricBatchPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one FabricBatch that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {FabricBatchFindUniqueOrThrowArgs} args - Arguments to find a FabricBatch
+     * @example
+     * // Get one FabricBatch
+     * const fabricBatch = await prisma.fabricBatch.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends FabricBatchFindUniqueOrThrowArgs>(args: SelectSubset<T, FabricBatchFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FabricBatchClient<$Result.GetResult<Prisma.$FabricBatchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FabricBatch that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricBatchFindFirstArgs} args - Arguments to find a FabricBatch
+     * @example
+     * // Get one FabricBatch
+     * const fabricBatch = await prisma.fabricBatch.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends FabricBatchFindFirstArgs>(args?: SelectSubset<T, FabricBatchFindFirstArgs<ExtArgs>>): Prisma__FabricBatchClient<$Result.GetResult<Prisma.$FabricBatchPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FabricBatch that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricBatchFindFirstOrThrowArgs} args - Arguments to find a FabricBatch
+     * @example
+     * // Get one FabricBatch
+     * const fabricBatch = await prisma.fabricBatch.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends FabricBatchFindFirstOrThrowArgs>(args?: SelectSubset<T, FabricBatchFindFirstOrThrowArgs<ExtArgs>>): Prisma__FabricBatchClient<$Result.GetResult<Prisma.$FabricBatchPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more FabricBatches that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricBatchFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all FabricBatches
+     * const fabricBatches = await prisma.fabricBatch.findMany()
+     * 
+     * // Get first 10 FabricBatches
+     * const fabricBatches = await prisma.fabricBatch.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const fabricBatchWithIdOnly = await prisma.fabricBatch.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends FabricBatchFindManyArgs>(args?: SelectSubset<T, FabricBatchFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricBatchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a FabricBatch.
+     * @param {FabricBatchCreateArgs} args - Arguments to create a FabricBatch.
+     * @example
+     * // Create one FabricBatch
+     * const FabricBatch = await prisma.fabricBatch.create({
+     *   data: {
+     *     // ... data to create a FabricBatch
+     *   }
+     * })
+     * 
+     */
+    create<T extends FabricBatchCreateArgs>(args: SelectSubset<T, FabricBatchCreateArgs<ExtArgs>>): Prisma__FabricBatchClient<$Result.GetResult<Prisma.$FabricBatchPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many FabricBatches.
+     * @param {FabricBatchCreateManyArgs} args - Arguments to create many FabricBatches.
+     * @example
+     * // Create many FabricBatches
+     * const fabricBatch = await prisma.fabricBatch.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends FabricBatchCreateManyArgs>(args?: SelectSubset<T, FabricBatchCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many FabricBatches and returns the data saved in the database.
+     * @param {FabricBatchCreateManyAndReturnArgs} args - Arguments to create many FabricBatches.
+     * @example
+     * // Create many FabricBatches
+     * const fabricBatch = await prisma.fabricBatch.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many FabricBatches and only return the `id`
+     * const fabricBatchWithIdOnly = await prisma.fabricBatch.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends FabricBatchCreateManyAndReturnArgs>(args?: SelectSubset<T, FabricBatchCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricBatchPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a FabricBatch.
+     * @param {FabricBatchDeleteArgs} args - Arguments to delete one FabricBatch.
+     * @example
+     * // Delete one FabricBatch
+     * const FabricBatch = await prisma.fabricBatch.delete({
+     *   where: {
+     *     // ... filter to delete one FabricBatch
+     *   }
+     * })
+     * 
+     */
+    delete<T extends FabricBatchDeleteArgs>(args: SelectSubset<T, FabricBatchDeleteArgs<ExtArgs>>): Prisma__FabricBatchClient<$Result.GetResult<Prisma.$FabricBatchPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one FabricBatch.
+     * @param {FabricBatchUpdateArgs} args - Arguments to update one FabricBatch.
+     * @example
+     * // Update one FabricBatch
+     * const fabricBatch = await prisma.fabricBatch.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends FabricBatchUpdateArgs>(args: SelectSubset<T, FabricBatchUpdateArgs<ExtArgs>>): Prisma__FabricBatchClient<$Result.GetResult<Prisma.$FabricBatchPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more FabricBatches.
+     * @param {FabricBatchDeleteManyArgs} args - Arguments to filter FabricBatches to delete.
+     * @example
+     * // Delete a few FabricBatches
+     * const { count } = await prisma.fabricBatch.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends FabricBatchDeleteManyArgs>(args?: SelectSubset<T, FabricBatchDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FabricBatches.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricBatchUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many FabricBatches
+     * const fabricBatch = await prisma.fabricBatch.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends FabricBatchUpdateManyArgs>(args: SelectSubset<T, FabricBatchUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FabricBatches and returns the data updated in the database.
+     * @param {FabricBatchUpdateManyAndReturnArgs} args - Arguments to update many FabricBatches.
+     * @example
+     * // Update many FabricBatches
+     * const fabricBatch = await prisma.fabricBatch.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more FabricBatches and only return the `id`
+     * const fabricBatchWithIdOnly = await prisma.fabricBatch.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends FabricBatchUpdateManyAndReturnArgs>(args: SelectSubset<T, FabricBatchUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricBatchPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one FabricBatch.
+     * @param {FabricBatchUpsertArgs} args - Arguments to update or create a FabricBatch.
+     * @example
+     * // Update or create a FabricBatch
+     * const fabricBatch = await prisma.fabricBatch.upsert({
+     *   create: {
+     *     // ... data to create a FabricBatch
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the FabricBatch we want to update
+     *   }
+     * })
+     */
+    upsert<T extends FabricBatchUpsertArgs>(args: SelectSubset<T, FabricBatchUpsertArgs<ExtArgs>>): Prisma__FabricBatchClient<$Result.GetResult<Prisma.$FabricBatchPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of FabricBatches.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricBatchCountArgs} args - Arguments to filter FabricBatches to count.
+     * @example
+     * // Count the number of FabricBatches
+     * const count = await prisma.fabricBatch.count({
+     *   where: {
+     *     // ... the filter for the FabricBatches we want to count
+     *   }
+     * })
+    **/
+    count<T extends FabricBatchCountArgs>(
+      args?: Subset<T, FabricBatchCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], FabricBatchCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a FabricBatch.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricBatchAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends FabricBatchAggregateArgs>(args: Subset<T, FabricBatchAggregateArgs>): Prisma.PrismaPromise<GetFabricBatchAggregateType<T>>
+
+    /**
+     * Group by FabricBatch.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricBatchGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends FabricBatchGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: FabricBatchGroupByArgs['orderBy'] }
+        : { orderBy?: FabricBatchGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, FabricBatchGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFabricBatchGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the FabricBatch model
+   */
+  readonly fields: FabricBatchFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for FabricBatch.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__FabricBatchClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    program<T extends FabricBatch$programArgs<ExtArgs> = {}>(args?: Subset<T, FabricBatch$programArgs<ExtArgs>>): Prisma__ProgramClient<$Result.GetResult<Prisma.$ProgramPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    createdBy<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    rolls<T extends FabricBatch$rollsArgs<ExtArgs> = {}>(args?: Subset<T, FabricBatch$rollsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStoreRollPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    receipts<T extends FabricBatch$receiptsArgs<ExtArgs> = {}>(args?: Subset<T, FabricBatch$receiptsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MaterialReceiptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    ledgerEntries<T extends FabricBatch$ledgerEntriesArgs<ExtArgs> = {}>(args?: Subset<T, FabricBatch$ledgerEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStockLedgerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the FabricBatch model
+   */
+  interface FabricBatchFieldRefs {
+    readonly id: FieldRef<"FabricBatch", 'String'>
+    readonly batchNumber: FieldRef<"FabricBatch", 'String'>
+    readonly programId: FieldRef<"FabricBatch", 'String'>
+    readonly supplierId: FieldRef<"FabricBatch", 'String'>
+    readonly fabricType: FieldRef<"FabricBatch", 'String'>
+    readonly fabricDescription: FieldRef<"FabricBatch", 'String'>
+    readonly colorCode: FieldRef<"FabricBatch", 'String'>
+    readonly colorName: FieldRef<"FabricBatch", 'String'>
+    readonly totalRolls: FieldRef<"FabricBatch", 'Int'>
+    readonly totalMeters: FieldRef<"FabricBatch", 'Decimal'>
+    readonly status: FieldRef<"FabricBatch", 'FabricBatchStatus'>
+    readonly receivedAt: FieldRef<"FabricBatch", 'DateTime'>
+    readonly createdById: FieldRef<"FabricBatch", 'String'>
+    readonly createdAt: FieldRef<"FabricBatch", 'DateTime'>
+    readonly updatedAt: FieldRef<"FabricBatch", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * FabricBatch findUnique
+   */
+  export type FabricBatchFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricBatch
+     */
+    select?: FabricBatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricBatch
+     */
+    omit?: FabricBatchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricBatchInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricBatch to fetch.
+     */
+    where: FabricBatchWhereUniqueInput
+  }
+
+  /**
+   * FabricBatch findUniqueOrThrow
+   */
+  export type FabricBatchFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricBatch
+     */
+    select?: FabricBatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricBatch
+     */
+    omit?: FabricBatchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricBatchInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricBatch to fetch.
+     */
+    where: FabricBatchWhereUniqueInput
+  }
+
+  /**
+   * FabricBatch findFirst
+   */
+  export type FabricBatchFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricBatch
+     */
+    select?: FabricBatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricBatch
+     */
+    omit?: FabricBatchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricBatchInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricBatch to fetch.
+     */
+    where?: FabricBatchWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricBatches to fetch.
+     */
+    orderBy?: FabricBatchOrderByWithRelationInput | FabricBatchOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FabricBatches.
+     */
+    cursor?: FabricBatchWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricBatches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricBatches.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FabricBatches.
+     */
+    distinct?: FabricBatchScalarFieldEnum | FabricBatchScalarFieldEnum[]
+  }
+
+  /**
+   * FabricBatch findFirstOrThrow
+   */
+  export type FabricBatchFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricBatch
+     */
+    select?: FabricBatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricBatch
+     */
+    omit?: FabricBatchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricBatchInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricBatch to fetch.
+     */
+    where?: FabricBatchWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricBatches to fetch.
+     */
+    orderBy?: FabricBatchOrderByWithRelationInput | FabricBatchOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FabricBatches.
+     */
+    cursor?: FabricBatchWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricBatches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricBatches.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FabricBatches.
+     */
+    distinct?: FabricBatchScalarFieldEnum | FabricBatchScalarFieldEnum[]
+  }
+
+  /**
+   * FabricBatch findMany
+   */
+  export type FabricBatchFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricBatch
+     */
+    select?: FabricBatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricBatch
+     */
+    omit?: FabricBatchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricBatchInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricBatches to fetch.
+     */
+    where?: FabricBatchWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricBatches to fetch.
+     */
+    orderBy?: FabricBatchOrderByWithRelationInput | FabricBatchOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing FabricBatches.
+     */
+    cursor?: FabricBatchWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricBatches from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricBatches.
+     */
+    skip?: number
+    distinct?: FabricBatchScalarFieldEnum | FabricBatchScalarFieldEnum[]
+  }
+
+  /**
+   * FabricBatch create
+   */
+  export type FabricBatchCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricBatch
+     */
+    select?: FabricBatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricBatch
+     */
+    omit?: FabricBatchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricBatchInclude<ExtArgs> | null
+    /**
+     * The data needed to create a FabricBatch.
+     */
+    data: XOR<FabricBatchCreateInput, FabricBatchUncheckedCreateInput>
+  }
+
+  /**
+   * FabricBatch createMany
+   */
+  export type FabricBatchCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many FabricBatches.
+     */
+    data: FabricBatchCreateManyInput | FabricBatchCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * FabricBatch createManyAndReturn
+   */
+  export type FabricBatchCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricBatch
+     */
+    select?: FabricBatchSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricBatch
+     */
+    omit?: FabricBatchOmit<ExtArgs> | null
+    /**
+     * The data used to create many FabricBatches.
+     */
+    data: FabricBatchCreateManyInput | FabricBatchCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricBatchIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * FabricBatch update
+   */
+  export type FabricBatchUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricBatch
+     */
+    select?: FabricBatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricBatch
+     */
+    omit?: FabricBatchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricBatchInclude<ExtArgs> | null
+    /**
+     * The data needed to update a FabricBatch.
+     */
+    data: XOR<FabricBatchUpdateInput, FabricBatchUncheckedUpdateInput>
+    /**
+     * Choose, which FabricBatch to update.
+     */
+    where: FabricBatchWhereUniqueInput
+  }
+
+  /**
+   * FabricBatch updateMany
+   */
+  export type FabricBatchUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update FabricBatches.
+     */
+    data: XOR<FabricBatchUpdateManyMutationInput, FabricBatchUncheckedUpdateManyInput>
+    /**
+     * Filter which FabricBatches to update
+     */
+    where?: FabricBatchWhereInput
+    /**
+     * Limit how many FabricBatches to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * FabricBatch updateManyAndReturn
+   */
+  export type FabricBatchUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricBatch
+     */
+    select?: FabricBatchSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricBatch
+     */
+    omit?: FabricBatchOmit<ExtArgs> | null
+    /**
+     * The data used to update FabricBatches.
+     */
+    data: XOR<FabricBatchUpdateManyMutationInput, FabricBatchUncheckedUpdateManyInput>
+    /**
+     * Filter which FabricBatches to update
+     */
+    where?: FabricBatchWhereInput
+    /**
+     * Limit how many FabricBatches to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricBatchIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * FabricBatch upsert
+   */
+  export type FabricBatchUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricBatch
+     */
+    select?: FabricBatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricBatch
+     */
+    omit?: FabricBatchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricBatchInclude<ExtArgs> | null
+    /**
+     * The filter to search for the FabricBatch to update in case it exists.
+     */
+    where: FabricBatchWhereUniqueInput
+    /**
+     * In case the FabricBatch found by the `where` argument doesn't exist, create a new FabricBatch with this data.
+     */
+    create: XOR<FabricBatchCreateInput, FabricBatchUncheckedCreateInput>
+    /**
+     * In case the FabricBatch was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<FabricBatchUpdateInput, FabricBatchUncheckedUpdateInput>
+  }
+
+  /**
+   * FabricBatch delete
+   */
+  export type FabricBatchDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricBatch
+     */
+    select?: FabricBatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricBatch
+     */
+    omit?: FabricBatchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricBatchInclude<ExtArgs> | null
+    /**
+     * Filter which FabricBatch to delete.
+     */
+    where: FabricBatchWhereUniqueInput
+  }
+
+  /**
+   * FabricBatch deleteMany
+   */
+  export type FabricBatchDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FabricBatches to delete
+     */
+    where?: FabricBatchWhereInput
+    /**
+     * Limit how many FabricBatches to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * FabricBatch.program
+   */
+  export type FabricBatch$programArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Program
+     */
+    select?: ProgramSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Program
+     */
+    omit?: ProgramOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProgramInclude<ExtArgs> | null
+    where?: ProgramWhereInput
+  }
+
+  /**
+   * FabricBatch.rolls
+   */
+  export type FabricBatch$rollsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStoreRoll
+     */
+    select?: FabricStoreRollSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStoreRoll
+     */
+    omit?: FabricStoreRollOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStoreRollInclude<ExtArgs> | null
+    where?: FabricStoreRollWhereInput
+    orderBy?: FabricStoreRollOrderByWithRelationInput | FabricStoreRollOrderByWithRelationInput[]
+    cursor?: FabricStoreRollWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FabricStoreRollScalarFieldEnum | FabricStoreRollScalarFieldEnum[]
+  }
+
+  /**
+   * FabricBatch.receipts
+   */
+  export type FabricBatch$receiptsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceipt
+     */
+    select?: MaterialReceiptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialReceipt
+     */
+    omit?: MaterialReceiptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialReceiptInclude<ExtArgs> | null
+    where?: MaterialReceiptWhereInput
+    orderBy?: MaterialReceiptOrderByWithRelationInput | MaterialReceiptOrderByWithRelationInput[]
+    cursor?: MaterialReceiptWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MaterialReceiptScalarFieldEnum | MaterialReceiptScalarFieldEnum[]
+  }
+
+  /**
+   * FabricBatch.ledgerEntries
+   */
+  export type FabricBatch$ledgerEntriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockLedger
+     */
+    select?: FabricStockLedgerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockLedger
+     */
+    omit?: FabricStockLedgerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockLedgerInclude<ExtArgs> | null
+    where?: FabricStockLedgerWhereInput
+    orderBy?: FabricStockLedgerOrderByWithRelationInput | FabricStockLedgerOrderByWithRelationInput[]
+    cursor?: FabricStockLedgerWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FabricStockLedgerScalarFieldEnum | FabricStockLedgerScalarFieldEnum[]
+  }
+
+  /**
+   * FabricBatch without action
+   */
+  export type FabricBatchDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricBatch
+     */
+    select?: FabricBatchSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricBatch
+     */
+    omit?: FabricBatchOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricBatchInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model FabricStoreRoll
+   */
+
+  export type AggregateFabricStoreRoll = {
+    _count: FabricStoreRollCountAggregateOutputType | null
+    _avg: FabricStoreRollAvgAggregateOutputType | null
+    _sum: FabricStoreRollSumAggregateOutputType | null
+    _min: FabricStoreRollMinAggregateOutputType | null
+    _max: FabricStoreRollMaxAggregateOutputType | null
+  }
+
+  export type FabricStoreRollAvgAggregateOutputType = {
+    length: Decimal | null
+    width: Decimal | null
+    weight: Decimal | null
+  }
+
+  export type FabricStoreRollSumAggregateOutputType = {
+    length: Decimal | null
+    width: Decimal | null
+    weight: Decimal | null
+  }
+
+  export type FabricStoreRollMinAggregateOutputType = {
+    id: string | null
+    rollNumber: string | null
+    batchId: string | null
+    locationId: string | null
+    length: Decimal | null
+    width: Decimal | null
+    weight: Decimal | null
+    status: $Enums.FabricRollStatus | null
+    qcStatus: $Enums.FabricQCStatus | null
+    qcInspectedById: string | null
+    qcInspectedAt: Date | null
+    qcRemarks: string | null
+    programIssuedToId: string | null
+    issuedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FabricStoreRollMaxAggregateOutputType = {
+    id: string | null
+    rollNumber: string | null
+    batchId: string | null
+    locationId: string | null
+    length: Decimal | null
+    width: Decimal | null
+    weight: Decimal | null
+    status: $Enums.FabricRollStatus | null
+    qcStatus: $Enums.FabricQCStatus | null
+    qcInspectedById: string | null
+    qcInspectedAt: Date | null
+    qcRemarks: string | null
+    programIssuedToId: string | null
+    issuedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FabricStoreRollCountAggregateOutputType = {
+    id: number
+    rollNumber: number
+    batchId: number
+    locationId: number
+    length: number
+    width: number
+    weight: number
+    status: number
+    qcStatus: number
+    qcInspectedById: number
+    qcInspectedAt: number
+    qcRemarks: number
+    programIssuedToId: number
+    issuedAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type FabricStoreRollAvgAggregateInputType = {
+    length?: true
+    width?: true
+    weight?: true
+  }
+
+  export type FabricStoreRollSumAggregateInputType = {
+    length?: true
+    width?: true
+    weight?: true
+  }
+
+  export type FabricStoreRollMinAggregateInputType = {
+    id?: true
+    rollNumber?: true
+    batchId?: true
+    locationId?: true
+    length?: true
+    width?: true
+    weight?: true
+    status?: true
+    qcStatus?: true
+    qcInspectedById?: true
+    qcInspectedAt?: true
+    qcRemarks?: true
+    programIssuedToId?: true
+    issuedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FabricStoreRollMaxAggregateInputType = {
+    id?: true
+    rollNumber?: true
+    batchId?: true
+    locationId?: true
+    length?: true
+    width?: true
+    weight?: true
+    status?: true
+    qcStatus?: true
+    qcInspectedById?: true
+    qcInspectedAt?: true
+    qcRemarks?: true
+    programIssuedToId?: true
+    issuedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FabricStoreRollCountAggregateInputType = {
+    id?: true
+    rollNumber?: true
+    batchId?: true
+    locationId?: true
+    length?: true
+    width?: true
+    weight?: true
+    status?: true
+    qcStatus?: true
+    qcInspectedById?: true
+    qcInspectedAt?: true
+    qcRemarks?: true
+    programIssuedToId?: true
+    issuedAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type FabricStoreRollAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FabricStoreRoll to aggregate.
+     */
+    where?: FabricStoreRollWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricStoreRolls to fetch.
+     */
+    orderBy?: FabricStoreRollOrderByWithRelationInput | FabricStoreRollOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: FabricStoreRollWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricStoreRolls from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricStoreRolls.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned FabricStoreRolls
+    **/
+    _count?: true | FabricStoreRollCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: FabricStoreRollAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: FabricStoreRollSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: FabricStoreRollMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: FabricStoreRollMaxAggregateInputType
+  }
+
+  export type GetFabricStoreRollAggregateType<T extends FabricStoreRollAggregateArgs> = {
+        [P in keyof T & keyof AggregateFabricStoreRoll]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateFabricStoreRoll[P]>
+      : GetScalarType<T[P], AggregateFabricStoreRoll[P]>
+  }
+
+
+
+
+  export type FabricStoreRollGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FabricStoreRollWhereInput
+    orderBy?: FabricStoreRollOrderByWithAggregationInput | FabricStoreRollOrderByWithAggregationInput[]
+    by: FabricStoreRollScalarFieldEnum[] | FabricStoreRollScalarFieldEnum
+    having?: FabricStoreRollScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: FabricStoreRollCountAggregateInputType | true
+    _avg?: FabricStoreRollAvgAggregateInputType
+    _sum?: FabricStoreRollSumAggregateInputType
+    _min?: FabricStoreRollMinAggregateInputType
+    _max?: FabricStoreRollMaxAggregateInputType
+  }
+
+  export type FabricStoreRollGroupByOutputType = {
+    id: string
+    rollNumber: string
+    batchId: string
+    locationId: string | null
+    length: Decimal
+    width: Decimal | null
+    weight: Decimal | null
+    status: $Enums.FabricRollStatus
+    qcStatus: $Enums.FabricQCStatus
+    qcInspectedById: string | null
+    qcInspectedAt: Date | null
+    qcRemarks: string | null
+    programIssuedToId: string | null
+    issuedAt: Date | null
+    createdAt: Date
+    updatedAt: Date
+    _count: FabricStoreRollCountAggregateOutputType | null
+    _avg: FabricStoreRollAvgAggregateOutputType | null
+    _sum: FabricStoreRollSumAggregateOutputType | null
+    _min: FabricStoreRollMinAggregateOutputType | null
+    _max: FabricStoreRollMaxAggregateOutputType | null
+  }
+
+  type GetFabricStoreRollGroupByPayload<T extends FabricStoreRollGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<FabricStoreRollGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof FabricStoreRollGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], FabricStoreRollGroupByOutputType[P]>
+            : GetScalarType<T[P], FabricStoreRollGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type FabricStoreRollSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    rollNumber?: boolean
+    batchId?: boolean
+    locationId?: boolean
+    length?: boolean
+    width?: boolean
+    weight?: boolean
+    status?: boolean
+    qcStatus?: boolean
+    qcInspectedById?: boolean
+    qcInspectedAt?: boolean
+    qcRemarks?: boolean
+    programIssuedToId?: boolean
+    issuedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    batch?: boolean | FabricBatchDefaultArgs<ExtArgs>
+    location?: boolean | FabricStoreRoll$locationArgs<ExtArgs>
+    qcInspectedBy?: boolean | FabricStoreRoll$qcInspectedByArgs<ExtArgs>
+    programIssuedTo?: boolean | FabricStoreRoll$programIssuedToArgs<ExtArgs>
+    receiptItems?: boolean | FabricStoreRoll$receiptItemsArgs<ExtArgs>
+    qcInspections?: boolean | FabricStoreRoll$qcInspectionsArgs<ExtArgs>
+    ledgerEntries?: boolean | FabricStoreRoll$ledgerEntriesArgs<ExtArgs>
+    _count?: boolean | FabricStoreRollCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["fabricStoreRoll"]>
+
+  export type FabricStoreRollSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    rollNumber?: boolean
+    batchId?: boolean
+    locationId?: boolean
+    length?: boolean
+    width?: boolean
+    weight?: boolean
+    status?: boolean
+    qcStatus?: boolean
+    qcInspectedById?: boolean
+    qcInspectedAt?: boolean
+    qcRemarks?: boolean
+    programIssuedToId?: boolean
+    issuedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    batch?: boolean | FabricBatchDefaultArgs<ExtArgs>
+    location?: boolean | FabricStoreRoll$locationArgs<ExtArgs>
+    qcInspectedBy?: boolean | FabricStoreRoll$qcInspectedByArgs<ExtArgs>
+    programIssuedTo?: boolean | FabricStoreRoll$programIssuedToArgs<ExtArgs>
+  }, ExtArgs["result"]["fabricStoreRoll"]>
+
+  export type FabricStoreRollSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    rollNumber?: boolean
+    batchId?: boolean
+    locationId?: boolean
+    length?: boolean
+    width?: boolean
+    weight?: boolean
+    status?: boolean
+    qcStatus?: boolean
+    qcInspectedById?: boolean
+    qcInspectedAt?: boolean
+    qcRemarks?: boolean
+    programIssuedToId?: boolean
+    issuedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    batch?: boolean | FabricBatchDefaultArgs<ExtArgs>
+    location?: boolean | FabricStoreRoll$locationArgs<ExtArgs>
+    qcInspectedBy?: boolean | FabricStoreRoll$qcInspectedByArgs<ExtArgs>
+    programIssuedTo?: boolean | FabricStoreRoll$programIssuedToArgs<ExtArgs>
+  }, ExtArgs["result"]["fabricStoreRoll"]>
+
+  export type FabricStoreRollSelectScalar = {
+    id?: boolean
+    rollNumber?: boolean
+    batchId?: boolean
+    locationId?: boolean
+    length?: boolean
+    width?: boolean
+    weight?: boolean
+    status?: boolean
+    qcStatus?: boolean
+    qcInspectedById?: boolean
+    qcInspectedAt?: boolean
+    qcRemarks?: boolean
+    programIssuedToId?: boolean
+    issuedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type FabricStoreRollOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "rollNumber" | "batchId" | "locationId" | "length" | "width" | "weight" | "status" | "qcStatus" | "qcInspectedById" | "qcInspectedAt" | "qcRemarks" | "programIssuedToId" | "issuedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["fabricStoreRoll"]>
+  export type FabricStoreRollInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    batch?: boolean | FabricBatchDefaultArgs<ExtArgs>
+    location?: boolean | FabricStoreRoll$locationArgs<ExtArgs>
+    qcInspectedBy?: boolean | FabricStoreRoll$qcInspectedByArgs<ExtArgs>
+    programIssuedTo?: boolean | FabricStoreRoll$programIssuedToArgs<ExtArgs>
+    receiptItems?: boolean | FabricStoreRoll$receiptItemsArgs<ExtArgs>
+    qcInspections?: boolean | FabricStoreRoll$qcInspectionsArgs<ExtArgs>
+    ledgerEntries?: boolean | FabricStoreRoll$ledgerEntriesArgs<ExtArgs>
+    _count?: boolean | FabricStoreRollCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type FabricStoreRollIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    batch?: boolean | FabricBatchDefaultArgs<ExtArgs>
+    location?: boolean | FabricStoreRoll$locationArgs<ExtArgs>
+    qcInspectedBy?: boolean | FabricStoreRoll$qcInspectedByArgs<ExtArgs>
+    programIssuedTo?: boolean | FabricStoreRoll$programIssuedToArgs<ExtArgs>
+  }
+  export type FabricStoreRollIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    batch?: boolean | FabricBatchDefaultArgs<ExtArgs>
+    location?: boolean | FabricStoreRoll$locationArgs<ExtArgs>
+    qcInspectedBy?: boolean | FabricStoreRoll$qcInspectedByArgs<ExtArgs>
+    programIssuedTo?: boolean | FabricStoreRoll$programIssuedToArgs<ExtArgs>
+  }
+
+  export type $FabricStoreRollPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "FabricStoreRoll"
+    objects: {
+      batch: Prisma.$FabricBatchPayload<ExtArgs>
+      location: Prisma.$InventoryLocationPayload<ExtArgs> | null
+      qcInspectedBy: Prisma.$UserPayload<ExtArgs> | null
+      programIssuedTo: Prisma.$ProgramPayload<ExtArgs> | null
+      receiptItems: Prisma.$MaterialReceiptItemPayload<ExtArgs>[]
+      qcInspections: Prisma.$FabricQCInspectionPayload<ExtArgs>[]
+      ledgerEntries: Prisma.$FabricStockLedgerPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      rollNumber: string
+      batchId: string
+      locationId: string | null
+      length: Prisma.Decimal
+      width: Prisma.Decimal | null
+      weight: Prisma.Decimal | null
+      status: $Enums.FabricRollStatus
+      qcStatus: $Enums.FabricQCStatus
+      qcInspectedById: string | null
+      qcInspectedAt: Date | null
+      qcRemarks: string | null
+      programIssuedToId: string | null
+      issuedAt: Date | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["fabricStoreRoll"]>
+    composites: {}
+  }
+
+  type FabricStoreRollGetPayload<S extends boolean | null | undefined | FabricStoreRollDefaultArgs> = $Result.GetResult<Prisma.$FabricStoreRollPayload, S>
+
+  type FabricStoreRollCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<FabricStoreRollFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: FabricStoreRollCountAggregateInputType | true
+    }
+
+  export interface FabricStoreRollDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['FabricStoreRoll'], meta: { name: 'FabricStoreRoll' } }
+    /**
+     * Find zero or one FabricStoreRoll that matches the filter.
+     * @param {FabricStoreRollFindUniqueArgs} args - Arguments to find a FabricStoreRoll
+     * @example
+     * // Get one FabricStoreRoll
+     * const fabricStoreRoll = await prisma.fabricStoreRoll.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends FabricStoreRollFindUniqueArgs>(args: SelectSubset<T, FabricStoreRollFindUniqueArgs<ExtArgs>>): Prisma__FabricStoreRollClient<$Result.GetResult<Prisma.$FabricStoreRollPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one FabricStoreRoll that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {FabricStoreRollFindUniqueOrThrowArgs} args - Arguments to find a FabricStoreRoll
+     * @example
+     * // Get one FabricStoreRoll
+     * const fabricStoreRoll = await prisma.fabricStoreRoll.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends FabricStoreRollFindUniqueOrThrowArgs>(args: SelectSubset<T, FabricStoreRollFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FabricStoreRollClient<$Result.GetResult<Prisma.$FabricStoreRollPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FabricStoreRoll that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricStoreRollFindFirstArgs} args - Arguments to find a FabricStoreRoll
+     * @example
+     * // Get one FabricStoreRoll
+     * const fabricStoreRoll = await prisma.fabricStoreRoll.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends FabricStoreRollFindFirstArgs>(args?: SelectSubset<T, FabricStoreRollFindFirstArgs<ExtArgs>>): Prisma__FabricStoreRollClient<$Result.GetResult<Prisma.$FabricStoreRollPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FabricStoreRoll that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricStoreRollFindFirstOrThrowArgs} args - Arguments to find a FabricStoreRoll
+     * @example
+     * // Get one FabricStoreRoll
+     * const fabricStoreRoll = await prisma.fabricStoreRoll.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends FabricStoreRollFindFirstOrThrowArgs>(args?: SelectSubset<T, FabricStoreRollFindFirstOrThrowArgs<ExtArgs>>): Prisma__FabricStoreRollClient<$Result.GetResult<Prisma.$FabricStoreRollPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more FabricStoreRolls that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricStoreRollFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all FabricStoreRolls
+     * const fabricStoreRolls = await prisma.fabricStoreRoll.findMany()
+     * 
+     * // Get first 10 FabricStoreRolls
+     * const fabricStoreRolls = await prisma.fabricStoreRoll.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const fabricStoreRollWithIdOnly = await prisma.fabricStoreRoll.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends FabricStoreRollFindManyArgs>(args?: SelectSubset<T, FabricStoreRollFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStoreRollPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a FabricStoreRoll.
+     * @param {FabricStoreRollCreateArgs} args - Arguments to create a FabricStoreRoll.
+     * @example
+     * // Create one FabricStoreRoll
+     * const FabricStoreRoll = await prisma.fabricStoreRoll.create({
+     *   data: {
+     *     // ... data to create a FabricStoreRoll
+     *   }
+     * })
+     * 
+     */
+    create<T extends FabricStoreRollCreateArgs>(args: SelectSubset<T, FabricStoreRollCreateArgs<ExtArgs>>): Prisma__FabricStoreRollClient<$Result.GetResult<Prisma.$FabricStoreRollPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many FabricStoreRolls.
+     * @param {FabricStoreRollCreateManyArgs} args - Arguments to create many FabricStoreRolls.
+     * @example
+     * // Create many FabricStoreRolls
+     * const fabricStoreRoll = await prisma.fabricStoreRoll.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends FabricStoreRollCreateManyArgs>(args?: SelectSubset<T, FabricStoreRollCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many FabricStoreRolls and returns the data saved in the database.
+     * @param {FabricStoreRollCreateManyAndReturnArgs} args - Arguments to create many FabricStoreRolls.
+     * @example
+     * // Create many FabricStoreRolls
+     * const fabricStoreRoll = await prisma.fabricStoreRoll.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many FabricStoreRolls and only return the `id`
+     * const fabricStoreRollWithIdOnly = await prisma.fabricStoreRoll.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends FabricStoreRollCreateManyAndReturnArgs>(args?: SelectSubset<T, FabricStoreRollCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStoreRollPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a FabricStoreRoll.
+     * @param {FabricStoreRollDeleteArgs} args - Arguments to delete one FabricStoreRoll.
+     * @example
+     * // Delete one FabricStoreRoll
+     * const FabricStoreRoll = await prisma.fabricStoreRoll.delete({
+     *   where: {
+     *     // ... filter to delete one FabricStoreRoll
+     *   }
+     * })
+     * 
+     */
+    delete<T extends FabricStoreRollDeleteArgs>(args: SelectSubset<T, FabricStoreRollDeleteArgs<ExtArgs>>): Prisma__FabricStoreRollClient<$Result.GetResult<Prisma.$FabricStoreRollPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one FabricStoreRoll.
+     * @param {FabricStoreRollUpdateArgs} args - Arguments to update one FabricStoreRoll.
+     * @example
+     * // Update one FabricStoreRoll
+     * const fabricStoreRoll = await prisma.fabricStoreRoll.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends FabricStoreRollUpdateArgs>(args: SelectSubset<T, FabricStoreRollUpdateArgs<ExtArgs>>): Prisma__FabricStoreRollClient<$Result.GetResult<Prisma.$FabricStoreRollPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more FabricStoreRolls.
+     * @param {FabricStoreRollDeleteManyArgs} args - Arguments to filter FabricStoreRolls to delete.
+     * @example
+     * // Delete a few FabricStoreRolls
+     * const { count } = await prisma.fabricStoreRoll.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends FabricStoreRollDeleteManyArgs>(args?: SelectSubset<T, FabricStoreRollDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FabricStoreRolls.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricStoreRollUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many FabricStoreRolls
+     * const fabricStoreRoll = await prisma.fabricStoreRoll.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends FabricStoreRollUpdateManyArgs>(args: SelectSubset<T, FabricStoreRollUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FabricStoreRolls and returns the data updated in the database.
+     * @param {FabricStoreRollUpdateManyAndReturnArgs} args - Arguments to update many FabricStoreRolls.
+     * @example
+     * // Update many FabricStoreRolls
+     * const fabricStoreRoll = await prisma.fabricStoreRoll.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more FabricStoreRolls and only return the `id`
+     * const fabricStoreRollWithIdOnly = await prisma.fabricStoreRoll.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends FabricStoreRollUpdateManyAndReturnArgs>(args: SelectSubset<T, FabricStoreRollUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStoreRollPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one FabricStoreRoll.
+     * @param {FabricStoreRollUpsertArgs} args - Arguments to update or create a FabricStoreRoll.
+     * @example
+     * // Update or create a FabricStoreRoll
+     * const fabricStoreRoll = await prisma.fabricStoreRoll.upsert({
+     *   create: {
+     *     // ... data to create a FabricStoreRoll
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the FabricStoreRoll we want to update
+     *   }
+     * })
+     */
+    upsert<T extends FabricStoreRollUpsertArgs>(args: SelectSubset<T, FabricStoreRollUpsertArgs<ExtArgs>>): Prisma__FabricStoreRollClient<$Result.GetResult<Prisma.$FabricStoreRollPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of FabricStoreRolls.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricStoreRollCountArgs} args - Arguments to filter FabricStoreRolls to count.
+     * @example
+     * // Count the number of FabricStoreRolls
+     * const count = await prisma.fabricStoreRoll.count({
+     *   where: {
+     *     // ... the filter for the FabricStoreRolls we want to count
+     *   }
+     * })
+    **/
+    count<T extends FabricStoreRollCountArgs>(
+      args?: Subset<T, FabricStoreRollCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], FabricStoreRollCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a FabricStoreRoll.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricStoreRollAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends FabricStoreRollAggregateArgs>(args: Subset<T, FabricStoreRollAggregateArgs>): Prisma.PrismaPromise<GetFabricStoreRollAggregateType<T>>
+
+    /**
+     * Group by FabricStoreRoll.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricStoreRollGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends FabricStoreRollGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: FabricStoreRollGroupByArgs['orderBy'] }
+        : { orderBy?: FabricStoreRollGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, FabricStoreRollGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFabricStoreRollGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the FabricStoreRoll model
+   */
+  readonly fields: FabricStoreRollFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for FabricStoreRoll.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__FabricStoreRollClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    batch<T extends FabricBatchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, FabricBatchDefaultArgs<ExtArgs>>): Prisma__FabricBatchClient<$Result.GetResult<Prisma.$FabricBatchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    location<T extends FabricStoreRoll$locationArgs<ExtArgs> = {}>(args?: Subset<T, FabricStoreRoll$locationArgs<ExtArgs>>): Prisma__InventoryLocationClient<$Result.GetResult<Prisma.$InventoryLocationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    qcInspectedBy<T extends FabricStoreRoll$qcInspectedByArgs<ExtArgs> = {}>(args?: Subset<T, FabricStoreRoll$qcInspectedByArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    programIssuedTo<T extends FabricStoreRoll$programIssuedToArgs<ExtArgs> = {}>(args?: Subset<T, FabricStoreRoll$programIssuedToArgs<ExtArgs>>): Prisma__ProgramClient<$Result.GetResult<Prisma.$ProgramPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    receiptItems<T extends FabricStoreRoll$receiptItemsArgs<ExtArgs> = {}>(args?: Subset<T, FabricStoreRoll$receiptItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MaterialReceiptItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    qcInspections<T extends FabricStoreRoll$qcInspectionsArgs<ExtArgs> = {}>(args?: Subset<T, FabricStoreRoll$qcInspectionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricQCInspectionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    ledgerEntries<T extends FabricStoreRoll$ledgerEntriesArgs<ExtArgs> = {}>(args?: Subset<T, FabricStoreRoll$ledgerEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStockLedgerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the FabricStoreRoll model
+   */
+  interface FabricStoreRollFieldRefs {
+    readonly id: FieldRef<"FabricStoreRoll", 'String'>
+    readonly rollNumber: FieldRef<"FabricStoreRoll", 'String'>
+    readonly batchId: FieldRef<"FabricStoreRoll", 'String'>
+    readonly locationId: FieldRef<"FabricStoreRoll", 'String'>
+    readonly length: FieldRef<"FabricStoreRoll", 'Decimal'>
+    readonly width: FieldRef<"FabricStoreRoll", 'Decimal'>
+    readonly weight: FieldRef<"FabricStoreRoll", 'Decimal'>
+    readonly status: FieldRef<"FabricStoreRoll", 'FabricRollStatus'>
+    readonly qcStatus: FieldRef<"FabricStoreRoll", 'FabricQCStatus'>
+    readonly qcInspectedById: FieldRef<"FabricStoreRoll", 'String'>
+    readonly qcInspectedAt: FieldRef<"FabricStoreRoll", 'DateTime'>
+    readonly qcRemarks: FieldRef<"FabricStoreRoll", 'String'>
+    readonly programIssuedToId: FieldRef<"FabricStoreRoll", 'String'>
+    readonly issuedAt: FieldRef<"FabricStoreRoll", 'DateTime'>
+    readonly createdAt: FieldRef<"FabricStoreRoll", 'DateTime'>
+    readonly updatedAt: FieldRef<"FabricStoreRoll", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * FabricStoreRoll findUnique
+   */
+  export type FabricStoreRollFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStoreRoll
+     */
+    select?: FabricStoreRollSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStoreRoll
+     */
+    omit?: FabricStoreRollOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStoreRollInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricStoreRoll to fetch.
+     */
+    where: FabricStoreRollWhereUniqueInput
+  }
+
+  /**
+   * FabricStoreRoll findUniqueOrThrow
+   */
+  export type FabricStoreRollFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStoreRoll
+     */
+    select?: FabricStoreRollSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStoreRoll
+     */
+    omit?: FabricStoreRollOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStoreRollInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricStoreRoll to fetch.
+     */
+    where: FabricStoreRollWhereUniqueInput
+  }
+
+  /**
+   * FabricStoreRoll findFirst
+   */
+  export type FabricStoreRollFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStoreRoll
+     */
+    select?: FabricStoreRollSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStoreRoll
+     */
+    omit?: FabricStoreRollOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStoreRollInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricStoreRoll to fetch.
+     */
+    where?: FabricStoreRollWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricStoreRolls to fetch.
+     */
+    orderBy?: FabricStoreRollOrderByWithRelationInput | FabricStoreRollOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FabricStoreRolls.
+     */
+    cursor?: FabricStoreRollWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricStoreRolls from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricStoreRolls.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FabricStoreRolls.
+     */
+    distinct?: FabricStoreRollScalarFieldEnum | FabricStoreRollScalarFieldEnum[]
+  }
+
+  /**
+   * FabricStoreRoll findFirstOrThrow
+   */
+  export type FabricStoreRollFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStoreRoll
+     */
+    select?: FabricStoreRollSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStoreRoll
+     */
+    omit?: FabricStoreRollOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStoreRollInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricStoreRoll to fetch.
+     */
+    where?: FabricStoreRollWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricStoreRolls to fetch.
+     */
+    orderBy?: FabricStoreRollOrderByWithRelationInput | FabricStoreRollOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FabricStoreRolls.
+     */
+    cursor?: FabricStoreRollWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricStoreRolls from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricStoreRolls.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FabricStoreRolls.
+     */
+    distinct?: FabricStoreRollScalarFieldEnum | FabricStoreRollScalarFieldEnum[]
+  }
+
+  /**
+   * FabricStoreRoll findMany
+   */
+  export type FabricStoreRollFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStoreRoll
+     */
+    select?: FabricStoreRollSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStoreRoll
+     */
+    omit?: FabricStoreRollOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStoreRollInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricStoreRolls to fetch.
+     */
+    where?: FabricStoreRollWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricStoreRolls to fetch.
+     */
+    orderBy?: FabricStoreRollOrderByWithRelationInput | FabricStoreRollOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing FabricStoreRolls.
+     */
+    cursor?: FabricStoreRollWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricStoreRolls from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricStoreRolls.
+     */
+    skip?: number
+    distinct?: FabricStoreRollScalarFieldEnum | FabricStoreRollScalarFieldEnum[]
+  }
+
+  /**
+   * FabricStoreRoll create
+   */
+  export type FabricStoreRollCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStoreRoll
+     */
+    select?: FabricStoreRollSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStoreRoll
+     */
+    omit?: FabricStoreRollOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStoreRollInclude<ExtArgs> | null
+    /**
+     * The data needed to create a FabricStoreRoll.
+     */
+    data: XOR<FabricStoreRollCreateInput, FabricStoreRollUncheckedCreateInput>
+  }
+
+  /**
+   * FabricStoreRoll createMany
+   */
+  export type FabricStoreRollCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many FabricStoreRolls.
+     */
+    data: FabricStoreRollCreateManyInput | FabricStoreRollCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * FabricStoreRoll createManyAndReturn
+   */
+  export type FabricStoreRollCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStoreRoll
+     */
+    select?: FabricStoreRollSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStoreRoll
+     */
+    omit?: FabricStoreRollOmit<ExtArgs> | null
+    /**
+     * The data used to create many FabricStoreRolls.
+     */
+    data: FabricStoreRollCreateManyInput | FabricStoreRollCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStoreRollIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * FabricStoreRoll update
+   */
+  export type FabricStoreRollUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStoreRoll
+     */
+    select?: FabricStoreRollSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStoreRoll
+     */
+    omit?: FabricStoreRollOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStoreRollInclude<ExtArgs> | null
+    /**
+     * The data needed to update a FabricStoreRoll.
+     */
+    data: XOR<FabricStoreRollUpdateInput, FabricStoreRollUncheckedUpdateInput>
+    /**
+     * Choose, which FabricStoreRoll to update.
+     */
+    where: FabricStoreRollWhereUniqueInput
+  }
+
+  /**
+   * FabricStoreRoll updateMany
+   */
+  export type FabricStoreRollUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update FabricStoreRolls.
+     */
+    data: XOR<FabricStoreRollUpdateManyMutationInput, FabricStoreRollUncheckedUpdateManyInput>
+    /**
+     * Filter which FabricStoreRolls to update
+     */
+    where?: FabricStoreRollWhereInput
+    /**
+     * Limit how many FabricStoreRolls to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * FabricStoreRoll updateManyAndReturn
+   */
+  export type FabricStoreRollUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStoreRoll
+     */
+    select?: FabricStoreRollSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStoreRoll
+     */
+    omit?: FabricStoreRollOmit<ExtArgs> | null
+    /**
+     * The data used to update FabricStoreRolls.
+     */
+    data: XOR<FabricStoreRollUpdateManyMutationInput, FabricStoreRollUncheckedUpdateManyInput>
+    /**
+     * Filter which FabricStoreRolls to update
+     */
+    where?: FabricStoreRollWhereInput
+    /**
+     * Limit how many FabricStoreRolls to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStoreRollIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * FabricStoreRoll upsert
+   */
+  export type FabricStoreRollUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStoreRoll
+     */
+    select?: FabricStoreRollSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStoreRoll
+     */
+    omit?: FabricStoreRollOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStoreRollInclude<ExtArgs> | null
+    /**
+     * The filter to search for the FabricStoreRoll to update in case it exists.
+     */
+    where: FabricStoreRollWhereUniqueInput
+    /**
+     * In case the FabricStoreRoll found by the `where` argument doesn't exist, create a new FabricStoreRoll with this data.
+     */
+    create: XOR<FabricStoreRollCreateInput, FabricStoreRollUncheckedCreateInput>
+    /**
+     * In case the FabricStoreRoll was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<FabricStoreRollUpdateInput, FabricStoreRollUncheckedUpdateInput>
+  }
+
+  /**
+   * FabricStoreRoll delete
+   */
+  export type FabricStoreRollDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStoreRoll
+     */
+    select?: FabricStoreRollSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStoreRoll
+     */
+    omit?: FabricStoreRollOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStoreRollInclude<ExtArgs> | null
+    /**
+     * Filter which FabricStoreRoll to delete.
+     */
+    where: FabricStoreRollWhereUniqueInput
+  }
+
+  /**
+   * FabricStoreRoll deleteMany
+   */
+  export type FabricStoreRollDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FabricStoreRolls to delete
+     */
+    where?: FabricStoreRollWhereInput
+    /**
+     * Limit how many FabricStoreRolls to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * FabricStoreRoll.location
+   */
+  export type FabricStoreRoll$locationArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InventoryLocation
+     */
+    select?: InventoryLocationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InventoryLocation
+     */
+    omit?: InventoryLocationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InventoryLocationInclude<ExtArgs> | null
+    where?: InventoryLocationWhereInput
+  }
+
+  /**
+   * FabricStoreRoll.qcInspectedBy
+   */
+  export type FabricStoreRoll$qcInspectedByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * FabricStoreRoll.programIssuedTo
+   */
+  export type FabricStoreRoll$programIssuedToArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Program
+     */
+    select?: ProgramSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Program
+     */
+    omit?: ProgramOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProgramInclude<ExtArgs> | null
+    where?: ProgramWhereInput
+  }
+
+  /**
+   * FabricStoreRoll.receiptItems
+   */
+  export type FabricStoreRoll$receiptItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceiptItem
+     */
+    select?: MaterialReceiptItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialReceiptItem
+     */
+    omit?: MaterialReceiptItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialReceiptItemInclude<ExtArgs> | null
+    where?: MaterialReceiptItemWhereInput
+    orderBy?: MaterialReceiptItemOrderByWithRelationInput | MaterialReceiptItemOrderByWithRelationInput[]
+    cursor?: MaterialReceiptItemWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MaterialReceiptItemScalarFieldEnum | MaterialReceiptItemScalarFieldEnum[]
+  }
+
+  /**
+   * FabricStoreRoll.qcInspections
+   */
+  export type FabricStoreRoll$qcInspectionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricQCInspection
+     */
+    select?: FabricQCInspectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricQCInspection
+     */
+    omit?: FabricQCInspectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricQCInspectionInclude<ExtArgs> | null
+    where?: FabricQCInspectionWhereInput
+    orderBy?: FabricQCInspectionOrderByWithRelationInput | FabricQCInspectionOrderByWithRelationInput[]
+    cursor?: FabricQCInspectionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FabricQCInspectionScalarFieldEnum | FabricQCInspectionScalarFieldEnum[]
+  }
+
+  /**
+   * FabricStoreRoll.ledgerEntries
+   */
+  export type FabricStoreRoll$ledgerEntriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockLedger
+     */
+    select?: FabricStockLedgerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockLedger
+     */
+    omit?: FabricStockLedgerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockLedgerInclude<ExtArgs> | null
+    where?: FabricStockLedgerWhereInput
+    orderBy?: FabricStockLedgerOrderByWithRelationInput | FabricStockLedgerOrderByWithRelationInput[]
+    cursor?: FabricStockLedgerWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FabricStockLedgerScalarFieldEnum | FabricStockLedgerScalarFieldEnum[]
+  }
+
+  /**
+   * FabricStoreRoll without action
+   */
+  export type FabricStoreRollDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStoreRoll
+     */
+    select?: FabricStoreRollSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStoreRoll
+     */
+    omit?: FabricStoreRollOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStoreRollInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model MaterialReceipt
+   */
+
+  export type AggregateMaterialReceipt = {
+    _count: MaterialReceiptCountAggregateOutputType | null
+    _avg: MaterialReceiptAvgAggregateOutputType | null
+    _sum: MaterialReceiptSumAggregateOutputType | null
+    _min: MaterialReceiptMinAggregateOutputType | null
+    _max: MaterialReceiptMaxAggregateOutputType | null
+  }
+
+  export type MaterialReceiptAvgAggregateOutputType = {
+    totalRollsReceived: number | null
+    totalMetersReceived: Decimal | null
+  }
+
+  export type MaterialReceiptSumAggregateOutputType = {
+    totalRollsReceived: number | null
+    totalMetersReceived: Decimal | null
+  }
+
+  export type MaterialReceiptMinAggregateOutputType = {
+    id: string | null
+    grnNumber: string | null
+    batchId: string | null
+    challanId: string | null
+    receivedById: string | null
+    receivedAt: Date | null
+    vehicleNumber: string | null
+    supplierName: string | null
+    totalRollsReceived: number | null
+    totalMetersReceived: Decimal | null
+    status: $Enums.GRNStatus | null
+    remarks: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MaterialReceiptMaxAggregateOutputType = {
+    id: string | null
+    grnNumber: string | null
+    batchId: string | null
+    challanId: string | null
+    receivedById: string | null
+    receivedAt: Date | null
+    vehicleNumber: string | null
+    supplierName: string | null
+    totalRollsReceived: number | null
+    totalMetersReceived: Decimal | null
+    status: $Enums.GRNStatus | null
+    remarks: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MaterialReceiptCountAggregateOutputType = {
+    id: number
+    grnNumber: number
+    batchId: number
+    challanId: number
+    receivedById: number
+    receivedAt: number
+    vehicleNumber: number
+    supplierName: number
+    totalRollsReceived: number
+    totalMetersReceived: number
+    status: number
+    remarks: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type MaterialReceiptAvgAggregateInputType = {
+    totalRollsReceived?: true
+    totalMetersReceived?: true
+  }
+
+  export type MaterialReceiptSumAggregateInputType = {
+    totalRollsReceived?: true
+    totalMetersReceived?: true
+  }
+
+  export type MaterialReceiptMinAggregateInputType = {
+    id?: true
+    grnNumber?: true
+    batchId?: true
+    challanId?: true
+    receivedById?: true
+    receivedAt?: true
+    vehicleNumber?: true
+    supplierName?: true
+    totalRollsReceived?: true
+    totalMetersReceived?: true
+    status?: true
+    remarks?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type MaterialReceiptMaxAggregateInputType = {
+    id?: true
+    grnNumber?: true
+    batchId?: true
+    challanId?: true
+    receivedById?: true
+    receivedAt?: true
+    vehicleNumber?: true
+    supplierName?: true
+    totalRollsReceived?: true
+    totalMetersReceived?: true
+    status?: true
+    remarks?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type MaterialReceiptCountAggregateInputType = {
+    id?: true
+    grnNumber?: true
+    batchId?: true
+    challanId?: true
+    receivedById?: true
+    receivedAt?: true
+    vehicleNumber?: true
+    supplierName?: true
+    totalRollsReceived?: true
+    totalMetersReceived?: true
+    status?: true
+    remarks?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type MaterialReceiptAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MaterialReceipt to aggregate.
+     */
+    where?: MaterialReceiptWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MaterialReceipts to fetch.
+     */
+    orderBy?: MaterialReceiptOrderByWithRelationInput | MaterialReceiptOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MaterialReceiptWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MaterialReceipts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MaterialReceipts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned MaterialReceipts
+    **/
+    _count?: true | MaterialReceiptCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: MaterialReceiptAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: MaterialReceiptSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MaterialReceiptMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MaterialReceiptMaxAggregateInputType
+  }
+
+  export type GetMaterialReceiptAggregateType<T extends MaterialReceiptAggregateArgs> = {
+        [P in keyof T & keyof AggregateMaterialReceipt]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMaterialReceipt[P]>
+      : GetScalarType<T[P], AggregateMaterialReceipt[P]>
+  }
+
+
+
+
+  export type MaterialReceiptGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MaterialReceiptWhereInput
+    orderBy?: MaterialReceiptOrderByWithAggregationInput | MaterialReceiptOrderByWithAggregationInput[]
+    by: MaterialReceiptScalarFieldEnum[] | MaterialReceiptScalarFieldEnum
+    having?: MaterialReceiptScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MaterialReceiptCountAggregateInputType | true
+    _avg?: MaterialReceiptAvgAggregateInputType
+    _sum?: MaterialReceiptSumAggregateInputType
+    _min?: MaterialReceiptMinAggregateInputType
+    _max?: MaterialReceiptMaxAggregateInputType
+  }
+
+  export type MaterialReceiptGroupByOutputType = {
+    id: string
+    grnNumber: string
+    batchId: string
+    challanId: string | null
+    receivedById: string
+    receivedAt: Date
+    vehicleNumber: string | null
+    supplierName: string
+    totalRollsReceived: number
+    totalMetersReceived: Decimal
+    status: $Enums.GRNStatus
+    remarks: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: MaterialReceiptCountAggregateOutputType | null
+    _avg: MaterialReceiptAvgAggregateOutputType | null
+    _sum: MaterialReceiptSumAggregateOutputType | null
+    _min: MaterialReceiptMinAggregateOutputType | null
+    _max: MaterialReceiptMaxAggregateOutputType | null
+  }
+
+  type GetMaterialReceiptGroupByPayload<T extends MaterialReceiptGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MaterialReceiptGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MaterialReceiptGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MaterialReceiptGroupByOutputType[P]>
+            : GetScalarType<T[P], MaterialReceiptGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MaterialReceiptSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    grnNumber?: boolean
+    batchId?: boolean
+    challanId?: boolean
+    receivedById?: boolean
+    receivedAt?: boolean
+    vehicleNumber?: boolean
+    supplierName?: boolean
+    totalRollsReceived?: boolean
+    totalMetersReceived?: boolean
+    status?: boolean
+    remarks?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    batch?: boolean | FabricBatchDefaultArgs<ExtArgs>
+    receivedBy?: boolean | UserDefaultArgs<ExtArgs>
+    items?: boolean | MaterialReceipt$itemsArgs<ExtArgs>
+    _count?: boolean | MaterialReceiptCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["materialReceipt"]>
+
+  export type MaterialReceiptSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    grnNumber?: boolean
+    batchId?: boolean
+    challanId?: boolean
+    receivedById?: boolean
+    receivedAt?: boolean
+    vehicleNumber?: boolean
+    supplierName?: boolean
+    totalRollsReceived?: boolean
+    totalMetersReceived?: boolean
+    status?: boolean
+    remarks?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    batch?: boolean | FabricBatchDefaultArgs<ExtArgs>
+    receivedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["materialReceipt"]>
+
+  export type MaterialReceiptSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    grnNumber?: boolean
+    batchId?: boolean
+    challanId?: boolean
+    receivedById?: boolean
+    receivedAt?: boolean
+    vehicleNumber?: boolean
+    supplierName?: boolean
+    totalRollsReceived?: boolean
+    totalMetersReceived?: boolean
+    status?: boolean
+    remarks?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    batch?: boolean | FabricBatchDefaultArgs<ExtArgs>
+    receivedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["materialReceipt"]>
+
+  export type MaterialReceiptSelectScalar = {
+    id?: boolean
+    grnNumber?: boolean
+    batchId?: boolean
+    challanId?: boolean
+    receivedById?: boolean
+    receivedAt?: boolean
+    vehicleNumber?: boolean
+    supplierName?: boolean
+    totalRollsReceived?: boolean
+    totalMetersReceived?: boolean
+    status?: boolean
+    remarks?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type MaterialReceiptOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "grnNumber" | "batchId" | "challanId" | "receivedById" | "receivedAt" | "vehicleNumber" | "supplierName" | "totalRollsReceived" | "totalMetersReceived" | "status" | "remarks" | "createdAt" | "updatedAt", ExtArgs["result"]["materialReceipt"]>
+  export type MaterialReceiptInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    batch?: boolean | FabricBatchDefaultArgs<ExtArgs>
+    receivedBy?: boolean | UserDefaultArgs<ExtArgs>
+    items?: boolean | MaterialReceipt$itemsArgs<ExtArgs>
+    _count?: boolean | MaterialReceiptCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type MaterialReceiptIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    batch?: boolean | FabricBatchDefaultArgs<ExtArgs>
+    receivedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type MaterialReceiptIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    batch?: boolean | FabricBatchDefaultArgs<ExtArgs>
+    receivedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $MaterialReceiptPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "MaterialReceipt"
+    objects: {
+      batch: Prisma.$FabricBatchPayload<ExtArgs>
+      receivedBy: Prisma.$UserPayload<ExtArgs>
+      items: Prisma.$MaterialReceiptItemPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      grnNumber: string
+      batchId: string
+      challanId: string | null
+      receivedById: string
+      receivedAt: Date
+      vehicleNumber: string | null
+      supplierName: string
+      totalRollsReceived: number
+      totalMetersReceived: Prisma.Decimal
+      status: $Enums.GRNStatus
+      remarks: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["materialReceipt"]>
+    composites: {}
+  }
+
+  type MaterialReceiptGetPayload<S extends boolean | null | undefined | MaterialReceiptDefaultArgs> = $Result.GetResult<Prisma.$MaterialReceiptPayload, S>
+
+  type MaterialReceiptCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MaterialReceiptFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MaterialReceiptCountAggregateInputType | true
+    }
+
+  export interface MaterialReceiptDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MaterialReceipt'], meta: { name: 'MaterialReceipt' } }
+    /**
+     * Find zero or one MaterialReceipt that matches the filter.
+     * @param {MaterialReceiptFindUniqueArgs} args - Arguments to find a MaterialReceipt
+     * @example
+     * // Get one MaterialReceipt
+     * const materialReceipt = await prisma.materialReceipt.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MaterialReceiptFindUniqueArgs>(args: SelectSubset<T, MaterialReceiptFindUniqueArgs<ExtArgs>>): Prisma__MaterialReceiptClient<$Result.GetResult<Prisma.$MaterialReceiptPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one MaterialReceipt that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MaterialReceiptFindUniqueOrThrowArgs} args - Arguments to find a MaterialReceipt
+     * @example
+     * // Get one MaterialReceipt
+     * const materialReceipt = await prisma.materialReceipt.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MaterialReceiptFindUniqueOrThrowArgs>(args: SelectSubset<T, MaterialReceiptFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MaterialReceiptClient<$Result.GetResult<Prisma.$MaterialReceiptPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MaterialReceipt that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialReceiptFindFirstArgs} args - Arguments to find a MaterialReceipt
+     * @example
+     * // Get one MaterialReceipt
+     * const materialReceipt = await prisma.materialReceipt.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MaterialReceiptFindFirstArgs>(args?: SelectSubset<T, MaterialReceiptFindFirstArgs<ExtArgs>>): Prisma__MaterialReceiptClient<$Result.GetResult<Prisma.$MaterialReceiptPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MaterialReceipt that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialReceiptFindFirstOrThrowArgs} args - Arguments to find a MaterialReceipt
+     * @example
+     * // Get one MaterialReceipt
+     * const materialReceipt = await prisma.materialReceipt.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MaterialReceiptFindFirstOrThrowArgs>(args?: SelectSubset<T, MaterialReceiptFindFirstOrThrowArgs<ExtArgs>>): Prisma__MaterialReceiptClient<$Result.GetResult<Prisma.$MaterialReceiptPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more MaterialReceipts that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialReceiptFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all MaterialReceipts
+     * const materialReceipts = await prisma.materialReceipt.findMany()
+     * 
+     * // Get first 10 MaterialReceipts
+     * const materialReceipts = await prisma.materialReceipt.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const materialReceiptWithIdOnly = await prisma.materialReceipt.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MaterialReceiptFindManyArgs>(args?: SelectSubset<T, MaterialReceiptFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MaterialReceiptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a MaterialReceipt.
+     * @param {MaterialReceiptCreateArgs} args - Arguments to create a MaterialReceipt.
+     * @example
+     * // Create one MaterialReceipt
+     * const MaterialReceipt = await prisma.materialReceipt.create({
+     *   data: {
+     *     // ... data to create a MaterialReceipt
+     *   }
+     * })
+     * 
+     */
+    create<T extends MaterialReceiptCreateArgs>(args: SelectSubset<T, MaterialReceiptCreateArgs<ExtArgs>>): Prisma__MaterialReceiptClient<$Result.GetResult<Prisma.$MaterialReceiptPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many MaterialReceipts.
+     * @param {MaterialReceiptCreateManyArgs} args - Arguments to create many MaterialReceipts.
+     * @example
+     * // Create many MaterialReceipts
+     * const materialReceipt = await prisma.materialReceipt.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MaterialReceiptCreateManyArgs>(args?: SelectSubset<T, MaterialReceiptCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many MaterialReceipts and returns the data saved in the database.
+     * @param {MaterialReceiptCreateManyAndReturnArgs} args - Arguments to create many MaterialReceipts.
+     * @example
+     * // Create many MaterialReceipts
+     * const materialReceipt = await prisma.materialReceipt.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many MaterialReceipts and only return the `id`
+     * const materialReceiptWithIdOnly = await prisma.materialReceipt.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends MaterialReceiptCreateManyAndReturnArgs>(args?: SelectSubset<T, MaterialReceiptCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MaterialReceiptPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a MaterialReceipt.
+     * @param {MaterialReceiptDeleteArgs} args - Arguments to delete one MaterialReceipt.
+     * @example
+     * // Delete one MaterialReceipt
+     * const MaterialReceipt = await prisma.materialReceipt.delete({
+     *   where: {
+     *     // ... filter to delete one MaterialReceipt
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MaterialReceiptDeleteArgs>(args: SelectSubset<T, MaterialReceiptDeleteArgs<ExtArgs>>): Prisma__MaterialReceiptClient<$Result.GetResult<Prisma.$MaterialReceiptPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one MaterialReceipt.
+     * @param {MaterialReceiptUpdateArgs} args - Arguments to update one MaterialReceipt.
+     * @example
+     * // Update one MaterialReceipt
+     * const materialReceipt = await prisma.materialReceipt.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MaterialReceiptUpdateArgs>(args: SelectSubset<T, MaterialReceiptUpdateArgs<ExtArgs>>): Prisma__MaterialReceiptClient<$Result.GetResult<Prisma.$MaterialReceiptPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more MaterialReceipts.
+     * @param {MaterialReceiptDeleteManyArgs} args - Arguments to filter MaterialReceipts to delete.
+     * @example
+     * // Delete a few MaterialReceipts
+     * const { count } = await prisma.materialReceipt.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MaterialReceiptDeleteManyArgs>(args?: SelectSubset<T, MaterialReceiptDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MaterialReceipts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialReceiptUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many MaterialReceipts
+     * const materialReceipt = await prisma.materialReceipt.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MaterialReceiptUpdateManyArgs>(args: SelectSubset<T, MaterialReceiptUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MaterialReceipts and returns the data updated in the database.
+     * @param {MaterialReceiptUpdateManyAndReturnArgs} args - Arguments to update many MaterialReceipts.
+     * @example
+     * // Update many MaterialReceipts
+     * const materialReceipt = await prisma.materialReceipt.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more MaterialReceipts and only return the `id`
+     * const materialReceiptWithIdOnly = await prisma.materialReceipt.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends MaterialReceiptUpdateManyAndReturnArgs>(args: SelectSubset<T, MaterialReceiptUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MaterialReceiptPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one MaterialReceipt.
+     * @param {MaterialReceiptUpsertArgs} args - Arguments to update or create a MaterialReceipt.
+     * @example
+     * // Update or create a MaterialReceipt
+     * const materialReceipt = await prisma.materialReceipt.upsert({
+     *   create: {
+     *     // ... data to create a MaterialReceipt
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the MaterialReceipt we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MaterialReceiptUpsertArgs>(args: SelectSubset<T, MaterialReceiptUpsertArgs<ExtArgs>>): Prisma__MaterialReceiptClient<$Result.GetResult<Prisma.$MaterialReceiptPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of MaterialReceipts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialReceiptCountArgs} args - Arguments to filter MaterialReceipts to count.
+     * @example
+     * // Count the number of MaterialReceipts
+     * const count = await prisma.materialReceipt.count({
+     *   where: {
+     *     // ... the filter for the MaterialReceipts we want to count
+     *   }
+     * })
+    **/
+    count<T extends MaterialReceiptCountArgs>(
+      args?: Subset<T, MaterialReceiptCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MaterialReceiptCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a MaterialReceipt.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialReceiptAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MaterialReceiptAggregateArgs>(args: Subset<T, MaterialReceiptAggregateArgs>): Prisma.PrismaPromise<GetMaterialReceiptAggregateType<T>>
+
+    /**
+     * Group by MaterialReceipt.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialReceiptGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MaterialReceiptGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MaterialReceiptGroupByArgs['orderBy'] }
+        : { orderBy?: MaterialReceiptGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MaterialReceiptGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMaterialReceiptGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the MaterialReceipt model
+   */
+  readonly fields: MaterialReceiptFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for MaterialReceipt.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MaterialReceiptClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    batch<T extends FabricBatchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, FabricBatchDefaultArgs<ExtArgs>>): Prisma__FabricBatchClient<$Result.GetResult<Prisma.$FabricBatchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    receivedBy<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    items<T extends MaterialReceipt$itemsArgs<ExtArgs> = {}>(args?: Subset<T, MaterialReceipt$itemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MaterialReceiptItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the MaterialReceipt model
+   */
+  interface MaterialReceiptFieldRefs {
+    readonly id: FieldRef<"MaterialReceipt", 'String'>
+    readonly grnNumber: FieldRef<"MaterialReceipt", 'String'>
+    readonly batchId: FieldRef<"MaterialReceipt", 'String'>
+    readonly challanId: FieldRef<"MaterialReceipt", 'String'>
+    readonly receivedById: FieldRef<"MaterialReceipt", 'String'>
+    readonly receivedAt: FieldRef<"MaterialReceipt", 'DateTime'>
+    readonly vehicleNumber: FieldRef<"MaterialReceipt", 'String'>
+    readonly supplierName: FieldRef<"MaterialReceipt", 'String'>
+    readonly totalRollsReceived: FieldRef<"MaterialReceipt", 'Int'>
+    readonly totalMetersReceived: FieldRef<"MaterialReceipt", 'Decimal'>
+    readonly status: FieldRef<"MaterialReceipt", 'GRNStatus'>
+    readonly remarks: FieldRef<"MaterialReceipt", 'String'>
+    readonly createdAt: FieldRef<"MaterialReceipt", 'DateTime'>
+    readonly updatedAt: FieldRef<"MaterialReceipt", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * MaterialReceipt findUnique
+   */
+  export type MaterialReceiptFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceipt
+     */
+    select?: MaterialReceiptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialReceipt
+     */
+    omit?: MaterialReceiptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialReceiptInclude<ExtArgs> | null
+    /**
+     * Filter, which MaterialReceipt to fetch.
+     */
+    where: MaterialReceiptWhereUniqueInput
+  }
+
+  /**
+   * MaterialReceipt findUniqueOrThrow
+   */
+  export type MaterialReceiptFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceipt
+     */
+    select?: MaterialReceiptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialReceipt
+     */
+    omit?: MaterialReceiptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialReceiptInclude<ExtArgs> | null
+    /**
+     * Filter, which MaterialReceipt to fetch.
+     */
+    where: MaterialReceiptWhereUniqueInput
+  }
+
+  /**
+   * MaterialReceipt findFirst
+   */
+  export type MaterialReceiptFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceipt
+     */
+    select?: MaterialReceiptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialReceipt
+     */
+    omit?: MaterialReceiptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialReceiptInclude<ExtArgs> | null
+    /**
+     * Filter, which MaterialReceipt to fetch.
+     */
+    where?: MaterialReceiptWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MaterialReceipts to fetch.
+     */
+    orderBy?: MaterialReceiptOrderByWithRelationInput | MaterialReceiptOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MaterialReceipts.
+     */
+    cursor?: MaterialReceiptWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MaterialReceipts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MaterialReceipts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MaterialReceipts.
+     */
+    distinct?: MaterialReceiptScalarFieldEnum | MaterialReceiptScalarFieldEnum[]
+  }
+
+  /**
+   * MaterialReceipt findFirstOrThrow
+   */
+  export type MaterialReceiptFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceipt
+     */
+    select?: MaterialReceiptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialReceipt
+     */
+    omit?: MaterialReceiptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialReceiptInclude<ExtArgs> | null
+    /**
+     * Filter, which MaterialReceipt to fetch.
+     */
+    where?: MaterialReceiptWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MaterialReceipts to fetch.
+     */
+    orderBy?: MaterialReceiptOrderByWithRelationInput | MaterialReceiptOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MaterialReceipts.
+     */
+    cursor?: MaterialReceiptWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MaterialReceipts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MaterialReceipts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MaterialReceipts.
+     */
+    distinct?: MaterialReceiptScalarFieldEnum | MaterialReceiptScalarFieldEnum[]
+  }
+
+  /**
+   * MaterialReceipt findMany
+   */
+  export type MaterialReceiptFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceipt
+     */
+    select?: MaterialReceiptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialReceipt
+     */
+    omit?: MaterialReceiptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialReceiptInclude<ExtArgs> | null
+    /**
+     * Filter, which MaterialReceipts to fetch.
+     */
+    where?: MaterialReceiptWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MaterialReceipts to fetch.
+     */
+    orderBy?: MaterialReceiptOrderByWithRelationInput | MaterialReceiptOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing MaterialReceipts.
+     */
+    cursor?: MaterialReceiptWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MaterialReceipts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MaterialReceipts.
+     */
+    skip?: number
+    distinct?: MaterialReceiptScalarFieldEnum | MaterialReceiptScalarFieldEnum[]
+  }
+
+  /**
+   * MaterialReceipt create
+   */
+  export type MaterialReceiptCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceipt
+     */
+    select?: MaterialReceiptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialReceipt
+     */
+    omit?: MaterialReceiptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialReceiptInclude<ExtArgs> | null
+    /**
+     * The data needed to create a MaterialReceipt.
+     */
+    data: XOR<MaterialReceiptCreateInput, MaterialReceiptUncheckedCreateInput>
+  }
+
+  /**
+   * MaterialReceipt createMany
+   */
+  export type MaterialReceiptCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many MaterialReceipts.
+     */
+    data: MaterialReceiptCreateManyInput | MaterialReceiptCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MaterialReceipt createManyAndReturn
+   */
+  export type MaterialReceiptCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceipt
+     */
+    select?: MaterialReceiptSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialReceipt
+     */
+    omit?: MaterialReceiptOmit<ExtArgs> | null
+    /**
+     * The data used to create many MaterialReceipts.
+     */
+    data: MaterialReceiptCreateManyInput | MaterialReceiptCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialReceiptIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MaterialReceipt update
+   */
+  export type MaterialReceiptUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceipt
+     */
+    select?: MaterialReceiptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialReceipt
+     */
+    omit?: MaterialReceiptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialReceiptInclude<ExtArgs> | null
+    /**
+     * The data needed to update a MaterialReceipt.
+     */
+    data: XOR<MaterialReceiptUpdateInput, MaterialReceiptUncheckedUpdateInput>
+    /**
+     * Choose, which MaterialReceipt to update.
+     */
+    where: MaterialReceiptWhereUniqueInput
+  }
+
+  /**
+   * MaterialReceipt updateMany
+   */
+  export type MaterialReceiptUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update MaterialReceipts.
+     */
+    data: XOR<MaterialReceiptUpdateManyMutationInput, MaterialReceiptUncheckedUpdateManyInput>
+    /**
+     * Filter which MaterialReceipts to update
+     */
+    where?: MaterialReceiptWhereInput
+    /**
+     * Limit how many MaterialReceipts to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MaterialReceipt updateManyAndReturn
+   */
+  export type MaterialReceiptUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceipt
+     */
+    select?: MaterialReceiptSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialReceipt
+     */
+    omit?: MaterialReceiptOmit<ExtArgs> | null
+    /**
+     * The data used to update MaterialReceipts.
+     */
+    data: XOR<MaterialReceiptUpdateManyMutationInput, MaterialReceiptUncheckedUpdateManyInput>
+    /**
+     * Filter which MaterialReceipts to update
+     */
+    where?: MaterialReceiptWhereInput
+    /**
+     * Limit how many MaterialReceipts to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialReceiptIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MaterialReceipt upsert
+   */
+  export type MaterialReceiptUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceipt
+     */
+    select?: MaterialReceiptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialReceipt
+     */
+    omit?: MaterialReceiptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialReceiptInclude<ExtArgs> | null
+    /**
+     * The filter to search for the MaterialReceipt to update in case it exists.
+     */
+    where: MaterialReceiptWhereUniqueInput
+    /**
+     * In case the MaterialReceipt found by the `where` argument doesn't exist, create a new MaterialReceipt with this data.
+     */
+    create: XOR<MaterialReceiptCreateInput, MaterialReceiptUncheckedCreateInput>
+    /**
+     * In case the MaterialReceipt was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MaterialReceiptUpdateInput, MaterialReceiptUncheckedUpdateInput>
+  }
+
+  /**
+   * MaterialReceipt delete
+   */
+  export type MaterialReceiptDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceipt
+     */
+    select?: MaterialReceiptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialReceipt
+     */
+    omit?: MaterialReceiptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialReceiptInclude<ExtArgs> | null
+    /**
+     * Filter which MaterialReceipt to delete.
+     */
+    where: MaterialReceiptWhereUniqueInput
+  }
+
+  /**
+   * MaterialReceipt deleteMany
+   */
+  export type MaterialReceiptDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MaterialReceipts to delete
+     */
+    where?: MaterialReceiptWhereInput
+    /**
+     * Limit how many MaterialReceipts to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * MaterialReceipt.items
+   */
+  export type MaterialReceipt$itemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceiptItem
+     */
+    select?: MaterialReceiptItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialReceiptItem
+     */
+    omit?: MaterialReceiptItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialReceiptItemInclude<ExtArgs> | null
+    where?: MaterialReceiptItemWhereInput
+    orderBy?: MaterialReceiptItemOrderByWithRelationInput | MaterialReceiptItemOrderByWithRelationInput[]
+    cursor?: MaterialReceiptItemWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MaterialReceiptItemScalarFieldEnum | MaterialReceiptItemScalarFieldEnum[]
+  }
+
+  /**
+   * MaterialReceipt without action
+   */
+  export type MaterialReceiptDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceipt
+     */
+    select?: MaterialReceiptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialReceipt
+     */
+    omit?: MaterialReceiptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialReceiptInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model MaterialReceiptItem
+   */
+
+  export type AggregateMaterialReceiptItem = {
+    _count: MaterialReceiptItemCountAggregateOutputType | null
+    _avg: MaterialReceiptItemAvgAggregateOutputType | null
+    _sum: MaterialReceiptItemSumAggregateOutputType | null
+    _min: MaterialReceiptItemMinAggregateOutputType | null
+    _max: MaterialReceiptItemMaxAggregateOutputType | null
+  }
+
+  export type MaterialReceiptItemAvgAggregateOutputType = {
+    measuredLength: Decimal | null
+    measuredWeight: Decimal | null
+  }
+
+  export type MaterialReceiptItemSumAggregateOutputType = {
+    measuredLength: Decimal | null
+    measuredWeight: Decimal | null
+  }
+
+  export type MaterialReceiptItemMinAggregateOutputType = {
+    id: string | null
+    receiptId: string | null
+    rollId: string | null
+    measuredLength: Decimal | null
+    measuredWeight: Decimal | null
+    remarks: string | null
+    createdAt: Date | null
+  }
+
+  export type MaterialReceiptItemMaxAggregateOutputType = {
+    id: string | null
+    receiptId: string | null
+    rollId: string | null
+    measuredLength: Decimal | null
+    measuredWeight: Decimal | null
+    remarks: string | null
+    createdAt: Date | null
+  }
+
+  export type MaterialReceiptItemCountAggregateOutputType = {
+    id: number
+    receiptId: number
+    rollId: number
+    measuredLength: number
+    measuredWeight: number
+    remarks: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type MaterialReceiptItemAvgAggregateInputType = {
+    measuredLength?: true
+    measuredWeight?: true
+  }
+
+  export type MaterialReceiptItemSumAggregateInputType = {
+    measuredLength?: true
+    measuredWeight?: true
+  }
+
+  export type MaterialReceiptItemMinAggregateInputType = {
+    id?: true
+    receiptId?: true
+    rollId?: true
+    measuredLength?: true
+    measuredWeight?: true
+    remarks?: true
+    createdAt?: true
+  }
+
+  export type MaterialReceiptItemMaxAggregateInputType = {
+    id?: true
+    receiptId?: true
+    rollId?: true
+    measuredLength?: true
+    measuredWeight?: true
+    remarks?: true
+    createdAt?: true
+  }
+
+  export type MaterialReceiptItemCountAggregateInputType = {
+    id?: true
+    receiptId?: true
+    rollId?: true
+    measuredLength?: true
+    measuredWeight?: true
+    remarks?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type MaterialReceiptItemAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MaterialReceiptItem to aggregate.
+     */
+    where?: MaterialReceiptItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MaterialReceiptItems to fetch.
+     */
+    orderBy?: MaterialReceiptItemOrderByWithRelationInput | MaterialReceiptItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MaterialReceiptItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MaterialReceiptItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MaterialReceiptItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned MaterialReceiptItems
+    **/
+    _count?: true | MaterialReceiptItemCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: MaterialReceiptItemAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: MaterialReceiptItemSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MaterialReceiptItemMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MaterialReceiptItemMaxAggregateInputType
+  }
+
+  export type GetMaterialReceiptItemAggregateType<T extends MaterialReceiptItemAggregateArgs> = {
+        [P in keyof T & keyof AggregateMaterialReceiptItem]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMaterialReceiptItem[P]>
+      : GetScalarType<T[P], AggregateMaterialReceiptItem[P]>
+  }
+
+
+
+
+  export type MaterialReceiptItemGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MaterialReceiptItemWhereInput
+    orderBy?: MaterialReceiptItemOrderByWithAggregationInput | MaterialReceiptItemOrderByWithAggregationInput[]
+    by: MaterialReceiptItemScalarFieldEnum[] | MaterialReceiptItemScalarFieldEnum
+    having?: MaterialReceiptItemScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MaterialReceiptItemCountAggregateInputType | true
+    _avg?: MaterialReceiptItemAvgAggregateInputType
+    _sum?: MaterialReceiptItemSumAggregateInputType
+    _min?: MaterialReceiptItemMinAggregateInputType
+    _max?: MaterialReceiptItemMaxAggregateInputType
+  }
+
+  export type MaterialReceiptItemGroupByOutputType = {
+    id: string
+    receiptId: string
+    rollId: string
+    measuredLength: Decimal
+    measuredWeight: Decimal | null
+    remarks: string | null
+    createdAt: Date
+    _count: MaterialReceiptItemCountAggregateOutputType | null
+    _avg: MaterialReceiptItemAvgAggregateOutputType | null
+    _sum: MaterialReceiptItemSumAggregateOutputType | null
+    _min: MaterialReceiptItemMinAggregateOutputType | null
+    _max: MaterialReceiptItemMaxAggregateOutputType | null
+  }
+
+  type GetMaterialReceiptItemGroupByPayload<T extends MaterialReceiptItemGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MaterialReceiptItemGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MaterialReceiptItemGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MaterialReceiptItemGroupByOutputType[P]>
+            : GetScalarType<T[P], MaterialReceiptItemGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MaterialReceiptItemSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    receiptId?: boolean
+    rollId?: boolean
+    measuredLength?: boolean
+    measuredWeight?: boolean
+    remarks?: boolean
+    createdAt?: boolean
+    receipt?: boolean | MaterialReceiptDefaultArgs<ExtArgs>
+    roll?: boolean | FabricStoreRollDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["materialReceiptItem"]>
+
+  export type MaterialReceiptItemSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    receiptId?: boolean
+    rollId?: boolean
+    measuredLength?: boolean
+    measuredWeight?: boolean
+    remarks?: boolean
+    createdAt?: boolean
+    receipt?: boolean | MaterialReceiptDefaultArgs<ExtArgs>
+    roll?: boolean | FabricStoreRollDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["materialReceiptItem"]>
+
+  export type MaterialReceiptItemSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    receiptId?: boolean
+    rollId?: boolean
+    measuredLength?: boolean
+    measuredWeight?: boolean
+    remarks?: boolean
+    createdAt?: boolean
+    receipt?: boolean | MaterialReceiptDefaultArgs<ExtArgs>
+    roll?: boolean | FabricStoreRollDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["materialReceiptItem"]>
+
+  export type MaterialReceiptItemSelectScalar = {
+    id?: boolean
+    receiptId?: boolean
+    rollId?: boolean
+    measuredLength?: boolean
+    measuredWeight?: boolean
+    remarks?: boolean
+    createdAt?: boolean
+  }
+
+  export type MaterialReceiptItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "receiptId" | "rollId" | "measuredLength" | "measuredWeight" | "remarks" | "createdAt", ExtArgs["result"]["materialReceiptItem"]>
+  export type MaterialReceiptItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    receipt?: boolean | MaterialReceiptDefaultArgs<ExtArgs>
+    roll?: boolean | FabricStoreRollDefaultArgs<ExtArgs>
+  }
+  export type MaterialReceiptItemIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    receipt?: boolean | MaterialReceiptDefaultArgs<ExtArgs>
+    roll?: boolean | FabricStoreRollDefaultArgs<ExtArgs>
+  }
+  export type MaterialReceiptItemIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    receipt?: boolean | MaterialReceiptDefaultArgs<ExtArgs>
+    roll?: boolean | FabricStoreRollDefaultArgs<ExtArgs>
+  }
+
+  export type $MaterialReceiptItemPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "MaterialReceiptItem"
+    objects: {
+      receipt: Prisma.$MaterialReceiptPayload<ExtArgs>
+      roll: Prisma.$FabricStoreRollPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      receiptId: string
+      rollId: string
+      measuredLength: Prisma.Decimal
+      measuredWeight: Prisma.Decimal | null
+      remarks: string | null
+      createdAt: Date
+    }, ExtArgs["result"]["materialReceiptItem"]>
+    composites: {}
+  }
+
+  type MaterialReceiptItemGetPayload<S extends boolean | null | undefined | MaterialReceiptItemDefaultArgs> = $Result.GetResult<Prisma.$MaterialReceiptItemPayload, S>
+
+  type MaterialReceiptItemCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MaterialReceiptItemFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MaterialReceiptItemCountAggregateInputType | true
+    }
+
+  export interface MaterialReceiptItemDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MaterialReceiptItem'], meta: { name: 'MaterialReceiptItem' } }
+    /**
+     * Find zero or one MaterialReceiptItem that matches the filter.
+     * @param {MaterialReceiptItemFindUniqueArgs} args - Arguments to find a MaterialReceiptItem
+     * @example
+     * // Get one MaterialReceiptItem
+     * const materialReceiptItem = await prisma.materialReceiptItem.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MaterialReceiptItemFindUniqueArgs>(args: SelectSubset<T, MaterialReceiptItemFindUniqueArgs<ExtArgs>>): Prisma__MaterialReceiptItemClient<$Result.GetResult<Prisma.$MaterialReceiptItemPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one MaterialReceiptItem that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MaterialReceiptItemFindUniqueOrThrowArgs} args - Arguments to find a MaterialReceiptItem
+     * @example
+     * // Get one MaterialReceiptItem
+     * const materialReceiptItem = await prisma.materialReceiptItem.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MaterialReceiptItemFindUniqueOrThrowArgs>(args: SelectSubset<T, MaterialReceiptItemFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MaterialReceiptItemClient<$Result.GetResult<Prisma.$MaterialReceiptItemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MaterialReceiptItem that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialReceiptItemFindFirstArgs} args - Arguments to find a MaterialReceiptItem
+     * @example
+     * // Get one MaterialReceiptItem
+     * const materialReceiptItem = await prisma.materialReceiptItem.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MaterialReceiptItemFindFirstArgs>(args?: SelectSubset<T, MaterialReceiptItemFindFirstArgs<ExtArgs>>): Prisma__MaterialReceiptItemClient<$Result.GetResult<Prisma.$MaterialReceiptItemPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MaterialReceiptItem that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialReceiptItemFindFirstOrThrowArgs} args - Arguments to find a MaterialReceiptItem
+     * @example
+     * // Get one MaterialReceiptItem
+     * const materialReceiptItem = await prisma.materialReceiptItem.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MaterialReceiptItemFindFirstOrThrowArgs>(args?: SelectSubset<T, MaterialReceiptItemFindFirstOrThrowArgs<ExtArgs>>): Prisma__MaterialReceiptItemClient<$Result.GetResult<Prisma.$MaterialReceiptItemPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more MaterialReceiptItems that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialReceiptItemFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all MaterialReceiptItems
+     * const materialReceiptItems = await prisma.materialReceiptItem.findMany()
+     * 
+     * // Get first 10 MaterialReceiptItems
+     * const materialReceiptItems = await prisma.materialReceiptItem.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const materialReceiptItemWithIdOnly = await prisma.materialReceiptItem.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MaterialReceiptItemFindManyArgs>(args?: SelectSubset<T, MaterialReceiptItemFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MaterialReceiptItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a MaterialReceiptItem.
+     * @param {MaterialReceiptItemCreateArgs} args - Arguments to create a MaterialReceiptItem.
+     * @example
+     * // Create one MaterialReceiptItem
+     * const MaterialReceiptItem = await prisma.materialReceiptItem.create({
+     *   data: {
+     *     // ... data to create a MaterialReceiptItem
+     *   }
+     * })
+     * 
+     */
+    create<T extends MaterialReceiptItemCreateArgs>(args: SelectSubset<T, MaterialReceiptItemCreateArgs<ExtArgs>>): Prisma__MaterialReceiptItemClient<$Result.GetResult<Prisma.$MaterialReceiptItemPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many MaterialReceiptItems.
+     * @param {MaterialReceiptItemCreateManyArgs} args - Arguments to create many MaterialReceiptItems.
+     * @example
+     * // Create many MaterialReceiptItems
+     * const materialReceiptItem = await prisma.materialReceiptItem.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MaterialReceiptItemCreateManyArgs>(args?: SelectSubset<T, MaterialReceiptItemCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many MaterialReceiptItems and returns the data saved in the database.
+     * @param {MaterialReceiptItemCreateManyAndReturnArgs} args - Arguments to create many MaterialReceiptItems.
+     * @example
+     * // Create many MaterialReceiptItems
+     * const materialReceiptItem = await prisma.materialReceiptItem.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many MaterialReceiptItems and only return the `id`
+     * const materialReceiptItemWithIdOnly = await prisma.materialReceiptItem.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends MaterialReceiptItemCreateManyAndReturnArgs>(args?: SelectSubset<T, MaterialReceiptItemCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MaterialReceiptItemPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a MaterialReceiptItem.
+     * @param {MaterialReceiptItemDeleteArgs} args - Arguments to delete one MaterialReceiptItem.
+     * @example
+     * // Delete one MaterialReceiptItem
+     * const MaterialReceiptItem = await prisma.materialReceiptItem.delete({
+     *   where: {
+     *     // ... filter to delete one MaterialReceiptItem
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MaterialReceiptItemDeleteArgs>(args: SelectSubset<T, MaterialReceiptItemDeleteArgs<ExtArgs>>): Prisma__MaterialReceiptItemClient<$Result.GetResult<Prisma.$MaterialReceiptItemPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one MaterialReceiptItem.
+     * @param {MaterialReceiptItemUpdateArgs} args - Arguments to update one MaterialReceiptItem.
+     * @example
+     * // Update one MaterialReceiptItem
+     * const materialReceiptItem = await prisma.materialReceiptItem.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MaterialReceiptItemUpdateArgs>(args: SelectSubset<T, MaterialReceiptItemUpdateArgs<ExtArgs>>): Prisma__MaterialReceiptItemClient<$Result.GetResult<Prisma.$MaterialReceiptItemPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more MaterialReceiptItems.
+     * @param {MaterialReceiptItemDeleteManyArgs} args - Arguments to filter MaterialReceiptItems to delete.
+     * @example
+     * // Delete a few MaterialReceiptItems
+     * const { count } = await prisma.materialReceiptItem.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MaterialReceiptItemDeleteManyArgs>(args?: SelectSubset<T, MaterialReceiptItemDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MaterialReceiptItems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialReceiptItemUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many MaterialReceiptItems
+     * const materialReceiptItem = await prisma.materialReceiptItem.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MaterialReceiptItemUpdateManyArgs>(args: SelectSubset<T, MaterialReceiptItemUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MaterialReceiptItems and returns the data updated in the database.
+     * @param {MaterialReceiptItemUpdateManyAndReturnArgs} args - Arguments to update many MaterialReceiptItems.
+     * @example
+     * // Update many MaterialReceiptItems
+     * const materialReceiptItem = await prisma.materialReceiptItem.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more MaterialReceiptItems and only return the `id`
+     * const materialReceiptItemWithIdOnly = await prisma.materialReceiptItem.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends MaterialReceiptItemUpdateManyAndReturnArgs>(args: SelectSubset<T, MaterialReceiptItemUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MaterialReceiptItemPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one MaterialReceiptItem.
+     * @param {MaterialReceiptItemUpsertArgs} args - Arguments to update or create a MaterialReceiptItem.
+     * @example
+     * // Update or create a MaterialReceiptItem
+     * const materialReceiptItem = await prisma.materialReceiptItem.upsert({
+     *   create: {
+     *     // ... data to create a MaterialReceiptItem
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the MaterialReceiptItem we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MaterialReceiptItemUpsertArgs>(args: SelectSubset<T, MaterialReceiptItemUpsertArgs<ExtArgs>>): Prisma__MaterialReceiptItemClient<$Result.GetResult<Prisma.$MaterialReceiptItemPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of MaterialReceiptItems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialReceiptItemCountArgs} args - Arguments to filter MaterialReceiptItems to count.
+     * @example
+     * // Count the number of MaterialReceiptItems
+     * const count = await prisma.materialReceiptItem.count({
+     *   where: {
+     *     // ... the filter for the MaterialReceiptItems we want to count
+     *   }
+     * })
+    **/
+    count<T extends MaterialReceiptItemCountArgs>(
+      args?: Subset<T, MaterialReceiptItemCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MaterialReceiptItemCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a MaterialReceiptItem.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialReceiptItemAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MaterialReceiptItemAggregateArgs>(args: Subset<T, MaterialReceiptItemAggregateArgs>): Prisma.PrismaPromise<GetMaterialReceiptItemAggregateType<T>>
+
+    /**
+     * Group by MaterialReceiptItem.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MaterialReceiptItemGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MaterialReceiptItemGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MaterialReceiptItemGroupByArgs['orderBy'] }
+        : { orderBy?: MaterialReceiptItemGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MaterialReceiptItemGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMaterialReceiptItemGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the MaterialReceiptItem model
+   */
+  readonly fields: MaterialReceiptItemFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for MaterialReceiptItem.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MaterialReceiptItemClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    receipt<T extends MaterialReceiptDefaultArgs<ExtArgs> = {}>(args?: Subset<T, MaterialReceiptDefaultArgs<ExtArgs>>): Prisma__MaterialReceiptClient<$Result.GetResult<Prisma.$MaterialReceiptPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    roll<T extends FabricStoreRollDefaultArgs<ExtArgs> = {}>(args?: Subset<T, FabricStoreRollDefaultArgs<ExtArgs>>): Prisma__FabricStoreRollClient<$Result.GetResult<Prisma.$FabricStoreRollPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the MaterialReceiptItem model
+   */
+  interface MaterialReceiptItemFieldRefs {
+    readonly id: FieldRef<"MaterialReceiptItem", 'String'>
+    readonly receiptId: FieldRef<"MaterialReceiptItem", 'String'>
+    readonly rollId: FieldRef<"MaterialReceiptItem", 'String'>
+    readonly measuredLength: FieldRef<"MaterialReceiptItem", 'Decimal'>
+    readonly measuredWeight: FieldRef<"MaterialReceiptItem", 'Decimal'>
+    readonly remarks: FieldRef<"MaterialReceiptItem", 'String'>
+    readonly createdAt: FieldRef<"MaterialReceiptItem", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * MaterialReceiptItem findUnique
+   */
+  export type MaterialReceiptItemFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceiptItem
+     */
+    select?: MaterialReceiptItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialReceiptItem
+     */
+    omit?: MaterialReceiptItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialReceiptItemInclude<ExtArgs> | null
+    /**
+     * Filter, which MaterialReceiptItem to fetch.
+     */
+    where: MaterialReceiptItemWhereUniqueInput
+  }
+
+  /**
+   * MaterialReceiptItem findUniqueOrThrow
+   */
+  export type MaterialReceiptItemFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceiptItem
+     */
+    select?: MaterialReceiptItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialReceiptItem
+     */
+    omit?: MaterialReceiptItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialReceiptItemInclude<ExtArgs> | null
+    /**
+     * Filter, which MaterialReceiptItem to fetch.
+     */
+    where: MaterialReceiptItemWhereUniqueInput
+  }
+
+  /**
+   * MaterialReceiptItem findFirst
+   */
+  export type MaterialReceiptItemFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceiptItem
+     */
+    select?: MaterialReceiptItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialReceiptItem
+     */
+    omit?: MaterialReceiptItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialReceiptItemInclude<ExtArgs> | null
+    /**
+     * Filter, which MaterialReceiptItem to fetch.
+     */
+    where?: MaterialReceiptItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MaterialReceiptItems to fetch.
+     */
+    orderBy?: MaterialReceiptItemOrderByWithRelationInput | MaterialReceiptItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MaterialReceiptItems.
+     */
+    cursor?: MaterialReceiptItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MaterialReceiptItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MaterialReceiptItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MaterialReceiptItems.
+     */
+    distinct?: MaterialReceiptItemScalarFieldEnum | MaterialReceiptItemScalarFieldEnum[]
+  }
+
+  /**
+   * MaterialReceiptItem findFirstOrThrow
+   */
+  export type MaterialReceiptItemFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceiptItem
+     */
+    select?: MaterialReceiptItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialReceiptItem
+     */
+    omit?: MaterialReceiptItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialReceiptItemInclude<ExtArgs> | null
+    /**
+     * Filter, which MaterialReceiptItem to fetch.
+     */
+    where?: MaterialReceiptItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MaterialReceiptItems to fetch.
+     */
+    orderBy?: MaterialReceiptItemOrderByWithRelationInput | MaterialReceiptItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MaterialReceiptItems.
+     */
+    cursor?: MaterialReceiptItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MaterialReceiptItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MaterialReceiptItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MaterialReceiptItems.
+     */
+    distinct?: MaterialReceiptItemScalarFieldEnum | MaterialReceiptItemScalarFieldEnum[]
+  }
+
+  /**
+   * MaterialReceiptItem findMany
+   */
+  export type MaterialReceiptItemFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceiptItem
+     */
+    select?: MaterialReceiptItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialReceiptItem
+     */
+    omit?: MaterialReceiptItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialReceiptItemInclude<ExtArgs> | null
+    /**
+     * Filter, which MaterialReceiptItems to fetch.
+     */
+    where?: MaterialReceiptItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MaterialReceiptItems to fetch.
+     */
+    orderBy?: MaterialReceiptItemOrderByWithRelationInput | MaterialReceiptItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing MaterialReceiptItems.
+     */
+    cursor?: MaterialReceiptItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MaterialReceiptItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MaterialReceiptItems.
+     */
+    skip?: number
+    distinct?: MaterialReceiptItemScalarFieldEnum | MaterialReceiptItemScalarFieldEnum[]
+  }
+
+  /**
+   * MaterialReceiptItem create
+   */
+  export type MaterialReceiptItemCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceiptItem
+     */
+    select?: MaterialReceiptItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialReceiptItem
+     */
+    omit?: MaterialReceiptItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialReceiptItemInclude<ExtArgs> | null
+    /**
+     * The data needed to create a MaterialReceiptItem.
+     */
+    data: XOR<MaterialReceiptItemCreateInput, MaterialReceiptItemUncheckedCreateInput>
+  }
+
+  /**
+   * MaterialReceiptItem createMany
+   */
+  export type MaterialReceiptItemCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many MaterialReceiptItems.
+     */
+    data: MaterialReceiptItemCreateManyInput | MaterialReceiptItemCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MaterialReceiptItem createManyAndReturn
+   */
+  export type MaterialReceiptItemCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceiptItem
+     */
+    select?: MaterialReceiptItemSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialReceiptItem
+     */
+    omit?: MaterialReceiptItemOmit<ExtArgs> | null
+    /**
+     * The data used to create many MaterialReceiptItems.
+     */
+    data: MaterialReceiptItemCreateManyInput | MaterialReceiptItemCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialReceiptItemIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MaterialReceiptItem update
+   */
+  export type MaterialReceiptItemUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceiptItem
+     */
+    select?: MaterialReceiptItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialReceiptItem
+     */
+    omit?: MaterialReceiptItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialReceiptItemInclude<ExtArgs> | null
+    /**
+     * The data needed to update a MaterialReceiptItem.
+     */
+    data: XOR<MaterialReceiptItemUpdateInput, MaterialReceiptItemUncheckedUpdateInput>
+    /**
+     * Choose, which MaterialReceiptItem to update.
+     */
+    where: MaterialReceiptItemWhereUniqueInput
+  }
+
+  /**
+   * MaterialReceiptItem updateMany
+   */
+  export type MaterialReceiptItemUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update MaterialReceiptItems.
+     */
+    data: XOR<MaterialReceiptItemUpdateManyMutationInput, MaterialReceiptItemUncheckedUpdateManyInput>
+    /**
+     * Filter which MaterialReceiptItems to update
+     */
+    where?: MaterialReceiptItemWhereInput
+    /**
+     * Limit how many MaterialReceiptItems to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MaterialReceiptItem updateManyAndReturn
+   */
+  export type MaterialReceiptItemUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceiptItem
+     */
+    select?: MaterialReceiptItemSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialReceiptItem
+     */
+    omit?: MaterialReceiptItemOmit<ExtArgs> | null
+    /**
+     * The data used to update MaterialReceiptItems.
+     */
+    data: XOR<MaterialReceiptItemUpdateManyMutationInput, MaterialReceiptItemUncheckedUpdateManyInput>
+    /**
+     * Filter which MaterialReceiptItems to update
+     */
+    where?: MaterialReceiptItemWhereInput
+    /**
+     * Limit how many MaterialReceiptItems to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialReceiptItemIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MaterialReceiptItem upsert
+   */
+  export type MaterialReceiptItemUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceiptItem
+     */
+    select?: MaterialReceiptItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialReceiptItem
+     */
+    omit?: MaterialReceiptItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialReceiptItemInclude<ExtArgs> | null
+    /**
+     * The filter to search for the MaterialReceiptItem to update in case it exists.
+     */
+    where: MaterialReceiptItemWhereUniqueInput
+    /**
+     * In case the MaterialReceiptItem found by the `where` argument doesn't exist, create a new MaterialReceiptItem with this data.
+     */
+    create: XOR<MaterialReceiptItemCreateInput, MaterialReceiptItemUncheckedCreateInput>
+    /**
+     * In case the MaterialReceiptItem was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MaterialReceiptItemUpdateInput, MaterialReceiptItemUncheckedUpdateInput>
+  }
+
+  /**
+   * MaterialReceiptItem delete
+   */
+  export type MaterialReceiptItemDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceiptItem
+     */
+    select?: MaterialReceiptItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialReceiptItem
+     */
+    omit?: MaterialReceiptItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialReceiptItemInclude<ExtArgs> | null
+    /**
+     * Filter which MaterialReceiptItem to delete.
+     */
+    where: MaterialReceiptItemWhereUniqueInput
+  }
+
+  /**
+   * MaterialReceiptItem deleteMany
+   */
+  export type MaterialReceiptItemDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MaterialReceiptItems to delete
+     */
+    where?: MaterialReceiptItemWhereInput
+    /**
+     * Limit how many MaterialReceiptItems to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * MaterialReceiptItem without action
+   */
+  export type MaterialReceiptItemDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MaterialReceiptItem
+     */
+    select?: MaterialReceiptItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MaterialReceiptItem
+     */
+    omit?: MaterialReceiptItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MaterialReceiptItemInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model FabricQCInspection
+   */
+
+  export type AggregateFabricQCInspection = {
+    _count: FabricQCInspectionCountAggregateOutputType | null
+    _min: FabricQCInspectionMinAggregateOutputType | null
+    _max: FabricQCInspectionMaxAggregateOutputType | null
+  }
+
+  export type FabricQCInspectionMinAggregateOutputType = {
+    id: string | null
+    inspectionNumber: string | null
+    rollId: string | null
+    inspectedById: string | null
+    inspectionType: $Enums.InspectionType | null
+    result: $Enums.InspectionResult | null
+    remarks: string | null
+    inspectedAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type FabricQCInspectionMaxAggregateOutputType = {
+    id: string | null
+    inspectionNumber: string | null
+    rollId: string | null
+    inspectedById: string | null
+    inspectionType: $Enums.InspectionType | null
+    result: $Enums.InspectionResult | null
+    remarks: string | null
+    inspectedAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type FabricQCInspectionCountAggregateOutputType = {
+    id: number
+    inspectionNumber: number
+    rollId: number
+    inspectedById: number
+    inspectionType: number
+    result: number
+    defects: number
+    remarks: number
+    inspectedAt: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type FabricQCInspectionMinAggregateInputType = {
+    id?: true
+    inspectionNumber?: true
+    rollId?: true
+    inspectedById?: true
+    inspectionType?: true
+    result?: true
+    remarks?: true
+    inspectedAt?: true
+    createdAt?: true
+  }
+
+  export type FabricQCInspectionMaxAggregateInputType = {
+    id?: true
+    inspectionNumber?: true
+    rollId?: true
+    inspectedById?: true
+    inspectionType?: true
+    result?: true
+    remarks?: true
+    inspectedAt?: true
+    createdAt?: true
+  }
+
+  export type FabricQCInspectionCountAggregateInputType = {
+    id?: true
+    inspectionNumber?: true
+    rollId?: true
+    inspectedById?: true
+    inspectionType?: true
+    result?: true
+    defects?: true
+    remarks?: true
+    inspectedAt?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type FabricQCInspectionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FabricQCInspection to aggregate.
+     */
+    where?: FabricQCInspectionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricQCInspections to fetch.
+     */
+    orderBy?: FabricQCInspectionOrderByWithRelationInput | FabricQCInspectionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: FabricQCInspectionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricQCInspections from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricQCInspections.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned FabricQCInspections
+    **/
+    _count?: true | FabricQCInspectionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: FabricQCInspectionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: FabricQCInspectionMaxAggregateInputType
+  }
+
+  export type GetFabricQCInspectionAggregateType<T extends FabricQCInspectionAggregateArgs> = {
+        [P in keyof T & keyof AggregateFabricQCInspection]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateFabricQCInspection[P]>
+      : GetScalarType<T[P], AggregateFabricQCInspection[P]>
+  }
+
+
+
+
+  export type FabricQCInspectionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FabricQCInspectionWhereInput
+    orderBy?: FabricQCInspectionOrderByWithAggregationInput | FabricQCInspectionOrderByWithAggregationInput[]
+    by: FabricQCInspectionScalarFieldEnum[] | FabricQCInspectionScalarFieldEnum
+    having?: FabricQCInspectionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: FabricQCInspectionCountAggregateInputType | true
+    _min?: FabricQCInspectionMinAggregateInputType
+    _max?: FabricQCInspectionMaxAggregateInputType
+  }
+
+  export type FabricQCInspectionGroupByOutputType = {
+    id: string
+    inspectionNumber: string
+    rollId: string
+    inspectedById: string
+    inspectionType: $Enums.InspectionType
+    result: $Enums.InspectionResult
+    defects: JsonValue | null
+    remarks: string | null
+    inspectedAt: Date
+    createdAt: Date
+    _count: FabricQCInspectionCountAggregateOutputType | null
+    _min: FabricQCInspectionMinAggregateOutputType | null
+    _max: FabricQCInspectionMaxAggregateOutputType | null
+  }
+
+  type GetFabricQCInspectionGroupByPayload<T extends FabricQCInspectionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<FabricQCInspectionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof FabricQCInspectionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], FabricQCInspectionGroupByOutputType[P]>
+            : GetScalarType<T[P], FabricQCInspectionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type FabricQCInspectionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    inspectionNumber?: boolean
+    rollId?: boolean
+    inspectedById?: boolean
+    inspectionType?: boolean
+    result?: boolean
+    defects?: boolean
+    remarks?: boolean
+    inspectedAt?: boolean
+    createdAt?: boolean
+    roll?: boolean | FabricStoreRollDefaultArgs<ExtArgs>
+    inspectedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["fabricQCInspection"]>
+
+  export type FabricQCInspectionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    inspectionNumber?: boolean
+    rollId?: boolean
+    inspectedById?: boolean
+    inspectionType?: boolean
+    result?: boolean
+    defects?: boolean
+    remarks?: boolean
+    inspectedAt?: boolean
+    createdAt?: boolean
+    roll?: boolean | FabricStoreRollDefaultArgs<ExtArgs>
+    inspectedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["fabricQCInspection"]>
+
+  export type FabricQCInspectionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    inspectionNumber?: boolean
+    rollId?: boolean
+    inspectedById?: boolean
+    inspectionType?: boolean
+    result?: boolean
+    defects?: boolean
+    remarks?: boolean
+    inspectedAt?: boolean
+    createdAt?: boolean
+    roll?: boolean | FabricStoreRollDefaultArgs<ExtArgs>
+    inspectedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["fabricQCInspection"]>
+
+  export type FabricQCInspectionSelectScalar = {
+    id?: boolean
+    inspectionNumber?: boolean
+    rollId?: boolean
+    inspectedById?: boolean
+    inspectionType?: boolean
+    result?: boolean
+    defects?: boolean
+    remarks?: boolean
+    inspectedAt?: boolean
+    createdAt?: boolean
+  }
+
+  export type FabricQCInspectionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "inspectionNumber" | "rollId" | "inspectedById" | "inspectionType" | "result" | "defects" | "remarks" | "inspectedAt" | "createdAt", ExtArgs["result"]["fabricQCInspection"]>
+  export type FabricQCInspectionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    roll?: boolean | FabricStoreRollDefaultArgs<ExtArgs>
+    inspectedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type FabricQCInspectionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    roll?: boolean | FabricStoreRollDefaultArgs<ExtArgs>
+    inspectedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type FabricQCInspectionIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    roll?: boolean | FabricStoreRollDefaultArgs<ExtArgs>
+    inspectedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $FabricQCInspectionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "FabricQCInspection"
+    objects: {
+      roll: Prisma.$FabricStoreRollPayload<ExtArgs>
+      inspectedBy: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      inspectionNumber: string
+      rollId: string
+      inspectedById: string
+      inspectionType: $Enums.InspectionType
+      result: $Enums.InspectionResult
+      defects: Prisma.JsonValue | null
+      remarks: string | null
+      inspectedAt: Date
+      createdAt: Date
+    }, ExtArgs["result"]["fabricQCInspection"]>
+    composites: {}
+  }
+
+  type FabricQCInspectionGetPayload<S extends boolean | null | undefined | FabricQCInspectionDefaultArgs> = $Result.GetResult<Prisma.$FabricQCInspectionPayload, S>
+
+  type FabricQCInspectionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<FabricQCInspectionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: FabricQCInspectionCountAggregateInputType | true
+    }
+
+  export interface FabricQCInspectionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['FabricQCInspection'], meta: { name: 'FabricQCInspection' } }
+    /**
+     * Find zero or one FabricQCInspection that matches the filter.
+     * @param {FabricQCInspectionFindUniqueArgs} args - Arguments to find a FabricQCInspection
+     * @example
+     * // Get one FabricQCInspection
+     * const fabricQCInspection = await prisma.fabricQCInspection.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends FabricQCInspectionFindUniqueArgs>(args: SelectSubset<T, FabricQCInspectionFindUniqueArgs<ExtArgs>>): Prisma__FabricQCInspectionClient<$Result.GetResult<Prisma.$FabricQCInspectionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one FabricQCInspection that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {FabricQCInspectionFindUniqueOrThrowArgs} args - Arguments to find a FabricQCInspection
+     * @example
+     * // Get one FabricQCInspection
+     * const fabricQCInspection = await prisma.fabricQCInspection.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends FabricQCInspectionFindUniqueOrThrowArgs>(args: SelectSubset<T, FabricQCInspectionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FabricQCInspectionClient<$Result.GetResult<Prisma.$FabricQCInspectionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FabricQCInspection that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricQCInspectionFindFirstArgs} args - Arguments to find a FabricQCInspection
+     * @example
+     * // Get one FabricQCInspection
+     * const fabricQCInspection = await prisma.fabricQCInspection.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends FabricQCInspectionFindFirstArgs>(args?: SelectSubset<T, FabricQCInspectionFindFirstArgs<ExtArgs>>): Prisma__FabricQCInspectionClient<$Result.GetResult<Prisma.$FabricQCInspectionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FabricQCInspection that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricQCInspectionFindFirstOrThrowArgs} args - Arguments to find a FabricQCInspection
+     * @example
+     * // Get one FabricQCInspection
+     * const fabricQCInspection = await prisma.fabricQCInspection.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends FabricQCInspectionFindFirstOrThrowArgs>(args?: SelectSubset<T, FabricQCInspectionFindFirstOrThrowArgs<ExtArgs>>): Prisma__FabricQCInspectionClient<$Result.GetResult<Prisma.$FabricQCInspectionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more FabricQCInspections that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricQCInspectionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all FabricQCInspections
+     * const fabricQCInspections = await prisma.fabricQCInspection.findMany()
+     * 
+     * // Get first 10 FabricQCInspections
+     * const fabricQCInspections = await prisma.fabricQCInspection.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const fabricQCInspectionWithIdOnly = await prisma.fabricQCInspection.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends FabricQCInspectionFindManyArgs>(args?: SelectSubset<T, FabricQCInspectionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricQCInspectionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a FabricQCInspection.
+     * @param {FabricQCInspectionCreateArgs} args - Arguments to create a FabricQCInspection.
+     * @example
+     * // Create one FabricQCInspection
+     * const FabricQCInspection = await prisma.fabricQCInspection.create({
+     *   data: {
+     *     // ... data to create a FabricQCInspection
+     *   }
+     * })
+     * 
+     */
+    create<T extends FabricQCInspectionCreateArgs>(args: SelectSubset<T, FabricQCInspectionCreateArgs<ExtArgs>>): Prisma__FabricQCInspectionClient<$Result.GetResult<Prisma.$FabricQCInspectionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many FabricQCInspections.
+     * @param {FabricQCInspectionCreateManyArgs} args - Arguments to create many FabricQCInspections.
+     * @example
+     * // Create many FabricQCInspections
+     * const fabricQCInspection = await prisma.fabricQCInspection.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends FabricQCInspectionCreateManyArgs>(args?: SelectSubset<T, FabricQCInspectionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many FabricQCInspections and returns the data saved in the database.
+     * @param {FabricQCInspectionCreateManyAndReturnArgs} args - Arguments to create many FabricQCInspections.
+     * @example
+     * // Create many FabricQCInspections
+     * const fabricQCInspection = await prisma.fabricQCInspection.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many FabricQCInspections and only return the `id`
+     * const fabricQCInspectionWithIdOnly = await prisma.fabricQCInspection.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends FabricQCInspectionCreateManyAndReturnArgs>(args?: SelectSubset<T, FabricQCInspectionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricQCInspectionPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a FabricQCInspection.
+     * @param {FabricQCInspectionDeleteArgs} args - Arguments to delete one FabricQCInspection.
+     * @example
+     * // Delete one FabricQCInspection
+     * const FabricQCInspection = await prisma.fabricQCInspection.delete({
+     *   where: {
+     *     // ... filter to delete one FabricQCInspection
+     *   }
+     * })
+     * 
+     */
+    delete<T extends FabricQCInspectionDeleteArgs>(args: SelectSubset<T, FabricQCInspectionDeleteArgs<ExtArgs>>): Prisma__FabricQCInspectionClient<$Result.GetResult<Prisma.$FabricQCInspectionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one FabricQCInspection.
+     * @param {FabricQCInspectionUpdateArgs} args - Arguments to update one FabricQCInspection.
+     * @example
+     * // Update one FabricQCInspection
+     * const fabricQCInspection = await prisma.fabricQCInspection.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends FabricQCInspectionUpdateArgs>(args: SelectSubset<T, FabricQCInspectionUpdateArgs<ExtArgs>>): Prisma__FabricQCInspectionClient<$Result.GetResult<Prisma.$FabricQCInspectionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more FabricQCInspections.
+     * @param {FabricQCInspectionDeleteManyArgs} args - Arguments to filter FabricQCInspections to delete.
+     * @example
+     * // Delete a few FabricQCInspections
+     * const { count } = await prisma.fabricQCInspection.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends FabricQCInspectionDeleteManyArgs>(args?: SelectSubset<T, FabricQCInspectionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FabricQCInspections.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricQCInspectionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many FabricQCInspections
+     * const fabricQCInspection = await prisma.fabricQCInspection.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends FabricQCInspectionUpdateManyArgs>(args: SelectSubset<T, FabricQCInspectionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FabricQCInspections and returns the data updated in the database.
+     * @param {FabricQCInspectionUpdateManyAndReturnArgs} args - Arguments to update many FabricQCInspections.
+     * @example
+     * // Update many FabricQCInspections
+     * const fabricQCInspection = await prisma.fabricQCInspection.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more FabricQCInspections and only return the `id`
+     * const fabricQCInspectionWithIdOnly = await prisma.fabricQCInspection.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends FabricQCInspectionUpdateManyAndReturnArgs>(args: SelectSubset<T, FabricQCInspectionUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricQCInspectionPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one FabricQCInspection.
+     * @param {FabricQCInspectionUpsertArgs} args - Arguments to update or create a FabricQCInspection.
+     * @example
+     * // Update or create a FabricQCInspection
+     * const fabricQCInspection = await prisma.fabricQCInspection.upsert({
+     *   create: {
+     *     // ... data to create a FabricQCInspection
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the FabricQCInspection we want to update
+     *   }
+     * })
+     */
+    upsert<T extends FabricQCInspectionUpsertArgs>(args: SelectSubset<T, FabricQCInspectionUpsertArgs<ExtArgs>>): Prisma__FabricQCInspectionClient<$Result.GetResult<Prisma.$FabricQCInspectionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of FabricQCInspections.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricQCInspectionCountArgs} args - Arguments to filter FabricQCInspections to count.
+     * @example
+     * // Count the number of FabricQCInspections
+     * const count = await prisma.fabricQCInspection.count({
+     *   where: {
+     *     // ... the filter for the FabricQCInspections we want to count
+     *   }
+     * })
+    **/
+    count<T extends FabricQCInspectionCountArgs>(
+      args?: Subset<T, FabricQCInspectionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], FabricQCInspectionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a FabricQCInspection.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricQCInspectionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends FabricQCInspectionAggregateArgs>(args: Subset<T, FabricQCInspectionAggregateArgs>): Prisma.PrismaPromise<GetFabricQCInspectionAggregateType<T>>
+
+    /**
+     * Group by FabricQCInspection.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricQCInspectionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends FabricQCInspectionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: FabricQCInspectionGroupByArgs['orderBy'] }
+        : { orderBy?: FabricQCInspectionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, FabricQCInspectionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFabricQCInspectionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the FabricQCInspection model
+   */
+  readonly fields: FabricQCInspectionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for FabricQCInspection.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__FabricQCInspectionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    roll<T extends FabricStoreRollDefaultArgs<ExtArgs> = {}>(args?: Subset<T, FabricStoreRollDefaultArgs<ExtArgs>>): Prisma__FabricStoreRollClient<$Result.GetResult<Prisma.$FabricStoreRollPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    inspectedBy<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the FabricQCInspection model
+   */
+  interface FabricQCInspectionFieldRefs {
+    readonly id: FieldRef<"FabricQCInspection", 'String'>
+    readonly inspectionNumber: FieldRef<"FabricQCInspection", 'String'>
+    readonly rollId: FieldRef<"FabricQCInspection", 'String'>
+    readonly inspectedById: FieldRef<"FabricQCInspection", 'String'>
+    readonly inspectionType: FieldRef<"FabricQCInspection", 'InspectionType'>
+    readonly result: FieldRef<"FabricQCInspection", 'InspectionResult'>
+    readonly defects: FieldRef<"FabricQCInspection", 'Json'>
+    readonly remarks: FieldRef<"FabricQCInspection", 'String'>
+    readonly inspectedAt: FieldRef<"FabricQCInspection", 'DateTime'>
+    readonly createdAt: FieldRef<"FabricQCInspection", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * FabricQCInspection findUnique
+   */
+  export type FabricQCInspectionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricQCInspection
+     */
+    select?: FabricQCInspectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricQCInspection
+     */
+    omit?: FabricQCInspectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricQCInspectionInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricQCInspection to fetch.
+     */
+    where: FabricQCInspectionWhereUniqueInput
+  }
+
+  /**
+   * FabricQCInspection findUniqueOrThrow
+   */
+  export type FabricQCInspectionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricQCInspection
+     */
+    select?: FabricQCInspectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricQCInspection
+     */
+    omit?: FabricQCInspectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricQCInspectionInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricQCInspection to fetch.
+     */
+    where: FabricQCInspectionWhereUniqueInput
+  }
+
+  /**
+   * FabricQCInspection findFirst
+   */
+  export type FabricQCInspectionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricQCInspection
+     */
+    select?: FabricQCInspectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricQCInspection
+     */
+    omit?: FabricQCInspectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricQCInspectionInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricQCInspection to fetch.
+     */
+    where?: FabricQCInspectionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricQCInspections to fetch.
+     */
+    orderBy?: FabricQCInspectionOrderByWithRelationInput | FabricQCInspectionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FabricQCInspections.
+     */
+    cursor?: FabricQCInspectionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricQCInspections from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricQCInspections.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FabricQCInspections.
+     */
+    distinct?: FabricQCInspectionScalarFieldEnum | FabricQCInspectionScalarFieldEnum[]
+  }
+
+  /**
+   * FabricQCInspection findFirstOrThrow
+   */
+  export type FabricQCInspectionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricQCInspection
+     */
+    select?: FabricQCInspectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricQCInspection
+     */
+    omit?: FabricQCInspectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricQCInspectionInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricQCInspection to fetch.
+     */
+    where?: FabricQCInspectionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricQCInspections to fetch.
+     */
+    orderBy?: FabricQCInspectionOrderByWithRelationInput | FabricQCInspectionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FabricQCInspections.
+     */
+    cursor?: FabricQCInspectionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricQCInspections from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricQCInspections.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FabricQCInspections.
+     */
+    distinct?: FabricQCInspectionScalarFieldEnum | FabricQCInspectionScalarFieldEnum[]
+  }
+
+  /**
+   * FabricQCInspection findMany
+   */
+  export type FabricQCInspectionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricQCInspection
+     */
+    select?: FabricQCInspectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricQCInspection
+     */
+    omit?: FabricQCInspectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricQCInspectionInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricQCInspections to fetch.
+     */
+    where?: FabricQCInspectionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricQCInspections to fetch.
+     */
+    orderBy?: FabricQCInspectionOrderByWithRelationInput | FabricQCInspectionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing FabricQCInspections.
+     */
+    cursor?: FabricQCInspectionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricQCInspections from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricQCInspections.
+     */
+    skip?: number
+    distinct?: FabricQCInspectionScalarFieldEnum | FabricQCInspectionScalarFieldEnum[]
+  }
+
+  /**
+   * FabricQCInspection create
+   */
+  export type FabricQCInspectionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricQCInspection
+     */
+    select?: FabricQCInspectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricQCInspection
+     */
+    omit?: FabricQCInspectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricQCInspectionInclude<ExtArgs> | null
+    /**
+     * The data needed to create a FabricQCInspection.
+     */
+    data: XOR<FabricQCInspectionCreateInput, FabricQCInspectionUncheckedCreateInput>
+  }
+
+  /**
+   * FabricQCInspection createMany
+   */
+  export type FabricQCInspectionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many FabricQCInspections.
+     */
+    data: FabricQCInspectionCreateManyInput | FabricQCInspectionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * FabricQCInspection createManyAndReturn
+   */
+  export type FabricQCInspectionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricQCInspection
+     */
+    select?: FabricQCInspectionSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricQCInspection
+     */
+    omit?: FabricQCInspectionOmit<ExtArgs> | null
+    /**
+     * The data used to create many FabricQCInspections.
+     */
+    data: FabricQCInspectionCreateManyInput | FabricQCInspectionCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricQCInspectionIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * FabricQCInspection update
+   */
+  export type FabricQCInspectionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricQCInspection
+     */
+    select?: FabricQCInspectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricQCInspection
+     */
+    omit?: FabricQCInspectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricQCInspectionInclude<ExtArgs> | null
+    /**
+     * The data needed to update a FabricQCInspection.
+     */
+    data: XOR<FabricQCInspectionUpdateInput, FabricQCInspectionUncheckedUpdateInput>
+    /**
+     * Choose, which FabricQCInspection to update.
+     */
+    where: FabricQCInspectionWhereUniqueInput
+  }
+
+  /**
+   * FabricQCInspection updateMany
+   */
+  export type FabricQCInspectionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update FabricQCInspections.
+     */
+    data: XOR<FabricQCInspectionUpdateManyMutationInput, FabricQCInspectionUncheckedUpdateManyInput>
+    /**
+     * Filter which FabricQCInspections to update
+     */
+    where?: FabricQCInspectionWhereInput
+    /**
+     * Limit how many FabricQCInspections to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * FabricQCInspection updateManyAndReturn
+   */
+  export type FabricQCInspectionUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricQCInspection
+     */
+    select?: FabricQCInspectionSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricQCInspection
+     */
+    omit?: FabricQCInspectionOmit<ExtArgs> | null
+    /**
+     * The data used to update FabricQCInspections.
+     */
+    data: XOR<FabricQCInspectionUpdateManyMutationInput, FabricQCInspectionUncheckedUpdateManyInput>
+    /**
+     * Filter which FabricQCInspections to update
+     */
+    where?: FabricQCInspectionWhereInput
+    /**
+     * Limit how many FabricQCInspections to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricQCInspectionIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * FabricQCInspection upsert
+   */
+  export type FabricQCInspectionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricQCInspection
+     */
+    select?: FabricQCInspectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricQCInspection
+     */
+    omit?: FabricQCInspectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricQCInspectionInclude<ExtArgs> | null
+    /**
+     * The filter to search for the FabricQCInspection to update in case it exists.
+     */
+    where: FabricQCInspectionWhereUniqueInput
+    /**
+     * In case the FabricQCInspection found by the `where` argument doesn't exist, create a new FabricQCInspection with this data.
+     */
+    create: XOR<FabricQCInspectionCreateInput, FabricQCInspectionUncheckedCreateInput>
+    /**
+     * In case the FabricQCInspection was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<FabricQCInspectionUpdateInput, FabricQCInspectionUncheckedUpdateInput>
+  }
+
+  /**
+   * FabricQCInspection delete
+   */
+  export type FabricQCInspectionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricQCInspection
+     */
+    select?: FabricQCInspectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricQCInspection
+     */
+    omit?: FabricQCInspectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricQCInspectionInclude<ExtArgs> | null
+    /**
+     * Filter which FabricQCInspection to delete.
+     */
+    where: FabricQCInspectionWhereUniqueInput
+  }
+
+  /**
+   * FabricQCInspection deleteMany
+   */
+  export type FabricQCInspectionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FabricQCInspections to delete
+     */
+    where?: FabricQCInspectionWhereInput
+    /**
+     * Limit how many FabricQCInspections to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * FabricQCInspection without action
+   */
+  export type FabricQCInspectionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricQCInspection
+     */
+    select?: FabricQCInspectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricQCInspection
+     */
+    omit?: FabricQCInspectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricQCInspectionInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model FabricStockLedger
+   */
+
+  export type AggregateFabricStockLedger = {
+    _count: FabricStockLedgerCountAggregateOutputType | null
+    _avg: FabricStockLedgerAvgAggregateOutputType | null
+    _sum: FabricStockLedgerSumAggregateOutputType | null
+    _min: FabricStockLedgerMinAggregateOutputType | null
+    _max: FabricStockLedgerMaxAggregateOutputType | null
+  }
+
+  export type FabricStockLedgerAvgAggregateOutputType = {
+    quantity: Decimal | null
+  }
+
+  export type FabricStockLedgerSumAggregateOutputType = {
+    quantity: Decimal | null
+  }
+
+  export type FabricStockLedgerMinAggregateOutputType = {
+    id: string | null
+    entryNumber: string | null
+    rollId: string | null
+    batchId: string | null
+    transactionType: $Enums.StockTransactionType | null
+    quantity: Decimal | null
+    referenceType: string | null
+    referenceId: string | null
+    fromLocationId: string | null
+    toLocationId: string | null
+    transactedById: string | null
+    transactedAt: Date | null
+    remarks: string | null
+    createdAt: Date | null
+  }
+
+  export type FabricStockLedgerMaxAggregateOutputType = {
+    id: string | null
+    entryNumber: string | null
+    rollId: string | null
+    batchId: string | null
+    transactionType: $Enums.StockTransactionType | null
+    quantity: Decimal | null
+    referenceType: string | null
+    referenceId: string | null
+    fromLocationId: string | null
+    toLocationId: string | null
+    transactedById: string | null
+    transactedAt: Date | null
+    remarks: string | null
+    createdAt: Date | null
+  }
+
+  export type FabricStockLedgerCountAggregateOutputType = {
+    id: number
+    entryNumber: number
+    rollId: number
+    batchId: number
+    transactionType: number
+    quantity: number
+    referenceType: number
+    referenceId: number
+    fromLocationId: number
+    toLocationId: number
+    transactedById: number
+    transactedAt: number
+    remarks: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type FabricStockLedgerAvgAggregateInputType = {
+    quantity?: true
+  }
+
+  export type FabricStockLedgerSumAggregateInputType = {
+    quantity?: true
+  }
+
+  export type FabricStockLedgerMinAggregateInputType = {
+    id?: true
+    entryNumber?: true
+    rollId?: true
+    batchId?: true
+    transactionType?: true
+    quantity?: true
+    referenceType?: true
+    referenceId?: true
+    fromLocationId?: true
+    toLocationId?: true
+    transactedById?: true
+    transactedAt?: true
+    remarks?: true
+    createdAt?: true
+  }
+
+  export type FabricStockLedgerMaxAggregateInputType = {
+    id?: true
+    entryNumber?: true
+    rollId?: true
+    batchId?: true
+    transactionType?: true
+    quantity?: true
+    referenceType?: true
+    referenceId?: true
+    fromLocationId?: true
+    toLocationId?: true
+    transactedById?: true
+    transactedAt?: true
+    remarks?: true
+    createdAt?: true
+  }
+
+  export type FabricStockLedgerCountAggregateInputType = {
+    id?: true
+    entryNumber?: true
+    rollId?: true
+    batchId?: true
+    transactionType?: true
+    quantity?: true
+    referenceType?: true
+    referenceId?: true
+    fromLocationId?: true
+    toLocationId?: true
+    transactedById?: true
+    transactedAt?: true
+    remarks?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type FabricStockLedgerAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FabricStockLedger to aggregate.
+     */
+    where?: FabricStockLedgerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricStockLedgers to fetch.
+     */
+    orderBy?: FabricStockLedgerOrderByWithRelationInput | FabricStockLedgerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: FabricStockLedgerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricStockLedgers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricStockLedgers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned FabricStockLedgers
+    **/
+    _count?: true | FabricStockLedgerCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: FabricStockLedgerAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: FabricStockLedgerSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: FabricStockLedgerMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: FabricStockLedgerMaxAggregateInputType
+  }
+
+  export type GetFabricStockLedgerAggregateType<T extends FabricStockLedgerAggregateArgs> = {
+        [P in keyof T & keyof AggregateFabricStockLedger]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateFabricStockLedger[P]>
+      : GetScalarType<T[P], AggregateFabricStockLedger[P]>
+  }
+
+
+
+
+  export type FabricStockLedgerGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FabricStockLedgerWhereInput
+    orderBy?: FabricStockLedgerOrderByWithAggregationInput | FabricStockLedgerOrderByWithAggregationInput[]
+    by: FabricStockLedgerScalarFieldEnum[] | FabricStockLedgerScalarFieldEnum
+    having?: FabricStockLedgerScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: FabricStockLedgerCountAggregateInputType | true
+    _avg?: FabricStockLedgerAvgAggregateInputType
+    _sum?: FabricStockLedgerSumAggregateInputType
+    _min?: FabricStockLedgerMinAggregateInputType
+    _max?: FabricStockLedgerMaxAggregateInputType
+  }
+
+  export type FabricStockLedgerGroupByOutputType = {
+    id: string
+    entryNumber: string
+    rollId: string
+    batchId: string
+    transactionType: $Enums.StockTransactionType
+    quantity: Decimal
+    referenceType: string
+    referenceId: string
+    fromLocationId: string | null
+    toLocationId: string | null
+    transactedById: string
+    transactedAt: Date
+    remarks: string | null
+    createdAt: Date
+    _count: FabricStockLedgerCountAggregateOutputType | null
+    _avg: FabricStockLedgerAvgAggregateOutputType | null
+    _sum: FabricStockLedgerSumAggregateOutputType | null
+    _min: FabricStockLedgerMinAggregateOutputType | null
+    _max: FabricStockLedgerMaxAggregateOutputType | null
+  }
+
+  type GetFabricStockLedgerGroupByPayload<T extends FabricStockLedgerGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<FabricStockLedgerGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof FabricStockLedgerGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], FabricStockLedgerGroupByOutputType[P]>
+            : GetScalarType<T[P], FabricStockLedgerGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type FabricStockLedgerSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    entryNumber?: boolean
+    rollId?: boolean
+    batchId?: boolean
+    transactionType?: boolean
+    quantity?: boolean
+    referenceType?: boolean
+    referenceId?: boolean
+    fromLocationId?: boolean
+    toLocationId?: boolean
+    transactedById?: boolean
+    transactedAt?: boolean
+    remarks?: boolean
+    createdAt?: boolean
+    roll?: boolean | FabricStoreRollDefaultArgs<ExtArgs>
+    batch?: boolean | FabricBatchDefaultArgs<ExtArgs>
+    fromLocation?: boolean | FabricStockLedger$fromLocationArgs<ExtArgs>
+    toLocation?: boolean | FabricStockLedger$toLocationArgs<ExtArgs>
+    transactedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["fabricStockLedger"]>
+
+  export type FabricStockLedgerSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    entryNumber?: boolean
+    rollId?: boolean
+    batchId?: boolean
+    transactionType?: boolean
+    quantity?: boolean
+    referenceType?: boolean
+    referenceId?: boolean
+    fromLocationId?: boolean
+    toLocationId?: boolean
+    transactedById?: boolean
+    transactedAt?: boolean
+    remarks?: boolean
+    createdAt?: boolean
+    roll?: boolean | FabricStoreRollDefaultArgs<ExtArgs>
+    batch?: boolean | FabricBatchDefaultArgs<ExtArgs>
+    fromLocation?: boolean | FabricStockLedger$fromLocationArgs<ExtArgs>
+    toLocation?: boolean | FabricStockLedger$toLocationArgs<ExtArgs>
+    transactedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["fabricStockLedger"]>
+
+  export type FabricStockLedgerSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    entryNumber?: boolean
+    rollId?: boolean
+    batchId?: boolean
+    transactionType?: boolean
+    quantity?: boolean
+    referenceType?: boolean
+    referenceId?: boolean
+    fromLocationId?: boolean
+    toLocationId?: boolean
+    transactedById?: boolean
+    transactedAt?: boolean
+    remarks?: boolean
+    createdAt?: boolean
+    roll?: boolean | FabricStoreRollDefaultArgs<ExtArgs>
+    batch?: boolean | FabricBatchDefaultArgs<ExtArgs>
+    fromLocation?: boolean | FabricStockLedger$fromLocationArgs<ExtArgs>
+    toLocation?: boolean | FabricStockLedger$toLocationArgs<ExtArgs>
+    transactedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["fabricStockLedger"]>
+
+  export type FabricStockLedgerSelectScalar = {
+    id?: boolean
+    entryNumber?: boolean
+    rollId?: boolean
+    batchId?: boolean
+    transactionType?: boolean
+    quantity?: boolean
+    referenceType?: boolean
+    referenceId?: boolean
+    fromLocationId?: boolean
+    toLocationId?: boolean
+    transactedById?: boolean
+    transactedAt?: boolean
+    remarks?: boolean
+    createdAt?: boolean
+  }
+
+  export type FabricStockLedgerOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "entryNumber" | "rollId" | "batchId" | "transactionType" | "quantity" | "referenceType" | "referenceId" | "fromLocationId" | "toLocationId" | "transactedById" | "transactedAt" | "remarks" | "createdAt", ExtArgs["result"]["fabricStockLedger"]>
+  export type FabricStockLedgerInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    roll?: boolean | FabricStoreRollDefaultArgs<ExtArgs>
+    batch?: boolean | FabricBatchDefaultArgs<ExtArgs>
+    fromLocation?: boolean | FabricStockLedger$fromLocationArgs<ExtArgs>
+    toLocation?: boolean | FabricStockLedger$toLocationArgs<ExtArgs>
+    transactedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type FabricStockLedgerIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    roll?: boolean | FabricStoreRollDefaultArgs<ExtArgs>
+    batch?: boolean | FabricBatchDefaultArgs<ExtArgs>
+    fromLocation?: boolean | FabricStockLedger$fromLocationArgs<ExtArgs>
+    toLocation?: boolean | FabricStockLedger$toLocationArgs<ExtArgs>
+    transactedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type FabricStockLedgerIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    roll?: boolean | FabricStoreRollDefaultArgs<ExtArgs>
+    batch?: boolean | FabricBatchDefaultArgs<ExtArgs>
+    fromLocation?: boolean | FabricStockLedger$fromLocationArgs<ExtArgs>
+    toLocation?: boolean | FabricStockLedger$toLocationArgs<ExtArgs>
+    transactedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $FabricStockLedgerPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "FabricStockLedger"
+    objects: {
+      roll: Prisma.$FabricStoreRollPayload<ExtArgs>
+      batch: Prisma.$FabricBatchPayload<ExtArgs>
+      fromLocation: Prisma.$InventoryLocationPayload<ExtArgs> | null
+      toLocation: Prisma.$InventoryLocationPayload<ExtArgs> | null
+      transactedBy: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      entryNumber: string
+      rollId: string
+      batchId: string
+      transactionType: $Enums.StockTransactionType
+      quantity: Prisma.Decimal
+      referenceType: string
+      referenceId: string
+      fromLocationId: string | null
+      toLocationId: string | null
+      transactedById: string
+      transactedAt: Date
+      remarks: string | null
+      createdAt: Date
+    }, ExtArgs["result"]["fabricStockLedger"]>
+    composites: {}
+  }
+
+  type FabricStockLedgerGetPayload<S extends boolean | null | undefined | FabricStockLedgerDefaultArgs> = $Result.GetResult<Prisma.$FabricStockLedgerPayload, S>
+
+  type FabricStockLedgerCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<FabricStockLedgerFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: FabricStockLedgerCountAggregateInputType | true
+    }
+
+  export interface FabricStockLedgerDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['FabricStockLedger'], meta: { name: 'FabricStockLedger' } }
+    /**
+     * Find zero or one FabricStockLedger that matches the filter.
+     * @param {FabricStockLedgerFindUniqueArgs} args - Arguments to find a FabricStockLedger
+     * @example
+     * // Get one FabricStockLedger
+     * const fabricStockLedger = await prisma.fabricStockLedger.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends FabricStockLedgerFindUniqueArgs>(args: SelectSubset<T, FabricStockLedgerFindUniqueArgs<ExtArgs>>): Prisma__FabricStockLedgerClient<$Result.GetResult<Prisma.$FabricStockLedgerPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one FabricStockLedger that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {FabricStockLedgerFindUniqueOrThrowArgs} args - Arguments to find a FabricStockLedger
+     * @example
+     * // Get one FabricStockLedger
+     * const fabricStockLedger = await prisma.fabricStockLedger.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends FabricStockLedgerFindUniqueOrThrowArgs>(args: SelectSubset<T, FabricStockLedgerFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FabricStockLedgerClient<$Result.GetResult<Prisma.$FabricStockLedgerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FabricStockLedger that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricStockLedgerFindFirstArgs} args - Arguments to find a FabricStockLedger
+     * @example
+     * // Get one FabricStockLedger
+     * const fabricStockLedger = await prisma.fabricStockLedger.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends FabricStockLedgerFindFirstArgs>(args?: SelectSubset<T, FabricStockLedgerFindFirstArgs<ExtArgs>>): Prisma__FabricStockLedgerClient<$Result.GetResult<Prisma.$FabricStockLedgerPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FabricStockLedger that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricStockLedgerFindFirstOrThrowArgs} args - Arguments to find a FabricStockLedger
+     * @example
+     * // Get one FabricStockLedger
+     * const fabricStockLedger = await prisma.fabricStockLedger.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends FabricStockLedgerFindFirstOrThrowArgs>(args?: SelectSubset<T, FabricStockLedgerFindFirstOrThrowArgs<ExtArgs>>): Prisma__FabricStockLedgerClient<$Result.GetResult<Prisma.$FabricStockLedgerPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more FabricStockLedgers that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricStockLedgerFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all FabricStockLedgers
+     * const fabricStockLedgers = await prisma.fabricStockLedger.findMany()
+     * 
+     * // Get first 10 FabricStockLedgers
+     * const fabricStockLedgers = await prisma.fabricStockLedger.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const fabricStockLedgerWithIdOnly = await prisma.fabricStockLedger.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends FabricStockLedgerFindManyArgs>(args?: SelectSubset<T, FabricStockLedgerFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStockLedgerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a FabricStockLedger.
+     * @param {FabricStockLedgerCreateArgs} args - Arguments to create a FabricStockLedger.
+     * @example
+     * // Create one FabricStockLedger
+     * const FabricStockLedger = await prisma.fabricStockLedger.create({
+     *   data: {
+     *     // ... data to create a FabricStockLedger
+     *   }
+     * })
+     * 
+     */
+    create<T extends FabricStockLedgerCreateArgs>(args: SelectSubset<T, FabricStockLedgerCreateArgs<ExtArgs>>): Prisma__FabricStockLedgerClient<$Result.GetResult<Prisma.$FabricStockLedgerPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many FabricStockLedgers.
+     * @param {FabricStockLedgerCreateManyArgs} args - Arguments to create many FabricStockLedgers.
+     * @example
+     * // Create many FabricStockLedgers
+     * const fabricStockLedger = await prisma.fabricStockLedger.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends FabricStockLedgerCreateManyArgs>(args?: SelectSubset<T, FabricStockLedgerCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many FabricStockLedgers and returns the data saved in the database.
+     * @param {FabricStockLedgerCreateManyAndReturnArgs} args - Arguments to create many FabricStockLedgers.
+     * @example
+     * // Create many FabricStockLedgers
+     * const fabricStockLedger = await prisma.fabricStockLedger.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many FabricStockLedgers and only return the `id`
+     * const fabricStockLedgerWithIdOnly = await prisma.fabricStockLedger.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends FabricStockLedgerCreateManyAndReturnArgs>(args?: SelectSubset<T, FabricStockLedgerCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStockLedgerPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a FabricStockLedger.
+     * @param {FabricStockLedgerDeleteArgs} args - Arguments to delete one FabricStockLedger.
+     * @example
+     * // Delete one FabricStockLedger
+     * const FabricStockLedger = await prisma.fabricStockLedger.delete({
+     *   where: {
+     *     // ... filter to delete one FabricStockLedger
+     *   }
+     * })
+     * 
+     */
+    delete<T extends FabricStockLedgerDeleteArgs>(args: SelectSubset<T, FabricStockLedgerDeleteArgs<ExtArgs>>): Prisma__FabricStockLedgerClient<$Result.GetResult<Prisma.$FabricStockLedgerPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one FabricStockLedger.
+     * @param {FabricStockLedgerUpdateArgs} args - Arguments to update one FabricStockLedger.
+     * @example
+     * // Update one FabricStockLedger
+     * const fabricStockLedger = await prisma.fabricStockLedger.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends FabricStockLedgerUpdateArgs>(args: SelectSubset<T, FabricStockLedgerUpdateArgs<ExtArgs>>): Prisma__FabricStockLedgerClient<$Result.GetResult<Prisma.$FabricStockLedgerPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more FabricStockLedgers.
+     * @param {FabricStockLedgerDeleteManyArgs} args - Arguments to filter FabricStockLedgers to delete.
+     * @example
+     * // Delete a few FabricStockLedgers
+     * const { count } = await prisma.fabricStockLedger.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends FabricStockLedgerDeleteManyArgs>(args?: SelectSubset<T, FabricStockLedgerDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FabricStockLedgers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricStockLedgerUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many FabricStockLedgers
+     * const fabricStockLedger = await prisma.fabricStockLedger.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends FabricStockLedgerUpdateManyArgs>(args: SelectSubset<T, FabricStockLedgerUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FabricStockLedgers and returns the data updated in the database.
+     * @param {FabricStockLedgerUpdateManyAndReturnArgs} args - Arguments to update many FabricStockLedgers.
+     * @example
+     * // Update many FabricStockLedgers
+     * const fabricStockLedger = await prisma.fabricStockLedger.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more FabricStockLedgers and only return the `id`
+     * const fabricStockLedgerWithIdOnly = await prisma.fabricStockLedger.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends FabricStockLedgerUpdateManyAndReturnArgs>(args: SelectSubset<T, FabricStockLedgerUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStockLedgerPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one FabricStockLedger.
+     * @param {FabricStockLedgerUpsertArgs} args - Arguments to update or create a FabricStockLedger.
+     * @example
+     * // Update or create a FabricStockLedger
+     * const fabricStockLedger = await prisma.fabricStockLedger.upsert({
+     *   create: {
+     *     // ... data to create a FabricStockLedger
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the FabricStockLedger we want to update
+     *   }
+     * })
+     */
+    upsert<T extends FabricStockLedgerUpsertArgs>(args: SelectSubset<T, FabricStockLedgerUpsertArgs<ExtArgs>>): Prisma__FabricStockLedgerClient<$Result.GetResult<Prisma.$FabricStockLedgerPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of FabricStockLedgers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricStockLedgerCountArgs} args - Arguments to filter FabricStockLedgers to count.
+     * @example
+     * // Count the number of FabricStockLedgers
+     * const count = await prisma.fabricStockLedger.count({
+     *   where: {
+     *     // ... the filter for the FabricStockLedgers we want to count
+     *   }
+     * })
+    **/
+    count<T extends FabricStockLedgerCountArgs>(
+      args?: Subset<T, FabricStockLedgerCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], FabricStockLedgerCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a FabricStockLedger.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricStockLedgerAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends FabricStockLedgerAggregateArgs>(args: Subset<T, FabricStockLedgerAggregateArgs>): Prisma.PrismaPromise<GetFabricStockLedgerAggregateType<T>>
+
+    /**
+     * Group by FabricStockLedger.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricStockLedgerGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends FabricStockLedgerGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: FabricStockLedgerGroupByArgs['orderBy'] }
+        : { orderBy?: FabricStockLedgerGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, FabricStockLedgerGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFabricStockLedgerGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the FabricStockLedger model
+   */
+  readonly fields: FabricStockLedgerFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for FabricStockLedger.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__FabricStockLedgerClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    roll<T extends FabricStoreRollDefaultArgs<ExtArgs> = {}>(args?: Subset<T, FabricStoreRollDefaultArgs<ExtArgs>>): Prisma__FabricStoreRollClient<$Result.GetResult<Prisma.$FabricStoreRollPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    batch<T extends FabricBatchDefaultArgs<ExtArgs> = {}>(args?: Subset<T, FabricBatchDefaultArgs<ExtArgs>>): Prisma__FabricBatchClient<$Result.GetResult<Prisma.$FabricBatchPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    fromLocation<T extends FabricStockLedger$fromLocationArgs<ExtArgs> = {}>(args?: Subset<T, FabricStockLedger$fromLocationArgs<ExtArgs>>): Prisma__InventoryLocationClient<$Result.GetResult<Prisma.$InventoryLocationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    toLocation<T extends FabricStockLedger$toLocationArgs<ExtArgs> = {}>(args?: Subset<T, FabricStockLedger$toLocationArgs<ExtArgs>>): Prisma__InventoryLocationClient<$Result.GetResult<Prisma.$InventoryLocationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    transactedBy<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the FabricStockLedger model
+   */
+  interface FabricStockLedgerFieldRefs {
+    readonly id: FieldRef<"FabricStockLedger", 'String'>
+    readonly entryNumber: FieldRef<"FabricStockLedger", 'String'>
+    readonly rollId: FieldRef<"FabricStockLedger", 'String'>
+    readonly batchId: FieldRef<"FabricStockLedger", 'String'>
+    readonly transactionType: FieldRef<"FabricStockLedger", 'StockTransactionType'>
+    readonly quantity: FieldRef<"FabricStockLedger", 'Decimal'>
+    readonly referenceType: FieldRef<"FabricStockLedger", 'String'>
+    readonly referenceId: FieldRef<"FabricStockLedger", 'String'>
+    readonly fromLocationId: FieldRef<"FabricStockLedger", 'String'>
+    readonly toLocationId: FieldRef<"FabricStockLedger", 'String'>
+    readonly transactedById: FieldRef<"FabricStockLedger", 'String'>
+    readonly transactedAt: FieldRef<"FabricStockLedger", 'DateTime'>
+    readonly remarks: FieldRef<"FabricStockLedger", 'String'>
+    readonly createdAt: FieldRef<"FabricStockLedger", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * FabricStockLedger findUnique
+   */
+  export type FabricStockLedgerFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockLedger
+     */
+    select?: FabricStockLedgerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockLedger
+     */
+    omit?: FabricStockLedgerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockLedgerInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricStockLedger to fetch.
+     */
+    where: FabricStockLedgerWhereUniqueInput
+  }
+
+  /**
+   * FabricStockLedger findUniqueOrThrow
+   */
+  export type FabricStockLedgerFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockLedger
+     */
+    select?: FabricStockLedgerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockLedger
+     */
+    omit?: FabricStockLedgerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockLedgerInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricStockLedger to fetch.
+     */
+    where: FabricStockLedgerWhereUniqueInput
+  }
+
+  /**
+   * FabricStockLedger findFirst
+   */
+  export type FabricStockLedgerFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockLedger
+     */
+    select?: FabricStockLedgerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockLedger
+     */
+    omit?: FabricStockLedgerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockLedgerInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricStockLedger to fetch.
+     */
+    where?: FabricStockLedgerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricStockLedgers to fetch.
+     */
+    orderBy?: FabricStockLedgerOrderByWithRelationInput | FabricStockLedgerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FabricStockLedgers.
+     */
+    cursor?: FabricStockLedgerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricStockLedgers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricStockLedgers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FabricStockLedgers.
+     */
+    distinct?: FabricStockLedgerScalarFieldEnum | FabricStockLedgerScalarFieldEnum[]
+  }
+
+  /**
+   * FabricStockLedger findFirstOrThrow
+   */
+  export type FabricStockLedgerFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockLedger
+     */
+    select?: FabricStockLedgerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockLedger
+     */
+    omit?: FabricStockLedgerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockLedgerInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricStockLedger to fetch.
+     */
+    where?: FabricStockLedgerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricStockLedgers to fetch.
+     */
+    orderBy?: FabricStockLedgerOrderByWithRelationInput | FabricStockLedgerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FabricStockLedgers.
+     */
+    cursor?: FabricStockLedgerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricStockLedgers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricStockLedgers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FabricStockLedgers.
+     */
+    distinct?: FabricStockLedgerScalarFieldEnum | FabricStockLedgerScalarFieldEnum[]
+  }
+
+  /**
+   * FabricStockLedger findMany
+   */
+  export type FabricStockLedgerFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockLedger
+     */
+    select?: FabricStockLedgerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockLedger
+     */
+    omit?: FabricStockLedgerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockLedgerInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricStockLedgers to fetch.
+     */
+    where?: FabricStockLedgerWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricStockLedgers to fetch.
+     */
+    orderBy?: FabricStockLedgerOrderByWithRelationInput | FabricStockLedgerOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing FabricStockLedgers.
+     */
+    cursor?: FabricStockLedgerWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricStockLedgers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricStockLedgers.
+     */
+    skip?: number
+    distinct?: FabricStockLedgerScalarFieldEnum | FabricStockLedgerScalarFieldEnum[]
+  }
+
+  /**
+   * FabricStockLedger create
+   */
+  export type FabricStockLedgerCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockLedger
+     */
+    select?: FabricStockLedgerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockLedger
+     */
+    omit?: FabricStockLedgerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockLedgerInclude<ExtArgs> | null
+    /**
+     * The data needed to create a FabricStockLedger.
+     */
+    data: XOR<FabricStockLedgerCreateInput, FabricStockLedgerUncheckedCreateInput>
+  }
+
+  /**
+   * FabricStockLedger createMany
+   */
+  export type FabricStockLedgerCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many FabricStockLedgers.
+     */
+    data: FabricStockLedgerCreateManyInput | FabricStockLedgerCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * FabricStockLedger createManyAndReturn
+   */
+  export type FabricStockLedgerCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockLedger
+     */
+    select?: FabricStockLedgerSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockLedger
+     */
+    omit?: FabricStockLedgerOmit<ExtArgs> | null
+    /**
+     * The data used to create many FabricStockLedgers.
+     */
+    data: FabricStockLedgerCreateManyInput | FabricStockLedgerCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockLedgerIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * FabricStockLedger update
+   */
+  export type FabricStockLedgerUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockLedger
+     */
+    select?: FabricStockLedgerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockLedger
+     */
+    omit?: FabricStockLedgerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockLedgerInclude<ExtArgs> | null
+    /**
+     * The data needed to update a FabricStockLedger.
+     */
+    data: XOR<FabricStockLedgerUpdateInput, FabricStockLedgerUncheckedUpdateInput>
+    /**
+     * Choose, which FabricStockLedger to update.
+     */
+    where: FabricStockLedgerWhereUniqueInput
+  }
+
+  /**
+   * FabricStockLedger updateMany
+   */
+  export type FabricStockLedgerUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update FabricStockLedgers.
+     */
+    data: XOR<FabricStockLedgerUpdateManyMutationInput, FabricStockLedgerUncheckedUpdateManyInput>
+    /**
+     * Filter which FabricStockLedgers to update
+     */
+    where?: FabricStockLedgerWhereInput
+    /**
+     * Limit how many FabricStockLedgers to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * FabricStockLedger updateManyAndReturn
+   */
+  export type FabricStockLedgerUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockLedger
+     */
+    select?: FabricStockLedgerSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockLedger
+     */
+    omit?: FabricStockLedgerOmit<ExtArgs> | null
+    /**
+     * The data used to update FabricStockLedgers.
+     */
+    data: XOR<FabricStockLedgerUpdateManyMutationInput, FabricStockLedgerUncheckedUpdateManyInput>
+    /**
+     * Filter which FabricStockLedgers to update
+     */
+    where?: FabricStockLedgerWhereInput
+    /**
+     * Limit how many FabricStockLedgers to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockLedgerIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * FabricStockLedger upsert
+   */
+  export type FabricStockLedgerUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockLedger
+     */
+    select?: FabricStockLedgerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockLedger
+     */
+    omit?: FabricStockLedgerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockLedgerInclude<ExtArgs> | null
+    /**
+     * The filter to search for the FabricStockLedger to update in case it exists.
+     */
+    where: FabricStockLedgerWhereUniqueInput
+    /**
+     * In case the FabricStockLedger found by the `where` argument doesn't exist, create a new FabricStockLedger with this data.
+     */
+    create: XOR<FabricStockLedgerCreateInput, FabricStockLedgerUncheckedCreateInput>
+    /**
+     * In case the FabricStockLedger was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<FabricStockLedgerUpdateInput, FabricStockLedgerUncheckedUpdateInput>
+  }
+
+  /**
+   * FabricStockLedger delete
+   */
+  export type FabricStockLedgerDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockLedger
+     */
+    select?: FabricStockLedgerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockLedger
+     */
+    omit?: FabricStockLedgerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockLedgerInclude<ExtArgs> | null
+    /**
+     * Filter which FabricStockLedger to delete.
+     */
+    where: FabricStockLedgerWhereUniqueInput
+  }
+
+  /**
+   * FabricStockLedger deleteMany
+   */
+  export type FabricStockLedgerDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FabricStockLedgers to delete
+     */
+    where?: FabricStockLedgerWhereInput
+    /**
+     * Limit how many FabricStockLedgers to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * FabricStockLedger.fromLocation
+   */
+  export type FabricStockLedger$fromLocationArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InventoryLocation
+     */
+    select?: InventoryLocationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InventoryLocation
+     */
+    omit?: InventoryLocationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InventoryLocationInclude<ExtArgs> | null
+    where?: InventoryLocationWhereInput
+  }
+
+  /**
+   * FabricStockLedger.toLocation
+   */
+  export type FabricStockLedger$toLocationArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the InventoryLocation
+     */
+    select?: InventoryLocationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the InventoryLocation
+     */
+    omit?: InventoryLocationOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: InventoryLocationInclude<ExtArgs> | null
+    where?: InventoryLocationWhereInput
+  }
+
+  /**
+   * FabricStockLedger without action
+   */
+  export type FabricStockLedgerDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockLedger
+     */
+    select?: FabricStockLedgerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockLedger
+     */
+    omit?: FabricStockLedgerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockLedgerInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -68810,12 +78698,145 @@ export namespace Prisma {
   export type IntegrityScanResultScalarFieldEnum = (typeof IntegrityScanResultScalarFieldEnum)[keyof typeof IntegrityScanResultScalarFieldEnum]
 
 
+  export const InventoryLocationScalarFieldEnum: {
+    id: 'id',
+    locationCode: 'locationCode',
+    locationName: 'locationName',
+    locationType: 'locationType',
+    isActive: 'isActive',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type InventoryLocationScalarFieldEnum = (typeof InventoryLocationScalarFieldEnum)[keyof typeof InventoryLocationScalarFieldEnum]
+
+
+  export const FabricBatchScalarFieldEnum: {
+    id: 'id',
+    batchNumber: 'batchNumber',
+    programId: 'programId',
+    supplierId: 'supplierId',
+    fabricType: 'fabricType',
+    fabricDescription: 'fabricDescription',
+    colorCode: 'colorCode',
+    colorName: 'colorName',
+    totalRolls: 'totalRolls',
+    totalMeters: 'totalMeters',
+    status: 'status',
+    receivedAt: 'receivedAt',
+    createdById: 'createdById',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type FabricBatchScalarFieldEnum = (typeof FabricBatchScalarFieldEnum)[keyof typeof FabricBatchScalarFieldEnum]
+
+
+  export const FabricStoreRollScalarFieldEnum: {
+    id: 'id',
+    rollNumber: 'rollNumber',
+    batchId: 'batchId',
+    locationId: 'locationId',
+    length: 'length',
+    width: 'width',
+    weight: 'weight',
+    status: 'status',
+    qcStatus: 'qcStatus',
+    qcInspectedById: 'qcInspectedById',
+    qcInspectedAt: 'qcInspectedAt',
+    qcRemarks: 'qcRemarks',
+    programIssuedToId: 'programIssuedToId',
+    issuedAt: 'issuedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type FabricStoreRollScalarFieldEnum = (typeof FabricStoreRollScalarFieldEnum)[keyof typeof FabricStoreRollScalarFieldEnum]
+
+
+  export const MaterialReceiptScalarFieldEnum: {
+    id: 'id',
+    grnNumber: 'grnNumber',
+    batchId: 'batchId',
+    challanId: 'challanId',
+    receivedById: 'receivedById',
+    receivedAt: 'receivedAt',
+    vehicleNumber: 'vehicleNumber',
+    supplierName: 'supplierName',
+    totalRollsReceived: 'totalRollsReceived',
+    totalMetersReceived: 'totalMetersReceived',
+    status: 'status',
+    remarks: 'remarks',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type MaterialReceiptScalarFieldEnum = (typeof MaterialReceiptScalarFieldEnum)[keyof typeof MaterialReceiptScalarFieldEnum]
+
+
+  export const MaterialReceiptItemScalarFieldEnum: {
+    id: 'id',
+    receiptId: 'receiptId',
+    rollId: 'rollId',
+    measuredLength: 'measuredLength',
+    measuredWeight: 'measuredWeight',
+    remarks: 'remarks',
+    createdAt: 'createdAt'
+  };
+
+  export type MaterialReceiptItemScalarFieldEnum = (typeof MaterialReceiptItemScalarFieldEnum)[keyof typeof MaterialReceiptItemScalarFieldEnum]
+
+
+  export const FabricQCInspectionScalarFieldEnum: {
+    id: 'id',
+    inspectionNumber: 'inspectionNumber',
+    rollId: 'rollId',
+    inspectedById: 'inspectedById',
+    inspectionType: 'inspectionType',
+    result: 'result',
+    defects: 'defects',
+    remarks: 'remarks',
+    inspectedAt: 'inspectedAt',
+    createdAt: 'createdAt'
+  };
+
+  export type FabricQCInspectionScalarFieldEnum = (typeof FabricQCInspectionScalarFieldEnum)[keyof typeof FabricQCInspectionScalarFieldEnum]
+
+
+  export const FabricStockLedgerScalarFieldEnum: {
+    id: 'id',
+    entryNumber: 'entryNumber',
+    rollId: 'rollId',
+    batchId: 'batchId',
+    transactionType: 'transactionType',
+    quantity: 'quantity',
+    referenceType: 'referenceType',
+    referenceId: 'referenceId',
+    fromLocationId: 'fromLocationId',
+    toLocationId: 'toLocationId',
+    transactedById: 'transactedById',
+    transactedAt: 'transactedAt',
+    remarks: 'remarks',
+    createdAt: 'createdAt'
+  };
+
+  export type FabricStockLedgerScalarFieldEnum = (typeof FabricStockLedgerScalarFieldEnum)[keyof typeof FabricStockLedgerScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
   };
 
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+  export const NullableJsonNullValueInput: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull
+  };
+
+  export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
   export const QueryMode: {
@@ -68832,6 +78853,15 @@ export namespace Prisma {
   };
 
   export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+  export const JsonNullValueFilter: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull,
+    AnyNull: typeof AnyNull
+  };
+
+  export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
   /**
@@ -68900,6 +78930,146 @@ export namespace Prisma {
    */
   export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
+
+
+  /**
+   * Reference to a field of type 'InventoryLocationType'
+   */
+  export type EnumInventoryLocationTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InventoryLocationType'>
+    
+
+
+  /**
+   * Reference to a field of type 'InventoryLocationType[]'
+   */
+  export type ListEnumInventoryLocationTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InventoryLocationType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Decimal'
+   */
+  export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
+    
+
+
+  /**
+   * Reference to a field of type 'Decimal[]'
+   */
+  export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'FabricBatchStatus'
+   */
+  export type EnumFabricBatchStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FabricBatchStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'FabricBatchStatus[]'
+   */
+  export type ListEnumFabricBatchStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FabricBatchStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'FabricRollStatus'
+   */
+  export type EnumFabricRollStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FabricRollStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'FabricRollStatus[]'
+   */
+  export type ListEnumFabricRollStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FabricRollStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'FabricQCStatus'
+   */
+  export type EnumFabricQCStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FabricQCStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'FabricQCStatus[]'
+   */
+  export type ListEnumFabricQCStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FabricQCStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'GRNStatus'
+   */
+  export type EnumGRNStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'GRNStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'GRNStatus[]'
+   */
+  export type ListEnumGRNStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'GRNStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'InspectionType'
+   */
+  export type EnumInspectionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InspectionType'>
+    
+
+
+  /**
+   * Reference to a field of type 'InspectionType[]'
+   */
+  export type ListEnumInspectionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InspectionType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'InspectionResult'
+   */
+  export type EnumInspectionResultFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InspectionResult'>
+    
+
+
+  /**
+   * Reference to a field of type 'InspectionResult[]'
+   */
+  export type ListEnumInspectionResultFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InspectionResult[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+  /**
+   * Reference to a field of type 'StockTransactionType'
+   */
+  export type EnumStockTransactionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StockTransactionType'>
+    
+
+
+  /**
+   * Reference to a field of type 'StockTransactionType[]'
+   */
+  export type ListEnumStockTransactionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StockTransactionType[]'>
+    
   /**
    * Deep Input Types
    */
@@ -68937,6 +79107,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionListRelationFilter
     recutsRequested?: RecutRequestListRelationFilter
     recutsApproved?: RecutRequestListRelationFilter
+    fabricBatchesCreated?: FabricBatchListRelationFilter
+    grnReceived?: MaterialReceiptListRelationFilter
+    fabricRollsInspected?: FabricStoreRollListRelationFilter
+    fabricQCInspections?: FabricQCInspectionListRelationFilter
+    fabricLedgerEntries?: FabricStockLedgerListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -68968,6 +79143,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionOrderByRelationAggregateInput
     recutsRequested?: RecutRequestOrderByRelationAggregateInput
     recutsApproved?: RecutRequestOrderByRelationAggregateInput
+    fabricBatchesCreated?: FabricBatchOrderByRelationAggregateInput
+    grnReceived?: MaterialReceiptOrderByRelationAggregateInput
+    fabricRollsInspected?: FabricStoreRollOrderByRelationAggregateInput
+    fabricQCInspections?: FabricQCInspectionOrderByRelationAggregateInput
+    fabricLedgerEntries?: FabricStockLedgerOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -69002,6 +79182,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionListRelationFilter
     recutsRequested?: RecutRequestListRelationFilter
     recutsApproved?: RecutRequestListRelationFilter
+    fabricBatchesCreated?: FabricBatchListRelationFilter
+    grnReceived?: MaterialReceiptListRelationFilter
+    fabricRollsInspected?: FabricStoreRollListRelationFilter
+    fabricQCInspections?: FabricQCInspectionListRelationFilter
+    fabricLedgerEntries?: FabricStockLedgerListRelationFilter
   }, "id" | "username" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -70528,6 +80713,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryListRelationFilter
     reworkTransactions?: ReworkTransactionListRelationFilter
     recutRequests?: RecutRequestListRelationFilter
+    fabricBatches?: FabricBatchListRelationFilter
+    fabricStoreRolls?: FabricStoreRollListRelationFilter
   }
 
   export type ProgramOrderByWithRelationInput = {
@@ -70606,6 +80793,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryOrderByRelationAggregateInput
     reworkTransactions?: ReworkTransactionOrderByRelationAggregateInput
     recutRequests?: RecutRequestOrderByRelationAggregateInput
+    fabricBatches?: FabricBatchOrderByRelationAggregateInput
+    fabricStoreRolls?: FabricStoreRollOrderByRelationAggregateInput
   }
 
   export type ProgramWhereUniqueInput = Prisma.AtLeast<{
@@ -70687,6 +80876,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryListRelationFilter
     reworkTransactions?: ReworkTransactionListRelationFilter
     recutRequests?: RecutRequestListRelationFilter
+    fabricBatches?: FabricBatchListRelationFilter
+    fabricStoreRolls?: FabricStoreRollListRelationFilter
   }, "id" | "programNumber">
 
   export type ProgramOrderByWithAggregationInput = {
@@ -73789,6 +83980,701 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"IntegrityScanResult"> | Date | string
   }
 
+  export type InventoryLocationWhereInput = {
+    AND?: InventoryLocationWhereInput | InventoryLocationWhereInput[]
+    OR?: InventoryLocationWhereInput[]
+    NOT?: InventoryLocationWhereInput | InventoryLocationWhereInput[]
+    id?: StringFilter<"InventoryLocation"> | string
+    locationCode?: StringFilter<"InventoryLocation"> | string
+    locationName?: StringFilter<"InventoryLocation"> | string
+    locationType?: EnumInventoryLocationTypeFilter<"InventoryLocation"> | $Enums.InventoryLocationType
+    isActive?: BoolFilter<"InventoryLocation"> | boolean
+    createdAt?: DateTimeFilter<"InventoryLocation"> | Date | string
+    updatedAt?: DateTimeFilter<"InventoryLocation"> | Date | string
+    rolls?: FabricStoreRollListRelationFilter
+    fromLedger?: FabricStockLedgerListRelationFilter
+    toLedger?: FabricStockLedgerListRelationFilter
+  }
+
+  export type InventoryLocationOrderByWithRelationInput = {
+    id?: SortOrder
+    locationCode?: SortOrder
+    locationName?: SortOrder
+    locationType?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    rolls?: FabricStoreRollOrderByRelationAggregateInput
+    fromLedger?: FabricStockLedgerOrderByRelationAggregateInput
+    toLedger?: FabricStockLedgerOrderByRelationAggregateInput
+  }
+
+  export type InventoryLocationWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    locationCode?: string
+    AND?: InventoryLocationWhereInput | InventoryLocationWhereInput[]
+    OR?: InventoryLocationWhereInput[]
+    NOT?: InventoryLocationWhereInput | InventoryLocationWhereInput[]
+    locationName?: StringFilter<"InventoryLocation"> | string
+    locationType?: EnumInventoryLocationTypeFilter<"InventoryLocation"> | $Enums.InventoryLocationType
+    isActive?: BoolFilter<"InventoryLocation"> | boolean
+    createdAt?: DateTimeFilter<"InventoryLocation"> | Date | string
+    updatedAt?: DateTimeFilter<"InventoryLocation"> | Date | string
+    rolls?: FabricStoreRollListRelationFilter
+    fromLedger?: FabricStockLedgerListRelationFilter
+    toLedger?: FabricStockLedgerListRelationFilter
+  }, "id" | "locationCode">
+
+  export type InventoryLocationOrderByWithAggregationInput = {
+    id?: SortOrder
+    locationCode?: SortOrder
+    locationName?: SortOrder
+    locationType?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: InventoryLocationCountOrderByAggregateInput
+    _max?: InventoryLocationMaxOrderByAggregateInput
+    _min?: InventoryLocationMinOrderByAggregateInput
+  }
+
+  export type InventoryLocationScalarWhereWithAggregatesInput = {
+    AND?: InventoryLocationScalarWhereWithAggregatesInput | InventoryLocationScalarWhereWithAggregatesInput[]
+    OR?: InventoryLocationScalarWhereWithAggregatesInput[]
+    NOT?: InventoryLocationScalarWhereWithAggregatesInput | InventoryLocationScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"InventoryLocation"> | string
+    locationCode?: StringWithAggregatesFilter<"InventoryLocation"> | string
+    locationName?: StringWithAggregatesFilter<"InventoryLocation"> | string
+    locationType?: EnumInventoryLocationTypeWithAggregatesFilter<"InventoryLocation"> | $Enums.InventoryLocationType
+    isActive?: BoolWithAggregatesFilter<"InventoryLocation"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"InventoryLocation"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"InventoryLocation"> | Date | string
+  }
+
+  export type FabricBatchWhereInput = {
+    AND?: FabricBatchWhereInput | FabricBatchWhereInput[]
+    OR?: FabricBatchWhereInput[]
+    NOT?: FabricBatchWhereInput | FabricBatchWhereInput[]
+    id?: StringFilter<"FabricBatch"> | string
+    batchNumber?: StringFilter<"FabricBatch"> | string
+    programId?: StringNullableFilter<"FabricBatch"> | string | null
+    supplierId?: StringNullableFilter<"FabricBatch"> | string | null
+    fabricType?: StringFilter<"FabricBatch"> | string
+    fabricDescription?: StringFilter<"FabricBatch"> | string
+    colorCode?: StringNullableFilter<"FabricBatch"> | string | null
+    colorName?: StringNullableFilter<"FabricBatch"> | string | null
+    totalRolls?: IntFilter<"FabricBatch"> | number
+    totalMeters?: DecimalFilter<"FabricBatch"> | Decimal | DecimalJsLike | number | string
+    status?: EnumFabricBatchStatusFilter<"FabricBatch"> | $Enums.FabricBatchStatus
+    receivedAt?: DateTimeNullableFilter<"FabricBatch"> | Date | string | null
+    createdById?: StringFilter<"FabricBatch"> | string
+    createdAt?: DateTimeFilter<"FabricBatch"> | Date | string
+    updatedAt?: DateTimeFilter<"FabricBatch"> | Date | string
+    program?: XOR<ProgramNullableScalarRelationFilter, ProgramWhereInput> | null
+    createdBy?: XOR<UserScalarRelationFilter, UserWhereInput>
+    rolls?: FabricStoreRollListRelationFilter
+    receipts?: MaterialReceiptListRelationFilter
+    ledgerEntries?: FabricStockLedgerListRelationFilter
+  }
+
+  export type FabricBatchOrderByWithRelationInput = {
+    id?: SortOrder
+    batchNumber?: SortOrder
+    programId?: SortOrderInput | SortOrder
+    supplierId?: SortOrderInput | SortOrder
+    fabricType?: SortOrder
+    fabricDescription?: SortOrder
+    colorCode?: SortOrderInput | SortOrder
+    colorName?: SortOrderInput | SortOrder
+    totalRolls?: SortOrder
+    totalMeters?: SortOrder
+    status?: SortOrder
+    receivedAt?: SortOrderInput | SortOrder
+    createdById?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    program?: ProgramOrderByWithRelationInput
+    createdBy?: UserOrderByWithRelationInput
+    rolls?: FabricStoreRollOrderByRelationAggregateInput
+    receipts?: MaterialReceiptOrderByRelationAggregateInput
+    ledgerEntries?: FabricStockLedgerOrderByRelationAggregateInput
+  }
+
+  export type FabricBatchWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    batchNumber?: string
+    AND?: FabricBatchWhereInput | FabricBatchWhereInput[]
+    OR?: FabricBatchWhereInput[]
+    NOT?: FabricBatchWhereInput | FabricBatchWhereInput[]
+    programId?: StringNullableFilter<"FabricBatch"> | string | null
+    supplierId?: StringNullableFilter<"FabricBatch"> | string | null
+    fabricType?: StringFilter<"FabricBatch"> | string
+    fabricDescription?: StringFilter<"FabricBatch"> | string
+    colorCode?: StringNullableFilter<"FabricBatch"> | string | null
+    colorName?: StringNullableFilter<"FabricBatch"> | string | null
+    totalRolls?: IntFilter<"FabricBatch"> | number
+    totalMeters?: DecimalFilter<"FabricBatch"> | Decimal | DecimalJsLike | number | string
+    status?: EnumFabricBatchStatusFilter<"FabricBatch"> | $Enums.FabricBatchStatus
+    receivedAt?: DateTimeNullableFilter<"FabricBatch"> | Date | string | null
+    createdById?: StringFilter<"FabricBatch"> | string
+    createdAt?: DateTimeFilter<"FabricBatch"> | Date | string
+    updatedAt?: DateTimeFilter<"FabricBatch"> | Date | string
+    program?: XOR<ProgramNullableScalarRelationFilter, ProgramWhereInput> | null
+    createdBy?: XOR<UserScalarRelationFilter, UserWhereInput>
+    rolls?: FabricStoreRollListRelationFilter
+    receipts?: MaterialReceiptListRelationFilter
+    ledgerEntries?: FabricStockLedgerListRelationFilter
+  }, "id" | "batchNumber">
+
+  export type FabricBatchOrderByWithAggregationInput = {
+    id?: SortOrder
+    batchNumber?: SortOrder
+    programId?: SortOrderInput | SortOrder
+    supplierId?: SortOrderInput | SortOrder
+    fabricType?: SortOrder
+    fabricDescription?: SortOrder
+    colorCode?: SortOrderInput | SortOrder
+    colorName?: SortOrderInput | SortOrder
+    totalRolls?: SortOrder
+    totalMeters?: SortOrder
+    status?: SortOrder
+    receivedAt?: SortOrderInput | SortOrder
+    createdById?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: FabricBatchCountOrderByAggregateInput
+    _avg?: FabricBatchAvgOrderByAggregateInput
+    _max?: FabricBatchMaxOrderByAggregateInput
+    _min?: FabricBatchMinOrderByAggregateInput
+    _sum?: FabricBatchSumOrderByAggregateInput
+  }
+
+  export type FabricBatchScalarWhereWithAggregatesInput = {
+    AND?: FabricBatchScalarWhereWithAggregatesInput | FabricBatchScalarWhereWithAggregatesInput[]
+    OR?: FabricBatchScalarWhereWithAggregatesInput[]
+    NOT?: FabricBatchScalarWhereWithAggregatesInput | FabricBatchScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"FabricBatch"> | string
+    batchNumber?: StringWithAggregatesFilter<"FabricBatch"> | string
+    programId?: StringNullableWithAggregatesFilter<"FabricBatch"> | string | null
+    supplierId?: StringNullableWithAggregatesFilter<"FabricBatch"> | string | null
+    fabricType?: StringWithAggregatesFilter<"FabricBatch"> | string
+    fabricDescription?: StringWithAggregatesFilter<"FabricBatch"> | string
+    colorCode?: StringNullableWithAggregatesFilter<"FabricBatch"> | string | null
+    colorName?: StringNullableWithAggregatesFilter<"FabricBatch"> | string | null
+    totalRolls?: IntWithAggregatesFilter<"FabricBatch"> | number
+    totalMeters?: DecimalWithAggregatesFilter<"FabricBatch"> | Decimal | DecimalJsLike | number | string
+    status?: EnumFabricBatchStatusWithAggregatesFilter<"FabricBatch"> | $Enums.FabricBatchStatus
+    receivedAt?: DateTimeNullableWithAggregatesFilter<"FabricBatch"> | Date | string | null
+    createdById?: StringWithAggregatesFilter<"FabricBatch"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"FabricBatch"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"FabricBatch"> | Date | string
+  }
+
+  export type FabricStoreRollWhereInput = {
+    AND?: FabricStoreRollWhereInput | FabricStoreRollWhereInput[]
+    OR?: FabricStoreRollWhereInput[]
+    NOT?: FabricStoreRollWhereInput | FabricStoreRollWhereInput[]
+    id?: StringFilter<"FabricStoreRoll"> | string
+    rollNumber?: StringFilter<"FabricStoreRoll"> | string
+    batchId?: StringFilter<"FabricStoreRoll"> | string
+    locationId?: StringNullableFilter<"FabricStoreRoll"> | string | null
+    length?: DecimalFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string
+    width?: DecimalNullableFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string | null
+    weight?: DecimalNullableFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string | null
+    status?: EnumFabricRollStatusFilter<"FabricStoreRoll"> | $Enums.FabricRollStatus
+    qcStatus?: EnumFabricQCStatusFilter<"FabricStoreRoll"> | $Enums.FabricQCStatus
+    qcInspectedById?: StringNullableFilter<"FabricStoreRoll"> | string | null
+    qcInspectedAt?: DateTimeNullableFilter<"FabricStoreRoll"> | Date | string | null
+    qcRemarks?: StringNullableFilter<"FabricStoreRoll"> | string | null
+    programIssuedToId?: StringNullableFilter<"FabricStoreRoll"> | string | null
+    issuedAt?: DateTimeNullableFilter<"FabricStoreRoll"> | Date | string | null
+    createdAt?: DateTimeFilter<"FabricStoreRoll"> | Date | string
+    updatedAt?: DateTimeFilter<"FabricStoreRoll"> | Date | string
+    batch?: XOR<FabricBatchScalarRelationFilter, FabricBatchWhereInput>
+    location?: XOR<InventoryLocationNullableScalarRelationFilter, InventoryLocationWhereInput> | null
+    qcInspectedBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    programIssuedTo?: XOR<ProgramNullableScalarRelationFilter, ProgramWhereInput> | null
+    receiptItems?: MaterialReceiptItemListRelationFilter
+    qcInspections?: FabricQCInspectionListRelationFilter
+    ledgerEntries?: FabricStockLedgerListRelationFilter
+  }
+
+  export type FabricStoreRollOrderByWithRelationInput = {
+    id?: SortOrder
+    rollNumber?: SortOrder
+    batchId?: SortOrder
+    locationId?: SortOrderInput | SortOrder
+    length?: SortOrder
+    width?: SortOrderInput | SortOrder
+    weight?: SortOrderInput | SortOrder
+    status?: SortOrder
+    qcStatus?: SortOrder
+    qcInspectedById?: SortOrderInput | SortOrder
+    qcInspectedAt?: SortOrderInput | SortOrder
+    qcRemarks?: SortOrderInput | SortOrder
+    programIssuedToId?: SortOrderInput | SortOrder
+    issuedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    batch?: FabricBatchOrderByWithRelationInput
+    location?: InventoryLocationOrderByWithRelationInput
+    qcInspectedBy?: UserOrderByWithRelationInput
+    programIssuedTo?: ProgramOrderByWithRelationInput
+    receiptItems?: MaterialReceiptItemOrderByRelationAggregateInput
+    qcInspections?: FabricQCInspectionOrderByRelationAggregateInput
+    ledgerEntries?: FabricStockLedgerOrderByRelationAggregateInput
+  }
+
+  export type FabricStoreRollWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    rollNumber?: string
+    AND?: FabricStoreRollWhereInput | FabricStoreRollWhereInput[]
+    OR?: FabricStoreRollWhereInput[]
+    NOT?: FabricStoreRollWhereInput | FabricStoreRollWhereInput[]
+    batchId?: StringFilter<"FabricStoreRoll"> | string
+    locationId?: StringNullableFilter<"FabricStoreRoll"> | string | null
+    length?: DecimalFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string
+    width?: DecimalNullableFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string | null
+    weight?: DecimalNullableFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string | null
+    status?: EnumFabricRollStatusFilter<"FabricStoreRoll"> | $Enums.FabricRollStatus
+    qcStatus?: EnumFabricQCStatusFilter<"FabricStoreRoll"> | $Enums.FabricQCStatus
+    qcInspectedById?: StringNullableFilter<"FabricStoreRoll"> | string | null
+    qcInspectedAt?: DateTimeNullableFilter<"FabricStoreRoll"> | Date | string | null
+    qcRemarks?: StringNullableFilter<"FabricStoreRoll"> | string | null
+    programIssuedToId?: StringNullableFilter<"FabricStoreRoll"> | string | null
+    issuedAt?: DateTimeNullableFilter<"FabricStoreRoll"> | Date | string | null
+    createdAt?: DateTimeFilter<"FabricStoreRoll"> | Date | string
+    updatedAt?: DateTimeFilter<"FabricStoreRoll"> | Date | string
+    batch?: XOR<FabricBatchScalarRelationFilter, FabricBatchWhereInput>
+    location?: XOR<InventoryLocationNullableScalarRelationFilter, InventoryLocationWhereInput> | null
+    qcInspectedBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    programIssuedTo?: XOR<ProgramNullableScalarRelationFilter, ProgramWhereInput> | null
+    receiptItems?: MaterialReceiptItemListRelationFilter
+    qcInspections?: FabricQCInspectionListRelationFilter
+    ledgerEntries?: FabricStockLedgerListRelationFilter
+  }, "id" | "rollNumber">
+
+  export type FabricStoreRollOrderByWithAggregationInput = {
+    id?: SortOrder
+    rollNumber?: SortOrder
+    batchId?: SortOrder
+    locationId?: SortOrderInput | SortOrder
+    length?: SortOrder
+    width?: SortOrderInput | SortOrder
+    weight?: SortOrderInput | SortOrder
+    status?: SortOrder
+    qcStatus?: SortOrder
+    qcInspectedById?: SortOrderInput | SortOrder
+    qcInspectedAt?: SortOrderInput | SortOrder
+    qcRemarks?: SortOrderInput | SortOrder
+    programIssuedToId?: SortOrderInput | SortOrder
+    issuedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: FabricStoreRollCountOrderByAggregateInput
+    _avg?: FabricStoreRollAvgOrderByAggregateInput
+    _max?: FabricStoreRollMaxOrderByAggregateInput
+    _min?: FabricStoreRollMinOrderByAggregateInput
+    _sum?: FabricStoreRollSumOrderByAggregateInput
+  }
+
+  export type FabricStoreRollScalarWhereWithAggregatesInput = {
+    AND?: FabricStoreRollScalarWhereWithAggregatesInput | FabricStoreRollScalarWhereWithAggregatesInput[]
+    OR?: FabricStoreRollScalarWhereWithAggregatesInput[]
+    NOT?: FabricStoreRollScalarWhereWithAggregatesInput | FabricStoreRollScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"FabricStoreRoll"> | string
+    rollNumber?: StringWithAggregatesFilter<"FabricStoreRoll"> | string
+    batchId?: StringWithAggregatesFilter<"FabricStoreRoll"> | string
+    locationId?: StringNullableWithAggregatesFilter<"FabricStoreRoll"> | string | null
+    length?: DecimalWithAggregatesFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string
+    width?: DecimalNullableWithAggregatesFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string | null
+    weight?: DecimalNullableWithAggregatesFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string | null
+    status?: EnumFabricRollStatusWithAggregatesFilter<"FabricStoreRoll"> | $Enums.FabricRollStatus
+    qcStatus?: EnumFabricQCStatusWithAggregatesFilter<"FabricStoreRoll"> | $Enums.FabricQCStatus
+    qcInspectedById?: StringNullableWithAggregatesFilter<"FabricStoreRoll"> | string | null
+    qcInspectedAt?: DateTimeNullableWithAggregatesFilter<"FabricStoreRoll"> | Date | string | null
+    qcRemarks?: StringNullableWithAggregatesFilter<"FabricStoreRoll"> | string | null
+    programIssuedToId?: StringNullableWithAggregatesFilter<"FabricStoreRoll"> | string | null
+    issuedAt?: DateTimeNullableWithAggregatesFilter<"FabricStoreRoll"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"FabricStoreRoll"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"FabricStoreRoll"> | Date | string
+  }
+
+  export type MaterialReceiptWhereInput = {
+    AND?: MaterialReceiptWhereInput | MaterialReceiptWhereInput[]
+    OR?: MaterialReceiptWhereInput[]
+    NOT?: MaterialReceiptWhereInput | MaterialReceiptWhereInput[]
+    id?: StringFilter<"MaterialReceipt"> | string
+    grnNumber?: StringFilter<"MaterialReceipt"> | string
+    batchId?: StringFilter<"MaterialReceipt"> | string
+    challanId?: StringNullableFilter<"MaterialReceipt"> | string | null
+    receivedById?: StringFilter<"MaterialReceipt"> | string
+    receivedAt?: DateTimeFilter<"MaterialReceipt"> | Date | string
+    vehicleNumber?: StringNullableFilter<"MaterialReceipt"> | string | null
+    supplierName?: StringFilter<"MaterialReceipt"> | string
+    totalRollsReceived?: IntFilter<"MaterialReceipt"> | number
+    totalMetersReceived?: DecimalFilter<"MaterialReceipt"> | Decimal | DecimalJsLike | number | string
+    status?: EnumGRNStatusFilter<"MaterialReceipt"> | $Enums.GRNStatus
+    remarks?: StringNullableFilter<"MaterialReceipt"> | string | null
+    createdAt?: DateTimeFilter<"MaterialReceipt"> | Date | string
+    updatedAt?: DateTimeFilter<"MaterialReceipt"> | Date | string
+    batch?: XOR<FabricBatchScalarRelationFilter, FabricBatchWhereInput>
+    receivedBy?: XOR<UserScalarRelationFilter, UserWhereInput>
+    items?: MaterialReceiptItemListRelationFilter
+  }
+
+  export type MaterialReceiptOrderByWithRelationInput = {
+    id?: SortOrder
+    grnNumber?: SortOrder
+    batchId?: SortOrder
+    challanId?: SortOrderInput | SortOrder
+    receivedById?: SortOrder
+    receivedAt?: SortOrder
+    vehicleNumber?: SortOrderInput | SortOrder
+    supplierName?: SortOrder
+    totalRollsReceived?: SortOrder
+    totalMetersReceived?: SortOrder
+    status?: SortOrder
+    remarks?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    batch?: FabricBatchOrderByWithRelationInput
+    receivedBy?: UserOrderByWithRelationInput
+    items?: MaterialReceiptItemOrderByRelationAggregateInput
+  }
+
+  export type MaterialReceiptWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    grnNumber?: string
+    AND?: MaterialReceiptWhereInput | MaterialReceiptWhereInput[]
+    OR?: MaterialReceiptWhereInput[]
+    NOT?: MaterialReceiptWhereInput | MaterialReceiptWhereInput[]
+    batchId?: StringFilter<"MaterialReceipt"> | string
+    challanId?: StringNullableFilter<"MaterialReceipt"> | string | null
+    receivedById?: StringFilter<"MaterialReceipt"> | string
+    receivedAt?: DateTimeFilter<"MaterialReceipt"> | Date | string
+    vehicleNumber?: StringNullableFilter<"MaterialReceipt"> | string | null
+    supplierName?: StringFilter<"MaterialReceipt"> | string
+    totalRollsReceived?: IntFilter<"MaterialReceipt"> | number
+    totalMetersReceived?: DecimalFilter<"MaterialReceipt"> | Decimal | DecimalJsLike | number | string
+    status?: EnumGRNStatusFilter<"MaterialReceipt"> | $Enums.GRNStatus
+    remarks?: StringNullableFilter<"MaterialReceipt"> | string | null
+    createdAt?: DateTimeFilter<"MaterialReceipt"> | Date | string
+    updatedAt?: DateTimeFilter<"MaterialReceipt"> | Date | string
+    batch?: XOR<FabricBatchScalarRelationFilter, FabricBatchWhereInput>
+    receivedBy?: XOR<UserScalarRelationFilter, UserWhereInput>
+    items?: MaterialReceiptItemListRelationFilter
+  }, "id" | "grnNumber">
+
+  export type MaterialReceiptOrderByWithAggregationInput = {
+    id?: SortOrder
+    grnNumber?: SortOrder
+    batchId?: SortOrder
+    challanId?: SortOrderInput | SortOrder
+    receivedById?: SortOrder
+    receivedAt?: SortOrder
+    vehicleNumber?: SortOrderInput | SortOrder
+    supplierName?: SortOrder
+    totalRollsReceived?: SortOrder
+    totalMetersReceived?: SortOrder
+    status?: SortOrder
+    remarks?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: MaterialReceiptCountOrderByAggregateInput
+    _avg?: MaterialReceiptAvgOrderByAggregateInput
+    _max?: MaterialReceiptMaxOrderByAggregateInput
+    _min?: MaterialReceiptMinOrderByAggregateInput
+    _sum?: MaterialReceiptSumOrderByAggregateInput
+  }
+
+  export type MaterialReceiptScalarWhereWithAggregatesInput = {
+    AND?: MaterialReceiptScalarWhereWithAggregatesInput | MaterialReceiptScalarWhereWithAggregatesInput[]
+    OR?: MaterialReceiptScalarWhereWithAggregatesInput[]
+    NOT?: MaterialReceiptScalarWhereWithAggregatesInput | MaterialReceiptScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"MaterialReceipt"> | string
+    grnNumber?: StringWithAggregatesFilter<"MaterialReceipt"> | string
+    batchId?: StringWithAggregatesFilter<"MaterialReceipt"> | string
+    challanId?: StringNullableWithAggregatesFilter<"MaterialReceipt"> | string | null
+    receivedById?: StringWithAggregatesFilter<"MaterialReceipt"> | string
+    receivedAt?: DateTimeWithAggregatesFilter<"MaterialReceipt"> | Date | string
+    vehicleNumber?: StringNullableWithAggregatesFilter<"MaterialReceipt"> | string | null
+    supplierName?: StringWithAggregatesFilter<"MaterialReceipt"> | string
+    totalRollsReceived?: IntWithAggregatesFilter<"MaterialReceipt"> | number
+    totalMetersReceived?: DecimalWithAggregatesFilter<"MaterialReceipt"> | Decimal | DecimalJsLike | number | string
+    status?: EnumGRNStatusWithAggregatesFilter<"MaterialReceipt"> | $Enums.GRNStatus
+    remarks?: StringNullableWithAggregatesFilter<"MaterialReceipt"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"MaterialReceipt"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"MaterialReceipt"> | Date | string
+  }
+
+  export type MaterialReceiptItemWhereInput = {
+    AND?: MaterialReceiptItemWhereInput | MaterialReceiptItemWhereInput[]
+    OR?: MaterialReceiptItemWhereInput[]
+    NOT?: MaterialReceiptItemWhereInput | MaterialReceiptItemWhereInput[]
+    id?: StringFilter<"MaterialReceiptItem"> | string
+    receiptId?: StringFilter<"MaterialReceiptItem"> | string
+    rollId?: StringFilter<"MaterialReceiptItem"> | string
+    measuredLength?: DecimalFilter<"MaterialReceiptItem"> | Decimal | DecimalJsLike | number | string
+    measuredWeight?: DecimalNullableFilter<"MaterialReceiptItem"> | Decimal | DecimalJsLike | number | string | null
+    remarks?: StringNullableFilter<"MaterialReceiptItem"> | string | null
+    createdAt?: DateTimeFilter<"MaterialReceiptItem"> | Date | string
+    receipt?: XOR<MaterialReceiptScalarRelationFilter, MaterialReceiptWhereInput>
+    roll?: XOR<FabricStoreRollScalarRelationFilter, FabricStoreRollWhereInput>
+  }
+
+  export type MaterialReceiptItemOrderByWithRelationInput = {
+    id?: SortOrder
+    receiptId?: SortOrder
+    rollId?: SortOrder
+    measuredLength?: SortOrder
+    measuredWeight?: SortOrderInput | SortOrder
+    remarks?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    receipt?: MaterialReceiptOrderByWithRelationInput
+    roll?: FabricStoreRollOrderByWithRelationInput
+  }
+
+  export type MaterialReceiptItemWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: MaterialReceiptItemWhereInput | MaterialReceiptItemWhereInput[]
+    OR?: MaterialReceiptItemWhereInput[]
+    NOT?: MaterialReceiptItemWhereInput | MaterialReceiptItemWhereInput[]
+    receiptId?: StringFilter<"MaterialReceiptItem"> | string
+    rollId?: StringFilter<"MaterialReceiptItem"> | string
+    measuredLength?: DecimalFilter<"MaterialReceiptItem"> | Decimal | DecimalJsLike | number | string
+    measuredWeight?: DecimalNullableFilter<"MaterialReceiptItem"> | Decimal | DecimalJsLike | number | string | null
+    remarks?: StringNullableFilter<"MaterialReceiptItem"> | string | null
+    createdAt?: DateTimeFilter<"MaterialReceiptItem"> | Date | string
+    receipt?: XOR<MaterialReceiptScalarRelationFilter, MaterialReceiptWhereInput>
+    roll?: XOR<FabricStoreRollScalarRelationFilter, FabricStoreRollWhereInput>
+  }, "id">
+
+  export type MaterialReceiptItemOrderByWithAggregationInput = {
+    id?: SortOrder
+    receiptId?: SortOrder
+    rollId?: SortOrder
+    measuredLength?: SortOrder
+    measuredWeight?: SortOrderInput | SortOrder
+    remarks?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: MaterialReceiptItemCountOrderByAggregateInput
+    _avg?: MaterialReceiptItemAvgOrderByAggregateInput
+    _max?: MaterialReceiptItemMaxOrderByAggregateInput
+    _min?: MaterialReceiptItemMinOrderByAggregateInput
+    _sum?: MaterialReceiptItemSumOrderByAggregateInput
+  }
+
+  export type MaterialReceiptItemScalarWhereWithAggregatesInput = {
+    AND?: MaterialReceiptItemScalarWhereWithAggregatesInput | MaterialReceiptItemScalarWhereWithAggregatesInput[]
+    OR?: MaterialReceiptItemScalarWhereWithAggregatesInput[]
+    NOT?: MaterialReceiptItemScalarWhereWithAggregatesInput | MaterialReceiptItemScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"MaterialReceiptItem"> | string
+    receiptId?: StringWithAggregatesFilter<"MaterialReceiptItem"> | string
+    rollId?: StringWithAggregatesFilter<"MaterialReceiptItem"> | string
+    measuredLength?: DecimalWithAggregatesFilter<"MaterialReceiptItem"> | Decimal | DecimalJsLike | number | string
+    measuredWeight?: DecimalNullableWithAggregatesFilter<"MaterialReceiptItem"> | Decimal | DecimalJsLike | number | string | null
+    remarks?: StringNullableWithAggregatesFilter<"MaterialReceiptItem"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"MaterialReceiptItem"> | Date | string
+  }
+
+  export type FabricQCInspectionWhereInput = {
+    AND?: FabricQCInspectionWhereInput | FabricQCInspectionWhereInput[]
+    OR?: FabricQCInspectionWhereInput[]
+    NOT?: FabricQCInspectionWhereInput | FabricQCInspectionWhereInput[]
+    id?: StringFilter<"FabricQCInspection"> | string
+    inspectionNumber?: StringFilter<"FabricQCInspection"> | string
+    rollId?: StringFilter<"FabricQCInspection"> | string
+    inspectedById?: StringFilter<"FabricQCInspection"> | string
+    inspectionType?: EnumInspectionTypeFilter<"FabricQCInspection"> | $Enums.InspectionType
+    result?: EnumInspectionResultFilter<"FabricQCInspection"> | $Enums.InspectionResult
+    defects?: JsonNullableFilter<"FabricQCInspection">
+    remarks?: StringNullableFilter<"FabricQCInspection"> | string | null
+    inspectedAt?: DateTimeFilter<"FabricQCInspection"> | Date | string
+    createdAt?: DateTimeFilter<"FabricQCInspection"> | Date | string
+    roll?: XOR<FabricStoreRollScalarRelationFilter, FabricStoreRollWhereInput>
+    inspectedBy?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type FabricQCInspectionOrderByWithRelationInput = {
+    id?: SortOrder
+    inspectionNumber?: SortOrder
+    rollId?: SortOrder
+    inspectedById?: SortOrder
+    inspectionType?: SortOrder
+    result?: SortOrder
+    defects?: SortOrderInput | SortOrder
+    remarks?: SortOrderInput | SortOrder
+    inspectedAt?: SortOrder
+    createdAt?: SortOrder
+    roll?: FabricStoreRollOrderByWithRelationInput
+    inspectedBy?: UserOrderByWithRelationInput
+  }
+
+  export type FabricQCInspectionWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    inspectionNumber?: string
+    AND?: FabricQCInspectionWhereInput | FabricQCInspectionWhereInput[]
+    OR?: FabricQCInspectionWhereInput[]
+    NOT?: FabricQCInspectionWhereInput | FabricQCInspectionWhereInput[]
+    rollId?: StringFilter<"FabricQCInspection"> | string
+    inspectedById?: StringFilter<"FabricQCInspection"> | string
+    inspectionType?: EnumInspectionTypeFilter<"FabricQCInspection"> | $Enums.InspectionType
+    result?: EnumInspectionResultFilter<"FabricQCInspection"> | $Enums.InspectionResult
+    defects?: JsonNullableFilter<"FabricQCInspection">
+    remarks?: StringNullableFilter<"FabricQCInspection"> | string | null
+    inspectedAt?: DateTimeFilter<"FabricQCInspection"> | Date | string
+    createdAt?: DateTimeFilter<"FabricQCInspection"> | Date | string
+    roll?: XOR<FabricStoreRollScalarRelationFilter, FabricStoreRollWhereInput>
+    inspectedBy?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "inspectionNumber">
+
+  export type FabricQCInspectionOrderByWithAggregationInput = {
+    id?: SortOrder
+    inspectionNumber?: SortOrder
+    rollId?: SortOrder
+    inspectedById?: SortOrder
+    inspectionType?: SortOrder
+    result?: SortOrder
+    defects?: SortOrderInput | SortOrder
+    remarks?: SortOrderInput | SortOrder
+    inspectedAt?: SortOrder
+    createdAt?: SortOrder
+    _count?: FabricQCInspectionCountOrderByAggregateInput
+    _max?: FabricQCInspectionMaxOrderByAggregateInput
+    _min?: FabricQCInspectionMinOrderByAggregateInput
+  }
+
+  export type FabricQCInspectionScalarWhereWithAggregatesInput = {
+    AND?: FabricQCInspectionScalarWhereWithAggregatesInput | FabricQCInspectionScalarWhereWithAggregatesInput[]
+    OR?: FabricQCInspectionScalarWhereWithAggregatesInput[]
+    NOT?: FabricQCInspectionScalarWhereWithAggregatesInput | FabricQCInspectionScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"FabricQCInspection"> | string
+    inspectionNumber?: StringWithAggregatesFilter<"FabricQCInspection"> | string
+    rollId?: StringWithAggregatesFilter<"FabricQCInspection"> | string
+    inspectedById?: StringWithAggregatesFilter<"FabricQCInspection"> | string
+    inspectionType?: EnumInspectionTypeWithAggregatesFilter<"FabricQCInspection"> | $Enums.InspectionType
+    result?: EnumInspectionResultWithAggregatesFilter<"FabricQCInspection"> | $Enums.InspectionResult
+    defects?: JsonNullableWithAggregatesFilter<"FabricQCInspection">
+    remarks?: StringNullableWithAggregatesFilter<"FabricQCInspection"> | string | null
+    inspectedAt?: DateTimeWithAggregatesFilter<"FabricQCInspection"> | Date | string
+    createdAt?: DateTimeWithAggregatesFilter<"FabricQCInspection"> | Date | string
+  }
+
+  export type FabricStockLedgerWhereInput = {
+    AND?: FabricStockLedgerWhereInput | FabricStockLedgerWhereInput[]
+    OR?: FabricStockLedgerWhereInput[]
+    NOT?: FabricStockLedgerWhereInput | FabricStockLedgerWhereInput[]
+    id?: StringFilter<"FabricStockLedger"> | string
+    entryNumber?: StringFilter<"FabricStockLedger"> | string
+    rollId?: StringFilter<"FabricStockLedger"> | string
+    batchId?: StringFilter<"FabricStockLedger"> | string
+    transactionType?: EnumStockTransactionTypeFilter<"FabricStockLedger"> | $Enums.StockTransactionType
+    quantity?: DecimalFilter<"FabricStockLedger"> | Decimal | DecimalJsLike | number | string
+    referenceType?: StringFilter<"FabricStockLedger"> | string
+    referenceId?: StringFilter<"FabricStockLedger"> | string
+    fromLocationId?: StringNullableFilter<"FabricStockLedger"> | string | null
+    toLocationId?: StringNullableFilter<"FabricStockLedger"> | string | null
+    transactedById?: StringFilter<"FabricStockLedger"> | string
+    transactedAt?: DateTimeFilter<"FabricStockLedger"> | Date | string
+    remarks?: StringNullableFilter<"FabricStockLedger"> | string | null
+    createdAt?: DateTimeFilter<"FabricStockLedger"> | Date | string
+    roll?: XOR<FabricStoreRollScalarRelationFilter, FabricStoreRollWhereInput>
+    batch?: XOR<FabricBatchScalarRelationFilter, FabricBatchWhereInput>
+    fromLocation?: XOR<InventoryLocationNullableScalarRelationFilter, InventoryLocationWhereInput> | null
+    toLocation?: XOR<InventoryLocationNullableScalarRelationFilter, InventoryLocationWhereInput> | null
+    transactedBy?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type FabricStockLedgerOrderByWithRelationInput = {
+    id?: SortOrder
+    entryNumber?: SortOrder
+    rollId?: SortOrder
+    batchId?: SortOrder
+    transactionType?: SortOrder
+    quantity?: SortOrder
+    referenceType?: SortOrder
+    referenceId?: SortOrder
+    fromLocationId?: SortOrderInput | SortOrder
+    toLocationId?: SortOrderInput | SortOrder
+    transactedById?: SortOrder
+    transactedAt?: SortOrder
+    remarks?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    roll?: FabricStoreRollOrderByWithRelationInput
+    batch?: FabricBatchOrderByWithRelationInput
+    fromLocation?: InventoryLocationOrderByWithRelationInput
+    toLocation?: InventoryLocationOrderByWithRelationInput
+    transactedBy?: UserOrderByWithRelationInput
+  }
+
+  export type FabricStockLedgerWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    entryNumber?: string
+    AND?: FabricStockLedgerWhereInput | FabricStockLedgerWhereInput[]
+    OR?: FabricStockLedgerWhereInput[]
+    NOT?: FabricStockLedgerWhereInput | FabricStockLedgerWhereInput[]
+    rollId?: StringFilter<"FabricStockLedger"> | string
+    batchId?: StringFilter<"FabricStockLedger"> | string
+    transactionType?: EnumStockTransactionTypeFilter<"FabricStockLedger"> | $Enums.StockTransactionType
+    quantity?: DecimalFilter<"FabricStockLedger"> | Decimal | DecimalJsLike | number | string
+    referenceType?: StringFilter<"FabricStockLedger"> | string
+    referenceId?: StringFilter<"FabricStockLedger"> | string
+    fromLocationId?: StringNullableFilter<"FabricStockLedger"> | string | null
+    toLocationId?: StringNullableFilter<"FabricStockLedger"> | string | null
+    transactedById?: StringFilter<"FabricStockLedger"> | string
+    transactedAt?: DateTimeFilter<"FabricStockLedger"> | Date | string
+    remarks?: StringNullableFilter<"FabricStockLedger"> | string | null
+    createdAt?: DateTimeFilter<"FabricStockLedger"> | Date | string
+    roll?: XOR<FabricStoreRollScalarRelationFilter, FabricStoreRollWhereInput>
+    batch?: XOR<FabricBatchScalarRelationFilter, FabricBatchWhereInput>
+    fromLocation?: XOR<InventoryLocationNullableScalarRelationFilter, InventoryLocationWhereInput> | null
+    toLocation?: XOR<InventoryLocationNullableScalarRelationFilter, InventoryLocationWhereInput> | null
+    transactedBy?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "entryNumber">
+
+  export type FabricStockLedgerOrderByWithAggregationInput = {
+    id?: SortOrder
+    entryNumber?: SortOrder
+    rollId?: SortOrder
+    batchId?: SortOrder
+    transactionType?: SortOrder
+    quantity?: SortOrder
+    referenceType?: SortOrder
+    referenceId?: SortOrder
+    fromLocationId?: SortOrderInput | SortOrder
+    toLocationId?: SortOrderInput | SortOrder
+    transactedById?: SortOrder
+    transactedAt?: SortOrder
+    remarks?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: FabricStockLedgerCountOrderByAggregateInput
+    _avg?: FabricStockLedgerAvgOrderByAggregateInput
+    _max?: FabricStockLedgerMaxOrderByAggregateInput
+    _min?: FabricStockLedgerMinOrderByAggregateInput
+    _sum?: FabricStockLedgerSumOrderByAggregateInput
+  }
+
+  export type FabricStockLedgerScalarWhereWithAggregatesInput = {
+    AND?: FabricStockLedgerScalarWhereWithAggregatesInput | FabricStockLedgerScalarWhereWithAggregatesInput[]
+    OR?: FabricStockLedgerScalarWhereWithAggregatesInput[]
+    NOT?: FabricStockLedgerScalarWhereWithAggregatesInput | FabricStockLedgerScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"FabricStockLedger"> | string
+    entryNumber?: StringWithAggregatesFilter<"FabricStockLedger"> | string
+    rollId?: StringWithAggregatesFilter<"FabricStockLedger"> | string
+    batchId?: StringWithAggregatesFilter<"FabricStockLedger"> | string
+    transactionType?: EnumStockTransactionTypeWithAggregatesFilter<"FabricStockLedger"> | $Enums.StockTransactionType
+    quantity?: DecimalWithAggregatesFilter<"FabricStockLedger"> | Decimal | DecimalJsLike | number | string
+    referenceType?: StringWithAggregatesFilter<"FabricStockLedger"> | string
+    referenceId?: StringWithAggregatesFilter<"FabricStockLedger"> | string
+    fromLocationId?: StringNullableWithAggregatesFilter<"FabricStockLedger"> | string | null
+    toLocationId?: StringNullableWithAggregatesFilter<"FabricStockLedger"> | string | null
+    transactedById?: StringWithAggregatesFilter<"FabricStockLedger"> | string
+    transactedAt?: DateTimeWithAggregatesFilter<"FabricStockLedger"> | Date | string
+    remarks?: StringNullableWithAggregatesFilter<"FabricStockLedger"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"FabricStockLedger"> | Date | string
+  }
+
   export type UserCreateInput = {
     id?: string
     username: string
@@ -73818,6 +84704,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -73849,6 +84740,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserUpdateInput = {
@@ -73880,6 +84776,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -73911,6 +84812,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -75611,6 +86517,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramUncheckedCreateInput = {
@@ -75685,6 +86593,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionUncheckedCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramUpdateInput = {
@@ -75759,6 +86669,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ProgramUncheckedUpdateInput = {
@@ -75833,6 +86745,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUncheckedUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ProgramCreateManyInput = {
@@ -79266,6 +90180,757 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type InventoryLocationCreateInput = {
+    id?: string
+    locationCode: string
+    locationName: string
+    locationType?: $Enums.InventoryLocationType
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    rolls?: FabricStoreRollCreateNestedManyWithoutLocationInput
+    fromLedger?: FabricStockLedgerCreateNestedManyWithoutFromLocationInput
+    toLedger?: FabricStockLedgerCreateNestedManyWithoutToLocationInput
+  }
+
+  export type InventoryLocationUncheckedCreateInput = {
+    id?: string
+    locationCode: string
+    locationName: string
+    locationType?: $Enums.InventoryLocationType
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    rolls?: FabricStoreRollUncheckedCreateNestedManyWithoutLocationInput
+    fromLedger?: FabricStockLedgerUncheckedCreateNestedManyWithoutFromLocationInput
+    toLedger?: FabricStockLedgerUncheckedCreateNestedManyWithoutToLocationInput
+  }
+
+  export type InventoryLocationUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    locationCode?: StringFieldUpdateOperationsInput | string
+    locationName?: StringFieldUpdateOperationsInput | string
+    locationType?: EnumInventoryLocationTypeFieldUpdateOperationsInput | $Enums.InventoryLocationType
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rolls?: FabricStoreRollUpdateManyWithoutLocationNestedInput
+    fromLedger?: FabricStockLedgerUpdateManyWithoutFromLocationNestedInput
+    toLedger?: FabricStockLedgerUpdateManyWithoutToLocationNestedInput
+  }
+
+  export type InventoryLocationUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    locationCode?: StringFieldUpdateOperationsInput | string
+    locationName?: StringFieldUpdateOperationsInput | string
+    locationType?: EnumInventoryLocationTypeFieldUpdateOperationsInput | $Enums.InventoryLocationType
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rolls?: FabricStoreRollUncheckedUpdateManyWithoutLocationNestedInput
+    fromLedger?: FabricStockLedgerUncheckedUpdateManyWithoutFromLocationNestedInput
+    toLedger?: FabricStockLedgerUncheckedUpdateManyWithoutToLocationNestedInput
+  }
+
+  export type InventoryLocationCreateManyInput = {
+    id?: string
+    locationCode: string
+    locationName: string
+    locationType?: $Enums.InventoryLocationType
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type InventoryLocationUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    locationCode?: StringFieldUpdateOperationsInput | string
+    locationName?: StringFieldUpdateOperationsInput | string
+    locationType?: EnumInventoryLocationTypeFieldUpdateOperationsInput | $Enums.InventoryLocationType
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type InventoryLocationUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    locationCode?: StringFieldUpdateOperationsInput | string
+    locationName?: StringFieldUpdateOperationsInput | string
+    locationType?: EnumInventoryLocationTypeFieldUpdateOperationsInput | $Enums.InventoryLocationType
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricBatchCreateInput = {
+    id?: string
+    batchNumber: string
+    supplierId?: string | null
+    fabricType: string
+    fabricDescription: string
+    colorCode?: string | null
+    colorName?: string | null
+    totalRolls?: number
+    totalMeters?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.FabricBatchStatus
+    receivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    program?: ProgramCreateNestedOneWithoutFabricBatchesInput
+    createdBy: UserCreateNestedOneWithoutFabricBatchesCreatedInput
+    rolls?: FabricStoreRollCreateNestedManyWithoutBatchInput
+    receipts?: MaterialReceiptCreateNestedManyWithoutBatchInput
+    ledgerEntries?: FabricStockLedgerCreateNestedManyWithoutBatchInput
+  }
+
+  export type FabricBatchUncheckedCreateInput = {
+    id?: string
+    batchNumber: string
+    programId?: string | null
+    supplierId?: string | null
+    fabricType: string
+    fabricDescription: string
+    colorCode?: string | null
+    colorName?: string | null
+    totalRolls?: number
+    totalMeters?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.FabricBatchStatus
+    receivedAt?: Date | string | null
+    createdById: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    rolls?: FabricStoreRollUncheckedCreateNestedManyWithoutBatchInput
+    receipts?: MaterialReceiptUncheckedCreateNestedManyWithoutBatchInput
+    ledgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutBatchInput
+  }
+
+  export type FabricBatchUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    batchNumber?: StringFieldUpdateOperationsInput | string
+    supplierId?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: StringFieldUpdateOperationsInput | string
+    fabricDescription?: StringFieldUpdateOperationsInput | string
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    colorName?: NullableStringFieldUpdateOperationsInput | string | null
+    totalRolls?: IntFieldUpdateOperationsInput | number
+    totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    program?: ProgramUpdateOneWithoutFabricBatchesNestedInput
+    createdBy?: UserUpdateOneRequiredWithoutFabricBatchesCreatedNestedInput
+    rolls?: FabricStoreRollUpdateManyWithoutBatchNestedInput
+    receipts?: MaterialReceiptUpdateManyWithoutBatchNestedInput
+    ledgerEntries?: FabricStockLedgerUpdateManyWithoutBatchNestedInput
+  }
+
+  export type FabricBatchUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    batchNumber?: StringFieldUpdateOperationsInput | string
+    programId?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierId?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: StringFieldUpdateOperationsInput | string
+    fabricDescription?: StringFieldUpdateOperationsInput | string
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    colorName?: NullableStringFieldUpdateOperationsInput | string | null
+    totalRolls?: IntFieldUpdateOperationsInput | number
+    totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdById?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rolls?: FabricStoreRollUncheckedUpdateManyWithoutBatchNestedInput
+    receipts?: MaterialReceiptUncheckedUpdateManyWithoutBatchNestedInput
+    ledgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutBatchNestedInput
+  }
+
+  export type FabricBatchCreateManyInput = {
+    id?: string
+    batchNumber: string
+    programId?: string | null
+    supplierId?: string | null
+    fabricType: string
+    fabricDescription: string
+    colorCode?: string | null
+    colorName?: string | null
+    totalRolls?: number
+    totalMeters?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.FabricBatchStatus
+    receivedAt?: Date | string | null
+    createdById: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FabricBatchUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    batchNumber?: StringFieldUpdateOperationsInput | string
+    supplierId?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: StringFieldUpdateOperationsInput | string
+    fabricDescription?: StringFieldUpdateOperationsInput | string
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    colorName?: NullableStringFieldUpdateOperationsInput | string | null
+    totalRolls?: IntFieldUpdateOperationsInput | number
+    totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricBatchUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    batchNumber?: StringFieldUpdateOperationsInput | string
+    programId?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierId?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: StringFieldUpdateOperationsInput | string
+    fabricDescription?: StringFieldUpdateOperationsInput | string
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    colorName?: NullableStringFieldUpdateOperationsInput | string | null
+    totalRolls?: IntFieldUpdateOperationsInput | number
+    totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdById?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStoreRollCreateInput = {
+    id?: string
+    rollNumber: string
+    length: Decimal | DecimalJsLike | number | string
+    width?: Decimal | DecimalJsLike | number | string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    status?: $Enums.FabricRollStatus
+    qcStatus?: $Enums.FabricQCStatus
+    qcInspectedAt?: Date | string | null
+    qcRemarks?: string | null
+    issuedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    batch: FabricBatchCreateNestedOneWithoutRollsInput
+    location?: InventoryLocationCreateNestedOneWithoutRollsInput
+    qcInspectedBy?: UserCreateNestedOneWithoutFabricRollsInspectedInput
+    programIssuedTo?: ProgramCreateNestedOneWithoutFabricStoreRollsInput
+    receiptItems?: MaterialReceiptItemCreateNestedManyWithoutRollInput
+    qcInspections?: FabricQCInspectionCreateNestedManyWithoutRollInput
+    ledgerEntries?: FabricStockLedgerCreateNestedManyWithoutRollInput
+  }
+
+  export type FabricStoreRollUncheckedCreateInput = {
+    id?: string
+    rollNumber: string
+    batchId: string
+    locationId?: string | null
+    length: Decimal | DecimalJsLike | number | string
+    width?: Decimal | DecimalJsLike | number | string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    status?: $Enums.FabricRollStatus
+    qcStatus?: $Enums.FabricQCStatus
+    qcInspectedById?: string | null
+    qcInspectedAt?: Date | string | null
+    qcRemarks?: string | null
+    programIssuedToId?: string | null
+    issuedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    receiptItems?: MaterialReceiptItemUncheckedCreateNestedManyWithoutRollInput
+    qcInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutRollInput
+    ledgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutRollInput
+  }
+
+  export type FabricStoreRollUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    rollNumber?: StringFieldUpdateOperationsInput | string
+    length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
+    qcStatus?: EnumFabricQCStatusFieldUpdateOperationsInput | $Enums.FabricQCStatus
+    qcInspectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    qcRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    batch?: FabricBatchUpdateOneRequiredWithoutRollsNestedInput
+    location?: InventoryLocationUpdateOneWithoutRollsNestedInput
+    qcInspectedBy?: UserUpdateOneWithoutFabricRollsInspectedNestedInput
+    programIssuedTo?: ProgramUpdateOneWithoutFabricStoreRollsNestedInput
+    receiptItems?: MaterialReceiptItemUpdateManyWithoutRollNestedInput
+    qcInspections?: FabricQCInspectionUpdateManyWithoutRollNestedInput
+    ledgerEntries?: FabricStockLedgerUpdateManyWithoutRollNestedInput
+  }
+
+  export type FabricStoreRollUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    rollNumber?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    locationId?: NullableStringFieldUpdateOperationsInput | string | null
+    length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
+    qcStatus?: EnumFabricQCStatusFieldUpdateOperationsInput | $Enums.FabricQCStatus
+    qcInspectedById?: NullableStringFieldUpdateOperationsInput | string | null
+    qcInspectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    qcRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    programIssuedToId?: NullableStringFieldUpdateOperationsInput | string | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    receiptItems?: MaterialReceiptItemUncheckedUpdateManyWithoutRollNestedInput
+    qcInspections?: FabricQCInspectionUncheckedUpdateManyWithoutRollNestedInput
+    ledgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutRollNestedInput
+  }
+
+  export type FabricStoreRollCreateManyInput = {
+    id?: string
+    rollNumber: string
+    batchId: string
+    locationId?: string | null
+    length: Decimal | DecimalJsLike | number | string
+    width?: Decimal | DecimalJsLike | number | string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    status?: $Enums.FabricRollStatus
+    qcStatus?: $Enums.FabricQCStatus
+    qcInspectedById?: string | null
+    qcInspectedAt?: Date | string | null
+    qcRemarks?: string | null
+    programIssuedToId?: string | null
+    issuedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FabricStoreRollUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    rollNumber?: StringFieldUpdateOperationsInput | string
+    length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
+    qcStatus?: EnumFabricQCStatusFieldUpdateOperationsInput | $Enums.FabricQCStatus
+    qcInspectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    qcRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStoreRollUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    rollNumber?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    locationId?: NullableStringFieldUpdateOperationsInput | string | null
+    length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
+    qcStatus?: EnumFabricQCStatusFieldUpdateOperationsInput | $Enums.FabricQCStatus
+    qcInspectedById?: NullableStringFieldUpdateOperationsInput | string | null
+    qcInspectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    qcRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    programIssuedToId?: NullableStringFieldUpdateOperationsInput | string | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MaterialReceiptCreateInput = {
+    id?: string
+    grnNumber: string
+    challanId?: string | null
+    receivedAt: Date | string
+    vehicleNumber?: string | null
+    supplierName: string
+    totalRollsReceived?: number
+    totalMetersReceived?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.GRNStatus
+    remarks?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    batch: FabricBatchCreateNestedOneWithoutReceiptsInput
+    receivedBy: UserCreateNestedOneWithoutGrnReceivedInput
+    items?: MaterialReceiptItemCreateNestedManyWithoutReceiptInput
+  }
+
+  export type MaterialReceiptUncheckedCreateInput = {
+    id?: string
+    grnNumber: string
+    batchId: string
+    challanId?: string | null
+    receivedById: string
+    receivedAt: Date | string
+    vehicleNumber?: string | null
+    supplierName: string
+    totalRollsReceived?: number
+    totalMetersReceived?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.GRNStatus
+    remarks?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    items?: MaterialReceiptItemUncheckedCreateNestedManyWithoutReceiptInput
+  }
+
+  export type MaterialReceiptUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    grnNumber?: StringFieldUpdateOperationsInput | string
+    challanId?: NullableStringFieldUpdateOperationsInput | string | null
+    receivedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    vehicleNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: StringFieldUpdateOperationsInput | string
+    totalRollsReceived?: IntFieldUpdateOperationsInput | number
+    totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    batch?: FabricBatchUpdateOneRequiredWithoutReceiptsNestedInput
+    receivedBy?: UserUpdateOneRequiredWithoutGrnReceivedNestedInput
+    items?: MaterialReceiptItemUpdateManyWithoutReceiptNestedInput
+  }
+
+  export type MaterialReceiptUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    grnNumber?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    challanId?: NullableStringFieldUpdateOperationsInput | string | null
+    receivedById?: StringFieldUpdateOperationsInput | string
+    receivedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    vehicleNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: StringFieldUpdateOperationsInput | string
+    totalRollsReceived?: IntFieldUpdateOperationsInput | number
+    totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    items?: MaterialReceiptItemUncheckedUpdateManyWithoutReceiptNestedInput
+  }
+
+  export type MaterialReceiptCreateManyInput = {
+    id?: string
+    grnNumber: string
+    batchId: string
+    challanId?: string | null
+    receivedById: string
+    receivedAt: Date | string
+    vehicleNumber?: string | null
+    supplierName: string
+    totalRollsReceived?: number
+    totalMetersReceived?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.GRNStatus
+    remarks?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MaterialReceiptUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    grnNumber?: StringFieldUpdateOperationsInput | string
+    challanId?: NullableStringFieldUpdateOperationsInput | string | null
+    receivedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    vehicleNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: StringFieldUpdateOperationsInput | string
+    totalRollsReceived?: IntFieldUpdateOperationsInput | number
+    totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MaterialReceiptUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    grnNumber?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    challanId?: NullableStringFieldUpdateOperationsInput | string | null
+    receivedById?: StringFieldUpdateOperationsInput | string
+    receivedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    vehicleNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: StringFieldUpdateOperationsInput | string
+    totalRollsReceived?: IntFieldUpdateOperationsInput | number
+    totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MaterialReceiptItemCreateInput = {
+    id?: string
+    measuredLength: Decimal | DecimalJsLike | number | string
+    measuredWeight?: Decimal | DecimalJsLike | number | string | null
+    remarks?: string | null
+    createdAt?: Date | string
+    receipt: MaterialReceiptCreateNestedOneWithoutItemsInput
+    roll: FabricStoreRollCreateNestedOneWithoutReceiptItemsInput
+  }
+
+  export type MaterialReceiptItemUncheckedCreateInput = {
+    id?: string
+    receiptId: string
+    rollId: string
+    measuredLength: Decimal | DecimalJsLike | number | string
+    measuredWeight?: Decimal | DecimalJsLike | number | string | null
+    remarks?: string | null
+    createdAt?: Date | string
+  }
+
+  export type MaterialReceiptItemUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    measuredLength?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    measuredWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    receipt?: MaterialReceiptUpdateOneRequiredWithoutItemsNestedInput
+    roll?: FabricStoreRollUpdateOneRequiredWithoutReceiptItemsNestedInput
+  }
+
+  export type MaterialReceiptItemUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    receiptId?: StringFieldUpdateOperationsInput | string
+    rollId?: StringFieldUpdateOperationsInput | string
+    measuredLength?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    measuredWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MaterialReceiptItemCreateManyInput = {
+    id?: string
+    receiptId: string
+    rollId: string
+    measuredLength: Decimal | DecimalJsLike | number | string
+    measuredWeight?: Decimal | DecimalJsLike | number | string | null
+    remarks?: string | null
+    createdAt?: Date | string
+  }
+
+  export type MaterialReceiptItemUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    measuredLength?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    measuredWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MaterialReceiptItemUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    receiptId?: StringFieldUpdateOperationsInput | string
+    rollId?: StringFieldUpdateOperationsInput | string
+    measuredLength?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    measuredWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricQCInspectionCreateInput = {
+    id?: string
+    inspectionNumber: string
+    inspectionType?: $Enums.InspectionType
+    result: $Enums.InspectionResult
+    defects?: NullableJsonNullValueInput | InputJsonValue
+    remarks?: string | null
+    inspectedAt: Date | string
+    createdAt?: Date | string
+    roll: FabricStoreRollCreateNestedOneWithoutQcInspectionsInput
+    inspectedBy: UserCreateNestedOneWithoutFabricQCInspectionsInput
+  }
+
+  export type FabricQCInspectionUncheckedCreateInput = {
+    id?: string
+    inspectionNumber: string
+    rollId: string
+    inspectedById: string
+    inspectionType?: $Enums.InspectionType
+    result: $Enums.InspectionResult
+    defects?: NullableJsonNullValueInput | InputJsonValue
+    remarks?: string | null
+    inspectedAt: Date | string
+    createdAt?: Date | string
+  }
+
+  export type FabricQCInspectionUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    inspectionNumber?: StringFieldUpdateOperationsInput | string
+    inspectionType?: EnumInspectionTypeFieldUpdateOperationsInput | $Enums.InspectionType
+    result?: EnumInspectionResultFieldUpdateOperationsInput | $Enums.InspectionResult
+    defects?: NullableJsonNullValueInput | InputJsonValue
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inspectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    roll?: FabricStoreRollUpdateOneRequiredWithoutQcInspectionsNestedInput
+    inspectedBy?: UserUpdateOneRequiredWithoutFabricQCInspectionsNestedInput
+  }
+
+  export type FabricQCInspectionUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    inspectionNumber?: StringFieldUpdateOperationsInput | string
+    rollId?: StringFieldUpdateOperationsInput | string
+    inspectedById?: StringFieldUpdateOperationsInput | string
+    inspectionType?: EnumInspectionTypeFieldUpdateOperationsInput | $Enums.InspectionType
+    result?: EnumInspectionResultFieldUpdateOperationsInput | $Enums.InspectionResult
+    defects?: NullableJsonNullValueInput | InputJsonValue
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inspectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricQCInspectionCreateManyInput = {
+    id?: string
+    inspectionNumber: string
+    rollId: string
+    inspectedById: string
+    inspectionType?: $Enums.InspectionType
+    result: $Enums.InspectionResult
+    defects?: NullableJsonNullValueInput | InputJsonValue
+    remarks?: string | null
+    inspectedAt: Date | string
+    createdAt?: Date | string
+  }
+
+  export type FabricQCInspectionUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    inspectionNumber?: StringFieldUpdateOperationsInput | string
+    inspectionType?: EnumInspectionTypeFieldUpdateOperationsInput | $Enums.InspectionType
+    result?: EnumInspectionResultFieldUpdateOperationsInput | $Enums.InspectionResult
+    defects?: NullableJsonNullValueInput | InputJsonValue
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inspectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricQCInspectionUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    inspectionNumber?: StringFieldUpdateOperationsInput | string
+    rollId?: StringFieldUpdateOperationsInput | string
+    inspectedById?: StringFieldUpdateOperationsInput | string
+    inspectionType?: EnumInspectionTypeFieldUpdateOperationsInput | $Enums.InspectionType
+    result?: EnumInspectionResultFieldUpdateOperationsInput | $Enums.InspectionResult
+    defects?: NullableJsonNullValueInput | InputJsonValue
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inspectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStockLedgerCreateInput = {
+    id?: string
+    entryNumber: string
+    transactionType: $Enums.StockTransactionType
+    quantity: Decimal | DecimalJsLike | number | string
+    referenceType: string
+    referenceId: string
+    transactedAt: Date | string
+    remarks?: string | null
+    createdAt?: Date | string
+    roll: FabricStoreRollCreateNestedOneWithoutLedgerEntriesInput
+    batch: FabricBatchCreateNestedOneWithoutLedgerEntriesInput
+    fromLocation?: InventoryLocationCreateNestedOneWithoutFromLedgerInput
+    toLocation?: InventoryLocationCreateNestedOneWithoutToLedgerInput
+    transactedBy: UserCreateNestedOneWithoutFabricLedgerEntriesInput
+  }
+
+  export type FabricStockLedgerUncheckedCreateInput = {
+    id?: string
+    entryNumber: string
+    rollId: string
+    batchId: string
+    transactionType: $Enums.StockTransactionType
+    quantity: Decimal | DecimalJsLike | number | string
+    referenceType: string
+    referenceId: string
+    fromLocationId?: string | null
+    toLocationId?: string | null
+    transactedById: string
+    transactedAt: Date | string
+    remarks?: string | null
+    createdAt?: Date | string
+  }
+
+  export type FabricStockLedgerUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    entryNumber?: StringFieldUpdateOperationsInput | string
+    transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    referenceType?: StringFieldUpdateOperationsInput | string
+    referenceId?: StringFieldUpdateOperationsInput | string
+    transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    roll?: FabricStoreRollUpdateOneRequiredWithoutLedgerEntriesNestedInput
+    batch?: FabricBatchUpdateOneRequiredWithoutLedgerEntriesNestedInput
+    fromLocation?: InventoryLocationUpdateOneWithoutFromLedgerNestedInput
+    toLocation?: InventoryLocationUpdateOneWithoutToLedgerNestedInput
+    transactedBy?: UserUpdateOneRequiredWithoutFabricLedgerEntriesNestedInput
+  }
+
+  export type FabricStockLedgerUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    entryNumber?: StringFieldUpdateOperationsInput | string
+    rollId?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    referenceType?: StringFieldUpdateOperationsInput | string
+    referenceId?: StringFieldUpdateOperationsInput | string
+    fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
+    toLocationId?: NullableStringFieldUpdateOperationsInput | string | null
+    transactedById?: StringFieldUpdateOperationsInput | string
+    transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStockLedgerCreateManyInput = {
+    id?: string
+    entryNumber: string
+    rollId: string
+    batchId: string
+    transactionType: $Enums.StockTransactionType
+    quantity: Decimal | DecimalJsLike | number | string
+    referenceType: string
+    referenceId: string
+    fromLocationId?: string | null
+    toLocationId?: string | null
+    transactedById: string
+    transactedAt: Date | string
+    remarks?: string | null
+    createdAt?: Date | string
+  }
+
+  export type FabricStockLedgerUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    entryNumber?: StringFieldUpdateOperationsInput | string
+    transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    referenceType?: StringFieldUpdateOperationsInput | string
+    referenceId?: StringFieldUpdateOperationsInput | string
+    transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStockLedgerUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    entryNumber?: StringFieldUpdateOperationsInput | string
+    rollId?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    referenceType?: StringFieldUpdateOperationsInput | string
+    referenceId?: StringFieldUpdateOperationsInput | string
+    fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
+    toLocationId?: NullableStringFieldUpdateOperationsInput | string | null
+    transactedById?: StringFieldUpdateOperationsInput | string
+    transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -79390,6 +91055,36 @@ export namespace Prisma {
     none?: RecutRequestWhereInput
   }
 
+  export type FabricBatchListRelationFilter = {
+    every?: FabricBatchWhereInput
+    some?: FabricBatchWhereInput
+    none?: FabricBatchWhereInput
+  }
+
+  export type MaterialReceiptListRelationFilter = {
+    every?: MaterialReceiptWhereInput
+    some?: MaterialReceiptWhereInput
+    none?: MaterialReceiptWhereInput
+  }
+
+  export type FabricStoreRollListRelationFilter = {
+    every?: FabricStoreRollWhereInput
+    some?: FabricStoreRollWhereInput
+    none?: FabricStoreRollWhereInput
+  }
+
+  export type FabricQCInspectionListRelationFilter = {
+    every?: FabricQCInspectionWhereInput
+    some?: FabricQCInspectionWhereInput
+    none?: FabricQCInspectionWhereInput
+  }
+
+  export type FabricStockLedgerListRelationFilter = {
+    every?: FabricStockLedgerWhereInput
+    some?: FabricStockLedgerWhereInput
+    none?: FabricStockLedgerWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -79444,6 +91139,26 @@ export namespace Prisma {
   }
 
   export type RecutRequestOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type FabricBatchOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type MaterialReceiptOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type FabricStoreRollOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type FabricQCInspectionOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type FabricStockLedgerOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -82628,6 +94343,635 @@ export namespace Prisma {
     issuesFound?: SortOrder
   }
 
+  export type EnumInventoryLocationTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.InventoryLocationType | EnumInventoryLocationTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.InventoryLocationType[] | ListEnumInventoryLocationTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InventoryLocationType[] | ListEnumInventoryLocationTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumInventoryLocationTypeFilter<$PrismaModel> | $Enums.InventoryLocationType
+  }
+
+  export type InventoryLocationCountOrderByAggregateInput = {
+    id?: SortOrder
+    locationCode?: SortOrder
+    locationName?: SortOrder
+    locationType?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type InventoryLocationMaxOrderByAggregateInput = {
+    id?: SortOrder
+    locationCode?: SortOrder
+    locationName?: SortOrder
+    locationType?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type InventoryLocationMinOrderByAggregateInput = {
+    id?: SortOrder
+    locationCode?: SortOrder
+    locationName?: SortOrder
+    locationType?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumInventoryLocationTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.InventoryLocationType | EnumInventoryLocationTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.InventoryLocationType[] | ListEnumInventoryLocationTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InventoryLocationType[] | ListEnumInventoryLocationTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumInventoryLocationTypeWithAggregatesFilter<$PrismaModel> | $Enums.InventoryLocationType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumInventoryLocationTypeFilter<$PrismaModel>
+    _max?: NestedEnumInventoryLocationTypeFilter<$PrismaModel>
+  }
+
+  export type DecimalFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
+  }
+
+  export type EnumFabricBatchStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.FabricBatchStatus | EnumFabricBatchStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.FabricBatchStatus[] | ListEnumFabricBatchStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FabricBatchStatus[] | ListEnumFabricBatchStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumFabricBatchStatusFilter<$PrismaModel> | $Enums.FabricBatchStatus
+  }
+
+  export type FabricBatchCountOrderByAggregateInput = {
+    id?: SortOrder
+    batchNumber?: SortOrder
+    programId?: SortOrder
+    supplierId?: SortOrder
+    fabricType?: SortOrder
+    fabricDescription?: SortOrder
+    colorCode?: SortOrder
+    colorName?: SortOrder
+    totalRolls?: SortOrder
+    totalMeters?: SortOrder
+    status?: SortOrder
+    receivedAt?: SortOrder
+    createdById?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FabricBatchAvgOrderByAggregateInput = {
+    totalRolls?: SortOrder
+    totalMeters?: SortOrder
+  }
+
+  export type FabricBatchMaxOrderByAggregateInput = {
+    id?: SortOrder
+    batchNumber?: SortOrder
+    programId?: SortOrder
+    supplierId?: SortOrder
+    fabricType?: SortOrder
+    fabricDescription?: SortOrder
+    colorCode?: SortOrder
+    colorName?: SortOrder
+    totalRolls?: SortOrder
+    totalMeters?: SortOrder
+    status?: SortOrder
+    receivedAt?: SortOrder
+    createdById?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FabricBatchMinOrderByAggregateInput = {
+    id?: SortOrder
+    batchNumber?: SortOrder
+    programId?: SortOrder
+    supplierId?: SortOrder
+    fabricType?: SortOrder
+    fabricDescription?: SortOrder
+    colorCode?: SortOrder
+    colorName?: SortOrder
+    totalRolls?: SortOrder
+    totalMeters?: SortOrder
+    status?: SortOrder
+    receivedAt?: SortOrder
+    createdById?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FabricBatchSumOrderByAggregateInput = {
+    totalRolls?: SortOrder
+    totalMeters?: SortOrder
+  }
+
+  export type DecimalWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedDecimalFilter<$PrismaModel>
+    _sum?: NestedDecimalFilter<$PrismaModel>
+    _min?: NestedDecimalFilter<$PrismaModel>
+    _max?: NestedDecimalFilter<$PrismaModel>
+  }
+
+  export type EnumFabricBatchStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.FabricBatchStatus | EnumFabricBatchStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.FabricBatchStatus[] | ListEnumFabricBatchStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FabricBatchStatus[] | ListEnumFabricBatchStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumFabricBatchStatusWithAggregatesFilter<$PrismaModel> | $Enums.FabricBatchStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumFabricBatchStatusFilter<$PrismaModel>
+    _max?: NestedEnumFabricBatchStatusFilter<$PrismaModel>
+  }
+
+  export type DecimalNullableFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+  }
+
+  export type EnumFabricRollStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.FabricRollStatus | EnumFabricRollStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.FabricRollStatus[] | ListEnumFabricRollStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FabricRollStatus[] | ListEnumFabricRollStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumFabricRollStatusFilter<$PrismaModel> | $Enums.FabricRollStatus
+  }
+
+  export type EnumFabricQCStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.FabricQCStatus | EnumFabricQCStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.FabricQCStatus[] | ListEnumFabricQCStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FabricQCStatus[] | ListEnumFabricQCStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumFabricQCStatusFilter<$PrismaModel> | $Enums.FabricQCStatus
+  }
+
+  export type FabricBatchScalarRelationFilter = {
+    is?: FabricBatchWhereInput
+    isNot?: FabricBatchWhereInput
+  }
+
+  export type InventoryLocationNullableScalarRelationFilter = {
+    is?: InventoryLocationWhereInput | null
+    isNot?: InventoryLocationWhereInput | null
+  }
+
+  export type MaterialReceiptItemListRelationFilter = {
+    every?: MaterialReceiptItemWhereInput
+    some?: MaterialReceiptItemWhereInput
+    none?: MaterialReceiptItemWhereInput
+  }
+
+  export type MaterialReceiptItemOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type FabricStoreRollCountOrderByAggregateInput = {
+    id?: SortOrder
+    rollNumber?: SortOrder
+    batchId?: SortOrder
+    locationId?: SortOrder
+    length?: SortOrder
+    width?: SortOrder
+    weight?: SortOrder
+    status?: SortOrder
+    qcStatus?: SortOrder
+    qcInspectedById?: SortOrder
+    qcInspectedAt?: SortOrder
+    qcRemarks?: SortOrder
+    programIssuedToId?: SortOrder
+    issuedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FabricStoreRollAvgOrderByAggregateInput = {
+    length?: SortOrder
+    width?: SortOrder
+    weight?: SortOrder
+  }
+
+  export type FabricStoreRollMaxOrderByAggregateInput = {
+    id?: SortOrder
+    rollNumber?: SortOrder
+    batchId?: SortOrder
+    locationId?: SortOrder
+    length?: SortOrder
+    width?: SortOrder
+    weight?: SortOrder
+    status?: SortOrder
+    qcStatus?: SortOrder
+    qcInspectedById?: SortOrder
+    qcInspectedAt?: SortOrder
+    qcRemarks?: SortOrder
+    programIssuedToId?: SortOrder
+    issuedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FabricStoreRollMinOrderByAggregateInput = {
+    id?: SortOrder
+    rollNumber?: SortOrder
+    batchId?: SortOrder
+    locationId?: SortOrder
+    length?: SortOrder
+    width?: SortOrder
+    weight?: SortOrder
+    status?: SortOrder
+    qcStatus?: SortOrder
+    qcInspectedById?: SortOrder
+    qcInspectedAt?: SortOrder
+    qcRemarks?: SortOrder
+    programIssuedToId?: SortOrder
+    issuedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FabricStoreRollSumOrderByAggregateInput = {
+    length?: SortOrder
+    width?: SortOrder
+    weight?: SortOrder
+  }
+
+  export type DecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedDecimalNullableFilter<$PrismaModel>
+    _sum?: NestedDecimalNullableFilter<$PrismaModel>
+    _min?: NestedDecimalNullableFilter<$PrismaModel>
+    _max?: NestedDecimalNullableFilter<$PrismaModel>
+  }
+
+  export type EnumFabricRollStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.FabricRollStatus | EnumFabricRollStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.FabricRollStatus[] | ListEnumFabricRollStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FabricRollStatus[] | ListEnumFabricRollStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumFabricRollStatusWithAggregatesFilter<$PrismaModel> | $Enums.FabricRollStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumFabricRollStatusFilter<$PrismaModel>
+    _max?: NestedEnumFabricRollStatusFilter<$PrismaModel>
+  }
+
+  export type EnumFabricQCStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.FabricQCStatus | EnumFabricQCStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.FabricQCStatus[] | ListEnumFabricQCStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FabricQCStatus[] | ListEnumFabricQCStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumFabricQCStatusWithAggregatesFilter<$PrismaModel> | $Enums.FabricQCStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumFabricQCStatusFilter<$PrismaModel>
+    _max?: NestedEnumFabricQCStatusFilter<$PrismaModel>
+  }
+
+  export type EnumGRNStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.GRNStatus | EnumGRNStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.GRNStatus[] | ListEnumGRNStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.GRNStatus[] | ListEnumGRNStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumGRNStatusFilter<$PrismaModel> | $Enums.GRNStatus
+  }
+
+  export type MaterialReceiptCountOrderByAggregateInput = {
+    id?: SortOrder
+    grnNumber?: SortOrder
+    batchId?: SortOrder
+    challanId?: SortOrder
+    receivedById?: SortOrder
+    receivedAt?: SortOrder
+    vehicleNumber?: SortOrder
+    supplierName?: SortOrder
+    totalRollsReceived?: SortOrder
+    totalMetersReceived?: SortOrder
+    status?: SortOrder
+    remarks?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MaterialReceiptAvgOrderByAggregateInput = {
+    totalRollsReceived?: SortOrder
+    totalMetersReceived?: SortOrder
+  }
+
+  export type MaterialReceiptMaxOrderByAggregateInput = {
+    id?: SortOrder
+    grnNumber?: SortOrder
+    batchId?: SortOrder
+    challanId?: SortOrder
+    receivedById?: SortOrder
+    receivedAt?: SortOrder
+    vehicleNumber?: SortOrder
+    supplierName?: SortOrder
+    totalRollsReceived?: SortOrder
+    totalMetersReceived?: SortOrder
+    status?: SortOrder
+    remarks?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MaterialReceiptMinOrderByAggregateInput = {
+    id?: SortOrder
+    grnNumber?: SortOrder
+    batchId?: SortOrder
+    challanId?: SortOrder
+    receivedById?: SortOrder
+    receivedAt?: SortOrder
+    vehicleNumber?: SortOrder
+    supplierName?: SortOrder
+    totalRollsReceived?: SortOrder
+    totalMetersReceived?: SortOrder
+    status?: SortOrder
+    remarks?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MaterialReceiptSumOrderByAggregateInput = {
+    totalRollsReceived?: SortOrder
+    totalMetersReceived?: SortOrder
+  }
+
+  export type EnumGRNStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.GRNStatus | EnumGRNStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.GRNStatus[] | ListEnumGRNStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.GRNStatus[] | ListEnumGRNStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumGRNStatusWithAggregatesFilter<$PrismaModel> | $Enums.GRNStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumGRNStatusFilter<$PrismaModel>
+    _max?: NestedEnumGRNStatusFilter<$PrismaModel>
+  }
+
+  export type MaterialReceiptScalarRelationFilter = {
+    is?: MaterialReceiptWhereInput
+    isNot?: MaterialReceiptWhereInput
+  }
+
+  export type FabricStoreRollScalarRelationFilter = {
+    is?: FabricStoreRollWhereInput
+    isNot?: FabricStoreRollWhereInput
+  }
+
+  export type MaterialReceiptItemCountOrderByAggregateInput = {
+    id?: SortOrder
+    receiptId?: SortOrder
+    rollId?: SortOrder
+    measuredLength?: SortOrder
+    measuredWeight?: SortOrder
+    remarks?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type MaterialReceiptItemAvgOrderByAggregateInput = {
+    measuredLength?: SortOrder
+    measuredWeight?: SortOrder
+  }
+
+  export type MaterialReceiptItemMaxOrderByAggregateInput = {
+    id?: SortOrder
+    receiptId?: SortOrder
+    rollId?: SortOrder
+    measuredLength?: SortOrder
+    measuredWeight?: SortOrder
+    remarks?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type MaterialReceiptItemMinOrderByAggregateInput = {
+    id?: SortOrder
+    receiptId?: SortOrder
+    rollId?: SortOrder
+    measuredLength?: SortOrder
+    measuredWeight?: SortOrder
+    remarks?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type MaterialReceiptItemSumOrderByAggregateInput = {
+    measuredLength?: SortOrder
+    measuredWeight?: SortOrder
+  }
+
+  export type EnumInspectionTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.InspectionType | EnumInspectionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.InspectionType[] | ListEnumInspectionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InspectionType[] | ListEnumInspectionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumInspectionTypeFilter<$PrismaModel> | $Enums.InspectionType
+  }
+
+  export type EnumInspectionResultFilter<$PrismaModel = never> = {
+    equals?: $Enums.InspectionResult | EnumInspectionResultFieldRefInput<$PrismaModel>
+    in?: $Enums.InspectionResult[] | ListEnumInspectionResultFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InspectionResult[] | ListEnumInspectionResultFieldRefInput<$PrismaModel>
+    not?: NestedEnumInspectionResultFilter<$PrismaModel> | $Enums.InspectionResult
+  }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type FabricQCInspectionCountOrderByAggregateInput = {
+    id?: SortOrder
+    inspectionNumber?: SortOrder
+    rollId?: SortOrder
+    inspectedById?: SortOrder
+    inspectionType?: SortOrder
+    result?: SortOrder
+    defects?: SortOrder
+    remarks?: SortOrder
+    inspectedAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type FabricQCInspectionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    inspectionNumber?: SortOrder
+    rollId?: SortOrder
+    inspectedById?: SortOrder
+    inspectionType?: SortOrder
+    result?: SortOrder
+    remarks?: SortOrder
+    inspectedAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type FabricQCInspectionMinOrderByAggregateInput = {
+    id?: SortOrder
+    inspectionNumber?: SortOrder
+    rollId?: SortOrder
+    inspectedById?: SortOrder
+    inspectionType?: SortOrder
+    result?: SortOrder
+    remarks?: SortOrder
+    inspectedAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type EnumInspectionTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.InspectionType | EnumInspectionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.InspectionType[] | ListEnumInspectionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InspectionType[] | ListEnumInspectionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumInspectionTypeWithAggregatesFilter<$PrismaModel> | $Enums.InspectionType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumInspectionTypeFilter<$PrismaModel>
+    _max?: NestedEnumInspectionTypeFilter<$PrismaModel>
+  }
+
+  export type EnumInspectionResultWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.InspectionResult | EnumInspectionResultFieldRefInput<$PrismaModel>
+    in?: $Enums.InspectionResult[] | ListEnumInspectionResultFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InspectionResult[] | ListEnumInspectionResultFieldRefInput<$PrismaModel>
+    not?: NestedEnumInspectionResultWithAggregatesFilter<$PrismaModel> | $Enums.InspectionResult
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumInspectionResultFilter<$PrismaModel>
+    _max?: NestedEnumInspectionResultFilter<$PrismaModel>
+  }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
+
+  export type EnumStockTransactionTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.StockTransactionType | EnumStockTransactionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.StockTransactionType[] | ListEnumStockTransactionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.StockTransactionType[] | ListEnumStockTransactionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumStockTransactionTypeFilter<$PrismaModel> | $Enums.StockTransactionType
+  }
+
+  export type FabricStockLedgerCountOrderByAggregateInput = {
+    id?: SortOrder
+    entryNumber?: SortOrder
+    rollId?: SortOrder
+    batchId?: SortOrder
+    transactionType?: SortOrder
+    quantity?: SortOrder
+    referenceType?: SortOrder
+    referenceId?: SortOrder
+    fromLocationId?: SortOrder
+    toLocationId?: SortOrder
+    transactedById?: SortOrder
+    transactedAt?: SortOrder
+    remarks?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type FabricStockLedgerAvgOrderByAggregateInput = {
+    quantity?: SortOrder
+  }
+
+  export type FabricStockLedgerMaxOrderByAggregateInput = {
+    id?: SortOrder
+    entryNumber?: SortOrder
+    rollId?: SortOrder
+    batchId?: SortOrder
+    transactionType?: SortOrder
+    quantity?: SortOrder
+    referenceType?: SortOrder
+    referenceId?: SortOrder
+    fromLocationId?: SortOrder
+    toLocationId?: SortOrder
+    transactedById?: SortOrder
+    transactedAt?: SortOrder
+    remarks?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type FabricStockLedgerMinOrderByAggregateInput = {
+    id?: SortOrder
+    entryNumber?: SortOrder
+    rollId?: SortOrder
+    batchId?: SortOrder
+    transactionType?: SortOrder
+    quantity?: SortOrder
+    referenceType?: SortOrder
+    referenceId?: SortOrder
+    fromLocationId?: SortOrder
+    toLocationId?: SortOrder
+    transactedById?: SortOrder
+    transactedAt?: SortOrder
+    remarks?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type FabricStockLedgerSumOrderByAggregateInput = {
+    quantity?: SortOrder
+  }
+
+  export type EnumStockTransactionTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.StockTransactionType | EnumStockTransactionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.StockTransactionType[] | ListEnumStockTransactionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.StockTransactionType[] | ListEnumStockTransactionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumStockTransactionTypeWithAggregatesFilter<$PrismaModel> | $Enums.StockTransactionType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumStockTransactionTypeFilter<$PrismaModel>
+    _max?: NestedEnumStockTransactionTypeFilter<$PrismaModel>
+  }
+
   export type UserRoleCreateNestedManyWithoutUserInput = {
     create?: XOR<UserRoleCreateWithoutUserInput, UserRoleUncheckedCreateWithoutUserInput> | UserRoleCreateWithoutUserInput[] | UserRoleUncheckedCreateWithoutUserInput[]
     connectOrCreate?: UserRoleCreateOrConnectWithoutUserInput | UserRoleCreateOrConnectWithoutUserInput[]
@@ -82761,6 +95105,41 @@ export namespace Prisma {
     connect?: RecutRequestWhereUniqueInput | RecutRequestWhereUniqueInput[]
   }
 
+  export type FabricBatchCreateNestedManyWithoutCreatedByInput = {
+    create?: XOR<FabricBatchCreateWithoutCreatedByInput, FabricBatchUncheckedCreateWithoutCreatedByInput> | FabricBatchCreateWithoutCreatedByInput[] | FabricBatchUncheckedCreateWithoutCreatedByInput[]
+    connectOrCreate?: FabricBatchCreateOrConnectWithoutCreatedByInput | FabricBatchCreateOrConnectWithoutCreatedByInput[]
+    createMany?: FabricBatchCreateManyCreatedByInputEnvelope
+    connect?: FabricBatchWhereUniqueInput | FabricBatchWhereUniqueInput[]
+  }
+
+  export type MaterialReceiptCreateNestedManyWithoutReceivedByInput = {
+    create?: XOR<MaterialReceiptCreateWithoutReceivedByInput, MaterialReceiptUncheckedCreateWithoutReceivedByInput> | MaterialReceiptCreateWithoutReceivedByInput[] | MaterialReceiptUncheckedCreateWithoutReceivedByInput[]
+    connectOrCreate?: MaterialReceiptCreateOrConnectWithoutReceivedByInput | MaterialReceiptCreateOrConnectWithoutReceivedByInput[]
+    createMany?: MaterialReceiptCreateManyReceivedByInputEnvelope
+    connect?: MaterialReceiptWhereUniqueInput | MaterialReceiptWhereUniqueInput[]
+  }
+
+  export type FabricStoreRollCreateNestedManyWithoutQcInspectedByInput = {
+    create?: XOR<FabricStoreRollCreateWithoutQcInspectedByInput, FabricStoreRollUncheckedCreateWithoutQcInspectedByInput> | FabricStoreRollCreateWithoutQcInspectedByInput[] | FabricStoreRollUncheckedCreateWithoutQcInspectedByInput[]
+    connectOrCreate?: FabricStoreRollCreateOrConnectWithoutQcInspectedByInput | FabricStoreRollCreateOrConnectWithoutQcInspectedByInput[]
+    createMany?: FabricStoreRollCreateManyQcInspectedByInputEnvelope
+    connect?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+  }
+
+  export type FabricQCInspectionCreateNestedManyWithoutInspectedByInput = {
+    create?: XOR<FabricQCInspectionCreateWithoutInspectedByInput, FabricQCInspectionUncheckedCreateWithoutInspectedByInput> | FabricQCInspectionCreateWithoutInspectedByInput[] | FabricQCInspectionUncheckedCreateWithoutInspectedByInput[]
+    connectOrCreate?: FabricQCInspectionCreateOrConnectWithoutInspectedByInput | FabricQCInspectionCreateOrConnectWithoutInspectedByInput[]
+    createMany?: FabricQCInspectionCreateManyInspectedByInputEnvelope
+    connect?: FabricQCInspectionWhereUniqueInput | FabricQCInspectionWhereUniqueInput[]
+  }
+
+  export type FabricStockLedgerCreateNestedManyWithoutTransactedByInput = {
+    create?: XOR<FabricStockLedgerCreateWithoutTransactedByInput, FabricStockLedgerUncheckedCreateWithoutTransactedByInput> | FabricStockLedgerCreateWithoutTransactedByInput[] | FabricStockLedgerUncheckedCreateWithoutTransactedByInput[]
+    connectOrCreate?: FabricStockLedgerCreateOrConnectWithoutTransactedByInput | FabricStockLedgerCreateOrConnectWithoutTransactedByInput[]
+    createMany?: FabricStockLedgerCreateManyTransactedByInputEnvelope
+    connect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+  }
+
   export type UserRoleUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<UserRoleCreateWithoutUserInput, UserRoleUncheckedCreateWithoutUserInput> | UserRoleCreateWithoutUserInput[] | UserRoleUncheckedCreateWithoutUserInput[]
     connectOrCreate?: UserRoleCreateOrConnectWithoutUserInput | UserRoleCreateOrConnectWithoutUserInput[]
@@ -82892,6 +95271,41 @@ export namespace Prisma {
     connectOrCreate?: RecutRequestCreateOrConnectWithoutApprovedByInput | RecutRequestCreateOrConnectWithoutApprovedByInput[]
     createMany?: RecutRequestCreateManyApprovedByInputEnvelope
     connect?: RecutRequestWhereUniqueInput | RecutRequestWhereUniqueInput[]
+  }
+
+  export type FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput = {
+    create?: XOR<FabricBatchCreateWithoutCreatedByInput, FabricBatchUncheckedCreateWithoutCreatedByInput> | FabricBatchCreateWithoutCreatedByInput[] | FabricBatchUncheckedCreateWithoutCreatedByInput[]
+    connectOrCreate?: FabricBatchCreateOrConnectWithoutCreatedByInput | FabricBatchCreateOrConnectWithoutCreatedByInput[]
+    createMany?: FabricBatchCreateManyCreatedByInputEnvelope
+    connect?: FabricBatchWhereUniqueInput | FabricBatchWhereUniqueInput[]
+  }
+
+  export type MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput = {
+    create?: XOR<MaterialReceiptCreateWithoutReceivedByInput, MaterialReceiptUncheckedCreateWithoutReceivedByInput> | MaterialReceiptCreateWithoutReceivedByInput[] | MaterialReceiptUncheckedCreateWithoutReceivedByInput[]
+    connectOrCreate?: MaterialReceiptCreateOrConnectWithoutReceivedByInput | MaterialReceiptCreateOrConnectWithoutReceivedByInput[]
+    createMany?: MaterialReceiptCreateManyReceivedByInputEnvelope
+    connect?: MaterialReceiptWhereUniqueInput | MaterialReceiptWhereUniqueInput[]
+  }
+
+  export type FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput = {
+    create?: XOR<FabricStoreRollCreateWithoutQcInspectedByInput, FabricStoreRollUncheckedCreateWithoutQcInspectedByInput> | FabricStoreRollCreateWithoutQcInspectedByInput[] | FabricStoreRollUncheckedCreateWithoutQcInspectedByInput[]
+    connectOrCreate?: FabricStoreRollCreateOrConnectWithoutQcInspectedByInput | FabricStoreRollCreateOrConnectWithoutQcInspectedByInput[]
+    createMany?: FabricStoreRollCreateManyQcInspectedByInputEnvelope
+    connect?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+  }
+
+  export type FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput = {
+    create?: XOR<FabricQCInspectionCreateWithoutInspectedByInput, FabricQCInspectionUncheckedCreateWithoutInspectedByInput> | FabricQCInspectionCreateWithoutInspectedByInput[] | FabricQCInspectionUncheckedCreateWithoutInspectedByInput[]
+    connectOrCreate?: FabricQCInspectionCreateOrConnectWithoutInspectedByInput | FabricQCInspectionCreateOrConnectWithoutInspectedByInput[]
+    createMany?: FabricQCInspectionCreateManyInspectedByInputEnvelope
+    connect?: FabricQCInspectionWhereUniqueInput | FabricQCInspectionWhereUniqueInput[]
+  }
+
+  export type FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput = {
+    create?: XOR<FabricStockLedgerCreateWithoutTransactedByInput, FabricStockLedgerUncheckedCreateWithoutTransactedByInput> | FabricStockLedgerCreateWithoutTransactedByInput[] | FabricStockLedgerUncheckedCreateWithoutTransactedByInput[]
+    connectOrCreate?: FabricStockLedgerCreateOrConnectWithoutTransactedByInput | FabricStockLedgerCreateOrConnectWithoutTransactedByInput[]
+    createMany?: FabricStockLedgerCreateManyTransactedByInputEnvelope
+    connect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -83176,6 +95590,76 @@ export namespace Prisma {
     deleteMany?: RecutRequestScalarWhereInput | RecutRequestScalarWhereInput[]
   }
 
+  export type FabricBatchUpdateManyWithoutCreatedByNestedInput = {
+    create?: XOR<FabricBatchCreateWithoutCreatedByInput, FabricBatchUncheckedCreateWithoutCreatedByInput> | FabricBatchCreateWithoutCreatedByInput[] | FabricBatchUncheckedCreateWithoutCreatedByInput[]
+    connectOrCreate?: FabricBatchCreateOrConnectWithoutCreatedByInput | FabricBatchCreateOrConnectWithoutCreatedByInput[]
+    upsert?: FabricBatchUpsertWithWhereUniqueWithoutCreatedByInput | FabricBatchUpsertWithWhereUniqueWithoutCreatedByInput[]
+    createMany?: FabricBatchCreateManyCreatedByInputEnvelope
+    set?: FabricBatchWhereUniqueInput | FabricBatchWhereUniqueInput[]
+    disconnect?: FabricBatchWhereUniqueInput | FabricBatchWhereUniqueInput[]
+    delete?: FabricBatchWhereUniqueInput | FabricBatchWhereUniqueInput[]
+    connect?: FabricBatchWhereUniqueInput | FabricBatchWhereUniqueInput[]
+    update?: FabricBatchUpdateWithWhereUniqueWithoutCreatedByInput | FabricBatchUpdateWithWhereUniqueWithoutCreatedByInput[]
+    updateMany?: FabricBatchUpdateManyWithWhereWithoutCreatedByInput | FabricBatchUpdateManyWithWhereWithoutCreatedByInput[]
+    deleteMany?: FabricBatchScalarWhereInput | FabricBatchScalarWhereInput[]
+  }
+
+  export type MaterialReceiptUpdateManyWithoutReceivedByNestedInput = {
+    create?: XOR<MaterialReceiptCreateWithoutReceivedByInput, MaterialReceiptUncheckedCreateWithoutReceivedByInput> | MaterialReceiptCreateWithoutReceivedByInput[] | MaterialReceiptUncheckedCreateWithoutReceivedByInput[]
+    connectOrCreate?: MaterialReceiptCreateOrConnectWithoutReceivedByInput | MaterialReceiptCreateOrConnectWithoutReceivedByInput[]
+    upsert?: MaterialReceiptUpsertWithWhereUniqueWithoutReceivedByInput | MaterialReceiptUpsertWithWhereUniqueWithoutReceivedByInput[]
+    createMany?: MaterialReceiptCreateManyReceivedByInputEnvelope
+    set?: MaterialReceiptWhereUniqueInput | MaterialReceiptWhereUniqueInput[]
+    disconnect?: MaterialReceiptWhereUniqueInput | MaterialReceiptWhereUniqueInput[]
+    delete?: MaterialReceiptWhereUniqueInput | MaterialReceiptWhereUniqueInput[]
+    connect?: MaterialReceiptWhereUniqueInput | MaterialReceiptWhereUniqueInput[]
+    update?: MaterialReceiptUpdateWithWhereUniqueWithoutReceivedByInput | MaterialReceiptUpdateWithWhereUniqueWithoutReceivedByInput[]
+    updateMany?: MaterialReceiptUpdateManyWithWhereWithoutReceivedByInput | MaterialReceiptUpdateManyWithWhereWithoutReceivedByInput[]
+    deleteMany?: MaterialReceiptScalarWhereInput | MaterialReceiptScalarWhereInput[]
+  }
+
+  export type FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput = {
+    create?: XOR<FabricStoreRollCreateWithoutQcInspectedByInput, FabricStoreRollUncheckedCreateWithoutQcInspectedByInput> | FabricStoreRollCreateWithoutQcInspectedByInput[] | FabricStoreRollUncheckedCreateWithoutQcInspectedByInput[]
+    connectOrCreate?: FabricStoreRollCreateOrConnectWithoutQcInspectedByInput | FabricStoreRollCreateOrConnectWithoutQcInspectedByInput[]
+    upsert?: FabricStoreRollUpsertWithWhereUniqueWithoutQcInspectedByInput | FabricStoreRollUpsertWithWhereUniqueWithoutQcInspectedByInput[]
+    createMany?: FabricStoreRollCreateManyQcInspectedByInputEnvelope
+    set?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    disconnect?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    delete?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    connect?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    update?: FabricStoreRollUpdateWithWhereUniqueWithoutQcInspectedByInput | FabricStoreRollUpdateWithWhereUniqueWithoutQcInspectedByInput[]
+    updateMany?: FabricStoreRollUpdateManyWithWhereWithoutQcInspectedByInput | FabricStoreRollUpdateManyWithWhereWithoutQcInspectedByInput[]
+    deleteMany?: FabricStoreRollScalarWhereInput | FabricStoreRollScalarWhereInput[]
+  }
+
+  export type FabricQCInspectionUpdateManyWithoutInspectedByNestedInput = {
+    create?: XOR<FabricQCInspectionCreateWithoutInspectedByInput, FabricQCInspectionUncheckedCreateWithoutInspectedByInput> | FabricQCInspectionCreateWithoutInspectedByInput[] | FabricQCInspectionUncheckedCreateWithoutInspectedByInput[]
+    connectOrCreate?: FabricQCInspectionCreateOrConnectWithoutInspectedByInput | FabricQCInspectionCreateOrConnectWithoutInspectedByInput[]
+    upsert?: FabricQCInspectionUpsertWithWhereUniqueWithoutInspectedByInput | FabricQCInspectionUpsertWithWhereUniqueWithoutInspectedByInput[]
+    createMany?: FabricQCInspectionCreateManyInspectedByInputEnvelope
+    set?: FabricQCInspectionWhereUniqueInput | FabricQCInspectionWhereUniqueInput[]
+    disconnect?: FabricQCInspectionWhereUniqueInput | FabricQCInspectionWhereUniqueInput[]
+    delete?: FabricQCInspectionWhereUniqueInput | FabricQCInspectionWhereUniqueInput[]
+    connect?: FabricQCInspectionWhereUniqueInput | FabricQCInspectionWhereUniqueInput[]
+    update?: FabricQCInspectionUpdateWithWhereUniqueWithoutInspectedByInput | FabricQCInspectionUpdateWithWhereUniqueWithoutInspectedByInput[]
+    updateMany?: FabricQCInspectionUpdateManyWithWhereWithoutInspectedByInput | FabricQCInspectionUpdateManyWithWhereWithoutInspectedByInput[]
+    deleteMany?: FabricQCInspectionScalarWhereInput | FabricQCInspectionScalarWhereInput[]
+  }
+
+  export type FabricStockLedgerUpdateManyWithoutTransactedByNestedInput = {
+    create?: XOR<FabricStockLedgerCreateWithoutTransactedByInput, FabricStockLedgerUncheckedCreateWithoutTransactedByInput> | FabricStockLedgerCreateWithoutTransactedByInput[] | FabricStockLedgerUncheckedCreateWithoutTransactedByInput[]
+    connectOrCreate?: FabricStockLedgerCreateOrConnectWithoutTransactedByInput | FabricStockLedgerCreateOrConnectWithoutTransactedByInput[]
+    upsert?: FabricStockLedgerUpsertWithWhereUniqueWithoutTransactedByInput | FabricStockLedgerUpsertWithWhereUniqueWithoutTransactedByInput[]
+    createMany?: FabricStockLedgerCreateManyTransactedByInputEnvelope
+    set?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    disconnect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    delete?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    connect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    update?: FabricStockLedgerUpdateWithWhereUniqueWithoutTransactedByInput | FabricStockLedgerUpdateWithWhereUniqueWithoutTransactedByInput[]
+    updateMany?: FabricStockLedgerUpdateManyWithWhereWithoutTransactedByInput | FabricStockLedgerUpdateManyWithWhereWithoutTransactedByInput[]
+    deleteMany?: FabricStockLedgerScalarWhereInput | FabricStockLedgerScalarWhereInput[]
+  }
+
   export type UserRoleUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<UserRoleCreateWithoutUserInput, UserRoleUncheckedCreateWithoutUserInput> | UserRoleCreateWithoutUserInput[] | UserRoleUncheckedCreateWithoutUserInput[]
     connectOrCreate?: UserRoleCreateOrConnectWithoutUserInput | UserRoleCreateOrConnectWithoutUserInput[]
@@ -83440,6 +95924,76 @@ export namespace Prisma {
     update?: RecutRequestUpdateWithWhereUniqueWithoutApprovedByInput | RecutRequestUpdateWithWhereUniqueWithoutApprovedByInput[]
     updateMany?: RecutRequestUpdateManyWithWhereWithoutApprovedByInput | RecutRequestUpdateManyWithWhereWithoutApprovedByInput[]
     deleteMany?: RecutRequestScalarWhereInput | RecutRequestScalarWhereInput[]
+  }
+
+  export type FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput = {
+    create?: XOR<FabricBatchCreateWithoutCreatedByInput, FabricBatchUncheckedCreateWithoutCreatedByInput> | FabricBatchCreateWithoutCreatedByInput[] | FabricBatchUncheckedCreateWithoutCreatedByInput[]
+    connectOrCreate?: FabricBatchCreateOrConnectWithoutCreatedByInput | FabricBatchCreateOrConnectWithoutCreatedByInput[]
+    upsert?: FabricBatchUpsertWithWhereUniqueWithoutCreatedByInput | FabricBatchUpsertWithWhereUniqueWithoutCreatedByInput[]
+    createMany?: FabricBatchCreateManyCreatedByInputEnvelope
+    set?: FabricBatchWhereUniqueInput | FabricBatchWhereUniqueInput[]
+    disconnect?: FabricBatchWhereUniqueInput | FabricBatchWhereUniqueInput[]
+    delete?: FabricBatchWhereUniqueInput | FabricBatchWhereUniqueInput[]
+    connect?: FabricBatchWhereUniqueInput | FabricBatchWhereUniqueInput[]
+    update?: FabricBatchUpdateWithWhereUniqueWithoutCreatedByInput | FabricBatchUpdateWithWhereUniqueWithoutCreatedByInput[]
+    updateMany?: FabricBatchUpdateManyWithWhereWithoutCreatedByInput | FabricBatchUpdateManyWithWhereWithoutCreatedByInput[]
+    deleteMany?: FabricBatchScalarWhereInput | FabricBatchScalarWhereInput[]
+  }
+
+  export type MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput = {
+    create?: XOR<MaterialReceiptCreateWithoutReceivedByInput, MaterialReceiptUncheckedCreateWithoutReceivedByInput> | MaterialReceiptCreateWithoutReceivedByInput[] | MaterialReceiptUncheckedCreateWithoutReceivedByInput[]
+    connectOrCreate?: MaterialReceiptCreateOrConnectWithoutReceivedByInput | MaterialReceiptCreateOrConnectWithoutReceivedByInput[]
+    upsert?: MaterialReceiptUpsertWithWhereUniqueWithoutReceivedByInput | MaterialReceiptUpsertWithWhereUniqueWithoutReceivedByInput[]
+    createMany?: MaterialReceiptCreateManyReceivedByInputEnvelope
+    set?: MaterialReceiptWhereUniqueInput | MaterialReceiptWhereUniqueInput[]
+    disconnect?: MaterialReceiptWhereUniqueInput | MaterialReceiptWhereUniqueInput[]
+    delete?: MaterialReceiptWhereUniqueInput | MaterialReceiptWhereUniqueInput[]
+    connect?: MaterialReceiptWhereUniqueInput | MaterialReceiptWhereUniqueInput[]
+    update?: MaterialReceiptUpdateWithWhereUniqueWithoutReceivedByInput | MaterialReceiptUpdateWithWhereUniqueWithoutReceivedByInput[]
+    updateMany?: MaterialReceiptUpdateManyWithWhereWithoutReceivedByInput | MaterialReceiptUpdateManyWithWhereWithoutReceivedByInput[]
+    deleteMany?: MaterialReceiptScalarWhereInput | MaterialReceiptScalarWhereInput[]
+  }
+
+  export type FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput = {
+    create?: XOR<FabricStoreRollCreateWithoutQcInspectedByInput, FabricStoreRollUncheckedCreateWithoutQcInspectedByInput> | FabricStoreRollCreateWithoutQcInspectedByInput[] | FabricStoreRollUncheckedCreateWithoutQcInspectedByInput[]
+    connectOrCreate?: FabricStoreRollCreateOrConnectWithoutQcInspectedByInput | FabricStoreRollCreateOrConnectWithoutQcInspectedByInput[]
+    upsert?: FabricStoreRollUpsertWithWhereUniqueWithoutQcInspectedByInput | FabricStoreRollUpsertWithWhereUniqueWithoutQcInspectedByInput[]
+    createMany?: FabricStoreRollCreateManyQcInspectedByInputEnvelope
+    set?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    disconnect?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    delete?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    connect?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    update?: FabricStoreRollUpdateWithWhereUniqueWithoutQcInspectedByInput | FabricStoreRollUpdateWithWhereUniqueWithoutQcInspectedByInput[]
+    updateMany?: FabricStoreRollUpdateManyWithWhereWithoutQcInspectedByInput | FabricStoreRollUpdateManyWithWhereWithoutQcInspectedByInput[]
+    deleteMany?: FabricStoreRollScalarWhereInput | FabricStoreRollScalarWhereInput[]
+  }
+
+  export type FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput = {
+    create?: XOR<FabricQCInspectionCreateWithoutInspectedByInput, FabricQCInspectionUncheckedCreateWithoutInspectedByInput> | FabricQCInspectionCreateWithoutInspectedByInput[] | FabricQCInspectionUncheckedCreateWithoutInspectedByInput[]
+    connectOrCreate?: FabricQCInspectionCreateOrConnectWithoutInspectedByInput | FabricQCInspectionCreateOrConnectWithoutInspectedByInput[]
+    upsert?: FabricQCInspectionUpsertWithWhereUniqueWithoutInspectedByInput | FabricQCInspectionUpsertWithWhereUniqueWithoutInspectedByInput[]
+    createMany?: FabricQCInspectionCreateManyInspectedByInputEnvelope
+    set?: FabricQCInspectionWhereUniqueInput | FabricQCInspectionWhereUniqueInput[]
+    disconnect?: FabricQCInspectionWhereUniqueInput | FabricQCInspectionWhereUniqueInput[]
+    delete?: FabricQCInspectionWhereUniqueInput | FabricQCInspectionWhereUniqueInput[]
+    connect?: FabricQCInspectionWhereUniqueInput | FabricQCInspectionWhereUniqueInput[]
+    update?: FabricQCInspectionUpdateWithWhereUniqueWithoutInspectedByInput | FabricQCInspectionUpdateWithWhereUniqueWithoutInspectedByInput[]
+    updateMany?: FabricQCInspectionUpdateManyWithWhereWithoutInspectedByInput | FabricQCInspectionUpdateManyWithWhereWithoutInspectedByInput[]
+    deleteMany?: FabricQCInspectionScalarWhereInput | FabricQCInspectionScalarWhereInput[]
+  }
+
+  export type FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput = {
+    create?: XOR<FabricStockLedgerCreateWithoutTransactedByInput, FabricStockLedgerUncheckedCreateWithoutTransactedByInput> | FabricStockLedgerCreateWithoutTransactedByInput[] | FabricStockLedgerUncheckedCreateWithoutTransactedByInput[]
+    connectOrCreate?: FabricStockLedgerCreateOrConnectWithoutTransactedByInput | FabricStockLedgerCreateOrConnectWithoutTransactedByInput[]
+    upsert?: FabricStockLedgerUpsertWithWhereUniqueWithoutTransactedByInput | FabricStockLedgerUpsertWithWhereUniqueWithoutTransactedByInput[]
+    createMany?: FabricStockLedgerCreateManyTransactedByInputEnvelope
+    set?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    disconnect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    delete?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    connect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    update?: FabricStockLedgerUpdateWithWhereUniqueWithoutTransactedByInput | FabricStockLedgerUpdateWithWhereUniqueWithoutTransactedByInput[]
+    updateMany?: FabricStockLedgerUpdateManyWithWhereWithoutTransactedByInput | FabricStockLedgerUpdateManyWithWhereWithoutTransactedByInput[]
+    deleteMany?: FabricStockLedgerScalarWhereInput | FabricStockLedgerScalarWhereInput[]
   }
 
   export type UserRoleCreateNestedManyWithoutRoleInput = {
@@ -84765,6 +97319,20 @@ export namespace Prisma {
     connect?: RecutRequestWhereUniqueInput | RecutRequestWhereUniqueInput[]
   }
 
+  export type FabricBatchCreateNestedManyWithoutProgramInput = {
+    create?: XOR<FabricBatchCreateWithoutProgramInput, FabricBatchUncheckedCreateWithoutProgramInput> | FabricBatchCreateWithoutProgramInput[] | FabricBatchUncheckedCreateWithoutProgramInput[]
+    connectOrCreate?: FabricBatchCreateOrConnectWithoutProgramInput | FabricBatchCreateOrConnectWithoutProgramInput[]
+    createMany?: FabricBatchCreateManyProgramInputEnvelope
+    connect?: FabricBatchWhereUniqueInput | FabricBatchWhereUniqueInput[]
+  }
+
+  export type FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput = {
+    create?: XOR<FabricStoreRollCreateWithoutProgramIssuedToInput, FabricStoreRollUncheckedCreateWithoutProgramIssuedToInput> | FabricStoreRollCreateWithoutProgramIssuedToInput[] | FabricStoreRollUncheckedCreateWithoutProgramIssuedToInput[]
+    connectOrCreate?: FabricStoreRollCreateOrConnectWithoutProgramIssuedToInput | FabricStoreRollCreateOrConnectWithoutProgramIssuedToInput[]
+    createMany?: FabricStoreRollCreateManyProgramIssuedToInputEnvelope
+    connect?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+  }
+
   export type ProgramFabricUncheckedCreateNestedManyWithoutProgramInput = {
     create?: XOR<ProgramFabricCreateWithoutProgramInput, ProgramFabricUncheckedCreateWithoutProgramInput> | ProgramFabricCreateWithoutProgramInput[] | ProgramFabricUncheckedCreateWithoutProgramInput[]
     connectOrCreate?: ProgramFabricCreateOrConnectWithoutProgramInput | ProgramFabricCreateOrConnectWithoutProgramInput[]
@@ -84868,6 +97436,20 @@ export namespace Prisma {
     connectOrCreate?: RecutRequestCreateOrConnectWithoutProgramInput | RecutRequestCreateOrConnectWithoutProgramInput[]
     createMany?: RecutRequestCreateManyProgramInputEnvelope
     connect?: RecutRequestWhereUniqueInput | RecutRequestWhereUniqueInput[]
+  }
+
+  export type FabricBatchUncheckedCreateNestedManyWithoutProgramInput = {
+    create?: XOR<FabricBatchCreateWithoutProgramInput, FabricBatchUncheckedCreateWithoutProgramInput> | FabricBatchCreateWithoutProgramInput[] | FabricBatchUncheckedCreateWithoutProgramInput[]
+    connectOrCreate?: FabricBatchCreateOrConnectWithoutProgramInput | FabricBatchCreateOrConnectWithoutProgramInput[]
+    createMany?: FabricBatchCreateManyProgramInputEnvelope
+    connect?: FabricBatchWhereUniqueInput | FabricBatchWhereUniqueInput[]
+  }
+
+  export type FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput = {
+    create?: XOR<FabricStoreRollCreateWithoutProgramIssuedToInput, FabricStoreRollUncheckedCreateWithoutProgramIssuedToInput> | FabricStoreRollCreateWithoutProgramIssuedToInput[] | FabricStoreRollUncheckedCreateWithoutProgramIssuedToInput[]
+    connectOrCreate?: FabricStoreRollCreateOrConnectWithoutProgramIssuedToInput | FabricStoreRollCreateOrConnectWithoutProgramIssuedToInput[]
+    createMany?: FabricStoreRollCreateManyProgramIssuedToInputEnvelope
+    connect?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
   }
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
@@ -85130,6 +97712,34 @@ export namespace Prisma {
     deleteMany?: RecutRequestScalarWhereInput | RecutRequestScalarWhereInput[]
   }
 
+  export type FabricBatchUpdateManyWithoutProgramNestedInput = {
+    create?: XOR<FabricBatchCreateWithoutProgramInput, FabricBatchUncheckedCreateWithoutProgramInput> | FabricBatchCreateWithoutProgramInput[] | FabricBatchUncheckedCreateWithoutProgramInput[]
+    connectOrCreate?: FabricBatchCreateOrConnectWithoutProgramInput | FabricBatchCreateOrConnectWithoutProgramInput[]
+    upsert?: FabricBatchUpsertWithWhereUniqueWithoutProgramInput | FabricBatchUpsertWithWhereUniqueWithoutProgramInput[]
+    createMany?: FabricBatchCreateManyProgramInputEnvelope
+    set?: FabricBatchWhereUniqueInput | FabricBatchWhereUniqueInput[]
+    disconnect?: FabricBatchWhereUniqueInput | FabricBatchWhereUniqueInput[]
+    delete?: FabricBatchWhereUniqueInput | FabricBatchWhereUniqueInput[]
+    connect?: FabricBatchWhereUniqueInput | FabricBatchWhereUniqueInput[]
+    update?: FabricBatchUpdateWithWhereUniqueWithoutProgramInput | FabricBatchUpdateWithWhereUniqueWithoutProgramInput[]
+    updateMany?: FabricBatchUpdateManyWithWhereWithoutProgramInput | FabricBatchUpdateManyWithWhereWithoutProgramInput[]
+    deleteMany?: FabricBatchScalarWhereInput | FabricBatchScalarWhereInput[]
+  }
+
+  export type FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput = {
+    create?: XOR<FabricStoreRollCreateWithoutProgramIssuedToInput, FabricStoreRollUncheckedCreateWithoutProgramIssuedToInput> | FabricStoreRollCreateWithoutProgramIssuedToInput[] | FabricStoreRollUncheckedCreateWithoutProgramIssuedToInput[]
+    connectOrCreate?: FabricStoreRollCreateOrConnectWithoutProgramIssuedToInput | FabricStoreRollCreateOrConnectWithoutProgramIssuedToInput[]
+    upsert?: FabricStoreRollUpsertWithWhereUniqueWithoutProgramIssuedToInput | FabricStoreRollUpsertWithWhereUniqueWithoutProgramIssuedToInput[]
+    createMany?: FabricStoreRollCreateManyProgramIssuedToInputEnvelope
+    set?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    disconnect?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    delete?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    connect?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    update?: FabricStoreRollUpdateWithWhereUniqueWithoutProgramIssuedToInput | FabricStoreRollUpdateWithWhereUniqueWithoutProgramIssuedToInput[]
+    updateMany?: FabricStoreRollUpdateManyWithWhereWithoutProgramIssuedToInput | FabricStoreRollUpdateManyWithWhereWithoutProgramIssuedToInput[]
+    deleteMany?: FabricStoreRollScalarWhereInput | FabricStoreRollScalarWhereInput[]
+  }
+
   export type ProgramFabricUncheckedUpdateManyWithoutProgramNestedInput = {
     create?: XOR<ProgramFabricCreateWithoutProgramInput, ProgramFabricUncheckedCreateWithoutProgramInput> | ProgramFabricCreateWithoutProgramInput[] | ProgramFabricUncheckedCreateWithoutProgramInput[]
     connectOrCreate?: ProgramFabricCreateOrConnectWithoutProgramInput | ProgramFabricCreateOrConnectWithoutProgramInput[]
@@ -85338,6 +97948,34 @@ export namespace Prisma {
     update?: RecutRequestUpdateWithWhereUniqueWithoutProgramInput | RecutRequestUpdateWithWhereUniqueWithoutProgramInput[]
     updateMany?: RecutRequestUpdateManyWithWhereWithoutProgramInput | RecutRequestUpdateManyWithWhereWithoutProgramInput[]
     deleteMany?: RecutRequestScalarWhereInput | RecutRequestScalarWhereInput[]
+  }
+
+  export type FabricBatchUncheckedUpdateManyWithoutProgramNestedInput = {
+    create?: XOR<FabricBatchCreateWithoutProgramInput, FabricBatchUncheckedCreateWithoutProgramInput> | FabricBatchCreateWithoutProgramInput[] | FabricBatchUncheckedCreateWithoutProgramInput[]
+    connectOrCreate?: FabricBatchCreateOrConnectWithoutProgramInput | FabricBatchCreateOrConnectWithoutProgramInput[]
+    upsert?: FabricBatchUpsertWithWhereUniqueWithoutProgramInput | FabricBatchUpsertWithWhereUniqueWithoutProgramInput[]
+    createMany?: FabricBatchCreateManyProgramInputEnvelope
+    set?: FabricBatchWhereUniqueInput | FabricBatchWhereUniqueInput[]
+    disconnect?: FabricBatchWhereUniqueInput | FabricBatchWhereUniqueInput[]
+    delete?: FabricBatchWhereUniqueInput | FabricBatchWhereUniqueInput[]
+    connect?: FabricBatchWhereUniqueInput | FabricBatchWhereUniqueInput[]
+    update?: FabricBatchUpdateWithWhereUniqueWithoutProgramInput | FabricBatchUpdateWithWhereUniqueWithoutProgramInput[]
+    updateMany?: FabricBatchUpdateManyWithWhereWithoutProgramInput | FabricBatchUpdateManyWithWhereWithoutProgramInput[]
+    deleteMany?: FabricBatchScalarWhereInput | FabricBatchScalarWhereInput[]
+  }
+
+  export type FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput = {
+    create?: XOR<FabricStoreRollCreateWithoutProgramIssuedToInput, FabricStoreRollUncheckedCreateWithoutProgramIssuedToInput> | FabricStoreRollCreateWithoutProgramIssuedToInput[] | FabricStoreRollUncheckedCreateWithoutProgramIssuedToInput[]
+    connectOrCreate?: FabricStoreRollCreateOrConnectWithoutProgramIssuedToInput | FabricStoreRollCreateOrConnectWithoutProgramIssuedToInput[]
+    upsert?: FabricStoreRollUpsertWithWhereUniqueWithoutProgramIssuedToInput | FabricStoreRollUpsertWithWhereUniqueWithoutProgramIssuedToInput[]
+    createMany?: FabricStoreRollCreateManyProgramIssuedToInputEnvelope
+    set?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    disconnect?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    delete?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    connect?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    update?: FabricStoreRollUpdateWithWhereUniqueWithoutProgramIssuedToInput | FabricStoreRollUpdateWithWhereUniqueWithoutProgramIssuedToInput[]
+    updateMany?: FabricStoreRollUpdateManyWithWhereWithoutProgramIssuedToInput | FabricStoreRollUpdateManyWithWhereWithoutProgramIssuedToInput[]
+    deleteMany?: FabricStoreRollScalarWhereInput | FabricStoreRollScalarWhereInput[]
   }
 
   export type ProgramCreateNestedOneWithoutFabricsInput = {
@@ -87112,6 +99750,724 @@ export namespace Prisma {
     update?: XOR<XOR<QualityInspectionUpdateToOneWithWhereWithoutParametersInput, QualityInspectionUpdateWithoutParametersInput>, QualityInspectionUncheckedUpdateWithoutParametersInput>
   }
 
+  export type FabricStoreRollCreateNestedManyWithoutLocationInput = {
+    create?: XOR<FabricStoreRollCreateWithoutLocationInput, FabricStoreRollUncheckedCreateWithoutLocationInput> | FabricStoreRollCreateWithoutLocationInput[] | FabricStoreRollUncheckedCreateWithoutLocationInput[]
+    connectOrCreate?: FabricStoreRollCreateOrConnectWithoutLocationInput | FabricStoreRollCreateOrConnectWithoutLocationInput[]
+    createMany?: FabricStoreRollCreateManyLocationInputEnvelope
+    connect?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+  }
+
+  export type FabricStockLedgerCreateNestedManyWithoutFromLocationInput = {
+    create?: XOR<FabricStockLedgerCreateWithoutFromLocationInput, FabricStockLedgerUncheckedCreateWithoutFromLocationInput> | FabricStockLedgerCreateWithoutFromLocationInput[] | FabricStockLedgerUncheckedCreateWithoutFromLocationInput[]
+    connectOrCreate?: FabricStockLedgerCreateOrConnectWithoutFromLocationInput | FabricStockLedgerCreateOrConnectWithoutFromLocationInput[]
+    createMany?: FabricStockLedgerCreateManyFromLocationInputEnvelope
+    connect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+  }
+
+  export type FabricStockLedgerCreateNestedManyWithoutToLocationInput = {
+    create?: XOR<FabricStockLedgerCreateWithoutToLocationInput, FabricStockLedgerUncheckedCreateWithoutToLocationInput> | FabricStockLedgerCreateWithoutToLocationInput[] | FabricStockLedgerUncheckedCreateWithoutToLocationInput[]
+    connectOrCreate?: FabricStockLedgerCreateOrConnectWithoutToLocationInput | FabricStockLedgerCreateOrConnectWithoutToLocationInput[]
+    createMany?: FabricStockLedgerCreateManyToLocationInputEnvelope
+    connect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+  }
+
+  export type FabricStoreRollUncheckedCreateNestedManyWithoutLocationInput = {
+    create?: XOR<FabricStoreRollCreateWithoutLocationInput, FabricStoreRollUncheckedCreateWithoutLocationInput> | FabricStoreRollCreateWithoutLocationInput[] | FabricStoreRollUncheckedCreateWithoutLocationInput[]
+    connectOrCreate?: FabricStoreRollCreateOrConnectWithoutLocationInput | FabricStoreRollCreateOrConnectWithoutLocationInput[]
+    createMany?: FabricStoreRollCreateManyLocationInputEnvelope
+    connect?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+  }
+
+  export type FabricStockLedgerUncheckedCreateNestedManyWithoutFromLocationInput = {
+    create?: XOR<FabricStockLedgerCreateWithoutFromLocationInput, FabricStockLedgerUncheckedCreateWithoutFromLocationInput> | FabricStockLedgerCreateWithoutFromLocationInput[] | FabricStockLedgerUncheckedCreateWithoutFromLocationInput[]
+    connectOrCreate?: FabricStockLedgerCreateOrConnectWithoutFromLocationInput | FabricStockLedgerCreateOrConnectWithoutFromLocationInput[]
+    createMany?: FabricStockLedgerCreateManyFromLocationInputEnvelope
+    connect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+  }
+
+  export type FabricStockLedgerUncheckedCreateNestedManyWithoutToLocationInput = {
+    create?: XOR<FabricStockLedgerCreateWithoutToLocationInput, FabricStockLedgerUncheckedCreateWithoutToLocationInput> | FabricStockLedgerCreateWithoutToLocationInput[] | FabricStockLedgerUncheckedCreateWithoutToLocationInput[]
+    connectOrCreate?: FabricStockLedgerCreateOrConnectWithoutToLocationInput | FabricStockLedgerCreateOrConnectWithoutToLocationInput[]
+    createMany?: FabricStockLedgerCreateManyToLocationInputEnvelope
+    connect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+  }
+
+  export type EnumInventoryLocationTypeFieldUpdateOperationsInput = {
+    set?: $Enums.InventoryLocationType
+  }
+
+  export type FabricStoreRollUpdateManyWithoutLocationNestedInput = {
+    create?: XOR<FabricStoreRollCreateWithoutLocationInput, FabricStoreRollUncheckedCreateWithoutLocationInput> | FabricStoreRollCreateWithoutLocationInput[] | FabricStoreRollUncheckedCreateWithoutLocationInput[]
+    connectOrCreate?: FabricStoreRollCreateOrConnectWithoutLocationInput | FabricStoreRollCreateOrConnectWithoutLocationInput[]
+    upsert?: FabricStoreRollUpsertWithWhereUniqueWithoutLocationInput | FabricStoreRollUpsertWithWhereUniqueWithoutLocationInput[]
+    createMany?: FabricStoreRollCreateManyLocationInputEnvelope
+    set?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    disconnect?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    delete?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    connect?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    update?: FabricStoreRollUpdateWithWhereUniqueWithoutLocationInput | FabricStoreRollUpdateWithWhereUniqueWithoutLocationInput[]
+    updateMany?: FabricStoreRollUpdateManyWithWhereWithoutLocationInput | FabricStoreRollUpdateManyWithWhereWithoutLocationInput[]
+    deleteMany?: FabricStoreRollScalarWhereInput | FabricStoreRollScalarWhereInput[]
+  }
+
+  export type FabricStockLedgerUpdateManyWithoutFromLocationNestedInput = {
+    create?: XOR<FabricStockLedgerCreateWithoutFromLocationInput, FabricStockLedgerUncheckedCreateWithoutFromLocationInput> | FabricStockLedgerCreateWithoutFromLocationInput[] | FabricStockLedgerUncheckedCreateWithoutFromLocationInput[]
+    connectOrCreate?: FabricStockLedgerCreateOrConnectWithoutFromLocationInput | FabricStockLedgerCreateOrConnectWithoutFromLocationInput[]
+    upsert?: FabricStockLedgerUpsertWithWhereUniqueWithoutFromLocationInput | FabricStockLedgerUpsertWithWhereUniqueWithoutFromLocationInput[]
+    createMany?: FabricStockLedgerCreateManyFromLocationInputEnvelope
+    set?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    disconnect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    delete?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    connect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    update?: FabricStockLedgerUpdateWithWhereUniqueWithoutFromLocationInput | FabricStockLedgerUpdateWithWhereUniqueWithoutFromLocationInput[]
+    updateMany?: FabricStockLedgerUpdateManyWithWhereWithoutFromLocationInput | FabricStockLedgerUpdateManyWithWhereWithoutFromLocationInput[]
+    deleteMany?: FabricStockLedgerScalarWhereInput | FabricStockLedgerScalarWhereInput[]
+  }
+
+  export type FabricStockLedgerUpdateManyWithoutToLocationNestedInput = {
+    create?: XOR<FabricStockLedgerCreateWithoutToLocationInput, FabricStockLedgerUncheckedCreateWithoutToLocationInput> | FabricStockLedgerCreateWithoutToLocationInput[] | FabricStockLedgerUncheckedCreateWithoutToLocationInput[]
+    connectOrCreate?: FabricStockLedgerCreateOrConnectWithoutToLocationInput | FabricStockLedgerCreateOrConnectWithoutToLocationInput[]
+    upsert?: FabricStockLedgerUpsertWithWhereUniqueWithoutToLocationInput | FabricStockLedgerUpsertWithWhereUniqueWithoutToLocationInput[]
+    createMany?: FabricStockLedgerCreateManyToLocationInputEnvelope
+    set?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    disconnect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    delete?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    connect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    update?: FabricStockLedgerUpdateWithWhereUniqueWithoutToLocationInput | FabricStockLedgerUpdateWithWhereUniqueWithoutToLocationInput[]
+    updateMany?: FabricStockLedgerUpdateManyWithWhereWithoutToLocationInput | FabricStockLedgerUpdateManyWithWhereWithoutToLocationInput[]
+    deleteMany?: FabricStockLedgerScalarWhereInput | FabricStockLedgerScalarWhereInput[]
+  }
+
+  export type FabricStoreRollUncheckedUpdateManyWithoutLocationNestedInput = {
+    create?: XOR<FabricStoreRollCreateWithoutLocationInput, FabricStoreRollUncheckedCreateWithoutLocationInput> | FabricStoreRollCreateWithoutLocationInput[] | FabricStoreRollUncheckedCreateWithoutLocationInput[]
+    connectOrCreate?: FabricStoreRollCreateOrConnectWithoutLocationInput | FabricStoreRollCreateOrConnectWithoutLocationInput[]
+    upsert?: FabricStoreRollUpsertWithWhereUniqueWithoutLocationInput | FabricStoreRollUpsertWithWhereUniqueWithoutLocationInput[]
+    createMany?: FabricStoreRollCreateManyLocationInputEnvelope
+    set?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    disconnect?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    delete?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    connect?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    update?: FabricStoreRollUpdateWithWhereUniqueWithoutLocationInput | FabricStoreRollUpdateWithWhereUniqueWithoutLocationInput[]
+    updateMany?: FabricStoreRollUpdateManyWithWhereWithoutLocationInput | FabricStoreRollUpdateManyWithWhereWithoutLocationInput[]
+    deleteMany?: FabricStoreRollScalarWhereInput | FabricStoreRollScalarWhereInput[]
+  }
+
+  export type FabricStockLedgerUncheckedUpdateManyWithoutFromLocationNestedInput = {
+    create?: XOR<FabricStockLedgerCreateWithoutFromLocationInput, FabricStockLedgerUncheckedCreateWithoutFromLocationInput> | FabricStockLedgerCreateWithoutFromLocationInput[] | FabricStockLedgerUncheckedCreateWithoutFromLocationInput[]
+    connectOrCreate?: FabricStockLedgerCreateOrConnectWithoutFromLocationInput | FabricStockLedgerCreateOrConnectWithoutFromLocationInput[]
+    upsert?: FabricStockLedgerUpsertWithWhereUniqueWithoutFromLocationInput | FabricStockLedgerUpsertWithWhereUniqueWithoutFromLocationInput[]
+    createMany?: FabricStockLedgerCreateManyFromLocationInputEnvelope
+    set?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    disconnect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    delete?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    connect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    update?: FabricStockLedgerUpdateWithWhereUniqueWithoutFromLocationInput | FabricStockLedgerUpdateWithWhereUniqueWithoutFromLocationInput[]
+    updateMany?: FabricStockLedgerUpdateManyWithWhereWithoutFromLocationInput | FabricStockLedgerUpdateManyWithWhereWithoutFromLocationInput[]
+    deleteMany?: FabricStockLedgerScalarWhereInput | FabricStockLedgerScalarWhereInput[]
+  }
+
+  export type FabricStockLedgerUncheckedUpdateManyWithoutToLocationNestedInput = {
+    create?: XOR<FabricStockLedgerCreateWithoutToLocationInput, FabricStockLedgerUncheckedCreateWithoutToLocationInput> | FabricStockLedgerCreateWithoutToLocationInput[] | FabricStockLedgerUncheckedCreateWithoutToLocationInput[]
+    connectOrCreate?: FabricStockLedgerCreateOrConnectWithoutToLocationInput | FabricStockLedgerCreateOrConnectWithoutToLocationInput[]
+    upsert?: FabricStockLedgerUpsertWithWhereUniqueWithoutToLocationInput | FabricStockLedgerUpsertWithWhereUniqueWithoutToLocationInput[]
+    createMany?: FabricStockLedgerCreateManyToLocationInputEnvelope
+    set?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    disconnect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    delete?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    connect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    update?: FabricStockLedgerUpdateWithWhereUniqueWithoutToLocationInput | FabricStockLedgerUpdateWithWhereUniqueWithoutToLocationInput[]
+    updateMany?: FabricStockLedgerUpdateManyWithWhereWithoutToLocationInput | FabricStockLedgerUpdateManyWithWhereWithoutToLocationInput[]
+    deleteMany?: FabricStockLedgerScalarWhereInput | FabricStockLedgerScalarWhereInput[]
+  }
+
+  export type ProgramCreateNestedOneWithoutFabricBatchesInput = {
+    create?: XOR<ProgramCreateWithoutFabricBatchesInput, ProgramUncheckedCreateWithoutFabricBatchesInput>
+    connectOrCreate?: ProgramCreateOrConnectWithoutFabricBatchesInput
+    connect?: ProgramWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutFabricBatchesCreatedInput = {
+    create?: XOR<UserCreateWithoutFabricBatchesCreatedInput, UserUncheckedCreateWithoutFabricBatchesCreatedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutFabricBatchesCreatedInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type FabricStoreRollCreateNestedManyWithoutBatchInput = {
+    create?: XOR<FabricStoreRollCreateWithoutBatchInput, FabricStoreRollUncheckedCreateWithoutBatchInput> | FabricStoreRollCreateWithoutBatchInput[] | FabricStoreRollUncheckedCreateWithoutBatchInput[]
+    connectOrCreate?: FabricStoreRollCreateOrConnectWithoutBatchInput | FabricStoreRollCreateOrConnectWithoutBatchInput[]
+    createMany?: FabricStoreRollCreateManyBatchInputEnvelope
+    connect?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+  }
+
+  export type MaterialReceiptCreateNestedManyWithoutBatchInput = {
+    create?: XOR<MaterialReceiptCreateWithoutBatchInput, MaterialReceiptUncheckedCreateWithoutBatchInput> | MaterialReceiptCreateWithoutBatchInput[] | MaterialReceiptUncheckedCreateWithoutBatchInput[]
+    connectOrCreate?: MaterialReceiptCreateOrConnectWithoutBatchInput | MaterialReceiptCreateOrConnectWithoutBatchInput[]
+    createMany?: MaterialReceiptCreateManyBatchInputEnvelope
+    connect?: MaterialReceiptWhereUniqueInput | MaterialReceiptWhereUniqueInput[]
+  }
+
+  export type FabricStockLedgerCreateNestedManyWithoutBatchInput = {
+    create?: XOR<FabricStockLedgerCreateWithoutBatchInput, FabricStockLedgerUncheckedCreateWithoutBatchInput> | FabricStockLedgerCreateWithoutBatchInput[] | FabricStockLedgerUncheckedCreateWithoutBatchInput[]
+    connectOrCreate?: FabricStockLedgerCreateOrConnectWithoutBatchInput | FabricStockLedgerCreateOrConnectWithoutBatchInput[]
+    createMany?: FabricStockLedgerCreateManyBatchInputEnvelope
+    connect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+  }
+
+  export type FabricStoreRollUncheckedCreateNestedManyWithoutBatchInput = {
+    create?: XOR<FabricStoreRollCreateWithoutBatchInput, FabricStoreRollUncheckedCreateWithoutBatchInput> | FabricStoreRollCreateWithoutBatchInput[] | FabricStoreRollUncheckedCreateWithoutBatchInput[]
+    connectOrCreate?: FabricStoreRollCreateOrConnectWithoutBatchInput | FabricStoreRollCreateOrConnectWithoutBatchInput[]
+    createMany?: FabricStoreRollCreateManyBatchInputEnvelope
+    connect?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+  }
+
+  export type MaterialReceiptUncheckedCreateNestedManyWithoutBatchInput = {
+    create?: XOR<MaterialReceiptCreateWithoutBatchInput, MaterialReceiptUncheckedCreateWithoutBatchInput> | MaterialReceiptCreateWithoutBatchInput[] | MaterialReceiptUncheckedCreateWithoutBatchInput[]
+    connectOrCreate?: MaterialReceiptCreateOrConnectWithoutBatchInput | MaterialReceiptCreateOrConnectWithoutBatchInput[]
+    createMany?: MaterialReceiptCreateManyBatchInputEnvelope
+    connect?: MaterialReceiptWhereUniqueInput | MaterialReceiptWhereUniqueInput[]
+  }
+
+  export type FabricStockLedgerUncheckedCreateNestedManyWithoutBatchInput = {
+    create?: XOR<FabricStockLedgerCreateWithoutBatchInput, FabricStockLedgerUncheckedCreateWithoutBatchInput> | FabricStockLedgerCreateWithoutBatchInput[] | FabricStockLedgerUncheckedCreateWithoutBatchInput[]
+    connectOrCreate?: FabricStockLedgerCreateOrConnectWithoutBatchInput | FabricStockLedgerCreateOrConnectWithoutBatchInput[]
+    createMany?: FabricStockLedgerCreateManyBatchInputEnvelope
+    connect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+  }
+
+  export type DecimalFieldUpdateOperationsInput = {
+    set?: Decimal | DecimalJsLike | number | string
+    increment?: Decimal | DecimalJsLike | number | string
+    decrement?: Decimal | DecimalJsLike | number | string
+    multiply?: Decimal | DecimalJsLike | number | string
+    divide?: Decimal | DecimalJsLike | number | string
+  }
+
+  export type EnumFabricBatchStatusFieldUpdateOperationsInput = {
+    set?: $Enums.FabricBatchStatus
+  }
+
+  export type ProgramUpdateOneWithoutFabricBatchesNestedInput = {
+    create?: XOR<ProgramCreateWithoutFabricBatchesInput, ProgramUncheckedCreateWithoutFabricBatchesInput>
+    connectOrCreate?: ProgramCreateOrConnectWithoutFabricBatchesInput
+    upsert?: ProgramUpsertWithoutFabricBatchesInput
+    disconnect?: ProgramWhereInput | boolean
+    delete?: ProgramWhereInput | boolean
+    connect?: ProgramWhereUniqueInput
+    update?: XOR<XOR<ProgramUpdateToOneWithWhereWithoutFabricBatchesInput, ProgramUpdateWithoutFabricBatchesInput>, ProgramUncheckedUpdateWithoutFabricBatchesInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutFabricBatchesCreatedNestedInput = {
+    create?: XOR<UserCreateWithoutFabricBatchesCreatedInput, UserUncheckedCreateWithoutFabricBatchesCreatedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutFabricBatchesCreatedInput
+    upsert?: UserUpsertWithoutFabricBatchesCreatedInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutFabricBatchesCreatedInput, UserUpdateWithoutFabricBatchesCreatedInput>, UserUncheckedUpdateWithoutFabricBatchesCreatedInput>
+  }
+
+  export type FabricStoreRollUpdateManyWithoutBatchNestedInput = {
+    create?: XOR<FabricStoreRollCreateWithoutBatchInput, FabricStoreRollUncheckedCreateWithoutBatchInput> | FabricStoreRollCreateWithoutBatchInput[] | FabricStoreRollUncheckedCreateWithoutBatchInput[]
+    connectOrCreate?: FabricStoreRollCreateOrConnectWithoutBatchInput | FabricStoreRollCreateOrConnectWithoutBatchInput[]
+    upsert?: FabricStoreRollUpsertWithWhereUniqueWithoutBatchInput | FabricStoreRollUpsertWithWhereUniqueWithoutBatchInput[]
+    createMany?: FabricStoreRollCreateManyBatchInputEnvelope
+    set?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    disconnect?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    delete?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    connect?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    update?: FabricStoreRollUpdateWithWhereUniqueWithoutBatchInput | FabricStoreRollUpdateWithWhereUniqueWithoutBatchInput[]
+    updateMany?: FabricStoreRollUpdateManyWithWhereWithoutBatchInput | FabricStoreRollUpdateManyWithWhereWithoutBatchInput[]
+    deleteMany?: FabricStoreRollScalarWhereInput | FabricStoreRollScalarWhereInput[]
+  }
+
+  export type MaterialReceiptUpdateManyWithoutBatchNestedInput = {
+    create?: XOR<MaterialReceiptCreateWithoutBatchInput, MaterialReceiptUncheckedCreateWithoutBatchInput> | MaterialReceiptCreateWithoutBatchInput[] | MaterialReceiptUncheckedCreateWithoutBatchInput[]
+    connectOrCreate?: MaterialReceiptCreateOrConnectWithoutBatchInput | MaterialReceiptCreateOrConnectWithoutBatchInput[]
+    upsert?: MaterialReceiptUpsertWithWhereUniqueWithoutBatchInput | MaterialReceiptUpsertWithWhereUniqueWithoutBatchInput[]
+    createMany?: MaterialReceiptCreateManyBatchInputEnvelope
+    set?: MaterialReceiptWhereUniqueInput | MaterialReceiptWhereUniqueInput[]
+    disconnect?: MaterialReceiptWhereUniqueInput | MaterialReceiptWhereUniqueInput[]
+    delete?: MaterialReceiptWhereUniqueInput | MaterialReceiptWhereUniqueInput[]
+    connect?: MaterialReceiptWhereUniqueInput | MaterialReceiptWhereUniqueInput[]
+    update?: MaterialReceiptUpdateWithWhereUniqueWithoutBatchInput | MaterialReceiptUpdateWithWhereUniqueWithoutBatchInput[]
+    updateMany?: MaterialReceiptUpdateManyWithWhereWithoutBatchInput | MaterialReceiptUpdateManyWithWhereWithoutBatchInput[]
+    deleteMany?: MaterialReceiptScalarWhereInput | MaterialReceiptScalarWhereInput[]
+  }
+
+  export type FabricStockLedgerUpdateManyWithoutBatchNestedInput = {
+    create?: XOR<FabricStockLedgerCreateWithoutBatchInput, FabricStockLedgerUncheckedCreateWithoutBatchInput> | FabricStockLedgerCreateWithoutBatchInput[] | FabricStockLedgerUncheckedCreateWithoutBatchInput[]
+    connectOrCreate?: FabricStockLedgerCreateOrConnectWithoutBatchInput | FabricStockLedgerCreateOrConnectWithoutBatchInput[]
+    upsert?: FabricStockLedgerUpsertWithWhereUniqueWithoutBatchInput | FabricStockLedgerUpsertWithWhereUniqueWithoutBatchInput[]
+    createMany?: FabricStockLedgerCreateManyBatchInputEnvelope
+    set?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    disconnect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    delete?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    connect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    update?: FabricStockLedgerUpdateWithWhereUniqueWithoutBatchInput | FabricStockLedgerUpdateWithWhereUniqueWithoutBatchInput[]
+    updateMany?: FabricStockLedgerUpdateManyWithWhereWithoutBatchInput | FabricStockLedgerUpdateManyWithWhereWithoutBatchInput[]
+    deleteMany?: FabricStockLedgerScalarWhereInput | FabricStockLedgerScalarWhereInput[]
+  }
+
+  export type FabricStoreRollUncheckedUpdateManyWithoutBatchNestedInput = {
+    create?: XOR<FabricStoreRollCreateWithoutBatchInput, FabricStoreRollUncheckedCreateWithoutBatchInput> | FabricStoreRollCreateWithoutBatchInput[] | FabricStoreRollUncheckedCreateWithoutBatchInput[]
+    connectOrCreate?: FabricStoreRollCreateOrConnectWithoutBatchInput | FabricStoreRollCreateOrConnectWithoutBatchInput[]
+    upsert?: FabricStoreRollUpsertWithWhereUniqueWithoutBatchInput | FabricStoreRollUpsertWithWhereUniqueWithoutBatchInput[]
+    createMany?: FabricStoreRollCreateManyBatchInputEnvelope
+    set?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    disconnect?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    delete?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    connect?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+    update?: FabricStoreRollUpdateWithWhereUniqueWithoutBatchInput | FabricStoreRollUpdateWithWhereUniqueWithoutBatchInput[]
+    updateMany?: FabricStoreRollUpdateManyWithWhereWithoutBatchInput | FabricStoreRollUpdateManyWithWhereWithoutBatchInput[]
+    deleteMany?: FabricStoreRollScalarWhereInput | FabricStoreRollScalarWhereInput[]
+  }
+
+  export type MaterialReceiptUncheckedUpdateManyWithoutBatchNestedInput = {
+    create?: XOR<MaterialReceiptCreateWithoutBatchInput, MaterialReceiptUncheckedCreateWithoutBatchInput> | MaterialReceiptCreateWithoutBatchInput[] | MaterialReceiptUncheckedCreateWithoutBatchInput[]
+    connectOrCreate?: MaterialReceiptCreateOrConnectWithoutBatchInput | MaterialReceiptCreateOrConnectWithoutBatchInput[]
+    upsert?: MaterialReceiptUpsertWithWhereUniqueWithoutBatchInput | MaterialReceiptUpsertWithWhereUniqueWithoutBatchInput[]
+    createMany?: MaterialReceiptCreateManyBatchInputEnvelope
+    set?: MaterialReceiptWhereUniqueInput | MaterialReceiptWhereUniqueInput[]
+    disconnect?: MaterialReceiptWhereUniqueInput | MaterialReceiptWhereUniqueInput[]
+    delete?: MaterialReceiptWhereUniqueInput | MaterialReceiptWhereUniqueInput[]
+    connect?: MaterialReceiptWhereUniqueInput | MaterialReceiptWhereUniqueInput[]
+    update?: MaterialReceiptUpdateWithWhereUniqueWithoutBatchInput | MaterialReceiptUpdateWithWhereUniqueWithoutBatchInput[]
+    updateMany?: MaterialReceiptUpdateManyWithWhereWithoutBatchInput | MaterialReceiptUpdateManyWithWhereWithoutBatchInput[]
+    deleteMany?: MaterialReceiptScalarWhereInput | MaterialReceiptScalarWhereInput[]
+  }
+
+  export type FabricStockLedgerUncheckedUpdateManyWithoutBatchNestedInput = {
+    create?: XOR<FabricStockLedgerCreateWithoutBatchInput, FabricStockLedgerUncheckedCreateWithoutBatchInput> | FabricStockLedgerCreateWithoutBatchInput[] | FabricStockLedgerUncheckedCreateWithoutBatchInput[]
+    connectOrCreate?: FabricStockLedgerCreateOrConnectWithoutBatchInput | FabricStockLedgerCreateOrConnectWithoutBatchInput[]
+    upsert?: FabricStockLedgerUpsertWithWhereUniqueWithoutBatchInput | FabricStockLedgerUpsertWithWhereUniqueWithoutBatchInput[]
+    createMany?: FabricStockLedgerCreateManyBatchInputEnvelope
+    set?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    disconnect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    delete?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    connect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    update?: FabricStockLedgerUpdateWithWhereUniqueWithoutBatchInput | FabricStockLedgerUpdateWithWhereUniqueWithoutBatchInput[]
+    updateMany?: FabricStockLedgerUpdateManyWithWhereWithoutBatchInput | FabricStockLedgerUpdateManyWithWhereWithoutBatchInput[]
+    deleteMany?: FabricStockLedgerScalarWhereInput | FabricStockLedgerScalarWhereInput[]
+  }
+
+  export type FabricBatchCreateNestedOneWithoutRollsInput = {
+    create?: XOR<FabricBatchCreateWithoutRollsInput, FabricBatchUncheckedCreateWithoutRollsInput>
+    connectOrCreate?: FabricBatchCreateOrConnectWithoutRollsInput
+    connect?: FabricBatchWhereUniqueInput
+  }
+
+  export type InventoryLocationCreateNestedOneWithoutRollsInput = {
+    create?: XOR<InventoryLocationCreateWithoutRollsInput, InventoryLocationUncheckedCreateWithoutRollsInput>
+    connectOrCreate?: InventoryLocationCreateOrConnectWithoutRollsInput
+    connect?: InventoryLocationWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutFabricRollsInspectedInput = {
+    create?: XOR<UserCreateWithoutFabricRollsInspectedInput, UserUncheckedCreateWithoutFabricRollsInspectedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutFabricRollsInspectedInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type ProgramCreateNestedOneWithoutFabricStoreRollsInput = {
+    create?: XOR<ProgramCreateWithoutFabricStoreRollsInput, ProgramUncheckedCreateWithoutFabricStoreRollsInput>
+    connectOrCreate?: ProgramCreateOrConnectWithoutFabricStoreRollsInput
+    connect?: ProgramWhereUniqueInput
+  }
+
+  export type MaterialReceiptItemCreateNestedManyWithoutRollInput = {
+    create?: XOR<MaterialReceiptItemCreateWithoutRollInput, MaterialReceiptItemUncheckedCreateWithoutRollInput> | MaterialReceiptItemCreateWithoutRollInput[] | MaterialReceiptItemUncheckedCreateWithoutRollInput[]
+    connectOrCreate?: MaterialReceiptItemCreateOrConnectWithoutRollInput | MaterialReceiptItemCreateOrConnectWithoutRollInput[]
+    createMany?: MaterialReceiptItemCreateManyRollInputEnvelope
+    connect?: MaterialReceiptItemWhereUniqueInput | MaterialReceiptItemWhereUniqueInput[]
+  }
+
+  export type FabricQCInspectionCreateNestedManyWithoutRollInput = {
+    create?: XOR<FabricQCInspectionCreateWithoutRollInput, FabricQCInspectionUncheckedCreateWithoutRollInput> | FabricQCInspectionCreateWithoutRollInput[] | FabricQCInspectionUncheckedCreateWithoutRollInput[]
+    connectOrCreate?: FabricQCInspectionCreateOrConnectWithoutRollInput | FabricQCInspectionCreateOrConnectWithoutRollInput[]
+    createMany?: FabricQCInspectionCreateManyRollInputEnvelope
+    connect?: FabricQCInspectionWhereUniqueInput | FabricQCInspectionWhereUniqueInput[]
+  }
+
+  export type FabricStockLedgerCreateNestedManyWithoutRollInput = {
+    create?: XOR<FabricStockLedgerCreateWithoutRollInput, FabricStockLedgerUncheckedCreateWithoutRollInput> | FabricStockLedgerCreateWithoutRollInput[] | FabricStockLedgerUncheckedCreateWithoutRollInput[]
+    connectOrCreate?: FabricStockLedgerCreateOrConnectWithoutRollInput | FabricStockLedgerCreateOrConnectWithoutRollInput[]
+    createMany?: FabricStockLedgerCreateManyRollInputEnvelope
+    connect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+  }
+
+  export type MaterialReceiptItemUncheckedCreateNestedManyWithoutRollInput = {
+    create?: XOR<MaterialReceiptItemCreateWithoutRollInput, MaterialReceiptItemUncheckedCreateWithoutRollInput> | MaterialReceiptItemCreateWithoutRollInput[] | MaterialReceiptItemUncheckedCreateWithoutRollInput[]
+    connectOrCreate?: MaterialReceiptItemCreateOrConnectWithoutRollInput | MaterialReceiptItemCreateOrConnectWithoutRollInput[]
+    createMany?: MaterialReceiptItemCreateManyRollInputEnvelope
+    connect?: MaterialReceiptItemWhereUniqueInput | MaterialReceiptItemWhereUniqueInput[]
+  }
+
+  export type FabricQCInspectionUncheckedCreateNestedManyWithoutRollInput = {
+    create?: XOR<FabricQCInspectionCreateWithoutRollInput, FabricQCInspectionUncheckedCreateWithoutRollInput> | FabricQCInspectionCreateWithoutRollInput[] | FabricQCInspectionUncheckedCreateWithoutRollInput[]
+    connectOrCreate?: FabricQCInspectionCreateOrConnectWithoutRollInput | FabricQCInspectionCreateOrConnectWithoutRollInput[]
+    createMany?: FabricQCInspectionCreateManyRollInputEnvelope
+    connect?: FabricQCInspectionWhereUniqueInput | FabricQCInspectionWhereUniqueInput[]
+  }
+
+  export type FabricStockLedgerUncheckedCreateNestedManyWithoutRollInput = {
+    create?: XOR<FabricStockLedgerCreateWithoutRollInput, FabricStockLedgerUncheckedCreateWithoutRollInput> | FabricStockLedgerCreateWithoutRollInput[] | FabricStockLedgerUncheckedCreateWithoutRollInput[]
+    connectOrCreate?: FabricStockLedgerCreateOrConnectWithoutRollInput | FabricStockLedgerCreateOrConnectWithoutRollInput[]
+    createMany?: FabricStockLedgerCreateManyRollInputEnvelope
+    connect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+  }
+
+  export type NullableDecimalFieldUpdateOperationsInput = {
+    set?: Decimal | DecimalJsLike | number | string | null
+    increment?: Decimal | DecimalJsLike | number | string
+    decrement?: Decimal | DecimalJsLike | number | string
+    multiply?: Decimal | DecimalJsLike | number | string
+    divide?: Decimal | DecimalJsLike | number | string
+  }
+
+  export type EnumFabricRollStatusFieldUpdateOperationsInput = {
+    set?: $Enums.FabricRollStatus
+  }
+
+  export type EnumFabricQCStatusFieldUpdateOperationsInput = {
+    set?: $Enums.FabricQCStatus
+  }
+
+  export type FabricBatchUpdateOneRequiredWithoutRollsNestedInput = {
+    create?: XOR<FabricBatchCreateWithoutRollsInput, FabricBatchUncheckedCreateWithoutRollsInput>
+    connectOrCreate?: FabricBatchCreateOrConnectWithoutRollsInput
+    upsert?: FabricBatchUpsertWithoutRollsInput
+    connect?: FabricBatchWhereUniqueInput
+    update?: XOR<XOR<FabricBatchUpdateToOneWithWhereWithoutRollsInput, FabricBatchUpdateWithoutRollsInput>, FabricBatchUncheckedUpdateWithoutRollsInput>
+  }
+
+  export type InventoryLocationUpdateOneWithoutRollsNestedInput = {
+    create?: XOR<InventoryLocationCreateWithoutRollsInput, InventoryLocationUncheckedCreateWithoutRollsInput>
+    connectOrCreate?: InventoryLocationCreateOrConnectWithoutRollsInput
+    upsert?: InventoryLocationUpsertWithoutRollsInput
+    disconnect?: InventoryLocationWhereInput | boolean
+    delete?: InventoryLocationWhereInput | boolean
+    connect?: InventoryLocationWhereUniqueInput
+    update?: XOR<XOR<InventoryLocationUpdateToOneWithWhereWithoutRollsInput, InventoryLocationUpdateWithoutRollsInput>, InventoryLocationUncheckedUpdateWithoutRollsInput>
+  }
+
+  export type UserUpdateOneWithoutFabricRollsInspectedNestedInput = {
+    create?: XOR<UserCreateWithoutFabricRollsInspectedInput, UserUncheckedCreateWithoutFabricRollsInspectedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutFabricRollsInspectedInput
+    upsert?: UserUpsertWithoutFabricRollsInspectedInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutFabricRollsInspectedInput, UserUpdateWithoutFabricRollsInspectedInput>, UserUncheckedUpdateWithoutFabricRollsInspectedInput>
+  }
+
+  export type ProgramUpdateOneWithoutFabricStoreRollsNestedInput = {
+    create?: XOR<ProgramCreateWithoutFabricStoreRollsInput, ProgramUncheckedCreateWithoutFabricStoreRollsInput>
+    connectOrCreate?: ProgramCreateOrConnectWithoutFabricStoreRollsInput
+    upsert?: ProgramUpsertWithoutFabricStoreRollsInput
+    disconnect?: ProgramWhereInput | boolean
+    delete?: ProgramWhereInput | boolean
+    connect?: ProgramWhereUniqueInput
+    update?: XOR<XOR<ProgramUpdateToOneWithWhereWithoutFabricStoreRollsInput, ProgramUpdateWithoutFabricStoreRollsInput>, ProgramUncheckedUpdateWithoutFabricStoreRollsInput>
+  }
+
+  export type MaterialReceiptItemUpdateManyWithoutRollNestedInput = {
+    create?: XOR<MaterialReceiptItemCreateWithoutRollInput, MaterialReceiptItemUncheckedCreateWithoutRollInput> | MaterialReceiptItemCreateWithoutRollInput[] | MaterialReceiptItemUncheckedCreateWithoutRollInput[]
+    connectOrCreate?: MaterialReceiptItemCreateOrConnectWithoutRollInput | MaterialReceiptItemCreateOrConnectWithoutRollInput[]
+    upsert?: MaterialReceiptItemUpsertWithWhereUniqueWithoutRollInput | MaterialReceiptItemUpsertWithWhereUniqueWithoutRollInput[]
+    createMany?: MaterialReceiptItemCreateManyRollInputEnvelope
+    set?: MaterialReceiptItemWhereUniqueInput | MaterialReceiptItemWhereUniqueInput[]
+    disconnect?: MaterialReceiptItemWhereUniqueInput | MaterialReceiptItemWhereUniqueInput[]
+    delete?: MaterialReceiptItemWhereUniqueInput | MaterialReceiptItemWhereUniqueInput[]
+    connect?: MaterialReceiptItemWhereUniqueInput | MaterialReceiptItemWhereUniqueInput[]
+    update?: MaterialReceiptItemUpdateWithWhereUniqueWithoutRollInput | MaterialReceiptItemUpdateWithWhereUniqueWithoutRollInput[]
+    updateMany?: MaterialReceiptItemUpdateManyWithWhereWithoutRollInput | MaterialReceiptItemUpdateManyWithWhereWithoutRollInput[]
+    deleteMany?: MaterialReceiptItemScalarWhereInput | MaterialReceiptItemScalarWhereInput[]
+  }
+
+  export type FabricQCInspectionUpdateManyWithoutRollNestedInput = {
+    create?: XOR<FabricQCInspectionCreateWithoutRollInput, FabricQCInspectionUncheckedCreateWithoutRollInput> | FabricQCInspectionCreateWithoutRollInput[] | FabricQCInspectionUncheckedCreateWithoutRollInput[]
+    connectOrCreate?: FabricQCInspectionCreateOrConnectWithoutRollInput | FabricQCInspectionCreateOrConnectWithoutRollInput[]
+    upsert?: FabricQCInspectionUpsertWithWhereUniqueWithoutRollInput | FabricQCInspectionUpsertWithWhereUniqueWithoutRollInput[]
+    createMany?: FabricQCInspectionCreateManyRollInputEnvelope
+    set?: FabricQCInspectionWhereUniqueInput | FabricQCInspectionWhereUniqueInput[]
+    disconnect?: FabricQCInspectionWhereUniqueInput | FabricQCInspectionWhereUniqueInput[]
+    delete?: FabricQCInspectionWhereUniqueInput | FabricQCInspectionWhereUniqueInput[]
+    connect?: FabricQCInspectionWhereUniqueInput | FabricQCInspectionWhereUniqueInput[]
+    update?: FabricQCInspectionUpdateWithWhereUniqueWithoutRollInput | FabricQCInspectionUpdateWithWhereUniqueWithoutRollInput[]
+    updateMany?: FabricQCInspectionUpdateManyWithWhereWithoutRollInput | FabricQCInspectionUpdateManyWithWhereWithoutRollInput[]
+    deleteMany?: FabricQCInspectionScalarWhereInput | FabricQCInspectionScalarWhereInput[]
+  }
+
+  export type FabricStockLedgerUpdateManyWithoutRollNestedInput = {
+    create?: XOR<FabricStockLedgerCreateWithoutRollInput, FabricStockLedgerUncheckedCreateWithoutRollInput> | FabricStockLedgerCreateWithoutRollInput[] | FabricStockLedgerUncheckedCreateWithoutRollInput[]
+    connectOrCreate?: FabricStockLedgerCreateOrConnectWithoutRollInput | FabricStockLedgerCreateOrConnectWithoutRollInput[]
+    upsert?: FabricStockLedgerUpsertWithWhereUniqueWithoutRollInput | FabricStockLedgerUpsertWithWhereUniqueWithoutRollInput[]
+    createMany?: FabricStockLedgerCreateManyRollInputEnvelope
+    set?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    disconnect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    delete?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    connect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    update?: FabricStockLedgerUpdateWithWhereUniqueWithoutRollInput | FabricStockLedgerUpdateWithWhereUniqueWithoutRollInput[]
+    updateMany?: FabricStockLedgerUpdateManyWithWhereWithoutRollInput | FabricStockLedgerUpdateManyWithWhereWithoutRollInput[]
+    deleteMany?: FabricStockLedgerScalarWhereInput | FabricStockLedgerScalarWhereInput[]
+  }
+
+  export type MaterialReceiptItemUncheckedUpdateManyWithoutRollNestedInput = {
+    create?: XOR<MaterialReceiptItemCreateWithoutRollInput, MaterialReceiptItemUncheckedCreateWithoutRollInput> | MaterialReceiptItemCreateWithoutRollInput[] | MaterialReceiptItemUncheckedCreateWithoutRollInput[]
+    connectOrCreate?: MaterialReceiptItemCreateOrConnectWithoutRollInput | MaterialReceiptItemCreateOrConnectWithoutRollInput[]
+    upsert?: MaterialReceiptItemUpsertWithWhereUniqueWithoutRollInput | MaterialReceiptItemUpsertWithWhereUniqueWithoutRollInput[]
+    createMany?: MaterialReceiptItemCreateManyRollInputEnvelope
+    set?: MaterialReceiptItemWhereUniqueInput | MaterialReceiptItemWhereUniqueInput[]
+    disconnect?: MaterialReceiptItemWhereUniqueInput | MaterialReceiptItemWhereUniqueInput[]
+    delete?: MaterialReceiptItemWhereUniqueInput | MaterialReceiptItemWhereUniqueInput[]
+    connect?: MaterialReceiptItemWhereUniqueInput | MaterialReceiptItemWhereUniqueInput[]
+    update?: MaterialReceiptItemUpdateWithWhereUniqueWithoutRollInput | MaterialReceiptItemUpdateWithWhereUniqueWithoutRollInput[]
+    updateMany?: MaterialReceiptItemUpdateManyWithWhereWithoutRollInput | MaterialReceiptItemUpdateManyWithWhereWithoutRollInput[]
+    deleteMany?: MaterialReceiptItemScalarWhereInput | MaterialReceiptItemScalarWhereInput[]
+  }
+
+  export type FabricQCInspectionUncheckedUpdateManyWithoutRollNestedInput = {
+    create?: XOR<FabricQCInspectionCreateWithoutRollInput, FabricQCInspectionUncheckedCreateWithoutRollInput> | FabricQCInspectionCreateWithoutRollInput[] | FabricQCInspectionUncheckedCreateWithoutRollInput[]
+    connectOrCreate?: FabricQCInspectionCreateOrConnectWithoutRollInput | FabricQCInspectionCreateOrConnectWithoutRollInput[]
+    upsert?: FabricQCInspectionUpsertWithWhereUniqueWithoutRollInput | FabricQCInspectionUpsertWithWhereUniqueWithoutRollInput[]
+    createMany?: FabricQCInspectionCreateManyRollInputEnvelope
+    set?: FabricQCInspectionWhereUniqueInput | FabricQCInspectionWhereUniqueInput[]
+    disconnect?: FabricQCInspectionWhereUniqueInput | FabricQCInspectionWhereUniqueInput[]
+    delete?: FabricQCInspectionWhereUniqueInput | FabricQCInspectionWhereUniqueInput[]
+    connect?: FabricQCInspectionWhereUniqueInput | FabricQCInspectionWhereUniqueInput[]
+    update?: FabricQCInspectionUpdateWithWhereUniqueWithoutRollInput | FabricQCInspectionUpdateWithWhereUniqueWithoutRollInput[]
+    updateMany?: FabricQCInspectionUpdateManyWithWhereWithoutRollInput | FabricQCInspectionUpdateManyWithWhereWithoutRollInput[]
+    deleteMany?: FabricQCInspectionScalarWhereInput | FabricQCInspectionScalarWhereInput[]
+  }
+
+  export type FabricStockLedgerUncheckedUpdateManyWithoutRollNestedInput = {
+    create?: XOR<FabricStockLedgerCreateWithoutRollInput, FabricStockLedgerUncheckedCreateWithoutRollInput> | FabricStockLedgerCreateWithoutRollInput[] | FabricStockLedgerUncheckedCreateWithoutRollInput[]
+    connectOrCreate?: FabricStockLedgerCreateOrConnectWithoutRollInput | FabricStockLedgerCreateOrConnectWithoutRollInput[]
+    upsert?: FabricStockLedgerUpsertWithWhereUniqueWithoutRollInput | FabricStockLedgerUpsertWithWhereUniqueWithoutRollInput[]
+    createMany?: FabricStockLedgerCreateManyRollInputEnvelope
+    set?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    disconnect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    delete?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    connect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+    update?: FabricStockLedgerUpdateWithWhereUniqueWithoutRollInput | FabricStockLedgerUpdateWithWhereUniqueWithoutRollInput[]
+    updateMany?: FabricStockLedgerUpdateManyWithWhereWithoutRollInput | FabricStockLedgerUpdateManyWithWhereWithoutRollInput[]
+    deleteMany?: FabricStockLedgerScalarWhereInput | FabricStockLedgerScalarWhereInput[]
+  }
+
+  export type FabricBatchCreateNestedOneWithoutReceiptsInput = {
+    create?: XOR<FabricBatchCreateWithoutReceiptsInput, FabricBatchUncheckedCreateWithoutReceiptsInput>
+    connectOrCreate?: FabricBatchCreateOrConnectWithoutReceiptsInput
+    connect?: FabricBatchWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutGrnReceivedInput = {
+    create?: XOR<UserCreateWithoutGrnReceivedInput, UserUncheckedCreateWithoutGrnReceivedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutGrnReceivedInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type MaterialReceiptItemCreateNestedManyWithoutReceiptInput = {
+    create?: XOR<MaterialReceiptItemCreateWithoutReceiptInput, MaterialReceiptItemUncheckedCreateWithoutReceiptInput> | MaterialReceiptItemCreateWithoutReceiptInput[] | MaterialReceiptItemUncheckedCreateWithoutReceiptInput[]
+    connectOrCreate?: MaterialReceiptItemCreateOrConnectWithoutReceiptInput | MaterialReceiptItemCreateOrConnectWithoutReceiptInput[]
+    createMany?: MaterialReceiptItemCreateManyReceiptInputEnvelope
+    connect?: MaterialReceiptItemWhereUniqueInput | MaterialReceiptItemWhereUniqueInput[]
+  }
+
+  export type MaterialReceiptItemUncheckedCreateNestedManyWithoutReceiptInput = {
+    create?: XOR<MaterialReceiptItemCreateWithoutReceiptInput, MaterialReceiptItemUncheckedCreateWithoutReceiptInput> | MaterialReceiptItemCreateWithoutReceiptInput[] | MaterialReceiptItemUncheckedCreateWithoutReceiptInput[]
+    connectOrCreate?: MaterialReceiptItemCreateOrConnectWithoutReceiptInput | MaterialReceiptItemCreateOrConnectWithoutReceiptInput[]
+    createMany?: MaterialReceiptItemCreateManyReceiptInputEnvelope
+    connect?: MaterialReceiptItemWhereUniqueInput | MaterialReceiptItemWhereUniqueInput[]
+  }
+
+  export type EnumGRNStatusFieldUpdateOperationsInput = {
+    set?: $Enums.GRNStatus
+  }
+
+  export type FabricBatchUpdateOneRequiredWithoutReceiptsNestedInput = {
+    create?: XOR<FabricBatchCreateWithoutReceiptsInput, FabricBatchUncheckedCreateWithoutReceiptsInput>
+    connectOrCreate?: FabricBatchCreateOrConnectWithoutReceiptsInput
+    upsert?: FabricBatchUpsertWithoutReceiptsInput
+    connect?: FabricBatchWhereUniqueInput
+    update?: XOR<XOR<FabricBatchUpdateToOneWithWhereWithoutReceiptsInput, FabricBatchUpdateWithoutReceiptsInput>, FabricBatchUncheckedUpdateWithoutReceiptsInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutGrnReceivedNestedInput = {
+    create?: XOR<UserCreateWithoutGrnReceivedInput, UserUncheckedCreateWithoutGrnReceivedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutGrnReceivedInput
+    upsert?: UserUpsertWithoutGrnReceivedInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutGrnReceivedInput, UserUpdateWithoutGrnReceivedInput>, UserUncheckedUpdateWithoutGrnReceivedInput>
+  }
+
+  export type MaterialReceiptItemUpdateManyWithoutReceiptNestedInput = {
+    create?: XOR<MaterialReceiptItemCreateWithoutReceiptInput, MaterialReceiptItemUncheckedCreateWithoutReceiptInput> | MaterialReceiptItemCreateWithoutReceiptInput[] | MaterialReceiptItemUncheckedCreateWithoutReceiptInput[]
+    connectOrCreate?: MaterialReceiptItemCreateOrConnectWithoutReceiptInput | MaterialReceiptItemCreateOrConnectWithoutReceiptInput[]
+    upsert?: MaterialReceiptItemUpsertWithWhereUniqueWithoutReceiptInput | MaterialReceiptItemUpsertWithWhereUniqueWithoutReceiptInput[]
+    createMany?: MaterialReceiptItemCreateManyReceiptInputEnvelope
+    set?: MaterialReceiptItemWhereUniqueInput | MaterialReceiptItemWhereUniqueInput[]
+    disconnect?: MaterialReceiptItemWhereUniqueInput | MaterialReceiptItemWhereUniqueInput[]
+    delete?: MaterialReceiptItemWhereUniqueInput | MaterialReceiptItemWhereUniqueInput[]
+    connect?: MaterialReceiptItemWhereUniqueInput | MaterialReceiptItemWhereUniqueInput[]
+    update?: MaterialReceiptItemUpdateWithWhereUniqueWithoutReceiptInput | MaterialReceiptItemUpdateWithWhereUniqueWithoutReceiptInput[]
+    updateMany?: MaterialReceiptItemUpdateManyWithWhereWithoutReceiptInput | MaterialReceiptItemUpdateManyWithWhereWithoutReceiptInput[]
+    deleteMany?: MaterialReceiptItemScalarWhereInput | MaterialReceiptItemScalarWhereInput[]
+  }
+
+  export type MaterialReceiptItemUncheckedUpdateManyWithoutReceiptNestedInput = {
+    create?: XOR<MaterialReceiptItemCreateWithoutReceiptInput, MaterialReceiptItemUncheckedCreateWithoutReceiptInput> | MaterialReceiptItemCreateWithoutReceiptInput[] | MaterialReceiptItemUncheckedCreateWithoutReceiptInput[]
+    connectOrCreate?: MaterialReceiptItemCreateOrConnectWithoutReceiptInput | MaterialReceiptItemCreateOrConnectWithoutReceiptInput[]
+    upsert?: MaterialReceiptItemUpsertWithWhereUniqueWithoutReceiptInput | MaterialReceiptItemUpsertWithWhereUniqueWithoutReceiptInput[]
+    createMany?: MaterialReceiptItemCreateManyReceiptInputEnvelope
+    set?: MaterialReceiptItemWhereUniqueInput | MaterialReceiptItemWhereUniqueInput[]
+    disconnect?: MaterialReceiptItemWhereUniqueInput | MaterialReceiptItemWhereUniqueInput[]
+    delete?: MaterialReceiptItemWhereUniqueInput | MaterialReceiptItemWhereUniqueInput[]
+    connect?: MaterialReceiptItemWhereUniqueInput | MaterialReceiptItemWhereUniqueInput[]
+    update?: MaterialReceiptItemUpdateWithWhereUniqueWithoutReceiptInput | MaterialReceiptItemUpdateWithWhereUniqueWithoutReceiptInput[]
+    updateMany?: MaterialReceiptItemUpdateManyWithWhereWithoutReceiptInput | MaterialReceiptItemUpdateManyWithWhereWithoutReceiptInput[]
+    deleteMany?: MaterialReceiptItemScalarWhereInput | MaterialReceiptItemScalarWhereInput[]
+  }
+
+  export type MaterialReceiptCreateNestedOneWithoutItemsInput = {
+    create?: XOR<MaterialReceiptCreateWithoutItemsInput, MaterialReceiptUncheckedCreateWithoutItemsInput>
+    connectOrCreate?: MaterialReceiptCreateOrConnectWithoutItemsInput
+    connect?: MaterialReceiptWhereUniqueInput
+  }
+
+  export type FabricStoreRollCreateNestedOneWithoutReceiptItemsInput = {
+    create?: XOR<FabricStoreRollCreateWithoutReceiptItemsInput, FabricStoreRollUncheckedCreateWithoutReceiptItemsInput>
+    connectOrCreate?: FabricStoreRollCreateOrConnectWithoutReceiptItemsInput
+    connect?: FabricStoreRollWhereUniqueInput
+  }
+
+  export type MaterialReceiptUpdateOneRequiredWithoutItemsNestedInput = {
+    create?: XOR<MaterialReceiptCreateWithoutItemsInput, MaterialReceiptUncheckedCreateWithoutItemsInput>
+    connectOrCreate?: MaterialReceiptCreateOrConnectWithoutItemsInput
+    upsert?: MaterialReceiptUpsertWithoutItemsInput
+    connect?: MaterialReceiptWhereUniqueInput
+    update?: XOR<XOR<MaterialReceiptUpdateToOneWithWhereWithoutItemsInput, MaterialReceiptUpdateWithoutItemsInput>, MaterialReceiptUncheckedUpdateWithoutItemsInput>
+  }
+
+  export type FabricStoreRollUpdateOneRequiredWithoutReceiptItemsNestedInput = {
+    create?: XOR<FabricStoreRollCreateWithoutReceiptItemsInput, FabricStoreRollUncheckedCreateWithoutReceiptItemsInput>
+    connectOrCreate?: FabricStoreRollCreateOrConnectWithoutReceiptItemsInput
+    upsert?: FabricStoreRollUpsertWithoutReceiptItemsInput
+    connect?: FabricStoreRollWhereUniqueInput
+    update?: XOR<XOR<FabricStoreRollUpdateToOneWithWhereWithoutReceiptItemsInput, FabricStoreRollUpdateWithoutReceiptItemsInput>, FabricStoreRollUncheckedUpdateWithoutReceiptItemsInput>
+  }
+
+  export type FabricStoreRollCreateNestedOneWithoutQcInspectionsInput = {
+    create?: XOR<FabricStoreRollCreateWithoutQcInspectionsInput, FabricStoreRollUncheckedCreateWithoutQcInspectionsInput>
+    connectOrCreate?: FabricStoreRollCreateOrConnectWithoutQcInspectionsInput
+    connect?: FabricStoreRollWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutFabricQCInspectionsInput = {
+    create?: XOR<UserCreateWithoutFabricQCInspectionsInput, UserUncheckedCreateWithoutFabricQCInspectionsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutFabricQCInspectionsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type EnumInspectionTypeFieldUpdateOperationsInput = {
+    set?: $Enums.InspectionType
+  }
+
+  export type EnumInspectionResultFieldUpdateOperationsInput = {
+    set?: $Enums.InspectionResult
+  }
+
+  export type FabricStoreRollUpdateOneRequiredWithoutQcInspectionsNestedInput = {
+    create?: XOR<FabricStoreRollCreateWithoutQcInspectionsInput, FabricStoreRollUncheckedCreateWithoutQcInspectionsInput>
+    connectOrCreate?: FabricStoreRollCreateOrConnectWithoutQcInspectionsInput
+    upsert?: FabricStoreRollUpsertWithoutQcInspectionsInput
+    connect?: FabricStoreRollWhereUniqueInput
+    update?: XOR<XOR<FabricStoreRollUpdateToOneWithWhereWithoutQcInspectionsInput, FabricStoreRollUpdateWithoutQcInspectionsInput>, FabricStoreRollUncheckedUpdateWithoutQcInspectionsInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutFabricQCInspectionsNestedInput = {
+    create?: XOR<UserCreateWithoutFabricQCInspectionsInput, UserUncheckedCreateWithoutFabricQCInspectionsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutFabricQCInspectionsInput
+    upsert?: UserUpsertWithoutFabricQCInspectionsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutFabricQCInspectionsInput, UserUpdateWithoutFabricQCInspectionsInput>, UserUncheckedUpdateWithoutFabricQCInspectionsInput>
+  }
+
+  export type FabricStoreRollCreateNestedOneWithoutLedgerEntriesInput = {
+    create?: XOR<FabricStoreRollCreateWithoutLedgerEntriesInput, FabricStoreRollUncheckedCreateWithoutLedgerEntriesInput>
+    connectOrCreate?: FabricStoreRollCreateOrConnectWithoutLedgerEntriesInput
+    connect?: FabricStoreRollWhereUniqueInput
+  }
+
+  export type FabricBatchCreateNestedOneWithoutLedgerEntriesInput = {
+    create?: XOR<FabricBatchCreateWithoutLedgerEntriesInput, FabricBatchUncheckedCreateWithoutLedgerEntriesInput>
+    connectOrCreate?: FabricBatchCreateOrConnectWithoutLedgerEntriesInput
+    connect?: FabricBatchWhereUniqueInput
+  }
+
+  export type InventoryLocationCreateNestedOneWithoutFromLedgerInput = {
+    create?: XOR<InventoryLocationCreateWithoutFromLedgerInput, InventoryLocationUncheckedCreateWithoutFromLedgerInput>
+    connectOrCreate?: InventoryLocationCreateOrConnectWithoutFromLedgerInput
+    connect?: InventoryLocationWhereUniqueInput
+  }
+
+  export type InventoryLocationCreateNestedOneWithoutToLedgerInput = {
+    create?: XOR<InventoryLocationCreateWithoutToLedgerInput, InventoryLocationUncheckedCreateWithoutToLedgerInput>
+    connectOrCreate?: InventoryLocationCreateOrConnectWithoutToLedgerInput
+    connect?: InventoryLocationWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutFabricLedgerEntriesInput = {
+    create?: XOR<UserCreateWithoutFabricLedgerEntriesInput, UserUncheckedCreateWithoutFabricLedgerEntriesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutFabricLedgerEntriesInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type EnumStockTransactionTypeFieldUpdateOperationsInput = {
+    set?: $Enums.StockTransactionType
+  }
+
+  export type FabricStoreRollUpdateOneRequiredWithoutLedgerEntriesNestedInput = {
+    create?: XOR<FabricStoreRollCreateWithoutLedgerEntriesInput, FabricStoreRollUncheckedCreateWithoutLedgerEntriesInput>
+    connectOrCreate?: FabricStoreRollCreateOrConnectWithoutLedgerEntriesInput
+    upsert?: FabricStoreRollUpsertWithoutLedgerEntriesInput
+    connect?: FabricStoreRollWhereUniqueInput
+    update?: XOR<XOR<FabricStoreRollUpdateToOneWithWhereWithoutLedgerEntriesInput, FabricStoreRollUpdateWithoutLedgerEntriesInput>, FabricStoreRollUncheckedUpdateWithoutLedgerEntriesInput>
+  }
+
+  export type FabricBatchUpdateOneRequiredWithoutLedgerEntriesNestedInput = {
+    create?: XOR<FabricBatchCreateWithoutLedgerEntriesInput, FabricBatchUncheckedCreateWithoutLedgerEntriesInput>
+    connectOrCreate?: FabricBatchCreateOrConnectWithoutLedgerEntriesInput
+    upsert?: FabricBatchUpsertWithoutLedgerEntriesInput
+    connect?: FabricBatchWhereUniqueInput
+    update?: XOR<XOR<FabricBatchUpdateToOneWithWhereWithoutLedgerEntriesInput, FabricBatchUpdateWithoutLedgerEntriesInput>, FabricBatchUncheckedUpdateWithoutLedgerEntriesInput>
+  }
+
+  export type InventoryLocationUpdateOneWithoutFromLedgerNestedInput = {
+    create?: XOR<InventoryLocationCreateWithoutFromLedgerInput, InventoryLocationUncheckedCreateWithoutFromLedgerInput>
+    connectOrCreate?: InventoryLocationCreateOrConnectWithoutFromLedgerInput
+    upsert?: InventoryLocationUpsertWithoutFromLedgerInput
+    disconnect?: InventoryLocationWhereInput | boolean
+    delete?: InventoryLocationWhereInput | boolean
+    connect?: InventoryLocationWhereUniqueInput
+    update?: XOR<XOR<InventoryLocationUpdateToOneWithWhereWithoutFromLedgerInput, InventoryLocationUpdateWithoutFromLedgerInput>, InventoryLocationUncheckedUpdateWithoutFromLedgerInput>
+  }
+
+  export type InventoryLocationUpdateOneWithoutToLedgerNestedInput = {
+    create?: XOR<InventoryLocationCreateWithoutToLedgerInput, InventoryLocationUncheckedCreateWithoutToLedgerInput>
+    connectOrCreate?: InventoryLocationCreateOrConnectWithoutToLedgerInput
+    upsert?: InventoryLocationUpsertWithoutToLedgerInput
+    disconnect?: InventoryLocationWhereInput | boolean
+    delete?: InventoryLocationWhereInput | boolean
+    connect?: InventoryLocationWhereUniqueInput
+    update?: XOR<XOR<InventoryLocationUpdateToOneWithWhereWithoutToLedgerInput, InventoryLocationUpdateWithoutToLedgerInput>, InventoryLocationUncheckedUpdateWithoutToLedgerInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutFabricLedgerEntriesNestedInput = {
+    create?: XOR<UserCreateWithoutFabricLedgerEntriesInput, UserUncheckedCreateWithoutFabricLedgerEntriesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutFabricLedgerEntriesInput
+    upsert?: UserUpsertWithoutFabricLedgerEntriesInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutFabricLedgerEntriesInput, UserUpdateWithoutFabricLedgerEntriesInput>, UserUncheckedUpdateWithoutFabricLedgerEntriesInput>
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -87345,6 +100701,219 @@ export namespace Prisma {
     _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
+  export type NestedEnumInventoryLocationTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.InventoryLocationType | EnumInventoryLocationTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.InventoryLocationType[] | ListEnumInventoryLocationTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InventoryLocationType[] | ListEnumInventoryLocationTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumInventoryLocationTypeFilter<$PrismaModel> | $Enums.InventoryLocationType
+  }
+
+  export type NestedEnumInventoryLocationTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.InventoryLocationType | EnumInventoryLocationTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.InventoryLocationType[] | ListEnumInventoryLocationTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InventoryLocationType[] | ListEnumInventoryLocationTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumInventoryLocationTypeWithAggregatesFilter<$PrismaModel> | $Enums.InventoryLocationType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumInventoryLocationTypeFilter<$PrismaModel>
+    _max?: NestedEnumInventoryLocationTypeFilter<$PrismaModel>
+  }
+
+  export type NestedDecimalFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
+  }
+
+  export type NestedEnumFabricBatchStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.FabricBatchStatus | EnumFabricBatchStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.FabricBatchStatus[] | ListEnumFabricBatchStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FabricBatchStatus[] | ListEnumFabricBatchStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumFabricBatchStatusFilter<$PrismaModel> | $Enums.FabricBatchStatus
+  }
+
+  export type NestedDecimalWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedDecimalFilter<$PrismaModel>
+    _sum?: NestedDecimalFilter<$PrismaModel>
+    _min?: NestedDecimalFilter<$PrismaModel>
+    _max?: NestedDecimalFilter<$PrismaModel>
+  }
+
+  export type NestedEnumFabricBatchStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.FabricBatchStatus | EnumFabricBatchStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.FabricBatchStatus[] | ListEnumFabricBatchStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FabricBatchStatus[] | ListEnumFabricBatchStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumFabricBatchStatusWithAggregatesFilter<$PrismaModel> | $Enums.FabricBatchStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumFabricBatchStatusFilter<$PrismaModel>
+    _max?: NestedEnumFabricBatchStatusFilter<$PrismaModel>
+  }
+
+  export type NestedDecimalNullableFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+  }
+
+  export type NestedEnumFabricRollStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.FabricRollStatus | EnumFabricRollStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.FabricRollStatus[] | ListEnumFabricRollStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FabricRollStatus[] | ListEnumFabricRollStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumFabricRollStatusFilter<$PrismaModel> | $Enums.FabricRollStatus
+  }
+
+  export type NestedEnumFabricQCStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.FabricQCStatus | EnumFabricQCStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.FabricQCStatus[] | ListEnumFabricQCStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FabricQCStatus[] | ListEnumFabricQCStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumFabricQCStatusFilter<$PrismaModel> | $Enums.FabricQCStatus
+  }
+
+  export type NestedDecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedDecimalNullableFilter<$PrismaModel>
+    _sum?: NestedDecimalNullableFilter<$PrismaModel>
+    _min?: NestedDecimalNullableFilter<$PrismaModel>
+    _max?: NestedDecimalNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumFabricRollStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.FabricRollStatus | EnumFabricRollStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.FabricRollStatus[] | ListEnumFabricRollStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FabricRollStatus[] | ListEnumFabricRollStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumFabricRollStatusWithAggregatesFilter<$PrismaModel> | $Enums.FabricRollStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumFabricRollStatusFilter<$PrismaModel>
+    _max?: NestedEnumFabricRollStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumFabricQCStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.FabricQCStatus | EnumFabricQCStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.FabricQCStatus[] | ListEnumFabricQCStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FabricQCStatus[] | ListEnumFabricQCStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumFabricQCStatusWithAggregatesFilter<$PrismaModel> | $Enums.FabricQCStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumFabricQCStatusFilter<$PrismaModel>
+    _max?: NestedEnumFabricQCStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumGRNStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.GRNStatus | EnumGRNStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.GRNStatus[] | ListEnumGRNStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.GRNStatus[] | ListEnumGRNStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumGRNStatusFilter<$PrismaModel> | $Enums.GRNStatus
+  }
+
+  export type NestedEnumGRNStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.GRNStatus | EnumGRNStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.GRNStatus[] | ListEnumGRNStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.GRNStatus[] | ListEnumGRNStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumGRNStatusWithAggregatesFilter<$PrismaModel> | $Enums.GRNStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumGRNStatusFilter<$PrismaModel>
+    _max?: NestedEnumGRNStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumInspectionTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.InspectionType | EnumInspectionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.InspectionType[] | ListEnumInspectionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InspectionType[] | ListEnumInspectionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumInspectionTypeFilter<$PrismaModel> | $Enums.InspectionType
+  }
+
+  export type NestedEnumInspectionResultFilter<$PrismaModel = never> = {
+    equals?: $Enums.InspectionResult | EnumInspectionResultFieldRefInput<$PrismaModel>
+    in?: $Enums.InspectionResult[] | ListEnumInspectionResultFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InspectionResult[] | ListEnumInspectionResultFieldRefInput<$PrismaModel>
+    not?: NestedEnumInspectionResultFilter<$PrismaModel> | $Enums.InspectionResult
+  }
+
+  export type NestedEnumInspectionTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.InspectionType | EnumInspectionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.InspectionType[] | ListEnumInspectionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InspectionType[] | ListEnumInspectionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumInspectionTypeWithAggregatesFilter<$PrismaModel> | $Enums.InspectionType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumInspectionTypeFilter<$PrismaModel>
+    _max?: NestedEnumInspectionTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumInspectionResultWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.InspectionResult | EnumInspectionResultFieldRefInput<$PrismaModel>
+    in?: $Enums.InspectionResult[] | ListEnumInspectionResultFieldRefInput<$PrismaModel>
+    notIn?: $Enums.InspectionResult[] | ListEnumInspectionResultFieldRefInput<$PrismaModel>
+    not?: NestedEnumInspectionResultWithAggregatesFilter<$PrismaModel> | $Enums.InspectionResult
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumInspectionResultFilter<$PrismaModel>
+    _max?: NestedEnumInspectionResultFilter<$PrismaModel>
+  }
+  export type NestedJsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type NestedEnumStockTransactionTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.StockTransactionType | EnumStockTransactionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.StockTransactionType[] | ListEnumStockTransactionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.StockTransactionType[] | ListEnumStockTransactionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumStockTransactionTypeFilter<$PrismaModel> | $Enums.StockTransactionType
+  }
+
+  export type NestedEnumStockTransactionTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.StockTransactionType | EnumStockTransactionTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.StockTransactionType[] | ListEnumStockTransactionTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.StockTransactionType[] | ListEnumStockTransactionTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumStockTransactionTypeWithAggregatesFilter<$PrismaModel> | $Enums.StockTransactionType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumStockTransactionTypeFilter<$PrismaModel>
+    _max?: NestedEnumStockTransactionTypeFilter<$PrismaModel>
+  }
+
   export type UserRoleCreateWithoutUserInput = {
     id?: string
     assignedAt?: Date | string
@@ -87438,6 +101007,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramUncheckedCreateWithoutCreatedByInput = {
@@ -87511,6 +101082,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionUncheckedCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramCreateOrConnectWithoutCreatedByInput = {
@@ -87594,6 +101167,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramUncheckedCreateWithoutApprovedByInput = {
@@ -87667,6 +101242,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionUncheckedCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramCreateOrConnectWithoutApprovedByInput = {
@@ -88481,6 +102058,228 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type FabricBatchCreateWithoutCreatedByInput = {
+    id?: string
+    batchNumber: string
+    supplierId?: string | null
+    fabricType: string
+    fabricDescription: string
+    colorCode?: string | null
+    colorName?: string | null
+    totalRolls?: number
+    totalMeters?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.FabricBatchStatus
+    receivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    program?: ProgramCreateNestedOneWithoutFabricBatchesInput
+    rolls?: FabricStoreRollCreateNestedManyWithoutBatchInput
+    receipts?: MaterialReceiptCreateNestedManyWithoutBatchInput
+    ledgerEntries?: FabricStockLedgerCreateNestedManyWithoutBatchInput
+  }
+
+  export type FabricBatchUncheckedCreateWithoutCreatedByInput = {
+    id?: string
+    batchNumber: string
+    programId?: string | null
+    supplierId?: string | null
+    fabricType: string
+    fabricDescription: string
+    colorCode?: string | null
+    colorName?: string | null
+    totalRolls?: number
+    totalMeters?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.FabricBatchStatus
+    receivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    rolls?: FabricStoreRollUncheckedCreateNestedManyWithoutBatchInput
+    receipts?: MaterialReceiptUncheckedCreateNestedManyWithoutBatchInput
+    ledgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutBatchInput
+  }
+
+  export type FabricBatchCreateOrConnectWithoutCreatedByInput = {
+    where: FabricBatchWhereUniqueInput
+    create: XOR<FabricBatchCreateWithoutCreatedByInput, FabricBatchUncheckedCreateWithoutCreatedByInput>
+  }
+
+  export type FabricBatchCreateManyCreatedByInputEnvelope = {
+    data: FabricBatchCreateManyCreatedByInput | FabricBatchCreateManyCreatedByInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type MaterialReceiptCreateWithoutReceivedByInput = {
+    id?: string
+    grnNumber: string
+    challanId?: string | null
+    receivedAt: Date | string
+    vehicleNumber?: string | null
+    supplierName: string
+    totalRollsReceived?: number
+    totalMetersReceived?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.GRNStatus
+    remarks?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    batch: FabricBatchCreateNestedOneWithoutReceiptsInput
+    items?: MaterialReceiptItemCreateNestedManyWithoutReceiptInput
+  }
+
+  export type MaterialReceiptUncheckedCreateWithoutReceivedByInput = {
+    id?: string
+    grnNumber: string
+    batchId: string
+    challanId?: string | null
+    receivedAt: Date | string
+    vehicleNumber?: string | null
+    supplierName: string
+    totalRollsReceived?: number
+    totalMetersReceived?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.GRNStatus
+    remarks?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    items?: MaterialReceiptItemUncheckedCreateNestedManyWithoutReceiptInput
+  }
+
+  export type MaterialReceiptCreateOrConnectWithoutReceivedByInput = {
+    where: MaterialReceiptWhereUniqueInput
+    create: XOR<MaterialReceiptCreateWithoutReceivedByInput, MaterialReceiptUncheckedCreateWithoutReceivedByInput>
+  }
+
+  export type MaterialReceiptCreateManyReceivedByInputEnvelope = {
+    data: MaterialReceiptCreateManyReceivedByInput | MaterialReceiptCreateManyReceivedByInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type FabricStoreRollCreateWithoutQcInspectedByInput = {
+    id?: string
+    rollNumber: string
+    length: Decimal | DecimalJsLike | number | string
+    width?: Decimal | DecimalJsLike | number | string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    status?: $Enums.FabricRollStatus
+    qcStatus?: $Enums.FabricQCStatus
+    qcInspectedAt?: Date | string | null
+    qcRemarks?: string | null
+    issuedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    batch: FabricBatchCreateNestedOneWithoutRollsInput
+    location?: InventoryLocationCreateNestedOneWithoutRollsInput
+    programIssuedTo?: ProgramCreateNestedOneWithoutFabricStoreRollsInput
+    receiptItems?: MaterialReceiptItemCreateNestedManyWithoutRollInput
+    qcInspections?: FabricQCInspectionCreateNestedManyWithoutRollInput
+    ledgerEntries?: FabricStockLedgerCreateNestedManyWithoutRollInput
+  }
+
+  export type FabricStoreRollUncheckedCreateWithoutQcInspectedByInput = {
+    id?: string
+    rollNumber: string
+    batchId: string
+    locationId?: string | null
+    length: Decimal | DecimalJsLike | number | string
+    width?: Decimal | DecimalJsLike | number | string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    status?: $Enums.FabricRollStatus
+    qcStatus?: $Enums.FabricQCStatus
+    qcInspectedAt?: Date | string | null
+    qcRemarks?: string | null
+    programIssuedToId?: string | null
+    issuedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    receiptItems?: MaterialReceiptItemUncheckedCreateNestedManyWithoutRollInput
+    qcInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutRollInput
+    ledgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutRollInput
+  }
+
+  export type FabricStoreRollCreateOrConnectWithoutQcInspectedByInput = {
+    where: FabricStoreRollWhereUniqueInput
+    create: XOR<FabricStoreRollCreateWithoutQcInspectedByInput, FabricStoreRollUncheckedCreateWithoutQcInspectedByInput>
+  }
+
+  export type FabricStoreRollCreateManyQcInspectedByInputEnvelope = {
+    data: FabricStoreRollCreateManyQcInspectedByInput | FabricStoreRollCreateManyQcInspectedByInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type FabricQCInspectionCreateWithoutInspectedByInput = {
+    id?: string
+    inspectionNumber: string
+    inspectionType?: $Enums.InspectionType
+    result: $Enums.InspectionResult
+    defects?: NullableJsonNullValueInput | InputJsonValue
+    remarks?: string | null
+    inspectedAt: Date | string
+    createdAt?: Date | string
+    roll: FabricStoreRollCreateNestedOneWithoutQcInspectionsInput
+  }
+
+  export type FabricQCInspectionUncheckedCreateWithoutInspectedByInput = {
+    id?: string
+    inspectionNumber: string
+    rollId: string
+    inspectionType?: $Enums.InspectionType
+    result: $Enums.InspectionResult
+    defects?: NullableJsonNullValueInput | InputJsonValue
+    remarks?: string | null
+    inspectedAt: Date | string
+    createdAt?: Date | string
+  }
+
+  export type FabricQCInspectionCreateOrConnectWithoutInspectedByInput = {
+    where: FabricQCInspectionWhereUniqueInput
+    create: XOR<FabricQCInspectionCreateWithoutInspectedByInput, FabricQCInspectionUncheckedCreateWithoutInspectedByInput>
+  }
+
+  export type FabricQCInspectionCreateManyInspectedByInputEnvelope = {
+    data: FabricQCInspectionCreateManyInspectedByInput | FabricQCInspectionCreateManyInspectedByInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type FabricStockLedgerCreateWithoutTransactedByInput = {
+    id?: string
+    entryNumber: string
+    transactionType: $Enums.StockTransactionType
+    quantity: Decimal | DecimalJsLike | number | string
+    referenceType: string
+    referenceId: string
+    transactedAt: Date | string
+    remarks?: string | null
+    createdAt?: Date | string
+    roll: FabricStoreRollCreateNestedOneWithoutLedgerEntriesInput
+    batch: FabricBatchCreateNestedOneWithoutLedgerEntriesInput
+    fromLocation?: InventoryLocationCreateNestedOneWithoutFromLedgerInput
+    toLocation?: InventoryLocationCreateNestedOneWithoutToLedgerInput
+  }
+
+  export type FabricStockLedgerUncheckedCreateWithoutTransactedByInput = {
+    id?: string
+    entryNumber: string
+    rollId: string
+    batchId: string
+    transactionType: $Enums.StockTransactionType
+    quantity: Decimal | DecimalJsLike | number | string
+    referenceType: string
+    referenceId: string
+    fromLocationId?: string | null
+    toLocationId?: string | null
+    transactedAt: Date | string
+    remarks?: string | null
+    createdAt?: Date | string
+  }
+
+  export type FabricStockLedgerCreateOrConnectWithoutTransactedByInput = {
+    where: FabricStockLedgerWhereUniqueInput
+    create: XOR<FabricStockLedgerCreateWithoutTransactedByInput, FabricStockLedgerUncheckedCreateWithoutTransactedByInput>
+  }
+
+  export type FabricStockLedgerCreateManyTransactedByInputEnvelope = {
+    data: FabricStockLedgerCreateManyTransactedByInput | FabricStockLedgerCreateManyTransactedByInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserRoleUpsertWithWhereUniqueWithoutUserInput = {
     where: UserRoleWhereUniqueInput
     update: XOR<UserRoleUpdateWithoutUserInput, UserRoleUncheckedUpdateWithoutUserInput>
@@ -89086,6 +102885,185 @@ export namespace Prisma {
     data: XOR<RecutRequestUpdateManyMutationInput, RecutRequestUncheckedUpdateManyWithoutApprovedByInput>
   }
 
+  export type FabricBatchUpsertWithWhereUniqueWithoutCreatedByInput = {
+    where: FabricBatchWhereUniqueInput
+    update: XOR<FabricBatchUpdateWithoutCreatedByInput, FabricBatchUncheckedUpdateWithoutCreatedByInput>
+    create: XOR<FabricBatchCreateWithoutCreatedByInput, FabricBatchUncheckedCreateWithoutCreatedByInput>
+  }
+
+  export type FabricBatchUpdateWithWhereUniqueWithoutCreatedByInput = {
+    where: FabricBatchWhereUniqueInput
+    data: XOR<FabricBatchUpdateWithoutCreatedByInput, FabricBatchUncheckedUpdateWithoutCreatedByInput>
+  }
+
+  export type FabricBatchUpdateManyWithWhereWithoutCreatedByInput = {
+    where: FabricBatchScalarWhereInput
+    data: XOR<FabricBatchUpdateManyMutationInput, FabricBatchUncheckedUpdateManyWithoutCreatedByInput>
+  }
+
+  export type FabricBatchScalarWhereInput = {
+    AND?: FabricBatchScalarWhereInput | FabricBatchScalarWhereInput[]
+    OR?: FabricBatchScalarWhereInput[]
+    NOT?: FabricBatchScalarWhereInput | FabricBatchScalarWhereInput[]
+    id?: StringFilter<"FabricBatch"> | string
+    batchNumber?: StringFilter<"FabricBatch"> | string
+    programId?: StringNullableFilter<"FabricBatch"> | string | null
+    supplierId?: StringNullableFilter<"FabricBatch"> | string | null
+    fabricType?: StringFilter<"FabricBatch"> | string
+    fabricDescription?: StringFilter<"FabricBatch"> | string
+    colorCode?: StringNullableFilter<"FabricBatch"> | string | null
+    colorName?: StringNullableFilter<"FabricBatch"> | string | null
+    totalRolls?: IntFilter<"FabricBatch"> | number
+    totalMeters?: DecimalFilter<"FabricBatch"> | Decimal | DecimalJsLike | number | string
+    status?: EnumFabricBatchStatusFilter<"FabricBatch"> | $Enums.FabricBatchStatus
+    receivedAt?: DateTimeNullableFilter<"FabricBatch"> | Date | string | null
+    createdById?: StringFilter<"FabricBatch"> | string
+    createdAt?: DateTimeFilter<"FabricBatch"> | Date | string
+    updatedAt?: DateTimeFilter<"FabricBatch"> | Date | string
+  }
+
+  export type MaterialReceiptUpsertWithWhereUniqueWithoutReceivedByInput = {
+    where: MaterialReceiptWhereUniqueInput
+    update: XOR<MaterialReceiptUpdateWithoutReceivedByInput, MaterialReceiptUncheckedUpdateWithoutReceivedByInput>
+    create: XOR<MaterialReceiptCreateWithoutReceivedByInput, MaterialReceiptUncheckedCreateWithoutReceivedByInput>
+  }
+
+  export type MaterialReceiptUpdateWithWhereUniqueWithoutReceivedByInput = {
+    where: MaterialReceiptWhereUniqueInput
+    data: XOR<MaterialReceiptUpdateWithoutReceivedByInput, MaterialReceiptUncheckedUpdateWithoutReceivedByInput>
+  }
+
+  export type MaterialReceiptUpdateManyWithWhereWithoutReceivedByInput = {
+    where: MaterialReceiptScalarWhereInput
+    data: XOR<MaterialReceiptUpdateManyMutationInput, MaterialReceiptUncheckedUpdateManyWithoutReceivedByInput>
+  }
+
+  export type MaterialReceiptScalarWhereInput = {
+    AND?: MaterialReceiptScalarWhereInput | MaterialReceiptScalarWhereInput[]
+    OR?: MaterialReceiptScalarWhereInput[]
+    NOT?: MaterialReceiptScalarWhereInput | MaterialReceiptScalarWhereInput[]
+    id?: StringFilter<"MaterialReceipt"> | string
+    grnNumber?: StringFilter<"MaterialReceipt"> | string
+    batchId?: StringFilter<"MaterialReceipt"> | string
+    challanId?: StringNullableFilter<"MaterialReceipt"> | string | null
+    receivedById?: StringFilter<"MaterialReceipt"> | string
+    receivedAt?: DateTimeFilter<"MaterialReceipt"> | Date | string
+    vehicleNumber?: StringNullableFilter<"MaterialReceipt"> | string | null
+    supplierName?: StringFilter<"MaterialReceipt"> | string
+    totalRollsReceived?: IntFilter<"MaterialReceipt"> | number
+    totalMetersReceived?: DecimalFilter<"MaterialReceipt"> | Decimal | DecimalJsLike | number | string
+    status?: EnumGRNStatusFilter<"MaterialReceipt"> | $Enums.GRNStatus
+    remarks?: StringNullableFilter<"MaterialReceipt"> | string | null
+    createdAt?: DateTimeFilter<"MaterialReceipt"> | Date | string
+    updatedAt?: DateTimeFilter<"MaterialReceipt"> | Date | string
+  }
+
+  export type FabricStoreRollUpsertWithWhereUniqueWithoutQcInspectedByInput = {
+    where: FabricStoreRollWhereUniqueInput
+    update: XOR<FabricStoreRollUpdateWithoutQcInspectedByInput, FabricStoreRollUncheckedUpdateWithoutQcInspectedByInput>
+    create: XOR<FabricStoreRollCreateWithoutQcInspectedByInput, FabricStoreRollUncheckedCreateWithoutQcInspectedByInput>
+  }
+
+  export type FabricStoreRollUpdateWithWhereUniqueWithoutQcInspectedByInput = {
+    where: FabricStoreRollWhereUniqueInput
+    data: XOR<FabricStoreRollUpdateWithoutQcInspectedByInput, FabricStoreRollUncheckedUpdateWithoutQcInspectedByInput>
+  }
+
+  export type FabricStoreRollUpdateManyWithWhereWithoutQcInspectedByInput = {
+    where: FabricStoreRollScalarWhereInput
+    data: XOR<FabricStoreRollUpdateManyMutationInput, FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByInput>
+  }
+
+  export type FabricStoreRollScalarWhereInput = {
+    AND?: FabricStoreRollScalarWhereInput | FabricStoreRollScalarWhereInput[]
+    OR?: FabricStoreRollScalarWhereInput[]
+    NOT?: FabricStoreRollScalarWhereInput | FabricStoreRollScalarWhereInput[]
+    id?: StringFilter<"FabricStoreRoll"> | string
+    rollNumber?: StringFilter<"FabricStoreRoll"> | string
+    batchId?: StringFilter<"FabricStoreRoll"> | string
+    locationId?: StringNullableFilter<"FabricStoreRoll"> | string | null
+    length?: DecimalFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string
+    width?: DecimalNullableFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string | null
+    weight?: DecimalNullableFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string | null
+    status?: EnumFabricRollStatusFilter<"FabricStoreRoll"> | $Enums.FabricRollStatus
+    qcStatus?: EnumFabricQCStatusFilter<"FabricStoreRoll"> | $Enums.FabricQCStatus
+    qcInspectedById?: StringNullableFilter<"FabricStoreRoll"> | string | null
+    qcInspectedAt?: DateTimeNullableFilter<"FabricStoreRoll"> | Date | string | null
+    qcRemarks?: StringNullableFilter<"FabricStoreRoll"> | string | null
+    programIssuedToId?: StringNullableFilter<"FabricStoreRoll"> | string | null
+    issuedAt?: DateTimeNullableFilter<"FabricStoreRoll"> | Date | string | null
+    createdAt?: DateTimeFilter<"FabricStoreRoll"> | Date | string
+    updatedAt?: DateTimeFilter<"FabricStoreRoll"> | Date | string
+  }
+
+  export type FabricQCInspectionUpsertWithWhereUniqueWithoutInspectedByInput = {
+    where: FabricQCInspectionWhereUniqueInput
+    update: XOR<FabricQCInspectionUpdateWithoutInspectedByInput, FabricQCInspectionUncheckedUpdateWithoutInspectedByInput>
+    create: XOR<FabricQCInspectionCreateWithoutInspectedByInput, FabricQCInspectionUncheckedCreateWithoutInspectedByInput>
+  }
+
+  export type FabricQCInspectionUpdateWithWhereUniqueWithoutInspectedByInput = {
+    where: FabricQCInspectionWhereUniqueInput
+    data: XOR<FabricQCInspectionUpdateWithoutInspectedByInput, FabricQCInspectionUncheckedUpdateWithoutInspectedByInput>
+  }
+
+  export type FabricQCInspectionUpdateManyWithWhereWithoutInspectedByInput = {
+    where: FabricQCInspectionScalarWhereInput
+    data: XOR<FabricQCInspectionUpdateManyMutationInput, FabricQCInspectionUncheckedUpdateManyWithoutInspectedByInput>
+  }
+
+  export type FabricQCInspectionScalarWhereInput = {
+    AND?: FabricQCInspectionScalarWhereInput | FabricQCInspectionScalarWhereInput[]
+    OR?: FabricQCInspectionScalarWhereInput[]
+    NOT?: FabricQCInspectionScalarWhereInput | FabricQCInspectionScalarWhereInput[]
+    id?: StringFilter<"FabricQCInspection"> | string
+    inspectionNumber?: StringFilter<"FabricQCInspection"> | string
+    rollId?: StringFilter<"FabricQCInspection"> | string
+    inspectedById?: StringFilter<"FabricQCInspection"> | string
+    inspectionType?: EnumInspectionTypeFilter<"FabricQCInspection"> | $Enums.InspectionType
+    result?: EnumInspectionResultFilter<"FabricQCInspection"> | $Enums.InspectionResult
+    defects?: JsonNullableFilter<"FabricQCInspection">
+    remarks?: StringNullableFilter<"FabricQCInspection"> | string | null
+    inspectedAt?: DateTimeFilter<"FabricQCInspection"> | Date | string
+    createdAt?: DateTimeFilter<"FabricQCInspection"> | Date | string
+  }
+
+  export type FabricStockLedgerUpsertWithWhereUniqueWithoutTransactedByInput = {
+    where: FabricStockLedgerWhereUniqueInput
+    update: XOR<FabricStockLedgerUpdateWithoutTransactedByInput, FabricStockLedgerUncheckedUpdateWithoutTransactedByInput>
+    create: XOR<FabricStockLedgerCreateWithoutTransactedByInput, FabricStockLedgerUncheckedCreateWithoutTransactedByInput>
+  }
+
+  export type FabricStockLedgerUpdateWithWhereUniqueWithoutTransactedByInput = {
+    where: FabricStockLedgerWhereUniqueInput
+    data: XOR<FabricStockLedgerUpdateWithoutTransactedByInput, FabricStockLedgerUncheckedUpdateWithoutTransactedByInput>
+  }
+
+  export type FabricStockLedgerUpdateManyWithWhereWithoutTransactedByInput = {
+    where: FabricStockLedgerScalarWhereInput
+    data: XOR<FabricStockLedgerUpdateManyMutationInput, FabricStockLedgerUncheckedUpdateManyWithoutTransactedByInput>
+  }
+
+  export type FabricStockLedgerScalarWhereInput = {
+    AND?: FabricStockLedgerScalarWhereInput | FabricStockLedgerScalarWhereInput[]
+    OR?: FabricStockLedgerScalarWhereInput[]
+    NOT?: FabricStockLedgerScalarWhereInput | FabricStockLedgerScalarWhereInput[]
+    id?: StringFilter<"FabricStockLedger"> | string
+    entryNumber?: StringFilter<"FabricStockLedger"> | string
+    rollId?: StringFilter<"FabricStockLedger"> | string
+    batchId?: StringFilter<"FabricStockLedger"> | string
+    transactionType?: EnumStockTransactionTypeFilter<"FabricStockLedger"> | $Enums.StockTransactionType
+    quantity?: DecimalFilter<"FabricStockLedger"> | Decimal | DecimalJsLike | number | string
+    referenceType?: StringFilter<"FabricStockLedger"> | string
+    referenceId?: StringFilter<"FabricStockLedger"> | string
+    fromLocationId?: StringNullableFilter<"FabricStockLedger"> | string | null
+    toLocationId?: StringNullableFilter<"FabricStockLedger"> | string | null
+    transactedById?: StringFilter<"FabricStockLedger"> | string
+    transactedAt?: DateTimeFilter<"FabricStockLedger"> | Date | string
+    remarks?: StringNullableFilter<"FabricStockLedger"> | string | null
+    createdAt?: DateTimeFilter<"FabricStockLedger"> | Date | string
+  }
+
   export type UserRoleCreateWithoutRoleInput = {
     id?: string
     assignedAt?: Date | string
@@ -89350,6 +103328,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserUncheckedCreateWithoutUserRolesInput = {
@@ -89380,6 +103363,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserCreateOrConnectWithoutUserRolesInput = {
@@ -89453,6 +103441,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutUserRolesInput = {
@@ -89483,6 +103476,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
   }
 
   export type RoleUpsertWithoutUserRolesInput = {
@@ -90489,6 +104487,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramUncheckedCreateWithoutCustomerInput = {
@@ -90562,6 +104562,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionUncheckedCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramCreateOrConnectWithoutCustomerInput = {
@@ -91128,6 +105130,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramUncheckedCreateWithoutDesignInput = {
@@ -91201,6 +105205,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionUncheckedCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramCreateOrConnectWithoutDesignInput = {
@@ -91867,6 +105873,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserUncheckedCreateWithoutCreatedProgramsInput = {
@@ -91897,6 +105908,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserCreateOrConnectWithoutCreatedProgramsInput = {
@@ -91932,6 +105948,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserUncheckedCreateWithoutApprovedProgramsInput = {
@@ -91962,6 +105983,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserCreateOrConnectWithoutApprovedProgramsInput = {
@@ -92655,6 +106681,108 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type FabricBatchCreateWithoutProgramInput = {
+    id?: string
+    batchNumber: string
+    supplierId?: string | null
+    fabricType: string
+    fabricDescription: string
+    colorCode?: string | null
+    colorName?: string | null
+    totalRolls?: number
+    totalMeters?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.FabricBatchStatus
+    receivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    createdBy: UserCreateNestedOneWithoutFabricBatchesCreatedInput
+    rolls?: FabricStoreRollCreateNestedManyWithoutBatchInput
+    receipts?: MaterialReceiptCreateNestedManyWithoutBatchInput
+    ledgerEntries?: FabricStockLedgerCreateNestedManyWithoutBatchInput
+  }
+
+  export type FabricBatchUncheckedCreateWithoutProgramInput = {
+    id?: string
+    batchNumber: string
+    supplierId?: string | null
+    fabricType: string
+    fabricDescription: string
+    colorCode?: string | null
+    colorName?: string | null
+    totalRolls?: number
+    totalMeters?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.FabricBatchStatus
+    receivedAt?: Date | string | null
+    createdById: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    rolls?: FabricStoreRollUncheckedCreateNestedManyWithoutBatchInput
+    receipts?: MaterialReceiptUncheckedCreateNestedManyWithoutBatchInput
+    ledgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutBatchInput
+  }
+
+  export type FabricBatchCreateOrConnectWithoutProgramInput = {
+    where: FabricBatchWhereUniqueInput
+    create: XOR<FabricBatchCreateWithoutProgramInput, FabricBatchUncheckedCreateWithoutProgramInput>
+  }
+
+  export type FabricBatchCreateManyProgramInputEnvelope = {
+    data: FabricBatchCreateManyProgramInput | FabricBatchCreateManyProgramInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type FabricStoreRollCreateWithoutProgramIssuedToInput = {
+    id?: string
+    rollNumber: string
+    length: Decimal | DecimalJsLike | number | string
+    width?: Decimal | DecimalJsLike | number | string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    status?: $Enums.FabricRollStatus
+    qcStatus?: $Enums.FabricQCStatus
+    qcInspectedAt?: Date | string | null
+    qcRemarks?: string | null
+    issuedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    batch: FabricBatchCreateNestedOneWithoutRollsInput
+    location?: InventoryLocationCreateNestedOneWithoutRollsInput
+    qcInspectedBy?: UserCreateNestedOneWithoutFabricRollsInspectedInput
+    receiptItems?: MaterialReceiptItemCreateNestedManyWithoutRollInput
+    qcInspections?: FabricQCInspectionCreateNestedManyWithoutRollInput
+    ledgerEntries?: FabricStockLedgerCreateNestedManyWithoutRollInput
+  }
+
+  export type FabricStoreRollUncheckedCreateWithoutProgramIssuedToInput = {
+    id?: string
+    rollNumber: string
+    batchId: string
+    locationId?: string | null
+    length: Decimal | DecimalJsLike | number | string
+    width?: Decimal | DecimalJsLike | number | string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    status?: $Enums.FabricRollStatus
+    qcStatus?: $Enums.FabricQCStatus
+    qcInspectedById?: string | null
+    qcInspectedAt?: Date | string | null
+    qcRemarks?: string | null
+    issuedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    receiptItems?: MaterialReceiptItemUncheckedCreateNestedManyWithoutRollInput
+    qcInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutRollInput
+    ledgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutRollInput
+  }
+
+  export type FabricStoreRollCreateOrConnectWithoutProgramIssuedToInput = {
+    where: FabricStoreRollWhereUniqueInput
+    create: XOR<FabricStoreRollCreateWithoutProgramIssuedToInput, FabricStoreRollUncheckedCreateWithoutProgramIssuedToInput>
+  }
+
+  export type FabricStoreRollCreateManyProgramIssuedToInputEnvelope = {
+    data: FabricStoreRollCreateManyProgramIssuedToInput | FabricStoreRollCreateManyProgramIssuedToInput[]
+    skipDuplicates?: boolean
+  }
+
   export type CustomerUpsertWithoutProgramsInput = {
     update: XOR<CustomerUpdateWithoutProgramsInput, CustomerUncheckedUpdateWithoutProgramsInput>
     create: XOR<CustomerCreateWithoutProgramsInput, CustomerUncheckedCreateWithoutProgramsInput>
@@ -92782,6 +106910,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCreatedProgramsInput = {
@@ -92812,6 +106945,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
   }
 
   export type UserUpsertWithoutApprovedProgramsInput = {
@@ -92853,6 +106991,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutApprovedProgramsInput = {
@@ -92883,6 +107026,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
   }
 
   export type ProgramFabricUpsertWithWhereUniqueWithoutProgramInput = {
@@ -93184,6 +107332,38 @@ export namespace Prisma {
     data: XOR<RecutRequestUpdateManyMutationInput, RecutRequestUncheckedUpdateManyWithoutProgramInput>
   }
 
+  export type FabricBatchUpsertWithWhereUniqueWithoutProgramInput = {
+    where: FabricBatchWhereUniqueInput
+    update: XOR<FabricBatchUpdateWithoutProgramInput, FabricBatchUncheckedUpdateWithoutProgramInput>
+    create: XOR<FabricBatchCreateWithoutProgramInput, FabricBatchUncheckedCreateWithoutProgramInput>
+  }
+
+  export type FabricBatchUpdateWithWhereUniqueWithoutProgramInput = {
+    where: FabricBatchWhereUniqueInput
+    data: XOR<FabricBatchUpdateWithoutProgramInput, FabricBatchUncheckedUpdateWithoutProgramInput>
+  }
+
+  export type FabricBatchUpdateManyWithWhereWithoutProgramInput = {
+    where: FabricBatchScalarWhereInput
+    data: XOR<FabricBatchUpdateManyMutationInput, FabricBatchUncheckedUpdateManyWithoutProgramInput>
+  }
+
+  export type FabricStoreRollUpsertWithWhereUniqueWithoutProgramIssuedToInput = {
+    where: FabricStoreRollWhereUniqueInput
+    update: XOR<FabricStoreRollUpdateWithoutProgramIssuedToInput, FabricStoreRollUncheckedUpdateWithoutProgramIssuedToInput>
+    create: XOR<FabricStoreRollCreateWithoutProgramIssuedToInput, FabricStoreRollUncheckedCreateWithoutProgramIssuedToInput>
+  }
+
+  export type FabricStoreRollUpdateWithWhereUniqueWithoutProgramIssuedToInput = {
+    where: FabricStoreRollWhereUniqueInput
+    data: XOR<FabricStoreRollUpdateWithoutProgramIssuedToInput, FabricStoreRollUncheckedUpdateWithoutProgramIssuedToInput>
+  }
+
+  export type FabricStoreRollUpdateManyWithWhereWithoutProgramIssuedToInput = {
+    where: FabricStoreRollScalarWhereInput
+    data: XOR<FabricStoreRollUpdateManyMutationInput, FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToInput>
+  }
+
   export type ProgramCreateWithoutFabricsInput = {
     id?: string
     programNumber: string
@@ -93255,6 +107435,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramUncheckedCreateWithoutFabricsInput = {
@@ -93328,6 +107510,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionUncheckedCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramCreateOrConnectWithoutFabricsInput = {
@@ -93481,6 +107665,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutFabricsInput = {
@@ -93554,6 +107740,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUncheckedUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type FabricUpsertWithoutProgramFabricsInput = {
@@ -93703,6 +107891,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramUncheckedCreateWithoutColoursInput = {
@@ -93776,6 +107966,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionUncheckedCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramCreateOrConnectWithoutColoursInput = {
@@ -93894,6 +108086,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutColoursInput = {
@@ -93967,6 +108161,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUncheckedUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ColourUpsertWithoutProgramColoursInput = {
@@ -94075,6 +108271,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramUncheckedCreateWithoutSizesInput = {
@@ -94148,6 +108346,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionUncheckedCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramCreateOrConnectWithoutSizesInput = {
@@ -94266,6 +108466,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutSizesInput = {
@@ -94339,6 +108541,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUncheckedUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type SizeUpsertWithoutProgramSizesInput = {
@@ -94447,6 +108651,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramUncheckedCreateWithoutSpecificationsInput = {
@@ -94520,6 +108726,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionUncheckedCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramCreateOrConnectWithoutSpecificationsInput = {
@@ -94638,6 +108846,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutSpecificationsInput = {
@@ -94711,6 +108921,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUncheckedUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type SizeUpsertWithoutSpecificationsInput = {
@@ -94819,6 +109031,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramUncheckedCreateWithoutBomItemsInput = {
@@ -94892,6 +109106,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionUncheckedCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramCreateOrConnectWithoutBomItemsInput = {
@@ -95055,6 +109271,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutBomItemsInput = {
@@ -95128,6 +109346,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUncheckedUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ItemUpsertWithoutBomItemsInput = {
@@ -95287,6 +109507,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramUncheckedCreateWithoutRoutesInput = {
@@ -95360,6 +109582,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionUncheckedCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramCreateOrConnectWithoutRoutesInput = {
@@ -95491,6 +109715,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutRoutesInput = {
@@ -95564,6 +109790,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUncheckedUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ProgramRouteStepUpsertWithWhereUniqueWithoutProgramRouteInput = {
@@ -95734,6 +109962,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserUncheckedCreateWithoutAttachmentsInput = {
@@ -95764,6 +109997,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserCreateOrConnectWithoutAttachmentsInput = {
@@ -95810,6 +110048,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAttachmentsInput = {
@@ -95840,6 +110083,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
   }
 
   export type UserCreateWithoutAuditLogsInput = {
@@ -95870,6 +110118,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserUncheckedCreateWithoutAuditLogsInput = {
@@ -95900,6 +110153,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserCreateOrConnectWithoutAuditLogsInput = {
@@ -95946,6 +110204,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAuditLogsInput = {
@@ -95976,6 +110239,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
   }
 
   export type ProgramCreateWithoutChallansInput = {
@@ -96049,6 +110317,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramUncheckedCreateWithoutChallansInput = {
@@ -96122,6 +110392,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionUncheckedCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramCreateOrConnectWithoutChallansInput = {
@@ -96354,6 +110626,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserUncheckedCreateWithoutCreatedChallansInput = {
@@ -96384,6 +110661,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserCreateOrConnectWithoutCreatedChallansInput = {
@@ -96419,6 +110701,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserUncheckedCreateWithoutIssuedChallansInput = {
@@ -96449,6 +110736,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserCreateOrConnectWithoutIssuedChallansInput = {
@@ -96484,6 +110776,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserUncheckedCreateWithoutReceivedChallansInput = {
@@ -96514,6 +110811,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserCreateOrConnectWithoutReceivedChallansInput = {
@@ -96549,6 +110851,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserUncheckedCreateWithoutApprovedChallansInput = {
@@ -96579,6 +110886,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserCreateOrConnectWithoutApprovedChallansInput = {
@@ -96958,6 +111270,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutChallansInput = {
@@ -97031,6 +111345,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUncheckedUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ChallanUpsertWithoutChildChallansInput = {
@@ -97237,6 +111553,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCreatedChallansInput = {
@@ -97267,6 +111588,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
   }
 
   export type UserUpsertWithoutIssuedChallansInput = {
@@ -97308,6 +111634,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutIssuedChallansInput = {
@@ -97338,6 +111669,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
   }
 
   export type UserUpsertWithoutReceivedChallansInput = {
@@ -97379,6 +111715,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReceivedChallansInput = {
@@ -97409,6 +111750,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
   }
 
   export type UserUpsertWithoutApprovedChallansInput = {
@@ -97450,6 +111796,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutApprovedChallansInput = {
@@ -97480,6 +111831,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
   }
 
   export type ChallanItemUpsertWithWhereUniqueWithoutChallanInput = {
@@ -97804,6 +112160,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramUncheckedCreateWithoutProductionLogsInput = {
@@ -97877,6 +112235,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionUncheckedCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramCreateOrConnectWithoutProductionLogsInput = {
@@ -97973,6 +112333,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserUncheckedCreateWithoutProductionRecordsInput = {
@@ -98003,6 +112368,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserCreateOrConnectWithoutProductionRecordsInput = {
@@ -98092,6 +112462,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutProductionLogsInput = {
@@ -98165,6 +112537,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUncheckedUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ChallanUpsertWithoutProductionLogsInput = {
@@ -98273,6 +112647,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutProductionRecordsInput = {
@@ -98303,6 +112682,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
   }
 
   export type ChallanCreateWithoutInspectionsInput = {
@@ -98394,6 +112778,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserUncheckedCreateWithoutInspectionsInput = {
@@ -98424,6 +112813,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserCreateOrConnectWithoutInspectionsInput = {
@@ -98597,6 +112991,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutInspectionsInput = {
@@ -98627,6 +113026,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
   }
 
   export type DefectLogUpsertWithWhereUniqueWithoutInspectionInput = {
@@ -98846,6 +113250,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserUncheckedCreateWithoutChallanEventsInput = {
@@ -98876,6 +113285,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserCreateOrConnectWithoutChallanEventsInput = {
@@ -98989,6 +113403,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutChallanEventsInput = {
@@ -99019,6 +113438,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
   }
 
   export type ProgramCreateWithoutStockLedgerEntriesInput = {
@@ -99092,6 +113516,8 @@ export namespace Prisma {
     defects?: DefectRecordCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramUncheckedCreateWithoutStockLedgerEntriesInput = {
@@ -99165,6 +113591,8 @@ export namespace Prisma {
     defects?: DefectRecordUncheckedCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionUncheckedCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramCreateOrConnectWithoutStockLedgerEntriesInput = {
@@ -99200,6 +113628,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserUncheckedCreateWithoutStockLedgerEntriesInput = {
@@ -99230,6 +113663,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserCreateOrConnectWithoutStockLedgerEntriesInput = {
@@ -99319,6 +113757,8 @@ export namespace Prisma {
     defects?: DefectRecordUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutStockLedgerEntriesInput = {
@@ -99392,6 +113832,8 @@ export namespace Prisma {
     defects?: DefectRecordUncheckedUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUncheckedUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type UserUpsertWithoutStockLedgerEntriesInput = {
@@ -99433,6 +113875,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutStockLedgerEntriesInput = {
@@ -99463,6 +113910,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
   }
 
   export type ProgramCreateWithoutRollsInput = {
@@ -99536,6 +113988,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramUncheckedCreateWithoutRollsInput = {
@@ -99609,6 +114063,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionUncheckedCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramCreateOrConnectWithoutRollsInput = {
@@ -99801,6 +114257,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutRollsInput = {
@@ -99874,6 +114332,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUncheckedUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type SupplierUpsertWithoutFabricRollsInput = {
@@ -100012,6 +114472,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramUncheckedCreateWithoutBundlesInput = {
@@ -100085,6 +114547,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionUncheckedCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramCreateOrConnectWithoutBundlesInput = {
@@ -100446,6 +114910,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutBundlesInput = {
@@ -100519,6 +114985,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUncheckedUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ChallanUpsertWithoutBundlesInput = {
@@ -100785,6 +115253,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramUncheckedCreateWithoutCartonsInput = {
@@ -100858,6 +115328,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionUncheckedCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramCreateOrConnectWithoutCartonsInput = {
@@ -100993,6 +115465,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutCartonsInput = {
@@ -101066,6 +115540,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUncheckedUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type CartonBundleUpsertWithWhereUniqueWithoutCartonInput = {
@@ -101387,6 +115863,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserUncheckedCreateWithoutDispatchesApprovedInput = {
@@ -101417,6 +115898,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserCreateOrConnectWithoutDispatchesApprovedInput = {
@@ -101452,6 +115938,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserUncheckedCreateWithoutDispatchesOperatedInput = {
@@ -101482,6 +115973,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserCreateOrConnectWithoutDispatchesOperatedInput = {
@@ -101597,6 +116093,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutDispatchesApprovedInput = {
@@ -101627,6 +116128,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
   }
 
   export type UserUpsertWithoutDispatchesOperatedInput = {
@@ -101668,6 +116174,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutDispatchesOperatedInput = {
@@ -101698,6 +116209,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
   }
 
   export type DispatchCartonUpsertWithWhereUniqueWithoutDispatchInput = {
@@ -101983,6 +116499,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramUncheckedCreateWithoutDefectsInput = {
@@ -102056,6 +116574,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionUncheckedCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramCreateOrConnectWithoutDefectsInput = {
@@ -102207,6 +116727,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserUncheckedCreateWithoutDefectsDetectedInput = {
@@ -102237,6 +116762,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserCreateOrConnectWithoutDefectsDetectedInput = {
@@ -102414,6 +116944,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutDefectsInput = {
@@ -102487,6 +117019,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUncheckedUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ChallanUpsertWithoutDefectsInput = {
@@ -102656,6 +117190,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutDefectsDetectedInput = {
@@ -102686,6 +117225,11 @@ export namespace Prisma {
     reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
   }
 
   export type ReworkTransactionUpsertWithWhereUniqueWithoutDefectInput = {
@@ -102836,6 +117380,8 @@ export namespace Prisma {
     defects?: DefectRecordCreateNestedManyWithoutProgramInput
     stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramUncheckedCreateWithoutReworkTransactionsInput = {
@@ -102909,6 +117455,8 @@ export namespace Prisma {
     defects?: DefectRecordUncheckedCreateNestedManyWithoutProgramInput
     stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramCreateOrConnectWithoutReworkTransactionsInput = {
@@ -102944,6 +117492,11 @@ export namespace Prisma {
     defectsDetected?: DefectRecordCreateNestedManyWithoutDetectedByInput
     recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserUncheckedCreateWithoutReworkOperationsInput = {
@@ -102974,6 +117527,11 @@ export namespace Prisma {
     defectsDetected?: DefectRecordUncheckedCreateNestedManyWithoutDetectedByInput
     recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
     recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserCreateOrConnectWithoutReworkOperationsInput = {
@@ -103114,6 +117672,8 @@ export namespace Prisma {
     defects?: DefectRecordUpdateManyWithoutProgramNestedInput
     stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutReworkTransactionsInput = {
@@ -103187,6 +117747,8 @@ export namespace Prisma {
     defects?: DefectRecordUncheckedUpdateManyWithoutProgramNestedInput
     stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type UserUpsertWithoutReworkOperationsInput = {
@@ -103228,6 +117790,11 @@ export namespace Prisma {
     defectsDetected?: DefectRecordUpdateManyWithoutDetectedByNestedInput
     recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReworkOperationsInput = {
@@ -103258,6 +117825,11 @@ export namespace Prisma {
     defectsDetected?: DefectRecordUncheckedUpdateManyWithoutDetectedByNestedInput
     recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
     recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
   }
 
   export type ProgramCreateWithoutRecutRequestsInput = {
@@ -103331,6 +117903,8 @@ export namespace Prisma {
     defects?: DefectRecordCreateNestedManyWithoutProgramInput
     stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramUncheckedCreateWithoutRecutRequestsInput = {
@@ -103404,6 +117978,8 @@ export namespace Prisma {
     defects?: DefectRecordUncheckedCreateNestedManyWithoutProgramInput
     stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutProgramInput
     reworkTransactions?: ReworkTransactionUncheckedCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
   }
 
   export type ProgramCreateOrConnectWithoutRecutRequestsInput = {
@@ -103539,6 +118115,11 @@ export namespace Prisma {
     defectsDetected?: DefectRecordCreateNestedManyWithoutDetectedByInput
     reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
     recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserUncheckedCreateWithoutRecutsRequestedInput = {
@@ -103569,6 +118150,11 @@ export namespace Prisma {
     defectsDetected?: DefectRecordUncheckedCreateNestedManyWithoutDetectedByInput
     reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
     recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserCreateOrConnectWithoutRecutsRequestedInput = {
@@ -103604,6 +118190,11 @@ export namespace Prisma {
     defectsDetected?: DefectRecordCreateNestedManyWithoutDetectedByInput
     reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserUncheckedCreateWithoutRecutsApprovedInput = {
@@ -103634,6 +118225,11 @@ export namespace Prisma {
     defectsDetected?: DefectRecordUncheckedCreateNestedManyWithoutDetectedByInput
     reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
     recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
   }
 
   export type UserCreateOrConnectWithoutRecutsApprovedInput = {
@@ -103778,6 +118374,8 @@ export namespace Prisma {
     defects?: DefectRecordUpdateManyWithoutProgramNestedInput
     stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutRecutRequestsInput = {
@@ -103851,6 +118449,8 @@ export namespace Prisma {
     defects?: DefectRecordUncheckedUpdateManyWithoutProgramNestedInput
     stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUncheckedUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type DefectRecordUpsertWithoutRecutRequestsInput = {
@@ -104004,6 +118604,11 @@ export namespace Prisma {
     defectsDetected?: DefectRecordUpdateManyWithoutDetectedByNestedInput
     reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
     recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutRecutsRequestedInput = {
@@ -104034,6 +118639,11 @@ export namespace Prisma {
     defectsDetected?: DefectRecordUncheckedUpdateManyWithoutDetectedByNestedInput
     reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
     recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
   }
 
   export type UserUpsertWithoutRecutsApprovedInput = {
@@ -104075,6 +118685,11 @@ export namespace Prisma {
     defectsDetected?: DefectRecordUpdateManyWithoutDetectedByNestedInput
     reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutRecutsApprovedInput = {
@@ -104105,6 +118720,11 @@ export namespace Prisma {
     defectsDetected?: DefectRecordUncheckedUpdateManyWithoutDetectedByNestedInput
     reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
     recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
   }
 
   export type BundleUpsertWithoutReplacementForInput = {
@@ -104234,6 +118854,2861 @@ export namespace Prisma {
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     inspectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     defects?: DefectLogUncheckedUpdateManyWithoutInspectionNestedInput
+  }
+
+  export type FabricStoreRollCreateWithoutLocationInput = {
+    id?: string
+    rollNumber: string
+    length: Decimal | DecimalJsLike | number | string
+    width?: Decimal | DecimalJsLike | number | string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    status?: $Enums.FabricRollStatus
+    qcStatus?: $Enums.FabricQCStatus
+    qcInspectedAt?: Date | string | null
+    qcRemarks?: string | null
+    issuedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    batch: FabricBatchCreateNestedOneWithoutRollsInput
+    qcInspectedBy?: UserCreateNestedOneWithoutFabricRollsInspectedInput
+    programIssuedTo?: ProgramCreateNestedOneWithoutFabricStoreRollsInput
+    receiptItems?: MaterialReceiptItemCreateNestedManyWithoutRollInput
+    qcInspections?: FabricQCInspectionCreateNestedManyWithoutRollInput
+    ledgerEntries?: FabricStockLedgerCreateNestedManyWithoutRollInput
+  }
+
+  export type FabricStoreRollUncheckedCreateWithoutLocationInput = {
+    id?: string
+    rollNumber: string
+    batchId: string
+    length: Decimal | DecimalJsLike | number | string
+    width?: Decimal | DecimalJsLike | number | string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    status?: $Enums.FabricRollStatus
+    qcStatus?: $Enums.FabricQCStatus
+    qcInspectedById?: string | null
+    qcInspectedAt?: Date | string | null
+    qcRemarks?: string | null
+    programIssuedToId?: string | null
+    issuedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    receiptItems?: MaterialReceiptItemUncheckedCreateNestedManyWithoutRollInput
+    qcInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutRollInput
+    ledgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutRollInput
+  }
+
+  export type FabricStoreRollCreateOrConnectWithoutLocationInput = {
+    where: FabricStoreRollWhereUniqueInput
+    create: XOR<FabricStoreRollCreateWithoutLocationInput, FabricStoreRollUncheckedCreateWithoutLocationInput>
+  }
+
+  export type FabricStoreRollCreateManyLocationInputEnvelope = {
+    data: FabricStoreRollCreateManyLocationInput | FabricStoreRollCreateManyLocationInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type FabricStockLedgerCreateWithoutFromLocationInput = {
+    id?: string
+    entryNumber: string
+    transactionType: $Enums.StockTransactionType
+    quantity: Decimal | DecimalJsLike | number | string
+    referenceType: string
+    referenceId: string
+    transactedAt: Date | string
+    remarks?: string | null
+    createdAt?: Date | string
+    roll: FabricStoreRollCreateNestedOneWithoutLedgerEntriesInput
+    batch: FabricBatchCreateNestedOneWithoutLedgerEntriesInput
+    toLocation?: InventoryLocationCreateNestedOneWithoutToLedgerInput
+    transactedBy: UserCreateNestedOneWithoutFabricLedgerEntriesInput
+  }
+
+  export type FabricStockLedgerUncheckedCreateWithoutFromLocationInput = {
+    id?: string
+    entryNumber: string
+    rollId: string
+    batchId: string
+    transactionType: $Enums.StockTransactionType
+    quantity: Decimal | DecimalJsLike | number | string
+    referenceType: string
+    referenceId: string
+    toLocationId?: string | null
+    transactedById: string
+    transactedAt: Date | string
+    remarks?: string | null
+    createdAt?: Date | string
+  }
+
+  export type FabricStockLedgerCreateOrConnectWithoutFromLocationInput = {
+    where: FabricStockLedgerWhereUniqueInput
+    create: XOR<FabricStockLedgerCreateWithoutFromLocationInput, FabricStockLedgerUncheckedCreateWithoutFromLocationInput>
+  }
+
+  export type FabricStockLedgerCreateManyFromLocationInputEnvelope = {
+    data: FabricStockLedgerCreateManyFromLocationInput | FabricStockLedgerCreateManyFromLocationInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type FabricStockLedgerCreateWithoutToLocationInput = {
+    id?: string
+    entryNumber: string
+    transactionType: $Enums.StockTransactionType
+    quantity: Decimal | DecimalJsLike | number | string
+    referenceType: string
+    referenceId: string
+    transactedAt: Date | string
+    remarks?: string | null
+    createdAt?: Date | string
+    roll: FabricStoreRollCreateNestedOneWithoutLedgerEntriesInput
+    batch: FabricBatchCreateNestedOneWithoutLedgerEntriesInput
+    fromLocation?: InventoryLocationCreateNestedOneWithoutFromLedgerInput
+    transactedBy: UserCreateNestedOneWithoutFabricLedgerEntriesInput
+  }
+
+  export type FabricStockLedgerUncheckedCreateWithoutToLocationInput = {
+    id?: string
+    entryNumber: string
+    rollId: string
+    batchId: string
+    transactionType: $Enums.StockTransactionType
+    quantity: Decimal | DecimalJsLike | number | string
+    referenceType: string
+    referenceId: string
+    fromLocationId?: string | null
+    transactedById: string
+    transactedAt: Date | string
+    remarks?: string | null
+    createdAt?: Date | string
+  }
+
+  export type FabricStockLedgerCreateOrConnectWithoutToLocationInput = {
+    where: FabricStockLedgerWhereUniqueInput
+    create: XOR<FabricStockLedgerCreateWithoutToLocationInput, FabricStockLedgerUncheckedCreateWithoutToLocationInput>
+  }
+
+  export type FabricStockLedgerCreateManyToLocationInputEnvelope = {
+    data: FabricStockLedgerCreateManyToLocationInput | FabricStockLedgerCreateManyToLocationInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type FabricStoreRollUpsertWithWhereUniqueWithoutLocationInput = {
+    where: FabricStoreRollWhereUniqueInput
+    update: XOR<FabricStoreRollUpdateWithoutLocationInput, FabricStoreRollUncheckedUpdateWithoutLocationInput>
+    create: XOR<FabricStoreRollCreateWithoutLocationInput, FabricStoreRollUncheckedCreateWithoutLocationInput>
+  }
+
+  export type FabricStoreRollUpdateWithWhereUniqueWithoutLocationInput = {
+    where: FabricStoreRollWhereUniqueInput
+    data: XOR<FabricStoreRollUpdateWithoutLocationInput, FabricStoreRollUncheckedUpdateWithoutLocationInput>
+  }
+
+  export type FabricStoreRollUpdateManyWithWhereWithoutLocationInput = {
+    where: FabricStoreRollScalarWhereInput
+    data: XOR<FabricStoreRollUpdateManyMutationInput, FabricStoreRollUncheckedUpdateManyWithoutLocationInput>
+  }
+
+  export type FabricStockLedgerUpsertWithWhereUniqueWithoutFromLocationInput = {
+    where: FabricStockLedgerWhereUniqueInput
+    update: XOR<FabricStockLedgerUpdateWithoutFromLocationInput, FabricStockLedgerUncheckedUpdateWithoutFromLocationInput>
+    create: XOR<FabricStockLedgerCreateWithoutFromLocationInput, FabricStockLedgerUncheckedCreateWithoutFromLocationInput>
+  }
+
+  export type FabricStockLedgerUpdateWithWhereUniqueWithoutFromLocationInput = {
+    where: FabricStockLedgerWhereUniqueInput
+    data: XOR<FabricStockLedgerUpdateWithoutFromLocationInput, FabricStockLedgerUncheckedUpdateWithoutFromLocationInput>
+  }
+
+  export type FabricStockLedgerUpdateManyWithWhereWithoutFromLocationInput = {
+    where: FabricStockLedgerScalarWhereInput
+    data: XOR<FabricStockLedgerUpdateManyMutationInput, FabricStockLedgerUncheckedUpdateManyWithoutFromLocationInput>
+  }
+
+  export type FabricStockLedgerUpsertWithWhereUniqueWithoutToLocationInput = {
+    where: FabricStockLedgerWhereUniqueInput
+    update: XOR<FabricStockLedgerUpdateWithoutToLocationInput, FabricStockLedgerUncheckedUpdateWithoutToLocationInput>
+    create: XOR<FabricStockLedgerCreateWithoutToLocationInput, FabricStockLedgerUncheckedCreateWithoutToLocationInput>
+  }
+
+  export type FabricStockLedgerUpdateWithWhereUniqueWithoutToLocationInput = {
+    where: FabricStockLedgerWhereUniqueInput
+    data: XOR<FabricStockLedgerUpdateWithoutToLocationInput, FabricStockLedgerUncheckedUpdateWithoutToLocationInput>
+  }
+
+  export type FabricStockLedgerUpdateManyWithWhereWithoutToLocationInput = {
+    where: FabricStockLedgerScalarWhereInput
+    data: XOR<FabricStockLedgerUpdateManyMutationInput, FabricStockLedgerUncheckedUpdateManyWithoutToLocationInput>
+  }
+
+  export type ProgramCreateWithoutFabricBatchesInput = {
+    id?: string
+    programNumber: string
+    programDate?: Date | string
+    buyerName: string
+    orderNumber: string
+    designName: string
+    styleCode: string
+    productCategory: string
+    targetQuantity: number
+    deliveryDate: Date | string
+    priority?: string
+    status?: string
+    remarks?: string | null
+    approvedAt?: Date | string | null
+    programSerialNo?: string | null
+    startDate?: Date | string | null
+    designNumber?: string | null
+    clientName?: string | null
+    clientPriority?: string | null
+    mainStyle?: string | null
+    subStyle?: string | null
+    pattern?: string | null
+    baseDesignType?: string | null
+    baseDesignPhoto?: string | null
+    wilcomDesignNumber?: string | null
+    wilcomDesignPhoto?: string | null
+    embroideryDesign?: string | null
+    embroideryDesignSize?: string | null
+    fabricName?: string | null
+    fabricType?: string | null
+    fabricWidth?: string | null
+    fabricWidthInches?: number | null
+    fabricColor?: string | null
+    fabricColorAvailable?: string | null
+    fabricAverage?: number | null
+    fabricAverageType?: string | null
+    fabricAverageMeasurement?: string | null
+    fabricDyeingRequired?: boolean
+    fabricIssuedToDyeing?: number | null
+    fabricSentToDyeing?: number | null
+    colorQuantity?: number | null
+    quantityMeasurement?: string | null
+    specialMaterial?: string | null
+    specialMaterialQuantity?: string | null
+    productionDesignDate?: Date | string | null
+    productionEndDate?: Date | string | null
+    piecesRejection?: number | null
+    rejectionReason?: string | null
+    comments?: string | null
+    metadataJson?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    customer?: CustomerCreateNestedOneWithoutProgramsInput
+    design?: DesignCreateNestedOneWithoutProgramsInput
+    createdBy: UserCreateNestedOneWithoutCreatedProgramsInput
+    approvedBy?: UserCreateNestedOneWithoutApprovedProgramsInput
+    fabrics?: ProgramFabricCreateNestedManyWithoutProgramInput
+    colours?: ProgramColourCreateNestedManyWithoutProgramInput
+    sizes?: ProgramSizeCreateNestedManyWithoutProgramInput
+    specifications?: ProgramSpecificationCreateNestedManyWithoutProgramInput
+    bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
+    routes?: ProgramRouteCreateNestedManyWithoutProgramInput
+    challans?: ChallanCreateNestedManyWithoutProgramInput
+    productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
+    rolls?: FabricRollCreateNestedManyWithoutProgramInput
+    bundles?: BundleCreateNestedManyWithoutProgramInput
+    cartons?: CartonCreateNestedManyWithoutProgramInput
+    defects?: DefectRecordCreateNestedManyWithoutProgramInput
+    stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutProgramInput
+    reworkTransactions?: ReworkTransactionCreateNestedManyWithoutProgramInput
+    recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
+  }
+
+  export type ProgramUncheckedCreateWithoutFabricBatchesInput = {
+    id?: string
+    programNumber: string
+    programDate?: Date | string
+    customerId?: string | null
+    buyerName: string
+    orderNumber: string
+    designId?: string | null
+    designName: string
+    styleCode: string
+    productCategory: string
+    targetQuantity: number
+    deliveryDate: Date | string
+    priority?: string
+    status?: string
+    remarks?: string | null
+    createdById: string
+    approvedById?: string | null
+    approvedAt?: Date | string | null
+    programSerialNo?: string | null
+    startDate?: Date | string | null
+    designNumber?: string | null
+    clientName?: string | null
+    clientPriority?: string | null
+    mainStyle?: string | null
+    subStyle?: string | null
+    pattern?: string | null
+    baseDesignType?: string | null
+    baseDesignPhoto?: string | null
+    wilcomDesignNumber?: string | null
+    wilcomDesignPhoto?: string | null
+    embroideryDesign?: string | null
+    embroideryDesignSize?: string | null
+    fabricName?: string | null
+    fabricType?: string | null
+    fabricWidth?: string | null
+    fabricWidthInches?: number | null
+    fabricColor?: string | null
+    fabricColorAvailable?: string | null
+    fabricAverage?: number | null
+    fabricAverageType?: string | null
+    fabricAverageMeasurement?: string | null
+    fabricDyeingRequired?: boolean
+    fabricIssuedToDyeing?: number | null
+    fabricSentToDyeing?: number | null
+    colorQuantity?: number | null
+    quantityMeasurement?: string | null
+    specialMaterial?: string | null
+    specialMaterialQuantity?: string | null
+    productionDesignDate?: Date | string | null
+    productionEndDate?: Date | string | null
+    piecesRejection?: number | null
+    rejectionReason?: string | null
+    comments?: string | null
+    metadataJson?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    fabrics?: ProgramFabricUncheckedCreateNestedManyWithoutProgramInput
+    colours?: ProgramColourUncheckedCreateNestedManyWithoutProgramInput
+    sizes?: ProgramSizeUncheckedCreateNestedManyWithoutProgramInput
+    specifications?: ProgramSpecificationUncheckedCreateNestedManyWithoutProgramInput
+    bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
+    routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
+    challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
+    rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
+    bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
+    cartons?: CartonUncheckedCreateNestedManyWithoutProgramInput
+    defects?: DefectRecordUncheckedCreateNestedManyWithoutProgramInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutProgramInput
+    reworkTransactions?: ReworkTransactionUncheckedCreateNestedManyWithoutProgramInput
+    recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
+  }
+
+  export type ProgramCreateOrConnectWithoutFabricBatchesInput = {
+    where: ProgramWhereUniqueInput
+    create: XOR<ProgramCreateWithoutFabricBatchesInput, ProgramUncheckedCreateWithoutFabricBatchesInput>
+  }
+
+  export type UserCreateWithoutFabricBatchesCreatedInput = {
+    id?: string
+    username: string
+    email: string
+    fullName: string
+    passwordHash: string
+    departmentCode?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userRoles?: UserRoleCreateNestedManyWithoutUserInput
+    createdPrograms?: ProgramCreateNestedManyWithoutCreatedByInput
+    approvedPrograms?: ProgramCreateNestedManyWithoutApprovedByInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    attachments?: AttachmentCreateNestedManyWithoutUploadedByInput
+    createdChallans?: ChallanCreateNestedManyWithoutCreatedByInput
+    issuedChallans?: ChallanCreateNestedManyWithoutIssuedByInput
+    receivedChallans?: ChallanCreateNestedManyWithoutReceivedByInput
+    approvedChallans?: ChallanCreateNestedManyWithoutApprovedByInput
+    productionRecords?: ProductionTransactionCreateNestedManyWithoutOperatorInput
+    inspections?: QualityInspectionCreateNestedManyWithoutInspectorInput
+    challanEvents?: ChallanEventCreateNestedManyWithoutActorInput
+    stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutActorInput
+    dispatchesApproved?: DispatchOrderCreateNestedManyWithoutApprovedByInput
+    dispatchesOperated?: DispatchOrderCreateNestedManyWithoutDispatchedByInput
+    defectsDetected?: DefectRecordCreateNestedManyWithoutDetectedByInput
+    reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
+    recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
+    recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+  }
+
+  export type UserUncheckedCreateWithoutFabricBatchesCreatedInput = {
+    id?: string
+    username: string
+    email: string
+    fullName: string
+    passwordHash: string
+    departmentCode?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userRoles?: UserRoleUncheckedCreateNestedManyWithoutUserInput
+    createdPrograms?: ProgramUncheckedCreateNestedManyWithoutCreatedByInput
+    approvedPrograms?: ProgramUncheckedCreateNestedManyWithoutApprovedByInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    attachments?: AttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+    createdChallans?: ChallanUncheckedCreateNestedManyWithoutCreatedByInput
+    issuedChallans?: ChallanUncheckedCreateNestedManyWithoutIssuedByInput
+    receivedChallans?: ChallanUncheckedCreateNestedManyWithoutReceivedByInput
+    approvedChallans?: ChallanUncheckedCreateNestedManyWithoutApprovedByInput
+    productionRecords?: ProductionTransactionUncheckedCreateNestedManyWithoutOperatorInput
+    inspections?: QualityInspectionUncheckedCreateNestedManyWithoutInspectorInput
+    challanEvents?: ChallanEventUncheckedCreateNestedManyWithoutActorInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutActorInput
+    dispatchesApproved?: DispatchOrderUncheckedCreateNestedManyWithoutApprovedByInput
+    dispatchesOperated?: DispatchOrderUncheckedCreateNestedManyWithoutDispatchedByInput
+    defectsDetected?: DefectRecordUncheckedCreateNestedManyWithoutDetectedByInput
+    reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
+    recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
+    recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+  }
+
+  export type UserCreateOrConnectWithoutFabricBatchesCreatedInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutFabricBatchesCreatedInput, UserUncheckedCreateWithoutFabricBatchesCreatedInput>
+  }
+
+  export type FabricStoreRollCreateWithoutBatchInput = {
+    id?: string
+    rollNumber: string
+    length: Decimal | DecimalJsLike | number | string
+    width?: Decimal | DecimalJsLike | number | string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    status?: $Enums.FabricRollStatus
+    qcStatus?: $Enums.FabricQCStatus
+    qcInspectedAt?: Date | string | null
+    qcRemarks?: string | null
+    issuedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    location?: InventoryLocationCreateNestedOneWithoutRollsInput
+    qcInspectedBy?: UserCreateNestedOneWithoutFabricRollsInspectedInput
+    programIssuedTo?: ProgramCreateNestedOneWithoutFabricStoreRollsInput
+    receiptItems?: MaterialReceiptItemCreateNestedManyWithoutRollInput
+    qcInspections?: FabricQCInspectionCreateNestedManyWithoutRollInput
+    ledgerEntries?: FabricStockLedgerCreateNestedManyWithoutRollInput
+  }
+
+  export type FabricStoreRollUncheckedCreateWithoutBatchInput = {
+    id?: string
+    rollNumber: string
+    locationId?: string | null
+    length: Decimal | DecimalJsLike | number | string
+    width?: Decimal | DecimalJsLike | number | string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    status?: $Enums.FabricRollStatus
+    qcStatus?: $Enums.FabricQCStatus
+    qcInspectedById?: string | null
+    qcInspectedAt?: Date | string | null
+    qcRemarks?: string | null
+    programIssuedToId?: string | null
+    issuedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    receiptItems?: MaterialReceiptItemUncheckedCreateNestedManyWithoutRollInput
+    qcInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutRollInput
+    ledgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutRollInput
+  }
+
+  export type FabricStoreRollCreateOrConnectWithoutBatchInput = {
+    where: FabricStoreRollWhereUniqueInput
+    create: XOR<FabricStoreRollCreateWithoutBatchInput, FabricStoreRollUncheckedCreateWithoutBatchInput>
+  }
+
+  export type FabricStoreRollCreateManyBatchInputEnvelope = {
+    data: FabricStoreRollCreateManyBatchInput | FabricStoreRollCreateManyBatchInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type MaterialReceiptCreateWithoutBatchInput = {
+    id?: string
+    grnNumber: string
+    challanId?: string | null
+    receivedAt: Date | string
+    vehicleNumber?: string | null
+    supplierName: string
+    totalRollsReceived?: number
+    totalMetersReceived?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.GRNStatus
+    remarks?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    receivedBy: UserCreateNestedOneWithoutGrnReceivedInput
+    items?: MaterialReceiptItemCreateNestedManyWithoutReceiptInput
+  }
+
+  export type MaterialReceiptUncheckedCreateWithoutBatchInput = {
+    id?: string
+    grnNumber: string
+    challanId?: string | null
+    receivedById: string
+    receivedAt: Date | string
+    vehicleNumber?: string | null
+    supplierName: string
+    totalRollsReceived?: number
+    totalMetersReceived?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.GRNStatus
+    remarks?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    items?: MaterialReceiptItemUncheckedCreateNestedManyWithoutReceiptInput
+  }
+
+  export type MaterialReceiptCreateOrConnectWithoutBatchInput = {
+    where: MaterialReceiptWhereUniqueInput
+    create: XOR<MaterialReceiptCreateWithoutBatchInput, MaterialReceiptUncheckedCreateWithoutBatchInput>
+  }
+
+  export type MaterialReceiptCreateManyBatchInputEnvelope = {
+    data: MaterialReceiptCreateManyBatchInput | MaterialReceiptCreateManyBatchInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type FabricStockLedgerCreateWithoutBatchInput = {
+    id?: string
+    entryNumber: string
+    transactionType: $Enums.StockTransactionType
+    quantity: Decimal | DecimalJsLike | number | string
+    referenceType: string
+    referenceId: string
+    transactedAt: Date | string
+    remarks?: string | null
+    createdAt?: Date | string
+    roll: FabricStoreRollCreateNestedOneWithoutLedgerEntriesInput
+    fromLocation?: InventoryLocationCreateNestedOneWithoutFromLedgerInput
+    toLocation?: InventoryLocationCreateNestedOneWithoutToLedgerInput
+    transactedBy: UserCreateNestedOneWithoutFabricLedgerEntriesInput
+  }
+
+  export type FabricStockLedgerUncheckedCreateWithoutBatchInput = {
+    id?: string
+    entryNumber: string
+    rollId: string
+    transactionType: $Enums.StockTransactionType
+    quantity: Decimal | DecimalJsLike | number | string
+    referenceType: string
+    referenceId: string
+    fromLocationId?: string | null
+    toLocationId?: string | null
+    transactedById: string
+    transactedAt: Date | string
+    remarks?: string | null
+    createdAt?: Date | string
+  }
+
+  export type FabricStockLedgerCreateOrConnectWithoutBatchInput = {
+    where: FabricStockLedgerWhereUniqueInput
+    create: XOR<FabricStockLedgerCreateWithoutBatchInput, FabricStockLedgerUncheckedCreateWithoutBatchInput>
+  }
+
+  export type FabricStockLedgerCreateManyBatchInputEnvelope = {
+    data: FabricStockLedgerCreateManyBatchInput | FabricStockLedgerCreateManyBatchInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ProgramUpsertWithoutFabricBatchesInput = {
+    update: XOR<ProgramUpdateWithoutFabricBatchesInput, ProgramUncheckedUpdateWithoutFabricBatchesInput>
+    create: XOR<ProgramCreateWithoutFabricBatchesInput, ProgramUncheckedCreateWithoutFabricBatchesInput>
+    where?: ProgramWhereInput
+  }
+
+  export type ProgramUpdateToOneWithWhereWithoutFabricBatchesInput = {
+    where?: ProgramWhereInput
+    data: XOR<ProgramUpdateWithoutFabricBatchesInput, ProgramUncheckedUpdateWithoutFabricBatchesInput>
+  }
+
+  export type ProgramUpdateWithoutFabricBatchesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    programNumber?: StringFieldUpdateOperationsInput | string
+    programDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    buyerName?: StringFieldUpdateOperationsInput | string
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    designName?: StringFieldUpdateOperationsInput | string
+    styleCode?: StringFieldUpdateOperationsInput | string
+    productCategory?: StringFieldUpdateOperationsInput | string
+    targetQuantity?: IntFieldUpdateOperationsInput | number
+    deliveryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    priority?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    programSerialNo?: NullableStringFieldUpdateOperationsInput | string | null
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    designNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    clientName?: NullableStringFieldUpdateOperationsInput | string | null
+    clientPriority?: NullableStringFieldUpdateOperationsInput | string | null
+    mainStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    subStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    pattern?: NullableStringFieldUpdateOperationsInput | string | null
+    baseDesignType?: NullableStringFieldUpdateOperationsInput | string | null
+    baseDesignPhoto?: NullableStringFieldUpdateOperationsInput | string | null
+    wilcomDesignNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    wilcomDesignPhoto?: NullableStringFieldUpdateOperationsInput | string | null
+    embroideryDesign?: NullableStringFieldUpdateOperationsInput | string | null
+    embroideryDesignSize?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricName?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricWidth?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricWidthInches?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricColor?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricColorAvailable?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricAverage?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricAverageType?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricAverageMeasurement?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricDyeingRequired?: BoolFieldUpdateOperationsInput | boolean
+    fabricIssuedToDyeing?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricSentToDyeing?: NullableFloatFieldUpdateOperationsInput | number | null
+    colorQuantity?: NullableIntFieldUpdateOperationsInput | number | null
+    quantityMeasurement?: NullableStringFieldUpdateOperationsInput | string | null
+    specialMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    specialMaterialQuantity?: NullableStringFieldUpdateOperationsInput | string | null
+    productionDesignDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    productionEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    piecesRejection?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    comments?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    customer?: CustomerUpdateOneWithoutProgramsNestedInput
+    design?: DesignUpdateOneWithoutProgramsNestedInput
+    createdBy?: UserUpdateOneRequiredWithoutCreatedProgramsNestedInput
+    approvedBy?: UserUpdateOneWithoutApprovedProgramsNestedInput
+    fabrics?: ProgramFabricUpdateManyWithoutProgramNestedInput
+    colours?: ProgramColourUpdateManyWithoutProgramNestedInput
+    sizes?: ProgramSizeUpdateManyWithoutProgramNestedInput
+    specifications?: ProgramSpecificationUpdateManyWithoutProgramNestedInput
+    bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
+    routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
+    challans?: ChallanUpdateManyWithoutProgramNestedInput
+    productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
+    rolls?: FabricRollUpdateManyWithoutProgramNestedInput
+    bundles?: BundleUpdateManyWithoutProgramNestedInput
+    cartons?: CartonUpdateManyWithoutProgramNestedInput
+    defects?: DefectRecordUpdateManyWithoutProgramNestedInput
+    stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutProgramNestedInput
+    reworkTransactions?: ReworkTransactionUpdateManyWithoutProgramNestedInput
+    recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
+  }
+
+  export type ProgramUncheckedUpdateWithoutFabricBatchesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    programNumber?: StringFieldUpdateOperationsInput | string
+    programDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    customerId?: NullableStringFieldUpdateOperationsInput | string | null
+    buyerName?: StringFieldUpdateOperationsInput | string
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    designId?: NullableStringFieldUpdateOperationsInput | string | null
+    designName?: StringFieldUpdateOperationsInput | string
+    styleCode?: StringFieldUpdateOperationsInput | string
+    productCategory?: StringFieldUpdateOperationsInput | string
+    targetQuantity?: IntFieldUpdateOperationsInput | number
+    deliveryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    priority?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdById?: StringFieldUpdateOperationsInput | string
+    approvedById?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    programSerialNo?: NullableStringFieldUpdateOperationsInput | string | null
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    designNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    clientName?: NullableStringFieldUpdateOperationsInput | string | null
+    clientPriority?: NullableStringFieldUpdateOperationsInput | string | null
+    mainStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    subStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    pattern?: NullableStringFieldUpdateOperationsInput | string | null
+    baseDesignType?: NullableStringFieldUpdateOperationsInput | string | null
+    baseDesignPhoto?: NullableStringFieldUpdateOperationsInput | string | null
+    wilcomDesignNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    wilcomDesignPhoto?: NullableStringFieldUpdateOperationsInput | string | null
+    embroideryDesign?: NullableStringFieldUpdateOperationsInput | string | null
+    embroideryDesignSize?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricName?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricWidth?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricWidthInches?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricColor?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricColorAvailable?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricAverage?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricAverageType?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricAverageMeasurement?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricDyeingRequired?: BoolFieldUpdateOperationsInput | boolean
+    fabricIssuedToDyeing?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricSentToDyeing?: NullableFloatFieldUpdateOperationsInput | number | null
+    colorQuantity?: NullableIntFieldUpdateOperationsInput | number | null
+    quantityMeasurement?: NullableStringFieldUpdateOperationsInput | string | null
+    specialMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    specialMaterialQuantity?: NullableStringFieldUpdateOperationsInput | string | null
+    productionDesignDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    productionEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    piecesRejection?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    comments?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabrics?: ProgramFabricUncheckedUpdateManyWithoutProgramNestedInput
+    colours?: ProgramColourUncheckedUpdateManyWithoutProgramNestedInput
+    sizes?: ProgramSizeUncheckedUpdateManyWithoutProgramNestedInput
+    specifications?: ProgramSpecificationUncheckedUpdateManyWithoutProgramNestedInput
+    bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
+    routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
+    challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
+    rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
+    bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
+    cartons?: CartonUncheckedUpdateManyWithoutProgramNestedInput
+    defects?: DefectRecordUncheckedUpdateManyWithoutProgramNestedInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutProgramNestedInput
+    reworkTransactions?: ReworkTransactionUncheckedUpdateManyWithoutProgramNestedInput
+    recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
+  }
+
+  export type UserUpsertWithoutFabricBatchesCreatedInput = {
+    update: XOR<UserUpdateWithoutFabricBatchesCreatedInput, UserUncheckedUpdateWithoutFabricBatchesCreatedInput>
+    create: XOR<UserCreateWithoutFabricBatchesCreatedInput, UserUncheckedCreateWithoutFabricBatchesCreatedInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutFabricBatchesCreatedInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutFabricBatchesCreatedInput, UserUncheckedUpdateWithoutFabricBatchesCreatedInput>
+  }
+
+  export type UserUpdateWithoutFabricBatchesCreatedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    departmentCode?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userRoles?: UserRoleUpdateManyWithoutUserNestedInput
+    createdPrograms?: ProgramUpdateManyWithoutCreatedByNestedInput
+    approvedPrograms?: ProgramUpdateManyWithoutApprovedByNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    attachments?: AttachmentUpdateManyWithoutUploadedByNestedInput
+    createdChallans?: ChallanUpdateManyWithoutCreatedByNestedInput
+    issuedChallans?: ChallanUpdateManyWithoutIssuedByNestedInput
+    receivedChallans?: ChallanUpdateManyWithoutReceivedByNestedInput
+    approvedChallans?: ChallanUpdateManyWithoutApprovedByNestedInput
+    productionRecords?: ProductionTransactionUpdateManyWithoutOperatorNestedInput
+    inspections?: QualityInspectionUpdateManyWithoutInspectorNestedInput
+    challanEvents?: ChallanEventUpdateManyWithoutActorNestedInput
+    stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutActorNestedInput
+    dispatchesApproved?: DispatchOrderUpdateManyWithoutApprovedByNestedInput
+    dispatchesOperated?: DispatchOrderUpdateManyWithoutDispatchedByNestedInput
+    defectsDetected?: DefectRecordUpdateManyWithoutDetectedByNestedInput
+    reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
+    recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
+    recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutFabricBatchesCreatedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    departmentCode?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userRoles?: UserRoleUncheckedUpdateManyWithoutUserNestedInput
+    createdPrograms?: ProgramUncheckedUpdateManyWithoutCreatedByNestedInput
+    approvedPrograms?: ProgramUncheckedUpdateManyWithoutApprovedByNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    attachments?: AttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+    createdChallans?: ChallanUncheckedUpdateManyWithoutCreatedByNestedInput
+    issuedChallans?: ChallanUncheckedUpdateManyWithoutIssuedByNestedInput
+    receivedChallans?: ChallanUncheckedUpdateManyWithoutReceivedByNestedInput
+    approvedChallans?: ChallanUncheckedUpdateManyWithoutApprovedByNestedInput
+    productionRecords?: ProductionTransactionUncheckedUpdateManyWithoutOperatorNestedInput
+    inspections?: QualityInspectionUncheckedUpdateManyWithoutInspectorNestedInput
+    challanEvents?: ChallanEventUncheckedUpdateManyWithoutActorNestedInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutActorNestedInput
+    dispatchesApproved?: DispatchOrderUncheckedUpdateManyWithoutApprovedByNestedInput
+    dispatchesOperated?: DispatchOrderUncheckedUpdateManyWithoutDispatchedByNestedInput
+    defectsDetected?: DefectRecordUncheckedUpdateManyWithoutDetectedByNestedInput
+    reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
+    recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+    recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+  }
+
+  export type FabricStoreRollUpsertWithWhereUniqueWithoutBatchInput = {
+    where: FabricStoreRollWhereUniqueInput
+    update: XOR<FabricStoreRollUpdateWithoutBatchInput, FabricStoreRollUncheckedUpdateWithoutBatchInput>
+    create: XOR<FabricStoreRollCreateWithoutBatchInput, FabricStoreRollUncheckedCreateWithoutBatchInput>
+  }
+
+  export type FabricStoreRollUpdateWithWhereUniqueWithoutBatchInput = {
+    where: FabricStoreRollWhereUniqueInput
+    data: XOR<FabricStoreRollUpdateWithoutBatchInput, FabricStoreRollUncheckedUpdateWithoutBatchInput>
+  }
+
+  export type FabricStoreRollUpdateManyWithWhereWithoutBatchInput = {
+    where: FabricStoreRollScalarWhereInput
+    data: XOR<FabricStoreRollUpdateManyMutationInput, FabricStoreRollUncheckedUpdateManyWithoutBatchInput>
+  }
+
+  export type MaterialReceiptUpsertWithWhereUniqueWithoutBatchInput = {
+    where: MaterialReceiptWhereUniqueInput
+    update: XOR<MaterialReceiptUpdateWithoutBatchInput, MaterialReceiptUncheckedUpdateWithoutBatchInput>
+    create: XOR<MaterialReceiptCreateWithoutBatchInput, MaterialReceiptUncheckedCreateWithoutBatchInput>
+  }
+
+  export type MaterialReceiptUpdateWithWhereUniqueWithoutBatchInput = {
+    where: MaterialReceiptWhereUniqueInput
+    data: XOR<MaterialReceiptUpdateWithoutBatchInput, MaterialReceiptUncheckedUpdateWithoutBatchInput>
+  }
+
+  export type MaterialReceiptUpdateManyWithWhereWithoutBatchInput = {
+    where: MaterialReceiptScalarWhereInput
+    data: XOR<MaterialReceiptUpdateManyMutationInput, MaterialReceiptUncheckedUpdateManyWithoutBatchInput>
+  }
+
+  export type FabricStockLedgerUpsertWithWhereUniqueWithoutBatchInput = {
+    where: FabricStockLedgerWhereUniqueInput
+    update: XOR<FabricStockLedgerUpdateWithoutBatchInput, FabricStockLedgerUncheckedUpdateWithoutBatchInput>
+    create: XOR<FabricStockLedgerCreateWithoutBatchInput, FabricStockLedgerUncheckedCreateWithoutBatchInput>
+  }
+
+  export type FabricStockLedgerUpdateWithWhereUniqueWithoutBatchInput = {
+    where: FabricStockLedgerWhereUniqueInput
+    data: XOR<FabricStockLedgerUpdateWithoutBatchInput, FabricStockLedgerUncheckedUpdateWithoutBatchInput>
+  }
+
+  export type FabricStockLedgerUpdateManyWithWhereWithoutBatchInput = {
+    where: FabricStockLedgerScalarWhereInput
+    data: XOR<FabricStockLedgerUpdateManyMutationInput, FabricStockLedgerUncheckedUpdateManyWithoutBatchInput>
+  }
+
+  export type FabricBatchCreateWithoutRollsInput = {
+    id?: string
+    batchNumber: string
+    supplierId?: string | null
+    fabricType: string
+    fabricDescription: string
+    colorCode?: string | null
+    colorName?: string | null
+    totalRolls?: number
+    totalMeters?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.FabricBatchStatus
+    receivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    program?: ProgramCreateNestedOneWithoutFabricBatchesInput
+    createdBy: UserCreateNestedOneWithoutFabricBatchesCreatedInput
+    receipts?: MaterialReceiptCreateNestedManyWithoutBatchInput
+    ledgerEntries?: FabricStockLedgerCreateNestedManyWithoutBatchInput
+  }
+
+  export type FabricBatchUncheckedCreateWithoutRollsInput = {
+    id?: string
+    batchNumber: string
+    programId?: string | null
+    supplierId?: string | null
+    fabricType: string
+    fabricDescription: string
+    colorCode?: string | null
+    colorName?: string | null
+    totalRolls?: number
+    totalMeters?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.FabricBatchStatus
+    receivedAt?: Date | string | null
+    createdById: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    receipts?: MaterialReceiptUncheckedCreateNestedManyWithoutBatchInput
+    ledgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutBatchInput
+  }
+
+  export type FabricBatchCreateOrConnectWithoutRollsInput = {
+    where: FabricBatchWhereUniqueInput
+    create: XOR<FabricBatchCreateWithoutRollsInput, FabricBatchUncheckedCreateWithoutRollsInput>
+  }
+
+  export type InventoryLocationCreateWithoutRollsInput = {
+    id?: string
+    locationCode: string
+    locationName: string
+    locationType?: $Enums.InventoryLocationType
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    fromLedger?: FabricStockLedgerCreateNestedManyWithoutFromLocationInput
+    toLedger?: FabricStockLedgerCreateNestedManyWithoutToLocationInput
+  }
+
+  export type InventoryLocationUncheckedCreateWithoutRollsInput = {
+    id?: string
+    locationCode: string
+    locationName: string
+    locationType?: $Enums.InventoryLocationType
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    fromLedger?: FabricStockLedgerUncheckedCreateNestedManyWithoutFromLocationInput
+    toLedger?: FabricStockLedgerUncheckedCreateNestedManyWithoutToLocationInput
+  }
+
+  export type InventoryLocationCreateOrConnectWithoutRollsInput = {
+    where: InventoryLocationWhereUniqueInput
+    create: XOR<InventoryLocationCreateWithoutRollsInput, InventoryLocationUncheckedCreateWithoutRollsInput>
+  }
+
+  export type UserCreateWithoutFabricRollsInspectedInput = {
+    id?: string
+    username: string
+    email: string
+    fullName: string
+    passwordHash: string
+    departmentCode?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userRoles?: UserRoleCreateNestedManyWithoutUserInput
+    createdPrograms?: ProgramCreateNestedManyWithoutCreatedByInput
+    approvedPrograms?: ProgramCreateNestedManyWithoutApprovedByInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    attachments?: AttachmentCreateNestedManyWithoutUploadedByInput
+    createdChallans?: ChallanCreateNestedManyWithoutCreatedByInput
+    issuedChallans?: ChallanCreateNestedManyWithoutIssuedByInput
+    receivedChallans?: ChallanCreateNestedManyWithoutReceivedByInput
+    approvedChallans?: ChallanCreateNestedManyWithoutApprovedByInput
+    productionRecords?: ProductionTransactionCreateNestedManyWithoutOperatorInput
+    inspections?: QualityInspectionCreateNestedManyWithoutInspectorInput
+    challanEvents?: ChallanEventCreateNestedManyWithoutActorInput
+    stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutActorInput
+    dispatchesApproved?: DispatchOrderCreateNestedManyWithoutApprovedByInput
+    dispatchesOperated?: DispatchOrderCreateNestedManyWithoutDispatchedByInput
+    defectsDetected?: DefectRecordCreateNestedManyWithoutDetectedByInput
+    reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
+    recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
+    recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+  }
+
+  export type UserUncheckedCreateWithoutFabricRollsInspectedInput = {
+    id?: string
+    username: string
+    email: string
+    fullName: string
+    passwordHash: string
+    departmentCode?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userRoles?: UserRoleUncheckedCreateNestedManyWithoutUserInput
+    createdPrograms?: ProgramUncheckedCreateNestedManyWithoutCreatedByInput
+    approvedPrograms?: ProgramUncheckedCreateNestedManyWithoutApprovedByInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    attachments?: AttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+    createdChallans?: ChallanUncheckedCreateNestedManyWithoutCreatedByInput
+    issuedChallans?: ChallanUncheckedCreateNestedManyWithoutIssuedByInput
+    receivedChallans?: ChallanUncheckedCreateNestedManyWithoutReceivedByInput
+    approvedChallans?: ChallanUncheckedCreateNestedManyWithoutApprovedByInput
+    productionRecords?: ProductionTransactionUncheckedCreateNestedManyWithoutOperatorInput
+    inspections?: QualityInspectionUncheckedCreateNestedManyWithoutInspectorInput
+    challanEvents?: ChallanEventUncheckedCreateNestedManyWithoutActorInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutActorInput
+    dispatchesApproved?: DispatchOrderUncheckedCreateNestedManyWithoutApprovedByInput
+    dispatchesOperated?: DispatchOrderUncheckedCreateNestedManyWithoutDispatchedByInput
+    defectsDetected?: DefectRecordUncheckedCreateNestedManyWithoutDetectedByInput
+    reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
+    recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
+    recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+  }
+
+  export type UserCreateOrConnectWithoutFabricRollsInspectedInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutFabricRollsInspectedInput, UserUncheckedCreateWithoutFabricRollsInspectedInput>
+  }
+
+  export type ProgramCreateWithoutFabricStoreRollsInput = {
+    id?: string
+    programNumber: string
+    programDate?: Date | string
+    buyerName: string
+    orderNumber: string
+    designName: string
+    styleCode: string
+    productCategory: string
+    targetQuantity: number
+    deliveryDate: Date | string
+    priority?: string
+    status?: string
+    remarks?: string | null
+    approvedAt?: Date | string | null
+    programSerialNo?: string | null
+    startDate?: Date | string | null
+    designNumber?: string | null
+    clientName?: string | null
+    clientPriority?: string | null
+    mainStyle?: string | null
+    subStyle?: string | null
+    pattern?: string | null
+    baseDesignType?: string | null
+    baseDesignPhoto?: string | null
+    wilcomDesignNumber?: string | null
+    wilcomDesignPhoto?: string | null
+    embroideryDesign?: string | null
+    embroideryDesignSize?: string | null
+    fabricName?: string | null
+    fabricType?: string | null
+    fabricWidth?: string | null
+    fabricWidthInches?: number | null
+    fabricColor?: string | null
+    fabricColorAvailable?: string | null
+    fabricAverage?: number | null
+    fabricAverageType?: string | null
+    fabricAverageMeasurement?: string | null
+    fabricDyeingRequired?: boolean
+    fabricIssuedToDyeing?: number | null
+    fabricSentToDyeing?: number | null
+    colorQuantity?: number | null
+    quantityMeasurement?: string | null
+    specialMaterial?: string | null
+    specialMaterialQuantity?: string | null
+    productionDesignDate?: Date | string | null
+    productionEndDate?: Date | string | null
+    piecesRejection?: number | null
+    rejectionReason?: string | null
+    comments?: string | null
+    metadataJson?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    customer?: CustomerCreateNestedOneWithoutProgramsInput
+    design?: DesignCreateNestedOneWithoutProgramsInput
+    createdBy: UserCreateNestedOneWithoutCreatedProgramsInput
+    approvedBy?: UserCreateNestedOneWithoutApprovedProgramsInput
+    fabrics?: ProgramFabricCreateNestedManyWithoutProgramInput
+    colours?: ProgramColourCreateNestedManyWithoutProgramInput
+    sizes?: ProgramSizeCreateNestedManyWithoutProgramInput
+    specifications?: ProgramSpecificationCreateNestedManyWithoutProgramInput
+    bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
+    routes?: ProgramRouteCreateNestedManyWithoutProgramInput
+    challans?: ChallanCreateNestedManyWithoutProgramInput
+    productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
+    rolls?: FabricRollCreateNestedManyWithoutProgramInput
+    bundles?: BundleCreateNestedManyWithoutProgramInput
+    cartons?: CartonCreateNestedManyWithoutProgramInput
+    defects?: DefectRecordCreateNestedManyWithoutProgramInput
+    stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutProgramInput
+    reworkTransactions?: ReworkTransactionCreateNestedManyWithoutProgramInput
+    recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
+  }
+
+  export type ProgramUncheckedCreateWithoutFabricStoreRollsInput = {
+    id?: string
+    programNumber: string
+    programDate?: Date | string
+    customerId?: string | null
+    buyerName: string
+    orderNumber: string
+    designId?: string | null
+    designName: string
+    styleCode: string
+    productCategory: string
+    targetQuantity: number
+    deliveryDate: Date | string
+    priority?: string
+    status?: string
+    remarks?: string | null
+    createdById: string
+    approvedById?: string | null
+    approvedAt?: Date | string | null
+    programSerialNo?: string | null
+    startDate?: Date | string | null
+    designNumber?: string | null
+    clientName?: string | null
+    clientPriority?: string | null
+    mainStyle?: string | null
+    subStyle?: string | null
+    pattern?: string | null
+    baseDesignType?: string | null
+    baseDesignPhoto?: string | null
+    wilcomDesignNumber?: string | null
+    wilcomDesignPhoto?: string | null
+    embroideryDesign?: string | null
+    embroideryDesignSize?: string | null
+    fabricName?: string | null
+    fabricType?: string | null
+    fabricWidth?: string | null
+    fabricWidthInches?: number | null
+    fabricColor?: string | null
+    fabricColorAvailable?: string | null
+    fabricAverage?: number | null
+    fabricAverageType?: string | null
+    fabricAverageMeasurement?: string | null
+    fabricDyeingRequired?: boolean
+    fabricIssuedToDyeing?: number | null
+    fabricSentToDyeing?: number | null
+    colorQuantity?: number | null
+    quantityMeasurement?: string | null
+    specialMaterial?: string | null
+    specialMaterialQuantity?: string | null
+    productionDesignDate?: Date | string | null
+    productionEndDate?: Date | string | null
+    piecesRejection?: number | null
+    rejectionReason?: string | null
+    comments?: string | null
+    metadataJson?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    fabrics?: ProgramFabricUncheckedCreateNestedManyWithoutProgramInput
+    colours?: ProgramColourUncheckedCreateNestedManyWithoutProgramInput
+    sizes?: ProgramSizeUncheckedCreateNestedManyWithoutProgramInput
+    specifications?: ProgramSpecificationUncheckedCreateNestedManyWithoutProgramInput
+    bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
+    routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
+    challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
+    rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
+    bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
+    cartons?: CartonUncheckedCreateNestedManyWithoutProgramInput
+    defects?: DefectRecordUncheckedCreateNestedManyWithoutProgramInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutProgramInput
+    reworkTransactions?: ReworkTransactionUncheckedCreateNestedManyWithoutProgramInput
+    recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
+  }
+
+  export type ProgramCreateOrConnectWithoutFabricStoreRollsInput = {
+    where: ProgramWhereUniqueInput
+    create: XOR<ProgramCreateWithoutFabricStoreRollsInput, ProgramUncheckedCreateWithoutFabricStoreRollsInput>
+  }
+
+  export type MaterialReceiptItemCreateWithoutRollInput = {
+    id?: string
+    measuredLength: Decimal | DecimalJsLike | number | string
+    measuredWeight?: Decimal | DecimalJsLike | number | string | null
+    remarks?: string | null
+    createdAt?: Date | string
+    receipt: MaterialReceiptCreateNestedOneWithoutItemsInput
+  }
+
+  export type MaterialReceiptItemUncheckedCreateWithoutRollInput = {
+    id?: string
+    receiptId: string
+    measuredLength: Decimal | DecimalJsLike | number | string
+    measuredWeight?: Decimal | DecimalJsLike | number | string | null
+    remarks?: string | null
+    createdAt?: Date | string
+  }
+
+  export type MaterialReceiptItemCreateOrConnectWithoutRollInput = {
+    where: MaterialReceiptItemWhereUniqueInput
+    create: XOR<MaterialReceiptItemCreateWithoutRollInput, MaterialReceiptItemUncheckedCreateWithoutRollInput>
+  }
+
+  export type MaterialReceiptItemCreateManyRollInputEnvelope = {
+    data: MaterialReceiptItemCreateManyRollInput | MaterialReceiptItemCreateManyRollInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type FabricQCInspectionCreateWithoutRollInput = {
+    id?: string
+    inspectionNumber: string
+    inspectionType?: $Enums.InspectionType
+    result: $Enums.InspectionResult
+    defects?: NullableJsonNullValueInput | InputJsonValue
+    remarks?: string | null
+    inspectedAt: Date | string
+    createdAt?: Date | string
+    inspectedBy: UserCreateNestedOneWithoutFabricQCInspectionsInput
+  }
+
+  export type FabricQCInspectionUncheckedCreateWithoutRollInput = {
+    id?: string
+    inspectionNumber: string
+    inspectedById: string
+    inspectionType?: $Enums.InspectionType
+    result: $Enums.InspectionResult
+    defects?: NullableJsonNullValueInput | InputJsonValue
+    remarks?: string | null
+    inspectedAt: Date | string
+    createdAt?: Date | string
+  }
+
+  export type FabricQCInspectionCreateOrConnectWithoutRollInput = {
+    where: FabricQCInspectionWhereUniqueInput
+    create: XOR<FabricQCInspectionCreateWithoutRollInput, FabricQCInspectionUncheckedCreateWithoutRollInput>
+  }
+
+  export type FabricQCInspectionCreateManyRollInputEnvelope = {
+    data: FabricQCInspectionCreateManyRollInput | FabricQCInspectionCreateManyRollInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type FabricStockLedgerCreateWithoutRollInput = {
+    id?: string
+    entryNumber: string
+    transactionType: $Enums.StockTransactionType
+    quantity: Decimal | DecimalJsLike | number | string
+    referenceType: string
+    referenceId: string
+    transactedAt: Date | string
+    remarks?: string | null
+    createdAt?: Date | string
+    batch: FabricBatchCreateNestedOneWithoutLedgerEntriesInput
+    fromLocation?: InventoryLocationCreateNestedOneWithoutFromLedgerInput
+    toLocation?: InventoryLocationCreateNestedOneWithoutToLedgerInput
+    transactedBy: UserCreateNestedOneWithoutFabricLedgerEntriesInput
+  }
+
+  export type FabricStockLedgerUncheckedCreateWithoutRollInput = {
+    id?: string
+    entryNumber: string
+    batchId: string
+    transactionType: $Enums.StockTransactionType
+    quantity: Decimal | DecimalJsLike | number | string
+    referenceType: string
+    referenceId: string
+    fromLocationId?: string | null
+    toLocationId?: string | null
+    transactedById: string
+    transactedAt: Date | string
+    remarks?: string | null
+    createdAt?: Date | string
+  }
+
+  export type FabricStockLedgerCreateOrConnectWithoutRollInput = {
+    where: FabricStockLedgerWhereUniqueInput
+    create: XOR<FabricStockLedgerCreateWithoutRollInput, FabricStockLedgerUncheckedCreateWithoutRollInput>
+  }
+
+  export type FabricStockLedgerCreateManyRollInputEnvelope = {
+    data: FabricStockLedgerCreateManyRollInput | FabricStockLedgerCreateManyRollInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type FabricBatchUpsertWithoutRollsInput = {
+    update: XOR<FabricBatchUpdateWithoutRollsInput, FabricBatchUncheckedUpdateWithoutRollsInput>
+    create: XOR<FabricBatchCreateWithoutRollsInput, FabricBatchUncheckedCreateWithoutRollsInput>
+    where?: FabricBatchWhereInput
+  }
+
+  export type FabricBatchUpdateToOneWithWhereWithoutRollsInput = {
+    where?: FabricBatchWhereInput
+    data: XOR<FabricBatchUpdateWithoutRollsInput, FabricBatchUncheckedUpdateWithoutRollsInput>
+  }
+
+  export type FabricBatchUpdateWithoutRollsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    batchNumber?: StringFieldUpdateOperationsInput | string
+    supplierId?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: StringFieldUpdateOperationsInput | string
+    fabricDescription?: StringFieldUpdateOperationsInput | string
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    colorName?: NullableStringFieldUpdateOperationsInput | string | null
+    totalRolls?: IntFieldUpdateOperationsInput | number
+    totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    program?: ProgramUpdateOneWithoutFabricBatchesNestedInput
+    createdBy?: UserUpdateOneRequiredWithoutFabricBatchesCreatedNestedInput
+    receipts?: MaterialReceiptUpdateManyWithoutBatchNestedInput
+    ledgerEntries?: FabricStockLedgerUpdateManyWithoutBatchNestedInput
+  }
+
+  export type FabricBatchUncheckedUpdateWithoutRollsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    batchNumber?: StringFieldUpdateOperationsInput | string
+    programId?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierId?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: StringFieldUpdateOperationsInput | string
+    fabricDescription?: StringFieldUpdateOperationsInput | string
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    colorName?: NullableStringFieldUpdateOperationsInput | string | null
+    totalRolls?: IntFieldUpdateOperationsInput | number
+    totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdById?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    receipts?: MaterialReceiptUncheckedUpdateManyWithoutBatchNestedInput
+    ledgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutBatchNestedInput
+  }
+
+  export type InventoryLocationUpsertWithoutRollsInput = {
+    update: XOR<InventoryLocationUpdateWithoutRollsInput, InventoryLocationUncheckedUpdateWithoutRollsInput>
+    create: XOR<InventoryLocationCreateWithoutRollsInput, InventoryLocationUncheckedCreateWithoutRollsInput>
+    where?: InventoryLocationWhereInput
+  }
+
+  export type InventoryLocationUpdateToOneWithWhereWithoutRollsInput = {
+    where?: InventoryLocationWhereInput
+    data: XOR<InventoryLocationUpdateWithoutRollsInput, InventoryLocationUncheckedUpdateWithoutRollsInput>
+  }
+
+  export type InventoryLocationUpdateWithoutRollsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    locationCode?: StringFieldUpdateOperationsInput | string
+    locationName?: StringFieldUpdateOperationsInput | string
+    locationType?: EnumInventoryLocationTypeFieldUpdateOperationsInput | $Enums.InventoryLocationType
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fromLedger?: FabricStockLedgerUpdateManyWithoutFromLocationNestedInput
+    toLedger?: FabricStockLedgerUpdateManyWithoutToLocationNestedInput
+  }
+
+  export type InventoryLocationUncheckedUpdateWithoutRollsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    locationCode?: StringFieldUpdateOperationsInput | string
+    locationName?: StringFieldUpdateOperationsInput | string
+    locationType?: EnumInventoryLocationTypeFieldUpdateOperationsInput | $Enums.InventoryLocationType
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fromLedger?: FabricStockLedgerUncheckedUpdateManyWithoutFromLocationNestedInput
+    toLedger?: FabricStockLedgerUncheckedUpdateManyWithoutToLocationNestedInput
+  }
+
+  export type UserUpsertWithoutFabricRollsInspectedInput = {
+    update: XOR<UserUpdateWithoutFabricRollsInspectedInput, UserUncheckedUpdateWithoutFabricRollsInspectedInput>
+    create: XOR<UserCreateWithoutFabricRollsInspectedInput, UserUncheckedCreateWithoutFabricRollsInspectedInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutFabricRollsInspectedInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutFabricRollsInspectedInput, UserUncheckedUpdateWithoutFabricRollsInspectedInput>
+  }
+
+  export type UserUpdateWithoutFabricRollsInspectedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    departmentCode?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userRoles?: UserRoleUpdateManyWithoutUserNestedInput
+    createdPrograms?: ProgramUpdateManyWithoutCreatedByNestedInput
+    approvedPrograms?: ProgramUpdateManyWithoutApprovedByNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    attachments?: AttachmentUpdateManyWithoutUploadedByNestedInput
+    createdChallans?: ChallanUpdateManyWithoutCreatedByNestedInput
+    issuedChallans?: ChallanUpdateManyWithoutIssuedByNestedInput
+    receivedChallans?: ChallanUpdateManyWithoutReceivedByNestedInput
+    approvedChallans?: ChallanUpdateManyWithoutApprovedByNestedInput
+    productionRecords?: ProductionTransactionUpdateManyWithoutOperatorNestedInput
+    inspections?: QualityInspectionUpdateManyWithoutInspectorNestedInput
+    challanEvents?: ChallanEventUpdateManyWithoutActorNestedInput
+    stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutActorNestedInput
+    dispatchesApproved?: DispatchOrderUpdateManyWithoutApprovedByNestedInput
+    dispatchesOperated?: DispatchOrderUpdateManyWithoutDispatchedByNestedInput
+    defectsDetected?: DefectRecordUpdateManyWithoutDetectedByNestedInput
+    reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
+    recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
+    recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutFabricRollsInspectedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    departmentCode?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userRoles?: UserRoleUncheckedUpdateManyWithoutUserNestedInput
+    createdPrograms?: ProgramUncheckedUpdateManyWithoutCreatedByNestedInput
+    approvedPrograms?: ProgramUncheckedUpdateManyWithoutApprovedByNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    attachments?: AttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+    createdChallans?: ChallanUncheckedUpdateManyWithoutCreatedByNestedInput
+    issuedChallans?: ChallanUncheckedUpdateManyWithoutIssuedByNestedInput
+    receivedChallans?: ChallanUncheckedUpdateManyWithoutReceivedByNestedInput
+    approvedChallans?: ChallanUncheckedUpdateManyWithoutApprovedByNestedInput
+    productionRecords?: ProductionTransactionUncheckedUpdateManyWithoutOperatorNestedInput
+    inspections?: QualityInspectionUncheckedUpdateManyWithoutInspectorNestedInput
+    challanEvents?: ChallanEventUncheckedUpdateManyWithoutActorNestedInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutActorNestedInput
+    dispatchesApproved?: DispatchOrderUncheckedUpdateManyWithoutApprovedByNestedInput
+    dispatchesOperated?: DispatchOrderUncheckedUpdateManyWithoutDispatchedByNestedInput
+    defectsDetected?: DefectRecordUncheckedUpdateManyWithoutDetectedByNestedInput
+    reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
+    recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+    recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+  }
+
+  export type ProgramUpsertWithoutFabricStoreRollsInput = {
+    update: XOR<ProgramUpdateWithoutFabricStoreRollsInput, ProgramUncheckedUpdateWithoutFabricStoreRollsInput>
+    create: XOR<ProgramCreateWithoutFabricStoreRollsInput, ProgramUncheckedCreateWithoutFabricStoreRollsInput>
+    where?: ProgramWhereInput
+  }
+
+  export type ProgramUpdateToOneWithWhereWithoutFabricStoreRollsInput = {
+    where?: ProgramWhereInput
+    data: XOR<ProgramUpdateWithoutFabricStoreRollsInput, ProgramUncheckedUpdateWithoutFabricStoreRollsInput>
+  }
+
+  export type ProgramUpdateWithoutFabricStoreRollsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    programNumber?: StringFieldUpdateOperationsInput | string
+    programDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    buyerName?: StringFieldUpdateOperationsInput | string
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    designName?: StringFieldUpdateOperationsInput | string
+    styleCode?: StringFieldUpdateOperationsInput | string
+    productCategory?: StringFieldUpdateOperationsInput | string
+    targetQuantity?: IntFieldUpdateOperationsInput | number
+    deliveryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    priority?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    programSerialNo?: NullableStringFieldUpdateOperationsInput | string | null
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    designNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    clientName?: NullableStringFieldUpdateOperationsInput | string | null
+    clientPriority?: NullableStringFieldUpdateOperationsInput | string | null
+    mainStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    subStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    pattern?: NullableStringFieldUpdateOperationsInput | string | null
+    baseDesignType?: NullableStringFieldUpdateOperationsInput | string | null
+    baseDesignPhoto?: NullableStringFieldUpdateOperationsInput | string | null
+    wilcomDesignNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    wilcomDesignPhoto?: NullableStringFieldUpdateOperationsInput | string | null
+    embroideryDesign?: NullableStringFieldUpdateOperationsInput | string | null
+    embroideryDesignSize?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricName?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricWidth?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricWidthInches?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricColor?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricColorAvailable?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricAverage?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricAverageType?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricAverageMeasurement?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricDyeingRequired?: BoolFieldUpdateOperationsInput | boolean
+    fabricIssuedToDyeing?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricSentToDyeing?: NullableFloatFieldUpdateOperationsInput | number | null
+    colorQuantity?: NullableIntFieldUpdateOperationsInput | number | null
+    quantityMeasurement?: NullableStringFieldUpdateOperationsInput | string | null
+    specialMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    specialMaterialQuantity?: NullableStringFieldUpdateOperationsInput | string | null
+    productionDesignDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    productionEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    piecesRejection?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    comments?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    customer?: CustomerUpdateOneWithoutProgramsNestedInput
+    design?: DesignUpdateOneWithoutProgramsNestedInput
+    createdBy?: UserUpdateOneRequiredWithoutCreatedProgramsNestedInput
+    approvedBy?: UserUpdateOneWithoutApprovedProgramsNestedInput
+    fabrics?: ProgramFabricUpdateManyWithoutProgramNestedInput
+    colours?: ProgramColourUpdateManyWithoutProgramNestedInput
+    sizes?: ProgramSizeUpdateManyWithoutProgramNestedInput
+    specifications?: ProgramSpecificationUpdateManyWithoutProgramNestedInput
+    bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
+    routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
+    challans?: ChallanUpdateManyWithoutProgramNestedInput
+    productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
+    rolls?: FabricRollUpdateManyWithoutProgramNestedInput
+    bundles?: BundleUpdateManyWithoutProgramNestedInput
+    cartons?: CartonUpdateManyWithoutProgramNestedInput
+    defects?: DefectRecordUpdateManyWithoutProgramNestedInput
+    stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutProgramNestedInput
+    reworkTransactions?: ReworkTransactionUpdateManyWithoutProgramNestedInput
+    recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
+  }
+
+  export type ProgramUncheckedUpdateWithoutFabricStoreRollsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    programNumber?: StringFieldUpdateOperationsInput | string
+    programDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    customerId?: NullableStringFieldUpdateOperationsInput | string | null
+    buyerName?: StringFieldUpdateOperationsInput | string
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    designId?: NullableStringFieldUpdateOperationsInput | string | null
+    designName?: StringFieldUpdateOperationsInput | string
+    styleCode?: StringFieldUpdateOperationsInput | string
+    productCategory?: StringFieldUpdateOperationsInput | string
+    targetQuantity?: IntFieldUpdateOperationsInput | number
+    deliveryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    priority?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdById?: StringFieldUpdateOperationsInput | string
+    approvedById?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    programSerialNo?: NullableStringFieldUpdateOperationsInput | string | null
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    designNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    clientName?: NullableStringFieldUpdateOperationsInput | string | null
+    clientPriority?: NullableStringFieldUpdateOperationsInput | string | null
+    mainStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    subStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    pattern?: NullableStringFieldUpdateOperationsInput | string | null
+    baseDesignType?: NullableStringFieldUpdateOperationsInput | string | null
+    baseDesignPhoto?: NullableStringFieldUpdateOperationsInput | string | null
+    wilcomDesignNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    wilcomDesignPhoto?: NullableStringFieldUpdateOperationsInput | string | null
+    embroideryDesign?: NullableStringFieldUpdateOperationsInput | string | null
+    embroideryDesignSize?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricName?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricWidth?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricWidthInches?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricColor?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricColorAvailable?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricAverage?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricAverageType?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricAverageMeasurement?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricDyeingRequired?: BoolFieldUpdateOperationsInput | boolean
+    fabricIssuedToDyeing?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricSentToDyeing?: NullableFloatFieldUpdateOperationsInput | number | null
+    colorQuantity?: NullableIntFieldUpdateOperationsInput | number | null
+    quantityMeasurement?: NullableStringFieldUpdateOperationsInput | string | null
+    specialMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    specialMaterialQuantity?: NullableStringFieldUpdateOperationsInput | string | null
+    productionDesignDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    productionEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    piecesRejection?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    comments?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabrics?: ProgramFabricUncheckedUpdateManyWithoutProgramNestedInput
+    colours?: ProgramColourUncheckedUpdateManyWithoutProgramNestedInput
+    sizes?: ProgramSizeUncheckedUpdateManyWithoutProgramNestedInput
+    specifications?: ProgramSpecificationUncheckedUpdateManyWithoutProgramNestedInput
+    bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
+    routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
+    challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
+    rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
+    bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
+    cartons?: CartonUncheckedUpdateManyWithoutProgramNestedInput
+    defects?: DefectRecordUncheckedUpdateManyWithoutProgramNestedInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutProgramNestedInput
+    reworkTransactions?: ReworkTransactionUncheckedUpdateManyWithoutProgramNestedInput
+    recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
+  }
+
+  export type MaterialReceiptItemUpsertWithWhereUniqueWithoutRollInput = {
+    where: MaterialReceiptItemWhereUniqueInput
+    update: XOR<MaterialReceiptItemUpdateWithoutRollInput, MaterialReceiptItemUncheckedUpdateWithoutRollInput>
+    create: XOR<MaterialReceiptItemCreateWithoutRollInput, MaterialReceiptItemUncheckedCreateWithoutRollInput>
+  }
+
+  export type MaterialReceiptItemUpdateWithWhereUniqueWithoutRollInput = {
+    where: MaterialReceiptItemWhereUniqueInput
+    data: XOR<MaterialReceiptItemUpdateWithoutRollInput, MaterialReceiptItemUncheckedUpdateWithoutRollInput>
+  }
+
+  export type MaterialReceiptItemUpdateManyWithWhereWithoutRollInput = {
+    where: MaterialReceiptItemScalarWhereInput
+    data: XOR<MaterialReceiptItemUpdateManyMutationInput, MaterialReceiptItemUncheckedUpdateManyWithoutRollInput>
+  }
+
+  export type MaterialReceiptItemScalarWhereInput = {
+    AND?: MaterialReceiptItemScalarWhereInput | MaterialReceiptItemScalarWhereInput[]
+    OR?: MaterialReceiptItemScalarWhereInput[]
+    NOT?: MaterialReceiptItemScalarWhereInput | MaterialReceiptItemScalarWhereInput[]
+    id?: StringFilter<"MaterialReceiptItem"> | string
+    receiptId?: StringFilter<"MaterialReceiptItem"> | string
+    rollId?: StringFilter<"MaterialReceiptItem"> | string
+    measuredLength?: DecimalFilter<"MaterialReceiptItem"> | Decimal | DecimalJsLike | number | string
+    measuredWeight?: DecimalNullableFilter<"MaterialReceiptItem"> | Decimal | DecimalJsLike | number | string | null
+    remarks?: StringNullableFilter<"MaterialReceiptItem"> | string | null
+    createdAt?: DateTimeFilter<"MaterialReceiptItem"> | Date | string
+  }
+
+  export type FabricQCInspectionUpsertWithWhereUniqueWithoutRollInput = {
+    where: FabricQCInspectionWhereUniqueInput
+    update: XOR<FabricQCInspectionUpdateWithoutRollInput, FabricQCInspectionUncheckedUpdateWithoutRollInput>
+    create: XOR<FabricQCInspectionCreateWithoutRollInput, FabricQCInspectionUncheckedCreateWithoutRollInput>
+  }
+
+  export type FabricQCInspectionUpdateWithWhereUniqueWithoutRollInput = {
+    where: FabricQCInspectionWhereUniqueInput
+    data: XOR<FabricQCInspectionUpdateWithoutRollInput, FabricQCInspectionUncheckedUpdateWithoutRollInput>
+  }
+
+  export type FabricQCInspectionUpdateManyWithWhereWithoutRollInput = {
+    where: FabricQCInspectionScalarWhereInput
+    data: XOR<FabricQCInspectionUpdateManyMutationInput, FabricQCInspectionUncheckedUpdateManyWithoutRollInput>
+  }
+
+  export type FabricStockLedgerUpsertWithWhereUniqueWithoutRollInput = {
+    where: FabricStockLedgerWhereUniqueInput
+    update: XOR<FabricStockLedgerUpdateWithoutRollInput, FabricStockLedgerUncheckedUpdateWithoutRollInput>
+    create: XOR<FabricStockLedgerCreateWithoutRollInput, FabricStockLedgerUncheckedCreateWithoutRollInput>
+  }
+
+  export type FabricStockLedgerUpdateWithWhereUniqueWithoutRollInput = {
+    where: FabricStockLedgerWhereUniqueInput
+    data: XOR<FabricStockLedgerUpdateWithoutRollInput, FabricStockLedgerUncheckedUpdateWithoutRollInput>
+  }
+
+  export type FabricStockLedgerUpdateManyWithWhereWithoutRollInput = {
+    where: FabricStockLedgerScalarWhereInput
+    data: XOR<FabricStockLedgerUpdateManyMutationInput, FabricStockLedgerUncheckedUpdateManyWithoutRollInput>
+  }
+
+  export type FabricBatchCreateWithoutReceiptsInput = {
+    id?: string
+    batchNumber: string
+    supplierId?: string | null
+    fabricType: string
+    fabricDescription: string
+    colorCode?: string | null
+    colorName?: string | null
+    totalRolls?: number
+    totalMeters?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.FabricBatchStatus
+    receivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    program?: ProgramCreateNestedOneWithoutFabricBatchesInput
+    createdBy: UserCreateNestedOneWithoutFabricBatchesCreatedInput
+    rolls?: FabricStoreRollCreateNestedManyWithoutBatchInput
+    ledgerEntries?: FabricStockLedgerCreateNestedManyWithoutBatchInput
+  }
+
+  export type FabricBatchUncheckedCreateWithoutReceiptsInput = {
+    id?: string
+    batchNumber: string
+    programId?: string | null
+    supplierId?: string | null
+    fabricType: string
+    fabricDescription: string
+    colorCode?: string | null
+    colorName?: string | null
+    totalRolls?: number
+    totalMeters?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.FabricBatchStatus
+    receivedAt?: Date | string | null
+    createdById: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    rolls?: FabricStoreRollUncheckedCreateNestedManyWithoutBatchInput
+    ledgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutBatchInput
+  }
+
+  export type FabricBatchCreateOrConnectWithoutReceiptsInput = {
+    where: FabricBatchWhereUniqueInput
+    create: XOR<FabricBatchCreateWithoutReceiptsInput, FabricBatchUncheckedCreateWithoutReceiptsInput>
+  }
+
+  export type UserCreateWithoutGrnReceivedInput = {
+    id?: string
+    username: string
+    email: string
+    fullName: string
+    passwordHash: string
+    departmentCode?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userRoles?: UserRoleCreateNestedManyWithoutUserInput
+    createdPrograms?: ProgramCreateNestedManyWithoutCreatedByInput
+    approvedPrograms?: ProgramCreateNestedManyWithoutApprovedByInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    attachments?: AttachmentCreateNestedManyWithoutUploadedByInput
+    createdChallans?: ChallanCreateNestedManyWithoutCreatedByInput
+    issuedChallans?: ChallanCreateNestedManyWithoutIssuedByInput
+    receivedChallans?: ChallanCreateNestedManyWithoutReceivedByInput
+    approvedChallans?: ChallanCreateNestedManyWithoutApprovedByInput
+    productionRecords?: ProductionTransactionCreateNestedManyWithoutOperatorInput
+    inspections?: QualityInspectionCreateNestedManyWithoutInspectorInput
+    challanEvents?: ChallanEventCreateNestedManyWithoutActorInput
+    stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutActorInput
+    dispatchesApproved?: DispatchOrderCreateNestedManyWithoutApprovedByInput
+    dispatchesOperated?: DispatchOrderCreateNestedManyWithoutDispatchedByInput
+    defectsDetected?: DefectRecordCreateNestedManyWithoutDetectedByInput
+    reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
+    recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
+    recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+  }
+
+  export type UserUncheckedCreateWithoutGrnReceivedInput = {
+    id?: string
+    username: string
+    email: string
+    fullName: string
+    passwordHash: string
+    departmentCode?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userRoles?: UserRoleUncheckedCreateNestedManyWithoutUserInput
+    createdPrograms?: ProgramUncheckedCreateNestedManyWithoutCreatedByInput
+    approvedPrograms?: ProgramUncheckedCreateNestedManyWithoutApprovedByInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    attachments?: AttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+    createdChallans?: ChallanUncheckedCreateNestedManyWithoutCreatedByInput
+    issuedChallans?: ChallanUncheckedCreateNestedManyWithoutIssuedByInput
+    receivedChallans?: ChallanUncheckedCreateNestedManyWithoutReceivedByInput
+    approvedChallans?: ChallanUncheckedCreateNestedManyWithoutApprovedByInput
+    productionRecords?: ProductionTransactionUncheckedCreateNestedManyWithoutOperatorInput
+    inspections?: QualityInspectionUncheckedCreateNestedManyWithoutInspectorInput
+    challanEvents?: ChallanEventUncheckedCreateNestedManyWithoutActorInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutActorInput
+    dispatchesApproved?: DispatchOrderUncheckedCreateNestedManyWithoutApprovedByInput
+    dispatchesOperated?: DispatchOrderUncheckedCreateNestedManyWithoutDispatchedByInput
+    defectsDetected?: DefectRecordUncheckedCreateNestedManyWithoutDetectedByInput
+    reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
+    recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
+    recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+  }
+
+  export type UserCreateOrConnectWithoutGrnReceivedInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutGrnReceivedInput, UserUncheckedCreateWithoutGrnReceivedInput>
+  }
+
+  export type MaterialReceiptItemCreateWithoutReceiptInput = {
+    id?: string
+    measuredLength: Decimal | DecimalJsLike | number | string
+    measuredWeight?: Decimal | DecimalJsLike | number | string | null
+    remarks?: string | null
+    createdAt?: Date | string
+    roll: FabricStoreRollCreateNestedOneWithoutReceiptItemsInput
+  }
+
+  export type MaterialReceiptItemUncheckedCreateWithoutReceiptInput = {
+    id?: string
+    rollId: string
+    measuredLength: Decimal | DecimalJsLike | number | string
+    measuredWeight?: Decimal | DecimalJsLike | number | string | null
+    remarks?: string | null
+    createdAt?: Date | string
+  }
+
+  export type MaterialReceiptItemCreateOrConnectWithoutReceiptInput = {
+    where: MaterialReceiptItemWhereUniqueInput
+    create: XOR<MaterialReceiptItemCreateWithoutReceiptInput, MaterialReceiptItemUncheckedCreateWithoutReceiptInput>
+  }
+
+  export type MaterialReceiptItemCreateManyReceiptInputEnvelope = {
+    data: MaterialReceiptItemCreateManyReceiptInput | MaterialReceiptItemCreateManyReceiptInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type FabricBatchUpsertWithoutReceiptsInput = {
+    update: XOR<FabricBatchUpdateWithoutReceiptsInput, FabricBatchUncheckedUpdateWithoutReceiptsInput>
+    create: XOR<FabricBatchCreateWithoutReceiptsInput, FabricBatchUncheckedCreateWithoutReceiptsInput>
+    where?: FabricBatchWhereInput
+  }
+
+  export type FabricBatchUpdateToOneWithWhereWithoutReceiptsInput = {
+    where?: FabricBatchWhereInput
+    data: XOR<FabricBatchUpdateWithoutReceiptsInput, FabricBatchUncheckedUpdateWithoutReceiptsInput>
+  }
+
+  export type FabricBatchUpdateWithoutReceiptsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    batchNumber?: StringFieldUpdateOperationsInput | string
+    supplierId?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: StringFieldUpdateOperationsInput | string
+    fabricDescription?: StringFieldUpdateOperationsInput | string
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    colorName?: NullableStringFieldUpdateOperationsInput | string | null
+    totalRolls?: IntFieldUpdateOperationsInput | number
+    totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    program?: ProgramUpdateOneWithoutFabricBatchesNestedInput
+    createdBy?: UserUpdateOneRequiredWithoutFabricBatchesCreatedNestedInput
+    rolls?: FabricStoreRollUpdateManyWithoutBatchNestedInput
+    ledgerEntries?: FabricStockLedgerUpdateManyWithoutBatchNestedInput
+  }
+
+  export type FabricBatchUncheckedUpdateWithoutReceiptsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    batchNumber?: StringFieldUpdateOperationsInput | string
+    programId?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierId?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: StringFieldUpdateOperationsInput | string
+    fabricDescription?: StringFieldUpdateOperationsInput | string
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    colorName?: NullableStringFieldUpdateOperationsInput | string | null
+    totalRolls?: IntFieldUpdateOperationsInput | number
+    totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdById?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rolls?: FabricStoreRollUncheckedUpdateManyWithoutBatchNestedInput
+    ledgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutBatchNestedInput
+  }
+
+  export type UserUpsertWithoutGrnReceivedInput = {
+    update: XOR<UserUpdateWithoutGrnReceivedInput, UserUncheckedUpdateWithoutGrnReceivedInput>
+    create: XOR<UserCreateWithoutGrnReceivedInput, UserUncheckedCreateWithoutGrnReceivedInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutGrnReceivedInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutGrnReceivedInput, UserUncheckedUpdateWithoutGrnReceivedInput>
+  }
+
+  export type UserUpdateWithoutGrnReceivedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    departmentCode?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userRoles?: UserRoleUpdateManyWithoutUserNestedInput
+    createdPrograms?: ProgramUpdateManyWithoutCreatedByNestedInput
+    approvedPrograms?: ProgramUpdateManyWithoutApprovedByNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    attachments?: AttachmentUpdateManyWithoutUploadedByNestedInput
+    createdChallans?: ChallanUpdateManyWithoutCreatedByNestedInput
+    issuedChallans?: ChallanUpdateManyWithoutIssuedByNestedInput
+    receivedChallans?: ChallanUpdateManyWithoutReceivedByNestedInput
+    approvedChallans?: ChallanUpdateManyWithoutApprovedByNestedInput
+    productionRecords?: ProductionTransactionUpdateManyWithoutOperatorNestedInput
+    inspections?: QualityInspectionUpdateManyWithoutInspectorNestedInput
+    challanEvents?: ChallanEventUpdateManyWithoutActorNestedInput
+    stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutActorNestedInput
+    dispatchesApproved?: DispatchOrderUpdateManyWithoutApprovedByNestedInput
+    dispatchesOperated?: DispatchOrderUpdateManyWithoutDispatchedByNestedInput
+    defectsDetected?: DefectRecordUpdateManyWithoutDetectedByNestedInput
+    reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
+    recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
+    recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutGrnReceivedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    departmentCode?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userRoles?: UserRoleUncheckedUpdateManyWithoutUserNestedInput
+    createdPrograms?: ProgramUncheckedUpdateManyWithoutCreatedByNestedInput
+    approvedPrograms?: ProgramUncheckedUpdateManyWithoutApprovedByNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    attachments?: AttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+    createdChallans?: ChallanUncheckedUpdateManyWithoutCreatedByNestedInput
+    issuedChallans?: ChallanUncheckedUpdateManyWithoutIssuedByNestedInput
+    receivedChallans?: ChallanUncheckedUpdateManyWithoutReceivedByNestedInput
+    approvedChallans?: ChallanUncheckedUpdateManyWithoutApprovedByNestedInput
+    productionRecords?: ProductionTransactionUncheckedUpdateManyWithoutOperatorNestedInput
+    inspections?: QualityInspectionUncheckedUpdateManyWithoutInspectorNestedInput
+    challanEvents?: ChallanEventUncheckedUpdateManyWithoutActorNestedInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutActorNestedInput
+    dispatchesApproved?: DispatchOrderUncheckedUpdateManyWithoutApprovedByNestedInput
+    dispatchesOperated?: DispatchOrderUncheckedUpdateManyWithoutDispatchedByNestedInput
+    defectsDetected?: DefectRecordUncheckedUpdateManyWithoutDetectedByNestedInput
+    reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
+    recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+    recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+  }
+
+  export type MaterialReceiptItemUpsertWithWhereUniqueWithoutReceiptInput = {
+    where: MaterialReceiptItemWhereUniqueInput
+    update: XOR<MaterialReceiptItemUpdateWithoutReceiptInput, MaterialReceiptItemUncheckedUpdateWithoutReceiptInput>
+    create: XOR<MaterialReceiptItemCreateWithoutReceiptInput, MaterialReceiptItemUncheckedCreateWithoutReceiptInput>
+  }
+
+  export type MaterialReceiptItemUpdateWithWhereUniqueWithoutReceiptInput = {
+    where: MaterialReceiptItemWhereUniqueInput
+    data: XOR<MaterialReceiptItemUpdateWithoutReceiptInput, MaterialReceiptItemUncheckedUpdateWithoutReceiptInput>
+  }
+
+  export type MaterialReceiptItemUpdateManyWithWhereWithoutReceiptInput = {
+    where: MaterialReceiptItemScalarWhereInput
+    data: XOR<MaterialReceiptItemUpdateManyMutationInput, MaterialReceiptItemUncheckedUpdateManyWithoutReceiptInput>
+  }
+
+  export type MaterialReceiptCreateWithoutItemsInput = {
+    id?: string
+    grnNumber: string
+    challanId?: string | null
+    receivedAt: Date | string
+    vehicleNumber?: string | null
+    supplierName: string
+    totalRollsReceived?: number
+    totalMetersReceived?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.GRNStatus
+    remarks?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    batch: FabricBatchCreateNestedOneWithoutReceiptsInput
+    receivedBy: UserCreateNestedOneWithoutGrnReceivedInput
+  }
+
+  export type MaterialReceiptUncheckedCreateWithoutItemsInput = {
+    id?: string
+    grnNumber: string
+    batchId: string
+    challanId?: string | null
+    receivedById: string
+    receivedAt: Date | string
+    vehicleNumber?: string | null
+    supplierName: string
+    totalRollsReceived?: number
+    totalMetersReceived?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.GRNStatus
+    remarks?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MaterialReceiptCreateOrConnectWithoutItemsInput = {
+    where: MaterialReceiptWhereUniqueInput
+    create: XOR<MaterialReceiptCreateWithoutItemsInput, MaterialReceiptUncheckedCreateWithoutItemsInput>
+  }
+
+  export type FabricStoreRollCreateWithoutReceiptItemsInput = {
+    id?: string
+    rollNumber: string
+    length: Decimal | DecimalJsLike | number | string
+    width?: Decimal | DecimalJsLike | number | string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    status?: $Enums.FabricRollStatus
+    qcStatus?: $Enums.FabricQCStatus
+    qcInspectedAt?: Date | string | null
+    qcRemarks?: string | null
+    issuedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    batch: FabricBatchCreateNestedOneWithoutRollsInput
+    location?: InventoryLocationCreateNestedOneWithoutRollsInput
+    qcInspectedBy?: UserCreateNestedOneWithoutFabricRollsInspectedInput
+    programIssuedTo?: ProgramCreateNestedOneWithoutFabricStoreRollsInput
+    qcInspections?: FabricQCInspectionCreateNestedManyWithoutRollInput
+    ledgerEntries?: FabricStockLedgerCreateNestedManyWithoutRollInput
+  }
+
+  export type FabricStoreRollUncheckedCreateWithoutReceiptItemsInput = {
+    id?: string
+    rollNumber: string
+    batchId: string
+    locationId?: string | null
+    length: Decimal | DecimalJsLike | number | string
+    width?: Decimal | DecimalJsLike | number | string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    status?: $Enums.FabricRollStatus
+    qcStatus?: $Enums.FabricQCStatus
+    qcInspectedById?: string | null
+    qcInspectedAt?: Date | string | null
+    qcRemarks?: string | null
+    programIssuedToId?: string | null
+    issuedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    qcInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutRollInput
+    ledgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutRollInput
+  }
+
+  export type FabricStoreRollCreateOrConnectWithoutReceiptItemsInput = {
+    where: FabricStoreRollWhereUniqueInput
+    create: XOR<FabricStoreRollCreateWithoutReceiptItemsInput, FabricStoreRollUncheckedCreateWithoutReceiptItemsInput>
+  }
+
+  export type MaterialReceiptUpsertWithoutItemsInput = {
+    update: XOR<MaterialReceiptUpdateWithoutItemsInput, MaterialReceiptUncheckedUpdateWithoutItemsInput>
+    create: XOR<MaterialReceiptCreateWithoutItemsInput, MaterialReceiptUncheckedCreateWithoutItemsInput>
+    where?: MaterialReceiptWhereInput
+  }
+
+  export type MaterialReceiptUpdateToOneWithWhereWithoutItemsInput = {
+    where?: MaterialReceiptWhereInput
+    data: XOR<MaterialReceiptUpdateWithoutItemsInput, MaterialReceiptUncheckedUpdateWithoutItemsInput>
+  }
+
+  export type MaterialReceiptUpdateWithoutItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    grnNumber?: StringFieldUpdateOperationsInput | string
+    challanId?: NullableStringFieldUpdateOperationsInput | string | null
+    receivedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    vehicleNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: StringFieldUpdateOperationsInput | string
+    totalRollsReceived?: IntFieldUpdateOperationsInput | number
+    totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    batch?: FabricBatchUpdateOneRequiredWithoutReceiptsNestedInput
+    receivedBy?: UserUpdateOneRequiredWithoutGrnReceivedNestedInput
+  }
+
+  export type MaterialReceiptUncheckedUpdateWithoutItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    grnNumber?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    challanId?: NullableStringFieldUpdateOperationsInput | string | null
+    receivedById?: StringFieldUpdateOperationsInput | string
+    receivedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    vehicleNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: StringFieldUpdateOperationsInput | string
+    totalRollsReceived?: IntFieldUpdateOperationsInput | number
+    totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStoreRollUpsertWithoutReceiptItemsInput = {
+    update: XOR<FabricStoreRollUpdateWithoutReceiptItemsInput, FabricStoreRollUncheckedUpdateWithoutReceiptItemsInput>
+    create: XOR<FabricStoreRollCreateWithoutReceiptItemsInput, FabricStoreRollUncheckedCreateWithoutReceiptItemsInput>
+    where?: FabricStoreRollWhereInput
+  }
+
+  export type FabricStoreRollUpdateToOneWithWhereWithoutReceiptItemsInput = {
+    where?: FabricStoreRollWhereInput
+    data: XOR<FabricStoreRollUpdateWithoutReceiptItemsInput, FabricStoreRollUncheckedUpdateWithoutReceiptItemsInput>
+  }
+
+  export type FabricStoreRollUpdateWithoutReceiptItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    rollNumber?: StringFieldUpdateOperationsInput | string
+    length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
+    qcStatus?: EnumFabricQCStatusFieldUpdateOperationsInput | $Enums.FabricQCStatus
+    qcInspectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    qcRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    batch?: FabricBatchUpdateOneRequiredWithoutRollsNestedInput
+    location?: InventoryLocationUpdateOneWithoutRollsNestedInput
+    qcInspectedBy?: UserUpdateOneWithoutFabricRollsInspectedNestedInput
+    programIssuedTo?: ProgramUpdateOneWithoutFabricStoreRollsNestedInput
+    qcInspections?: FabricQCInspectionUpdateManyWithoutRollNestedInput
+    ledgerEntries?: FabricStockLedgerUpdateManyWithoutRollNestedInput
+  }
+
+  export type FabricStoreRollUncheckedUpdateWithoutReceiptItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    rollNumber?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    locationId?: NullableStringFieldUpdateOperationsInput | string | null
+    length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
+    qcStatus?: EnumFabricQCStatusFieldUpdateOperationsInput | $Enums.FabricQCStatus
+    qcInspectedById?: NullableStringFieldUpdateOperationsInput | string | null
+    qcInspectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    qcRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    programIssuedToId?: NullableStringFieldUpdateOperationsInput | string | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    qcInspections?: FabricQCInspectionUncheckedUpdateManyWithoutRollNestedInput
+    ledgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutRollNestedInput
+  }
+
+  export type FabricStoreRollCreateWithoutQcInspectionsInput = {
+    id?: string
+    rollNumber: string
+    length: Decimal | DecimalJsLike | number | string
+    width?: Decimal | DecimalJsLike | number | string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    status?: $Enums.FabricRollStatus
+    qcStatus?: $Enums.FabricQCStatus
+    qcInspectedAt?: Date | string | null
+    qcRemarks?: string | null
+    issuedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    batch: FabricBatchCreateNestedOneWithoutRollsInput
+    location?: InventoryLocationCreateNestedOneWithoutRollsInput
+    qcInspectedBy?: UserCreateNestedOneWithoutFabricRollsInspectedInput
+    programIssuedTo?: ProgramCreateNestedOneWithoutFabricStoreRollsInput
+    receiptItems?: MaterialReceiptItemCreateNestedManyWithoutRollInput
+    ledgerEntries?: FabricStockLedgerCreateNestedManyWithoutRollInput
+  }
+
+  export type FabricStoreRollUncheckedCreateWithoutQcInspectionsInput = {
+    id?: string
+    rollNumber: string
+    batchId: string
+    locationId?: string | null
+    length: Decimal | DecimalJsLike | number | string
+    width?: Decimal | DecimalJsLike | number | string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    status?: $Enums.FabricRollStatus
+    qcStatus?: $Enums.FabricQCStatus
+    qcInspectedById?: string | null
+    qcInspectedAt?: Date | string | null
+    qcRemarks?: string | null
+    programIssuedToId?: string | null
+    issuedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    receiptItems?: MaterialReceiptItemUncheckedCreateNestedManyWithoutRollInput
+    ledgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutRollInput
+  }
+
+  export type FabricStoreRollCreateOrConnectWithoutQcInspectionsInput = {
+    where: FabricStoreRollWhereUniqueInput
+    create: XOR<FabricStoreRollCreateWithoutQcInspectionsInput, FabricStoreRollUncheckedCreateWithoutQcInspectionsInput>
+  }
+
+  export type UserCreateWithoutFabricQCInspectionsInput = {
+    id?: string
+    username: string
+    email: string
+    fullName: string
+    passwordHash: string
+    departmentCode?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userRoles?: UserRoleCreateNestedManyWithoutUserInput
+    createdPrograms?: ProgramCreateNestedManyWithoutCreatedByInput
+    approvedPrograms?: ProgramCreateNestedManyWithoutApprovedByInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    attachments?: AttachmentCreateNestedManyWithoutUploadedByInput
+    createdChallans?: ChallanCreateNestedManyWithoutCreatedByInput
+    issuedChallans?: ChallanCreateNestedManyWithoutIssuedByInput
+    receivedChallans?: ChallanCreateNestedManyWithoutReceivedByInput
+    approvedChallans?: ChallanCreateNestedManyWithoutApprovedByInput
+    productionRecords?: ProductionTransactionCreateNestedManyWithoutOperatorInput
+    inspections?: QualityInspectionCreateNestedManyWithoutInspectorInput
+    challanEvents?: ChallanEventCreateNestedManyWithoutActorInput
+    stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutActorInput
+    dispatchesApproved?: DispatchOrderCreateNestedManyWithoutApprovedByInput
+    dispatchesOperated?: DispatchOrderCreateNestedManyWithoutDispatchedByInput
+    defectsDetected?: DefectRecordCreateNestedManyWithoutDetectedByInput
+    reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
+    recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
+    recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+  }
+
+  export type UserUncheckedCreateWithoutFabricQCInspectionsInput = {
+    id?: string
+    username: string
+    email: string
+    fullName: string
+    passwordHash: string
+    departmentCode?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userRoles?: UserRoleUncheckedCreateNestedManyWithoutUserInput
+    createdPrograms?: ProgramUncheckedCreateNestedManyWithoutCreatedByInput
+    approvedPrograms?: ProgramUncheckedCreateNestedManyWithoutApprovedByInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    attachments?: AttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+    createdChallans?: ChallanUncheckedCreateNestedManyWithoutCreatedByInput
+    issuedChallans?: ChallanUncheckedCreateNestedManyWithoutIssuedByInput
+    receivedChallans?: ChallanUncheckedCreateNestedManyWithoutReceivedByInput
+    approvedChallans?: ChallanUncheckedCreateNestedManyWithoutApprovedByInput
+    productionRecords?: ProductionTransactionUncheckedCreateNestedManyWithoutOperatorInput
+    inspections?: QualityInspectionUncheckedCreateNestedManyWithoutInspectorInput
+    challanEvents?: ChallanEventUncheckedCreateNestedManyWithoutActorInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutActorInput
+    dispatchesApproved?: DispatchOrderUncheckedCreateNestedManyWithoutApprovedByInput
+    dispatchesOperated?: DispatchOrderUncheckedCreateNestedManyWithoutDispatchedByInput
+    defectsDetected?: DefectRecordUncheckedCreateNestedManyWithoutDetectedByInput
+    reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
+    recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
+    recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+  }
+
+  export type UserCreateOrConnectWithoutFabricQCInspectionsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutFabricQCInspectionsInput, UserUncheckedCreateWithoutFabricQCInspectionsInput>
+  }
+
+  export type FabricStoreRollUpsertWithoutQcInspectionsInput = {
+    update: XOR<FabricStoreRollUpdateWithoutQcInspectionsInput, FabricStoreRollUncheckedUpdateWithoutQcInspectionsInput>
+    create: XOR<FabricStoreRollCreateWithoutQcInspectionsInput, FabricStoreRollUncheckedCreateWithoutQcInspectionsInput>
+    where?: FabricStoreRollWhereInput
+  }
+
+  export type FabricStoreRollUpdateToOneWithWhereWithoutQcInspectionsInput = {
+    where?: FabricStoreRollWhereInput
+    data: XOR<FabricStoreRollUpdateWithoutQcInspectionsInput, FabricStoreRollUncheckedUpdateWithoutQcInspectionsInput>
+  }
+
+  export type FabricStoreRollUpdateWithoutQcInspectionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    rollNumber?: StringFieldUpdateOperationsInput | string
+    length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
+    qcStatus?: EnumFabricQCStatusFieldUpdateOperationsInput | $Enums.FabricQCStatus
+    qcInspectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    qcRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    batch?: FabricBatchUpdateOneRequiredWithoutRollsNestedInput
+    location?: InventoryLocationUpdateOneWithoutRollsNestedInput
+    qcInspectedBy?: UserUpdateOneWithoutFabricRollsInspectedNestedInput
+    programIssuedTo?: ProgramUpdateOneWithoutFabricStoreRollsNestedInput
+    receiptItems?: MaterialReceiptItemUpdateManyWithoutRollNestedInput
+    ledgerEntries?: FabricStockLedgerUpdateManyWithoutRollNestedInput
+  }
+
+  export type FabricStoreRollUncheckedUpdateWithoutQcInspectionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    rollNumber?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    locationId?: NullableStringFieldUpdateOperationsInput | string | null
+    length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
+    qcStatus?: EnumFabricQCStatusFieldUpdateOperationsInput | $Enums.FabricQCStatus
+    qcInspectedById?: NullableStringFieldUpdateOperationsInput | string | null
+    qcInspectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    qcRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    programIssuedToId?: NullableStringFieldUpdateOperationsInput | string | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    receiptItems?: MaterialReceiptItemUncheckedUpdateManyWithoutRollNestedInput
+    ledgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutRollNestedInput
+  }
+
+  export type UserUpsertWithoutFabricQCInspectionsInput = {
+    update: XOR<UserUpdateWithoutFabricQCInspectionsInput, UserUncheckedUpdateWithoutFabricQCInspectionsInput>
+    create: XOR<UserCreateWithoutFabricQCInspectionsInput, UserUncheckedCreateWithoutFabricQCInspectionsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutFabricQCInspectionsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutFabricQCInspectionsInput, UserUncheckedUpdateWithoutFabricQCInspectionsInput>
+  }
+
+  export type UserUpdateWithoutFabricQCInspectionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    departmentCode?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userRoles?: UserRoleUpdateManyWithoutUserNestedInput
+    createdPrograms?: ProgramUpdateManyWithoutCreatedByNestedInput
+    approvedPrograms?: ProgramUpdateManyWithoutApprovedByNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    attachments?: AttachmentUpdateManyWithoutUploadedByNestedInput
+    createdChallans?: ChallanUpdateManyWithoutCreatedByNestedInput
+    issuedChallans?: ChallanUpdateManyWithoutIssuedByNestedInput
+    receivedChallans?: ChallanUpdateManyWithoutReceivedByNestedInput
+    approvedChallans?: ChallanUpdateManyWithoutApprovedByNestedInput
+    productionRecords?: ProductionTransactionUpdateManyWithoutOperatorNestedInput
+    inspections?: QualityInspectionUpdateManyWithoutInspectorNestedInput
+    challanEvents?: ChallanEventUpdateManyWithoutActorNestedInput
+    stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutActorNestedInput
+    dispatchesApproved?: DispatchOrderUpdateManyWithoutApprovedByNestedInput
+    dispatchesOperated?: DispatchOrderUpdateManyWithoutDispatchedByNestedInput
+    defectsDetected?: DefectRecordUpdateManyWithoutDetectedByNestedInput
+    reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
+    recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
+    recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutFabricQCInspectionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    departmentCode?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userRoles?: UserRoleUncheckedUpdateManyWithoutUserNestedInput
+    createdPrograms?: ProgramUncheckedUpdateManyWithoutCreatedByNestedInput
+    approvedPrograms?: ProgramUncheckedUpdateManyWithoutApprovedByNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    attachments?: AttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+    createdChallans?: ChallanUncheckedUpdateManyWithoutCreatedByNestedInput
+    issuedChallans?: ChallanUncheckedUpdateManyWithoutIssuedByNestedInput
+    receivedChallans?: ChallanUncheckedUpdateManyWithoutReceivedByNestedInput
+    approvedChallans?: ChallanUncheckedUpdateManyWithoutApprovedByNestedInput
+    productionRecords?: ProductionTransactionUncheckedUpdateManyWithoutOperatorNestedInput
+    inspections?: QualityInspectionUncheckedUpdateManyWithoutInspectorNestedInput
+    challanEvents?: ChallanEventUncheckedUpdateManyWithoutActorNestedInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutActorNestedInput
+    dispatchesApproved?: DispatchOrderUncheckedUpdateManyWithoutApprovedByNestedInput
+    dispatchesOperated?: DispatchOrderUncheckedUpdateManyWithoutDispatchedByNestedInput
+    defectsDetected?: DefectRecordUncheckedUpdateManyWithoutDetectedByNestedInput
+    reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
+    recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+    recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+  }
+
+  export type FabricStoreRollCreateWithoutLedgerEntriesInput = {
+    id?: string
+    rollNumber: string
+    length: Decimal | DecimalJsLike | number | string
+    width?: Decimal | DecimalJsLike | number | string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    status?: $Enums.FabricRollStatus
+    qcStatus?: $Enums.FabricQCStatus
+    qcInspectedAt?: Date | string | null
+    qcRemarks?: string | null
+    issuedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    batch: FabricBatchCreateNestedOneWithoutRollsInput
+    location?: InventoryLocationCreateNestedOneWithoutRollsInput
+    qcInspectedBy?: UserCreateNestedOneWithoutFabricRollsInspectedInput
+    programIssuedTo?: ProgramCreateNestedOneWithoutFabricStoreRollsInput
+    receiptItems?: MaterialReceiptItemCreateNestedManyWithoutRollInput
+    qcInspections?: FabricQCInspectionCreateNestedManyWithoutRollInput
+  }
+
+  export type FabricStoreRollUncheckedCreateWithoutLedgerEntriesInput = {
+    id?: string
+    rollNumber: string
+    batchId: string
+    locationId?: string | null
+    length: Decimal | DecimalJsLike | number | string
+    width?: Decimal | DecimalJsLike | number | string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    status?: $Enums.FabricRollStatus
+    qcStatus?: $Enums.FabricQCStatus
+    qcInspectedById?: string | null
+    qcInspectedAt?: Date | string | null
+    qcRemarks?: string | null
+    programIssuedToId?: string | null
+    issuedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    receiptItems?: MaterialReceiptItemUncheckedCreateNestedManyWithoutRollInput
+    qcInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutRollInput
+  }
+
+  export type FabricStoreRollCreateOrConnectWithoutLedgerEntriesInput = {
+    where: FabricStoreRollWhereUniqueInput
+    create: XOR<FabricStoreRollCreateWithoutLedgerEntriesInput, FabricStoreRollUncheckedCreateWithoutLedgerEntriesInput>
+  }
+
+  export type FabricBatchCreateWithoutLedgerEntriesInput = {
+    id?: string
+    batchNumber: string
+    supplierId?: string | null
+    fabricType: string
+    fabricDescription: string
+    colorCode?: string | null
+    colorName?: string | null
+    totalRolls?: number
+    totalMeters?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.FabricBatchStatus
+    receivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    program?: ProgramCreateNestedOneWithoutFabricBatchesInput
+    createdBy: UserCreateNestedOneWithoutFabricBatchesCreatedInput
+    rolls?: FabricStoreRollCreateNestedManyWithoutBatchInput
+    receipts?: MaterialReceiptCreateNestedManyWithoutBatchInput
+  }
+
+  export type FabricBatchUncheckedCreateWithoutLedgerEntriesInput = {
+    id?: string
+    batchNumber: string
+    programId?: string | null
+    supplierId?: string | null
+    fabricType: string
+    fabricDescription: string
+    colorCode?: string | null
+    colorName?: string | null
+    totalRolls?: number
+    totalMeters?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.FabricBatchStatus
+    receivedAt?: Date | string | null
+    createdById: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    rolls?: FabricStoreRollUncheckedCreateNestedManyWithoutBatchInput
+    receipts?: MaterialReceiptUncheckedCreateNestedManyWithoutBatchInput
+  }
+
+  export type FabricBatchCreateOrConnectWithoutLedgerEntriesInput = {
+    where: FabricBatchWhereUniqueInput
+    create: XOR<FabricBatchCreateWithoutLedgerEntriesInput, FabricBatchUncheckedCreateWithoutLedgerEntriesInput>
+  }
+
+  export type InventoryLocationCreateWithoutFromLedgerInput = {
+    id?: string
+    locationCode: string
+    locationName: string
+    locationType?: $Enums.InventoryLocationType
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    rolls?: FabricStoreRollCreateNestedManyWithoutLocationInput
+    toLedger?: FabricStockLedgerCreateNestedManyWithoutToLocationInput
+  }
+
+  export type InventoryLocationUncheckedCreateWithoutFromLedgerInput = {
+    id?: string
+    locationCode: string
+    locationName: string
+    locationType?: $Enums.InventoryLocationType
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    rolls?: FabricStoreRollUncheckedCreateNestedManyWithoutLocationInput
+    toLedger?: FabricStockLedgerUncheckedCreateNestedManyWithoutToLocationInput
+  }
+
+  export type InventoryLocationCreateOrConnectWithoutFromLedgerInput = {
+    where: InventoryLocationWhereUniqueInput
+    create: XOR<InventoryLocationCreateWithoutFromLedgerInput, InventoryLocationUncheckedCreateWithoutFromLedgerInput>
+  }
+
+  export type InventoryLocationCreateWithoutToLedgerInput = {
+    id?: string
+    locationCode: string
+    locationName: string
+    locationType?: $Enums.InventoryLocationType
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    rolls?: FabricStoreRollCreateNestedManyWithoutLocationInput
+    fromLedger?: FabricStockLedgerCreateNestedManyWithoutFromLocationInput
+  }
+
+  export type InventoryLocationUncheckedCreateWithoutToLedgerInput = {
+    id?: string
+    locationCode: string
+    locationName: string
+    locationType?: $Enums.InventoryLocationType
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    rolls?: FabricStoreRollUncheckedCreateNestedManyWithoutLocationInput
+    fromLedger?: FabricStockLedgerUncheckedCreateNestedManyWithoutFromLocationInput
+  }
+
+  export type InventoryLocationCreateOrConnectWithoutToLedgerInput = {
+    where: InventoryLocationWhereUniqueInput
+    create: XOR<InventoryLocationCreateWithoutToLedgerInput, InventoryLocationUncheckedCreateWithoutToLedgerInput>
+  }
+
+  export type UserCreateWithoutFabricLedgerEntriesInput = {
+    id?: string
+    username: string
+    email: string
+    fullName: string
+    passwordHash: string
+    departmentCode?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userRoles?: UserRoleCreateNestedManyWithoutUserInput
+    createdPrograms?: ProgramCreateNestedManyWithoutCreatedByInput
+    approvedPrograms?: ProgramCreateNestedManyWithoutApprovedByInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    attachments?: AttachmentCreateNestedManyWithoutUploadedByInput
+    createdChallans?: ChallanCreateNestedManyWithoutCreatedByInput
+    issuedChallans?: ChallanCreateNestedManyWithoutIssuedByInput
+    receivedChallans?: ChallanCreateNestedManyWithoutReceivedByInput
+    approvedChallans?: ChallanCreateNestedManyWithoutApprovedByInput
+    productionRecords?: ProductionTransactionCreateNestedManyWithoutOperatorInput
+    inspections?: QualityInspectionCreateNestedManyWithoutInspectorInput
+    challanEvents?: ChallanEventCreateNestedManyWithoutActorInput
+    stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutActorInput
+    dispatchesApproved?: DispatchOrderCreateNestedManyWithoutApprovedByInput
+    dispatchesOperated?: DispatchOrderCreateNestedManyWithoutDispatchedByInput
+    defectsDetected?: DefectRecordCreateNestedManyWithoutDetectedByInput
+    reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
+    recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
+    recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+  }
+
+  export type UserUncheckedCreateWithoutFabricLedgerEntriesInput = {
+    id?: string
+    username: string
+    email: string
+    fullName: string
+    passwordHash: string
+    departmentCode?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userRoles?: UserRoleUncheckedCreateNestedManyWithoutUserInput
+    createdPrograms?: ProgramUncheckedCreateNestedManyWithoutCreatedByInput
+    approvedPrograms?: ProgramUncheckedCreateNestedManyWithoutApprovedByInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    attachments?: AttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+    createdChallans?: ChallanUncheckedCreateNestedManyWithoutCreatedByInput
+    issuedChallans?: ChallanUncheckedCreateNestedManyWithoutIssuedByInput
+    receivedChallans?: ChallanUncheckedCreateNestedManyWithoutReceivedByInput
+    approvedChallans?: ChallanUncheckedCreateNestedManyWithoutApprovedByInput
+    productionRecords?: ProductionTransactionUncheckedCreateNestedManyWithoutOperatorInput
+    inspections?: QualityInspectionUncheckedCreateNestedManyWithoutInspectorInput
+    challanEvents?: ChallanEventUncheckedCreateNestedManyWithoutActorInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutActorInput
+    dispatchesApproved?: DispatchOrderUncheckedCreateNestedManyWithoutApprovedByInput
+    dispatchesOperated?: DispatchOrderUncheckedCreateNestedManyWithoutDispatchedByInput
+    defectsDetected?: DefectRecordUncheckedCreateNestedManyWithoutDetectedByInput
+    reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
+    recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
+    recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+  }
+
+  export type UserCreateOrConnectWithoutFabricLedgerEntriesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutFabricLedgerEntriesInput, UserUncheckedCreateWithoutFabricLedgerEntriesInput>
+  }
+
+  export type FabricStoreRollUpsertWithoutLedgerEntriesInput = {
+    update: XOR<FabricStoreRollUpdateWithoutLedgerEntriesInput, FabricStoreRollUncheckedUpdateWithoutLedgerEntriesInput>
+    create: XOR<FabricStoreRollCreateWithoutLedgerEntriesInput, FabricStoreRollUncheckedCreateWithoutLedgerEntriesInput>
+    where?: FabricStoreRollWhereInput
+  }
+
+  export type FabricStoreRollUpdateToOneWithWhereWithoutLedgerEntriesInput = {
+    where?: FabricStoreRollWhereInput
+    data: XOR<FabricStoreRollUpdateWithoutLedgerEntriesInput, FabricStoreRollUncheckedUpdateWithoutLedgerEntriesInput>
+  }
+
+  export type FabricStoreRollUpdateWithoutLedgerEntriesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    rollNumber?: StringFieldUpdateOperationsInput | string
+    length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
+    qcStatus?: EnumFabricQCStatusFieldUpdateOperationsInput | $Enums.FabricQCStatus
+    qcInspectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    qcRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    batch?: FabricBatchUpdateOneRequiredWithoutRollsNestedInput
+    location?: InventoryLocationUpdateOneWithoutRollsNestedInput
+    qcInspectedBy?: UserUpdateOneWithoutFabricRollsInspectedNestedInput
+    programIssuedTo?: ProgramUpdateOneWithoutFabricStoreRollsNestedInput
+    receiptItems?: MaterialReceiptItemUpdateManyWithoutRollNestedInput
+    qcInspections?: FabricQCInspectionUpdateManyWithoutRollNestedInput
+  }
+
+  export type FabricStoreRollUncheckedUpdateWithoutLedgerEntriesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    rollNumber?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    locationId?: NullableStringFieldUpdateOperationsInput | string | null
+    length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
+    qcStatus?: EnumFabricQCStatusFieldUpdateOperationsInput | $Enums.FabricQCStatus
+    qcInspectedById?: NullableStringFieldUpdateOperationsInput | string | null
+    qcInspectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    qcRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    programIssuedToId?: NullableStringFieldUpdateOperationsInput | string | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    receiptItems?: MaterialReceiptItemUncheckedUpdateManyWithoutRollNestedInput
+    qcInspections?: FabricQCInspectionUncheckedUpdateManyWithoutRollNestedInput
+  }
+
+  export type FabricBatchUpsertWithoutLedgerEntriesInput = {
+    update: XOR<FabricBatchUpdateWithoutLedgerEntriesInput, FabricBatchUncheckedUpdateWithoutLedgerEntriesInput>
+    create: XOR<FabricBatchCreateWithoutLedgerEntriesInput, FabricBatchUncheckedCreateWithoutLedgerEntriesInput>
+    where?: FabricBatchWhereInput
+  }
+
+  export type FabricBatchUpdateToOneWithWhereWithoutLedgerEntriesInput = {
+    where?: FabricBatchWhereInput
+    data: XOR<FabricBatchUpdateWithoutLedgerEntriesInput, FabricBatchUncheckedUpdateWithoutLedgerEntriesInput>
+  }
+
+  export type FabricBatchUpdateWithoutLedgerEntriesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    batchNumber?: StringFieldUpdateOperationsInput | string
+    supplierId?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: StringFieldUpdateOperationsInput | string
+    fabricDescription?: StringFieldUpdateOperationsInput | string
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    colorName?: NullableStringFieldUpdateOperationsInput | string | null
+    totalRolls?: IntFieldUpdateOperationsInput | number
+    totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    program?: ProgramUpdateOneWithoutFabricBatchesNestedInput
+    createdBy?: UserUpdateOneRequiredWithoutFabricBatchesCreatedNestedInput
+    rolls?: FabricStoreRollUpdateManyWithoutBatchNestedInput
+    receipts?: MaterialReceiptUpdateManyWithoutBatchNestedInput
+  }
+
+  export type FabricBatchUncheckedUpdateWithoutLedgerEntriesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    batchNumber?: StringFieldUpdateOperationsInput | string
+    programId?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierId?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: StringFieldUpdateOperationsInput | string
+    fabricDescription?: StringFieldUpdateOperationsInput | string
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    colorName?: NullableStringFieldUpdateOperationsInput | string | null
+    totalRolls?: IntFieldUpdateOperationsInput | number
+    totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdById?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rolls?: FabricStoreRollUncheckedUpdateManyWithoutBatchNestedInput
+    receipts?: MaterialReceiptUncheckedUpdateManyWithoutBatchNestedInput
+  }
+
+  export type InventoryLocationUpsertWithoutFromLedgerInput = {
+    update: XOR<InventoryLocationUpdateWithoutFromLedgerInput, InventoryLocationUncheckedUpdateWithoutFromLedgerInput>
+    create: XOR<InventoryLocationCreateWithoutFromLedgerInput, InventoryLocationUncheckedCreateWithoutFromLedgerInput>
+    where?: InventoryLocationWhereInput
+  }
+
+  export type InventoryLocationUpdateToOneWithWhereWithoutFromLedgerInput = {
+    where?: InventoryLocationWhereInput
+    data: XOR<InventoryLocationUpdateWithoutFromLedgerInput, InventoryLocationUncheckedUpdateWithoutFromLedgerInput>
+  }
+
+  export type InventoryLocationUpdateWithoutFromLedgerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    locationCode?: StringFieldUpdateOperationsInput | string
+    locationName?: StringFieldUpdateOperationsInput | string
+    locationType?: EnumInventoryLocationTypeFieldUpdateOperationsInput | $Enums.InventoryLocationType
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rolls?: FabricStoreRollUpdateManyWithoutLocationNestedInput
+    toLedger?: FabricStockLedgerUpdateManyWithoutToLocationNestedInput
+  }
+
+  export type InventoryLocationUncheckedUpdateWithoutFromLedgerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    locationCode?: StringFieldUpdateOperationsInput | string
+    locationName?: StringFieldUpdateOperationsInput | string
+    locationType?: EnumInventoryLocationTypeFieldUpdateOperationsInput | $Enums.InventoryLocationType
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rolls?: FabricStoreRollUncheckedUpdateManyWithoutLocationNestedInput
+    toLedger?: FabricStockLedgerUncheckedUpdateManyWithoutToLocationNestedInput
+  }
+
+  export type InventoryLocationUpsertWithoutToLedgerInput = {
+    update: XOR<InventoryLocationUpdateWithoutToLedgerInput, InventoryLocationUncheckedUpdateWithoutToLedgerInput>
+    create: XOR<InventoryLocationCreateWithoutToLedgerInput, InventoryLocationUncheckedCreateWithoutToLedgerInput>
+    where?: InventoryLocationWhereInput
+  }
+
+  export type InventoryLocationUpdateToOneWithWhereWithoutToLedgerInput = {
+    where?: InventoryLocationWhereInput
+    data: XOR<InventoryLocationUpdateWithoutToLedgerInput, InventoryLocationUncheckedUpdateWithoutToLedgerInput>
+  }
+
+  export type InventoryLocationUpdateWithoutToLedgerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    locationCode?: StringFieldUpdateOperationsInput | string
+    locationName?: StringFieldUpdateOperationsInput | string
+    locationType?: EnumInventoryLocationTypeFieldUpdateOperationsInput | $Enums.InventoryLocationType
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rolls?: FabricStoreRollUpdateManyWithoutLocationNestedInput
+    fromLedger?: FabricStockLedgerUpdateManyWithoutFromLocationNestedInput
+  }
+
+  export type InventoryLocationUncheckedUpdateWithoutToLedgerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    locationCode?: StringFieldUpdateOperationsInput | string
+    locationName?: StringFieldUpdateOperationsInput | string
+    locationType?: EnumInventoryLocationTypeFieldUpdateOperationsInput | $Enums.InventoryLocationType
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rolls?: FabricStoreRollUncheckedUpdateManyWithoutLocationNestedInput
+    fromLedger?: FabricStockLedgerUncheckedUpdateManyWithoutFromLocationNestedInput
+  }
+
+  export type UserUpsertWithoutFabricLedgerEntriesInput = {
+    update: XOR<UserUpdateWithoutFabricLedgerEntriesInput, UserUncheckedUpdateWithoutFabricLedgerEntriesInput>
+    create: XOR<UserCreateWithoutFabricLedgerEntriesInput, UserUncheckedCreateWithoutFabricLedgerEntriesInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutFabricLedgerEntriesInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutFabricLedgerEntriesInput, UserUncheckedUpdateWithoutFabricLedgerEntriesInput>
+  }
+
+  export type UserUpdateWithoutFabricLedgerEntriesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    departmentCode?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userRoles?: UserRoleUpdateManyWithoutUserNestedInput
+    createdPrograms?: ProgramUpdateManyWithoutCreatedByNestedInput
+    approvedPrograms?: ProgramUpdateManyWithoutApprovedByNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    attachments?: AttachmentUpdateManyWithoutUploadedByNestedInput
+    createdChallans?: ChallanUpdateManyWithoutCreatedByNestedInput
+    issuedChallans?: ChallanUpdateManyWithoutIssuedByNestedInput
+    receivedChallans?: ChallanUpdateManyWithoutReceivedByNestedInput
+    approvedChallans?: ChallanUpdateManyWithoutApprovedByNestedInput
+    productionRecords?: ProductionTransactionUpdateManyWithoutOperatorNestedInput
+    inspections?: QualityInspectionUpdateManyWithoutInspectorNestedInput
+    challanEvents?: ChallanEventUpdateManyWithoutActorNestedInput
+    stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutActorNestedInput
+    dispatchesApproved?: DispatchOrderUpdateManyWithoutApprovedByNestedInput
+    dispatchesOperated?: DispatchOrderUpdateManyWithoutDispatchedByNestedInput
+    defectsDetected?: DefectRecordUpdateManyWithoutDetectedByNestedInput
+    reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
+    recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
+    recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutFabricLedgerEntriesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    departmentCode?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userRoles?: UserRoleUncheckedUpdateManyWithoutUserNestedInput
+    createdPrograms?: ProgramUncheckedUpdateManyWithoutCreatedByNestedInput
+    approvedPrograms?: ProgramUncheckedUpdateManyWithoutApprovedByNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    attachments?: AttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+    createdChallans?: ChallanUncheckedUpdateManyWithoutCreatedByNestedInput
+    issuedChallans?: ChallanUncheckedUpdateManyWithoutIssuedByNestedInput
+    receivedChallans?: ChallanUncheckedUpdateManyWithoutReceivedByNestedInput
+    approvedChallans?: ChallanUncheckedUpdateManyWithoutApprovedByNestedInput
+    productionRecords?: ProductionTransactionUncheckedUpdateManyWithoutOperatorNestedInput
+    inspections?: QualityInspectionUncheckedUpdateManyWithoutInspectorNestedInput
+    challanEvents?: ChallanEventUncheckedUpdateManyWithoutActorNestedInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutActorNestedInput
+    dispatchesApproved?: DispatchOrderUncheckedUpdateManyWithoutApprovedByNestedInput
+    dispatchesOperated?: DispatchOrderUncheckedUpdateManyWithoutDispatchedByNestedInput
+    defectsDetected?: DefectRecordUncheckedUpdateManyWithoutDetectedByNestedInput
+    reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
+    recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+    recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
   }
 
   export type UserRoleCreateManyUserInput = {
@@ -104645,6 +122120,85 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type FabricBatchCreateManyCreatedByInput = {
+    id?: string
+    batchNumber: string
+    programId?: string | null
+    supplierId?: string | null
+    fabricType: string
+    fabricDescription: string
+    colorCode?: string | null
+    colorName?: string | null
+    totalRolls?: number
+    totalMeters?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.FabricBatchStatus
+    receivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MaterialReceiptCreateManyReceivedByInput = {
+    id?: string
+    grnNumber: string
+    batchId: string
+    challanId?: string | null
+    receivedAt: Date | string
+    vehicleNumber?: string | null
+    supplierName: string
+    totalRollsReceived?: number
+    totalMetersReceived?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.GRNStatus
+    remarks?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FabricStoreRollCreateManyQcInspectedByInput = {
+    id?: string
+    rollNumber: string
+    batchId: string
+    locationId?: string | null
+    length: Decimal | DecimalJsLike | number | string
+    width?: Decimal | DecimalJsLike | number | string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    status?: $Enums.FabricRollStatus
+    qcStatus?: $Enums.FabricQCStatus
+    qcInspectedAt?: Date | string | null
+    qcRemarks?: string | null
+    programIssuedToId?: string | null
+    issuedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FabricQCInspectionCreateManyInspectedByInput = {
+    id?: string
+    inspectionNumber: string
+    rollId: string
+    inspectionType?: $Enums.InspectionType
+    result: $Enums.InspectionResult
+    defects?: NullableJsonNullValueInput | InputJsonValue
+    remarks?: string | null
+    inspectedAt: Date | string
+    createdAt?: Date | string
+  }
+
+  export type FabricStockLedgerCreateManyTransactedByInput = {
+    id?: string
+    entryNumber: string
+    rollId: string
+    batchId: string
+    transactionType: $Enums.StockTransactionType
+    quantity: Decimal | DecimalJsLike | number | string
+    referenceType: string
+    referenceId: string
+    fromLocationId?: string | null
+    toLocationId?: string | null
+    transactedAt: Date | string
+    remarks?: string | null
+    createdAt?: Date | string
+  }
+
   export type UserRoleUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -104734,6 +122288,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutCreatedByInput = {
@@ -104807,6 +122363,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUncheckedUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ProgramUncheckedUpdateManyWithoutCreatedByInput = {
@@ -104938,6 +122496,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutApprovedByInput = {
@@ -105011,6 +122571,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUncheckedUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ProgramUncheckedUpdateManyWithoutApprovedByInput = {
@@ -106000,6 +123562,257 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type FabricBatchUpdateWithoutCreatedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    batchNumber?: StringFieldUpdateOperationsInput | string
+    supplierId?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: StringFieldUpdateOperationsInput | string
+    fabricDescription?: StringFieldUpdateOperationsInput | string
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    colorName?: NullableStringFieldUpdateOperationsInput | string | null
+    totalRolls?: IntFieldUpdateOperationsInput | number
+    totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    program?: ProgramUpdateOneWithoutFabricBatchesNestedInput
+    rolls?: FabricStoreRollUpdateManyWithoutBatchNestedInput
+    receipts?: MaterialReceiptUpdateManyWithoutBatchNestedInput
+    ledgerEntries?: FabricStockLedgerUpdateManyWithoutBatchNestedInput
+  }
+
+  export type FabricBatchUncheckedUpdateWithoutCreatedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    batchNumber?: StringFieldUpdateOperationsInput | string
+    programId?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierId?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: StringFieldUpdateOperationsInput | string
+    fabricDescription?: StringFieldUpdateOperationsInput | string
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    colorName?: NullableStringFieldUpdateOperationsInput | string | null
+    totalRolls?: IntFieldUpdateOperationsInput | number
+    totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rolls?: FabricStoreRollUncheckedUpdateManyWithoutBatchNestedInput
+    receipts?: MaterialReceiptUncheckedUpdateManyWithoutBatchNestedInput
+    ledgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutBatchNestedInput
+  }
+
+  export type FabricBatchUncheckedUpdateManyWithoutCreatedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    batchNumber?: StringFieldUpdateOperationsInput | string
+    programId?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierId?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: StringFieldUpdateOperationsInput | string
+    fabricDescription?: StringFieldUpdateOperationsInput | string
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    colorName?: NullableStringFieldUpdateOperationsInput | string | null
+    totalRolls?: IntFieldUpdateOperationsInput | number
+    totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MaterialReceiptUpdateWithoutReceivedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    grnNumber?: StringFieldUpdateOperationsInput | string
+    challanId?: NullableStringFieldUpdateOperationsInput | string | null
+    receivedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    vehicleNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: StringFieldUpdateOperationsInput | string
+    totalRollsReceived?: IntFieldUpdateOperationsInput | number
+    totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    batch?: FabricBatchUpdateOneRequiredWithoutReceiptsNestedInput
+    items?: MaterialReceiptItemUpdateManyWithoutReceiptNestedInput
+  }
+
+  export type MaterialReceiptUncheckedUpdateWithoutReceivedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    grnNumber?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    challanId?: NullableStringFieldUpdateOperationsInput | string | null
+    receivedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    vehicleNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: StringFieldUpdateOperationsInput | string
+    totalRollsReceived?: IntFieldUpdateOperationsInput | number
+    totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    items?: MaterialReceiptItemUncheckedUpdateManyWithoutReceiptNestedInput
+  }
+
+  export type MaterialReceiptUncheckedUpdateManyWithoutReceivedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    grnNumber?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    challanId?: NullableStringFieldUpdateOperationsInput | string | null
+    receivedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    vehicleNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: StringFieldUpdateOperationsInput | string
+    totalRollsReceived?: IntFieldUpdateOperationsInput | number
+    totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStoreRollUpdateWithoutQcInspectedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    rollNumber?: StringFieldUpdateOperationsInput | string
+    length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
+    qcStatus?: EnumFabricQCStatusFieldUpdateOperationsInput | $Enums.FabricQCStatus
+    qcInspectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    qcRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    batch?: FabricBatchUpdateOneRequiredWithoutRollsNestedInput
+    location?: InventoryLocationUpdateOneWithoutRollsNestedInput
+    programIssuedTo?: ProgramUpdateOneWithoutFabricStoreRollsNestedInput
+    receiptItems?: MaterialReceiptItemUpdateManyWithoutRollNestedInput
+    qcInspections?: FabricQCInspectionUpdateManyWithoutRollNestedInput
+    ledgerEntries?: FabricStockLedgerUpdateManyWithoutRollNestedInput
+  }
+
+  export type FabricStoreRollUncheckedUpdateWithoutQcInspectedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    rollNumber?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    locationId?: NullableStringFieldUpdateOperationsInput | string | null
+    length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
+    qcStatus?: EnumFabricQCStatusFieldUpdateOperationsInput | $Enums.FabricQCStatus
+    qcInspectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    qcRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    programIssuedToId?: NullableStringFieldUpdateOperationsInput | string | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    receiptItems?: MaterialReceiptItemUncheckedUpdateManyWithoutRollNestedInput
+    qcInspections?: FabricQCInspectionUncheckedUpdateManyWithoutRollNestedInput
+    ledgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutRollNestedInput
+  }
+
+  export type FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    rollNumber?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    locationId?: NullableStringFieldUpdateOperationsInput | string | null
+    length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
+    qcStatus?: EnumFabricQCStatusFieldUpdateOperationsInput | $Enums.FabricQCStatus
+    qcInspectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    qcRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    programIssuedToId?: NullableStringFieldUpdateOperationsInput | string | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricQCInspectionUpdateWithoutInspectedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    inspectionNumber?: StringFieldUpdateOperationsInput | string
+    inspectionType?: EnumInspectionTypeFieldUpdateOperationsInput | $Enums.InspectionType
+    result?: EnumInspectionResultFieldUpdateOperationsInput | $Enums.InspectionResult
+    defects?: NullableJsonNullValueInput | InputJsonValue
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inspectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    roll?: FabricStoreRollUpdateOneRequiredWithoutQcInspectionsNestedInput
+  }
+
+  export type FabricQCInspectionUncheckedUpdateWithoutInspectedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    inspectionNumber?: StringFieldUpdateOperationsInput | string
+    rollId?: StringFieldUpdateOperationsInput | string
+    inspectionType?: EnumInspectionTypeFieldUpdateOperationsInput | $Enums.InspectionType
+    result?: EnumInspectionResultFieldUpdateOperationsInput | $Enums.InspectionResult
+    defects?: NullableJsonNullValueInput | InputJsonValue
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inspectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricQCInspectionUncheckedUpdateManyWithoutInspectedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    inspectionNumber?: StringFieldUpdateOperationsInput | string
+    rollId?: StringFieldUpdateOperationsInput | string
+    inspectionType?: EnumInspectionTypeFieldUpdateOperationsInput | $Enums.InspectionType
+    result?: EnumInspectionResultFieldUpdateOperationsInput | $Enums.InspectionResult
+    defects?: NullableJsonNullValueInput | InputJsonValue
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inspectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStockLedgerUpdateWithoutTransactedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    entryNumber?: StringFieldUpdateOperationsInput | string
+    transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    referenceType?: StringFieldUpdateOperationsInput | string
+    referenceId?: StringFieldUpdateOperationsInput | string
+    transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    roll?: FabricStoreRollUpdateOneRequiredWithoutLedgerEntriesNestedInput
+    batch?: FabricBatchUpdateOneRequiredWithoutLedgerEntriesNestedInput
+    fromLocation?: InventoryLocationUpdateOneWithoutFromLedgerNestedInput
+    toLocation?: InventoryLocationUpdateOneWithoutToLedgerNestedInput
+  }
+
+  export type FabricStockLedgerUncheckedUpdateWithoutTransactedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    entryNumber?: StringFieldUpdateOperationsInput | string
+    rollId?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    referenceType?: StringFieldUpdateOperationsInput | string
+    referenceId?: StringFieldUpdateOperationsInput | string
+    fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
+    toLocationId?: NullableStringFieldUpdateOperationsInput | string | null
+    transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStockLedgerUncheckedUpdateManyWithoutTransactedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    entryNumber?: StringFieldUpdateOperationsInput | string
+    rollId?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    referenceType?: StringFieldUpdateOperationsInput | string
+    referenceId?: StringFieldUpdateOperationsInput | string
+    fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
+    toLocationId?: NullableStringFieldUpdateOperationsInput | string | null
+    transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type UserRoleCreateManyRoleInput = {
     id?: string
     userId: string
@@ -106900,6 +124713,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutCustomerInput = {
@@ -106973,6 +124788,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUncheckedUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ProgramUncheckedUpdateManyWithoutCustomerInput = {
@@ -107355,6 +125172,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutDesignInput = {
@@ -107428,6 +125247,8 @@ export namespace Prisma {
     stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutProgramNestedInput
     reworkTransactions?: ReworkTransactionUncheckedUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
   }
 
   export type ProgramUncheckedUpdateManyWithoutDesignInput = {
@@ -108011,6 +125832,41 @@ export namespace Prisma {
     status?: string
     replacementBundleId?: string | null
     notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FabricBatchCreateManyProgramInput = {
+    id?: string
+    batchNumber: string
+    supplierId?: string | null
+    fabricType: string
+    fabricDescription: string
+    colorCode?: string | null
+    colorName?: string | null
+    totalRolls?: number
+    totalMeters?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.FabricBatchStatus
+    receivedAt?: Date | string | null
+    createdById: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FabricStoreRollCreateManyProgramIssuedToInput = {
+    id?: string
+    rollNumber: string
+    batchId: string
+    locationId?: string | null
+    length: Decimal | DecimalJsLike | number | string
+    width?: Decimal | DecimalJsLike | number | string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    status?: $Enums.FabricRollStatus
+    qcStatus?: $Enums.FabricQCStatus
+    qcInspectedById?: string | null
+    qcInspectedAt?: Date | string | null
+    qcRemarks?: string | null
+    issuedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -108798,6 +126654,123 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     replacementBundleId?: NullableStringFieldUpdateOperationsInput | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricBatchUpdateWithoutProgramInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    batchNumber?: StringFieldUpdateOperationsInput | string
+    supplierId?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: StringFieldUpdateOperationsInput | string
+    fabricDescription?: StringFieldUpdateOperationsInput | string
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    colorName?: NullableStringFieldUpdateOperationsInput | string | null
+    totalRolls?: IntFieldUpdateOperationsInput | number
+    totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdBy?: UserUpdateOneRequiredWithoutFabricBatchesCreatedNestedInput
+    rolls?: FabricStoreRollUpdateManyWithoutBatchNestedInput
+    receipts?: MaterialReceiptUpdateManyWithoutBatchNestedInput
+    ledgerEntries?: FabricStockLedgerUpdateManyWithoutBatchNestedInput
+  }
+
+  export type FabricBatchUncheckedUpdateWithoutProgramInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    batchNumber?: StringFieldUpdateOperationsInput | string
+    supplierId?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: StringFieldUpdateOperationsInput | string
+    fabricDescription?: StringFieldUpdateOperationsInput | string
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    colorName?: NullableStringFieldUpdateOperationsInput | string | null
+    totalRolls?: IntFieldUpdateOperationsInput | number
+    totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdById?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rolls?: FabricStoreRollUncheckedUpdateManyWithoutBatchNestedInput
+    receipts?: MaterialReceiptUncheckedUpdateManyWithoutBatchNestedInput
+    ledgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutBatchNestedInput
+  }
+
+  export type FabricBatchUncheckedUpdateManyWithoutProgramInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    batchNumber?: StringFieldUpdateOperationsInput | string
+    supplierId?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: StringFieldUpdateOperationsInput | string
+    fabricDescription?: StringFieldUpdateOperationsInput | string
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    colorName?: NullableStringFieldUpdateOperationsInput | string | null
+    totalRolls?: IntFieldUpdateOperationsInput | number
+    totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
+    receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdById?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStoreRollUpdateWithoutProgramIssuedToInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    rollNumber?: StringFieldUpdateOperationsInput | string
+    length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
+    qcStatus?: EnumFabricQCStatusFieldUpdateOperationsInput | $Enums.FabricQCStatus
+    qcInspectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    qcRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    batch?: FabricBatchUpdateOneRequiredWithoutRollsNestedInput
+    location?: InventoryLocationUpdateOneWithoutRollsNestedInput
+    qcInspectedBy?: UserUpdateOneWithoutFabricRollsInspectedNestedInput
+    receiptItems?: MaterialReceiptItemUpdateManyWithoutRollNestedInput
+    qcInspections?: FabricQCInspectionUpdateManyWithoutRollNestedInput
+    ledgerEntries?: FabricStockLedgerUpdateManyWithoutRollNestedInput
+  }
+
+  export type FabricStoreRollUncheckedUpdateWithoutProgramIssuedToInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    rollNumber?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    locationId?: NullableStringFieldUpdateOperationsInput | string | null
+    length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
+    qcStatus?: EnumFabricQCStatusFieldUpdateOperationsInput | $Enums.FabricQCStatus
+    qcInspectedById?: NullableStringFieldUpdateOperationsInput | string | null
+    qcInspectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    qcRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    receiptItems?: MaterialReceiptItemUncheckedUpdateManyWithoutRollNestedInput
+    qcInspections?: FabricQCInspectionUncheckedUpdateManyWithoutRollNestedInput
+    ledgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutRollNestedInput
+  }
+
+  export type FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    rollNumber?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    locationId?: NullableStringFieldUpdateOperationsInput | string | null
+    length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
+    qcStatus?: EnumFabricQCStatusFieldUpdateOperationsInput | $Enums.FabricQCStatus
+    qcInspectedById?: NullableStringFieldUpdateOperationsInput | string | null
+    qcInspectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    qcRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -110038,6 +128011,604 @@ export namespace Prisma {
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStoreRollCreateManyLocationInput = {
+    id?: string
+    rollNumber: string
+    batchId: string
+    length: Decimal | DecimalJsLike | number | string
+    width?: Decimal | DecimalJsLike | number | string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    status?: $Enums.FabricRollStatus
+    qcStatus?: $Enums.FabricQCStatus
+    qcInspectedById?: string | null
+    qcInspectedAt?: Date | string | null
+    qcRemarks?: string | null
+    programIssuedToId?: string | null
+    issuedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FabricStockLedgerCreateManyFromLocationInput = {
+    id?: string
+    entryNumber: string
+    rollId: string
+    batchId: string
+    transactionType: $Enums.StockTransactionType
+    quantity: Decimal | DecimalJsLike | number | string
+    referenceType: string
+    referenceId: string
+    toLocationId?: string | null
+    transactedById: string
+    transactedAt: Date | string
+    remarks?: string | null
+    createdAt?: Date | string
+  }
+
+  export type FabricStockLedgerCreateManyToLocationInput = {
+    id?: string
+    entryNumber: string
+    rollId: string
+    batchId: string
+    transactionType: $Enums.StockTransactionType
+    quantity: Decimal | DecimalJsLike | number | string
+    referenceType: string
+    referenceId: string
+    fromLocationId?: string | null
+    transactedById: string
+    transactedAt: Date | string
+    remarks?: string | null
+    createdAt?: Date | string
+  }
+
+  export type FabricStoreRollUpdateWithoutLocationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    rollNumber?: StringFieldUpdateOperationsInput | string
+    length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
+    qcStatus?: EnumFabricQCStatusFieldUpdateOperationsInput | $Enums.FabricQCStatus
+    qcInspectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    qcRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    batch?: FabricBatchUpdateOneRequiredWithoutRollsNestedInput
+    qcInspectedBy?: UserUpdateOneWithoutFabricRollsInspectedNestedInput
+    programIssuedTo?: ProgramUpdateOneWithoutFabricStoreRollsNestedInput
+    receiptItems?: MaterialReceiptItemUpdateManyWithoutRollNestedInput
+    qcInspections?: FabricQCInspectionUpdateManyWithoutRollNestedInput
+    ledgerEntries?: FabricStockLedgerUpdateManyWithoutRollNestedInput
+  }
+
+  export type FabricStoreRollUncheckedUpdateWithoutLocationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    rollNumber?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
+    qcStatus?: EnumFabricQCStatusFieldUpdateOperationsInput | $Enums.FabricQCStatus
+    qcInspectedById?: NullableStringFieldUpdateOperationsInput | string | null
+    qcInspectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    qcRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    programIssuedToId?: NullableStringFieldUpdateOperationsInput | string | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    receiptItems?: MaterialReceiptItemUncheckedUpdateManyWithoutRollNestedInput
+    qcInspections?: FabricQCInspectionUncheckedUpdateManyWithoutRollNestedInput
+    ledgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutRollNestedInput
+  }
+
+  export type FabricStoreRollUncheckedUpdateManyWithoutLocationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    rollNumber?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
+    qcStatus?: EnumFabricQCStatusFieldUpdateOperationsInput | $Enums.FabricQCStatus
+    qcInspectedById?: NullableStringFieldUpdateOperationsInput | string | null
+    qcInspectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    qcRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    programIssuedToId?: NullableStringFieldUpdateOperationsInput | string | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStockLedgerUpdateWithoutFromLocationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    entryNumber?: StringFieldUpdateOperationsInput | string
+    transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    referenceType?: StringFieldUpdateOperationsInput | string
+    referenceId?: StringFieldUpdateOperationsInput | string
+    transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    roll?: FabricStoreRollUpdateOneRequiredWithoutLedgerEntriesNestedInput
+    batch?: FabricBatchUpdateOneRequiredWithoutLedgerEntriesNestedInput
+    toLocation?: InventoryLocationUpdateOneWithoutToLedgerNestedInput
+    transactedBy?: UserUpdateOneRequiredWithoutFabricLedgerEntriesNestedInput
+  }
+
+  export type FabricStockLedgerUncheckedUpdateWithoutFromLocationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    entryNumber?: StringFieldUpdateOperationsInput | string
+    rollId?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    referenceType?: StringFieldUpdateOperationsInput | string
+    referenceId?: StringFieldUpdateOperationsInput | string
+    toLocationId?: NullableStringFieldUpdateOperationsInput | string | null
+    transactedById?: StringFieldUpdateOperationsInput | string
+    transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStockLedgerUncheckedUpdateManyWithoutFromLocationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    entryNumber?: StringFieldUpdateOperationsInput | string
+    rollId?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    referenceType?: StringFieldUpdateOperationsInput | string
+    referenceId?: StringFieldUpdateOperationsInput | string
+    toLocationId?: NullableStringFieldUpdateOperationsInput | string | null
+    transactedById?: StringFieldUpdateOperationsInput | string
+    transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStockLedgerUpdateWithoutToLocationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    entryNumber?: StringFieldUpdateOperationsInput | string
+    transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    referenceType?: StringFieldUpdateOperationsInput | string
+    referenceId?: StringFieldUpdateOperationsInput | string
+    transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    roll?: FabricStoreRollUpdateOneRequiredWithoutLedgerEntriesNestedInput
+    batch?: FabricBatchUpdateOneRequiredWithoutLedgerEntriesNestedInput
+    fromLocation?: InventoryLocationUpdateOneWithoutFromLedgerNestedInput
+    transactedBy?: UserUpdateOneRequiredWithoutFabricLedgerEntriesNestedInput
+  }
+
+  export type FabricStockLedgerUncheckedUpdateWithoutToLocationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    entryNumber?: StringFieldUpdateOperationsInput | string
+    rollId?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    referenceType?: StringFieldUpdateOperationsInput | string
+    referenceId?: StringFieldUpdateOperationsInput | string
+    fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
+    transactedById?: StringFieldUpdateOperationsInput | string
+    transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStockLedgerUncheckedUpdateManyWithoutToLocationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    entryNumber?: StringFieldUpdateOperationsInput | string
+    rollId?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    referenceType?: StringFieldUpdateOperationsInput | string
+    referenceId?: StringFieldUpdateOperationsInput | string
+    fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
+    transactedById?: StringFieldUpdateOperationsInput | string
+    transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStoreRollCreateManyBatchInput = {
+    id?: string
+    rollNumber: string
+    locationId?: string | null
+    length: Decimal | DecimalJsLike | number | string
+    width?: Decimal | DecimalJsLike | number | string | null
+    weight?: Decimal | DecimalJsLike | number | string | null
+    status?: $Enums.FabricRollStatus
+    qcStatus?: $Enums.FabricQCStatus
+    qcInspectedById?: string | null
+    qcInspectedAt?: Date | string | null
+    qcRemarks?: string | null
+    programIssuedToId?: string | null
+    issuedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MaterialReceiptCreateManyBatchInput = {
+    id?: string
+    grnNumber: string
+    challanId?: string | null
+    receivedById: string
+    receivedAt: Date | string
+    vehicleNumber?: string | null
+    supplierName: string
+    totalRollsReceived?: number
+    totalMetersReceived?: Decimal | DecimalJsLike | number | string
+    status?: $Enums.GRNStatus
+    remarks?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FabricStockLedgerCreateManyBatchInput = {
+    id?: string
+    entryNumber: string
+    rollId: string
+    transactionType: $Enums.StockTransactionType
+    quantity: Decimal | DecimalJsLike | number | string
+    referenceType: string
+    referenceId: string
+    fromLocationId?: string | null
+    toLocationId?: string | null
+    transactedById: string
+    transactedAt: Date | string
+    remarks?: string | null
+    createdAt?: Date | string
+  }
+
+  export type FabricStoreRollUpdateWithoutBatchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    rollNumber?: StringFieldUpdateOperationsInput | string
+    length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
+    qcStatus?: EnumFabricQCStatusFieldUpdateOperationsInput | $Enums.FabricQCStatus
+    qcInspectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    qcRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    location?: InventoryLocationUpdateOneWithoutRollsNestedInput
+    qcInspectedBy?: UserUpdateOneWithoutFabricRollsInspectedNestedInput
+    programIssuedTo?: ProgramUpdateOneWithoutFabricStoreRollsNestedInput
+    receiptItems?: MaterialReceiptItemUpdateManyWithoutRollNestedInput
+    qcInspections?: FabricQCInspectionUpdateManyWithoutRollNestedInput
+    ledgerEntries?: FabricStockLedgerUpdateManyWithoutRollNestedInput
+  }
+
+  export type FabricStoreRollUncheckedUpdateWithoutBatchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    rollNumber?: StringFieldUpdateOperationsInput | string
+    locationId?: NullableStringFieldUpdateOperationsInput | string | null
+    length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
+    qcStatus?: EnumFabricQCStatusFieldUpdateOperationsInput | $Enums.FabricQCStatus
+    qcInspectedById?: NullableStringFieldUpdateOperationsInput | string | null
+    qcInspectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    qcRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    programIssuedToId?: NullableStringFieldUpdateOperationsInput | string | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    receiptItems?: MaterialReceiptItemUncheckedUpdateManyWithoutRollNestedInput
+    qcInspections?: FabricQCInspectionUncheckedUpdateManyWithoutRollNestedInput
+    ledgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutRollNestedInput
+  }
+
+  export type FabricStoreRollUncheckedUpdateManyWithoutBatchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    rollNumber?: StringFieldUpdateOperationsInput | string
+    locationId?: NullableStringFieldUpdateOperationsInput | string | null
+    length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
+    qcStatus?: EnumFabricQCStatusFieldUpdateOperationsInput | $Enums.FabricQCStatus
+    qcInspectedById?: NullableStringFieldUpdateOperationsInput | string | null
+    qcInspectedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    qcRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    programIssuedToId?: NullableStringFieldUpdateOperationsInput | string | null
+    issuedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MaterialReceiptUpdateWithoutBatchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    grnNumber?: StringFieldUpdateOperationsInput | string
+    challanId?: NullableStringFieldUpdateOperationsInput | string | null
+    receivedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    vehicleNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: StringFieldUpdateOperationsInput | string
+    totalRollsReceived?: IntFieldUpdateOperationsInput | number
+    totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    receivedBy?: UserUpdateOneRequiredWithoutGrnReceivedNestedInput
+    items?: MaterialReceiptItemUpdateManyWithoutReceiptNestedInput
+  }
+
+  export type MaterialReceiptUncheckedUpdateWithoutBatchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    grnNumber?: StringFieldUpdateOperationsInput | string
+    challanId?: NullableStringFieldUpdateOperationsInput | string | null
+    receivedById?: StringFieldUpdateOperationsInput | string
+    receivedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    vehicleNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: StringFieldUpdateOperationsInput | string
+    totalRollsReceived?: IntFieldUpdateOperationsInput | number
+    totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    items?: MaterialReceiptItemUncheckedUpdateManyWithoutReceiptNestedInput
+  }
+
+  export type MaterialReceiptUncheckedUpdateManyWithoutBatchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    grnNumber?: StringFieldUpdateOperationsInput | string
+    challanId?: NullableStringFieldUpdateOperationsInput | string | null
+    receivedById?: StringFieldUpdateOperationsInput | string
+    receivedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    vehicleNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: StringFieldUpdateOperationsInput | string
+    totalRollsReceived?: IntFieldUpdateOperationsInput | number
+    totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStockLedgerUpdateWithoutBatchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    entryNumber?: StringFieldUpdateOperationsInput | string
+    transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    referenceType?: StringFieldUpdateOperationsInput | string
+    referenceId?: StringFieldUpdateOperationsInput | string
+    transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    roll?: FabricStoreRollUpdateOneRequiredWithoutLedgerEntriesNestedInput
+    fromLocation?: InventoryLocationUpdateOneWithoutFromLedgerNestedInput
+    toLocation?: InventoryLocationUpdateOneWithoutToLedgerNestedInput
+    transactedBy?: UserUpdateOneRequiredWithoutFabricLedgerEntriesNestedInput
+  }
+
+  export type FabricStockLedgerUncheckedUpdateWithoutBatchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    entryNumber?: StringFieldUpdateOperationsInput | string
+    rollId?: StringFieldUpdateOperationsInput | string
+    transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    referenceType?: StringFieldUpdateOperationsInput | string
+    referenceId?: StringFieldUpdateOperationsInput | string
+    fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
+    toLocationId?: NullableStringFieldUpdateOperationsInput | string | null
+    transactedById?: StringFieldUpdateOperationsInput | string
+    transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStockLedgerUncheckedUpdateManyWithoutBatchInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    entryNumber?: StringFieldUpdateOperationsInput | string
+    rollId?: StringFieldUpdateOperationsInput | string
+    transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    referenceType?: StringFieldUpdateOperationsInput | string
+    referenceId?: StringFieldUpdateOperationsInput | string
+    fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
+    toLocationId?: NullableStringFieldUpdateOperationsInput | string | null
+    transactedById?: StringFieldUpdateOperationsInput | string
+    transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MaterialReceiptItemCreateManyRollInput = {
+    id?: string
+    receiptId: string
+    measuredLength: Decimal | DecimalJsLike | number | string
+    measuredWeight?: Decimal | DecimalJsLike | number | string | null
+    remarks?: string | null
+    createdAt?: Date | string
+  }
+
+  export type FabricQCInspectionCreateManyRollInput = {
+    id?: string
+    inspectionNumber: string
+    inspectedById: string
+    inspectionType?: $Enums.InspectionType
+    result: $Enums.InspectionResult
+    defects?: NullableJsonNullValueInput | InputJsonValue
+    remarks?: string | null
+    inspectedAt: Date | string
+    createdAt?: Date | string
+  }
+
+  export type FabricStockLedgerCreateManyRollInput = {
+    id?: string
+    entryNumber: string
+    batchId: string
+    transactionType: $Enums.StockTransactionType
+    quantity: Decimal | DecimalJsLike | number | string
+    referenceType: string
+    referenceId: string
+    fromLocationId?: string | null
+    toLocationId?: string | null
+    transactedById: string
+    transactedAt: Date | string
+    remarks?: string | null
+    createdAt?: Date | string
+  }
+
+  export type MaterialReceiptItemUpdateWithoutRollInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    measuredLength?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    measuredWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    receipt?: MaterialReceiptUpdateOneRequiredWithoutItemsNestedInput
+  }
+
+  export type MaterialReceiptItemUncheckedUpdateWithoutRollInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    receiptId?: StringFieldUpdateOperationsInput | string
+    measuredLength?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    measuredWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MaterialReceiptItemUncheckedUpdateManyWithoutRollInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    receiptId?: StringFieldUpdateOperationsInput | string
+    measuredLength?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    measuredWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricQCInspectionUpdateWithoutRollInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    inspectionNumber?: StringFieldUpdateOperationsInput | string
+    inspectionType?: EnumInspectionTypeFieldUpdateOperationsInput | $Enums.InspectionType
+    result?: EnumInspectionResultFieldUpdateOperationsInput | $Enums.InspectionResult
+    defects?: NullableJsonNullValueInput | InputJsonValue
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inspectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    inspectedBy?: UserUpdateOneRequiredWithoutFabricQCInspectionsNestedInput
+  }
+
+  export type FabricQCInspectionUncheckedUpdateWithoutRollInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    inspectionNumber?: StringFieldUpdateOperationsInput | string
+    inspectedById?: StringFieldUpdateOperationsInput | string
+    inspectionType?: EnumInspectionTypeFieldUpdateOperationsInput | $Enums.InspectionType
+    result?: EnumInspectionResultFieldUpdateOperationsInput | $Enums.InspectionResult
+    defects?: NullableJsonNullValueInput | InputJsonValue
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inspectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricQCInspectionUncheckedUpdateManyWithoutRollInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    inspectionNumber?: StringFieldUpdateOperationsInput | string
+    inspectedById?: StringFieldUpdateOperationsInput | string
+    inspectionType?: EnumInspectionTypeFieldUpdateOperationsInput | $Enums.InspectionType
+    result?: EnumInspectionResultFieldUpdateOperationsInput | $Enums.InspectionResult
+    defects?: NullableJsonNullValueInput | InputJsonValue
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inspectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStockLedgerUpdateWithoutRollInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    entryNumber?: StringFieldUpdateOperationsInput | string
+    transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    referenceType?: StringFieldUpdateOperationsInput | string
+    referenceId?: StringFieldUpdateOperationsInput | string
+    transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    batch?: FabricBatchUpdateOneRequiredWithoutLedgerEntriesNestedInput
+    fromLocation?: InventoryLocationUpdateOneWithoutFromLedgerNestedInput
+    toLocation?: InventoryLocationUpdateOneWithoutToLedgerNestedInput
+    transactedBy?: UserUpdateOneRequiredWithoutFabricLedgerEntriesNestedInput
+  }
+
+  export type FabricStockLedgerUncheckedUpdateWithoutRollInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    entryNumber?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    referenceType?: StringFieldUpdateOperationsInput | string
+    referenceId?: StringFieldUpdateOperationsInput | string
+    fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
+    toLocationId?: NullableStringFieldUpdateOperationsInput | string | null
+    transactedById?: StringFieldUpdateOperationsInput | string
+    transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStockLedgerUncheckedUpdateManyWithoutRollInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    entryNumber?: StringFieldUpdateOperationsInput | string
+    batchId?: StringFieldUpdateOperationsInput | string
+    transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
+    quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    referenceType?: StringFieldUpdateOperationsInput | string
+    referenceId?: StringFieldUpdateOperationsInput | string
+    fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
+    toLocationId?: NullableStringFieldUpdateOperationsInput | string | null
+    transactedById?: StringFieldUpdateOperationsInput | string
+    transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MaterialReceiptItemCreateManyReceiptInput = {
+    id?: string
+    rollId: string
+    measuredLength: Decimal | DecimalJsLike | number | string
+    measuredWeight?: Decimal | DecimalJsLike | number | string | null
+    remarks?: string | null
+    createdAt?: Date | string
+  }
+
+  export type MaterialReceiptItemUpdateWithoutReceiptInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    measuredLength?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    measuredWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    roll?: FabricStoreRollUpdateOneRequiredWithoutReceiptItemsNestedInput
+  }
+
+  export type MaterialReceiptItemUncheckedUpdateWithoutReceiptInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    rollId?: StringFieldUpdateOperationsInput | string
+    measuredLength?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    measuredWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MaterialReceiptItemUncheckedUpdateManyWithoutReceiptInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    rollId?: StringFieldUpdateOperationsInput | string
+    measuredLength?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    measuredWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

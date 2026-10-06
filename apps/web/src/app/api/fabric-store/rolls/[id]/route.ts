@@ -6,11 +6,12 @@ export const dynamic = 'force-dynamic';
 // GET /api/fabric-store/rolls/[id]
 export async function GET(
   _request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const roll = await prisma.fabricStoreRoll.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         batch: true,
         location: true,
@@ -47,13 +48,14 @@ export async function GET(
 // PATCH /api/fabric-store/rolls/[id]/location → move to new location
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const { locationId } = body;
 
-    const roll = await prisma.fabricStoreRoll.findUnique({ where: { id: params.id } });
+    const roll = await prisma.fabricStoreRoll.findUnique({ where: { id } });
     if (!roll) {
       return NextResponse.json({ error: 'Roll not found' }, { status: 404 });
     }
@@ -72,7 +74,7 @@ export async function PATCH(
 
     await prisma.$transaction(async (tx) => {
       await tx.fabricStoreRoll.update({
-        where: { id: params.id },
+        where: { id },
         data: { locationId: locationId || null },
       });
 
@@ -108,7 +110,7 @@ export async function PATCH(
     });
 
     const updated = await prisma.fabricStoreRoll.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { location: { select: { locationCode: true, locationName: true } } },
     });
 

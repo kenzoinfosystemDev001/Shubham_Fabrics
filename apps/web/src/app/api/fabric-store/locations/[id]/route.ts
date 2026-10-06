@@ -6,14 +6,15 @@ export const dynamic = 'force-dynamic';
 // PATCH /api/fabric-store/locations/[id]
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const { locationCode, locationName, locationType, isActive } = body;
 
     const location = await prisma.inventoryLocation.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(locationCode && { locationCode: locationCode.toUpperCase() }),
         ...(locationName && { locationName }),
@@ -34,11 +35,12 @@ export async function PATCH(
 // DELETE /api/fabric-store/locations/[id] → soft delete
 export async function DELETE(
   _request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     await prisma.inventoryLocation.update({
-      where: { id: params.id },
+      where: { id },
       data: { isActive: false },
     });
     return NextResponse.json({ message: 'Location deactivated' });

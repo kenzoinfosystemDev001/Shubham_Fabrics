@@ -6,11 +6,12 @@ export const dynamic = 'force-dynamic';
 // GET /api/fabric-store/batches/[id]
 export async function GET(
   _request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const batch = await prisma.fabricBatch.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         createdBy: { select: { fullName: true, username: true } },
         program: { select: { programNumber: true, clientName: true, styleCode: true } },
@@ -46,14 +47,15 @@ export async function GET(
 // PATCH /api/fabric-store/batches/[id]
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const { fabricType, fabricDescription, colorCode, colorName, status, supplierId } = body;
 
     const batch = await prisma.fabricBatch.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(fabricType && { fabricType }),
         ...(fabricDescription && { fabricDescription }),

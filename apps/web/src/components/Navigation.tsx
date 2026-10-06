@@ -12,7 +12,8 @@ import {
   ChevronDown, 
   ChevronRight, 
   LogOut, 
-  UserCircle 
+  UserCircle,
+  Building2 
 } from 'lucide-react';
 import { api } from '@/lib/api';
 
@@ -64,8 +65,8 @@ export function Navigation() {
     router.push('/login');
   };
 
-  // Do not render sidebar on login page
-  if (pathname === '/login') {
+  // Do not render sidebar on login page or when in fabric-store workspace
+  if (pathname === '/login' || pathname.startsWith('/fabric-store')) {
     return null;
   }
 
@@ -94,9 +95,27 @@ export function Navigation() {
         </div>
       </div>
 
+      {/* DEPARTMENT SWITCHER */}
+      <div className="px-3 pt-3 pb-1 border-b border-slate-800/60">
+        <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-500 px-1 mb-1">
+          Department
+        </p>
+        <div className="flex items-center gap-2 px-2 py-1.5 rounded text-[11px] text-white bg-slate-800/70 border border-amber-800/40 mb-1">
+          <Building2 className="w-3.5 h-3.5 text-amber-400" />
+          <span className="font-semibold text-amber-300">Programming Dept.</span>
+        </div>
+        <Link
+          href="/fabric-store"
+          className="flex items-center gap-2 px-2 py-1.5 rounded text-[11px] text-slate-400 hover:bg-slate-800/50 hover:text-white transition"
+        >
+          <Building2 className="w-3.5 h-3.5" />
+          <span>Fabric Store Dept.</span>
+        </Link>
+      </div>
+
       {/* DEPARTMENT TITLE */}
-      <div className="px-5 pt-5 pb-2">
-        <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-400 block">
+      <div className="px-5 pt-3 pb-1">
+        <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-amber-500/80 block">
           PROGRAMMING
         </span>
       </div>

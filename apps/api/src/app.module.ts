@@ -28,8 +28,10 @@ import { SearchModule } from './modules/search/search.module';
 import { DiagnosticsModule } from './modules/diagnostics/diagnostics.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { IdempotencyInterceptor } from './common/interceptors/idempotency.interceptor';
+import { AppController } from './app.controller';
 
 @Module({
+  controllers: [AppController],
   imports: [
     ThrottlerModule.forRoot([
       {
