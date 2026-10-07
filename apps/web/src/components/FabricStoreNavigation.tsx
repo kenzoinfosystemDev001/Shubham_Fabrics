@@ -9,7 +9,6 @@ import {
   PackageCheck,
   ClipboardCheck,
   ArrowDownToLine,
-  ArrowUpFromLine,
   ChevronDown,
   ChevronRight,
   LogOut,
@@ -21,8 +20,10 @@ import {
   Building2,
   Send,
   AlertTriangle,
+  ShieldCheck,
 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { isAdminUser } from '@/lib/rbac';
 
 export function FabricStoreNavigation() {
   const pathname = usePathname();
@@ -31,9 +32,9 @@ export function FabricStoreNavigation() {
   const [myWorkOpen, setMyWorkOpen] = useState(true);
   const [inventoryOpen, setInventoryOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>({
-    fullName: 'Store Incharge',
-    username: 'store_mgr',
-    role: 'STORE_MANAGER',
+    fullName: 'Fabric Store Incharge',
+    username: 'store',
+    role: 'FABRIC_STORE',
     departmentCode: 'STORE',
   });
 
@@ -70,17 +71,18 @@ export function FabricStoreNavigation() {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('subham_mes_token');
       localStorage.removeItem('subham_mes_user');
+      document.cookie = 'subham_mes_token=; path=/; max-age=0';
+      document.cookie = 'subham_mes_role=; path=/; max-age=0';
+      document.cookie = 'subham_mes_dept=; path=/; max-age=0';
     }
     router.push('/login');
   };
 
-  if (!mounted) return null;
-
-  const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
+  const isAdmin = isAdminUser(currentUser);
 
   const linkClass = (href: string, exact = false) => {
-    const active = exact ? pathname === href : isActive(href);
-    return `flex items-center gap-3 px-3 py-2.5 rounded-md text-xs font-semibold transition ${
+    const active = exact ? pathname === href : pathname === href || pathname.startsWith(href + '/');
+    return `flex items-center gap-3 px-3 py-2 rounded-md text-xs font-semibold transition ${
       active
         ? 'bg-[#1E293B] text-white border-l-2 border-teal-400 pl-2.5 shadow-xs'
         : 'text-slate-300 hover:bg-slate-800/60 hover:text-white'
@@ -99,7 +101,7 @@ export function FabricStoreNavigation() {
   const sectionHeader = (label: string, isOpen: boolean, toggle: () => void, isAnyActive: boolean) => (
     <div
       onClick={toggle}
-      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-md text-xs font-semibold cursor-pointer transition ${
+      className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-xs font-semibold cursor-pointer transition ${
         isAnyActive ? 'text-white' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white'
       }`}
     >
@@ -113,37 +115,66 @@ export function FabricStoreNavigation() {
 
   return (
     <aside className="w-64 bg-[#0F172A] text-slate-300 flex flex-col fixed inset-y-0 left-0 z-50 border-r border-slate-800 select-none">
-      {/* BRANDING */}
-      <div className="p-5 border-b border-slate-800 bg-[#0A0F1D]">
+      {/* BRANDING WITH OFFICIAL IMG 3 LOGO */}
+      <div className="p-4 border-b border-slate-800 bg-[#0A0F1D]">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded bg-[#0D3B3B] border border-teal-500/40 flex items-center justify-center text-teal-400 font-serif font-black text-sm shadow-sm">
-            SF
+          <div className="w-10 h-10 rounded-lg bg-white p-0.5 border border-teal-500/40 flex items-center justify-center shadow-sm overflow-hidden shrink-0">
+            <img
+              src="/shubham-logo.jpg"
+              alt="Shubham Fabrics Logo"
+              className="w-full h-full object-contain"
+            />
           </div>
-          <div>
-            <span className="text-xs font-bold tracking-[0.16em] text-white block">SHUBHAM FABRICS</span>
-            <span className="text-[10px] font-medium tracking-[0.2em] text-teal-400/90 block">MES ENTERPRISE</span>
+          <div className="min-w-0">
+            <span className="text-xs font-bold tracking-[0.14em] text-white truncate block">SHUBHAM FABRICS</span>
+            <span className="text-[10px] font-medium tracking-[0.18em] text-teal-400 block truncate">MES ENTERPRISE</span>
           </div>
         </div>
       </div>
 
-      {/* DEPT SWITCHER */}
-      <div className="px-3 pt-3 pb-1 border-b border-slate-800/60">
-        <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-500 px-1 mb-1">Department</p>
-        <Link
-          href="/"
-          className="flex items-center gap-2 px-2 py-1.5 rounded text-[11px] text-slate-400 hover:bg-slate-800/50 hover:text-white transition"
-        >
-          <Building2 className="w-3.5 h-3.5" />
-          <span>Programming Dept.</span>
-        </Link>
-        <div className="flex items-center gap-2 px-2 py-1.5 rounded text-[11px] text-white bg-slate-800/70 border border-teal-800/40">
+      {/* DEPT / STATION SWITCHER */}
+      <div className="px-3 pt-3 pb-2 border-b border-slate-800/60">
+        <div className="flex items-center justify-between mb-1.5 px-1">
+          <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-500">Current Station</p>
+          {isAdmin && (
+            <span className="text-[9px] bg-indigo-900/60 text-indigo-300 px-1.5 py-0.5 rounded border border-indigo-700/50 font-bold uppercase tracking-wider">
+              Admin Access
+            </span>
+          )}
+        </div>
+
+        {/* Active station */}
+        <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] text-white bg-slate-800/80 border border-teal-800/40 mb-1">
           <Building2 className="w-3.5 h-3.5 text-teal-400" />
           <span className="font-semibold text-teal-300">Fabric Store Dept.</span>
         </div>
+
+        {/* ADMIN EXCLUSIVE: Switcher to other workspaces */}
+        {isAdmin && (
+          <div className="space-y-1 mt-1.5 pt-1.5 border-t border-slate-800/60">
+            <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-slate-500 px-1 mb-1">
+              Switch Workspace
+            </p>
+            <Link
+              href="/admin"
+              className="flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] text-indigo-300 hover:bg-indigo-950/40 hover:text-white transition"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
+              <span>Admin Console</span>
+            </Link>
+            <Link
+              href="/"
+              className="flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] text-slate-400 hover:bg-slate-800/50 hover:text-white transition"
+            >
+              <Building2 className="w-3.5 h-3.5 text-amber-400" />
+              <span>Programming Dept.</span>
+            </Link>
+          </div>
+        )}
       </div>
 
-      <div className="px-5 pt-4 pb-1">
-        <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-teal-600 block">FABRIC STORE</span>
+      <div className="px-5 pt-3 pb-1">
+        <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-teal-500/90 block">FABRIC STORE</span>
       </div>
 
       {/* NAV */}
@@ -157,31 +188,29 @@ export function FabricStoreNavigation() {
 
         {/* My Work */}
         <div>
-          <div className="flex items-center gap-3 px-3 py-2.5">
+          <div className="flex items-center gap-3 px-3 py-2">
             <Briefcase className="w-4 h-4 text-slate-400" />
-            {sectionHeader('My Work', myWorkOpen, () => setMyWorkOpen(!myWorkOpen), myWorkActive)}
+            <div className="flex-1">
+              {sectionHeader('My Work', myWorkOpen, () => setMyWorkOpen(!myWorkOpen), myWorkActive)}
+            </div>
           </div>
           {myWorkOpen && (
-            <div className="ml-4 pl-3 border-l border-slate-700/80 my-1 space-y-0.5">
+            <div className="ml-7 pl-3 border-l border-slate-700/80 space-y-0.5 my-0.5">
               <Link href="/fabric-store/my-work/incoming-challans" className={subLinkClass('/fabric-store/my-work/incoming-challans')}>
-                <ArrowDownToLine className="w-3.5 h-3.5 text-teal-400/80" />
+                <PackageCheck className="w-3.5 h-3.5 text-teal-400" />
                 <span>Incoming Challans</span>
               </Link>
               <Link href="/fabric-store/my-work/material-receipt" className={subLinkClass('/fabric-store/my-work/material-receipt')}>
-                <PackageCheck className="w-3.5 h-3.5 text-teal-400/80" />
-                <span>Material Receipt (GRN)</span>
+                <ArrowDownToLine className="w-3.5 h-3.5 text-blue-400" />
+                <span>Material Receipt</span>
               </Link>
               <Link href="/fabric-store/my-work/qc-inspections" className={subLinkClass('/fabric-store/my-work/qc-inspections')}>
-                <ClipboardCheck className="w-3.5 h-3.5 text-amber-400/80" />
+                <ClipboardCheck className="w-3.5 h-3.5 text-amber-400" />
                 <span>QC Inspections</span>
-              </Link>
-              <Link href="/fabric-store/my-work/material-issue" className={subLinkClass('/fabric-store/my-work/material-issue')}>
-                <ArrowUpFromLine className="w-3.5 h-3.5 text-blue-400/80" />
-                <span>Material Issue</span>
               </Link>
               <Link href="/fabric-store/my-work/issue-challan" className={subLinkClass('/fabric-store/my-work/issue-challan')}>
                 <Send className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="font-semibold text-emerald-300">Issue Challan</span>
+                <span>Issue Challan</span>
               </Link>
             </div>
           )}
@@ -189,26 +218,32 @@ export function FabricStoreNavigation() {
 
         {/* Inventory */}
         <div>
-          <div className="flex items-center gap-3 px-3 py-2.5">
+          <div className="flex items-center gap-3 px-3 py-2">
             <Boxes className="w-4 h-4 text-slate-400" />
-            {sectionHeader('Inventory', inventoryOpen, () => setInventoryOpen(!inventoryOpen), inventoryActive)}
+            <div className="flex-1">
+              {sectionHeader('Inventory', inventoryOpen, () => setInventoryOpen(!inventoryOpen), inventoryActive)}
+            </div>
           </div>
           {inventoryOpen && (
-            <div className="ml-4 pl-3 border-l border-slate-700/80 my-1 space-y-0.5">
+            <div className="ml-7 pl-3 border-l border-slate-700/80 space-y-0.5 my-0.5">
               <Link href="/fabric-store/inventory/stock" className={subLinkClass('/fabric-store/inventory/stock')}>
-                <Boxes className="w-3.5 h-3.5 text-teal-400/70" />
-                <span>Stock</span>
+                <Boxes className="w-3.5 h-3.5 text-teal-400" />
+                <span>Stock Overview</span>
               </Link>
               <Link href="/fabric-store/inventory/rolls" className={subLinkClass('/fabric-store/inventory/rolls')}>
-                <ListChecks className="w-3.5 h-3.5 text-slate-400" />
-                <span>Rolls</span>
+                <ListChecks className="w-3.5 h-3.5 text-blue-400" />
+                <span>Rolls Registry</span>
+              </Link>
+              <Link href="/fabric-store/inventory/batches" className={subLinkClass('/fabric-store/inventory/batches')}>
+                <PackageCheck className="w-3.5 h-3.5 text-amber-400" />
+                <span>Batches</span>
               </Link>
               <Link href="/fabric-store/inventory/defected-shelf" className={subLinkClass('/fabric-store/inventory/defected-shelf')}>
                 <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
-                <span className="text-rose-300 font-medium">Defected Shelf</span>
+                <span>Defected Shelf</span>
               </Link>
               <Link href="/fabric-store/inventory/stock-ledger" className={subLinkClass('/fabric-store/inventory/stock-ledger')}>
-                <BookOpen className="w-3.5 h-3.5 text-slate-400" />
+                <BookOpen className="w-3.5 h-3.5 text-purple-400" />
                 <span>Stock Ledger</span>
               </Link>
             </div>
@@ -216,25 +251,27 @@ export function FabricStoreNavigation() {
         </div>
 
         {/* Floor Board */}
-        <Link href="/floor-board" className={linkClass('/floor-board')}>
+        <Link href="/fabric-store/floor-board" className={linkClass('/fabric-store/floor-board', true)}>
           <Kanban className="w-4 h-4 text-slate-400" />
           <span>Floor Board</span>
         </Link>
+
       </nav>
 
-      {/* USER FOOTER */}
+      {/* USER & SIGN OUT */}
       <div className="p-4 border-t border-slate-800 bg-[#0A0F1D]/80">
         <div className="flex items-center gap-3 mb-3">
           <UserCircle className="w-8 h-8 text-slate-400" />
           <div className="flex-1 min-w-0">
             <span className="text-xs font-semibold text-white truncate block">
-              {currentUser.fullName || 'Store User'}
+              {currentUser.fullName || currentUser.username || 'Store Incharge'}
             </span>
             <span className="text-[10px] text-teal-400/90 font-medium tracking-wide block truncate">
-              Fabric Store Department
+              {isAdmin ? 'System Administrator' : 'Fabric Store Department'}
             </span>
           </div>
         </div>
+
         <button
           onClick={handleSignOut}
           className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-slate-800/80 hover:bg-rose-950/40 hover:text-rose-300 hover:border-rose-900 border border-slate-700/60 rounded text-xs text-slate-300 transition"

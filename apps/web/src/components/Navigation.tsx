@@ -13,9 +13,11 @@ import {
   ChevronRight, 
   LogOut, 
   UserCircle,
-  Building2 
+  Building2,
+  ShieldCheck
 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { isAdminUser } from '@/lib/rbac';
 
 export function Navigation() {
   const pathname = usePathname();
@@ -24,8 +26,8 @@ export function Navigation() {
   const [myWorkOpen, setMyWorkOpen] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>({
     fullName: 'Programming Incharge',
-    username: 'programmer',
-    role: 'PROGRAMMING_INCHARGE',
+    username: 'program',
+    role: 'PROGRAMMER',
     departmentCode: 'PROGRAMMING',
   });
 
@@ -61,12 +63,15 @@ export function Navigation() {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('subham_mes_token');
       localStorage.removeItem('subham_mes_user');
+      document.cookie = 'subham_mes_token=; path=/; max-age=0';
+      document.cookie = 'subham_mes_role=; path=/; max-age=0';
+      document.cookie = 'subham_mes_dept=; path=/; max-age=0';
     }
     router.push('/login');
   };
 
-  // Do not render sidebar on login page or when in fabric-store workspace
-  if (pathname === '/login' || pathname.startsWith('/fabric-store')) {
+  // Do not render sidebar on login page, fabric-store workspace, or admin workspace
+  if (pathname === '/login' || pathname.startsWith('/fabric-store') || pathname.startsWith('/admin')) {
     return null;
   }
 
@@ -75,42 +80,72 @@ export function Navigation() {
   const isIssueChallanActive = pathname === '/my-work/issue-challan';
   const isMyWorkRootActive = pathname === '/my-work';
   const isFloorBoardActive = pathname === '/floor-board';
+  const isAdmin = isAdminUser(currentUser);
 
   return (
     <aside className="w-64 bg-[#0F172A] text-slate-300 flex flex-col fixed inset-y-0 left-0 z-50 border-r border-slate-800 select-none">
-      {/* BRANDING HEADER */}
-      <div className="p-5 border-b border-slate-800 bg-[#0A0F1D]">
+      {/* BRANDING HEADER WITH OFFICIAL IMG 3 LOGO */}
+      <div className="p-4 border-b border-slate-800 bg-[#0A0F1D]">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded bg-[#163767] border border-amber-500/40 flex items-center justify-center text-amber-400 font-serif font-black text-sm shadow-sm">
-            SF
+          <div className="w-10 h-10 rounded-lg bg-white p-0.5 border border-amber-500/40 flex items-center justify-center shadow-sm overflow-hidden shrink-0">
+            <img
+              src="/shubham-logo.jpg"
+              alt="Shubham Fabrics Logo"
+              className="w-full h-full object-contain"
+            />
           </div>
-          <div>
-            <span className="text-xs font-bold tracking-[0.16em] text-white block">
+          <div className="min-w-0">
+            <span className="text-xs font-bold tracking-[0.14em] text-white truncate block">
               SHUBHAM FABRICS
             </span>
-            <span className="text-[10px] font-medium tracking-[0.2em] text-amber-400/90 block">
+            <span className="text-[10px] font-medium tracking-[0.18em] text-amber-400 block truncate">
               MES ENTERPRISE
             </span>
           </div>
         </div>
       </div>
 
-      {/* DEPARTMENT SWITCHER */}
-      <div className="px-3 pt-3 pb-1 border-b border-slate-800/60">
-        <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-500 px-1 mb-1">
-          Department
-        </p>
-        <div className="flex items-center gap-2 px-2 py-1.5 rounded text-[11px] text-white bg-slate-800/70 border border-amber-800/40 mb-1">
+      {/* DEPARTMENT / RBAC STATION INDICATOR */}
+      <div className="px-3 pt-3 pb-2 border-b border-slate-800/60">
+        <div className="flex items-center justify-between mb-1.5 px-1">
+          <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-500">
+            Current Station
+          </p>
+          {isAdmin && (
+            <span className="text-[9px] bg-indigo-900/60 text-indigo-300 px-1.5 py-0.5 rounded border border-indigo-700/50 font-bold uppercase tracking-wider">
+              Admin Access
+            </span>
+          )}
+        </div>
+
+        {/* Active station */}
+        <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] text-white bg-slate-800/80 border border-amber-800/40 mb-1">
           <Building2 className="w-3.5 h-3.5 text-amber-400" />
           <span className="font-semibold text-amber-300">Programming Dept.</span>
         </div>
-        <Link
-          href="/fabric-store"
-          className="flex items-center gap-2 px-2 py-1.5 rounded text-[11px] text-slate-400 hover:bg-slate-800/50 hover:text-white transition"
-        >
-          <Building2 className="w-3.5 h-3.5" />
-          <span>Fabric Store Dept.</span>
-        </Link>
+
+        {/* ADMIN EXCLUSIVE: Switcher to other workspaces */}
+        {isAdmin && (
+          <div className="space-y-1 mt-1.5 pt-1.5 border-t border-slate-800/60">
+            <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-slate-500 px-1 mb-1">
+              Switch Workspace
+            </p>
+            <Link
+              href="/admin"
+              className="flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] text-indigo-300 hover:bg-indigo-950/40 hover:text-white transition"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
+              <span>Admin Console</span>
+            </Link>
+            <Link
+              href="/fabric-store"
+              className="flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] text-slate-400 hover:bg-slate-800/50 hover:text-white transition"
+            >
+              <Building2 className="w-3.5 h-3.5 text-teal-400" />
+              <span>Fabric Store Dept.</span>
+            </Link>
+          </div>
+        )}
       </div>
 
       {/* DEPARTMENT TITLE */}
@@ -186,7 +221,7 @@ export function Navigation() {
           )}
         </div>
 
-        {/* 3. Floor Board (Separate Main Nav Item) */}
+        {/* 3. Floor Board */}
         <Link
           href="/floor-board"
           className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-xs font-semibold transition ${
@@ -206,10 +241,10 @@ export function Navigation() {
           <UserCircle className="w-8 h-8 text-slate-400" />
           <div className="flex-1 min-w-0">
             <span className="text-xs font-semibold text-white truncate block">
-              {currentUser.fullName || 'Programming User'}
+              {currentUser.fullName || currentUser.username || 'Programming User'}
             </span>
             <span className="text-[10px] text-amber-400/90 font-medium tracking-wide block truncate">
-              Programming Department
+              {isAdmin ? 'System Administrator' : 'Programming Department'}
             </span>
           </div>
         </div>

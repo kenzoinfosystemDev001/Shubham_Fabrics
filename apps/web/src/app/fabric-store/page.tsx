@@ -45,6 +45,15 @@ export default function FabricStoreDashboard() {
         router.push('/login');
         return;
       }
+      try {
+        const parsed = JSON.parse(savedUser);
+        const isProgramming = (parsed.departmentCode === 'PROGRAMMING' || parsed.role === 'PROGRAMMER' || parsed.role === 'PROGRAMMING_INCHARGE') &&
+          parsed.role !== 'ADMIN' && parsed.role !== 'SUPER_ADMIN';
+        if (isProgramming) {
+          router.push('/');
+          return;
+        }
+      } catch {}
     }
     loadData();
   }, [router]);

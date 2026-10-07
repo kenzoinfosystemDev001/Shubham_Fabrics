@@ -23,6 +23,7 @@ import {
   Eye,
   ExternalLink
 } from 'lucide-react';
+import { ImageUpload } from '@/components/ImageUpload';
 import { api } from '@/lib/api';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { 
@@ -466,15 +467,12 @@ export default function CreateProductionSheetPage() {
               </div>
 
               <div className="sm:col-span-2">
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Base Design Photo / Drawing Reference URL
-                </label>
-                <input
-                  type="text"
+                <ImageUpload
+                  label="Base Design Photo / Drawing Reference (Cloudinary)"
                   value={formData.baseDesignPhoto}
-                  onChange={(e) => handleChange('baseDesignPhoto', e.target.value)}
-                  placeholder="https://storage.shubhamfabrics.com/designs/base_01.jpg"
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
+                  onChange={(url) => handleChange('baseDesignPhoto', url)}
+                  folder="base-designs"
+                  helpText="Upload sketch, photo, or mock reference"
                 />
               </div>
             </div>
@@ -534,15 +532,12 @@ export default function CreateProductionSheetPage() {
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Wilcom Design Photo URL
-                </label>
-                <input
-                  type="text"
+                <ImageUpload
+                  label="Wilcom Design / Embroidery Technical Photo (Cloudinary)"
                   value={formData.wilcomDesignPhoto}
-                  onChange={(e) => handleChange('wilcomDesignPhoto', e.target.value)}
-                  placeholder="https://storage.shubhamfabrics.com/wilcom/sample.png"
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
+                  onChange={(url) => handleChange('wilcomDesignPhoto', url)}
+                  folder="wilcom-designs"
+                  helpText="Upload Wilcom screenshot or digitizer proof"
                 />
               </div>
             </div>

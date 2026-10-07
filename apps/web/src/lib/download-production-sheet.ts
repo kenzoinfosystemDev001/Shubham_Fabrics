@@ -321,10 +321,13 @@ export function generateProductionSheetHtml(program: any): string {
     
     <!-- HEADER -->
     <div class="sheet-header">
-      <div>
-        <div class="company-title">SHUBHAM FABRICS INDIA PVT. LTD.</div>
-        <div class="company-sub">Manufacturing Execution System &middot; Production Sheet</div>
-        <div class="doc-badge">Department: Programming &middot; Factory Traveler Card</div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <img src="/shubham-logo.jpg" alt="Logo" style="height: 52px; width: auto; object-fit: contain; border-radius: 4px;" />
+        <div>
+          <div class="company-title">SHUBHAM FABRICS INDIA PVT. LTD.</div>
+          <div class="company-sub">Manufacturing Execution System &middot; Production Sheet</div>
+          <div class="doc-badge">Department: Programming &middot; Factory Traveler Card</div>
+        </div>
       </div>
       <div class="header-meta">
         <div class="prog-number">${serialNo}</div>
@@ -413,6 +416,16 @@ export function generateProductionSheetHtml(program: any): string {
         <th>Embroidery Description</th>
         <td colspan="3" style="font-weight: 600;">${embroideryDesign}</td>
       </tr>
+      ${program.wilcomDesignPhoto || program.baseDesignPhoto ? `
+      <tr>
+        <th>Design Attachments</th>
+        <td colspan="3" style="padding: 6px;">
+          <div style="display: flex; gap: 12px; align-items: center;">
+            ${program.baseDesignPhoto ? `<div><span style="font-size: 8px; font-weight: bold; display: block; color: #64748b;">BASE DESIGN:</span><img src="${program.baseDesignPhoto}" style="max-height: 90px; max-width: 140px; object-fit: contain; border: 1px solid #cbd5e1; border-radius: 4px;" /></div>` : ''}
+            ${program.wilcomDesignPhoto ? `<div><span style="font-size: 8px; font-weight: bold; display: block; color: #64748b;">WILCOM TECHNICAL:</span><img src="${program.wilcomDesignPhoto}" style="max-height: 90px; max-width: 140px; object-fit: contain; border: 1px solid #cbd5e1; border-radius: 4px;" /></div>` : ''}
+          </div>
+        </td>
+      </tr>` : ''}
     </table>
 
     <!-- SECTION 4 & 5: FABRIC & DYEING -->

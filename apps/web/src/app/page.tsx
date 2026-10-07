@@ -52,7 +52,14 @@ export default function ProgrammingDashboardPage() {
       const savedUser = localStorage.getItem('subham_mes_user');
       if (savedUser) {
         try {
-          setCurrentUser(JSON.parse(savedUser));
+          const parsed = JSON.parse(savedUser);
+          const isStore = (parsed.departmentCode === 'STORE' || parsed.role === 'FABRIC_STORE') && 
+            parsed.role !== 'ADMIN' && parsed.role !== 'SUPER_ADMIN';
+          if (isStore) {
+            router.push('/fabric-store');
+            return;
+          }
+          setCurrentUser(parsed);
         } catch {}
       } else {
         router.push('/login');

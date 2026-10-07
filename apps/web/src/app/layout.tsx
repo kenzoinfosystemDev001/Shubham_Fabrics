@@ -2,10 +2,11 @@ import React from 'react';
 import './globals.css';
 import { Navigation } from '@/components/Navigation';
 import { ThemeProvider } from '@/components/ThemeContext';
+import { DepartmentGuard } from '@/components/DepartmentGuard';
 
 export const metadata = {
-  title: 'Shubham Fabrics India Pvt. Ltd. | MES - Programming Department',
-  description: 'Enterprise Manufacturing Execution System - Programming Department Workspace',
+  title: 'Shubham Fabrics India Pvt. Ltd. | MES Enterprise',
+  description: 'Enterprise Manufacturing Execution System - Shubham Fabrics India Pvt. Ltd.',
 };
 
 export default function RootLayout({
@@ -18,9 +19,11 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col font-sans antialiased" suppressHydrationWarning>
         <ThemeProvider>
           <Navigation />
-          <main className="flex-1 min-h-screen flex flex-col">
-            {children}
-          </main>
+          <DepartmentGuard>
+            <main className="flex-1 min-h-screen flex flex-col">
+              {children}
+            </main>
+          </DepartmentGuard>
         </ThemeProvider>
       </body>
     </html>
