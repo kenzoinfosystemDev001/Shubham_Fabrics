@@ -13,8 +13,7 @@ import {
   ChevronRight, 
   LogOut, 
   UserCircle,
-  Building2,
-  ShieldCheck
+  Building2
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { isAdminUser } from '@/lib/rbac';
@@ -105,53 +104,10 @@ export function Navigation() {
         </div>
       </div>
 
-      {/* DEPARTMENT / RBAC STATION INDICATOR */}
-      <div className="px-3 pt-3 pb-2 border-b border-slate-800/60">
-        <div className="flex items-center justify-between mb-1.5 px-1">
-          <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-500">
-            Current Station
-          </p>
-          {isAdmin && (
-            <span className="text-[9px] bg-indigo-900/60 text-indigo-300 px-1.5 py-0.5 rounded border border-indigo-700/50 font-bold uppercase tracking-wider">
-              Admin Access
-            </span>
-          )}
-        </div>
-
-        {/* Active station */}
-        <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] text-white bg-slate-800/80 border border-amber-800/40 mb-1">
-          <Building2 className="w-3.5 h-3.5 text-amber-400" />
-          <span className="font-semibold text-amber-300">Programming Dept.</span>
-        </div>
-
-        {/* ADMIN EXCLUSIVE: Switcher to other workspaces */}
-        {isAdmin && (
-          <div className="space-y-1 mt-1.5 pt-1.5 border-t border-slate-800/60">
-            <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-slate-500 px-1 mb-1">
-              Switch Workspace
-            </p>
-            <Link
-              href="/admin"
-              className="flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] text-indigo-300 hover:bg-indigo-950/40 hover:text-white transition"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Admin Console</span>
-            </Link>
-            <Link
-              href="/fabric-store"
-              className="flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] text-slate-400 hover:bg-slate-800/50 hover:text-white transition"
-            >
-              <Building2 className="w-3.5 h-3.5 text-teal-400" />
-              <span>Fabric Store Dept.</span>
-            </Link>
-          </div>
-        )}
-      </div>
-
       {/* DEPARTMENT TITLE */}
-      <div className="px-5 pt-3 pb-1">
-        <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-amber-500/80 block">
-          PROGRAMMING
+      <div className="px-5 pt-4 pb-2 border-b border-slate-800/60">
+        <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-amber-500/90 block">
+          PROGRAMMING DEPARTMENT
         </span>
       </div>
 
