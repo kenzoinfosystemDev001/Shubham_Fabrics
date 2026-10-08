@@ -115,7 +115,24 @@ export default function ChallanDetailPage() {
               <span className="text-[11px] font-bold tracking-[0.2em] text-[#A66E22] block mb-1">
                 SHUBHAM FABRICS INDIA PVT. LTD.
               </span>
-              {challan.fromDepartment === 'DYEING' || challan.toDepartment === 'QC1' || (challan.challanNumber && challan.challanNumber.startsWith('CH-DYE-')) ? (
+              {challan.fromDepartment === 'STORE' && (challan.toDepartment === 'DYEING' || challan.toDepartment?.includes('DYE')) ? (
+                <div>
+                  <h2 className="text-xl font-serif font-black text-slate-900 tracking-wide">
+                    FABRIC STORE DEPARTMENT
+                  </h2>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-sm font-black font-mono tracking-wider text-purple-900 bg-purple-50 px-2 py-0.5 rounded border border-purple-200">
+                      FABRIC STORE → DYEING
+                    </span>
+                    <span className="text-sm font-bold text-slate-800 tracking-widest">
+                      CHALLAN
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Raw material / kora fabric dispatch slip to Dyeing Department
+                  </p>
+                </div>
+              ) : challan.fromDepartment === 'DYEING' || challan.toDepartment === 'QC1' || (challan.challanNumber && challan.challanNumber.startsWith('CH-DYE-')) ? (
                 <div>
                   <h2 className="text-xl font-serif font-black text-slate-900 tracking-wide">
                     DYEING DEPARTMENT

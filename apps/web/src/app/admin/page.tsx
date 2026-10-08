@@ -237,6 +237,27 @@ export default function AdminConsolePage() {
     }
   };
 
+  // Clear ALL Factory Data (Factory Reset)
+  const handleClearAllFactoryData = async () => {
+    const confirmation = prompt('CRITICAL WARNING: This will completely wipe ALL production sheets, challans, dyeing orders, inventory, defect logs, and audit logs from the database, resetting the system to a clean initial state.\n\nType "WIPE ALL DATA" to confirm:');
+    if (confirmation !== 'WIPE ALL DATA') {
+      if (confirmation !== null) alert('Action cancelled. Confirmation text did not match.');
+      return;
+    }
+    try {
+      setLoading(true);
+      const res = await fetch('/api/admin/clear-all-data', { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to clear factory data');
+      showNotification('All factory data successfully cleared. Database is in pristine initial state.');
+      loadData();
+    } catch (err: any) {
+      showNotification(err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Create Supplier handler
   const handleCreateSupplier = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -337,6 +358,23 @@ export default function AdminConsolePage() {
             <Building2 className="w-3.5 h-3.5" />
             <span>Fabric Store</span>
           </Link>
+
+          <Link
+            href="/dyeing"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-500/10 text-purple-300 border border-purple-500/30 hover:bg-purple-500/20 transition"
+          >
+            <Building2 className="w-3.5 h-3.5" />
+            <span>Dyeing</span>
+          </Link>
+
+          <button
+            onClick={handleClearAllFactoryData}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-600/90 hover:bg-rose-700 text-white shadow-xs transition"
+            title="Wipe all production sheets, challans, and operational data (Factory Reset)"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>Wipe All Data</span>
+          </button>
 
           <button
             onClick={handleSignOut}

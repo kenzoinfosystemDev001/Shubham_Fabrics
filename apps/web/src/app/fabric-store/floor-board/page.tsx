@@ -196,8 +196,14 @@ export default function FabricStoreFloorBoardPage() {
                         Prog: {c.program.programNumber || c.programNumber}
                       </div>
                     )}
-                    <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between">
-                      <span className="text-[10px] text-slate-400 font-mono">{c.totalRolls || 0} Rolls</span>
+                    <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between gap-1">
+                      <Link
+                        href={`/fabric-store/my-work/issue-challan?programId=${c.programId || c.program?.id}&dest=DYEING`}
+                        className="text-[10px] font-bold text-purple-700 hover:text-purple-900 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200"
+                        title="Dispatch directly to Dyeing"
+                      >
+                        To Dyeing →
+                      </Link>
                       <Link
                         href="/fabric-store/my-work/material-receipt/create"
                         className="text-[11px] font-bold text-teal-700 hover:text-teal-900 flex items-center gap-1"

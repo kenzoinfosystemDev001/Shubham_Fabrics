@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { syncInboundChallansToDyeingOrders } from '@/lib/dyeing-sync';
 
 export const dynamic = 'force-dynamic';
 
@@ -226,12 +227,22 @@ export async function POST(request: Request) {
       return challan;
     });
 
+    // If dispatched to Dyeing, immediately sync to DyeingOrders
+    if (toDept === 'DYEING' || toDept.includes('DYE')) {
+      try {
+        await syncInboundChallansToDyeingOrders();
+      } catch (syncErr) {
+        console.warn('Auto-sync to Dyeing notification:', syncErr);
+      }
+    }
+
     const fullChallan = await prisma.challan.findUnique({
       where: { id: created.id },
       include: {
         program: true,
         items: true,
         createdBy: { select: { id: true, username: true, fullName: true } },
+        dyeingInboundOrders: true,
       },
     });
 

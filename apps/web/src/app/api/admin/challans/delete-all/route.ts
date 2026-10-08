@@ -21,9 +21,12 @@ export async function DELETE() {
         await tx.productionTransaction.deleteMany({});
 
         // 4. Delete quality inspections, defects, bundles
+        await tx.cartonBundle.deleteMany({});
+        await tx.bundle.deleteMany({});
+        await tx.defectLog.deleteMany({});
+        await tx.qualityInspectionParameter.deleteMany({});
         await tx.qualityInspection.deleteMany({});
         await tx.defectRecord.deleteMany({});
-        await tx.bundle.deleteMany({});
 
         // 5. Delete challan line items and tracking events
         await tx.challanItem.deleteMany({});

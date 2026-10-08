@@ -23,11 +23,15 @@ export async function DELETE() {
         });
 
         // 4. Delete all production and inspection logs that reference challans or programs
-        await tx.productionTransaction.deleteMany({});
-        await tx.qualityInspection.deleteMany({});
-        await tx.defectRecord.deleteMany({});
+        await tx.fabricStockLedger.deleteMany({});
+        await tx.cartonBundle.deleteMany({});
         await tx.bundle.deleteMany({});
         await tx.carton.deleteMany({});
+        await tx.productionTransaction.deleteMany({});
+        await tx.defectLog.deleteMany({});
+        await tx.qualityInspectionParameter.deleteMany({});
+        await tx.qualityInspection.deleteMany({});
+        await tx.defectRecord.deleteMany({});
         await tx.fabricRoll.deleteMany({});
         await tx.fabricBatch.deleteMany({});
         await tx.reworkTransaction.deleteMany({});

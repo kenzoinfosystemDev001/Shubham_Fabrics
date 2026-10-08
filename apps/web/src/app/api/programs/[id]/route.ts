@@ -97,7 +97,20 @@ export async function DELETE(
             where: { challanId: { in: challanIds } },
           });
 
-          // Delete quality inspections on these challans
+          // Delete quality inspections on these challans (clean up children first)
+          const chInspections = await tx.qualityInspection.findMany({
+            where: { challanId: { in: challanIds } },
+            select: { id: true },
+          });
+          const chInspIds = chInspections.map((i) => i.id);
+          if (chInspIds.length > 0) {
+            await tx.defectLog.deleteMany({
+              where: { inspectionId: { in: chInspIds } },
+            });
+            await tx.qualityInspectionParameter.deleteMany({
+              where: { inspectionId: { in: chInspIds } },
+            });
+          }
           await tx.qualityInspection.deleteMany({
             where: { challanId: { in: challanIds } },
           });
@@ -107,7 +120,17 @@ export async function DELETE(
             where: { challanId: { in: challanIds } },
           });
 
-          // Delete bundles on these challans
+          // Delete bundles on these challans (clear cartonBundle first)
+          const challanBundles = await tx.bundle.findMany({
+            where: { challanId: { in: challanIds } },
+            select: { id: true },
+          });
+          const chBundleIds = challanBundles.map((b) => b.id);
+          if (chBundleIds.length > 0) {
+            await tx.cartonBundle.deleteMany({
+              where: { bundleId: { in: chBundleIds } },
+            });
+          }
           await tx.bundle.deleteMany({
             where: { challanId: { in: challanIds } },
           });
@@ -152,7 +175,27 @@ export async function DELETE(
           where: { programId: id },
         });
 
-        // 7. Delete bundles, cartons, fabric rolls, fabric batches
+        // 7. Delete bundles, cartons, fabric rolls, fabric batches (clear cartonBundle first)
+        const progBundles = await tx.bundle.findMany({
+          where: { programId: id },
+          select: { id: true },
+        });
+        const pBundleIds = progBundles.map((b) => b.id);
+        if (pBundleIds.length > 0) {
+          await tx.cartonBundle.deleteMany({
+            where: { bundleId: { in: pBundleIds } },
+          });
+        }
+        const progCartons = await tx.carton.findMany({
+          where: { programId: id },
+          select: { id: true },
+        });
+        const pCartonIds = progCartons.map((c) => c.id);
+        if (pCartonIds.length > 0) {
+          await tx.cartonBundle.deleteMany({
+            where: { cartonId: { in: pCartonIds } },
+          });
+        }
         await tx.bundle.deleteMany({
           where: { programId: id },
         });

@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Send,
   FileText,
@@ -23,6 +23,8 @@ import {
   RefreshCw,
   Eye,
   Check,
+  PackageCheck,
+  Droplet,
 } from 'lucide-react';
 import {
   generateProductionSheetHtml,
@@ -30,8 +32,11 @@ import {
   printProductionSheet,
 } from '@/lib/download-production-sheet';
 
-export default function FabricStoreIssueChallanPage() {
+function FabricStoreIssueChallanContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const queryProgramId = searchParams.get('programId');
+  const queryDest = searchParams.get('dest');
 
   // Data states
   const [loading, setLoading] = useState(true);
@@ -39,11 +44,21 @@ export default function FabricStoreIssueChallanPage() {
   const [availableRolls, setAvailableRolls] = useState<any[]>([]);
 
   // Selection states
-  const [selectedProgramId, setSelectedProgramId] = useState<string>('');
+  const [selectedProgramId, setSelectedProgramId] = useState<string>(queryProgramId || '');
   const [destinationDept, setDestinationDept] = useState<'DYEING' | 'EMBROIDERY'>('DYEING');
   const [selectedRollIds, setSelectedRollIds] = useState<string[]>([]);
 
-  // Form states
+  // Dispatch mode: 'ROLLS' (physical rolls) vs 'DIRECT_LOT' (meters/lot without individual roll tags)
+  const [dispatchMode, setDispatchMode] = useState<'ROLLS' | 'DIRECT_LOT'>('DIRECT_LOT');
+
+  // Direct Lot / Meters fields
+  const [directQuantity, setDirectQuantity] = useState<string>('500');
+  const [directUom, setDirectUom] = useState<string>('MTR');
+  const [directFabric, setDirectFabric] = useState<string>('');
+  const [directColor, setDirectColor] = useState<string>('');
+  const [directLotNumber, setDirectLotNumber] = useState<string>('');
+
+  // Logistics form states
   const [vehicleNumber, setVehicleNumber] = useState('');
   const [driverName, setDriverName] = useState('');
   const [remarks, setRemarks] = useState('');
@@ -74,9 +89,24 @@ export default function FabricStoreIssueChallanPage() {
       const allRolls = rollsData.data || [];
       setAvailableRolls(allRolls);
 
-      // Select first program if available
-      if (progList.length > 0 && !selectedProgramId) {
-        selectProgram(progList[0]);
+      // Select program if query param matches, else select first program
+      let targetProg = null;
+      if (queryProgramId) {
+        targetProg = progList.find((p) => p.id === queryProgramId);
+      }
+      if (!targetProg && progList.length > 0) {
+        targetProg = progList[0];
+      }
+
+      if (targetProg) {
+        selectProgram(targetProg);
+      }
+
+      // If physical rolls are available in stock, default to ROLLS mode; otherwise DIRECT_LOT mode
+      if (allRolls.length > 0) {
+        setDispatchMode('ROLLS');
+      } else {
+        setDispatchMode('DIRECT_LOT');
       }
     } catch (err: any) {
       setError(err.message || 'Failed to load programs and rolls');
@@ -87,16 +117,33 @@ export default function FabricStoreIssueChallanPage() {
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [queryProgramId]);
 
   const selectProgram = (prog: any) => {
     setSelectedProgramId(prog.id);
-    // Smart recommendation: if fabricDyeingRequired is true, default to DYEING; else default to EMBROIDERY
-    if (prog.fabricDyeingRequired) {
+
+    // If queryDest is provided, honor it, otherwise smart recommendation
+    if (queryDest === 'EMBROIDERY') {
+      setDestinationDept('EMBROIDERY');
+    } else if (queryDest === 'DYEING' || prog.fabricDyeingRequired) {
       setDestinationDept('DYEING');
     } else {
       setDestinationDept('EMBROIDERY');
     }
+
+    // Populate direct lot defaults from the program
+    const defaultQty =
+      prog.fabricIssuedToDyeing ||
+      prog.fabricSentToDyeing ||
+      prog.targetQuantity ||
+      prog.colorQuantity ||
+      500;
+    setDirectQuantity(String(defaultQty));
+    setDirectUom(prog.quantityMeasurement || 'MTR');
+    setDirectFabric(prog.fabricName || 'Cotton Fabric');
+    setDirectColor(prog.fabricColor || 'Natural');
+    setDirectLotNumber(`LOT-${prog.programSerialNo || prog.programNumber || '01'}`);
+    setPriority(prog.priority || 'NORMAL');
   };
 
   const selectedProgram = programs.find((p) => p.id === selectedProgramId);
@@ -129,8 +176,12 @@ export default function FabricStoreIssueChallanPage() {
       setError('Please select a program first.');
       return;
     }
-    if (selectedRollIds.length === 0) {
-      setError('Please select at least one fabric roll to issue on the challan.');
+
+    const useRolls = dispatchMode === 'ROLLS' && selectedRollIds.length > 0;
+    const directQtyNum = parseFloat(directQuantity);
+
+    if (!useRolls && (isNaN(directQtyNum) || directQtyNum <= 0)) {
+      setError('Please enter a valid dispatch quantity in meters/pieces.');
       return;
     }
 
@@ -138,18 +189,43 @@ export default function FabricStoreIssueChallanPage() {
       setSubmitting(true);
       setError('');
 
-      // 1. Prepare Challan Items from selected rolls
-      const challanItems = selectedRolls.map((roll) => ({
-        itemDescription: `${roll.batch?.fabricDescription || 'Fabric Roll'} (${roll.rollNumber})`,
-        unitType: 'ROLL',
-        rollNumber: roll.rollNumber,
-        lotNumber: roll.batch?.batchNumber || null,
-        quantity: parseFloat(roll.length) || 1,
-        uom: 'MTR',
-        fabricCode: roll.batch?.fabricType || selectedProgram.fabricName || 'FABRIC',
-        colour: roll.batch?.colorName || selectedProgram.fabricColor || null,
-        remarks: `Dispatched from Fabric Store location ${roll.location?.locationCode || 'STOCK'}`,
-      }));
+      let challanItems: any[] = [];
+      let dispatchedMeters = 0;
+      let dispatchedRollsCount = 0;
+
+      if (useRolls) {
+        // 1A. Prepare Challan Items from selected rolls
+        challanItems = selectedRolls.map((roll) => ({
+          itemDescription: `${roll.batch?.fabricDescription || 'Fabric Roll'} (${roll.rollNumber})`,
+          unitType: 'ROLL',
+          rollNumber: roll.rollNumber,
+          lotNumber: roll.batch?.batchNumber || null,
+          quantity: parseFloat(roll.length) || 1,
+          uom: 'MTR',
+          fabricCode: roll.batch?.fabricType || selectedProgram.fabricName || 'FABRIC',
+          colour: roll.batch?.colorName || selectedProgram.fabricColor || null,
+          remarks: `Dispatched from Fabric Store location ${roll.location?.locationCode || 'STOCK'}`,
+        }));
+        dispatchedMeters = totalMetersSelected;
+        dispatchedRollsCount = selectedRollIds.length;
+      } else {
+        // 1B. Direct Program Lot Dispatch
+        const itemDesc = `${directFabric || selectedProgram.fabricName || 'Fabric'} - ${directColor || selectedProgram.fabricColor || 'Natural'} (Lot: ${directLotNumber || 'LOT-01'})`;
+        challanItems = [
+          {
+            itemDescription: itemDesc,
+            unitType: 'LOT',
+            quantity: directQtyNum,
+            uom: directUom,
+            fabricCode: directFabric || selectedProgram.fabricName || 'FABRIC',
+            colour: directColor || selectedProgram.fabricColor || 'Natural',
+            lotNumber: directLotNumber || null,
+            remarks: `Direct Fabric Lot Dispatch from Store to ${destinationDept}`,
+          },
+        ];
+        dispatchedMeters = directQtyNum;
+        dispatchedRollsCount = 1;
+      }
 
       // 2. Create Challan via POST /api/challans
       const challanPayload = {
@@ -180,26 +256,35 @@ export default function FabricStoreIssueChallanPage() {
         throw new Error(challanJson.error || 'Failed to create challan');
       }
 
-      // 3. Mark rolls as ISSUED in Fabric Store ledger via POST /api/fabric-store/issue
-      const issueRes = await fetch('/api/fabric-store/issue', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          rollIds: selectedRollIds,
-          programId: selectedProgram.id,
-          remarks: `Dispatched on Challan ${challanJson.challanNumber} to ${destinationDept} Department`,
-        }),
-      });
+      // 3. Mark rolls as ISSUED in Fabric Store ledger if physical rolls were selected
+      if (useRolls) {
+        try {
+          await fetch('/api/fabric-store/issue', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              rollIds: selectedRollIds,
+              programId: selectedProgram.id,
+              remarks: `Dispatched on Challan ${challanJson.challanNumber} to ${destinationDept} Department`,
+            }),
+          });
+        } catch (issueErr) {
+          console.warn('Roll status ledger update notice:', issueErr);
+        }
+      }
 
-      if (!issueRes.ok) {
-        console.warn('Roll status ledger update notice:', await issueRes.json());
+      // 4. Ensure Dyeing synchronization is guaranteed if sent to DYEING
+      if (destinationDept === 'DYEING') {
+        try {
+          await fetch('/api/dyeing/sync', { method: 'POST' });
+        } catch {}
       }
 
       setIssuedChallan({
         ...challanJson,
         program: selectedProgram,
-        dispatchedRollsCount: selectedRollIds.length,
-        dispatchedMeters: totalMetersSelected,
+        dispatchedRollsCount,
+        dispatchedMeters,
         destinationDept,
       });
     } catch (err: any) {
@@ -240,10 +325,10 @@ export default function FabricStoreIssueChallanPage() {
           </div>
           <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2 mt-0.5">
             <Send className="w-5 h-5 text-emerald-600" />
-            Issue Challan to Production (Dyeing / Embroidery)
+            Issue Challan to Production (Fabric Store → Dyeing / Embroidery)
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Dispatches approved fabric rolls along with linked Production Sheet traveler to next production stage
+            Dispatches approved fabric lots along with linked Production Sheet traveler directly to Dyeing or Embroidery
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -259,7 +344,14 @@ export default function FabricStoreIssueChallanPage() {
             href="/fabric-store/my-work/incoming-challans"
             className="flex items-center gap-2 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-md transition"
           >
-            <span>View All Challans</span>
+            <span>View Incoming Challans</span>
+          </Link>
+          <Link
+            href="/dyeing"
+            className="flex items-center gap-1.5 px-3 py-2 bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-800 text-xs font-semibold rounded-md transition"
+          >
+            <Droplet className="w-3.5 h-3.5 text-purple-600" />
+            <span>Dyeing Dept</span>
           </Link>
         </div>
       </header>
@@ -281,17 +373,18 @@ export default function FabricStoreIssueChallanPage() {
               </div>
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-700">
-                  DISPATCH CONFIRMED &middot; CHALLAN ISSUED
+                  DISPATCH CONFIRMED &middot; CHALLAN ISSUED &amp; SYNCHRONIZED
                 </span>
                 <h2 className="text-2xl font-bold text-slate-900 mt-0.5">
                   Challan {issuedChallan.challanNumber} Dispatched
                 </h2>
                 <p className="text-xs text-slate-600 mt-1">
-                  Successfully issued to{' '}
+                  Successfully issued from{' '}
+                  <strong className="text-slate-900 font-bold">Fabric Store</strong> to{' '}
                   <strong className="text-emerald-800 font-bold">
                     {issuedChallan.destinationDept === 'DYEING' ? 'Dyeing Department' : 'Embroidery Department'}
                   </strong>{' '}
-                  along with Production Sheet traveler card.
+                  along with Production Sheet traveler card. The work order is now live in the receiving department!
                 </p>
               </div>
             </div>
@@ -310,41 +403,48 @@ export default function FabricStoreIssueChallanPage() {
               </div>
               <div>
                 <span className="text-slate-500 block text-[10px] uppercase font-bold">Destination</span>
-                <span className="font-bold text-emerald-800 text-sm">
+                <span className="font-bold text-purple-800 text-sm flex items-center gap-1">
+                  {issuedChallan.destinationDept === 'DYEING' && <Droplet className="w-3.5 h-3.5 text-purple-600" />}
                   {issuedChallan.destinationDept}
                 </span>
               </div>
               <div>
                 <span className="text-slate-500 block text-[10px] uppercase font-bold">Quantity Dispatched</span>
                 <span className="font-mono font-bold text-slate-900 text-sm">
-                  {issuedChallan.dispatchedRollsCount} rolls ({issuedChallan.dispatchedMeters.toFixed(1)} m)
+                  {issuedChallan.dispatchedMeters.toFixed(1)} m ({issuedChallan.dispatchedRollsCount} {issuedChallan.dispatchedRollsCount > 1 ? 'rolls' : 'lot'})
                 </span>
               </div>
             </div>
 
             {/* ACTIONS */}
             <div className="flex flex-wrap items-center gap-3 pt-2">
+              <Link
+                href={`/challans/${issuedChallan.id}`}
+                target="_blank"
+                className="flex items-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xs transition"
+              >
+                <Printer className="w-4 h-4" />
+                <span>View / Print Challan Slip</span>
+              </Link>
+
+              {issuedChallan.destinationDept === 'DYEING' && (
+                <Link
+                  href="/dyeing/my-work"
+                  className="flex items-center gap-2 px-4 py-2.5 bg-purple-700 hover:bg-purple-800 text-white text-xs font-semibold rounded-lg shadow-xs transition"
+                >
+                  <Droplet className="w-4 h-4" />
+                  <span>Open in Dyeing Department →</span>
+                </Link>
+              )}
+
               <button
                 onClick={() => printProductionSheet(issuedChallan.program)}
                 className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-xs transition"
               >
-                <Printer className="w-4 h-4" />
-                <span>Print Production Sheet (A4)</span>
+                <FileText className="w-4 h-4" />
+                <span>Print Production Sheet</span>
               </button>
-              <button
-                onClick={() => downloadProductionSheetHtml(issuedChallan.program)}
-                className="flex items-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xs transition"
-              >
-                <Download className="w-4 h-4" />
-                <span>Download Production Sheet HTML</span>
-              </button>
-              <button
-                onClick={() => setShowSheetModal(true)}
-                className="flex items-center gap-2 px-4 py-2.5 border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg transition"
-              >
-                <Eye className="w-4 h-4" />
-                <span>View Production Sheet</span>
-              </button>
+
               <button
                 onClick={resetForm}
                 className="flex items-center gap-2 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-lg shadow-xs transition ml-auto"
@@ -470,11 +570,11 @@ export default function FabricStoreIssueChallanPage() {
                       <span
                         className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold ${
                           selectedProgram.fabricDyeingRequired
-                            ? 'bg-blue-100 text-blue-800'
+                            ? 'bg-purple-100 text-purple-800'
                             : 'bg-slate-200 text-slate-700'
                         }`}
                       >
-                        {selectedProgram.fabricDyeingRequired ? 'YES (Dyeing Needed)' : 'NO (Ready)'}
+                        {selectedProgram.fabricDyeingRequired ? 'YES (Dyeing Needed)' : 'NO (Pre-Dyed/Ready)'}
                       </span>
                     </div>
                   </div>
@@ -503,13 +603,6 @@ export default function FabricStoreIssueChallanPage() {
                       </span>
                     </div>
                   </div>
-
-                  {selectedProgram.remarks && (
-                    <div className="text-[11px] text-slate-600 bg-amber-50/60 border border-amber-200/60 p-2 rounded">
-                      <strong className="text-amber-900">Production Note: </strong>
-                      {selectedProgram.remarks}
-                    </div>
-                  )}
                 </div>
               )}
             </div>
@@ -533,7 +626,7 @@ export default function FabricStoreIssueChallanPage() {
                 <div
                   className={`p-3 rounded-xl border text-xs flex items-center gap-2 ${
                     selectedProgram.fabricDyeingRequired
-                      ? 'bg-blue-50/80 border-blue-200 text-blue-900'
+                      ? 'bg-purple-50/80 border-purple-200 text-purple-900'
                       : 'bg-emerald-50/80 border-emerald-200 text-emerald-900'
                   }`}
                 >
@@ -545,7 +638,7 @@ export default function FabricStoreIssueChallanPage() {
                       </>
                     ) : (
                       <>
-                        <strong>System Recommendation: Embroidery Department.</strong> Fabric is pre-dyed or kora is ready for embroidery machines.
+                        <strong>System Recommendation: Embroidery Department.</strong> Fabric is pre-dyed or ready for embroidery machines.
                       </>
                     )}
                   </span>
@@ -558,7 +651,7 @@ export default function FabricStoreIssueChallanPage() {
                   onClick={() => setDestinationDept('DYEING')}
                   className={`p-4 rounded-xl border-2 cursor-pointer transition relative ${
                     destinationDept === 'DYEING'
-                      ? 'border-blue-600 bg-blue-50/40 shadow-xs'
+                      ? 'border-purple-600 bg-purple-50/40 shadow-xs'
                       : 'border-slate-200 hover:border-slate-300 bg-white'
                   }`}
                 >
@@ -567,21 +660,21 @@ export default function FabricStoreIssueChallanPage() {
                       <div
                         className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                           destinationDept === 'DYEING'
-                            ? 'bg-blue-600 text-white'
+                            ? 'bg-purple-600 text-white'
                             : 'bg-slate-100 text-slate-600'
                         }`}
                       >
-                        <Building2 className="w-5 h-5" />
+                        <Droplet className="w-5 h-5" />
                       </div>
                       <div>
                         <h3 className="text-sm font-bold text-slate-900">Dyeing Department</h3>
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-blue-700">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-purple-700">
                           CODE: DYEING
                         </span>
                       </div>
                     </div>
                     {destinationDept === 'DYEING' && (
-                      <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs">
+                      <span className="w-5 h-5 rounded-full bg-purple-600 text-white flex items-center justify-center text-xs">
                         <Check className="w-3.5 h-3.5 stroke-[3]" />
                       </span>
                     )}
@@ -630,112 +723,234 @@ export default function FabricStoreIssueChallanPage() {
               </div>
             </div>
 
-            {/* STEP 3: SELECT FABRIC ROLLS */}
+            {/* STEP 3: DISPATCH MATERIAL SELECTION (ROLLS OR DIRECT QUANTITY) */}
             <div className="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-xs space-y-4">
-              <div className="flex items-center justify-between border-b pb-3 border-slate-100">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-3 border-slate-100 gap-2">
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-800 text-xs font-bold flex items-center justify-center">
                     3
                   </div>
                   <div>
-                    <h2 className="text-sm font-bold text-slate-900">Select Fabric Rolls to Issue</h2>
+                    <h2 className="text-sm font-bold text-slate-900">Fabric Material Dispatch Mode</h2>
                     <p className="text-[11px] text-slate-500">
-                      Only QC-Passed, In-Stock fabric rolls can be issued on production challans
+                      Issue physical rolls from inventory, or dispatch fabric quantity / lot directly
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 text-xs">
-                  <span className="text-slate-600">
-                    Selected: <strong className="text-teal-900">{selectedRollIds.length}</strong> rolls &middot;{' '}
-                    <strong className="text-teal-900">{totalMetersSelected.toFixed(1)}</strong> m
-                  </span>
+                {/* MODE TOGGLE TABS */}
+                <div className="flex items-center bg-slate-100 p-1 rounded-lg text-xs">
                   <button
                     type="button"
-                    onClick={toggleAllRolls}
-                    className="text-teal-700 hover:text-teal-900 font-semibold"
+                    onClick={() => setDispatchMode('DIRECT_LOT')}
+                    className={`px-3 py-1.5 rounded-md font-semibold transition ${
+                      dispatchMode === 'DIRECT_LOT'
+                        ? 'bg-white text-slate-900 shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
                   >
-                    {selectedRollIds.length === availableRolls.length ? 'Deselect All' : 'Select All'}
+                    Direct Fabric Lot / Meters
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDispatchMode('ROLLS')}
+                    className={`px-3 py-1.5 rounded-md font-semibold transition ${
+                      dispatchMode === 'ROLLS'
+                        ? 'bg-white text-slate-900 shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Select Scanned Rolls ({availableRolls.length})
                   </button>
                 </div>
               </div>
 
-              {availableRolls.length === 0 ? (
-                <div className="p-8 text-center text-xs text-slate-500 bg-slate-50 rounded-xl">
-                  No QC-passed rolls currently in stock. Please receive fabric (GRN) and complete QC inspection first.
+              {/* MODE 1: DIRECT FABRIC LOT FORM */}
+              {dispatchMode === 'DIRECT_LOT' && (
+                <div className="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                      Direct Dispatch Specifications
+                    </span>
+                    <span className="text-[11px] text-teal-800 bg-teal-50 px-2 py-0.5 rounded font-semibold border border-teal-200">
+                      Dispatches directly from Fabric Store to {destinationDept}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">
+                        Dispatch Quantity <span className="text-rose-500">*</span>
+                      </label>
+                      <input
+                        type="number"
+                        step="any"
+                        required
+                        value={directQuantity}
+                        onChange={(e) => setDirectQuantity(e.target.value)}
+                        placeholder="e.g. 500"
+                        className="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono font-bold text-slate-900 bg-white"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Unit of Measure (UOM)</label>
+                      <select
+                        value={directUom}
+                        onChange={(e) => setDirectUom(e.target.value)}
+                        className="w-full border border-slate-300 rounded-lg px-3 py-2 bg-white"
+                      >
+                        <option value="MTR">MTR (Meters)</option>
+                        <option value="KG">KG (Kilograms)</option>
+                        <option value="PCS">PCS (Pieces)</option>
+                        <option value="ROLL">ROLL (Rolls)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Fabric Quality / Name</label>
+                      <input
+                        type="text"
+                        value={directFabric}
+                        onChange={(e) => setDirectFabric(e.target.value)}
+                        placeholder="e.g. 100% Cotton Kora"
+                        className="w-full border border-slate-300 rounded-lg px-3 py-2 bg-white"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">Fabric Color / Shade</label>
+                      <input
+                        type="text"
+                        value={directColor}
+                        onChange={(e) => setDirectColor(e.target.value)}
+                        placeholder="e.g. Off White / Grey"
+                        className="w-full border border-slate-300 rounded-lg px-3 py-2 bg-white"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label className="block font-bold text-slate-700 mb-1">Lot / Batch Reference Number</label>
+                      <input
+                        type="text"
+                        value={directLotNumber}
+                        onChange={(e) => setDirectLotNumber(e.target.value)}
+                        placeholder="e.g. LOT-2026-001"
+                        className="w-full border border-slate-300 rounded-lg px-3 py-2 font-mono uppercase bg-white"
+                      />
+                    </div>
+
+                    <div className="sm:col-span-2 flex items-center">
+                      <p className="text-[11px] text-slate-500 pt-5">
+                        This lot will be transferred under Challan control directly to the <strong>{destinationDept}</strong> department floor.
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              ) : (
-                <div className="overflow-x-auto border border-slate-200 rounded-xl">
-                  <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
-                      <tr>
-                        <th className="py-2.5 px-4 w-10 text-center">
-                          <input
-                            type="checkbox"
-                            checked={selectedRollIds.length === availableRolls.length && availableRolls.length > 0}
-                            onChange={toggleAllRolls}
-                            className="rounded text-teal-700"
-                          />
-                        </th>
-                        <th className="py-2.5 px-4">Roll Number</th>
-                        <th className="py-2.5 px-4">Batch Number</th>
-                        <th className="py-2.5 px-4">Fabric Description</th>
-                        <th className="py-2.5 px-4">Color / Shade</th>
-                        <th className="py-2.5 px-4">Length</th>
-                        <th className="py-2.5 px-4">Store Location</th>
-                        <th className="py-2.5 px-4">QC Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 text-slate-700">
-                      {availableRolls.map((roll) => {
-                        const isChecked = selectedRollIds.includes(roll.id);
-                        return (
-                          <tr
-                            key={roll.id}
-                            onClick={() => toggleRoll(roll.id)}
-                            className={`cursor-pointer transition ${
-                              isChecked ? 'bg-teal-50/60' : 'hover:bg-slate-50/60'
-                            }`}
-                          >
-                            <td className="py-3 px-4 text-center">
+              )}
+
+              {/* MODE 2: ROLLS SELECTION TABLE */}
+              {dispatchMode === 'ROLLS' && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-slate-600">
+                      Selected: <strong className="text-teal-900">{selectedRollIds.length}</strong> rolls &middot;{' '}
+                      <strong className="text-teal-900">{totalMetersSelected.toFixed(1)}</strong> m
+                    </span>
+                    <button
+                      type="button"
+                      onClick={toggleAllRolls}
+                      className="text-teal-700 hover:text-teal-900 font-semibold"
+                    >
+                      {selectedRollIds.length === availableRolls.length ? 'Deselect All' : 'Select All'}
+                    </button>
+                  </div>
+
+                  {availableRolls.length === 0 ? (
+                    <div className="p-8 text-center text-xs text-slate-500 bg-slate-50 rounded-xl space-y-2">
+                      <p>No QC-passed rolls currently in stock in Fabric Store inventory.</p>
+                      <button
+                        type="button"
+                        onClick={() => setDispatchMode('DIRECT_LOT')}
+                        className="px-3.5 py-1.5 bg-teal-700 text-white rounded-md text-xs font-semibold"
+                      >
+                        Switch to Direct Fabric Lot / Meters Mode →
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto border border-slate-200 rounded-xl">
+                      <table className="w-full text-left text-xs">
+                        <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                          <tr>
+                            <th className="py-2.5 px-4 w-10 text-center">
                               <input
                                 type="checkbox"
-                                checked={isChecked}
-                                onChange={() => {}} // handled by row click
+                                checked={selectedRollIds.length === availableRolls.length && availableRolls.length > 0}
+                                onChange={toggleAllRolls}
                                 className="rounded text-teal-700"
                               />
-                            </td>
-                            <td className="py-3 px-4 font-mono font-bold text-teal-900">
-                              {roll.rollNumber}
-                            </td>
-                            <td className="py-3 px-4 font-mono text-[11px]">
-                              {roll.batch?.batchNumber || '—'}
-                            </td>
-                            <td className="py-3 px-4">
-                              <span className="font-semibold text-slate-800 block">
-                                {roll.batch?.fabricType || 'Fabric'}
-                              </span>
-                              <span className="text-[10px] text-slate-500">
-                                {roll.batch?.fabricDescription}
-                              </span>
-                            </td>
-                            <td className="py-3 px-4">{roll.batch?.colorName || '—'}</td>
-                            <td className="py-3 px-4 font-mono font-bold text-slate-900">
-                              {parseFloat(roll.length).toFixed(2)} m
-                            </td>
-                            <td className="py-3 px-4 font-mono text-[11px] text-slate-600">
-                              {roll.location?.locationCode || 'RACK-01'}
-                            </td>
-                            <td className="py-3 px-4">
-                              <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                                PASSED
-                              </span>
-                            </td>
+                            </th>
+                            <th className="py-2.5 px-4">Roll Number</th>
+                            <th className="py-2.5 px-4">Batch Number</th>
+                            <th className="py-2.5 px-4">Fabric Description</th>
+                            <th className="py-2.5 px-4">Color / Shade</th>
+                            <th className="py-2.5 px-4">Length</th>
+                            <th className="py-2.5 px-4">Store Location</th>
+                            <th className="py-2.5 px-4">QC Status</th>
                           </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 text-slate-700">
+                          {availableRolls.map((roll) => {
+                            const isChecked = selectedRollIds.includes(roll.id);
+                            return (
+                              <tr
+                                key={roll.id}
+                                onClick={() => toggleRoll(roll.id)}
+                                className={`cursor-pointer transition ${
+                                  isChecked ? 'bg-teal-50/60' : 'hover:bg-slate-50/60'
+                                }`}
+                              >
+                                <td className="py-3 px-4 text-center">
+                                  <input
+                                    type="checkbox"
+                                    checked={isChecked}
+                                    onChange={() => {}} // handled by row click
+                                    className="rounded text-teal-700"
+                                  />
+                                </td>
+                                <td className="py-3 px-4 font-mono font-bold text-teal-900">
+                                  {roll.rollNumber}
+                                </td>
+                                <td className="py-3 px-4 font-mono text-[11px]">
+                                  {roll.batch?.batchNumber || '—'}
+                                </td>
+                                <td className="py-3 px-4">
+                                  <span className="font-semibold text-slate-800 block">
+                                    {roll.batch?.fabricType || 'Fabric'}
+                                  </span>
+                                  <span className="text-[10px] text-slate-500">
+                                    {roll.batch?.fabricDescription}
+                                  </span>
+                                </td>
+                                <td className="py-3 px-4">{roll.batch?.colorName || '—'}</td>
+                                <td className="py-3 px-4 font-mono font-bold text-slate-900">
+                                  {parseFloat(roll.length).toFixed(2)} m
+                                </td>
+                                <td className="py-3 px-4 font-mono text-[11px] text-slate-600">
+                                  {roll.location?.locationCode || 'RACK-01'}
+                                </td>
+                                <td className="py-3 px-4">
+                                  <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                                    PASSED
+                                  </span>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -785,7 +1000,7 @@ export default function FabricStoreIssueChallanPage() {
                   </label>
                   <textarea
                     rows={2}
-                    placeholder="e.g. Urgent lot for Program delivery; handle with care to avoid contamination."
+                    placeholder="e.g. Undyed Kora lot for Dyeing Department; maintain lot traceability."
                     value={remarks}
                     onChange={(e) => setRemarks(e.target.value)}
                     className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2"
@@ -794,20 +1009,28 @@ export default function FabricStoreIssueChallanPage() {
               </div>
 
               {/* DISPATCH ACTION BAR */}
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+              <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="text-xs text-slate-500">
                   Ready to dispatch{' '}
-                  <strong className="text-slate-900 font-semibold">{selectedRollIds.length} rolls</strong> (
-                  <strong className="text-slate-900 font-semibold">{totalMetersSelected.toFixed(1)} m</strong>) to{' '}
-                  <strong className="text-emerald-800 font-bold">
-                    {destinationDept === 'DYEING' ? 'Dyeing' : 'Embroidery'}
+                  <strong className="text-slate-900 font-semibold">
+                    {dispatchMode === 'ROLLS' && selectedRollIds.length > 0
+                      ? `${selectedRollIds.length} rolls (${totalMetersSelected.toFixed(1)} m)`
+                      : `${parseFloat(directQuantity) || 0} ${directUom}`}
                   </strong>{' '}
-                  with linked Production Sheet.
+                  from Fabric Store to{' '}
+                  <strong className="text-purple-800 font-bold">
+                    {destinationDept === 'DYEING' ? 'Dyeing Department' : 'Embroidery Department'}
+                  </strong>{' '}
+                  with linked Production Sheet traveler.
                 </div>
                 <button
                   type="submit"
-                  disabled={submitting || selectedRollIds.length === 0}
-                  className="flex items-center gap-2 px-6 py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-xs transition"
+                  disabled={
+                    submitting ||
+                    (dispatchMode === 'ROLLS' && selectedRollIds.length === 0) ||
+                    (dispatchMode === 'DIRECT_LOT' && (!directQuantity || parseFloat(directQuantity) <= 0))
+                  }
+                  className="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-xs transition"
                 >
                   <Send className="w-4 h-4" />
                   <span>
@@ -906,24 +1129,8 @@ export default function FabricStoreIssueChallanPage() {
                     <span className="text-slate-700">{selectedProgram.fabricType || '—'}</span>
                   </div>
                   <div className="p-2.5 bg-slate-50 rounded">
-                    <span className="text-[10px] text-slate-500 font-bold uppercase block">Fabric Width</span>
-                    <span className="font-mono text-slate-700">
-                      {selectedProgram.fabricWidth || (selectedProgram.fabricWidthInches ? `${selectedProgram.fabricWidthInches} Inches` : '—')}
-                    </span>
-                  </div>
-                  <div className="p-2.5 bg-slate-50 rounded">
                     <span className="text-[10px] text-slate-500 font-bold uppercase block">Fabric Color</span>
                     <strong className="text-slate-900">{selectedProgram.fabricColor || '—'}</strong>
-                  </div>
-                  <div className="p-2.5 bg-slate-50 rounded">
-                    <span className="text-[10px] text-slate-500 font-bold uppercase block">Fabric Dyeing Required</span>
-                    <span
-                      className={`font-bold ${
-                        selectedProgram.fabricDyeingRequired ? 'text-blue-700' : 'text-slate-600'
-                      }`}
-                    >
-                      {selectedProgram.fabricDyeingRequired ? 'YES' : 'NO'}
-                    </span>
                   </div>
                   <div className="p-2.5 bg-slate-50 rounded">
                     <span className="text-[10px] text-slate-500 font-bold uppercase block">Target Quantity</span>
@@ -931,12 +1138,6 @@ export default function FabricStoreIssueChallanPage() {
                       {selectedProgram.colorQuantity || selectedProgram.targetQuantity || 0}{' '}
                       {selectedProgram.quantityMeasurement || 'PCS'}
                     </strong>
-                  </div>
-                  <div className="p-2.5 bg-slate-50 rounded">
-                    <span className="text-[10px] text-slate-500 font-bold uppercase block">Average Consumption</span>
-                    <span className="font-mono text-slate-700">
-                      {selectedProgram.fabricAverage ? `${selectedProgram.fabricAverage} ${selectedProgram.fabricAverageType || 'Mtr/Pc'}` : '—'}
-                    </span>
                   </div>
                   <div className="p-2.5 bg-slate-50 rounded">
                     <span className="text-[10px] text-slate-500 font-bold uppercase block">Delivery Target Date</span>
@@ -949,28 +1150,6 @@ export default function FabricStoreIssueChallanPage() {
                     <span className="font-bold text-slate-800">{selectedProgram.clientPriority || 'NORMAL'}</span>
                   </div>
                 </div>
-
-                {/* Embroidery details */}
-                <div className="p-3 bg-slate-50 rounded border border-slate-200">
-                  <span className="text-[10px] text-slate-500 font-bold uppercase block mb-1">
-                    Embroidery Design Specifications
-                  </span>
-                  <p className="text-xs text-slate-800 font-medium">
-                    {selectedProgram.embroideryDesign || selectedProgram.designName || 'Standard embroidery specs per Wilcom tape.'}
-                  </p>
-                </div>
-
-                {/* Instructions */}
-                {selectedProgram.comments && (
-                  <div className="p-3 bg-amber-50/60 rounded border border-amber-200">
-                    <span className="text-[10px] text-amber-900 font-bold uppercase block mb-1">
-                      Technical Instructions &amp; Comments
-                    </span>
-                    <p className="text-xs text-amber-950 font-serif italic">
-                      {selectedProgram.comments}
-                    </p>
-                  </div>
-                )}
               </div>
 
               <div className="flex justify-end pt-2">
@@ -986,5 +1165,19 @@ export default function FabricStoreIssueChallanPage() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function FabricStoreIssueChallanPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#F0FAF9] flex items-center justify-center text-xs font-mono text-slate-500">
+          Loading Challan Dispatch Center...
+        </div>
+      }
+    >
+      <FabricStoreIssueChallanContent />
+    </Suspense>
   );
 }

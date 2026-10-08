@@ -72,7 +72,20 @@ export async function DELETE(
           where: { challanId: id },
         });
 
-        // 4. Delete quality inspections
+        // 4. Delete quality inspections (clean up children first)
+        const chInspections = await tx.qualityInspection.findMany({
+          where: { challanId: id },
+          select: { id: true },
+        });
+        const chInspectionIds = chInspections.map((i) => i.id);
+        if (chInspectionIds.length > 0) {
+          await tx.defectLog.deleteMany({
+            where: { inspectionId: { in: chInspectionIds } },
+          });
+          await tx.qualityInspectionParameter.deleteMany({
+            where: { inspectionId: { in: chInspectionIds } },
+          });
+        }
         await tx.qualityInspection.deleteMany({
           where: { challanId: id },
         });
@@ -82,7 +95,17 @@ export async function DELETE(
           where: { challanId: id },
         });
 
-        // 6. Delete bundles
+        // 6. Delete bundles (clear cartonBundle first)
+        const chBundles = await tx.bundle.findMany({
+          where: { challanId: id },
+          select: { id: true },
+        });
+        const chBundleIds = chBundles.map((b) => b.id);
+        if (chBundleIds.length > 0) {
+          await tx.cartonBundle.deleteMany({
+            where: { bundleId: { in: chBundleIds } },
+          });
+        }
         await tx.bundle.deleteMany({
           where: { challanId: id },
         });

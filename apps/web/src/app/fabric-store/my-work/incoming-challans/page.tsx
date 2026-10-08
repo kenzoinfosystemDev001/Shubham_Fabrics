@@ -99,7 +99,14 @@ export default function IncomingChallansPage() {
                       <td className="py-3 px-4 text-[11px]">{new Date(ch.createdAt).toLocaleDateString()}</td>
                       <td className="py-3 px-4 text-[11px]">{ch.items?.[0]?.itemDescription || '—'}</td>
                       <td className="py-3 px-4">{statusBadge(ch.status)}</td>
-                      <td className="py-3 px-4 text-right">
+                      <td className="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
+                        <Link
+                          href={`/fabric-store/my-work/issue-challan?programId=${ch.programId}&dest=DYEING`}
+                          className="inline-flex items-center gap-1 text-[11px] font-bold text-purple-700 hover:text-purple-900 bg-purple-50 hover:bg-purple-100 border border-purple-200 px-2 py-1 rounded transition"
+                          title="Dispatch to Dyeing Department"
+                        >
+                          To Dyeing →
+                        </Link>
                         <Link
                           href={`/fabric-store/my-work/material-receipt/create?challanId=${ch.id}`}
                           className="inline-flex items-center gap-1 text-[11px] font-bold text-teal-700 hover:text-teal-900 bg-teal-50 hover:bg-teal-100 px-2 py-1 rounded transition"
