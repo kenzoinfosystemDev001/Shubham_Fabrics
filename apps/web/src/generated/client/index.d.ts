@@ -298,6 +298,11 @@ export type FabricQCInspection = $Result.DefaultSelection<Prisma.$FabricQCInspec
  * 
  */
 export type FabricStockLedger = $Result.DefaultSelection<Prisma.$FabricStockLedgerPayload>
+/**
+ * Model DyeingOrder
+ * 
+ */
+export type DyeingOrder = $Result.DefaultSelection<Prisma.$DyeingOrderPayload>
 
 /**
  * Enums
@@ -1112,6 +1117,16 @@ export class PrismaClient<
     * ```
     */
   get fabricStockLedger(): Prisma.FabricStockLedgerDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.dyeingOrder`: Exposes CRUD operations for the **DyeingOrder** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more DyeingOrders
+    * const dyeingOrders = await prisma.dyeingOrder.findMany()
+    * ```
+    */
+  get dyeingOrder(): Prisma.DyeingOrderDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1609,7 +1624,8 @@ export namespace Prisma {
     MaterialReceipt: 'MaterialReceipt',
     MaterialReceiptItem: 'MaterialReceiptItem',
     FabricQCInspection: 'FabricQCInspection',
-    FabricStockLedger: 'FabricStockLedger'
+    FabricStockLedger: 'FabricStockLedger',
+    DyeingOrder: 'DyeingOrder'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1628,7 +1644,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "role" | "permission" | "rolePermission" | "userRole" | "department" | "workCenter" | "machine" | "shift" | "supplier" | "customer" | "item" | "fabric" | "trim" | "design" | "colour" | "size" | "operation" | "defectCode" | "program" | "programFabric" | "programColour" | "programSize" | "programSpecification" | "programBOM" | "programRoute" | "programRouteStep" | "attachment" | "auditLog" | "challan" | "challanItem" | "productionTransaction" | "qualityInspection" | "defectLog" | "inventoryStock" | "challanEvent" | "stockLedgerEntry" | "fabricRoll" | "bundle" | "carton" | "cartonBundle" | "dispatchOrder" | "dispatchCarton" | "defectRecord" | "reworkTransaction" | "recutRequest" | "qualityInspectionParameter" | "idempotencyRecord" | "notification" | "integrityScanResult" | "inventoryLocation" | "fabricBatch" | "fabricStoreRoll" | "materialReceipt" | "materialReceiptItem" | "fabricQCInspection" | "fabricStockLedger"
+      modelProps: "user" | "role" | "permission" | "rolePermission" | "userRole" | "department" | "workCenter" | "machine" | "shift" | "supplier" | "customer" | "item" | "fabric" | "trim" | "design" | "colour" | "size" | "operation" | "defectCode" | "program" | "programFabric" | "programColour" | "programSize" | "programSpecification" | "programBOM" | "programRoute" | "programRouteStep" | "attachment" | "auditLog" | "challan" | "challanItem" | "productionTransaction" | "qualityInspection" | "defectLog" | "inventoryStock" | "challanEvent" | "stockLedgerEntry" | "fabricRoll" | "bundle" | "carton" | "cartonBundle" | "dispatchOrder" | "dispatchCarton" | "defectRecord" | "reworkTransaction" | "recutRequest" | "qualityInspectionParameter" | "idempotencyRecord" | "notification" | "integrityScanResult" | "inventoryLocation" | "fabricBatch" | "fabricStoreRoll" | "materialReceipt" | "materialReceiptItem" | "fabricQCInspection" | "fabricStockLedger" | "dyeingOrder"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -5850,6 +5866,80 @@ export namespace Prisma {
           }
         }
       }
+      DyeingOrder: {
+        payload: Prisma.$DyeingOrderPayload<ExtArgs>
+        fields: Prisma.DyeingOrderFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DyeingOrderFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DyeingOrderPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DyeingOrderFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DyeingOrderPayload>
+          }
+          findFirst: {
+            args: Prisma.DyeingOrderFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DyeingOrderPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DyeingOrderFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DyeingOrderPayload>
+          }
+          findMany: {
+            args: Prisma.DyeingOrderFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DyeingOrderPayload>[]
+          }
+          create: {
+            args: Prisma.DyeingOrderCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DyeingOrderPayload>
+          }
+          createMany: {
+            args: Prisma.DyeingOrderCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DyeingOrderCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DyeingOrderPayload>[]
+          }
+          delete: {
+            args: Prisma.DyeingOrderDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DyeingOrderPayload>
+          }
+          update: {
+            args: Prisma.DyeingOrderUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DyeingOrderPayload>
+          }
+          deleteMany: {
+            args: Prisma.DyeingOrderDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DyeingOrderUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.DyeingOrderUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DyeingOrderPayload>[]
+          }
+          upsert: {
+            args: Prisma.DyeingOrderUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DyeingOrderPayload>
+          }
+          aggregate: {
+            args: Prisma.DyeingOrderAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDyeingOrder>
+          }
+          groupBy: {
+            args: Prisma.DyeingOrderGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DyeingOrderGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DyeingOrderCountArgs<ExtArgs>
+            result: $Utils.Optional<DyeingOrderCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -6003,6 +6093,7 @@ export namespace Prisma {
     materialReceiptItem?: MaterialReceiptItemOmit
     fabricQCInspection?: FabricQCInspectionOmit
     fabricStockLedger?: FabricStockLedgerOmit
+    dyeingOrder?: DyeingOrderOmit
   }
 
   /* Types for Logging */
@@ -6107,6 +6198,7 @@ export namespace Prisma {
     fabricRollsInspected: number
     fabricQCInspections: number
     fabricLedgerEntries: number
+    dyeingOrdersIncharge: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6134,6 +6226,7 @@ export namespace Prisma {
     fabricRollsInspected?: boolean | UserCountOutputTypeCountFabricRollsInspectedArgs
     fabricQCInspections?: boolean | UserCountOutputTypeCountFabricQCInspectionsArgs
     fabricLedgerEntries?: boolean | UserCountOutputTypeCountFabricLedgerEntriesArgs
+    dyeingOrdersIncharge?: boolean | UserCountOutputTypeCountDyeingOrdersInchargeArgs
   }
 
   // Custom InputTypes
@@ -6313,6 +6406,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountFabricLedgerEntriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: FabricStockLedgerWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountDyeingOrdersInchargeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DyeingOrderWhereInput
   }
 
 
@@ -6818,6 +6918,7 @@ export namespace Prisma {
     recutRequests: number
     fabricBatches: number
     fabricStoreRolls: number
+    dyeingOrders: number
   }
 
   export type ProgramCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6838,6 +6939,7 @@ export namespace Prisma {
     recutRequests?: boolean | ProgramCountOutputTypeCountRecutRequestsArgs
     fabricBatches?: boolean | ProgramCountOutputTypeCountFabricBatchesArgs
     fabricStoreRolls?: boolean | ProgramCountOutputTypeCountFabricStoreRollsArgs
+    dyeingOrders?: boolean | ProgramCountOutputTypeCountDyeingOrdersArgs
   }
 
   // Custom InputTypes
@@ -6970,6 +7072,13 @@ export namespace Prisma {
     where?: FabricStoreRollWhereInput
   }
 
+  /**
+   * ProgramCountOutputType without action
+   */
+  export type ProgramCountOutputTypeCountDyeingOrdersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DyeingOrderWhereInput
+  }
+
 
   /**
    * Count Type ProgramRouteCountOutputType
@@ -7014,6 +7123,8 @@ export namespace Prisma {
     events: number
     bundles: number
     defects: number
+    dyeingInboundOrders: number
+    dyeingQc1Orders: number
   }
 
   export type ChallanCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7024,6 +7135,8 @@ export namespace Prisma {
     events?: boolean | ChallanCountOutputTypeCountEventsArgs
     bundles?: boolean | ChallanCountOutputTypeCountBundlesArgs
     defects?: boolean | ChallanCountOutputTypeCountDefectsArgs
+    dyeingInboundOrders?: boolean | ChallanCountOutputTypeCountDyeingInboundOrdersArgs
+    dyeingQc1Orders?: boolean | ChallanCountOutputTypeCountDyeingQc1OrdersArgs
   }
 
   // Custom InputTypes
@@ -7084,6 +7197,20 @@ export namespace Prisma {
    */
   export type ChallanCountOutputTypeCountDefectsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: DefectRecordWhereInput
+  }
+
+  /**
+   * ChallanCountOutputType without action
+   */
+  export type ChallanCountOutputTypeCountDyeingInboundOrdersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DyeingOrderWhereInput
+  }
+
+  /**
+   * ChallanCountOutputType without action
+   */
+  export type ChallanCountOutputTypeCountDyeingQc1OrdersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DyeingOrderWhereInput
   }
 
 
@@ -7729,6 +7856,7 @@ export namespace Prisma {
     fabricRollsInspected?: boolean | User$fabricRollsInspectedArgs<ExtArgs>
     fabricQCInspections?: boolean | User$fabricQCInspectionsArgs<ExtArgs>
     fabricLedgerEntries?: boolean | User$fabricLedgerEntriesArgs<ExtArgs>
+    dyeingOrdersIncharge?: boolean | User$dyeingOrdersInchargeArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -7794,6 +7922,7 @@ export namespace Prisma {
     fabricRollsInspected?: boolean | User$fabricRollsInspectedArgs<ExtArgs>
     fabricQCInspections?: boolean | User$fabricQCInspectionsArgs<ExtArgs>
     fabricLedgerEntries?: boolean | User$fabricLedgerEntriesArgs<ExtArgs>
+    dyeingOrdersIncharge?: boolean | User$dyeingOrdersInchargeArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -7826,6 +7955,7 @@ export namespace Prisma {
       fabricRollsInspected: Prisma.$FabricStoreRollPayload<ExtArgs>[]
       fabricQCInspections: Prisma.$FabricQCInspectionPayload<ExtArgs>[]
       fabricLedgerEntries: Prisma.$FabricStockLedgerPayload<ExtArgs>[]
+      dyeingOrdersIncharge: Prisma.$DyeingOrderPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -8255,6 +8385,7 @@ export namespace Prisma {
     fabricRollsInspected<T extends User$fabricRollsInspectedArgs<ExtArgs> = {}>(args?: Subset<T, User$fabricRollsInspectedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStoreRollPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     fabricQCInspections<T extends User$fabricQCInspectionsArgs<ExtArgs> = {}>(args?: Subset<T, User$fabricQCInspectionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricQCInspectionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     fabricLedgerEntries<T extends User$fabricLedgerEntriesArgs<ExtArgs> = {}>(args?: Subset<T, User$fabricLedgerEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStockLedgerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    dyeingOrdersIncharge<T extends User$dyeingOrdersInchargeArgs<ExtArgs> = {}>(args?: Subset<T, User$dyeingOrdersInchargeArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DyeingOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -9254,6 +9385,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: FabricStockLedgerScalarFieldEnum | FabricStockLedgerScalarFieldEnum[]
+  }
+
+  /**
+   * User.dyeingOrdersIncharge
+   */
+  export type User$dyeingOrdersInchargeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DyeingOrder
+     */
+    select?: DyeingOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DyeingOrder
+     */
+    omit?: DyeingOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DyeingOrderInclude<ExtArgs> | null
+    where?: DyeingOrderWhereInput
+    orderBy?: DyeingOrderOrderByWithRelationInput | DyeingOrderOrderByWithRelationInput[]
+    cursor?: DyeingOrderWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DyeingOrderScalarFieldEnum | DyeingOrderScalarFieldEnum[]
   }
 
   /**
@@ -30758,6 +30913,7 @@ export namespace Prisma {
     recutRequests?: boolean | Program$recutRequestsArgs<ExtArgs>
     fabricBatches?: boolean | Program$fabricBatchesArgs<ExtArgs>
     fabricStoreRolls?: boolean | Program$fabricStoreRollsArgs<ExtArgs>
+    dyeingOrders?: boolean | Program$dyeingOrdersArgs<ExtArgs>
     _count?: boolean | ProgramCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["program"]>
 
@@ -30969,6 +31125,7 @@ export namespace Prisma {
     recutRequests?: boolean | Program$recutRequestsArgs<ExtArgs>
     fabricBatches?: boolean | Program$fabricBatchesArgs<ExtArgs>
     fabricStoreRolls?: boolean | Program$fabricStoreRollsArgs<ExtArgs>
+    dyeingOrders?: boolean | Program$dyeingOrdersArgs<ExtArgs>
     _count?: boolean | ProgramCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ProgramIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -31008,6 +31165,7 @@ export namespace Prisma {
       recutRequests: Prisma.$RecutRequestPayload<ExtArgs>[]
       fabricBatches: Prisma.$FabricBatchPayload<ExtArgs>[]
       fabricStoreRolls: Prisma.$FabricStoreRollPayload<ExtArgs>[]
+      dyeingOrders: Prisma.$DyeingOrderPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -31481,6 +31639,7 @@ export namespace Prisma {
     recutRequests<T extends Program$recutRequestsArgs<ExtArgs> = {}>(args?: Subset<T, Program$recutRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RecutRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     fabricBatches<T extends Program$fabricBatchesArgs<ExtArgs> = {}>(args?: Subset<T, Program$fabricBatchesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricBatchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     fabricStoreRolls<T extends Program$fabricStoreRollsArgs<ExtArgs> = {}>(args?: Subset<T, Program$fabricStoreRollsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStoreRollPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    dyeingOrders<T extends Program$dyeingOrdersArgs<ExtArgs> = {}>(args?: Subset<T, Program$dyeingOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DyeingOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -32424,6 +32583,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: FabricStoreRollScalarFieldEnum | FabricStoreRollScalarFieldEnum[]
+  }
+
+  /**
+   * Program.dyeingOrders
+   */
+  export type Program$dyeingOrdersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DyeingOrder
+     */
+    select?: DyeingOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DyeingOrder
+     */
+    omit?: DyeingOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DyeingOrderInclude<ExtArgs> | null
+    where?: DyeingOrderWhereInput
+    orderBy?: DyeingOrderOrderByWithRelationInput | DyeingOrderOrderByWithRelationInput[]
+    cursor?: DyeingOrderWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DyeingOrderScalarFieldEnum | DyeingOrderScalarFieldEnum[]
   }
 
   /**
@@ -43478,6 +43661,8 @@ export namespace Prisma {
     events?: boolean | Challan$eventsArgs<ExtArgs>
     bundles?: boolean | Challan$bundlesArgs<ExtArgs>
     defects?: boolean | Challan$defectsArgs<ExtArgs>
+    dyeingInboundOrders?: boolean | Challan$dyeingInboundOrdersArgs<ExtArgs>
+    dyeingQc1Orders?: boolean | Challan$dyeingQc1OrdersArgs<ExtArgs>
     _count?: boolean | ChallanCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["challan"]>
 
@@ -43580,6 +43765,8 @@ export namespace Prisma {
     events?: boolean | Challan$eventsArgs<ExtArgs>
     bundles?: boolean | Challan$bundlesArgs<ExtArgs>
     defects?: boolean | Challan$defectsArgs<ExtArgs>
+    dyeingInboundOrders?: boolean | Challan$dyeingInboundOrdersArgs<ExtArgs>
+    dyeingQc1Orders?: boolean | Challan$dyeingQc1OrdersArgs<ExtArgs>
     _count?: boolean | ChallanCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ChallanIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -43621,6 +43808,8 @@ export namespace Prisma {
       events: Prisma.$ChallanEventPayload<ExtArgs>[]
       bundles: Prisma.$BundlePayload<ExtArgs>[]
       defects: Prisma.$DefectRecordPayload<ExtArgs>[]
+      dyeingInboundOrders: Prisma.$DyeingOrderPayload<ExtArgs>[]
+      dyeingQc1Orders: Prisma.$DyeingOrderPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -44051,6 +44240,8 @@ export namespace Prisma {
     events<T extends Challan$eventsArgs<ExtArgs> = {}>(args?: Subset<T, Challan$eventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ChallanEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     bundles<T extends Challan$bundlesArgs<ExtArgs> = {}>(args?: Subset<T, Challan$bundlesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BundlePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     defects<T extends Challan$defectsArgs<ExtArgs> = {}>(args?: Subset<T, Challan$defectsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DefectRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    dyeingInboundOrders<T extends Challan$dyeingInboundOrdersArgs<ExtArgs> = {}>(args?: Subset<T, Challan$dyeingInboundOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DyeingOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    dyeingQc1Orders<T extends Challan$dyeingQc1OrdersArgs<ExtArgs> = {}>(args?: Subset<T, Challan$dyeingQc1OrdersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DyeingOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -44736,6 +44927,54 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: DefectRecordScalarFieldEnum | DefectRecordScalarFieldEnum[]
+  }
+
+  /**
+   * Challan.dyeingInboundOrders
+   */
+  export type Challan$dyeingInboundOrdersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DyeingOrder
+     */
+    select?: DyeingOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DyeingOrder
+     */
+    omit?: DyeingOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DyeingOrderInclude<ExtArgs> | null
+    where?: DyeingOrderWhereInput
+    orderBy?: DyeingOrderOrderByWithRelationInput | DyeingOrderOrderByWithRelationInput[]
+    cursor?: DyeingOrderWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DyeingOrderScalarFieldEnum | DyeingOrderScalarFieldEnum[]
+  }
+
+  /**
+   * Challan.dyeingQc1Orders
+   */
+  export type Challan$dyeingQc1OrdersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DyeingOrder
+     */
+    select?: DyeingOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DyeingOrder
+     */
+    omit?: DyeingOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DyeingOrderInclude<ExtArgs> | null
+    where?: DyeingOrderWhereInput
+    orderBy?: DyeingOrderOrderByWithRelationInput | DyeingOrderOrderByWithRelationInput[]
+    cursor?: DyeingOrderWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DyeingOrderScalarFieldEnum | DyeingOrderScalarFieldEnum[]
   }
 
   /**
@@ -77786,6 +78025,1494 @@ export namespace Prisma {
 
 
   /**
+   * Model DyeingOrder
+   */
+
+  export type AggregateDyeingOrder = {
+    _count: DyeingOrderCountAggregateOutputType | null
+    _avg: DyeingOrderAvgAggregateOutputType | null
+    _sum: DyeingOrderSumAggregateOutputType | null
+    _min: DyeingOrderMinAggregateOutputType | null
+    _max: DyeingOrderMaxAggregateOutputType | null
+  }
+
+  export type DyeingOrderAvgAggregateOutputType = {
+    requiredQuantity: number | null
+    dyedQuantity: number | null
+    undyedQuantity: number | null
+    readyForQc1Quantity: number | null
+    sentToQc1Quantity: number | null
+  }
+
+  export type DyeingOrderSumAggregateOutputType = {
+    requiredQuantity: number | null
+    dyedQuantity: number | null
+    undyedQuantity: number | null
+    readyForQc1Quantity: number | null
+    sentToQc1Quantity: number | null
+  }
+
+  export type DyeingOrderMinAggregateOutputType = {
+    id: string | null
+    orderNumber: string | null
+    programId: string | null
+    inboundChallanId: string | null
+    status: string | null
+    priority: string | null
+    fabricName: string | null
+    fabricType: string | null
+    targetColor: string | null
+    dyedColor: string | null
+    colorCode: string | null
+    requiredQuantity: number | null
+    dyedQuantity: number | null
+    undyedQuantity: number | null
+    readyForQc1Quantity: number | null
+    sentToQc1Quantity: number | null
+    uom: string | null
+    inchargeId: string | null
+    inchargeName: string | null
+    batchNumber: string | null
+    machineNumber: string | null
+    processRemarks: string | null
+    qc1ChallanId: string | null
+    startedAt: Date | null
+    completedAt: Date | null
+    sentToQc1At: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DyeingOrderMaxAggregateOutputType = {
+    id: string | null
+    orderNumber: string | null
+    programId: string | null
+    inboundChallanId: string | null
+    status: string | null
+    priority: string | null
+    fabricName: string | null
+    fabricType: string | null
+    targetColor: string | null
+    dyedColor: string | null
+    colorCode: string | null
+    requiredQuantity: number | null
+    dyedQuantity: number | null
+    undyedQuantity: number | null
+    readyForQc1Quantity: number | null
+    sentToQc1Quantity: number | null
+    uom: string | null
+    inchargeId: string | null
+    inchargeName: string | null
+    batchNumber: string | null
+    machineNumber: string | null
+    processRemarks: string | null
+    qc1ChallanId: string | null
+    startedAt: Date | null
+    completedAt: Date | null
+    sentToQc1At: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type DyeingOrderCountAggregateOutputType = {
+    id: number
+    orderNumber: number
+    programId: number
+    inboundChallanId: number
+    status: number
+    priority: number
+    fabricName: number
+    fabricType: number
+    targetColor: number
+    dyedColor: number
+    colorCode: number
+    requiredQuantity: number
+    dyedQuantity: number
+    undyedQuantity: number
+    readyForQc1Quantity: number
+    sentToQc1Quantity: number
+    uom: number
+    inchargeId: number
+    inchargeName: number
+    batchNumber: number
+    machineNumber: number
+    processRemarks: number
+    qc1ChallanId: number
+    startedAt: number
+    completedAt: number
+    sentToQc1At: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type DyeingOrderAvgAggregateInputType = {
+    requiredQuantity?: true
+    dyedQuantity?: true
+    undyedQuantity?: true
+    readyForQc1Quantity?: true
+    sentToQc1Quantity?: true
+  }
+
+  export type DyeingOrderSumAggregateInputType = {
+    requiredQuantity?: true
+    dyedQuantity?: true
+    undyedQuantity?: true
+    readyForQc1Quantity?: true
+    sentToQc1Quantity?: true
+  }
+
+  export type DyeingOrderMinAggregateInputType = {
+    id?: true
+    orderNumber?: true
+    programId?: true
+    inboundChallanId?: true
+    status?: true
+    priority?: true
+    fabricName?: true
+    fabricType?: true
+    targetColor?: true
+    dyedColor?: true
+    colorCode?: true
+    requiredQuantity?: true
+    dyedQuantity?: true
+    undyedQuantity?: true
+    readyForQc1Quantity?: true
+    sentToQc1Quantity?: true
+    uom?: true
+    inchargeId?: true
+    inchargeName?: true
+    batchNumber?: true
+    machineNumber?: true
+    processRemarks?: true
+    qc1ChallanId?: true
+    startedAt?: true
+    completedAt?: true
+    sentToQc1At?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DyeingOrderMaxAggregateInputType = {
+    id?: true
+    orderNumber?: true
+    programId?: true
+    inboundChallanId?: true
+    status?: true
+    priority?: true
+    fabricName?: true
+    fabricType?: true
+    targetColor?: true
+    dyedColor?: true
+    colorCode?: true
+    requiredQuantity?: true
+    dyedQuantity?: true
+    undyedQuantity?: true
+    readyForQc1Quantity?: true
+    sentToQc1Quantity?: true
+    uom?: true
+    inchargeId?: true
+    inchargeName?: true
+    batchNumber?: true
+    machineNumber?: true
+    processRemarks?: true
+    qc1ChallanId?: true
+    startedAt?: true
+    completedAt?: true
+    sentToQc1At?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type DyeingOrderCountAggregateInputType = {
+    id?: true
+    orderNumber?: true
+    programId?: true
+    inboundChallanId?: true
+    status?: true
+    priority?: true
+    fabricName?: true
+    fabricType?: true
+    targetColor?: true
+    dyedColor?: true
+    colorCode?: true
+    requiredQuantity?: true
+    dyedQuantity?: true
+    undyedQuantity?: true
+    readyForQc1Quantity?: true
+    sentToQc1Quantity?: true
+    uom?: true
+    inchargeId?: true
+    inchargeName?: true
+    batchNumber?: true
+    machineNumber?: true
+    processRemarks?: true
+    qc1ChallanId?: true
+    startedAt?: true
+    completedAt?: true
+    sentToQc1At?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type DyeingOrderAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DyeingOrder to aggregate.
+     */
+    where?: DyeingOrderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DyeingOrders to fetch.
+     */
+    orderBy?: DyeingOrderOrderByWithRelationInput | DyeingOrderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DyeingOrderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DyeingOrders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DyeingOrders.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned DyeingOrders
+    **/
+    _count?: true | DyeingOrderCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: DyeingOrderAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: DyeingOrderSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DyeingOrderMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DyeingOrderMaxAggregateInputType
+  }
+
+  export type GetDyeingOrderAggregateType<T extends DyeingOrderAggregateArgs> = {
+        [P in keyof T & keyof AggregateDyeingOrder]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDyeingOrder[P]>
+      : GetScalarType<T[P], AggregateDyeingOrder[P]>
+  }
+
+
+
+
+  export type DyeingOrderGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DyeingOrderWhereInput
+    orderBy?: DyeingOrderOrderByWithAggregationInput | DyeingOrderOrderByWithAggregationInput[]
+    by: DyeingOrderScalarFieldEnum[] | DyeingOrderScalarFieldEnum
+    having?: DyeingOrderScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DyeingOrderCountAggregateInputType | true
+    _avg?: DyeingOrderAvgAggregateInputType
+    _sum?: DyeingOrderSumAggregateInputType
+    _min?: DyeingOrderMinAggregateInputType
+    _max?: DyeingOrderMaxAggregateInputType
+  }
+
+  export type DyeingOrderGroupByOutputType = {
+    id: string
+    orderNumber: string
+    programId: string
+    inboundChallanId: string | null
+    status: string
+    priority: string
+    fabricName: string
+    fabricType: string | null
+    targetColor: string
+    dyedColor: string | null
+    colorCode: string | null
+    requiredQuantity: number
+    dyedQuantity: number
+    undyedQuantity: number
+    readyForQc1Quantity: number
+    sentToQc1Quantity: number
+    uom: string
+    inchargeId: string | null
+    inchargeName: string | null
+    batchNumber: string | null
+    machineNumber: string | null
+    processRemarks: string | null
+    qc1ChallanId: string | null
+    startedAt: Date | null
+    completedAt: Date | null
+    sentToQc1At: Date | null
+    createdAt: Date
+    updatedAt: Date
+    _count: DyeingOrderCountAggregateOutputType | null
+    _avg: DyeingOrderAvgAggregateOutputType | null
+    _sum: DyeingOrderSumAggregateOutputType | null
+    _min: DyeingOrderMinAggregateOutputType | null
+    _max: DyeingOrderMaxAggregateOutputType | null
+  }
+
+  type GetDyeingOrderGroupByPayload<T extends DyeingOrderGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DyeingOrderGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DyeingOrderGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DyeingOrderGroupByOutputType[P]>
+            : GetScalarType<T[P], DyeingOrderGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DyeingOrderSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    orderNumber?: boolean
+    programId?: boolean
+    inboundChallanId?: boolean
+    status?: boolean
+    priority?: boolean
+    fabricName?: boolean
+    fabricType?: boolean
+    targetColor?: boolean
+    dyedColor?: boolean
+    colorCode?: boolean
+    requiredQuantity?: boolean
+    dyedQuantity?: boolean
+    undyedQuantity?: boolean
+    readyForQc1Quantity?: boolean
+    sentToQc1Quantity?: boolean
+    uom?: boolean
+    inchargeId?: boolean
+    inchargeName?: boolean
+    batchNumber?: boolean
+    machineNumber?: boolean
+    processRemarks?: boolean
+    qc1ChallanId?: boolean
+    startedAt?: boolean
+    completedAt?: boolean
+    sentToQc1At?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    program?: boolean | ProgramDefaultArgs<ExtArgs>
+    inboundChallan?: boolean | DyeingOrder$inboundChallanArgs<ExtArgs>
+    incharge?: boolean | DyeingOrder$inchargeArgs<ExtArgs>
+    qc1Challan?: boolean | DyeingOrder$qc1ChallanArgs<ExtArgs>
+  }, ExtArgs["result"]["dyeingOrder"]>
+
+  export type DyeingOrderSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    orderNumber?: boolean
+    programId?: boolean
+    inboundChallanId?: boolean
+    status?: boolean
+    priority?: boolean
+    fabricName?: boolean
+    fabricType?: boolean
+    targetColor?: boolean
+    dyedColor?: boolean
+    colorCode?: boolean
+    requiredQuantity?: boolean
+    dyedQuantity?: boolean
+    undyedQuantity?: boolean
+    readyForQc1Quantity?: boolean
+    sentToQc1Quantity?: boolean
+    uom?: boolean
+    inchargeId?: boolean
+    inchargeName?: boolean
+    batchNumber?: boolean
+    machineNumber?: boolean
+    processRemarks?: boolean
+    qc1ChallanId?: boolean
+    startedAt?: boolean
+    completedAt?: boolean
+    sentToQc1At?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    program?: boolean | ProgramDefaultArgs<ExtArgs>
+    inboundChallan?: boolean | DyeingOrder$inboundChallanArgs<ExtArgs>
+    incharge?: boolean | DyeingOrder$inchargeArgs<ExtArgs>
+    qc1Challan?: boolean | DyeingOrder$qc1ChallanArgs<ExtArgs>
+  }, ExtArgs["result"]["dyeingOrder"]>
+
+  export type DyeingOrderSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    orderNumber?: boolean
+    programId?: boolean
+    inboundChallanId?: boolean
+    status?: boolean
+    priority?: boolean
+    fabricName?: boolean
+    fabricType?: boolean
+    targetColor?: boolean
+    dyedColor?: boolean
+    colorCode?: boolean
+    requiredQuantity?: boolean
+    dyedQuantity?: boolean
+    undyedQuantity?: boolean
+    readyForQc1Quantity?: boolean
+    sentToQc1Quantity?: boolean
+    uom?: boolean
+    inchargeId?: boolean
+    inchargeName?: boolean
+    batchNumber?: boolean
+    machineNumber?: boolean
+    processRemarks?: boolean
+    qc1ChallanId?: boolean
+    startedAt?: boolean
+    completedAt?: boolean
+    sentToQc1At?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    program?: boolean | ProgramDefaultArgs<ExtArgs>
+    inboundChallan?: boolean | DyeingOrder$inboundChallanArgs<ExtArgs>
+    incharge?: boolean | DyeingOrder$inchargeArgs<ExtArgs>
+    qc1Challan?: boolean | DyeingOrder$qc1ChallanArgs<ExtArgs>
+  }, ExtArgs["result"]["dyeingOrder"]>
+
+  export type DyeingOrderSelectScalar = {
+    id?: boolean
+    orderNumber?: boolean
+    programId?: boolean
+    inboundChallanId?: boolean
+    status?: boolean
+    priority?: boolean
+    fabricName?: boolean
+    fabricType?: boolean
+    targetColor?: boolean
+    dyedColor?: boolean
+    colorCode?: boolean
+    requiredQuantity?: boolean
+    dyedQuantity?: boolean
+    undyedQuantity?: boolean
+    readyForQc1Quantity?: boolean
+    sentToQc1Quantity?: boolean
+    uom?: boolean
+    inchargeId?: boolean
+    inchargeName?: boolean
+    batchNumber?: boolean
+    machineNumber?: boolean
+    processRemarks?: boolean
+    qc1ChallanId?: boolean
+    startedAt?: boolean
+    completedAt?: boolean
+    sentToQc1At?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type DyeingOrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "orderNumber" | "programId" | "inboundChallanId" | "status" | "priority" | "fabricName" | "fabricType" | "targetColor" | "dyedColor" | "colorCode" | "requiredQuantity" | "dyedQuantity" | "undyedQuantity" | "readyForQc1Quantity" | "sentToQc1Quantity" | "uom" | "inchargeId" | "inchargeName" | "batchNumber" | "machineNumber" | "processRemarks" | "qc1ChallanId" | "startedAt" | "completedAt" | "sentToQc1At" | "createdAt" | "updatedAt", ExtArgs["result"]["dyeingOrder"]>
+  export type DyeingOrderInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    program?: boolean | ProgramDefaultArgs<ExtArgs>
+    inboundChallan?: boolean | DyeingOrder$inboundChallanArgs<ExtArgs>
+    incharge?: boolean | DyeingOrder$inchargeArgs<ExtArgs>
+    qc1Challan?: boolean | DyeingOrder$qc1ChallanArgs<ExtArgs>
+  }
+  export type DyeingOrderIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    program?: boolean | ProgramDefaultArgs<ExtArgs>
+    inboundChallan?: boolean | DyeingOrder$inboundChallanArgs<ExtArgs>
+    incharge?: boolean | DyeingOrder$inchargeArgs<ExtArgs>
+    qc1Challan?: boolean | DyeingOrder$qc1ChallanArgs<ExtArgs>
+  }
+  export type DyeingOrderIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    program?: boolean | ProgramDefaultArgs<ExtArgs>
+    inboundChallan?: boolean | DyeingOrder$inboundChallanArgs<ExtArgs>
+    incharge?: boolean | DyeingOrder$inchargeArgs<ExtArgs>
+    qc1Challan?: boolean | DyeingOrder$qc1ChallanArgs<ExtArgs>
+  }
+
+  export type $DyeingOrderPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "DyeingOrder"
+    objects: {
+      program: Prisma.$ProgramPayload<ExtArgs>
+      inboundChallan: Prisma.$ChallanPayload<ExtArgs> | null
+      incharge: Prisma.$UserPayload<ExtArgs> | null
+      qc1Challan: Prisma.$ChallanPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      orderNumber: string
+      programId: string
+      inboundChallanId: string | null
+      status: string
+      priority: string
+      fabricName: string
+      fabricType: string | null
+      targetColor: string
+      dyedColor: string | null
+      colorCode: string | null
+      requiredQuantity: number
+      dyedQuantity: number
+      undyedQuantity: number
+      readyForQc1Quantity: number
+      sentToQc1Quantity: number
+      uom: string
+      inchargeId: string | null
+      inchargeName: string | null
+      batchNumber: string | null
+      machineNumber: string | null
+      processRemarks: string | null
+      qc1ChallanId: string | null
+      startedAt: Date | null
+      completedAt: Date | null
+      sentToQc1At: Date | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["dyeingOrder"]>
+    composites: {}
+  }
+
+  type DyeingOrderGetPayload<S extends boolean | null | undefined | DyeingOrderDefaultArgs> = $Result.GetResult<Prisma.$DyeingOrderPayload, S>
+
+  type DyeingOrderCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<DyeingOrderFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: DyeingOrderCountAggregateInputType | true
+    }
+
+  export interface DyeingOrderDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DyeingOrder'], meta: { name: 'DyeingOrder' } }
+    /**
+     * Find zero or one DyeingOrder that matches the filter.
+     * @param {DyeingOrderFindUniqueArgs} args - Arguments to find a DyeingOrder
+     * @example
+     * // Get one DyeingOrder
+     * const dyeingOrder = await prisma.dyeingOrder.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DyeingOrderFindUniqueArgs>(args: SelectSubset<T, DyeingOrderFindUniqueArgs<ExtArgs>>): Prisma__DyeingOrderClient<$Result.GetResult<Prisma.$DyeingOrderPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one DyeingOrder that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {DyeingOrderFindUniqueOrThrowArgs} args - Arguments to find a DyeingOrder
+     * @example
+     * // Get one DyeingOrder
+     * const dyeingOrder = await prisma.dyeingOrder.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DyeingOrderFindUniqueOrThrowArgs>(args: SelectSubset<T, DyeingOrderFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DyeingOrderClient<$Result.GetResult<Prisma.$DyeingOrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DyeingOrder that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DyeingOrderFindFirstArgs} args - Arguments to find a DyeingOrder
+     * @example
+     * // Get one DyeingOrder
+     * const dyeingOrder = await prisma.dyeingOrder.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DyeingOrderFindFirstArgs>(args?: SelectSubset<T, DyeingOrderFindFirstArgs<ExtArgs>>): Prisma__DyeingOrderClient<$Result.GetResult<Prisma.$DyeingOrderPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DyeingOrder that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DyeingOrderFindFirstOrThrowArgs} args - Arguments to find a DyeingOrder
+     * @example
+     * // Get one DyeingOrder
+     * const dyeingOrder = await prisma.dyeingOrder.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DyeingOrderFindFirstOrThrowArgs>(args?: SelectSubset<T, DyeingOrderFindFirstOrThrowArgs<ExtArgs>>): Prisma__DyeingOrderClient<$Result.GetResult<Prisma.$DyeingOrderPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more DyeingOrders that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DyeingOrderFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all DyeingOrders
+     * const dyeingOrders = await prisma.dyeingOrder.findMany()
+     * 
+     * // Get first 10 DyeingOrders
+     * const dyeingOrders = await prisma.dyeingOrder.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const dyeingOrderWithIdOnly = await prisma.dyeingOrder.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DyeingOrderFindManyArgs>(args?: SelectSubset<T, DyeingOrderFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DyeingOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a DyeingOrder.
+     * @param {DyeingOrderCreateArgs} args - Arguments to create a DyeingOrder.
+     * @example
+     * // Create one DyeingOrder
+     * const DyeingOrder = await prisma.dyeingOrder.create({
+     *   data: {
+     *     // ... data to create a DyeingOrder
+     *   }
+     * })
+     * 
+     */
+    create<T extends DyeingOrderCreateArgs>(args: SelectSubset<T, DyeingOrderCreateArgs<ExtArgs>>): Prisma__DyeingOrderClient<$Result.GetResult<Prisma.$DyeingOrderPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many DyeingOrders.
+     * @param {DyeingOrderCreateManyArgs} args - Arguments to create many DyeingOrders.
+     * @example
+     * // Create many DyeingOrders
+     * const dyeingOrder = await prisma.dyeingOrder.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DyeingOrderCreateManyArgs>(args?: SelectSubset<T, DyeingOrderCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many DyeingOrders and returns the data saved in the database.
+     * @param {DyeingOrderCreateManyAndReturnArgs} args - Arguments to create many DyeingOrders.
+     * @example
+     * // Create many DyeingOrders
+     * const dyeingOrder = await prisma.dyeingOrder.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many DyeingOrders and only return the `id`
+     * const dyeingOrderWithIdOnly = await prisma.dyeingOrder.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DyeingOrderCreateManyAndReturnArgs>(args?: SelectSubset<T, DyeingOrderCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DyeingOrderPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a DyeingOrder.
+     * @param {DyeingOrderDeleteArgs} args - Arguments to delete one DyeingOrder.
+     * @example
+     * // Delete one DyeingOrder
+     * const DyeingOrder = await prisma.dyeingOrder.delete({
+     *   where: {
+     *     // ... filter to delete one DyeingOrder
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DyeingOrderDeleteArgs>(args: SelectSubset<T, DyeingOrderDeleteArgs<ExtArgs>>): Prisma__DyeingOrderClient<$Result.GetResult<Prisma.$DyeingOrderPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one DyeingOrder.
+     * @param {DyeingOrderUpdateArgs} args - Arguments to update one DyeingOrder.
+     * @example
+     * // Update one DyeingOrder
+     * const dyeingOrder = await prisma.dyeingOrder.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DyeingOrderUpdateArgs>(args: SelectSubset<T, DyeingOrderUpdateArgs<ExtArgs>>): Prisma__DyeingOrderClient<$Result.GetResult<Prisma.$DyeingOrderPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more DyeingOrders.
+     * @param {DyeingOrderDeleteManyArgs} args - Arguments to filter DyeingOrders to delete.
+     * @example
+     * // Delete a few DyeingOrders
+     * const { count } = await prisma.dyeingOrder.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DyeingOrderDeleteManyArgs>(args?: SelectSubset<T, DyeingOrderDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DyeingOrders.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DyeingOrderUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many DyeingOrders
+     * const dyeingOrder = await prisma.dyeingOrder.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DyeingOrderUpdateManyArgs>(args: SelectSubset<T, DyeingOrderUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DyeingOrders and returns the data updated in the database.
+     * @param {DyeingOrderUpdateManyAndReturnArgs} args - Arguments to update many DyeingOrders.
+     * @example
+     * // Update many DyeingOrders
+     * const dyeingOrder = await prisma.dyeingOrder.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more DyeingOrders and only return the `id`
+     * const dyeingOrderWithIdOnly = await prisma.dyeingOrder.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends DyeingOrderUpdateManyAndReturnArgs>(args: SelectSubset<T, DyeingOrderUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DyeingOrderPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one DyeingOrder.
+     * @param {DyeingOrderUpsertArgs} args - Arguments to update or create a DyeingOrder.
+     * @example
+     * // Update or create a DyeingOrder
+     * const dyeingOrder = await prisma.dyeingOrder.upsert({
+     *   create: {
+     *     // ... data to create a DyeingOrder
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the DyeingOrder we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DyeingOrderUpsertArgs>(args: SelectSubset<T, DyeingOrderUpsertArgs<ExtArgs>>): Prisma__DyeingOrderClient<$Result.GetResult<Prisma.$DyeingOrderPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of DyeingOrders.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DyeingOrderCountArgs} args - Arguments to filter DyeingOrders to count.
+     * @example
+     * // Count the number of DyeingOrders
+     * const count = await prisma.dyeingOrder.count({
+     *   where: {
+     *     // ... the filter for the DyeingOrders we want to count
+     *   }
+     * })
+    **/
+    count<T extends DyeingOrderCountArgs>(
+      args?: Subset<T, DyeingOrderCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DyeingOrderCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a DyeingOrder.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DyeingOrderAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DyeingOrderAggregateArgs>(args: Subset<T, DyeingOrderAggregateArgs>): Prisma.PrismaPromise<GetDyeingOrderAggregateType<T>>
+
+    /**
+     * Group by DyeingOrder.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DyeingOrderGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DyeingOrderGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DyeingOrderGroupByArgs['orderBy'] }
+        : { orderBy?: DyeingOrderGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DyeingOrderGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDyeingOrderGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the DyeingOrder model
+   */
+  readonly fields: DyeingOrderFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for DyeingOrder.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DyeingOrderClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    program<T extends ProgramDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProgramDefaultArgs<ExtArgs>>): Prisma__ProgramClient<$Result.GetResult<Prisma.$ProgramPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    inboundChallan<T extends DyeingOrder$inboundChallanArgs<ExtArgs> = {}>(args?: Subset<T, DyeingOrder$inboundChallanArgs<ExtArgs>>): Prisma__ChallanClient<$Result.GetResult<Prisma.$ChallanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    incharge<T extends DyeingOrder$inchargeArgs<ExtArgs> = {}>(args?: Subset<T, DyeingOrder$inchargeArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    qc1Challan<T extends DyeingOrder$qc1ChallanArgs<ExtArgs> = {}>(args?: Subset<T, DyeingOrder$qc1ChallanArgs<ExtArgs>>): Prisma__ChallanClient<$Result.GetResult<Prisma.$ChallanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the DyeingOrder model
+   */
+  interface DyeingOrderFieldRefs {
+    readonly id: FieldRef<"DyeingOrder", 'String'>
+    readonly orderNumber: FieldRef<"DyeingOrder", 'String'>
+    readonly programId: FieldRef<"DyeingOrder", 'String'>
+    readonly inboundChallanId: FieldRef<"DyeingOrder", 'String'>
+    readonly status: FieldRef<"DyeingOrder", 'String'>
+    readonly priority: FieldRef<"DyeingOrder", 'String'>
+    readonly fabricName: FieldRef<"DyeingOrder", 'String'>
+    readonly fabricType: FieldRef<"DyeingOrder", 'String'>
+    readonly targetColor: FieldRef<"DyeingOrder", 'String'>
+    readonly dyedColor: FieldRef<"DyeingOrder", 'String'>
+    readonly colorCode: FieldRef<"DyeingOrder", 'String'>
+    readonly requiredQuantity: FieldRef<"DyeingOrder", 'Float'>
+    readonly dyedQuantity: FieldRef<"DyeingOrder", 'Float'>
+    readonly undyedQuantity: FieldRef<"DyeingOrder", 'Float'>
+    readonly readyForQc1Quantity: FieldRef<"DyeingOrder", 'Float'>
+    readonly sentToQc1Quantity: FieldRef<"DyeingOrder", 'Float'>
+    readonly uom: FieldRef<"DyeingOrder", 'String'>
+    readonly inchargeId: FieldRef<"DyeingOrder", 'String'>
+    readonly inchargeName: FieldRef<"DyeingOrder", 'String'>
+    readonly batchNumber: FieldRef<"DyeingOrder", 'String'>
+    readonly machineNumber: FieldRef<"DyeingOrder", 'String'>
+    readonly processRemarks: FieldRef<"DyeingOrder", 'String'>
+    readonly qc1ChallanId: FieldRef<"DyeingOrder", 'String'>
+    readonly startedAt: FieldRef<"DyeingOrder", 'DateTime'>
+    readonly completedAt: FieldRef<"DyeingOrder", 'DateTime'>
+    readonly sentToQc1At: FieldRef<"DyeingOrder", 'DateTime'>
+    readonly createdAt: FieldRef<"DyeingOrder", 'DateTime'>
+    readonly updatedAt: FieldRef<"DyeingOrder", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * DyeingOrder findUnique
+   */
+  export type DyeingOrderFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DyeingOrder
+     */
+    select?: DyeingOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DyeingOrder
+     */
+    omit?: DyeingOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DyeingOrderInclude<ExtArgs> | null
+    /**
+     * Filter, which DyeingOrder to fetch.
+     */
+    where: DyeingOrderWhereUniqueInput
+  }
+
+  /**
+   * DyeingOrder findUniqueOrThrow
+   */
+  export type DyeingOrderFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DyeingOrder
+     */
+    select?: DyeingOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DyeingOrder
+     */
+    omit?: DyeingOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DyeingOrderInclude<ExtArgs> | null
+    /**
+     * Filter, which DyeingOrder to fetch.
+     */
+    where: DyeingOrderWhereUniqueInput
+  }
+
+  /**
+   * DyeingOrder findFirst
+   */
+  export type DyeingOrderFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DyeingOrder
+     */
+    select?: DyeingOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DyeingOrder
+     */
+    omit?: DyeingOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DyeingOrderInclude<ExtArgs> | null
+    /**
+     * Filter, which DyeingOrder to fetch.
+     */
+    where?: DyeingOrderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DyeingOrders to fetch.
+     */
+    orderBy?: DyeingOrderOrderByWithRelationInput | DyeingOrderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DyeingOrders.
+     */
+    cursor?: DyeingOrderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DyeingOrders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DyeingOrders.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DyeingOrders.
+     */
+    distinct?: DyeingOrderScalarFieldEnum | DyeingOrderScalarFieldEnum[]
+  }
+
+  /**
+   * DyeingOrder findFirstOrThrow
+   */
+  export type DyeingOrderFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DyeingOrder
+     */
+    select?: DyeingOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DyeingOrder
+     */
+    omit?: DyeingOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DyeingOrderInclude<ExtArgs> | null
+    /**
+     * Filter, which DyeingOrder to fetch.
+     */
+    where?: DyeingOrderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DyeingOrders to fetch.
+     */
+    orderBy?: DyeingOrderOrderByWithRelationInput | DyeingOrderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DyeingOrders.
+     */
+    cursor?: DyeingOrderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DyeingOrders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DyeingOrders.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DyeingOrders.
+     */
+    distinct?: DyeingOrderScalarFieldEnum | DyeingOrderScalarFieldEnum[]
+  }
+
+  /**
+   * DyeingOrder findMany
+   */
+  export type DyeingOrderFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DyeingOrder
+     */
+    select?: DyeingOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DyeingOrder
+     */
+    omit?: DyeingOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DyeingOrderInclude<ExtArgs> | null
+    /**
+     * Filter, which DyeingOrders to fetch.
+     */
+    where?: DyeingOrderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DyeingOrders to fetch.
+     */
+    orderBy?: DyeingOrderOrderByWithRelationInput | DyeingOrderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing DyeingOrders.
+     */
+    cursor?: DyeingOrderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DyeingOrders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DyeingOrders.
+     */
+    skip?: number
+    distinct?: DyeingOrderScalarFieldEnum | DyeingOrderScalarFieldEnum[]
+  }
+
+  /**
+   * DyeingOrder create
+   */
+  export type DyeingOrderCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DyeingOrder
+     */
+    select?: DyeingOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DyeingOrder
+     */
+    omit?: DyeingOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DyeingOrderInclude<ExtArgs> | null
+    /**
+     * The data needed to create a DyeingOrder.
+     */
+    data: XOR<DyeingOrderCreateInput, DyeingOrderUncheckedCreateInput>
+  }
+
+  /**
+   * DyeingOrder createMany
+   */
+  export type DyeingOrderCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many DyeingOrders.
+     */
+    data: DyeingOrderCreateManyInput | DyeingOrderCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DyeingOrder createManyAndReturn
+   */
+  export type DyeingOrderCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DyeingOrder
+     */
+    select?: DyeingOrderSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DyeingOrder
+     */
+    omit?: DyeingOrderOmit<ExtArgs> | null
+    /**
+     * The data used to create many DyeingOrders.
+     */
+    data: DyeingOrderCreateManyInput | DyeingOrderCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DyeingOrderIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DyeingOrder update
+   */
+  export type DyeingOrderUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DyeingOrder
+     */
+    select?: DyeingOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DyeingOrder
+     */
+    omit?: DyeingOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DyeingOrderInclude<ExtArgs> | null
+    /**
+     * The data needed to update a DyeingOrder.
+     */
+    data: XOR<DyeingOrderUpdateInput, DyeingOrderUncheckedUpdateInput>
+    /**
+     * Choose, which DyeingOrder to update.
+     */
+    where: DyeingOrderWhereUniqueInput
+  }
+
+  /**
+   * DyeingOrder updateMany
+   */
+  export type DyeingOrderUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update DyeingOrders.
+     */
+    data: XOR<DyeingOrderUpdateManyMutationInput, DyeingOrderUncheckedUpdateManyInput>
+    /**
+     * Filter which DyeingOrders to update
+     */
+    where?: DyeingOrderWhereInput
+    /**
+     * Limit how many DyeingOrders to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * DyeingOrder updateManyAndReturn
+   */
+  export type DyeingOrderUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DyeingOrder
+     */
+    select?: DyeingOrderSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DyeingOrder
+     */
+    omit?: DyeingOrderOmit<ExtArgs> | null
+    /**
+     * The data used to update DyeingOrders.
+     */
+    data: XOR<DyeingOrderUpdateManyMutationInput, DyeingOrderUncheckedUpdateManyInput>
+    /**
+     * Filter which DyeingOrders to update
+     */
+    where?: DyeingOrderWhereInput
+    /**
+     * Limit how many DyeingOrders to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DyeingOrderIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DyeingOrder upsert
+   */
+  export type DyeingOrderUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DyeingOrder
+     */
+    select?: DyeingOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DyeingOrder
+     */
+    omit?: DyeingOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DyeingOrderInclude<ExtArgs> | null
+    /**
+     * The filter to search for the DyeingOrder to update in case it exists.
+     */
+    where: DyeingOrderWhereUniqueInput
+    /**
+     * In case the DyeingOrder found by the `where` argument doesn't exist, create a new DyeingOrder with this data.
+     */
+    create: XOR<DyeingOrderCreateInput, DyeingOrderUncheckedCreateInput>
+    /**
+     * In case the DyeingOrder was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DyeingOrderUpdateInput, DyeingOrderUncheckedUpdateInput>
+  }
+
+  /**
+   * DyeingOrder delete
+   */
+  export type DyeingOrderDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DyeingOrder
+     */
+    select?: DyeingOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DyeingOrder
+     */
+    omit?: DyeingOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DyeingOrderInclude<ExtArgs> | null
+    /**
+     * Filter which DyeingOrder to delete.
+     */
+    where: DyeingOrderWhereUniqueInput
+  }
+
+  /**
+   * DyeingOrder deleteMany
+   */
+  export type DyeingOrderDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DyeingOrders to delete
+     */
+    where?: DyeingOrderWhereInput
+    /**
+     * Limit how many DyeingOrders to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * DyeingOrder.inboundChallan
+   */
+  export type DyeingOrder$inboundChallanArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Challan
+     */
+    select?: ChallanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Challan
+     */
+    omit?: ChallanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChallanInclude<ExtArgs> | null
+    where?: ChallanWhereInput
+  }
+
+  /**
+   * DyeingOrder.incharge
+   */
+  export type DyeingOrder$inchargeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * DyeingOrder.qc1Challan
+   */
+  export type DyeingOrder$qc1ChallanArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Challan
+     */
+    select?: ChallanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Challan
+     */
+    omit?: ChallanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChallanInclude<ExtArgs> | null
+    where?: ChallanWhereInput
+  }
+
+  /**
+   * DyeingOrder without action
+   */
+  export type DyeingOrderDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DyeingOrder
+     */
+    select?: DyeingOrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DyeingOrder
+     */
+    omit?: DyeingOrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DyeingOrderInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -78823,6 +80550,40 @@ export namespace Prisma {
   export type FabricStockLedgerScalarFieldEnum = (typeof FabricStockLedgerScalarFieldEnum)[keyof typeof FabricStockLedgerScalarFieldEnum]
 
 
+  export const DyeingOrderScalarFieldEnum: {
+    id: 'id',
+    orderNumber: 'orderNumber',
+    programId: 'programId',
+    inboundChallanId: 'inboundChallanId',
+    status: 'status',
+    priority: 'priority',
+    fabricName: 'fabricName',
+    fabricType: 'fabricType',
+    targetColor: 'targetColor',
+    dyedColor: 'dyedColor',
+    colorCode: 'colorCode',
+    requiredQuantity: 'requiredQuantity',
+    dyedQuantity: 'dyedQuantity',
+    undyedQuantity: 'undyedQuantity',
+    readyForQc1Quantity: 'readyForQc1Quantity',
+    sentToQc1Quantity: 'sentToQc1Quantity',
+    uom: 'uom',
+    inchargeId: 'inchargeId',
+    inchargeName: 'inchargeName',
+    batchNumber: 'batchNumber',
+    machineNumber: 'machineNumber',
+    processRemarks: 'processRemarks',
+    qc1ChallanId: 'qc1ChallanId',
+    startedAt: 'startedAt',
+    completedAt: 'completedAt',
+    sentToQc1At: 'sentToQc1At',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type DyeingOrderScalarFieldEnum = (typeof DyeingOrderScalarFieldEnum)[keyof typeof DyeingOrderScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -79112,6 +80873,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollListRelationFilter
     fabricQCInspections?: FabricQCInspectionListRelationFilter
     fabricLedgerEntries?: FabricStockLedgerListRelationFilter
+    dyeingOrdersIncharge?: DyeingOrderListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -79148,6 +80910,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollOrderByRelationAggregateInput
     fabricQCInspections?: FabricQCInspectionOrderByRelationAggregateInput
     fabricLedgerEntries?: FabricStockLedgerOrderByRelationAggregateInput
+    dyeingOrdersIncharge?: DyeingOrderOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -79187,6 +80950,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollListRelationFilter
     fabricQCInspections?: FabricQCInspectionListRelationFilter
     fabricLedgerEntries?: FabricStockLedgerListRelationFilter
+    dyeingOrdersIncharge?: DyeingOrderListRelationFilter
   }, "id" | "username" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -80715,6 +82479,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestListRelationFilter
     fabricBatches?: FabricBatchListRelationFilter
     fabricStoreRolls?: FabricStoreRollListRelationFilter
+    dyeingOrders?: DyeingOrderListRelationFilter
   }
 
   export type ProgramOrderByWithRelationInput = {
@@ -80795,6 +82560,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestOrderByRelationAggregateInput
     fabricBatches?: FabricBatchOrderByRelationAggregateInput
     fabricStoreRolls?: FabricStoreRollOrderByRelationAggregateInput
+    dyeingOrders?: DyeingOrderOrderByRelationAggregateInput
   }
 
   export type ProgramWhereUniqueInput = Prisma.AtLeast<{
@@ -80878,6 +82644,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestListRelationFilter
     fabricBatches?: FabricBatchListRelationFilter
     fabricStoreRolls?: FabricStoreRollListRelationFilter
+    dyeingOrders?: DyeingOrderListRelationFilter
   }, "id" | "programNumber">
 
   export type ProgramOrderByWithAggregationInput = {
@@ -81841,6 +83608,8 @@ export namespace Prisma {
     events?: ChallanEventListRelationFilter
     bundles?: BundleListRelationFilter
     defects?: DefectRecordListRelationFilter
+    dyeingInboundOrders?: DyeingOrderListRelationFilter
+    dyeingQc1Orders?: DyeingOrderListRelationFilter
   }
 
   export type ChallanOrderByWithRelationInput = {
@@ -81878,6 +83647,8 @@ export namespace Prisma {
     events?: ChallanEventOrderByRelationAggregateInput
     bundles?: BundleOrderByRelationAggregateInput
     defects?: DefectRecordOrderByRelationAggregateInput
+    dyeingInboundOrders?: DyeingOrderOrderByRelationAggregateInput
+    dyeingQc1Orders?: DyeingOrderOrderByRelationAggregateInput
   }
 
   export type ChallanWhereUniqueInput = Prisma.AtLeast<{
@@ -81918,6 +83689,8 @@ export namespace Prisma {
     events?: ChallanEventListRelationFilter
     bundles?: BundleListRelationFilter
     defects?: DefectRecordListRelationFilter
+    dyeingInboundOrders?: DyeingOrderListRelationFilter
+    dyeingQc1Orders?: DyeingOrderListRelationFilter
   }, "id" | "challanNumber">
 
   export type ChallanOrderByWithAggregationInput = {
@@ -84675,6 +86448,187 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"FabricStockLedger"> | Date | string
   }
 
+  export type DyeingOrderWhereInput = {
+    AND?: DyeingOrderWhereInput | DyeingOrderWhereInput[]
+    OR?: DyeingOrderWhereInput[]
+    NOT?: DyeingOrderWhereInput | DyeingOrderWhereInput[]
+    id?: StringFilter<"DyeingOrder"> | string
+    orderNumber?: StringFilter<"DyeingOrder"> | string
+    programId?: StringFilter<"DyeingOrder"> | string
+    inboundChallanId?: StringNullableFilter<"DyeingOrder"> | string | null
+    status?: StringFilter<"DyeingOrder"> | string
+    priority?: StringFilter<"DyeingOrder"> | string
+    fabricName?: StringFilter<"DyeingOrder"> | string
+    fabricType?: StringNullableFilter<"DyeingOrder"> | string | null
+    targetColor?: StringFilter<"DyeingOrder"> | string
+    dyedColor?: StringNullableFilter<"DyeingOrder"> | string | null
+    colorCode?: StringNullableFilter<"DyeingOrder"> | string | null
+    requiredQuantity?: FloatFilter<"DyeingOrder"> | number
+    dyedQuantity?: FloatFilter<"DyeingOrder"> | number
+    undyedQuantity?: FloatFilter<"DyeingOrder"> | number
+    readyForQc1Quantity?: FloatFilter<"DyeingOrder"> | number
+    sentToQc1Quantity?: FloatFilter<"DyeingOrder"> | number
+    uom?: StringFilter<"DyeingOrder"> | string
+    inchargeId?: StringNullableFilter<"DyeingOrder"> | string | null
+    inchargeName?: StringNullableFilter<"DyeingOrder"> | string | null
+    batchNumber?: StringNullableFilter<"DyeingOrder"> | string | null
+    machineNumber?: StringNullableFilter<"DyeingOrder"> | string | null
+    processRemarks?: StringNullableFilter<"DyeingOrder"> | string | null
+    qc1ChallanId?: StringNullableFilter<"DyeingOrder"> | string | null
+    startedAt?: DateTimeNullableFilter<"DyeingOrder"> | Date | string | null
+    completedAt?: DateTimeNullableFilter<"DyeingOrder"> | Date | string | null
+    sentToQc1At?: DateTimeNullableFilter<"DyeingOrder"> | Date | string | null
+    createdAt?: DateTimeFilter<"DyeingOrder"> | Date | string
+    updatedAt?: DateTimeFilter<"DyeingOrder"> | Date | string
+    program?: XOR<ProgramScalarRelationFilter, ProgramWhereInput>
+    inboundChallan?: XOR<ChallanNullableScalarRelationFilter, ChallanWhereInput> | null
+    incharge?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    qc1Challan?: XOR<ChallanNullableScalarRelationFilter, ChallanWhereInput> | null
+  }
+
+  export type DyeingOrderOrderByWithRelationInput = {
+    id?: SortOrder
+    orderNumber?: SortOrder
+    programId?: SortOrder
+    inboundChallanId?: SortOrderInput | SortOrder
+    status?: SortOrder
+    priority?: SortOrder
+    fabricName?: SortOrder
+    fabricType?: SortOrderInput | SortOrder
+    targetColor?: SortOrder
+    dyedColor?: SortOrderInput | SortOrder
+    colorCode?: SortOrderInput | SortOrder
+    requiredQuantity?: SortOrder
+    dyedQuantity?: SortOrder
+    undyedQuantity?: SortOrder
+    readyForQc1Quantity?: SortOrder
+    sentToQc1Quantity?: SortOrder
+    uom?: SortOrder
+    inchargeId?: SortOrderInput | SortOrder
+    inchargeName?: SortOrderInput | SortOrder
+    batchNumber?: SortOrderInput | SortOrder
+    machineNumber?: SortOrderInput | SortOrder
+    processRemarks?: SortOrderInput | SortOrder
+    qc1ChallanId?: SortOrderInput | SortOrder
+    startedAt?: SortOrderInput | SortOrder
+    completedAt?: SortOrderInput | SortOrder
+    sentToQc1At?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    program?: ProgramOrderByWithRelationInput
+    inboundChallan?: ChallanOrderByWithRelationInput
+    incharge?: UserOrderByWithRelationInput
+    qc1Challan?: ChallanOrderByWithRelationInput
+  }
+
+  export type DyeingOrderWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    orderNumber?: string
+    AND?: DyeingOrderWhereInput | DyeingOrderWhereInput[]
+    OR?: DyeingOrderWhereInput[]
+    NOT?: DyeingOrderWhereInput | DyeingOrderWhereInput[]
+    programId?: StringFilter<"DyeingOrder"> | string
+    inboundChallanId?: StringNullableFilter<"DyeingOrder"> | string | null
+    status?: StringFilter<"DyeingOrder"> | string
+    priority?: StringFilter<"DyeingOrder"> | string
+    fabricName?: StringFilter<"DyeingOrder"> | string
+    fabricType?: StringNullableFilter<"DyeingOrder"> | string | null
+    targetColor?: StringFilter<"DyeingOrder"> | string
+    dyedColor?: StringNullableFilter<"DyeingOrder"> | string | null
+    colorCode?: StringNullableFilter<"DyeingOrder"> | string | null
+    requiredQuantity?: FloatFilter<"DyeingOrder"> | number
+    dyedQuantity?: FloatFilter<"DyeingOrder"> | number
+    undyedQuantity?: FloatFilter<"DyeingOrder"> | number
+    readyForQc1Quantity?: FloatFilter<"DyeingOrder"> | number
+    sentToQc1Quantity?: FloatFilter<"DyeingOrder"> | number
+    uom?: StringFilter<"DyeingOrder"> | string
+    inchargeId?: StringNullableFilter<"DyeingOrder"> | string | null
+    inchargeName?: StringNullableFilter<"DyeingOrder"> | string | null
+    batchNumber?: StringNullableFilter<"DyeingOrder"> | string | null
+    machineNumber?: StringNullableFilter<"DyeingOrder"> | string | null
+    processRemarks?: StringNullableFilter<"DyeingOrder"> | string | null
+    qc1ChallanId?: StringNullableFilter<"DyeingOrder"> | string | null
+    startedAt?: DateTimeNullableFilter<"DyeingOrder"> | Date | string | null
+    completedAt?: DateTimeNullableFilter<"DyeingOrder"> | Date | string | null
+    sentToQc1At?: DateTimeNullableFilter<"DyeingOrder"> | Date | string | null
+    createdAt?: DateTimeFilter<"DyeingOrder"> | Date | string
+    updatedAt?: DateTimeFilter<"DyeingOrder"> | Date | string
+    program?: XOR<ProgramScalarRelationFilter, ProgramWhereInput>
+    inboundChallan?: XOR<ChallanNullableScalarRelationFilter, ChallanWhereInput> | null
+    incharge?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    qc1Challan?: XOR<ChallanNullableScalarRelationFilter, ChallanWhereInput> | null
+  }, "id" | "orderNumber">
+
+  export type DyeingOrderOrderByWithAggregationInput = {
+    id?: SortOrder
+    orderNumber?: SortOrder
+    programId?: SortOrder
+    inboundChallanId?: SortOrderInput | SortOrder
+    status?: SortOrder
+    priority?: SortOrder
+    fabricName?: SortOrder
+    fabricType?: SortOrderInput | SortOrder
+    targetColor?: SortOrder
+    dyedColor?: SortOrderInput | SortOrder
+    colorCode?: SortOrderInput | SortOrder
+    requiredQuantity?: SortOrder
+    dyedQuantity?: SortOrder
+    undyedQuantity?: SortOrder
+    readyForQc1Quantity?: SortOrder
+    sentToQc1Quantity?: SortOrder
+    uom?: SortOrder
+    inchargeId?: SortOrderInput | SortOrder
+    inchargeName?: SortOrderInput | SortOrder
+    batchNumber?: SortOrderInput | SortOrder
+    machineNumber?: SortOrderInput | SortOrder
+    processRemarks?: SortOrderInput | SortOrder
+    qc1ChallanId?: SortOrderInput | SortOrder
+    startedAt?: SortOrderInput | SortOrder
+    completedAt?: SortOrderInput | SortOrder
+    sentToQc1At?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: DyeingOrderCountOrderByAggregateInput
+    _avg?: DyeingOrderAvgOrderByAggregateInput
+    _max?: DyeingOrderMaxOrderByAggregateInput
+    _min?: DyeingOrderMinOrderByAggregateInput
+    _sum?: DyeingOrderSumOrderByAggregateInput
+  }
+
+  export type DyeingOrderScalarWhereWithAggregatesInput = {
+    AND?: DyeingOrderScalarWhereWithAggregatesInput | DyeingOrderScalarWhereWithAggregatesInput[]
+    OR?: DyeingOrderScalarWhereWithAggregatesInput[]
+    NOT?: DyeingOrderScalarWhereWithAggregatesInput | DyeingOrderScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"DyeingOrder"> | string
+    orderNumber?: StringWithAggregatesFilter<"DyeingOrder"> | string
+    programId?: StringWithAggregatesFilter<"DyeingOrder"> | string
+    inboundChallanId?: StringNullableWithAggregatesFilter<"DyeingOrder"> | string | null
+    status?: StringWithAggregatesFilter<"DyeingOrder"> | string
+    priority?: StringWithAggregatesFilter<"DyeingOrder"> | string
+    fabricName?: StringWithAggregatesFilter<"DyeingOrder"> | string
+    fabricType?: StringNullableWithAggregatesFilter<"DyeingOrder"> | string | null
+    targetColor?: StringWithAggregatesFilter<"DyeingOrder"> | string
+    dyedColor?: StringNullableWithAggregatesFilter<"DyeingOrder"> | string | null
+    colorCode?: StringNullableWithAggregatesFilter<"DyeingOrder"> | string | null
+    requiredQuantity?: FloatWithAggregatesFilter<"DyeingOrder"> | number
+    dyedQuantity?: FloatWithAggregatesFilter<"DyeingOrder"> | number
+    undyedQuantity?: FloatWithAggregatesFilter<"DyeingOrder"> | number
+    readyForQc1Quantity?: FloatWithAggregatesFilter<"DyeingOrder"> | number
+    sentToQc1Quantity?: FloatWithAggregatesFilter<"DyeingOrder"> | number
+    uom?: StringWithAggregatesFilter<"DyeingOrder"> | string
+    inchargeId?: StringNullableWithAggregatesFilter<"DyeingOrder"> | string | null
+    inchargeName?: StringNullableWithAggregatesFilter<"DyeingOrder"> | string | null
+    batchNumber?: StringNullableWithAggregatesFilter<"DyeingOrder"> | string | null
+    machineNumber?: StringNullableWithAggregatesFilter<"DyeingOrder"> | string | null
+    processRemarks?: StringNullableWithAggregatesFilter<"DyeingOrder"> | string | null
+    qc1ChallanId?: StringNullableWithAggregatesFilter<"DyeingOrder"> | string | null
+    startedAt?: DateTimeNullableWithAggregatesFilter<"DyeingOrder"> | Date | string | null
+    completedAt?: DateTimeNullableWithAggregatesFilter<"DyeingOrder"> | Date | string | null
+    sentToQc1At?: DateTimeNullableWithAggregatesFilter<"DyeingOrder"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"DyeingOrder"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"DyeingOrder"> | Date | string
+  }
+
   export type UserCreateInput = {
     id?: string
     username: string
@@ -84709,6 +86663,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -84745,6 +86700,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUpdateInput = {
@@ -84781,6 +86737,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -84817,6 +86774,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -86519,6 +88477,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateInput = {
@@ -86595,6 +88554,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUpdateInput = {
@@ -86671,6 +88631,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateInput = {
@@ -86747,6 +88708,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramCreateManyInput = {
@@ -87804,6 +89766,8 @@ export namespace Prisma {
     events?: ChallanEventCreateNestedManyWithoutChallanInput
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanUncheckedCreateInput = {
@@ -87833,6 +89797,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedCreateNestedManyWithoutChallanInput
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanUpdateInput = {
@@ -87862,6 +89828,8 @@ export namespace Prisma {
     events?: ChallanEventUpdateManyWithoutChallanNestedInput
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateInput = {
@@ -87891,6 +89859,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedUpdateManyWithoutChallanNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type ChallanCreateManyInput = {
@@ -90931,6 +92901,219 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type DyeingOrderCreateInput = {
+    id?: string
+    orderNumber: string
+    status?: string
+    priority?: string
+    fabricName: string
+    fabricType?: string | null
+    targetColor: string
+    dyedColor?: string | null
+    colorCode?: string | null
+    requiredQuantity: number
+    dyedQuantity?: number
+    undyedQuantity?: number
+    readyForQc1Quantity?: number
+    sentToQc1Quantity?: number
+    uom?: string
+    inchargeName?: string | null
+    batchNumber?: string | null
+    machineNumber?: string | null
+    processRemarks?: string | null
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    sentToQc1At?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    program: ProgramCreateNestedOneWithoutDyeingOrdersInput
+    inboundChallan?: ChallanCreateNestedOneWithoutDyeingInboundOrdersInput
+    incharge?: UserCreateNestedOneWithoutDyeingOrdersInchargeInput
+    qc1Challan?: ChallanCreateNestedOneWithoutDyeingQc1OrdersInput
+  }
+
+  export type DyeingOrderUncheckedCreateInput = {
+    id?: string
+    orderNumber: string
+    programId: string
+    inboundChallanId?: string | null
+    status?: string
+    priority?: string
+    fabricName: string
+    fabricType?: string | null
+    targetColor: string
+    dyedColor?: string | null
+    colorCode?: string | null
+    requiredQuantity: number
+    dyedQuantity?: number
+    undyedQuantity?: number
+    readyForQc1Quantity?: number
+    sentToQc1Quantity?: number
+    uom?: string
+    inchargeId?: string | null
+    inchargeName?: string | null
+    batchNumber?: string | null
+    machineNumber?: string | null
+    processRemarks?: string | null
+    qc1ChallanId?: string | null
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    sentToQc1At?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DyeingOrderUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    priority?: StringFieldUpdateOperationsInput | string
+    fabricName?: StringFieldUpdateOperationsInput | string
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    targetColor?: StringFieldUpdateOperationsInput | string
+    dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: FloatFieldUpdateOperationsInput | number
+    dyedQuantity?: FloatFieldUpdateOperationsInput | number
+    undyedQuantity?: FloatFieldUpdateOperationsInput | number
+    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: StringFieldUpdateOperationsInput | string
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
+    batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    machineNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    program?: ProgramUpdateOneRequiredWithoutDyeingOrdersNestedInput
+    inboundChallan?: ChallanUpdateOneWithoutDyeingInboundOrdersNestedInput
+    incharge?: UserUpdateOneWithoutDyeingOrdersInchargeNestedInput
+    qc1Challan?: ChallanUpdateOneWithoutDyeingQc1OrdersNestedInput
+  }
+
+  export type DyeingOrderUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    programId?: StringFieldUpdateOperationsInput | string
+    inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    priority?: StringFieldUpdateOperationsInput | string
+    fabricName?: StringFieldUpdateOperationsInput | string
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    targetColor?: StringFieldUpdateOperationsInput | string
+    dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: FloatFieldUpdateOperationsInput | number
+    dyedQuantity?: FloatFieldUpdateOperationsInput | number
+    undyedQuantity?: FloatFieldUpdateOperationsInput | number
+    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: StringFieldUpdateOperationsInput | string
+    inchargeId?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
+    batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    machineNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    qc1ChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DyeingOrderCreateManyInput = {
+    id?: string
+    orderNumber: string
+    programId: string
+    inboundChallanId?: string | null
+    status?: string
+    priority?: string
+    fabricName: string
+    fabricType?: string | null
+    targetColor: string
+    dyedColor?: string | null
+    colorCode?: string | null
+    requiredQuantity: number
+    dyedQuantity?: number
+    undyedQuantity?: number
+    readyForQc1Quantity?: number
+    sentToQc1Quantity?: number
+    uom?: string
+    inchargeId?: string | null
+    inchargeName?: string | null
+    batchNumber?: string | null
+    machineNumber?: string | null
+    processRemarks?: string | null
+    qc1ChallanId?: string | null
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    sentToQc1At?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DyeingOrderUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    priority?: StringFieldUpdateOperationsInput | string
+    fabricName?: StringFieldUpdateOperationsInput | string
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    targetColor?: StringFieldUpdateOperationsInput | string
+    dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: FloatFieldUpdateOperationsInput | number
+    dyedQuantity?: FloatFieldUpdateOperationsInput | number
+    undyedQuantity?: FloatFieldUpdateOperationsInput | number
+    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: StringFieldUpdateOperationsInput | string
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
+    batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    machineNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DyeingOrderUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    programId?: StringFieldUpdateOperationsInput | string
+    inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    priority?: StringFieldUpdateOperationsInput | string
+    fabricName?: StringFieldUpdateOperationsInput | string
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    targetColor?: StringFieldUpdateOperationsInput | string
+    dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: FloatFieldUpdateOperationsInput | number
+    dyedQuantity?: FloatFieldUpdateOperationsInput | number
+    undyedQuantity?: FloatFieldUpdateOperationsInput | number
+    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: StringFieldUpdateOperationsInput | string
+    inchargeId?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
+    batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    machineNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    qc1ChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -91085,6 +93268,12 @@ export namespace Prisma {
     none?: FabricStockLedgerWhereInput
   }
 
+  export type DyeingOrderListRelationFilter = {
+    every?: DyeingOrderWhereInput
+    some?: DyeingOrderWhereInput
+    none?: DyeingOrderWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -91159,6 +93348,10 @@ export namespace Prisma {
   }
 
   export type FabricStockLedgerOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type DyeingOrderOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -94972,6 +97165,115 @@ export namespace Prisma {
     _max?: NestedEnumStockTransactionTypeFilter<$PrismaModel>
   }
 
+  export type DyeingOrderCountOrderByAggregateInput = {
+    id?: SortOrder
+    orderNumber?: SortOrder
+    programId?: SortOrder
+    inboundChallanId?: SortOrder
+    status?: SortOrder
+    priority?: SortOrder
+    fabricName?: SortOrder
+    fabricType?: SortOrder
+    targetColor?: SortOrder
+    dyedColor?: SortOrder
+    colorCode?: SortOrder
+    requiredQuantity?: SortOrder
+    dyedQuantity?: SortOrder
+    undyedQuantity?: SortOrder
+    readyForQc1Quantity?: SortOrder
+    sentToQc1Quantity?: SortOrder
+    uom?: SortOrder
+    inchargeId?: SortOrder
+    inchargeName?: SortOrder
+    batchNumber?: SortOrder
+    machineNumber?: SortOrder
+    processRemarks?: SortOrder
+    qc1ChallanId?: SortOrder
+    startedAt?: SortOrder
+    completedAt?: SortOrder
+    sentToQc1At?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DyeingOrderAvgOrderByAggregateInput = {
+    requiredQuantity?: SortOrder
+    dyedQuantity?: SortOrder
+    undyedQuantity?: SortOrder
+    readyForQc1Quantity?: SortOrder
+    sentToQc1Quantity?: SortOrder
+  }
+
+  export type DyeingOrderMaxOrderByAggregateInput = {
+    id?: SortOrder
+    orderNumber?: SortOrder
+    programId?: SortOrder
+    inboundChallanId?: SortOrder
+    status?: SortOrder
+    priority?: SortOrder
+    fabricName?: SortOrder
+    fabricType?: SortOrder
+    targetColor?: SortOrder
+    dyedColor?: SortOrder
+    colorCode?: SortOrder
+    requiredQuantity?: SortOrder
+    dyedQuantity?: SortOrder
+    undyedQuantity?: SortOrder
+    readyForQc1Quantity?: SortOrder
+    sentToQc1Quantity?: SortOrder
+    uom?: SortOrder
+    inchargeId?: SortOrder
+    inchargeName?: SortOrder
+    batchNumber?: SortOrder
+    machineNumber?: SortOrder
+    processRemarks?: SortOrder
+    qc1ChallanId?: SortOrder
+    startedAt?: SortOrder
+    completedAt?: SortOrder
+    sentToQc1At?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DyeingOrderMinOrderByAggregateInput = {
+    id?: SortOrder
+    orderNumber?: SortOrder
+    programId?: SortOrder
+    inboundChallanId?: SortOrder
+    status?: SortOrder
+    priority?: SortOrder
+    fabricName?: SortOrder
+    fabricType?: SortOrder
+    targetColor?: SortOrder
+    dyedColor?: SortOrder
+    colorCode?: SortOrder
+    requiredQuantity?: SortOrder
+    dyedQuantity?: SortOrder
+    undyedQuantity?: SortOrder
+    readyForQc1Quantity?: SortOrder
+    sentToQc1Quantity?: SortOrder
+    uom?: SortOrder
+    inchargeId?: SortOrder
+    inchargeName?: SortOrder
+    batchNumber?: SortOrder
+    machineNumber?: SortOrder
+    processRemarks?: SortOrder
+    qc1ChallanId?: SortOrder
+    startedAt?: SortOrder
+    completedAt?: SortOrder
+    sentToQc1At?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DyeingOrderSumOrderByAggregateInput = {
+    requiredQuantity?: SortOrder
+    dyedQuantity?: SortOrder
+    undyedQuantity?: SortOrder
+    readyForQc1Quantity?: SortOrder
+    sentToQc1Quantity?: SortOrder
+  }
+
   export type UserRoleCreateNestedManyWithoutUserInput = {
     create?: XOR<UserRoleCreateWithoutUserInput, UserRoleUncheckedCreateWithoutUserInput> | UserRoleCreateWithoutUserInput[] | UserRoleUncheckedCreateWithoutUserInput[]
     connectOrCreate?: UserRoleCreateOrConnectWithoutUserInput | UserRoleCreateOrConnectWithoutUserInput[]
@@ -95140,6 +97442,13 @@ export namespace Prisma {
     connect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
   }
 
+  export type DyeingOrderCreateNestedManyWithoutInchargeInput = {
+    create?: XOR<DyeingOrderCreateWithoutInchargeInput, DyeingOrderUncheckedCreateWithoutInchargeInput> | DyeingOrderCreateWithoutInchargeInput[] | DyeingOrderUncheckedCreateWithoutInchargeInput[]
+    connectOrCreate?: DyeingOrderCreateOrConnectWithoutInchargeInput | DyeingOrderCreateOrConnectWithoutInchargeInput[]
+    createMany?: DyeingOrderCreateManyInchargeInputEnvelope
+    connect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+  }
+
   export type UserRoleUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<UserRoleCreateWithoutUserInput, UserRoleUncheckedCreateWithoutUserInput> | UserRoleCreateWithoutUserInput[] | UserRoleUncheckedCreateWithoutUserInput[]
     connectOrCreate?: UserRoleCreateOrConnectWithoutUserInput | UserRoleCreateOrConnectWithoutUserInput[]
@@ -95306,6 +97615,13 @@ export namespace Prisma {
     connectOrCreate?: FabricStockLedgerCreateOrConnectWithoutTransactedByInput | FabricStockLedgerCreateOrConnectWithoutTransactedByInput[]
     createMany?: FabricStockLedgerCreateManyTransactedByInputEnvelope
     connect?: FabricStockLedgerWhereUniqueInput | FabricStockLedgerWhereUniqueInput[]
+  }
+
+  export type DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput = {
+    create?: XOR<DyeingOrderCreateWithoutInchargeInput, DyeingOrderUncheckedCreateWithoutInchargeInput> | DyeingOrderCreateWithoutInchargeInput[] | DyeingOrderUncheckedCreateWithoutInchargeInput[]
+    connectOrCreate?: DyeingOrderCreateOrConnectWithoutInchargeInput | DyeingOrderCreateOrConnectWithoutInchargeInput[]
+    createMany?: DyeingOrderCreateManyInchargeInputEnvelope
+    connect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -95660,6 +97976,20 @@ export namespace Prisma {
     deleteMany?: FabricStockLedgerScalarWhereInput | FabricStockLedgerScalarWhereInput[]
   }
 
+  export type DyeingOrderUpdateManyWithoutInchargeNestedInput = {
+    create?: XOR<DyeingOrderCreateWithoutInchargeInput, DyeingOrderUncheckedCreateWithoutInchargeInput> | DyeingOrderCreateWithoutInchargeInput[] | DyeingOrderUncheckedCreateWithoutInchargeInput[]
+    connectOrCreate?: DyeingOrderCreateOrConnectWithoutInchargeInput | DyeingOrderCreateOrConnectWithoutInchargeInput[]
+    upsert?: DyeingOrderUpsertWithWhereUniqueWithoutInchargeInput | DyeingOrderUpsertWithWhereUniqueWithoutInchargeInput[]
+    createMany?: DyeingOrderCreateManyInchargeInputEnvelope
+    set?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    disconnect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    delete?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    connect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    update?: DyeingOrderUpdateWithWhereUniqueWithoutInchargeInput | DyeingOrderUpdateWithWhereUniqueWithoutInchargeInput[]
+    updateMany?: DyeingOrderUpdateManyWithWhereWithoutInchargeInput | DyeingOrderUpdateManyWithWhereWithoutInchargeInput[]
+    deleteMany?: DyeingOrderScalarWhereInput | DyeingOrderScalarWhereInput[]
+  }
+
   export type UserRoleUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<UserRoleCreateWithoutUserInput, UserRoleUncheckedCreateWithoutUserInput> | UserRoleCreateWithoutUserInput[] | UserRoleUncheckedCreateWithoutUserInput[]
     connectOrCreate?: UserRoleCreateOrConnectWithoutUserInput | UserRoleCreateOrConnectWithoutUserInput[]
@@ -95994,6 +98324,20 @@ export namespace Prisma {
     update?: FabricStockLedgerUpdateWithWhereUniqueWithoutTransactedByInput | FabricStockLedgerUpdateWithWhereUniqueWithoutTransactedByInput[]
     updateMany?: FabricStockLedgerUpdateManyWithWhereWithoutTransactedByInput | FabricStockLedgerUpdateManyWithWhereWithoutTransactedByInput[]
     deleteMany?: FabricStockLedgerScalarWhereInput | FabricStockLedgerScalarWhereInput[]
+  }
+
+  export type DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput = {
+    create?: XOR<DyeingOrderCreateWithoutInchargeInput, DyeingOrderUncheckedCreateWithoutInchargeInput> | DyeingOrderCreateWithoutInchargeInput[] | DyeingOrderUncheckedCreateWithoutInchargeInput[]
+    connectOrCreate?: DyeingOrderCreateOrConnectWithoutInchargeInput | DyeingOrderCreateOrConnectWithoutInchargeInput[]
+    upsert?: DyeingOrderUpsertWithWhereUniqueWithoutInchargeInput | DyeingOrderUpsertWithWhereUniqueWithoutInchargeInput[]
+    createMany?: DyeingOrderCreateManyInchargeInputEnvelope
+    set?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    disconnect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    delete?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    connect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    update?: DyeingOrderUpdateWithWhereUniqueWithoutInchargeInput | DyeingOrderUpdateWithWhereUniqueWithoutInchargeInput[]
+    updateMany?: DyeingOrderUpdateManyWithWhereWithoutInchargeInput | DyeingOrderUpdateManyWithWhereWithoutInchargeInput[]
+    deleteMany?: DyeingOrderScalarWhereInput | DyeingOrderScalarWhereInput[]
   }
 
   export type UserRoleCreateNestedManyWithoutRoleInput = {
@@ -97333,6 +99677,13 @@ export namespace Prisma {
     connect?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
   }
 
+  export type DyeingOrderCreateNestedManyWithoutProgramInput = {
+    create?: XOR<DyeingOrderCreateWithoutProgramInput, DyeingOrderUncheckedCreateWithoutProgramInput> | DyeingOrderCreateWithoutProgramInput[] | DyeingOrderUncheckedCreateWithoutProgramInput[]
+    connectOrCreate?: DyeingOrderCreateOrConnectWithoutProgramInput | DyeingOrderCreateOrConnectWithoutProgramInput[]
+    createMany?: DyeingOrderCreateManyProgramInputEnvelope
+    connect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+  }
+
   export type ProgramFabricUncheckedCreateNestedManyWithoutProgramInput = {
     create?: XOR<ProgramFabricCreateWithoutProgramInput, ProgramFabricUncheckedCreateWithoutProgramInput> | ProgramFabricCreateWithoutProgramInput[] | ProgramFabricUncheckedCreateWithoutProgramInput[]
     connectOrCreate?: ProgramFabricCreateOrConnectWithoutProgramInput | ProgramFabricCreateOrConnectWithoutProgramInput[]
@@ -97450,6 +99801,13 @@ export namespace Prisma {
     connectOrCreate?: FabricStoreRollCreateOrConnectWithoutProgramIssuedToInput | FabricStoreRollCreateOrConnectWithoutProgramIssuedToInput[]
     createMany?: FabricStoreRollCreateManyProgramIssuedToInputEnvelope
     connect?: FabricStoreRollWhereUniqueInput | FabricStoreRollWhereUniqueInput[]
+  }
+
+  export type DyeingOrderUncheckedCreateNestedManyWithoutProgramInput = {
+    create?: XOR<DyeingOrderCreateWithoutProgramInput, DyeingOrderUncheckedCreateWithoutProgramInput> | DyeingOrderCreateWithoutProgramInput[] | DyeingOrderUncheckedCreateWithoutProgramInput[]
+    connectOrCreate?: DyeingOrderCreateOrConnectWithoutProgramInput | DyeingOrderCreateOrConnectWithoutProgramInput[]
+    createMany?: DyeingOrderCreateManyProgramInputEnvelope
+    connect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
   }
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
@@ -97740,6 +100098,20 @@ export namespace Prisma {
     deleteMany?: FabricStoreRollScalarWhereInput | FabricStoreRollScalarWhereInput[]
   }
 
+  export type DyeingOrderUpdateManyWithoutProgramNestedInput = {
+    create?: XOR<DyeingOrderCreateWithoutProgramInput, DyeingOrderUncheckedCreateWithoutProgramInput> | DyeingOrderCreateWithoutProgramInput[] | DyeingOrderUncheckedCreateWithoutProgramInput[]
+    connectOrCreate?: DyeingOrderCreateOrConnectWithoutProgramInput | DyeingOrderCreateOrConnectWithoutProgramInput[]
+    upsert?: DyeingOrderUpsertWithWhereUniqueWithoutProgramInput | DyeingOrderUpsertWithWhereUniqueWithoutProgramInput[]
+    createMany?: DyeingOrderCreateManyProgramInputEnvelope
+    set?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    disconnect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    delete?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    connect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    update?: DyeingOrderUpdateWithWhereUniqueWithoutProgramInput | DyeingOrderUpdateWithWhereUniqueWithoutProgramInput[]
+    updateMany?: DyeingOrderUpdateManyWithWhereWithoutProgramInput | DyeingOrderUpdateManyWithWhereWithoutProgramInput[]
+    deleteMany?: DyeingOrderScalarWhereInput | DyeingOrderScalarWhereInput[]
+  }
+
   export type ProgramFabricUncheckedUpdateManyWithoutProgramNestedInput = {
     create?: XOR<ProgramFabricCreateWithoutProgramInput, ProgramFabricUncheckedCreateWithoutProgramInput> | ProgramFabricCreateWithoutProgramInput[] | ProgramFabricUncheckedCreateWithoutProgramInput[]
     connectOrCreate?: ProgramFabricCreateOrConnectWithoutProgramInput | ProgramFabricCreateOrConnectWithoutProgramInput[]
@@ -97976,6 +100348,20 @@ export namespace Prisma {
     update?: FabricStoreRollUpdateWithWhereUniqueWithoutProgramIssuedToInput | FabricStoreRollUpdateWithWhereUniqueWithoutProgramIssuedToInput[]
     updateMany?: FabricStoreRollUpdateManyWithWhereWithoutProgramIssuedToInput | FabricStoreRollUpdateManyWithWhereWithoutProgramIssuedToInput[]
     deleteMany?: FabricStoreRollScalarWhereInput | FabricStoreRollScalarWhereInput[]
+  }
+
+  export type DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput = {
+    create?: XOR<DyeingOrderCreateWithoutProgramInput, DyeingOrderUncheckedCreateWithoutProgramInput> | DyeingOrderCreateWithoutProgramInput[] | DyeingOrderUncheckedCreateWithoutProgramInput[]
+    connectOrCreate?: DyeingOrderCreateOrConnectWithoutProgramInput | DyeingOrderCreateOrConnectWithoutProgramInput[]
+    upsert?: DyeingOrderUpsertWithWhereUniqueWithoutProgramInput | DyeingOrderUpsertWithWhereUniqueWithoutProgramInput[]
+    createMany?: DyeingOrderCreateManyProgramInputEnvelope
+    set?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    disconnect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    delete?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    connect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    update?: DyeingOrderUpdateWithWhereUniqueWithoutProgramInput | DyeingOrderUpdateWithWhereUniqueWithoutProgramInput[]
+    updateMany?: DyeingOrderUpdateManyWithWhereWithoutProgramInput | DyeingOrderUpdateManyWithWhereWithoutProgramInput[]
+    deleteMany?: DyeingOrderScalarWhereInput | DyeingOrderScalarWhereInput[]
   }
 
   export type ProgramCreateNestedOneWithoutFabricsInput = {
@@ -98371,6 +100757,20 @@ export namespace Prisma {
     connect?: DefectRecordWhereUniqueInput | DefectRecordWhereUniqueInput[]
   }
 
+  export type DyeingOrderCreateNestedManyWithoutInboundChallanInput = {
+    create?: XOR<DyeingOrderCreateWithoutInboundChallanInput, DyeingOrderUncheckedCreateWithoutInboundChallanInput> | DyeingOrderCreateWithoutInboundChallanInput[] | DyeingOrderUncheckedCreateWithoutInboundChallanInput[]
+    connectOrCreate?: DyeingOrderCreateOrConnectWithoutInboundChallanInput | DyeingOrderCreateOrConnectWithoutInboundChallanInput[]
+    createMany?: DyeingOrderCreateManyInboundChallanInputEnvelope
+    connect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+  }
+
+  export type DyeingOrderCreateNestedManyWithoutQc1ChallanInput = {
+    create?: XOR<DyeingOrderCreateWithoutQc1ChallanInput, DyeingOrderUncheckedCreateWithoutQc1ChallanInput> | DyeingOrderCreateWithoutQc1ChallanInput[] | DyeingOrderUncheckedCreateWithoutQc1ChallanInput[]
+    connectOrCreate?: DyeingOrderCreateOrConnectWithoutQc1ChallanInput | DyeingOrderCreateOrConnectWithoutQc1ChallanInput[]
+    createMany?: DyeingOrderCreateManyQc1ChallanInputEnvelope
+    connect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+  }
+
   export type ChallanUncheckedCreateNestedManyWithoutParentChallanInput = {
     create?: XOR<ChallanCreateWithoutParentChallanInput, ChallanUncheckedCreateWithoutParentChallanInput> | ChallanCreateWithoutParentChallanInput[] | ChallanUncheckedCreateWithoutParentChallanInput[]
     connectOrCreate?: ChallanCreateOrConnectWithoutParentChallanInput | ChallanCreateOrConnectWithoutParentChallanInput[]
@@ -98418,6 +100818,20 @@ export namespace Prisma {
     connectOrCreate?: DefectRecordCreateOrConnectWithoutChallanInput | DefectRecordCreateOrConnectWithoutChallanInput[]
     createMany?: DefectRecordCreateManyChallanInputEnvelope
     connect?: DefectRecordWhereUniqueInput | DefectRecordWhereUniqueInput[]
+  }
+
+  export type DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput = {
+    create?: XOR<DyeingOrderCreateWithoutInboundChallanInput, DyeingOrderUncheckedCreateWithoutInboundChallanInput> | DyeingOrderCreateWithoutInboundChallanInput[] | DyeingOrderUncheckedCreateWithoutInboundChallanInput[]
+    connectOrCreate?: DyeingOrderCreateOrConnectWithoutInboundChallanInput | DyeingOrderCreateOrConnectWithoutInboundChallanInput[]
+    createMany?: DyeingOrderCreateManyInboundChallanInputEnvelope
+    connect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+  }
+
+  export type DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput = {
+    create?: XOR<DyeingOrderCreateWithoutQc1ChallanInput, DyeingOrderUncheckedCreateWithoutQc1ChallanInput> | DyeingOrderCreateWithoutQc1ChallanInput[] | DyeingOrderUncheckedCreateWithoutQc1ChallanInput[]
+    connectOrCreate?: DyeingOrderCreateOrConnectWithoutQc1ChallanInput | DyeingOrderCreateOrConnectWithoutQc1ChallanInput[]
+    createMany?: DyeingOrderCreateManyQc1ChallanInputEnvelope
+    connect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
   }
 
   export type ProgramUpdateOneRequiredWithoutChallansNestedInput = {
@@ -98590,6 +101004,34 @@ export namespace Prisma {
     deleteMany?: DefectRecordScalarWhereInput | DefectRecordScalarWhereInput[]
   }
 
+  export type DyeingOrderUpdateManyWithoutInboundChallanNestedInput = {
+    create?: XOR<DyeingOrderCreateWithoutInboundChallanInput, DyeingOrderUncheckedCreateWithoutInboundChallanInput> | DyeingOrderCreateWithoutInboundChallanInput[] | DyeingOrderUncheckedCreateWithoutInboundChallanInput[]
+    connectOrCreate?: DyeingOrderCreateOrConnectWithoutInboundChallanInput | DyeingOrderCreateOrConnectWithoutInboundChallanInput[]
+    upsert?: DyeingOrderUpsertWithWhereUniqueWithoutInboundChallanInput | DyeingOrderUpsertWithWhereUniqueWithoutInboundChallanInput[]
+    createMany?: DyeingOrderCreateManyInboundChallanInputEnvelope
+    set?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    disconnect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    delete?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    connect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    update?: DyeingOrderUpdateWithWhereUniqueWithoutInboundChallanInput | DyeingOrderUpdateWithWhereUniqueWithoutInboundChallanInput[]
+    updateMany?: DyeingOrderUpdateManyWithWhereWithoutInboundChallanInput | DyeingOrderUpdateManyWithWhereWithoutInboundChallanInput[]
+    deleteMany?: DyeingOrderScalarWhereInput | DyeingOrderScalarWhereInput[]
+  }
+
+  export type DyeingOrderUpdateManyWithoutQc1ChallanNestedInput = {
+    create?: XOR<DyeingOrderCreateWithoutQc1ChallanInput, DyeingOrderUncheckedCreateWithoutQc1ChallanInput> | DyeingOrderCreateWithoutQc1ChallanInput[] | DyeingOrderUncheckedCreateWithoutQc1ChallanInput[]
+    connectOrCreate?: DyeingOrderCreateOrConnectWithoutQc1ChallanInput | DyeingOrderCreateOrConnectWithoutQc1ChallanInput[]
+    upsert?: DyeingOrderUpsertWithWhereUniqueWithoutQc1ChallanInput | DyeingOrderUpsertWithWhereUniqueWithoutQc1ChallanInput[]
+    createMany?: DyeingOrderCreateManyQc1ChallanInputEnvelope
+    set?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    disconnect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    delete?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    connect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    update?: DyeingOrderUpdateWithWhereUniqueWithoutQc1ChallanInput | DyeingOrderUpdateWithWhereUniqueWithoutQc1ChallanInput[]
+    updateMany?: DyeingOrderUpdateManyWithWhereWithoutQc1ChallanInput | DyeingOrderUpdateManyWithWhereWithoutQc1ChallanInput[]
+    deleteMany?: DyeingOrderScalarWhereInput | DyeingOrderScalarWhereInput[]
+  }
+
   export type ChallanUncheckedUpdateManyWithoutParentChallanNestedInput = {
     create?: XOR<ChallanCreateWithoutParentChallanInput, ChallanUncheckedCreateWithoutParentChallanInput> | ChallanCreateWithoutParentChallanInput[] | ChallanUncheckedCreateWithoutParentChallanInput[]
     connectOrCreate?: ChallanCreateOrConnectWithoutParentChallanInput | ChallanCreateOrConnectWithoutParentChallanInput[]
@@ -98686,6 +101128,34 @@ export namespace Prisma {
     update?: DefectRecordUpdateWithWhereUniqueWithoutChallanInput | DefectRecordUpdateWithWhereUniqueWithoutChallanInput[]
     updateMany?: DefectRecordUpdateManyWithWhereWithoutChallanInput | DefectRecordUpdateManyWithWhereWithoutChallanInput[]
     deleteMany?: DefectRecordScalarWhereInput | DefectRecordScalarWhereInput[]
+  }
+
+  export type DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput = {
+    create?: XOR<DyeingOrderCreateWithoutInboundChallanInput, DyeingOrderUncheckedCreateWithoutInboundChallanInput> | DyeingOrderCreateWithoutInboundChallanInput[] | DyeingOrderUncheckedCreateWithoutInboundChallanInput[]
+    connectOrCreate?: DyeingOrderCreateOrConnectWithoutInboundChallanInput | DyeingOrderCreateOrConnectWithoutInboundChallanInput[]
+    upsert?: DyeingOrderUpsertWithWhereUniqueWithoutInboundChallanInput | DyeingOrderUpsertWithWhereUniqueWithoutInboundChallanInput[]
+    createMany?: DyeingOrderCreateManyInboundChallanInputEnvelope
+    set?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    disconnect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    delete?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    connect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    update?: DyeingOrderUpdateWithWhereUniqueWithoutInboundChallanInput | DyeingOrderUpdateWithWhereUniqueWithoutInboundChallanInput[]
+    updateMany?: DyeingOrderUpdateManyWithWhereWithoutInboundChallanInput | DyeingOrderUpdateManyWithWhereWithoutInboundChallanInput[]
+    deleteMany?: DyeingOrderScalarWhereInput | DyeingOrderScalarWhereInput[]
+  }
+
+  export type DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput = {
+    create?: XOR<DyeingOrderCreateWithoutQc1ChallanInput, DyeingOrderUncheckedCreateWithoutQc1ChallanInput> | DyeingOrderCreateWithoutQc1ChallanInput[] | DyeingOrderUncheckedCreateWithoutQc1ChallanInput[]
+    connectOrCreate?: DyeingOrderCreateOrConnectWithoutQc1ChallanInput | DyeingOrderCreateOrConnectWithoutQc1ChallanInput[]
+    upsert?: DyeingOrderUpsertWithWhereUniqueWithoutQc1ChallanInput | DyeingOrderUpsertWithWhereUniqueWithoutQc1ChallanInput[]
+    createMany?: DyeingOrderCreateManyQc1ChallanInputEnvelope
+    set?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    disconnect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    delete?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    connect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+    update?: DyeingOrderUpdateWithWhereUniqueWithoutQc1ChallanInput | DyeingOrderUpdateWithWhereUniqueWithoutQc1ChallanInput[]
+    updateMany?: DyeingOrderUpdateManyWithWhereWithoutQc1ChallanInput | DyeingOrderUpdateManyWithWhereWithoutQc1ChallanInput[]
+    deleteMany?: DyeingOrderScalarWhereInput | DyeingOrderScalarWhereInput[]
   }
 
   export type ChallanCreateNestedOneWithoutItemsInput = {
@@ -100468,6 +102938,68 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutFabricLedgerEntriesInput, UserUpdateWithoutFabricLedgerEntriesInput>, UserUncheckedUpdateWithoutFabricLedgerEntriesInput>
   }
 
+  export type ProgramCreateNestedOneWithoutDyeingOrdersInput = {
+    create?: XOR<ProgramCreateWithoutDyeingOrdersInput, ProgramUncheckedCreateWithoutDyeingOrdersInput>
+    connectOrCreate?: ProgramCreateOrConnectWithoutDyeingOrdersInput
+    connect?: ProgramWhereUniqueInput
+  }
+
+  export type ChallanCreateNestedOneWithoutDyeingInboundOrdersInput = {
+    create?: XOR<ChallanCreateWithoutDyeingInboundOrdersInput, ChallanUncheckedCreateWithoutDyeingInboundOrdersInput>
+    connectOrCreate?: ChallanCreateOrConnectWithoutDyeingInboundOrdersInput
+    connect?: ChallanWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutDyeingOrdersInchargeInput = {
+    create?: XOR<UserCreateWithoutDyeingOrdersInchargeInput, UserUncheckedCreateWithoutDyeingOrdersInchargeInput>
+    connectOrCreate?: UserCreateOrConnectWithoutDyeingOrdersInchargeInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type ChallanCreateNestedOneWithoutDyeingQc1OrdersInput = {
+    create?: XOR<ChallanCreateWithoutDyeingQc1OrdersInput, ChallanUncheckedCreateWithoutDyeingQc1OrdersInput>
+    connectOrCreate?: ChallanCreateOrConnectWithoutDyeingQc1OrdersInput
+    connect?: ChallanWhereUniqueInput
+  }
+
+  export type ProgramUpdateOneRequiredWithoutDyeingOrdersNestedInput = {
+    create?: XOR<ProgramCreateWithoutDyeingOrdersInput, ProgramUncheckedCreateWithoutDyeingOrdersInput>
+    connectOrCreate?: ProgramCreateOrConnectWithoutDyeingOrdersInput
+    upsert?: ProgramUpsertWithoutDyeingOrdersInput
+    connect?: ProgramWhereUniqueInput
+    update?: XOR<XOR<ProgramUpdateToOneWithWhereWithoutDyeingOrdersInput, ProgramUpdateWithoutDyeingOrdersInput>, ProgramUncheckedUpdateWithoutDyeingOrdersInput>
+  }
+
+  export type ChallanUpdateOneWithoutDyeingInboundOrdersNestedInput = {
+    create?: XOR<ChallanCreateWithoutDyeingInboundOrdersInput, ChallanUncheckedCreateWithoutDyeingInboundOrdersInput>
+    connectOrCreate?: ChallanCreateOrConnectWithoutDyeingInboundOrdersInput
+    upsert?: ChallanUpsertWithoutDyeingInboundOrdersInput
+    disconnect?: ChallanWhereInput | boolean
+    delete?: ChallanWhereInput | boolean
+    connect?: ChallanWhereUniqueInput
+    update?: XOR<XOR<ChallanUpdateToOneWithWhereWithoutDyeingInboundOrdersInput, ChallanUpdateWithoutDyeingInboundOrdersInput>, ChallanUncheckedUpdateWithoutDyeingInboundOrdersInput>
+  }
+
+  export type UserUpdateOneWithoutDyeingOrdersInchargeNestedInput = {
+    create?: XOR<UserCreateWithoutDyeingOrdersInchargeInput, UserUncheckedCreateWithoutDyeingOrdersInchargeInput>
+    connectOrCreate?: UserCreateOrConnectWithoutDyeingOrdersInchargeInput
+    upsert?: UserUpsertWithoutDyeingOrdersInchargeInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutDyeingOrdersInchargeInput, UserUpdateWithoutDyeingOrdersInchargeInput>, UserUncheckedUpdateWithoutDyeingOrdersInchargeInput>
+  }
+
+  export type ChallanUpdateOneWithoutDyeingQc1OrdersNestedInput = {
+    create?: XOR<ChallanCreateWithoutDyeingQc1OrdersInput, ChallanUncheckedCreateWithoutDyeingQc1OrdersInput>
+    connectOrCreate?: ChallanCreateOrConnectWithoutDyeingQc1OrdersInput
+    upsert?: ChallanUpsertWithoutDyeingQc1OrdersInput
+    disconnect?: ChallanWhereInput | boolean
+    delete?: ChallanWhereInput | boolean
+    connect?: ChallanWhereUniqueInput
+    update?: XOR<XOR<ChallanUpdateToOneWithWhereWithoutDyeingQc1OrdersInput, ChallanUpdateWithoutDyeingQc1OrdersInput>, ChallanUncheckedUpdateWithoutDyeingQc1OrdersInput>
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -101009,6 +103541,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutCreatedByInput = {
@@ -101084,6 +103617,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutCreatedByInput = {
@@ -101169,6 +103703,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutApprovedByInput = {
@@ -101244,6 +103779,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutApprovedByInput = {
@@ -101348,6 +103884,8 @@ export namespace Prisma {
     events?: ChallanEventCreateNestedManyWithoutChallanInput
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutCreatedByInput = {
@@ -101376,6 +103914,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedCreateNestedManyWithoutChallanInput
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutCreatedByInput = {
@@ -101414,6 +103954,8 @@ export namespace Prisma {
     events?: ChallanEventCreateNestedManyWithoutChallanInput
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutIssuedByInput = {
@@ -101442,6 +103984,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedCreateNestedManyWithoutChallanInput
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutIssuedByInput = {
@@ -101480,6 +104024,8 @@ export namespace Prisma {
     events?: ChallanEventCreateNestedManyWithoutChallanInput
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutReceivedByInput = {
@@ -101508,6 +104054,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedCreateNestedManyWithoutChallanInput
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutReceivedByInput = {
@@ -101546,6 +104094,8 @@ export namespace Prisma {
     events?: ChallanEventCreateNestedManyWithoutChallanInput
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutApprovedByInput = {
@@ -101574,6 +104124,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedCreateNestedManyWithoutChallanInput
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutApprovedByInput = {
@@ -102277,6 +104829,76 @@ export namespace Prisma {
 
   export type FabricStockLedgerCreateManyTransactedByInputEnvelope = {
     data: FabricStockLedgerCreateManyTransactedByInput | FabricStockLedgerCreateManyTransactedByInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type DyeingOrderCreateWithoutInchargeInput = {
+    id?: string
+    orderNumber: string
+    status?: string
+    priority?: string
+    fabricName: string
+    fabricType?: string | null
+    targetColor: string
+    dyedColor?: string | null
+    colorCode?: string | null
+    requiredQuantity: number
+    dyedQuantity?: number
+    undyedQuantity?: number
+    readyForQc1Quantity?: number
+    sentToQc1Quantity?: number
+    uom?: string
+    inchargeName?: string | null
+    batchNumber?: string | null
+    machineNumber?: string | null
+    processRemarks?: string | null
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    sentToQc1At?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    program: ProgramCreateNestedOneWithoutDyeingOrdersInput
+    inboundChallan?: ChallanCreateNestedOneWithoutDyeingInboundOrdersInput
+    qc1Challan?: ChallanCreateNestedOneWithoutDyeingQc1OrdersInput
+  }
+
+  export type DyeingOrderUncheckedCreateWithoutInchargeInput = {
+    id?: string
+    orderNumber: string
+    programId: string
+    inboundChallanId?: string | null
+    status?: string
+    priority?: string
+    fabricName: string
+    fabricType?: string | null
+    targetColor: string
+    dyedColor?: string | null
+    colorCode?: string | null
+    requiredQuantity: number
+    dyedQuantity?: number
+    undyedQuantity?: number
+    readyForQc1Quantity?: number
+    sentToQc1Quantity?: number
+    uom?: string
+    inchargeName?: string | null
+    batchNumber?: string | null
+    machineNumber?: string | null
+    processRemarks?: string | null
+    qc1ChallanId?: string | null
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    sentToQc1At?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DyeingOrderCreateOrConnectWithoutInchargeInput = {
+    where: DyeingOrderWhereUniqueInput
+    create: XOR<DyeingOrderCreateWithoutInchargeInput, DyeingOrderUncheckedCreateWithoutInchargeInput>
+  }
+
+  export type DyeingOrderCreateManyInchargeInputEnvelope = {
+    data: DyeingOrderCreateManyInchargeInput | DyeingOrderCreateManyInchargeInput[]
     skipDuplicates?: boolean
   }
 
@@ -103064,6 +105686,56 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"FabricStockLedger"> | Date | string
   }
 
+  export type DyeingOrderUpsertWithWhereUniqueWithoutInchargeInput = {
+    where: DyeingOrderWhereUniqueInput
+    update: XOR<DyeingOrderUpdateWithoutInchargeInput, DyeingOrderUncheckedUpdateWithoutInchargeInput>
+    create: XOR<DyeingOrderCreateWithoutInchargeInput, DyeingOrderUncheckedCreateWithoutInchargeInput>
+  }
+
+  export type DyeingOrderUpdateWithWhereUniqueWithoutInchargeInput = {
+    where: DyeingOrderWhereUniqueInput
+    data: XOR<DyeingOrderUpdateWithoutInchargeInput, DyeingOrderUncheckedUpdateWithoutInchargeInput>
+  }
+
+  export type DyeingOrderUpdateManyWithWhereWithoutInchargeInput = {
+    where: DyeingOrderScalarWhereInput
+    data: XOR<DyeingOrderUpdateManyMutationInput, DyeingOrderUncheckedUpdateManyWithoutInchargeInput>
+  }
+
+  export type DyeingOrderScalarWhereInput = {
+    AND?: DyeingOrderScalarWhereInput | DyeingOrderScalarWhereInput[]
+    OR?: DyeingOrderScalarWhereInput[]
+    NOT?: DyeingOrderScalarWhereInput | DyeingOrderScalarWhereInput[]
+    id?: StringFilter<"DyeingOrder"> | string
+    orderNumber?: StringFilter<"DyeingOrder"> | string
+    programId?: StringFilter<"DyeingOrder"> | string
+    inboundChallanId?: StringNullableFilter<"DyeingOrder"> | string | null
+    status?: StringFilter<"DyeingOrder"> | string
+    priority?: StringFilter<"DyeingOrder"> | string
+    fabricName?: StringFilter<"DyeingOrder"> | string
+    fabricType?: StringNullableFilter<"DyeingOrder"> | string | null
+    targetColor?: StringFilter<"DyeingOrder"> | string
+    dyedColor?: StringNullableFilter<"DyeingOrder"> | string | null
+    colorCode?: StringNullableFilter<"DyeingOrder"> | string | null
+    requiredQuantity?: FloatFilter<"DyeingOrder"> | number
+    dyedQuantity?: FloatFilter<"DyeingOrder"> | number
+    undyedQuantity?: FloatFilter<"DyeingOrder"> | number
+    readyForQc1Quantity?: FloatFilter<"DyeingOrder"> | number
+    sentToQc1Quantity?: FloatFilter<"DyeingOrder"> | number
+    uom?: StringFilter<"DyeingOrder"> | string
+    inchargeId?: StringNullableFilter<"DyeingOrder"> | string | null
+    inchargeName?: StringNullableFilter<"DyeingOrder"> | string | null
+    batchNumber?: StringNullableFilter<"DyeingOrder"> | string | null
+    machineNumber?: StringNullableFilter<"DyeingOrder"> | string | null
+    processRemarks?: StringNullableFilter<"DyeingOrder"> | string | null
+    qc1ChallanId?: StringNullableFilter<"DyeingOrder"> | string | null
+    startedAt?: DateTimeNullableFilter<"DyeingOrder"> | Date | string | null
+    completedAt?: DateTimeNullableFilter<"DyeingOrder"> | Date | string | null
+    sentToQc1At?: DateTimeNullableFilter<"DyeingOrder"> | Date | string | null
+    createdAt?: DateTimeFilter<"DyeingOrder"> | Date | string
+    updatedAt?: DateTimeFilter<"DyeingOrder"> | Date | string
+  }
+
   export type UserRoleCreateWithoutRoleInput = {
     id?: string
     assignedAt?: Date | string
@@ -103333,6 +106005,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutUserRolesInput = {
@@ -103368,6 +106041,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutUserRolesInput = {
@@ -103446,6 +106120,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutUserRolesInput = {
@@ -103481,6 +106156,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type RoleUpsertWithoutUserRolesInput = {
@@ -103642,6 +106318,8 @@ export namespace Prisma {
     events?: ChallanEventCreateNestedManyWithoutChallanInput
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutFromDeptRelInput = {
@@ -103670,6 +106348,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedCreateNestedManyWithoutChallanInput
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutFromDeptRelInput = {
@@ -103708,6 +106388,8 @@ export namespace Prisma {
     events?: ChallanEventCreateNestedManyWithoutChallanInput
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutToDeptRelInput = {
@@ -103736,6 +106418,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedCreateNestedManyWithoutChallanInput
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutToDeptRelInput = {
@@ -104489,6 +107173,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutCustomerInput = {
@@ -104564,6 +107249,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutCustomerInput = {
@@ -105132,6 +107818,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutDesignInput = {
@@ -105207,6 +107894,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutDesignInput = {
@@ -105878,6 +108566,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutCreatedProgramsInput = {
@@ -105913,6 +108602,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutCreatedProgramsInput = {
@@ -105953,6 +108643,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutApprovedProgramsInput = {
@@ -105988,6 +108679,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutApprovedProgramsInput = {
@@ -106235,6 +108927,8 @@ export namespace Prisma {
     events?: ChallanEventCreateNestedManyWithoutChallanInput
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutProgramInput = {
@@ -106263,6 +108957,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedCreateNestedManyWithoutChallanInput
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutProgramInput = {
@@ -106783,6 +109479,76 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type DyeingOrderCreateWithoutProgramInput = {
+    id?: string
+    orderNumber: string
+    status?: string
+    priority?: string
+    fabricName: string
+    fabricType?: string | null
+    targetColor: string
+    dyedColor?: string | null
+    colorCode?: string | null
+    requiredQuantity: number
+    dyedQuantity?: number
+    undyedQuantity?: number
+    readyForQc1Quantity?: number
+    sentToQc1Quantity?: number
+    uom?: string
+    inchargeName?: string | null
+    batchNumber?: string | null
+    machineNumber?: string | null
+    processRemarks?: string | null
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    sentToQc1At?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    inboundChallan?: ChallanCreateNestedOneWithoutDyeingInboundOrdersInput
+    incharge?: UserCreateNestedOneWithoutDyeingOrdersInchargeInput
+    qc1Challan?: ChallanCreateNestedOneWithoutDyeingQc1OrdersInput
+  }
+
+  export type DyeingOrderUncheckedCreateWithoutProgramInput = {
+    id?: string
+    orderNumber: string
+    inboundChallanId?: string | null
+    status?: string
+    priority?: string
+    fabricName: string
+    fabricType?: string | null
+    targetColor: string
+    dyedColor?: string | null
+    colorCode?: string | null
+    requiredQuantity: number
+    dyedQuantity?: number
+    undyedQuantity?: number
+    readyForQc1Quantity?: number
+    sentToQc1Quantity?: number
+    uom?: string
+    inchargeId?: string | null
+    inchargeName?: string | null
+    batchNumber?: string | null
+    machineNumber?: string | null
+    processRemarks?: string | null
+    qc1ChallanId?: string | null
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    sentToQc1At?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DyeingOrderCreateOrConnectWithoutProgramInput = {
+    where: DyeingOrderWhereUniqueInput
+    create: XOR<DyeingOrderCreateWithoutProgramInput, DyeingOrderUncheckedCreateWithoutProgramInput>
+  }
+
+  export type DyeingOrderCreateManyProgramInputEnvelope = {
+    data: DyeingOrderCreateManyProgramInput | DyeingOrderCreateManyProgramInput[]
+    skipDuplicates?: boolean
+  }
+
   export type CustomerUpsertWithoutProgramsInput = {
     update: XOR<CustomerUpdateWithoutProgramsInput, CustomerUncheckedUpdateWithoutProgramsInput>
     create: XOR<CustomerCreateWithoutProgramsInput, CustomerUncheckedCreateWithoutProgramsInput>
@@ -106915,6 +109681,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCreatedProgramsInput = {
@@ -106950,6 +109717,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUpsertWithoutApprovedProgramsInput = {
@@ -106996,6 +109764,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutApprovedProgramsInput = {
@@ -107031,6 +109800,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type ProgramFabricUpsertWithWhereUniqueWithoutProgramInput = {
@@ -107364,6 +110134,22 @@ export namespace Prisma {
     data: XOR<FabricStoreRollUpdateManyMutationInput, FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToInput>
   }
 
+  export type DyeingOrderUpsertWithWhereUniqueWithoutProgramInput = {
+    where: DyeingOrderWhereUniqueInput
+    update: XOR<DyeingOrderUpdateWithoutProgramInput, DyeingOrderUncheckedUpdateWithoutProgramInput>
+    create: XOR<DyeingOrderCreateWithoutProgramInput, DyeingOrderUncheckedCreateWithoutProgramInput>
+  }
+
+  export type DyeingOrderUpdateWithWhereUniqueWithoutProgramInput = {
+    where: DyeingOrderWhereUniqueInput
+    data: XOR<DyeingOrderUpdateWithoutProgramInput, DyeingOrderUncheckedUpdateWithoutProgramInput>
+  }
+
+  export type DyeingOrderUpdateManyWithWhereWithoutProgramInput = {
+    where: DyeingOrderScalarWhereInput
+    data: XOR<DyeingOrderUpdateManyMutationInput, DyeingOrderUncheckedUpdateManyWithoutProgramInput>
+  }
+
   export type ProgramCreateWithoutFabricsInput = {
     id?: string
     programNumber: string
@@ -107437,6 +110223,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutFabricsInput = {
@@ -107512,6 +110299,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutFabricsInput = {
@@ -107667,6 +110455,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutFabricsInput = {
@@ -107742,6 +110531,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type FabricUpsertWithoutProgramFabricsInput = {
@@ -107893,6 +110683,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutColoursInput = {
@@ -107968,6 +110759,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutColoursInput = {
@@ -108088,6 +110880,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutColoursInput = {
@@ -108163,6 +110956,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type ColourUpsertWithoutProgramColoursInput = {
@@ -108273,6 +111067,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutSizesInput = {
@@ -108348,6 +111143,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutSizesInput = {
@@ -108468,6 +111264,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutSizesInput = {
@@ -108543,6 +111340,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type SizeUpsertWithoutProgramSizesInput = {
@@ -108653,6 +111451,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutSpecificationsInput = {
@@ -108728,6 +111527,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutSpecificationsInput = {
@@ -108848,6 +111648,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutSpecificationsInput = {
@@ -108923,6 +111724,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type SizeUpsertWithoutSpecificationsInput = {
@@ -109033,6 +111835,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutBomItemsInput = {
@@ -109108,6 +111911,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutBomItemsInput = {
@@ -109273,6 +112077,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutBomItemsInput = {
@@ -109348,6 +112153,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type ItemUpsertWithoutBomItemsInput = {
@@ -109509,6 +112315,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutRoutesInput = {
@@ -109584,6 +112391,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutRoutesInput = {
@@ -109717,6 +112525,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutRoutesInput = {
@@ -109792,6 +112601,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramRouteStepUpsertWithWhereUniqueWithoutProgramRouteInput = {
@@ -109967,6 +112777,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutAttachmentsInput = {
@@ -110002,6 +112813,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutAttachmentsInput = {
@@ -110053,6 +112865,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAttachmentsInput = {
@@ -110088,6 +112901,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserCreateWithoutAuditLogsInput = {
@@ -110123,6 +112937,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutAuditLogsInput = {
@@ -110158,6 +112973,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutAuditLogsInput = {
@@ -110209,6 +113025,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAuditLogsInput = {
@@ -110244,6 +113061,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type ProgramCreateWithoutChallansInput = {
@@ -110319,6 +113137,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutChallansInput = {
@@ -110394,6 +113213,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutChallansInput = {
@@ -110427,6 +113247,8 @@ export namespace Prisma {
     events?: ChallanEventCreateNestedManyWithoutChallanInput
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutChildChallansInput = {
@@ -110455,6 +113277,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedCreateNestedManyWithoutChallanInput
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutChildChallansInput = {
@@ -110488,6 +113312,8 @@ export namespace Prisma {
     events?: ChallanEventCreateNestedManyWithoutChallanInput
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutParentChallanInput = {
@@ -110516,6 +113342,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedCreateNestedManyWithoutChallanInput
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutParentChallanInput = {
@@ -110631,6 +113459,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutCreatedChallansInput = {
@@ -110666,6 +113495,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutCreatedChallansInput = {
@@ -110706,6 +113536,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutIssuedChallansInput = {
@@ -110741,6 +113572,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutIssuedChallansInput = {
@@ -110781,6 +113613,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutReceivedChallansInput = {
@@ -110816,6 +113649,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutReceivedChallansInput = {
@@ -110856,6 +113690,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutApprovedChallansInput = {
@@ -110891,6 +113726,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutApprovedChallansInput = {
@@ -111188,6 +114024,146 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type DyeingOrderCreateWithoutInboundChallanInput = {
+    id?: string
+    orderNumber: string
+    status?: string
+    priority?: string
+    fabricName: string
+    fabricType?: string | null
+    targetColor: string
+    dyedColor?: string | null
+    colorCode?: string | null
+    requiredQuantity: number
+    dyedQuantity?: number
+    undyedQuantity?: number
+    readyForQc1Quantity?: number
+    sentToQc1Quantity?: number
+    uom?: string
+    inchargeName?: string | null
+    batchNumber?: string | null
+    machineNumber?: string | null
+    processRemarks?: string | null
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    sentToQc1At?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    program: ProgramCreateNestedOneWithoutDyeingOrdersInput
+    incharge?: UserCreateNestedOneWithoutDyeingOrdersInchargeInput
+    qc1Challan?: ChallanCreateNestedOneWithoutDyeingQc1OrdersInput
+  }
+
+  export type DyeingOrderUncheckedCreateWithoutInboundChallanInput = {
+    id?: string
+    orderNumber: string
+    programId: string
+    status?: string
+    priority?: string
+    fabricName: string
+    fabricType?: string | null
+    targetColor: string
+    dyedColor?: string | null
+    colorCode?: string | null
+    requiredQuantity: number
+    dyedQuantity?: number
+    undyedQuantity?: number
+    readyForQc1Quantity?: number
+    sentToQc1Quantity?: number
+    uom?: string
+    inchargeId?: string | null
+    inchargeName?: string | null
+    batchNumber?: string | null
+    machineNumber?: string | null
+    processRemarks?: string | null
+    qc1ChallanId?: string | null
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    sentToQc1At?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DyeingOrderCreateOrConnectWithoutInboundChallanInput = {
+    where: DyeingOrderWhereUniqueInput
+    create: XOR<DyeingOrderCreateWithoutInboundChallanInput, DyeingOrderUncheckedCreateWithoutInboundChallanInput>
+  }
+
+  export type DyeingOrderCreateManyInboundChallanInputEnvelope = {
+    data: DyeingOrderCreateManyInboundChallanInput | DyeingOrderCreateManyInboundChallanInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type DyeingOrderCreateWithoutQc1ChallanInput = {
+    id?: string
+    orderNumber: string
+    status?: string
+    priority?: string
+    fabricName: string
+    fabricType?: string | null
+    targetColor: string
+    dyedColor?: string | null
+    colorCode?: string | null
+    requiredQuantity: number
+    dyedQuantity?: number
+    undyedQuantity?: number
+    readyForQc1Quantity?: number
+    sentToQc1Quantity?: number
+    uom?: string
+    inchargeName?: string | null
+    batchNumber?: string | null
+    machineNumber?: string | null
+    processRemarks?: string | null
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    sentToQc1At?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    program: ProgramCreateNestedOneWithoutDyeingOrdersInput
+    inboundChallan?: ChallanCreateNestedOneWithoutDyeingInboundOrdersInput
+    incharge?: UserCreateNestedOneWithoutDyeingOrdersInchargeInput
+  }
+
+  export type DyeingOrderUncheckedCreateWithoutQc1ChallanInput = {
+    id?: string
+    orderNumber: string
+    programId: string
+    inboundChallanId?: string | null
+    status?: string
+    priority?: string
+    fabricName: string
+    fabricType?: string | null
+    targetColor: string
+    dyedColor?: string | null
+    colorCode?: string | null
+    requiredQuantity: number
+    dyedQuantity?: number
+    undyedQuantity?: number
+    readyForQc1Quantity?: number
+    sentToQc1Quantity?: number
+    uom?: string
+    inchargeId?: string | null
+    inchargeName?: string | null
+    batchNumber?: string | null
+    machineNumber?: string | null
+    processRemarks?: string | null
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    sentToQc1At?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DyeingOrderCreateOrConnectWithoutQc1ChallanInput = {
+    where: DyeingOrderWhereUniqueInput
+    create: XOR<DyeingOrderCreateWithoutQc1ChallanInput, DyeingOrderUncheckedCreateWithoutQc1ChallanInput>
+  }
+
+  export type DyeingOrderCreateManyQc1ChallanInputEnvelope = {
+    data: DyeingOrderCreateManyQc1ChallanInput | DyeingOrderCreateManyQc1ChallanInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ProgramUpsertWithoutChallansInput = {
     update: XOR<ProgramUpdateWithoutChallansInput, ProgramUncheckedUpdateWithoutChallansInput>
     create: XOR<ProgramCreateWithoutChallansInput, ProgramUncheckedCreateWithoutChallansInput>
@@ -111272,6 +114248,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutChallansInput = {
@@ -111347,6 +114324,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type ChallanUpsertWithoutChildChallansInput = {
@@ -111386,6 +114364,8 @@ export namespace Prisma {
     events?: ChallanEventUpdateManyWithoutChallanNestedInput
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutChildChallansInput = {
@@ -111414,6 +114394,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedUpdateManyWithoutChallanNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type ChallanUpsertWithWhereUniqueWithoutParentChallanInput = {
@@ -111558,6 +114540,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCreatedChallansInput = {
@@ -111593,6 +114576,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUpsertWithoutIssuedChallansInput = {
@@ -111639,6 +114623,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutIssuedChallansInput = {
@@ -111674,6 +114659,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUpsertWithoutReceivedChallansInput = {
@@ -111720,6 +114706,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReceivedChallansInput = {
@@ -111755,6 +114742,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUpsertWithoutApprovedChallansInput = {
@@ -111801,6 +114789,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutApprovedChallansInput = {
@@ -111836,6 +114825,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type ChallanItemUpsertWithWhereUniqueWithoutChallanInput = {
@@ -111961,6 +114951,38 @@ export namespace Prisma {
     data: XOR<DefectRecordUpdateManyMutationInput, DefectRecordUncheckedUpdateManyWithoutChallanInput>
   }
 
+  export type DyeingOrderUpsertWithWhereUniqueWithoutInboundChallanInput = {
+    where: DyeingOrderWhereUniqueInput
+    update: XOR<DyeingOrderUpdateWithoutInboundChallanInput, DyeingOrderUncheckedUpdateWithoutInboundChallanInput>
+    create: XOR<DyeingOrderCreateWithoutInboundChallanInput, DyeingOrderUncheckedCreateWithoutInboundChallanInput>
+  }
+
+  export type DyeingOrderUpdateWithWhereUniqueWithoutInboundChallanInput = {
+    where: DyeingOrderWhereUniqueInput
+    data: XOR<DyeingOrderUpdateWithoutInboundChallanInput, DyeingOrderUncheckedUpdateWithoutInboundChallanInput>
+  }
+
+  export type DyeingOrderUpdateManyWithWhereWithoutInboundChallanInput = {
+    where: DyeingOrderScalarWhereInput
+    data: XOR<DyeingOrderUpdateManyMutationInput, DyeingOrderUncheckedUpdateManyWithoutInboundChallanInput>
+  }
+
+  export type DyeingOrderUpsertWithWhereUniqueWithoutQc1ChallanInput = {
+    where: DyeingOrderWhereUniqueInput
+    update: XOR<DyeingOrderUpdateWithoutQc1ChallanInput, DyeingOrderUncheckedUpdateWithoutQc1ChallanInput>
+    create: XOR<DyeingOrderCreateWithoutQc1ChallanInput, DyeingOrderUncheckedCreateWithoutQc1ChallanInput>
+  }
+
+  export type DyeingOrderUpdateWithWhereUniqueWithoutQc1ChallanInput = {
+    where: DyeingOrderWhereUniqueInput
+    data: XOR<DyeingOrderUpdateWithoutQc1ChallanInput, DyeingOrderUncheckedUpdateWithoutQc1ChallanInput>
+  }
+
+  export type DyeingOrderUpdateManyWithWhereWithoutQc1ChallanInput = {
+    where: DyeingOrderScalarWhereInput
+    data: XOR<DyeingOrderUpdateManyMutationInput, DyeingOrderUncheckedUpdateManyWithoutQc1ChallanInput>
+  }
+
   export type ChallanCreateWithoutItemsInput = {
     id?: string
     challanNumber: string
@@ -111987,6 +115009,8 @@ export namespace Prisma {
     events?: ChallanEventCreateNestedManyWithoutChallanInput
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutItemsInput = {
@@ -112015,6 +115039,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedCreateNestedManyWithoutChallanInput
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutItemsInput = {
@@ -112059,6 +115085,8 @@ export namespace Prisma {
     events?: ChallanEventUpdateManyWithoutChallanNestedInput
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutItemsInput = {
@@ -112087,6 +115115,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedUpdateManyWithoutChallanNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type ProgramCreateWithoutProductionLogsInput = {
@@ -112162,6 +115192,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutProductionLogsInput = {
@@ -112237,6 +115268,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutProductionLogsInput = {
@@ -112270,6 +115302,8 @@ export namespace Prisma {
     events?: ChallanEventCreateNestedManyWithoutChallanInput
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutProductionLogsInput = {
@@ -112298,6 +115332,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedCreateNestedManyWithoutChallanInput
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutProductionLogsInput = {
@@ -112338,6 +115374,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutProductionRecordsInput = {
@@ -112373,6 +115410,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutProductionRecordsInput = {
@@ -112464,6 +115502,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutProductionLogsInput = {
@@ -112539,6 +115578,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type ChallanUpsertWithoutProductionLogsInput = {
@@ -112578,6 +115618,8 @@ export namespace Prisma {
     events?: ChallanEventUpdateManyWithoutChallanNestedInput
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutProductionLogsInput = {
@@ -112606,6 +115648,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedUpdateManyWithoutChallanNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type UserUpsertWithoutProductionRecordsInput = {
@@ -112652,6 +115696,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutProductionRecordsInput = {
@@ -112687,6 +115732,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type ChallanCreateWithoutInspectionsInput = {
@@ -112715,6 +115761,8 @@ export namespace Prisma {
     events?: ChallanEventCreateNestedManyWithoutChallanInput
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutInspectionsInput = {
@@ -112743,6 +115791,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedCreateNestedManyWithoutChallanInput
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutInspectionsInput = {
@@ -112783,6 +115833,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutInspectionsInput = {
@@ -112818,6 +115869,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutInspectionsInput = {
@@ -112922,6 +115974,8 @@ export namespace Prisma {
     events?: ChallanEventUpdateManyWithoutChallanNestedInput
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutInspectionsInput = {
@@ -112950,6 +116004,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedUpdateManyWithoutChallanNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type UserUpsertWithoutInspectionsInput = {
@@ -112996,6 +116052,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutInspectionsInput = {
@@ -113031,6 +116088,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type DefectLogUpsertWithWhereUniqueWithoutInspectionInput = {
@@ -113187,6 +116245,8 @@ export namespace Prisma {
     inspections?: QualityInspectionCreateNestedManyWithoutChallanInput
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutEventsInput = {
@@ -113215,6 +116275,8 @@ export namespace Prisma {
     inspections?: QualityInspectionUncheckedCreateNestedManyWithoutChallanInput
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutEventsInput = {
@@ -113255,6 +116317,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutChallanEventsInput = {
@@ -113290,6 +116353,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutChallanEventsInput = {
@@ -113334,6 +116398,8 @@ export namespace Prisma {
     inspections?: QualityInspectionUpdateManyWithoutChallanNestedInput
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutEventsInput = {
@@ -113362,6 +116428,8 @@ export namespace Prisma {
     inspections?: QualityInspectionUncheckedUpdateManyWithoutChallanNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type UserUpsertWithoutChallanEventsInput = {
@@ -113408,6 +116476,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutChallanEventsInput = {
@@ -113443,6 +116512,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type ProgramCreateWithoutStockLedgerEntriesInput = {
@@ -113518,6 +116588,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutStockLedgerEntriesInput = {
@@ -113593,6 +116664,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutStockLedgerEntriesInput = {
@@ -113633,6 +116705,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutStockLedgerEntriesInput = {
@@ -113668,6 +116741,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutStockLedgerEntriesInput = {
@@ -113759,6 +116833,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutStockLedgerEntriesInput = {
@@ -113834,6 +116909,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type UserUpsertWithoutStockLedgerEntriesInput = {
@@ -113880,6 +116956,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutStockLedgerEntriesInput = {
@@ -113915,6 +116992,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type ProgramCreateWithoutRollsInput = {
@@ -113990,6 +117068,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutRollsInput = {
@@ -114065,6 +117144,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutRollsInput = {
@@ -114259,6 +117339,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutRollsInput = {
@@ -114334,6 +117415,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type SupplierUpsertWithoutFabricRollsInput = {
@@ -114474,6 +117556,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutBundlesInput = {
@@ -114549,6 +117632,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutBundlesInput = {
@@ -114582,6 +117666,8 @@ export namespace Prisma {
     inspections?: QualityInspectionCreateNestedManyWithoutChallanInput
     events?: ChallanEventCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutBundlesInput = {
@@ -114610,6 +117696,8 @@ export namespace Prisma {
     inspections?: QualityInspectionUncheckedCreateNestedManyWithoutChallanInput
     events?: ChallanEventUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutBundlesInput = {
@@ -114912,6 +118000,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutBundlesInput = {
@@ -114987,6 +118076,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type ChallanUpsertWithoutBundlesInput = {
@@ -115026,6 +118116,8 @@ export namespace Prisma {
     inspections?: QualityInspectionUpdateManyWithoutChallanNestedInput
     events?: ChallanEventUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutBundlesInput = {
@@ -115054,6 +118146,8 @@ export namespace Prisma {
     inspections?: QualityInspectionUncheckedUpdateManyWithoutChallanNestedInput
     events?: ChallanEventUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type FabricRollUpsertWithoutBundlesInput = {
@@ -115255,6 +118349,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutCartonsInput = {
@@ -115330,6 +118425,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutCartonsInput = {
@@ -115467,6 +118563,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutCartonsInput = {
@@ -115542,6 +118639,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type CartonBundleUpsertWithWhereUniqueWithoutCartonInput = {
@@ -115868,6 +118966,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutDispatchesApprovedInput = {
@@ -115903,6 +119002,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutDispatchesApprovedInput = {
@@ -115943,6 +119043,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutDispatchesOperatedInput = {
@@ -115978,6 +119079,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutDispatchesOperatedInput = {
@@ -116098,6 +119200,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutDispatchesApprovedInput = {
@@ -116133,6 +119236,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUpsertWithoutDispatchesOperatedInput = {
@@ -116179,6 +119283,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutDispatchesOperatedInput = {
@@ -116214,6 +119319,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type DispatchCartonUpsertWithWhereUniqueWithoutDispatchInput = {
@@ -116501,6 +119607,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutDefectsInput = {
@@ -116576,6 +119683,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutDefectsInput = {
@@ -116609,6 +119717,8 @@ export namespace Prisma {
     inspections?: QualityInspectionCreateNestedManyWithoutChallanInput
     events?: ChallanEventCreateNestedManyWithoutChallanInput
     bundles?: BundleCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutDefectsInput = {
@@ -116637,6 +119747,8 @@ export namespace Prisma {
     inspections?: QualityInspectionUncheckedCreateNestedManyWithoutChallanInput
     events?: ChallanEventUncheckedCreateNestedManyWithoutChallanInput
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
+    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutDefectsInput = {
@@ -116732,6 +119844,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutDefectsDetectedInput = {
@@ -116767,6 +119880,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutDefectsDetectedInput = {
@@ -116946,6 +120060,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutDefectsInput = {
@@ -117021,6 +120136,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type ChallanUpsertWithoutDefectsInput = {
@@ -117060,6 +120176,8 @@ export namespace Prisma {
     inspections?: QualityInspectionUpdateManyWithoutChallanNestedInput
     events?: ChallanEventUpdateManyWithoutChallanNestedInput
     bundles?: BundleUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutDefectsInput = {
@@ -117088,6 +120206,8 @@ export namespace Prisma {
     inspections?: QualityInspectionUncheckedUpdateManyWithoutChallanNestedInput
     events?: ChallanEventUncheckedUpdateManyWithoutChallanNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type BundleUpsertWithoutDefectsInput = {
@@ -117195,6 +120315,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutDefectsDetectedInput = {
@@ -117230,6 +120351,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type ReworkTransactionUpsertWithWhereUniqueWithoutDefectInput = {
@@ -117382,6 +120504,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutReworkTransactionsInput = {
@@ -117457,6 +120580,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutReworkTransactionsInput = {
@@ -117497,6 +120621,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutReworkOperationsInput = {
@@ -117532,6 +120657,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutReworkOperationsInput = {
@@ -117674,6 +120800,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutReworkTransactionsInput = {
@@ -117749,6 +120876,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type UserUpsertWithoutReworkOperationsInput = {
@@ -117795,6 +120923,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReworkOperationsInput = {
@@ -117830,6 +120959,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type ProgramCreateWithoutRecutRequestsInput = {
@@ -117905,6 +121035,7 @@ export namespace Prisma {
     reworkTransactions?: ReworkTransactionCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutRecutRequestsInput = {
@@ -117980,6 +121111,7 @@ export namespace Prisma {
     reworkTransactions?: ReworkTransactionUncheckedCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutRecutRequestsInput = {
@@ -118120,6 +121252,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutRecutsRequestedInput = {
@@ -118155,6 +121288,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutRecutsRequestedInput = {
@@ -118195,6 +121329,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutRecutsApprovedInput = {
@@ -118230,6 +121365,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutRecutsApprovedInput = {
@@ -118376,6 +121512,7 @@ export namespace Prisma {
     reworkTransactions?: ReworkTransactionUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutRecutRequestsInput = {
@@ -118451,6 +121588,7 @@ export namespace Prisma {
     reworkTransactions?: ReworkTransactionUncheckedUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type DefectRecordUpsertWithoutRecutRequestsInput = {
@@ -118609,6 +121747,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutRecutsRequestedInput = {
@@ -118644,6 +121783,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUpsertWithoutRecutsApprovedInput = {
@@ -118690,6 +121830,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutRecutsApprovedInput = {
@@ -118725,6 +121866,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type BundleUpsertWithoutReplacementForInput = {
@@ -119113,6 +122255,7 @@ export namespace Prisma {
     reworkTransactions?: ReworkTransactionCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutFabricBatchesInput = {
@@ -119188,6 +122331,7 @@ export namespace Prisma {
     reworkTransactions?: ReworkTransactionUncheckedCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutFabricBatchesInput = {
@@ -119228,6 +122372,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutFabricBatchesCreatedInput = {
@@ -119263,6 +122408,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutFabricBatchesCreatedInput = {
@@ -119492,6 +122638,7 @@ export namespace Prisma {
     reworkTransactions?: ReworkTransactionUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutFabricBatchesInput = {
@@ -119567,6 +122714,7 @@ export namespace Prisma {
     reworkTransactions?: ReworkTransactionUncheckedUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type UserUpsertWithoutFabricBatchesCreatedInput = {
@@ -119613,6 +122761,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutFabricBatchesCreatedInput = {
@@ -119648,6 +122797,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type FabricStoreRollUpsertWithWhereUniqueWithoutBatchInput = {
@@ -119805,6 +122955,7 @@ export namespace Prisma {
     grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutFabricRollsInspectedInput = {
@@ -119840,6 +122991,7 @@ export namespace Prisma {
     grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutFabricRollsInspectedInput = {
@@ -119920,6 +123072,7 @@ export namespace Prisma {
     reworkTransactions?: ReworkTransactionCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
+    dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutFabricStoreRollsInput = {
@@ -119995,6 +123148,7 @@ export namespace Prisma {
     reworkTransactions?: ReworkTransactionUncheckedCreateNestedManyWithoutProgramInput
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
+    dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutFabricStoreRollsInput = {
@@ -120236,6 +123390,7 @@ export namespace Prisma {
     grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutFabricRollsInspectedInput = {
@@ -120271,6 +123426,7 @@ export namespace Prisma {
     grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type ProgramUpsertWithoutFabricStoreRollsInput = {
@@ -120357,6 +123513,7 @@ export namespace Prisma {
     reworkTransactions?: ReworkTransactionUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
+    dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutFabricStoreRollsInput = {
@@ -120432,6 +123589,7 @@ export namespace Prisma {
     reworkTransactions?: ReworkTransactionUncheckedUpdateManyWithoutProgramNestedInput
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
+    dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type MaterialReceiptItemUpsertWithWhereUniqueWithoutRollInput = {
@@ -120573,6 +123731,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutGrnReceivedInput = {
@@ -120608,6 +123767,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutGrnReceivedInput = {
@@ -120738,6 +123898,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutGrnReceivedInput = {
@@ -120773,6 +123934,7 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type MaterialReceiptItemUpsertWithWhereUniqueWithoutReceiptInput = {
@@ -121055,6 +124217,7 @@ export namespace Prisma {
     grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
     fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutFabricQCInspectionsInput = {
@@ -121090,6 +124253,7 @@ export namespace Prisma {
     grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
     fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutFabricQCInspectionsInput = {
@@ -121194,6 +124358,7 @@ export namespace Prisma {
     grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
     fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutFabricQCInspectionsInput = {
@@ -121229,6 +124394,7 @@ export namespace Prisma {
     grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
     fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type FabricStoreRollCreateWithoutLedgerEntriesInput = {
@@ -121414,6 +124580,7 @@ export namespace Prisma {
     grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
     fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutFabricLedgerEntriesInput = {
@@ -121449,6 +124616,7 @@ export namespace Prisma {
     grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
     fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutFabricLedgerEntriesInput = {
@@ -121674,6 +124842,7 @@ export namespace Prisma {
     grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
     fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutFabricLedgerEntriesInput = {
@@ -121709,6 +124878,759 @@ export namespace Prisma {
     grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
     fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+  }
+
+  export type ProgramCreateWithoutDyeingOrdersInput = {
+    id?: string
+    programNumber: string
+    programDate?: Date | string
+    buyerName: string
+    orderNumber: string
+    designName: string
+    styleCode: string
+    productCategory: string
+    targetQuantity: number
+    deliveryDate: Date | string
+    priority?: string
+    status?: string
+    remarks?: string | null
+    approvedAt?: Date | string | null
+    programSerialNo?: string | null
+    startDate?: Date | string | null
+    designNumber?: string | null
+    clientName?: string | null
+    clientPriority?: string | null
+    mainStyle?: string | null
+    subStyle?: string | null
+    pattern?: string | null
+    baseDesignType?: string | null
+    baseDesignPhoto?: string | null
+    wilcomDesignNumber?: string | null
+    wilcomDesignPhoto?: string | null
+    embroideryDesign?: string | null
+    embroideryDesignSize?: string | null
+    fabricName?: string | null
+    fabricType?: string | null
+    fabricWidth?: string | null
+    fabricWidthInches?: number | null
+    fabricColor?: string | null
+    fabricColorAvailable?: string | null
+    fabricAverage?: number | null
+    fabricAverageType?: string | null
+    fabricAverageMeasurement?: string | null
+    fabricDyeingRequired?: boolean
+    fabricIssuedToDyeing?: number | null
+    fabricSentToDyeing?: number | null
+    colorQuantity?: number | null
+    quantityMeasurement?: string | null
+    specialMaterial?: string | null
+    specialMaterialQuantity?: string | null
+    productionDesignDate?: Date | string | null
+    productionEndDate?: Date | string | null
+    piecesRejection?: number | null
+    rejectionReason?: string | null
+    comments?: string | null
+    metadataJson?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    customer?: CustomerCreateNestedOneWithoutProgramsInput
+    design?: DesignCreateNestedOneWithoutProgramsInput
+    createdBy: UserCreateNestedOneWithoutCreatedProgramsInput
+    approvedBy?: UserCreateNestedOneWithoutApprovedProgramsInput
+    fabrics?: ProgramFabricCreateNestedManyWithoutProgramInput
+    colours?: ProgramColourCreateNestedManyWithoutProgramInput
+    sizes?: ProgramSizeCreateNestedManyWithoutProgramInput
+    specifications?: ProgramSpecificationCreateNestedManyWithoutProgramInput
+    bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
+    routes?: ProgramRouteCreateNestedManyWithoutProgramInput
+    challans?: ChallanCreateNestedManyWithoutProgramInput
+    productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
+    rolls?: FabricRollCreateNestedManyWithoutProgramInput
+    bundles?: BundleCreateNestedManyWithoutProgramInput
+    cartons?: CartonCreateNestedManyWithoutProgramInput
+    defects?: DefectRecordCreateNestedManyWithoutProgramInput
+    stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutProgramInput
+    reworkTransactions?: ReworkTransactionCreateNestedManyWithoutProgramInput
+    recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
+  }
+
+  export type ProgramUncheckedCreateWithoutDyeingOrdersInput = {
+    id?: string
+    programNumber: string
+    programDate?: Date | string
+    customerId?: string | null
+    buyerName: string
+    orderNumber: string
+    designId?: string | null
+    designName: string
+    styleCode: string
+    productCategory: string
+    targetQuantity: number
+    deliveryDate: Date | string
+    priority?: string
+    status?: string
+    remarks?: string | null
+    createdById: string
+    approvedById?: string | null
+    approvedAt?: Date | string | null
+    programSerialNo?: string | null
+    startDate?: Date | string | null
+    designNumber?: string | null
+    clientName?: string | null
+    clientPriority?: string | null
+    mainStyle?: string | null
+    subStyle?: string | null
+    pattern?: string | null
+    baseDesignType?: string | null
+    baseDesignPhoto?: string | null
+    wilcomDesignNumber?: string | null
+    wilcomDesignPhoto?: string | null
+    embroideryDesign?: string | null
+    embroideryDesignSize?: string | null
+    fabricName?: string | null
+    fabricType?: string | null
+    fabricWidth?: string | null
+    fabricWidthInches?: number | null
+    fabricColor?: string | null
+    fabricColorAvailable?: string | null
+    fabricAverage?: number | null
+    fabricAverageType?: string | null
+    fabricAverageMeasurement?: string | null
+    fabricDyeingRequired?: boolean
+    fabricIssuedToDyeing?: number | null
+    fabricSentToDyeing?: number | null
+    colorQuantity?: number | null
+    quantityMeasurement?: string | null
+    specialMaterial?: string | null
+    specialMaterialQuantity?: string | null
+    productionDesignDate?: Date | string | null
+    productionEndDate?: Date | string | null
+    piecesRejection?: number | null
+    rejectionReason?: string | null
+    comments?: string | null
+    metadataJson?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    fabrics?: ProgramFabricUncheckedCreateNestedManyWithoutProgramInput
+    colours?: ProgramColourUncheckedCreateNestedManyWithoutProgramInput
+    sizes?: ProgramSizeUncheckedCreateNestedManyWithoutProgramInput
+    specifications?: ProgramSpecificationUncheckedCreateNestedManyWithoutProgramInput
+    bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
+    routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
+    challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
+    rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
+    bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
+    cartons?: CartonUncheckedCreateNestedManyWithoutProgramInput
+    defects?: DefectRecordUncheckedCreateNestedManyWithoutProgramInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutProgramInput
+    reworkTransactions?: ReworkTransactionUncheckedCreateNestedManyWithoutProgramInput
+    recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
+  }
+
+  export type ProgramCreateOrConnectWithoutDyeingOrdersInput = {
+    where: ProgramWhereUniqueInput
+    create: XOR<ProgramCreateWithoutDyeingOrdersInput, ProgramUncheckedCreateWithoutDyeingOrdersInput>
+  }
+
+  export type ChallanCreateWithoutDyeingInboundOrdersInput = {
+    id?: string
+    challanNumber: string
+    challanType: string
+    status?: string
+    priority?: string
+    issuedDate?: Date | string | null
+    receivedDate?: Date | string | null
+    completedDate?: Date | string | null
+    remarks?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    program: ProgramCreateNestedOneWithoutChallansInput
+    parentChallan?: ChallanCreateNestedOneWithoutChildChallansInput
+    childChallans?: ChallanCreateNestedManyWithoutParentChallanInput
+    fromDeptRel: DepartmentCreateNestedOneWithoutFromChallansInput
+    toDeptRel: DepartmentCreateNestedOneWithoutToChallansInput
+    createdBy: UserCreateNestedOneWithoutCreatedChallansInput
+    issuedBy?: UserCreateNestedOneWithoutIssuedChallansInput
+    receivedBy?: UserCreateNestedOneWithoutReceivedChallansInput
+    approvedBy?: UserCreateNestedOneWithoutApprovedChallansInput
+    items?: ChallanItemCreateNestedManyWithoutChallanInput
+    productionLogs?: ProductionTransactionCreateNestedManyWithoutChallanInput
+    inspections?: QualityInspectionCreateNestedManyWithoutChallanInput
+    events?: ChallanEventCreateNestedManyWithoutChallanInput
+    bundles?: BundleCreateNestedManyWithoutChallanInput
+    defects?: DefectRecordCreateNestedManyWithoutChallanInput
+    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
+  }
+
+  export type ChallanUncheckedCreateWithoutDyeingInboundOrdersInput = {
+    id?: string
+    challanNumber: string
+    challanType: string
+    programId: string
+    parentChallanId?: string | null
+    fromDepartment: string
+    toDepartment: string
+    status?: string
+    priority?: string
+    issuedDate?: Date | string | null
+    receivedDate?: Date | string | null
+    completedDate?: Date | string | null
+    createdById: string
+    issuedById?: string | null
+    receivedById?: string | null
+    approvedById?: string | null
+    remarks?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    childChallans?: ChallanUncheckedCreateNestedManyWithoutParentChallanInput
+    items?: ChallanItemUncheckedCreateNestedManyWithoutChallanInput
+    productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutChallanInput
+    inspections?: QualityInspectionUncheckedCreateNestedManyWithoutChallanInput
+    events?: ChallanEventUncheckedCreateNestedManyWithoutChallanInput
+    bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
+    defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
+    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
+  }
+
+  export type ChallanCreateOrConnectWithoutDyeingInboundOrdersInput = {
+    where: ChallanWhereUniqueInput
+    create: XOR<ChallanCreateWithoutDyeingInboundOrdersInput, ChallanUncheckedCreateWithoutDyeingInboundOrdersInput>
+  }
+
+  export type UserCreateWithoutDyeingOrdersInchargeInput = {
+    id?: string
+    username: string
+    email: string
+    fullName: string
+    passwordHash: string
+    departmentCode?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userRoles?: UserRoleCreateNestedManyWithoutUserInput
+    createdPrograms?: ProgramCreateNestedManyWithoutCreatedByInput
+    approvedPrograms?: ProgramCreateNestedManyWithoutApprovedByInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    attachments?: AttachmentCreateNestedManyWithoutUploadedByInput
+    createdChallans?: ChallanCreateNestedManyWithoutCreatedByInput
+    issuedChallans?: ChallanCreateNestedManyWithoutIssuedByInput
+    receivedChallans?: ChallanCreateNestedManyWithoutReceivedByInput
+    approvedChallans?: ChallanCreateNestedManyWithoutApprovedByInput
+    productionRecords?: ProductionTransactionCreateNestedManyWithoutOperatorInput
+    inspections?: QualityInspectionCreateNestedManyWithoutInspectorInput
+    challanEvents?: ChallanEventCreateNestedManyWithoutActorInput
+    stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutActorInput
+    dispatchesApproved?: DispatchOrderCreateNestedManyWithoutApprovedByInput
+    dispatchesOperated?: DispatchOrderCreateNestedManyWithoutDispatchedByInput
+    defectsDetected?: DefectRecordCreateNestedManyWithoutDetectedByInput
+    reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
+    recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
+    recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+  }
+
+  export type UserUncheckedCreateWithoutDyeingOrdersInchargeInput = {
+    id?: string
+    username: string
+    email: string
+    fullName: string
+    passwordHash: string
+    departmentCode?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userRoles?: UserRoleUncheckedCreateNestedManyWithoutUserInput
+    createdPrograms?: ProgramUncheckedCreateNestedManyWithoutCreatedByInput
+    approvedPrograms?: ProgramUncheckedCreateNestedManyWithoutApprovedByInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    attachments?: AttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+    createdChallans?: ChallanUncheckedCreateNestedManyWithoutCreatedByInput
+    issuedChallans?: ChallanUncheckedCreateNestedManyWithoutIssuedByInput
+    receivedChallans?: ChallanUncheckedCreateNestedManyWithoutReceivedByInput
+    approvedChallans?: ChallanUncheckedCreateNestedManyWithoutApprovedByInput
+    productionRecords?: ProductionTransactionUncheckedCreateNestedManyWithoutOperatorInput
+    inspections?: QualityInspectionUncheckedCreateNestedManyWithoutInspectorInput
+    challanEvents?: ChallanEventUncheckedCreateNestedManyWithoutActorInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutActorInput
+    dispatchesApproved?: DispatchOrderUncheckedCreateNestedManyWithoutApprovedByInput
+    dispatchesOperated?: DispatchOrderUncheckedCreateNestedManyWithoutDispatchedByInput
+    defectsDetected?: DefectRecordUncheckedCreateNestedManyWithoutDetectedByInput
+    reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
+    recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
+    recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+  }
+
+  export type UserCreateOrConnectWithoutDyeingOrdersInchargeInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutDyeingOrdersInchargeInput, UserUncheckedCreateWithoutDyeingOrdersInchargeInput>
+  }
+
+  export type ChallanCreateWithoutDyeingQc1OrdersInput = {
+    id?: string
+    challanNumber: string
+    challanType: string
+    status?: string
+    priority?: string
+    issuedDate?: Date | string | null
+    receivedDate?: Date | string | null
+    completedDate?: Date | string | null
+    remarks?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    program: ProgramCreateNestedOneWithoutChallansInput
+    parentChallan?: ChallanCreateNestedOneWithoutChildChallansInput
+    childChallans?: ChallanCreateNestedManyWithoutParentChallanInput
+    fromDeptRel: DepartmentCreateNestedOneWithoutFromChallansInput
+    toDeptRel: DepartmentCreateNestedOneWithoutToChallansInput
+    createdBy: UserCreateNestedOneWithoutCreatedChallansInput
+    issuedBy?: UserCreateNestedOneWithoutIssuedChallansInput
+    receivedBy?: UserCreateNestedOneWithoutReceivedChallansInput
+    approvedBy?: UserCreateNestedOneWithoutApprovedChallansInput
+    items?: ChallanItemCreateNestedManyWithoutChallanInput
+    productionLogs?: ProductionTransactionCreateNestedManyWithoutChallanInput
+    inspections?: QualityInspectionCreateNestedManyWithoutChallanInput
+    events?: ChallanEventCreateNestedManyWithoutChallanInput
+    bundles?: BundleCreateNestedManyWithoutChallanInput
+    defects?: DefectRecordCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
+  }
+
+  export type ChallanUncheckedCreateWithoutDyeingQc1OrdersInput = {
+    id?: string
+    challanNumber: string
+    challanType: string
+    programId: string
+    parentChallanId?: string | null
+    fromDepartment: string
+    toDepartment: string
+    status?: string
+    priority?: string
+    issuedDate?: Date | string | null
+    receivedDate?: Date | string | null
+    completedDate?: Date | string | null
+    createdById: string
+    issuedById?: string | null
+    receivedById?: string | null
+    approvedById?: string | null
+    remarks?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    childChallans?: ChallanUncheckedCreateNestedManyWithoutParentChallanInput
+    items?: ChallanItemUncheckedCreateNestedManyWithoutChallanInput
+    productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutChallanInput
+    inspections?: QualityInspectionUncheckedCreateNestedManyWithoutChallanInput
+    events?: ChallanEventUncheckedCreateNestedManyWithoutChallanInput
+    bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
+    defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
+  }
+
+  export type ChallanCreateOrConnectWithoutDyeingQc1OrdersInput = {
+    where: ChallanWhereUniqueInput
+    create: XOR<ChallanCreateWithoutDyeingQc1OrdersInput, ChallanUncheckedCreateWithoutDyeingQc1OrdersInput>
+  }
+
+  export type ProgramUpsertWithoutDyeingOrdersInput = {
+    update: XOR<ProgramUpdateWithoutDyeingOrdersInput, ProgramUncheckedUpdateWithoutDyeingOrdersInput>
+    create: XOR<ProgramCreateWithoutDyeingOrdersInput, ProgramUncheckedCreateWithoutDyeingOrdersInput>
+    where?: ProgramWhereInput
+  }
+
+  export type ProgramUpdateToOneWithWhereWithoutDyeingOrdersInput = {
+    where?: ProgramWhereInput
+    data: XOR<ProgramUpdateWithoutDyeingOrdersInput, ProgramUncheckedUpdateWithoutDyeingOrdersInput>
+  }
+
+  export type ProgramUpdateWithoutDyeingOrdersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    programNumber?: StringFieldUpdateOperationsInput | string
+    programDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    buyerName?: StringFieldUpdateOperationsInput | string
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    designName?: StringFieldUpdateOperationsInput | string
+    styleCode?: StringFieldUpdateOperationsInput | string
+    productCategory?: StringFieldUpdateOperationsInput | string
+    targetQuantity?: IntFieldUpdateOperationsInput | number
+    deliveryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    priority?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    programSerialNo?: NullableStringFieldUpdateOperationsInput | string | null
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    designNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    clientName?: NullableStringFieldUpdateOperationsInput | string | null
+    clientPriority?: NullableStringFieldUpdateOperationsInput | string | null
+    mainStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    subStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    pattern?: NullableStringFieldUpdateOperationsInput | string | null
+    baseDesignType?: NullableStringFieldUpdateOperationsInput | string | null
+    baseDesignPhoto?: NullableStringFieldUpdateOperationsInput | string | null
+    wilcomDesignNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    wilcomDesignPhoto?: NullableStringFieldUpdateOperationsInput | string | null
+    embroideryDesign?: NullableStringFieldUpdateOperationsInput | string | null
+    embroideryDesignSize?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricName?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricWidth?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricWidthInches?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricColor?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricColorAvailable?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricAverage?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricAverageType?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricAverageMeasurement?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricDyeingRequired?: BoolFieldUpdateOperationsInput | boolean
+    fabricIssuedToDyeing?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricSentToDyeing?: NullableFloatFieldUpdateOperationsInput | number | null
+    colorQuantity?: NullableIntFieldUpdateOperationsInput | number | null
+    quantityMeasurement?: NullableStringFieldUpdateOperationsInput | string | null
+    specialMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    specialMaterialQuantity?: NullableStringFieldUpdateOperationsInput | string | null
+    productionDesignDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    productionEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    piecesRejection?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    comments?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    customer?: CustomerUpdateOneWithoutProgramsNestedInput
+    design?: DesignUpdateOneWithoutProgramsNestedInput
+    createdBy?: UserUpdateOneRequiredWithoutCreatedProgramsNestedInput
+    approvedBy?: UserUpdateOneWithoutApprovedProgramsNestedInput
+    fabrics?: ProgramFabricUpdateManyWithoutProgramNestedInput
+    colours?: ProgramColourUpdateManyWithoutProgramNestedInput
+    sizes?: ProgramSizeUpdateManyWithoutProgramNestedInput
+    specifications?: ProgramSpecificationUpdateManyWithoutProgramNestedInput
+    bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
+    routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
+    challans?: ChallanUpdateManyWithoutProgramNestedInput
+    productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
+    rolls?: FabricRollUpdateManyWithoutProgramNestedInput
+    bundles?: BundleUpdateManyWithoutProgramNestedInput
+    cartons?: CartonUpdateManyWithoutProgramNestedInput
+    defects?: DefectRecordUpdateManyWithoutProgramNestedInput
+    stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutProgramNestedInput
+    reworkTransactions?: ReworkTransactionUpdateManyWithoutProgramNestedInput
+    recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
+  }
+
+  export type ProgramUncheckedUpdateWithoutDyeingOrdersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    programNumber?: StringFieldUpdateOperationsInput | string
+    programDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    customerId?: NullableStringFieldUpdateOperationsInput | string | null
+    buyerName?: StringFieldUpdateOperationsInput | string
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    designId?: NullableStringFieldUpdateOperationsInput | string | null
+    designName?: StringFieldUpdateOperationsInput | string
+    styleCode?: StringFieldUpdateOperationsInput | string
+    productCategory?: StringFieldUpdateOperationsInput | string
+    targetQuantity?: IntFieldUpdateOperationsInput | number
+    deliveryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    priority?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdById?: StringFieldUpdateOperationsInput | string
+    approvedById?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    programSerialNo?: NullableStringFieldUpdateOperationsInput | string | null
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    designNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    clientName?: NullableStringFieldUpdateOperationsInput | string | null
+    clientPriority?: NullableStringFieldUpdateOperationsInput | string | null
+    mainStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    subStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    pattern?: NullableStringFieldUpdateOperationsInput | string | null
+    baseDesignType?: NullableStringFieldUpdateOperationsInput | string | null
+    baseDesignPhoto?: NullableStringFieldUpdateOperationsInput | string | null
+    wilcomDesignNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    wilcomDesignPhoto?: NullableStringFieldUpdateOperationsInput | string | null
+    embroideryDesign?: NullableStringFieldUpdateOperationsInput | string | null
+    embroideryDesignSize?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricName?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricWidth?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricWidthInches?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricColor?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricColorAvailable?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricAverage?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricAverageType?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricAverageMeasurement?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricDyeingRequired?: BoolFieldUpdateOperationsInput | boolean
+    fabricIssuedToDyeing?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricSentToDyeing?: NullableFloatFieldUpdateOperationsInput | number | null
+    colorQuantity?: NullableIntFieldUpdateOperationsInput | number | null
+    quantityMeasurement?: NullableStringFieldUpdateOperationsInput | string | null
+    specialMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    specialMaterialQuantity?: NullableStringFieldUpdateOperationsInput | string | null
+    productionDesignDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    productionEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    piecesRejection?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    comments?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabrics?: ProgramFabricUncheckedUpdateManyWithoutProgramNestedInput
+    colours?: ProgramColourUncheckedUpdateManyWithoutProgramNestedInput
+    sizes?: ProgramSizeUncheckedUpdateManyWithoutProgramNestedInput
+    specifications?: ProgramSpecificationUncheckedUpdateManyWithoutProgramNestedInput
+    bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
+    routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
+    challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
+    rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
+    bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
+    cartons?: CartonUncheckedUpdateManyWithoutProgramNestedInput
+    defects?: DefectRecordUncheckedUpdateManyWithoutProgramNestedInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutProgramNestedInput
+    reworkTransactions?: ReworkTransactionUncheckedUpdateManyWithoutProgramNestedInput
+    recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
+  }
+
+  export type ChallanUpsertWithoutDyeingInboundOrdersInput = {
+    update: XOR<ChallanUpdateWithoutDyeingInboundOrdersInput, ChallanUncheckedUpdateWithoutDyeingInboundOrdersInput>
+    create: XOR<ChallanCreateWithoutDyeingInboundOrdersInput, ChallanUncheckedCreateWithoutDyeingInboundOrdersInput>
+    where?: ChallanWhereInput
+  }
+
+  export type ChallanUpdateToOneWithWhereWithoutDyeingInboundOrdersInput = {
+    where?: ChallanWhereInput
+    data: XOR<ChallanUpdateWithoutDyeingInboundOrdersInput, ChallanUncheckedUpdateWithoutDyeingInboundOrdersInput>
+  }
+
+  export type ChallanUpdateWithoutDyeingInboundOrdersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    challanNumber?: StringFieldUpdateOperationsInput | string
+    challanType?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    priority?: StringFieldUpdateOperationsInput | string
+    issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    program?: ProgramUpdateOneRequiredWithoutChallansNestedInput
+    parentChallan?: ChallanUpdateOneWithoutChildChallansNestedInput
+    childChallans?: ChallanUpdateManyWithoutParentChallanNestedInput
+    fromDeptRel?: DepartmentUpdateOneRequiredWithoutFromChallansNestedInput
+    toDeptRel?: DepartmentUpdateOneRequiredWithoutToChallansNestedInput
+    createdBy?: UserUpdateOneRequiredWithoutCreatedChallansNestedInput
+    issuedBy?: UserUpdateOneWithoutIssuedChallansNestedInput
+    receivedBy?: UserUpdateOneWithoutReceivedChallansNestedInput
+    approvedBy?: UserUpdateOneWithoutApprovedChallansNestedInput
+    items?: ChallanItemUpdateManyWithoutChallanNestedInput
+    productionLogs?: ProductionTransactionUpdateManyWithoutChallanNestedInput
+    inspections?: QualityInspectionUpdateManyWithoutChallanNestedInput
+    events?: ChallanEventUpdateManyWithoutChallanNestedInput
+    bundles?: BundleUpdateManyWithoutChallanNestedInput
+    defects?: DefectRecordUpdateManyWithoutChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
+  }
+
+  export type ChallanUncheckedUpdateWithoutDyeingInboundOrdersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    challanNumber?: StringFieldUpdateOperationsInput | string
+    challanType?: StringFieldUpdateOperationsInput | string
+    programId?: StringFieldUpdateOperationsInput | string
+    parentChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    fromDepartment?: StringFieldUpdateOperationsInput | string
+    toDepartment?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    priority?: StringFieldUpdateOperationsInput | string
+    issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdById?: StringFieldUpdateOperationsInput | string
+    issuedById?: NullableStringFieldUpdateOperationsInput | string | null
+    receivedById?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedById?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    childChallans?: ChallanUncheckedUpdateManyWithoutParentChallanNestedInput
+    items?: ChallanItemUncheckedUpdateManyWithoutChallanNestedInput
+    productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutChallanNestedInput
+    inspections?: QualityInspectionUncheckedUpdateManyWithoutChallanNestedInput
+    events?: ChallanEventUncheckedUpdateManyWithoutChallanNestedInput
+    bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
+    defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
+  }
+
+  export type UserUpsertWithoutDyeingOrdersInchargeInput = {
+    update: XOR<UserUpdateWithoutDyeingOrdersInchargeInput, UserUncheckedUpdateWithoutDyeingOrdersInchargeInput>
+    create: XOR<UserCreateWithoutDyeingOrdersInchargeInput, UserUncheckedCreateWithoutDyeingOrdersInchargeInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutDyeingOrdersInchargeInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutDyeingOrdersInchargeInput, UserUncheckedUpdateWithoutDyeingOrdersInchargeInput>
+  }
+
+  export type UserUpdateWithoutDyeingOrdersInchargeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    departmentCode?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userRoles?: UserRoleUpdateManyWithoutUserNestedInput
+    createdPrograms?: ProgramUpdateManyWithoutCreatedByNestedInput
+    approvedPrograms?: ProgramUpdateManyWithoutApprovedByNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    attachments?: AttachmentUpdateManyWithoutUploadedByNestedInput
+    createdChallans?: ChallanUpdateManyWithoutCreatedByNestedInput
+    issuedChallans?: ChallanUpdateManyWithoutIssuedByNestedInput
+    receivedChallans?: ChallanUpdateManyWithoutReceivedByNestedInput
+    approvedChallans?: ChallanUpdateManyWithoutApprovedByNestedInput
+    productionRecords?: ProductionTransactionUpdateManyWithoutOperatorNestedInput
+    inspections?: QualityInspectionUpdateManyWithoutInspectorNestedInput
+    challanEvents?: ChallanEventUpdateManyWithoutActorNestedInput
+    stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutActorNestedInput
+    dispatchesApproved?: DispatchOrderUpdateManyWithoutApprovedByNestedInput
+    dispatchesOperated?: DispatchOrderUpdateManyWithoutDispatchedByNestedInput
+    defectsDetected?: DefectRecordUpdateManyWithoutDetectedByNestedInput
+    reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
+    recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
+    recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutDyeingOrdersInchargeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    departmentCode?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userRoles?: UserRoleUncheckedUpdateManyWithoutUserNestedInput
+    createdPrograms?: ProgramUncheckedUpdateManyWithoutCreatedByNestedInput
+    approvedPrograms?: ProgramUncheckedUpdateManyWithoutApprovedByNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    attachments?: AttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+    createdChallans?: ChallanUncheckedUpdateManyWithoutCreatedByNestedInput
+    issuedChallans?: ChallanUncheckedUpdateManyWithoutIssuedByNestedInput
+    receivedChallans?: ChallanUncheckedUpdateManyWithoutReceivedByNestedInput
+    approvedChallans?: ChallanUncheckedUpdateManyWithoutApprovedByNestedInput
+    productionRecords?: ProductionTransactionUncheckedUpdateManyWithoutOperatorNestedInput
+    inspections?: QualityInspectionUncheckedUpdateManyWithoutInspectorNestedInput
+    challanEvents?: ChallanEventUncheckedUpdateManyWithoutActorNestedInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutActorNestedInput
+    dispatchesApproved?: DispatchOrderUncheckedUpdateManyWithoutApprovedByNestedInput
+    dispatchesOperated?: DispatchOrderUncheckedUpdateManyWithoutDispatchedByNestedInput
+    defectsDetected?: DefectRecordUncheckedUpdateManyWithoutDetectedByNestedInput
+    reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
+    recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+    recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+  }
+
+  export type ChallanUpsertWithoutDyeingQc1OrdersInput = {
+    update: XOR<ChallanUpdateWithoutDyeingQc1OrdersInput, ChallanUncheckedUpdateWithoutDyeingQc1OrdersInput>
+    create: XOR<ChallanCreateWithoutDyeingQc1OrdersInput, ChallanUncheckedCreateWithoutDyeingQc1OrdersInput>
+    where?: ChallanWhereInput
+  }
+
+  export type ChallanUpdateToOneWithWhereWithoutDyeingQc1OrdersInput = {
+    where?: ChallanWhereInput
+    data: XOR<ChallanUpdateWithoutDyeingQc1OrdersInput, ChallanUncheckedUpdateWithoutDyeingQc1OrdersInput>
+  }
+
+  export type ChallanUpdateWithoutDyeingQc1OrdersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    challanNumber?: StringFieldUpdateOperationsInput | string
+    challanType?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    priority?: StringFieldUpdateOperationsInput | string
+    issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    program?: ProgramUpdateOneRequiredWithoutChallansNestedInput
+    parentChallan?: ChallanUpdateOneWithoutChildChallansNestedInput
+    childChallans?: ChallanUpdateManyWithoutParentChallanNestedInput
+    fromDeptRel?: DepartmentUpdateOneRequiredWithoutFromChallansNestedInput
+    toDeptRel?: DepartmentUpdateOneRequiredWithoutToChallansNestedInput
+    createdBy?: UserUpdateOneRequiredWithoutCreatedChallansNestedInput
+    issuedBy?: UserUpdateOneWithoutIssuedChallansNestedInput
+    receivedBy?: UserUpdateOneWithoutReceivedChallansNestedInput
+    approvedBy?: UserUpdateOneWithoutApprovedChallansNestedInput
+    items?: ChallanItemUpdateManyWithoutChallanNestedInput
+    productionLogs?: ProductionTransactionUpdateManyWithoutChallanNestedInput
+    inspections?: QualityInspectionUpdateManyWithoutChallanNestedInput
+    events?: ChallanEventUpdateManyWithoutChallanNestedInput
+    bundles?: BundleUpdateManyWithoutChallanNestedInput
+    defects?: DefectRecordUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
+  }
+
+  export type ChallanUncheckedUpdateWithoutDyeingQc1OrdersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    challanNumber?: StringFieldUpdateOperationsInput | string
+    challanType?: StringFieldUpdateOperationsInput | string
+    programId?: StringFieldUpdateOperationsInput | string
+    parentChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    fromDepartment?: StringFieldUpdateOperationsInput | string
+    toDepartment?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    priority?: StringFieldUpdateOperationsInput | string
+    issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdById?: StringFieldUpdateOperationsInput | string
+    issuedById?: NullableStringFieldUpdateOperationsInput | string | null
+    receivedById?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedById?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    childChallans?: ChallanUncheckedUpdateManyWithoutParentChallanNestedInput
+    items?: ChallanItemUncheckedUpdateManyWithoutChallanNestedInput
+    productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutChallanNestedInput
+    inspections?: QualityInspectionUncheckedUpdateManyWithoutChallanNestedInput
+    events?: ChallanEventUncheckedUpdateManyWithoutChallanNestedInput
+    bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
+    defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
   }
 
   export type UserRoleCreateManyUserInput = {
@@ -122199,6 +126121,36 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type DyeingOrderCreateManyInchargeInput = {
+    id?: string
+    orderNumber: string
+    programId: string
+    inboundChallanId?: string | null
+    status?: string
+    priority?: string
+    fabricName: string
+    fabricType?: string | null
+    targetColor: string
+    dyedColor?: string | null
+    colorCode?: string | null
+    requiredQuantity: number
+    dyedQuantity?: number
+    undyedQuantity?: number
+    readyForQc1Quantity?: number
+    sentToQc1Quantity?: number
+    uom?: string
+    inchargeName?: string | null
+    batchNumber?: string | null
+    machineNumber?: string | null
+    processRemarks?: string | null
+    qc1ChallanId?: string | null
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    sentToQc1At?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type UserRoleUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -122290,6 +126242,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutCreatedByInput = {
@@ -122365,6 +126318,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateManyWithoutCreatedByInput = {
@@ -122498,6 +126452,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutApprovedByInput = {
@@ -122573,6 +126528,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateManyWithoutApprovedByInput = {
@@ -122728,6 +126684,8 @@ export namespace Prisma {
     events?: ChallanEventUpdateManyWithoutChallanNestedInput
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutCreatedByInput = {
@@ -122756,6 +126714,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedUpdateManyWithoutChallanNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateManyWithoutCreatedByInput = {
@@ -122805,6 +126765,8 @@ export namespace Prisma {
     events?: ChallanEventUpdateManyWithoutChallanNestedInput
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutIssuedByInput = {
@@ -122833,6 +126795,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedUpdateManyWithoutChallanNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateManyWithoutIssuedByInput = {
@@ -122882,6 +126846,8 @@ export namespace Prisma {
     events?: ChallanEventUpdateManyWithoutChallanNestedInput
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutReceivedByInput = {
@@ -122910,6 +126876,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedUpdateManyWithoutChallanNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateManyWithoutReceivedByInput = {
@@ -122959,6 +126927,8 @@ export namespace Prisma {
     events?: ChallanEventUpdateManyWithoutChallanNestedInput
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutApprovedByInput = {
@@ -122987,6 +126957,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedUpdateManyWithoutChallanNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateManyWithoutApprovedByInput = {
@@ -123813,6 +127785,96 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type DyeingOrderUpdateWithoutInchargeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    priority?: StringFieldUpdateOperationsInput | string
+    fabricName?: StringFieldUpdateOperationsInput | string
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    targetColor?: StringFieldUpdateOperationsInput | string
+    dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: FloatFieldUpdateOperationsInput | number
+    dyedQuantity?: FloatFieldUpdateOperationsInput | number
+    undyedQuantity?: FloatFieldUpdateOperationsInput | number
+    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: StringFieldUpdateOperationsInput | string
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
+    batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    machineNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    program?: ProgramUpdateOneRequiredWithoutDyeingOrdersNestedInput
+    inboundChallan?: ChallanUpdateOneWithoutDyeingInboundOrdersNestedInput
+    qc1Challan?: ChallanUpdateOneWithoutDyeingQc1OrdersNestedInput
+  }
+
+  export type DyeingOrderUncheckedUpdateWithoutInchargeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    programId?: StringFieldUpdateOperationsInput | string
+    inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    priority?: StringFieldUpdateOperationsInput | string
+    fabricName?: StringFieldUpdateOperationsInput | string
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    targetColor?: StringFieldUpdateOperationsInput | string
+    dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: FloatFieldUpdateOperationsInput | number
+    dyedQuantity?: FloatFieldUpdateOperationsInput | number
+    undyedQuantity?: FloatFieldUpdateOperationsInput | number
+    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: StringFieldUpdateOperationsInput | string
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
+    batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    machineNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    qc1ChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DyeingOrderUncheckedUpdateManyWithoutInchargeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    programId?: StringFieldUpdateOperationsInput | string
+    inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    priority?: StringFieldUpdateOperationsInput | string
+    fabricName?: StringFieldUpdateOperationsInput | string
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    targetColor?: StringFieldUpdateOperationsInput | string
+    dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: FloatFieldUpdateOperationsInput | number
+    dyedQuantity?: FloatFieldUpdateOperationsInput | number
+    undyedQuantity?: FloatFieldUpdateOperationsInput | number
+    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: StringFieldUpdateOperationsInput | string
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
+    batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    machineNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    qc1ChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type UserRoleCreateManyRoleInput = {
     id?: string
     userId: string
@@ -124089,6 +128151,8 @@ export namespace Prisma {
     events?: ChallanEventUpdateManyWithoutChallanNestedInput
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutFromDeptRelInput = {
@@ -124117,6 +128181,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedUpdateManyWithoutChallanNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateManyWithoutFromDeptRelInput = {
@@ -124166,6 +128232,8 @@ export namespace Prisma {
     events?: ChallanEventUpdateManyWithoutChallanNestedInput
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutToDeptRelInput = {
@@ -124194,6 +128262,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedUpdateManyWithoutChallanNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateManyWithoutToDeptRelInput = {
@@ -124715,6 +128785,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutCustomerInput = {
@@ -124790,6 +128861,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateManyWithoutCustomerInput = {
@@ -125174,6 +129246,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutDesignInput = {
@@ -125249,6 +129322,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateManyWithoutDesignInput = {
@@ -125871,6 +129945,36 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type DyeingOrderCreateManyProgramInput = {
+    id?: string
+    orderNumber: string
+    inboundChallanId?: string | null
+    status?: string
+    priority?: string
+    fabricName: string
+    fabricType?: string | null
+    targetColor: string
+    dyedColor?: string | null
+    colorCode?: string | null
+    requiredQuantity: number
+    dyedQuantity?: number
+    undyedQuantity?: number
+    readyForQc1Quantity?: number
+    sentToQc1Quantity?: number
+    uom?: string
+    inchargeId?: string | null
+    inchargeName?: string | null
+    batchNumber?: string | null
+    machineNumber?: string | null
+    processRemarks?: string | null
+    qc1ChallanId?: string | null
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    sentToQc1At?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type ProgramFabricUpdateWithoutProgramInput = {
     id?: StringFieldUpdateOperationsInput | string
     fabricCode?: StringFieldUpdateOperationsInput | string
@@ -126127,6 +130231,8 @@ export namespace Prisma {
     events?: ChallanEventUpdateManyWithoutChallanNestedInput
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutProgramInput = {
@@ -126155,6 +130261,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedUpdateManyWithoutChallanNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateManyWithoutProgramInput = {
@@ -126775,6 +130883,96 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type DyeingOrderUpdateWithoutProgramInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    priority?: StringFieldUpdateOperationsInput | string
+    fabricName?: StringFieldUpdateOperationsInput | string
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    targetColor?: StringFieldUpdateOperationsInput | string
+    dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: FloatFieldUpdateOperationsInput | number
+    dyedQuantity?: FloatFieldUpdateOperationsInput | number
+    undyedQuantity?: FloatFieldUpdateOperationsInput | number
+    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: StringFieldUpdateOperationsInput | string
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
+    batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    machineNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    inboundChallan?: ChallanUpdateOneWithoutDyeingInboundOrdersNestedInput
+    incharge?: UserUpdateOneWithoutDyeingOrdersInchargeNestedInput
+    qc1Challan?: ChallanUpdateOneWithoutDyeingQc1OrdersNestedInput
+  }
+
+  export type DyeingOrderUncheckedUpdateWithoutProgramInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    priority?: StringFieldUpdateOperationsInput | string
+    fabricName?: StringFieldUpdateOperationsInput | string
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    targetColor?: StringFieldUpdateOperationsInput | string
+    dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: FloatFieldUpdateOperationsInput | number
+    dyedQuantity?: FloatFieldUpdateOperationsInput | number
+    undyedQuantity?: FloatFieldUpdateOperationsInput | number
+    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: StringFieldUpdateOperationsInput | string
+    inchargeId?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
+    batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    machineNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    qc1ChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DyeingOrderUncheckedUpdateManyWithoutProgramInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    priority?: StringFieldUpdateOperationsInput | string
+    fabricName?: StringFieldUpdateOperationsInput | string
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    targetColor?: StringFieldUpdateOperationsInput | string
+    dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: FloatFieldUpdateOperationsInput | number
+    dyedQuantity?: FloatFieldUpdateOperationsInput | number
+    undyedQuantity?: FloatFieldUpdateOperationsInput | number
+    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: StringFieldUpdateOperationsInput | string
+    inchargeId?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
+    batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    machineNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    qc1ChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type ProgramRouteStepCreateManyProgramRouteInput = {
     id?: string
     sequenceOrder: number
@@ -126967,6 +131165,66 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type DyeingOrderCreateManyInboundChallanInput = {
+    id?: string
+    orderNumber: string
+    programId: string
+    status?: string
+    priority?: string
+    fabricName: string
+    fabricType?: string | null
+    targetColor: string
+    dyedColor?: string | null
+    colorCode?: string | null
+    requiredQuantity: number
+    dyedQuantity?: number
+    undyedQuantity?: number
+    readyForQc1Quantity?: number
+    sentToQc1Quantity?: number
+    uom?: string
+    inchargeId?: string | null
+    inchargeName?: string | null
+    batchNumber?: string | null
+    machineNumber?: string | null
+    processRemarks?: string | null
+    qc1ChallanId?: string | null
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    sentToQc1At?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DyeingOrderCreateManyQc1ChallanInput = {
+    id?: string
+    orderNumber: string
+    programId: string
+    inboundChallanId?: string | null
+    status?: string
+    priority?: string
+    fabricName: string
+    fabricType?: string | null
+    targetColor: string
+    dyedColor?: string | null
+    colorCode?: string | null
+    requiredQuantity: number
+    dyedQuantity?: number
+    undyedQuantity?: number
+    readyForQc1Quantity?: number
+    sentToQc1Quantity?: number
+    uom?: string
+    inchargeId?: string | null
+    inchargeName?: string | null
+    batchNumber?: string | null
+    machineNumber?: string | null
+    processRemarks?: string | null
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    sentToQc1At?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type ChallanUpdateWithoutParentChallanInput = {
     id?: StringFieldUpdateOperationsInput | string
     challanNumber?: StringFieldUpdateOperationsInput | string
@@ -126993,6 +131251,8 @@ export namespace Prisma {
     events?: ChallanEventUpdateManyWithoutChallanNestedInput
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutParentChallanInput = {
@@ -127021,6 +131281,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedUpdateManyWithoutChallanNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
+    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateManyWithoutParentChallanInput = {
@@ -127377,6 +131639,186 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DyeingOrderUpdateWithoutInboundChallanInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    priority?: StringFieldUpdateOperationsInput | string
+    fabricName?: StringFieldUpdateOperationsInput | string
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    targetColor?: StringFieldUpdateOperationsInput | string
+    dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: FloatFieldUpdateOperationsInput | number
+    dyedQuantity?: FloatFieldUpdateOperationsInput | number
+    undyedQuantity?: FloatFieldUpdateOperationsInput | number
+    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: StringFieldUpdateOperationsInput | string
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
+    batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    machineNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    program?: ProgramUpdateOneRequiredWithoutDyeingOrdersNestedInput
+    incharge?: UserUpdateOneWithoutDyeingOrdersInchargeNestedInput
+    qc1Challan?: ChallanUpdateOneWithoutDyeingQc1OrdersNestedInput
+  }
+
+  export type DyeingOrderUncheckedUpdateWithoutInboundChallanInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    programId?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    priority?: StringFieldUpdateOperationsInput | string
+    fabricName?: StringFieldUpdateOperationsInput | string
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    targetColor?: StringFieldUpdateOperationsInput | string
+    dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: FloatFieldUpdateOperationsInput | number
+    dyedQuantity?: FloatFieldUpdateOperationsInput | number
+    undyedQuantity?: FloatFieldUpdateOperationsInput | number
+    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: StringFieldUpdateOperationsInput | string
+    inchargeId?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
+    batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    machineNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    qc1ChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DyeingOrderUncheckedUpdateManyWithoutInboundChallanInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    programId?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    priority?: StringFieldUpdateOperationsInput | string
+    fabricName?: StringFieldUpdateOperationsInput | string
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    targetColor?: StringFieldUpdateOperationsInput | string
+    dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: FloatFieldUpdateOperationsInput | number
+    dyedQuantity?: FloatFieldUpdateOperationsInput | number
+    undyedQuantity?: FloatFieldUpdateOperationsInput | number
+    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: StringFieldUpdateOperationsInput | string
+    inchargeId?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
+    batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    machineNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    qc1ChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DyeingOrderUpdateWithoutQc1ChallanInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    priority?: StringFieldUpdateOperationsInput | string
+    fabricName?: StringFieldUpdateOperationsInput | string
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    targetColor?: StringFieldUpdateOperationsInput | string
+    dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: FloatFieldUpdateOperationsInput | number
+    dyedQuantity?: FloatFieldUpdateOperationsInput | number
+    undyedQuantity?: FloatFieldUpdateOperationsInput | number
+    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: StringFieldUpdateOperationsInput | string
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
+    batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    machineNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    program?: ProgramUpdateOneRequiredWithoutDyeingOrdersNestedInput
+    inboundChallan?: ChallanUpdateOneWithoutDyeingInboundOrdersNestedInput
+    incharge?: UserUpdateOneWithoutDyeingOrdersInchargeNestedInput
+  }
+
+  export type DyeingOrderUncheckedUpdateWithoutQc1ChallanInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    programId?: StringFieldUpdateOperationsInput | string
+    inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    priority?: StringFieldUpdateOperationsInput | string
+    fabricName?: StringFieldUpdateOperationsInput | string
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    targetColor?: StringFieldUpdateOperationsInput | string
+    dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: FloatFieldUpdateOperationsInput | number
+    dyedQuantity?: FloatFieldUpdateOperationsInput | number
+    undyedQuantity?: FloatFieldUpdateOperationsInput | number
+    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: StringFieldUpdateOperationsInput | string
+    inchargeId?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
+    batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    machineNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DyeingOrderUncheckedUpdateManyWithoutQc1ChallanInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    programId?: StringFieldUpdateOperationsInput | string
+    inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    priority?: StringFieldUpdateOperationsInput | string
+    fabricName?: StringFieldUpdateOperationsInput | string
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    targetColor?: StringFieldUpdateOperationsInput | string
+    dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
+    colorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: FloatFieldUpdateOperationsInput | number
+    dyedQuantity?: FloatFieldUpdateOperationsInput | number
+    undyedQuantity?: FloatFieldUpdateOperationsInput | number
+    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: StringFieldUpdateOperationsInput | string
+    inchargeId?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
+    batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    machineNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

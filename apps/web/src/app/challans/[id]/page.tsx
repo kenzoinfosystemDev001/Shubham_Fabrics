@@ -115,12 +115,33 @@ export default function ChallanDetailPage() {
               <span className="text-[11px] font-bold tracking-[0.2em] text-[#A66E22] block mb-1">
                 SHUBHAM FABRICS INDIA PVT. LTD.
               </span>
-              <h2 className="text-2xl font-serif font-black text-slate-900">
-                MATERIAL DISPATCH CHALLAN
-              </h2>
-              <p className="text-xs text-slate-500 mt-1">
-                Inter-department manufacturing transfer &amp; chain of custody
-              </p>
+              {challan.fromDepartment === 'DYEING' || challan.toDepartment === 'QC1' || (challan.challanNumber && challan.challanNumber.startsWith('CH-DYE-')) ? (
+                <div>
+                  <h2 className="text-xl font-serif font-black text-slate-900 tracking-wide">
+                    DYEING DEPARTMENT
+                  </h2>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-sm font-black font-mono tracking-wider text-blue-900 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                      DYEING → QC1
+                    </span>
+                    <span className="text-sm font-bold text-slate-800 tracking-widest">
+                      CHALLAN
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Inter-department manufacturing transfer &amp; quality check dispatch slip
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <h2 className="text-2xl font-serif font-black text-slate-900">
+                    MATERIAL DISPATCH CHALLAN
+                  </h2>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Inter-department manufacturing transfer &amp; chain of custody
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="text-right">
@@ -140,8 +161,10 @@ export default function ChallanDetailPage() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 bg-slate-50 border border-slate-200 rounded-lg text-xs">
             <div>
               <span className="text-slate-400 block text-[10px] font-bold uppercase">Issued From</span>
-              <span className="font-bold text-slate-900 text-sm">PROGRAMMING</span>
-              <span className="text-[10px] text-slate-500 block">Department #1</span>
+              <span className="font-bold text-slate-900 text-sm">{challan.fromDepartment || 'FABRIC STORE'}</span>
+              <span className="text-[10px] text-slate-500 block">
+                {challan.fromDepartment === 'DYEING' ? 'Dyeing Unit' : 'Source Gate'}
+              </span>
             </div>
             <div>
               <span className="text-slate-400 block text-[10px] font-bold uppercase">Dispatched To</span>
@@ -160,7 +183,7 @@ export default function ChallanDetailPage() {
             <div>
               <span className="text-slate-400 block text-[10px] font-bold uppercase">Issuer</span>
               <span className="font-semibold text-slate-900 text-sm">
-                {challan.createdBy?.fullName || challan.createdBy?.username || 'Programming Incharge'}
+                {challan.issuedBy?.fullName || challan.createdBy?.fullName || challan.createdBy?.username || 'Department Incharge'}
               </span>
               <span className="text-[10px] text-emerald-700 block">✓ Digitally Signed</span>
             </div>
@@ -215,7 +238,13 @@ export default function ChallanDetailPage() {
           {/* PHYSICAL SIGNATURE BLOCKS FOR FACTORY HANDOFF */}
           <div className="pt-8 border-t border-slate-200 grid grid-cols-2 gap-8 text-xs">
             <div className="border-t border-dashed border-slate-400 pt-2 text-center">
-              <span className="font-bold text-slate-800 block">Programming Department</span>
+              <span className="font-bold text-slate-800 block">
+                {challan.fromDepartment === 'DYEING' || challan.toDepartment === 'QC1'
+                  ? 'Dyeing Department'
+                  : challan.fromDepartment
+                  ? `${challan.fromDepartment} Department`
+                  : 'Dispatch Department'}
+              </span>
               <span className="text-[10px] text-slate-500">Authorized Issuer Signature</span>
             </div>
             <div className="border-t border-dashed border-slate-400 pt-2 text-center">

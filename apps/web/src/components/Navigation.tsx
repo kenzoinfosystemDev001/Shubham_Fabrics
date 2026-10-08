@@ -75,8 +75,8 @@ export function Navigation() {
     router.push('/login');
   };
 
-  // Do not render sidebar on login page, fabric-store workspace, or admin workspace
-  if (pathname === '/login' || pathname.startsWith('/fabric-store') || pathname.startsWith('/admin')) {
+  // Do not render sidebar on login page, fabric-store workspace, admin workspace, or dyeing workspace
+  if (pathname === '/login' || pathname.startsWith('/fabric-store') || pathname.startsWith('/admin') || pathname.startsWith('/dyeing')) {
     return null;
   }
 

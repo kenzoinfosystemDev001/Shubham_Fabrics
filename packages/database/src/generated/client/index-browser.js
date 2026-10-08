@@ -974,6 +974,37 @@ exports.Prisma.FabricStockLedgerScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.DyeingOrderScalarFieldEnum = {
+  id: 'id',
+  orderNumber: 'orderNumber',
+  programId: 'programId',
+  inboundChallanId: 'inboundChallanId',
+  status: 'status',
+  priority: 'priority',
+  fabricName: 'fabricName',
+  fabricType: 'fabricType',
+  targetColor: 'targetColor',
+  dyedColor: 'dyedColor',
+  colorCode: 'colorCode',
+  requiredQuantity: 'requiredQuantity',
+  dyedQuantity: 'dyedQuantity',
+  undyedQuantity: 'undyedQuantity',
+  readyForQc1Quantity: 'readyForQc1Quantity',
+  sentToQc1Quantity: 'sentToQc1Quantity',
+  uom: 'uom',
+  inchargeId: 'inchargeId',
+  inchargeName: 'inchargeName',
+  batchNumber: 'batchNumber',
+  machineNumber: 'machineNumber',
+  processRemarks: 'processRemarks',
+  qc1ChallanId: 'qc1ChallanId',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  sentToQc1At: 'sentToQc1At',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1121,7 +1152,8 @@ exports.Prisma.ModelName = {
   MaterialReceipt: 'MaterialReceipt',
   MaterialReceiptItem: 'MaterialReceiptItem',
   FabricQCInspection: 'FabricQCInspection',
-  FabricStockLedger: 'FabricStockLedger'
+  FabricStockLedger: 'FabricStockLedger',
+  DyeingOrder: 'DyeingOrder'
 };
 
 /**

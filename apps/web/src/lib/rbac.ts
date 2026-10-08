@@ -80,6 +80,25 @@ export function isFabricStoreUser(user: MESUser | null): boolean {
   );
 }
 
+export function isDyeingUser(user: MESUser | null): boolean {
+  if (!user) return false;
+  if (isAdminUser(user)) return true; // Admins have all access
+
+  const username = (user.username || '').toLowerCase();
+  const dept = (user.departmentCode || '').toUpperCase();
+  const role = (user.role || '').toUpperCase();
+  const roles = (user.roles || []).map((r) => r.toUpperCase());
+
+  return (
+    username === 'dyeing' ||
+    dept === 'DYEING' ||
+    role === 'DYEING_INCHARGE' ||
+    role === 'DYEING_OPERATOR' ||
+    roles.includes('DYEING_INCHARGE') ||
+    roles.includes('DYEING_OPERATOR')
+  );
+}
+
 /**
  * Checks if the current user has access to a specific route pathname.
  * Returns { allowed: boolean, redirectTarget: string, reason?: string }
@@ -102,13 +121,31 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
     return { allowed: true, redirectTarget: pathname };
   }
 
+  const defaultUserHome =
+    user.departmentCode === 'DYEING'
+      ? '/dyeing'
+      : user.departmentCode === 'STORE'
+      ? '/fabric-store'
+      : '/';
+
   // Admin routes protection
   if (pathname.startsWith('/admin')) {
-    const fallback = user.departmentCode === 'STORE' ? '/fabric-store' : '/';
     return {
       allowed: false,
-      redirectTarget: fallback,
+      redirectTarget: defaultUserHome,
       reason: 'Access Restricted: Admin Console is restricted to System Administrators.',
+    };
+  }
+
+  // Dyeing Department routes protection
+  if (pathname.startsWith('/dyeing')) {
+    if (isDyeingUser(user)) {
+      return { allowed: true, redirectTarget: pathname };
+    }
+    return {
+      allowed: false,
+      redirectTarget: defaultUserHome,
+      reason: 'Access Restricted: You are not authorized for the Dyeing Department. Access is restricted to Dyeing Department personnel and Admins.',
     };
   }
 
@@ -119,8 +156,8 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
     }
     return {
       allowed: false,
-      redirectTarget: '/',
-      reason: 'Access Restricted: You are logged into Programming. Fabric Store is restricted to Store Department personnel and Admins.',
+      redirectTarget: defaultUserHome,
+      reason: 'Access Restricted: Fabric Store is restricted to Store Department personnel and Admins.',
     };
   }
 
@@ -130,7 +167,9 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
     pathname === '/dashboard' ||
     pathname.startsWith('/my-work') ||
     pathname.startsWith('/programs') ||
-    (pathname.startsWith('/floor-board') && !pathname.startsWith('/fabric-store/floor-board'));
+    (pathname.startsWith('/floor-board') &&
+      !pathname.startsWith('/fabric-store/floor-board') &&
+      !pathname.startsWith('/dyeing/floor-board'));
 
   if (isProgrammingRoute) {
     if (isProgrammingUser(user)) {
@@ -138,8 +177,8 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
     }
     return {
       allowed: false,
-      redirectTarget: '/fabric-store',
-      reason: 'Access Restricted: You are logged into Fabric Store. Programming Department is restricted to Programming personnel and Admins.',
+      redirectTarget: defaultUserHome,
+      reason: 'Access Restricted: Programming Department is restricted to Programming personnel and Admins.',
     };
   }
 

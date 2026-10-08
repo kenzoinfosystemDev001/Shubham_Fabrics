@@ -23,6 +23,7 @@ export async function POST(request: Request) {
       program: { role: 'PROGRAMMING_INCHARGE', dept: 'PROGRAMMING', name: 'Programming Department' },
       programmer: { role: 'PROGRAMMING_INCHARGE', dept: 'PROGRAMMING', name: 'Programming Department' },
       store: { role: 'FABRIC_STORE', dept: 'STORE', name: 'Fabric Store Department' },
+      dyeing: { role: 'DYEING_INCHARGE', dept: 'DYEING', name: 'Dyeing Incharge' },
     };
 
     // 2. Query user from Neon DB
@@ -135,8 +136,19 @@ export async function POST(request: Request) {
         roleCodes.includes('PROGRAMMER') ||
         roleCodes.includes('PRODUCTION_MANAGER'));
 
+    const isDyeing =
+      !isAdmin &&
+      !isStore &&
+      !isProgramming &&
+      (user.username.toLowerCase() === 'dyeing' ||
+        user.departmentCode === 'DYEING' ||
+        roleCodes.includes('DYEING_INCHARGE') ||
+        roleCodes.includes('DYEING_OPERATOR'));
+
     const normalizedRole = isAdmin
       ? 'ADMIN'
+      : isDyeing
+      ? 'DYEING_INCHARGE'
       : isStore
       ? 'FABRIC_STORE'
       : isProgramming
@@ -145,6 +157,8 @@ export async function POST(request: Request) {
 
     const normalizedDept = isAdmin
       ? 'ADMIN'
+      : isDyeing
+      ? 'DYEING'
       : isStore
       ? 'STORE'
       : isProgramming
@@ -153,6 +167,8 @@ export async function POST(request: Request) {
 
     const defaultRedirect = isAdmin
       ? '/admin'
+      : isDyeing
+      ? '/dyeing'
       : isStore
       ? '/fabric-store'
       : '/';
