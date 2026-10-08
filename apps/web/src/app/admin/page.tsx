@@ -169,12 +169,26 @@ export default function AdminConsolePage() {
 
   // Delete Program Sheet handler (Admin remove capability)
   const handleDeleteProgram = async (id: string, progNo: string) => {
-    if (!confirm(`Are you sure you want to completely remove Production Sheet "${progNo}"? This action cascades safely.`)) return;
+    if (!confirm(`Are you sure you want to completely remove Production Sheet "${progNo}"? This action will permanently remove it and all linked records from the database.`)) return;
     try {
       const res = await fetch(`/api/programs/${id}`, { method: 'DELETE' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to delete program');
-      showNotification(`Production Sheet "${progNo}" removed successfully.`);
+      showNotification(`Production Sheet "${progNo}" permanently removed.`);
+      loadData();
+    } catch (err: any) {
+      showNotification(err.message, 'error');
+    }
+  };
+
+  // Delete Challan handler (Admin remove capability)
+  const handleDeleteChallan = async (id: string, challanNo: string) => {
+    if (!confirm(`Are you sure you want to permanently delete Challan "${challanNo}"? This action will permanently remove it from the database.`)) return;
+    try {
+      const res = await fetch(`/api/challans/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete challan');
+      showNotification(`Challan "${challanNo}" permanently deleted.`);
       loadData();
     } catch (err: any) {
       showNotification(err.message, 'error');
@@ -620,12 +634,13 @@ export default function AdminConsolePage() {
                         <th className="py-3 px-4 font-bold">Destination Dept</th>
                         <th className="py-3 px-4 font-bold">Program #</th>
                         <th className="py-3 px-4 font-bold">Status</th>
+                        <th className="py-3 px-4 font-bold text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {challans.length === 0 ? (
                         <tr>
-                          <td colSpan={6} className="py-8 text-center text-slate-400">
+                          <td colSpan={7} className="py-8 text-center text-slate-400">
                             No challans recorded yet.
                           </td>
                         </tr>
@@ -655,6 +670,24 @@ export default function AdminConsolePage() {
                               <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800">
                                 {c.status || 'ISSUED'}
                               </span>
+                            </td>
+                            <td className="py-3 px-4 text-right">
+                              <div className="flex items-center justify-end gap-1.5">
+                                <Link
+                                  href={`/challans/${c.id}`}
+                                  className="p-1 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded"
+                                  title="View / Print Slip"
+                                >
+                                  <Printer className="w-3.5 h-3.5" />
+                                </Link>
+                                <button
+                                  onClick={() => handleDeleteChallan(c.id, c.challanNumber)}
+                                  className="p-1 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded"
+                                  title="Permanently Delete Challan"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))

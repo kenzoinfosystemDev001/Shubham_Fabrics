@@ -155,78 +155,88 @@ export async function PATCH(
       actorUser = await prisma.user.findFirst({ select: { id: true } });
     }
 
-    // Transactional Update
-    const updated = await prisma.$transaction(async (tx) => {
-      const order = await tx.dyeingOrder.update({
-        where: { id },
-        data: {
-          dyedQuantity: newDyedQty,
-          undyedQuantity: newUndyedQty,
-          readyForQc1Quantity: newReadyForQc1Qty,
-          status: finalStatus,
-          dyedColor: dyedColor !== undefined ? dyedColor : existingOrder.dyedColor,
-          colorCode: colorCode !== undefined ? colorCode : existingOrder.colorCode,
-          inchargeId: resolvedInchargeId,
-          inchargeName: resolvedInchargeName,
-          batchNumber: batchNumber !== undefined ? batchNumber : existingOrder.batchNumber,
-          machineNumber: machineNumber !== undefined ? machineNumber : existingOrder.machineNumber,
-          processRemarks: processRemarks !== undefined ? processRemarks : existingOrder.processRemarks,
-          startedAt: existingOrder.startedAt || new Date(),
-          completedAt: ['DYED', 'READY_FOR_QC1', 'SENT_TO_QC1'].includes(finalStatus)
-            ? (existingOrder.completedAt || new Date())
-            : null,
-        },
-        include: {
-          program: true,
-          inboundChallan: true,
-          qc1Challan: true,
-          incharge: true,
-        },
-      });
+    // Prefetch fallback challan outside transaction
+    let fallbackChallanId = existingOrder.inboundChallanId;
+    if (!fallbackChallanId) {
+      const ch = await prisma.challan.findFirst({ select: { id: true } });
+      fallbackChallanId = ch?.id || '';
+    }
 
-      // Record Production Transaction for auditability and manufacturing traceability
-      if (dyedQuantity !== undefined && actorUser) {
-        await tx.productionTransaction.create({
+    // Transactional Update with extended timeout for cloud DB
+    const updated = await prisma.$transaction(
+      async (tx) => {
+        const order = await tx.dyeingOrder.update({
+          where: { id },
           data: {
-            programId: order.programId,
-            challanId: order.inboundChallanId || (await tx.challan.findFirst({ select: { id: true } }))?.id || '',
-            departmentCode: 'DYEING',
-            operationName: 'FABRIC_DYEING',
-            operatorId: actorUser.id,
-            machineId: order.machineNumber || null,
-            inputQuantity: order.requiredQuantity,
-            goodQuantity: newDyedQty,
-            balanceQuantity: newUndyedQty,
-            unitOfMeasure: order.uom,
-            notes: processRemarks || `Dyeing progress updated: ${newDyedQty} ${order.uom} dyed (${order.dyedColor || order.targetColor})`,
+            dyedQuantity: newDyedQty,
+            undyedQuantity: newUndyedQty,
+            readyForQc1Quantity: newReadyForQc1Qty,
+            status: finalStatus,
+            dyedColor: dyedColor !== undefined ? dyedColor : existingOrder.dyedColor,
+            colorCode: colorCode !== undefined ? colorCode : existingOrder.colorCode,
+            inchargeId: resolvedInchargeId,
+            inchargeName: resolvedInchargeName,
+            batchNumber: batchNumber !== undefined ? batchNumber : existingOrder.batchNumber,
+            machineNumber: machineNumber !== undefined ? machineNumber : existingOrder.machineNumber,
+            processRemarks: processRemarks !== undefined ? processRemarks : existingOrder.processRemarks,
+            startedAt: existingOrder.startedAt || new Date(),
+            completedAt: ['DYED', 'READY_FOR_QC1', 'SENT_TO_QC1'].includes(finalStatus)
+              ? (existingOrder.completedAt || new Date())
+              : null,
+          },
+          include: {
+            program: true,
+            inboundChallan: true,
+            qc1Challan: true,
+            incharge: true,
           },
         });
-      }
 
-      // Record Audit Log
-      if (actorUser) {
-        await tx.auditLog.create({
-          data: {
-            action: 'DYEING_UPDATE',
-            entity: 'DyeingOrder',
-            entityId: order.id,
-            actor: {
-              connect: { id: actorUser.id },
+        // Record Production Transaction for auditability and manufacturing traceability
+        if (dyedQuantity !== undefined && actorUser) {
+          await tx.productionTransaction.create({
+            data: {
+              programId: order.programId,
+              challanId: order.inboundChallanId || fallbackChallanId,
+              departmentCode: 'DYEING',
+              operationName: 'FABRIC_DYEING',
+              operatorId: actorUser.id,
+              machineId: order.machineNumber || null,
+              inputQuantity: order.requiredQuantity,
+              goodQuantity: newDyedQty,
+              balanceQuantity: newUndyedQty,
+              unitOfMeasure: order.uom,
+              notes: processRemarks || `Dyeing progress updated: ${newDyedQty} ${order.uom} dyed (${order.dyedColor || order.targetColor})`,
             },
-            afterState: JSON.stringify({
-              orderNumber: order.orderNumber,
-              dyedQuantity: newDyedQty,
-              undyedQuantity: newUndyedQty,
-              status: finalStatus,
-              dyedColor: order.dyedColor,
-              inchargeName: order.inchargeName,
-            }),
-          },
-        });
-      }
+          });
+        }
 
-      return order;
-    });
+        // Record Audit Log
+        if (actorUser) {
+          await tx.auditLog.create({
+            data: {
+              action: 'DYEING_UPDATE',
+              entity: 'DyeingOrder',
+              entityId: order.id,
+              actor: {
+                connect: { id: actorUser.id },
+              },
+              afterState: JSON.stringify({
+                orderNumber: order.orderNumber,
+                dyedQuantity: newDyedQty,
+                undyedQuantity: newUndyedQty,
+                status: finalStatus,
+                dyedColor: order.dyedColor,
+                inchargeName: order.inchargeName,
+              }),
+            },
+          });
+        }
+
+        return order;
+      },
+      { maxWait: 15000, timeout: 30000 }
+    );
 
     return NextResponse.json({ data: updated });
   } catch (error: any) {
