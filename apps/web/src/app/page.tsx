@@ -89,9 +89,9 @@ export default function ProgrammingDashboardPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pl-64">
+    <div className="min-h-screen bg-[#F8FAFC] pl-0 md:pl-64">
       {/* TOP HEADER BAR */}
-      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-8 py-4 flex items-center justify-between shadow-xs">
+      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div>
           <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A66E22] block">
             SHUBHAM FABRICS MES · OPERATIONS
@@ -130,7 +130,7 @@ export default function ProgrammingDashboardPage() {
       </header>
 
       {/* DASHBOARD CONTENT */}
-      <main className="p-8 max-w-7xl mx-auto space-y-6">
+      <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
         
         {/* KPI METRICS OVERVIEW */}
         <section className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">

@@ -119,7 +119,7 @@ export default function MaterialIssuePage() {
 
   return (
     <div className="min-h-screen bg-[#F0FAF9] pb-24">
-      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-8 py-4 flex items-center justify-between shadow-xs">
+      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div>
           <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-700 block">
             FABRIC STORE · DISPATCH &amp; ISSUE
@@ -141,7 +141,7 @@ export default function MaterialIssuePage() {
         </div>
       </header>
 
-      <main className="p-8 max-w-7xl mx-auto space-y-6">
+      <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
         {error && (
           <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-xs font-semibold">
             {error}
@@ -319,7 +319,7 @@ export default function MaterialIssuePage() {
 
       {/* Floating Action Bar when rolls are selected */}
       {selectedRollIds.length > 0 && (
-        <div className="fixed bottom-0 inset-x-0 bg-slate-900/95 backdrop-blur-xs border-t border-slate-800 p-4 z-40 flex items-center justify-between px-8 text-white">
+        <div className="fixed bottom-0 inset-x-0 bg-slate-900/95 backdrop-blur-xs border-t border-slate-800 p-4 z-40 flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-8 text-white">
           <div className="flex items-center gap-6 text-xs">
             <div>
               <span className="text-slate-400 block text-[10px] uppercase font-bold">Selected Rolls</span>

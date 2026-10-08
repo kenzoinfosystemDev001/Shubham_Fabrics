@@ -60,7 +60,7 @@ export default function ProgramDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] pl-64 flex items-center justify-center">
+      <div className="min-h-screen bg-[#F8FAFC] pl-0 md:pl-64 flex items-center justify-center">
         <div className="text-xs text-slate-500 font-mono animate-pulse">
           Loading Production Sheet...
         </div>
@@ -70,7 +70,7 @@ export default function ProgramDetailPage() {
 
   if (error || !program) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] pl-64 p-8">
+      <div className="min-h-screen bg-[#F8FAFC] pl-0 md:pl-64 p-4 sm:p-8">
         <div className="max-w-xl mx-auto p-6 bg-rose-50 border border-rose-200 rounded-xl text-center space-y-3">
           <AlertCircle className="w-8 h-8 text-rose-600 mx-auto" />
           <h2 className="text-sm font-bold text-rose-900">Error Loading Sheet</h2>
@@ -91,9 +91,9 @@ export default function ProgramDetailPage() {
   const isIssued = program.status === 'ISSUED' || program.status === 'IN_PRODUCTION';
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pl-64 pb-20">
+    <div className="min-h-screen bg-[#F8FAFC] pl-0 md:pl-64 pb-20">
       {/* HEADER */}
-      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-8 py-4 flex items-center justify-between shadow-xs">
+      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div className="flex items-center gap-4">
           <Link
             href="/"
@@ -174,7 +174,7 @@ export default function ProgramDetailPage() {
       </header>
 
       {/* BODY CONTENT - 8 SECTIONS */}
-      <main className="p-8 max-w-5xl mx-auto space-y-6">
+      <main className="p-4 sm:p-8 max-w-5xl mx-auto space-y-6">
         
         {/* SUMMARY STRIP */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-5 bg-white border border-slate-200/90 rounded-xl shadow-xs text-xs">

@@ -39,9 +39,9 @@ export default function MyWorkRootPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pl-64">
+    <div className="min-h-screen bg-[#F8FAFC] pl-0 md:pl-64">
       {/* HEADER */}
-      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-8 py-5 shadow-xs">
+      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 sm:py-5 shadow-xs">
         <div>
           <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A66E22] block">
             PROGRAMMING DEPARTMENT WORKSPACE
@@ -56,7 +56,7 @@ export default function MyWorkRootPage() {
       </header>
 
       {/* TWO PRIMARY OPTIONS ONLY */}
-      <main className="p-8 max-w-5xl mx-auto space-y-8">
+      <main className="p-4 sm:p-8 max-w-5xl mx-auto space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
           {/* OPTION 1: CREATE PRODUCTION SHEET */}

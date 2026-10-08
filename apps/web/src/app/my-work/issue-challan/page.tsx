@@ -142,9 +142,9 @@ function IssueChallanContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pl-64 pb-20">
+    <div className="min-h-screen bg-[#F8FAFC] pl-0 md:pl-64 pb-20">
       {/* TOP HEADER */}
-      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-8 py-4 flex items-center justify-between shadow-xs">
+      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div className="flex items-center gap-4">
           <Link
             href="/my-work"
@@ -170,7 +170,7 @@ function IssueChallanContent() {
       </header>
 
       {/* FORM BODY */}
-      <main className="p-8 max-w-4xl mx-auto space-y-6">
+      <main className="p-4 sm:p-8 max-w-4xl mx-auto space-y-6">
 
         {/* Error notification */}
         {error && (
@@ -502,7 +502,7 @@ function IssueChallanContent() {
 export default function IssueChallanPage() {
   return (
     <React.Suspense fallback={
-      <div className="min-h-screen bg-[#F8FAFC] pl-64 flex items-center justify-center text-xs text-slate-500 font-mono">
+      <div className="min-h-screen bg-[#F8FAFC] pl-0 md:pl-64 flex items-center justify-center text-xs text-slate-500 font-mono">
         Loading Challan Form...
       </div>
     }>

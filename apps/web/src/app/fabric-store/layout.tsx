@@ -16,7 +16,7 @@ export default function FabricStoreLayout({
   return (
     <ThemeProvider>
       <FabricStoreNavigation />
-      <main className="flex-1 min-h-screen flex flex-col pl-64">
+      <main className="flex-1 min-h-screen flex flex-col pl-0 md:pl-64">
         {children}
       </main>
     </ThemeProvider>

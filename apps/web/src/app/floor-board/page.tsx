@@ -57,9 +57,9 @@ export default function ProgrammingFloorBoardPage() {
   const issuedLane = programs.filter(p => p.status === 'ISSUED' || p.status === 'IN_PRODUCTION' || p.status === 'COMPLETED');
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pl-64 pb-16">
+    <div className="min-h-screen bg-[#F8FAFC] pl-0 md:pl-64 pb-16">
       {/* HEADER */}
-      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-8 py-4 flex items-center justify-between shadow-xs">
+      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div>
           <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A66E22] block">
             SHUBHAM FABRICS MES · OPERATIONS BOARD
@@ -91,7 +91,7 @@ export default function ProgrammingFloorBoardPage() {
       </header>
 
       {/* PIPELINE SUMMARY STATS */}
-      <div className="px-8 pt-6 max-w-7xl mx-auto">
+      <div className="px-4 sm:px-8 pt-6 max-w-7xl mx-auto">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 bg-white border border-slate-200/90 rounded-xl shadow-xs">
           <div>
             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total In Pipeline</span>
@@ -113,11 +113,11 @@ export default function ProgrammingFloorBoardPage() {
       </div>
 
       {/* 4-COLUMN KANBAN SWIMLANES */}
-      <main className="px-8 pt-6 max-w-7xl mx-auto">
+      <main className="px-4 sm:px-8 pt-6 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
           
           {/* COLUMN 1: DRAFT */}
-          <div className="bg-slate-100/70 border border-slate-200 rounded-xl p-3 flex flex-col h-[calc(100vh-230px)]">
+          <div className="bg-slate-100/70 border border-slate-200 rounded-xl p-3 flex flex-col min-h-[400px] md:h-[calc(100vh-230px)]">
             <div className="flex items-center justify-between pb-3 px-2 border-b border-slate-200">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>

@@ -179,7 +179,7 @@ function CreateGRNContent() {
 
   return (
     <div className="min-h-screen bg-[#F0FAF9] pb-16">
-      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-8 py-4 flex items-center justify-between shadow-xs">
+      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div className="flex items-center gap-3">
           <Link
             href="/fabric-store/my-work/material-receipt"
@@ -196,7 +196,7 @@ function CreateGRNContent() {
         </div>
       </header>
 
-      <main className="p-8 max-w-5xl mx-auto space-y-6">
+      <main className="p-4 sm:p-8 max-w-5xl mx-auto space-y-6">
         {error && (
           <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-3 text-rose-800 text-xs font-semibold">
             <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />

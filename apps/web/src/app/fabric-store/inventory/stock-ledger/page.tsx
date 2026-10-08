@@ -54,7 +54,7 @@ export default function StockLedgerPage() {
 
   return (
     <div className="min-h-screen bg-[#F0FAF9] pb-16">
-      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-8 py-4 flex items-center justify-between shadow-xs">
+      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div>
           <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-teal-700 block">
             FABRIC STORE · AUDIT &amp; TRACEABILITY
@@ -76,7 +76,7 @@ export default function StockLedgerPage() {
         </div>
       </header>
 
-      <main className="p-8 max-w-7xl mx-auto space-y-6">
+      <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
         {/* Banner */}
         <div className="bg-slate-900 text-white rounded-xl p-4 flex items-center justify-between gap-4 text-xs">
           <div className="flex items-center gap-3">

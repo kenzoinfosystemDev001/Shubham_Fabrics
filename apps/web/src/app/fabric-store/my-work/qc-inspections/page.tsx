@@ -40,7 +40,7 @@ export default function QCInspectionsQueuePage() {
 
   return (
     <div className="min-h-screen bg-[#F0FAF9]">
-      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-8 py-4 flex items-center justify-between shadow-xs">
+      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div>
           <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-700 block">
             FABRIC STORE · QUALITY CONTROL
@@ -69,7 +69,7 @@ export default function QCInspectionsQueuePage() {
         </div>
       </header>
 
-      <main className="p-8 max-w-7xl mx-auto space-y-6">
+      <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
         {/* Filter bar */}
         <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-xs flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">

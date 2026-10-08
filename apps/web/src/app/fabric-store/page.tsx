@@ -80,14 +80,14 @@ export default function FabricStoreDashboard() {
   return (
     <div className="min-h-screen bg-[#F0FAF9]">
       {/* TOP HEADER */}
-      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-8 py-4 flex items-center justify-between shadow-xs">
+      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div>
           <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-teal-700 block">
             SHUBHAM FABRICS MES · FABRIC STORE
           </span>
           <h1 className="text-xl font-bold text-slate-900">Fabric Store Department Dashboard</h1>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <button
             onClick={loadData}
             disabled={loading}
@@ -127,7 +127,7 @@ export default function FabricStoreDashboard() {
         </div>
       </header>
 
-      <main className="p-8 max-w-7xl mx-auto space-y-6">
+      <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-red-800">
             {error}
