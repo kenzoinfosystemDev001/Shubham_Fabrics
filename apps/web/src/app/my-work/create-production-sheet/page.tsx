@@ -34,20 +34,20 @@ import {
 export default function CreateProductionSheetPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [fetchingNumber, setFetchingNumber] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<any | null>(null);
   const [showPrintModal, setShowPrintModal] = useState(false);
+  const [createdProgramId, setCreatedProgramId] = useState<string | null>(null);
 
   // FORM STATE - All 8 Sections of Shubham Fabrics Production Sheet
   const [formData, setFormData] = useState({
     // SECTION 1: Program Information
     programSerialNo: '',
-    startDate: new Date().toISOString().split('T')[0],
+    startDate: '',
     designNumber: '',
     clientName: '',
     clientPriority: 'NORMAL',
-    deliveryDate: new Date(Date.now() + 14 * 86400000).toISOString().split('T')[0],
+    deliveryDate: '',
 
     // SECTION 2: Style Information
     mainStyle: '',
@@ -65,14 +65,14 @@ export default function CreateProductionSheetPage() {
     // SECTION 4: Fabric Information
     fabricName: '',
     fabric: '',
-    fabricType: 'Cotton Cambric',
-    fabricWidth: '58 Inches',
-    fabricWidthInches: '58',
+    fabricType: '',
+    fabricWidth: '',
+    fabricWidthInches: '',
     fabricColor: '',
     fabricColorAvailable: 'IN_STOCK',
-    fabricAverage: '1.25',
-    fabricAverageType: 'Meters/Piece',
-    fabricAverageMeasurement: 'Standard Lay Consumption',
+    fabricAverage: '',
+    fabricAverageType: '',
+    fabricAverageMeasurement: '',
 
     // SECTION 5: Dyeing Information
     fabricDyeingRequired: false,
@@ -81,40 +81,20 @@ export default function CreateProductionSheetPage() {
 
     // SECTION 6: Production Quantity
     color: '',
-    colorQuantity: '500',
+    colorQuantity: '',
     quantityMeasurement: 'PCS',
     specialMaterial: '',
     specialMaterialQuantity: '',
 
     // SECTION 7: Production Dates
-    productionDesignDate: new Date().toISOString().split('T')[0],
-    productionEndDate: new Date(Date.now() + 10 * 86400000).toISOString().split('T')[0],
+    productionDesignDate: '',
+    productionEndDate: '',
 
     // SECTION 8: Rejection / Remarks
-    piecesRejection: '0',
+    piecesRejection: '',
     rejectionReason: '',
     comments: '',
   });
-
-  useEffect(() => {
-    const fetchNextSeq = async () => {
-      try {
-        setFetchingNumber(true);
-        const res = await api.getNextProgramNumber();
-        if (res?.nextNumber) {
-          setFormData((prev) => ({
-            ...prev,
-            programSerialNo: res.nextNumber,
-          }));
-        }
-      } catch (err) {
-        console.error('Failed to get next program number:', err);
-      } finally {
-        setFetchingNumber(false);
-      }
-    };
-    fetchNextSeq();
-  }, []);
 
   const handleChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -125,40 +105,48 @@ export default function CreateProductionSheetPage() {
     setSuccess(null);
 
     // Basic required field validations
-    if (!formData.programSerialNo.trim()) {
-      setError('Program Serial Number is mandatory.');
-      return;
-    }
-    if (!formData.clientName.trim()) {
-      setError('Client Name is mandatory.');
-      return;
-    }
-    if (!formData.mainStyle.trim()) {
-      setError('Main Style is mandatory.');
-      return;
-    }
-    if (!formData.wilcomDesignNumber.trim()) {
-      setError('Wilcom Design Number is mandatory for embroidery manufacturing.');
-      return;
+    if (targetStatus !== 'DRAFT') {
+      if (!formData.clientName.trim()) {
+        setError('Client Name is mandatory.');
+        return;
+      }
+      if (!formData.mainStyle.trim()) {
+        setError('Main Style is mandatory.');
+        return;
+      }
+      if (!formData.wilcomDesignNumber.trim()) {
+        setError('Wilcom Design Number is mandatory for embroidery manufacturing.');
+        return;
+      }
+    } else {
+      if (!formData.clientName.trim() && !formData.programSerialNo.trim() && !formData.designNumber.trim()) {
+        setError('Please enter at least Client Name, Design #, or Serial # to save as draft.');
+        return;
+      }
     }
 
     setLoading(true);
     try {
-      const payload = {
+      const payload: any = {
         ...formData,
-        programNumber: formData.programSerialNo,
+        id: createdProgramId || undefined,
+        programNumber: formData.programSerialNo.trim() || undefined,
+        programSerialNo: formData.programSerialNo.trim() || undefined,
         status: targetStatus,
         fabricDyeingRequired: Boolean(formData.fabricDyeingRequired),
-        fabricWidthInches: parseFloat(formData.fabricWidthInches) || 58.0,
-        fabricAverage: parseFloat(formData.fabricAverage) || 1.25,
-        colorQuantity: parseInt(formData.colorQuantity, 10) || 1,
-        targetQuantity: parseInt(formData.colorQuantity, 10) || 1,
-        piecesRejection: parseInt(formData.piecesRejection, 10) || 0,
+        fabricWidthInches: formData.fabricWidthInches ? parseFloat(formData.fabricWidthInches) : null,
+        fabricAverage: formData.fabricAverage ? parseFloat(formData.fabricAverage) : null,
+        colorQuantity: formData.colorQuantity ? parseInt(formData.colorQuantity, 10) : 0,
+        targetQuantity: formData.colorQuantity ? parseInt(formData.colorQuantity, 10) : 0,
+        piecesRejection: formData.piecesRejection ? parseInt(formData.piecesRejection, 10) : 0,
         fabricIssuedToDyeing: formData.fabricIssuedToDyeing ? parseFloat(formData.fabricIssuedToDyeing) : 0,
         fabricSentToDyeing: formData.fabricSentToDyeing ? parseFloat(formData.fabricSentToDyeing) : 0,
       };
 
       const result = await api.createProductionSheet(payload);
+      if (result?.id) {
+        setCreatedProgramId(result.id);
+      }
       setSuccess(result);
     } catch (err: any) {
       setError(err.message || 'Failed to save Production Sheet.');
@@ -180,7 +168,7 @@ export default function CreateProductionSheetPage() {
           </Link>
           <div>
             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A66E22] block">
-              MY WORK · FORM 01
+              MY WORK · PRODUCTION SHEET
             </span>
             <h1 className="text-xl font-bold text-slate-900">
               Create Production Sheet
@@ -293,39 +281,28 @@ export default function CreateProductionSheetPage() {
           </div>
         )}
 
-        {/* 8-SECTION PROFESSIONAL FORM */}
+        {/* PRODUCTION SHEET FORM */}
         <div className="space-y-6">
 
-          {/* SECTION 1: PROGRAM INFORMATION */}
+          {/* PROGRAM INFORMATION */}
           <div className="bg-white border border-slate-200/90 rounded-xl p-6 shadow-xs space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-              <div className="w-6 h-6 rounded bg-blue-100 text-blue-900 font-bold text-xs flex items-center justify-center">
-                1
-              </div>
-              <div>
-                <h2 className="text-sm font-bold text-slate-900">Program Information</h2>
-                <p className="text-[11px] text-slate-500">Core manufacturing order identification</p>
-              </div>
+            <div className="pb-3 border-b border-slate-100">
+              <h2 className="text-sm font-bold text-slate-900">Program Information</h2>
+              <p className="text-[11px] text-slate-500">Core manufacturing order identification</p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Program Serial # *
+                  Program Serial #
                 </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    required
-                    value={formData.programSerialNo}
-                    onChange={(e) => handleChange('programSerialNo', e.target.value)}
-                    placeholder="PRG-2026-00001"
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded text-xs font-mono font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-800"
-                  />
-                  {fetchingNumber && (
-                    <RefreshCw className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-2.5 animate-spin" />
-                  )}
-                </div>
+                <input
+                  type="text"
+                  value={formData.programSerialNo}
+                  onChange={(e) => handleChange('programSerialNo', e.target.value)}
+                  placeholder=""
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded text-xs font-mono font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-800"
+                />
               </div>
 
               <div>
@@ -350,7 +327,6 @@ export default function CreateProductionSheetPage() {
                   required
                   value={formData.designNumber}
                   onChange={(e) => handleChange('designNumber', e.target.value)}
-                  placeholder="e.g. SF-DSG-8902"
                   className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
                 />
               </div>
@@ -364,25 +340,8 @@ export default function CreateProductionSheetPage() {
                   required
                   value={formData.clientName}
                   onChange={(e) => handleChange('clientName', e.target.value)}
-                  placeholder="e.g. Raymond Apparel / FabIndia"
                   className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
                 />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Client Priority
-                </label>
-                <select
-                  value={formData.clientPriority}
-                  onChange={(e) => handleChange('clientPriority', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
-                >
-                  <option value="LOW">LOW</option>
-                  <option value="NORMAL">NORMAL</option>
-                  <option value="HIGH">HIGH</option>
-                  <option value="URGENT">URGENT</option>
-                </select>
               </div>
 
               <div>
@@ -400,19 +359,85 @@ export default function CreateProductionSheetPage() {
             </div>
           </div>
 
-          {/* SECTION 2: STYLE INFORMATION */}
+          {/* PRIORITY */}
           <div className="bg-white border border-slate-200/90 rounded-xl p-6 shadow-xs space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-              <div className="w-6 h-6 rounded bg-amber-100 text-amber-900 font-bold text-xs flex items-center justify-center">
-                2
-              </div>
-              <div>
-                <h2 className="text-sm font-bold text-slate-900">Style Information</h2>
-                <p className="text-[11px] text-slate-500">Pattern cut, style taxonomy, and base artwork</p>
-              </div>
+            <div className="pb-3 border-b border-slate-100">
+              <h2 className="text-sm font-bold text-slate-900">Priority</h2>
+              <p className="text-[11px] text-slate-500">Order execution urgency and shopfloor production scheduling</p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+              {[
+                {
+                  id: 'LOW',
+                  label: 'LOW',
+                  desc: 'Routine manufacturing queue, flexible lead time',
+                  color: 'border-slate-200 hover:border-slate-400 text-slate-700',
+                  activeBg: 'bg-slate-50 border-slate-600 ring-2 ring-slate-400/20 text-slate-900',
+                  badge: 'bg-slate-100 text-slate-700',
+                },
+                {
+                  id: 'NORMAL',
+                  label: 'NORMAL',
+                  desc: 'Standard production pipeline and dispatch schedule',
+                  color: 'border-slate-200 hover:border-blue-400 text-slate-700',
+                  activeBg: 'bg-blue-50/80 border-blue-600 ring-2 ring-blue-500/20 text-blue-950',
+                  badge: 'bg-blue-100 text-blue-800',
+                },
+                {
+                  id: 'HIGH',
+                  label: 'HIGH',
+                  desc: 'Priority queue for expedited delivery commitments',
+                  color: 'border-slate-200 hover:border-amber-400 text-slate-700',
+                  activeBg: 'bg-amber-50/80 border-amber-600 ring-2 ring-amber-500/20 text-amber-950',
+                  badge: 'bg-amber-100 text-amber-900',
+                },
+                {
+                  id: 'URGENT',
+                  label: 'URGENT',
+                  desc: 'Immediate dispatch & top floor priority across departments',
+                  color: 'border-slate-200 hover:border-rose-400 text-slate-700',
+                  activeBg: 'bg-rose-50/80 border-rose-600 ring-2 ring-rose-500/20 text-rose-950',
+                  badge: 'bg-rose-100 text-rose-900',
+                },
+              ].map((lvl) => {
+                const isSelected = formData.clientPriority === lvl.id;
+                return (
+                  <button
+                    key={lvl.id}
+                    type="button"
+                    onClick={() => {
+                      handleChange('clientPriority', lvl.id);
+                    }}
+                    className={`p-3.5 rounded-xl border text-left transition flex flex-col justify-between cursor-pointer ${
+                      isSelected ? lvl.activeBg : `bg-white ${lvl.color}`
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className={`text-[11px] font-bold px-2 py-0.5 rounded ${lvl.badge}`}>
+                        {lvl.label}
+                      </span>
+                      {isSelected && (
+                        <span className="w-2 h-2 rounded-full bg-current animate-pulse" />
+                      )}
+                    </div>
+                    <p className="text-[11px] text-slate-600 leading-snug">
+                      {lvl.desc}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* STYLE INFORMATION */}
+          <div className="bg-white border border-slate-200/90 rounded-xl p-6 shadow-xs space-y-4">
+            <div className="pb-3 border-b border-slate-100">
+              <h2 className="text-sm font-bold text-slate-900">Style Information</h2>
+              <p className="text-[11px] text-slate-500">Pattern cut, style taxonomy, and base artwork</p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
                   Main Style *
@@ -422,7 +447,6 @@ export default function CreateProductionSheetPage() {
                   required
                   value={formData.mainStyle}
                   onChange={(e) => handleChange('mainStyle', e.target.value)}
-                  placeholder="e.g. Polo Shirt / Kurti"
                   className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
                 />
               </div>
@@ -435,7 +459,6 @@ export default function CreateProductionSheetPage() {
                   type="text"
                   value={formData.subStyle}
                   onChange={(e) => handleChange('subStyle', e.target.value)}
-                  placeholder="e.g. Slim Fit / Mandarin Collar"
                   className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
                 />
               </div>
@@ -448,7 +471,6 @@ export default function CreateProductionSheetPage() {
                   type="text"
                   value={formData.pattern}
                   onChange={(e) => handleChange('pattern', e.target.value)}
-                  placeholder="e.g. PAT-2026-M04"
                   className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
                 />
               </div>
@@ -461,33 +483,17 @@ export default function CreateProductionSheetPage() {
                   type="text"
                   value={formData.baseDesignType}
                   onChange={(e) => handleChange('baseDesignType', e.target.value)}
-                  placeholder="e.g. Floral Motif / Geometric Border"
                   className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
-                />
-              </div>
-
-              <div className="sm:col-span-2">
-                <ImageUpload
-                  label="Base Design Photo / Drawing Reference (Cloudinary)"
-                  value={formData.baseDesignPhoto}
-                  onChange={(url) => handleChange('baseDesignPhoto', url)}
-                  folder="base-designs"
-                  helpText="Upload sketch, photo, or mock reference"
                 />
               </div>
             </div>
           </div>
 
-          {/* SECTION 3: DESIGN INFORMATION (WILCOM) */}
+          {/* DESIGN INFORMATION (WILCOM) */}
           <div className="bg-white border border-slate-200/90 rounded-xl p-6 shadow-xs space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-              <div className="w-6 h-6 rounded bg-purple-100 text-purple-900 font-bold text-xs flex items-center justify-center">
-                3
-              </div>
-              <div>
-                <h2 className="text-sm font-bold text-slate-900">Design Information (Embroidery &amp; Wilcom)</h2>
-                <p className="text-[11px] text-slate-500">Multi-head embroidery machine digitizing parameters</p>
-              </div>
+            <div className="pb-3 border-b border-slate-100">
+              <h2 className="text-sm font-bold text-slate-900">Design Information (Embroidery &amp; Wilcom)</h2>
+              <p className="text-[11px] text-slate-500">Multi-head embroidery machine digitizing parameters</p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -500,7 +506,6 @@ export default function CreateProductionSheetPage() {
                   required
                   value={formData.wilcomDesignNumber}
                   onChange={(e) => handleChange('wilcomDesignNumber', e.target.value)}
-                  placeholder="e.g. WLC-EMB-5541"
                   className="w-full px-3 py-2 font-mono font-bold border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
                 />
               </div>
@@ -513,7 +518,6 @@ export default function CreateProductionSheetPage() {
                   type="text"
                   value={formData.embroideryDesign}
                   onChange={(e) => handleChange('embroideryDesign', e.target.value)}
-                  placeholder="e.g. Chest Logo 4-Color"
                   className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
                 />
               </div>
@@ -526,7 +530,6 @@ export default function CreateProductionSheetPage() {
                   type="text"
                   value={formData.embroideryDesignSize}
                   onChange={(e) => handleChange('embroideryDesignSize', e.target.value)}
-                  placeholder="e.g. 120mm x 85mm"
                   className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
                 />
               </div>
@@ -543,16 +546,11 @@ export default function CreateProductionSheetPage() {
             </div>
           </div>
 
-          {/* SECTION 4: FABRIC INFORMATION */}
+          {/* FABRIC INFORMATION */}
           <div className="bg-white border border-slate-200/90 rounded-xl p-6 shadow-xs space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-              <div className="w-6 h-6 rounded bg-emerald-100 text-emerald-900 font-bold text-xs flex items-center justify-center">
-                4
-              </div>
-              <div>
-                <h2 className="text-sm font-bold text-slate-900">Fabric Information</h2>
-                <p className="text-[11px] text-slate-500">Fabric specifications, roll widths, and consumption averages</p>
-              </div>
+            <div className="pb-3 border-b border-slate-100">
+              <h2 className="text-sm font-bold text-slate-900">Fabric Information</h2>
+              <p className="text-[11px] text-slate-500">Fabric specifications, roll widths, and consumption averages</p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -565,7 +563,6 @@ export default function CreateProductionSheetPage() {
                   required
                   value={formData.fabricName}
                   onChange={(e) => handleChange('fabricName', e.target.value)}
-                  placeholder="e.g. Cotton Cambric 60s"
                   className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
                 />
               </div>
@@ -578,7 +575,6 @@ export default function CreateProductionSheetPage() {
                   type="text"
                   value={formData.fabricType}
                   onChange={(e) => handleChange('fabricType', e.target.value)}
-                  placeholder="e.g. 100% Woven Cotton"
                   className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
                 />
               </div>
@@ -592,7 +588,6 @@ export default function CreateProductionSheetPage() {
                   step="0.5"
                   value={formData.fabricWidthInches}
                   onChange={(e) => handleChange('fabricWidthInches', e.target.value)}
-                  placeholder="58"
                   className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
                 />
               </div>
@@ -605,7 +600,6 @@ export default function CreateProductionSheetPage() {
                   type="text"
                   value={formData.fabricColor}
                   onChange={(e) => handleChange('fabricColor', e.target.value)}
-                  placeholder="e.g. Optical White / Navy Blue"
                   className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
                 />
               </div>
@@ -634,7 +628,6 @@ export default function CreateProductionSheetPage() {
                   step="0.01"
                   value={formData.fabricAverage}
                   onChange={(e) => handleChange('fabricAverage', e.target.value)}
-                  placeholder="1.25"
                   className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
                 />
               </div>
@@ -647,7 +640,6 @@ export default function CreateProductionSheetPage() {
                   type="text"
                   value={formData.fabricAverageType}
                   onChange={(e) => handleChange('fabricAverageType', e.target.value)}
-                  placeholder="Meters/Piece"
                   className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
                 />
               </div>
@@ -660,81 +652,61 @@ export default function CreateProductionSheetPage() {
                   type="text"
                   value={formData.fabricAverageMeasurement}
                   onChange={(e) => handleChange('fabricAverageMeasurement', e.target.value)}
-                  placeholder="Marker length 12.5m for 10 garments lay"
                   className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
                 />
               </div>
             </div>
           </div>
 
-          {/* SECTION 5: DYEING INFORMATION (CONDITIONAL ROUTING) */}
+          {/* DYEING INFORMATION (CONDITIONAL ROUTING) */}
           <div className="bg-white border border-slate-200/90 rounded-xl p-6 shadow-xs space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-              <div className="w-6 h-6 rounded bg-rose-100 text-rose-900 font-bold text-xs flex items-center justify-center">
-                5
-              </div>
-              <div>
-                <h2 className="text-sm font-bold text-slate-900">Dyeing Information</h2>
-                <p className="text-[11px] text-slate-500">Flags for undyed/Kora fabric conditioning before embroidery</p>
-              </div>
+            <div className="pb-3 border-b border-slate-100">
+              <h2 className="text-sm font-bold text-slate-900">Dyeing Information</h2>
+              <p className="text-[11px] text-slate-500">Route to Dyeing department (YES) or directly to Embroidery department (NO)</p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded">
-                <input
-                  type="checkbox"
-                  id="fabricDyeingRequired"
-                  checked={formData.fabricDyeingRequired}
-                  onChange={(e) => handleChange('fabricDyeingRequired', e.target.checked)}
-                  className="w-4 h-4 text-[#163767] rounded border-slate-300 focus:ring-0"
-                />
-                <label htmlFor="fabricDyeingRequired" className="text-xs font-bold text-slate-800 cursor-pointer">
-                  Fabric Dyeing Required?
-                </label>
-              </div>
-
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Fabric Issued to Dyeing (Qty/Mtr)
+                  Is Dyeing Required? *
                 </label>
-                <input
-                  type="number"
-                  step="0.1"
-                  disabled={!formData.fabricDyeingRequired}
-                  value={formData.fabricIssuedToDyeing}
-                  onChange={(e) => handleChange('fabricIssuedToDyeing', e.target.value)}
-                  placeholder="0.0"
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 disabled:bg-slate-100 disabled:text-slate-400"
-                />
+                <select
+                  value={formData.fabricDyeingRequired ? 'YES' : 'NO'}
+                  onChange={(e) => handleChange('fabricDyeingRequired', e.target.value === 'YES')}
+                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs font-bold text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-blue-800"
+                >
+                  <option value="NO">NO</option>
+                  <option value="YES">YES</option>
+                </select>
               </div>
 
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Program Fabric Sent to Dyeing (Mtr)
-                </label>
-                <input
-                  type="number"
-                  step="0.1"
-                  disabled={!formData.fabricDyeingRequired}
-                  value={formData.fabricSentToDyeing}
-                  onChange={(e) => handleChange('fabricSentToDyeing', e.target.value)}
-                  placeholder="0.0"
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 disabled:bg-slate-100 disabled:text-slate-400"
-                />
+              <div className="pt-1">
+                {formData.fabricDyeingRequired ? (
+                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-900 text-xs flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
+                    <div>
+                      <strong className="font-semibold">Next Station: Dyeing Department</strong>
+                      <p className="text-[11px] text-amber-700 mt-0.5">Fabric requires dyeing/coloring before embroidery.</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-900 text-xs flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                    <div>
+                      <strong className="font-semibold">Next Station: Embroidery Department</strong>
+                      <p className="text-[11px] text-emerald-700 mt-0.5">Fabric skips dyeing and will go directly to embroidery.</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
 
-          {/* SECTION 6: PRODUCTION QUANTITY */}
+          {/* PRODUCTION QUANTITY */}
           <div className="bg-white border border-slate-200/90 rounded-xl p-6 shadow-xs space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-              <div className="w-6 h-6 rounded bg-indigo-100 text-indigo-900 font-bold text-xs flex items-center justify-center">
-                6
-              </div>
-              <div>
-                <h2 className="text-sm font-bold text-slate-900">Production Quantity &amp; Special Materials</h2>
-                <p className="text-[11px] text-slate-500">Target volume, measurement unit, and trims</p>
-              </div>
+            <div className="pb-3 border-b border-slate-100">
+              <h2 className="text-sm font-bold text-slate-900">Production Quantity &amp; Special Materials</h2>
+              <p className="text-[11px] text-slate-500">Target volume, measurement unit, and trims</p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -746,7 +718,6 @@ export default function CreateProductionSheetPage() {
                   type="text"
                   value={formData.color}
                   onChange={(e) => handleChange('color', e.target.value)}
-                  placeholder="e.g. Royal Blue"
                   className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800"
                 />
               </div>
@@ -760,7 +731,6 @@ export default function CreateProductionSheetPage() {
                   required
                   value={formData.colorQuantity}
                   onChange={(e) => handleChange('colorQuantity', e.target.value)}
-                  placeholder="500"
                   className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 font-bold font-mono"
                 />
               </div>
@@ -789,7 +759,6 @@ export default function CreateProductionSheetPage() {
                   type="text"
                   value={formData.specialMaterial}
                   onChange={(e) => handleChange('specialMaterial', e.target.value)}
-                  placeholder="e.g. Metallic Gold Zari Thread"
                   className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800"
                 />
               </div>
@@ -802,23 +771,17 @@ export default function CreateProductionSheetPage() {
                   type="text"
                   value={formData.specialMaterialQuantity}
                   onChange={(e) => handleChange('specialMaterialQuantity', e.target.value)}
-                  placeholder="e.g. 15 Cones / 5000 Meters"
                   className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800"
                 />
               </div>
             </div>
           </div>
 
-          {/* SECTION 7: PRODUCTION DATES */}
+          {/* PRODUCTION DATES */}
           <div className="bg-white border border-slate-200/90 rounded-xl p-6 shadow-xs space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-              <div className="w-6 h-6 rounded bg-teal-100 text-teal-900 font-bold text-xs flex items-center justify-center">
-                7
-              </div>
-              <div>
-                <h2 className="text-sm font-bold text-slate-900">Production Dates</h2>
-                <p className="text-[11px] text-slate-500">Design release and projected factory completion schedule</p>
-              </div>
+            <div className="pb-3 border-b border-slate-100">
+              <h2 className="text-sm font-bold text-slate-900">Production Dates</h2>
+              <p className="text-[11px] text-slate-500">Design release and projected factory completion schedule</p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -843,60 +806,6 @@ export default function CreateProductionSheetPage() {
                   value={formData.productionEndDate}
                   onChange={(e) => handleChange('productionEndDate', e.target.value)}
                   className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* SECTION 8: REJECTION & REMARKS */}
-          <div className="bg-white border border-slate-200/90 rounded-xl p-6 shadow-xs space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-              <div className="w-6 h-6 rounded bg-slate-200 text-slate-900 font-bold text-xs flex items-center justify-center">
-                8
-              </div>
-              <div>
-                <h2 className="text-sm font-bold text-slate-900">Rejection Parameters &amp; Comments</h2>
-                <p className="text-[11px] text-slate-500">Allowed tolerance, known defect risk notes, and instructions</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Pieces Rejection Tolerance
-                </label>
-                <input
-                  type="number"
-                  value={formData.piecesRejection}
-                  onChange={(e) => handleChange('piecesRejection', e.target.value)}
-                  placeholder="0"
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800"
-                />
-              </div>
-
-              <div className="sm:col-span-2">
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Rejection Reason / Risk Notes
-                </label>
-                <input
-                  type="text"
-                  value={formData.rejectionReason}
-                  onChange={(e) => handleChange('rejectionReason', e.target.value)}
-                  placeholder="e.g. Check for needle cut on lightweight knit"
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800"
-                />
-              </div>
-
-              <div className="sm:col-span-3">
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  General Production Comments &amp; Special Operator Instructions
-                </label>
-                <textarea
-                  rows={3}
-                  value={formData.comments}
-                  onChange={(e) => handleChange('comments', e.target.value)}
-                  placeholder="Add any specific stitching tension, bobbin thread, or washing shrinkage instructions here..."
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
                 />
               </div>
             </div>

@@ -340,10 +340,10 @@ export function generateProductionSheetHtml(program: any): string {
       </div>
     </div>
 
-    <!-- SECTION 1 & 2: ORDER & STYLE -->
+    <!-- ORDER & PRIORITY -->
     <div class="grid-2">
       <div>
-        <div class="section-title">Section 1 · Order &amp; Commercial Info</div>
+        <div class="section-title">Order &amp; Commercial Info</div>
         <table class="spec-table">
           <tr>
             <th>Program Serial #</th>
@@ -358,12 +358,8 @@ export function generateProductionSheetHtml(program: any): string {
             <td class="font-mono">${designNo}</td>
           </tr>
           <tr>
-            <th>Client Priority</th>
-            <td><strong style="color: ${program.clientPriority === 'HIGH' || program.clientPriority === 'URGENT' ? '#b91c1c' : '#1e3a8a'};">${program.clientPriority || 'NORMAL'}</strong></td>
-          </tr>
-          <tr>
             <th>Target Delivery Date</th>
-            <td class="font-mono" style="font-weight: 700;">${deliveryDate}</td>
+            <td class="font-mono" style="font-weight: 700; color: #b91c1c;">${deliveryDate}</td>
           </tr>
           <tr>
             <th>Program Start Date</th>
@@ -373,23 +369,38 @@ export function generateProductionSheetHtml(program: any): string {
       </div>
 
       <div>
-        <div class="section-title">Section 2 · Style Specifications</div>
+        <div class="section-title">Priority &amp; Dispatch Urgency</div>
         <table class="spec-table">
           <tr>
-            <th>Main Style</th>
-            <td style="font-weight: 700;">${mainStyle}</td>
+            <th>Priority Level</th>
+            <td>
+              <span style="display: inline-block; padding: 4px 10px; border-radius: 4px; font-weight: 800; font-size: 11px; letter-spacing: 0.05em; background: ${
+                (program.clientPriority || program.priority) === 'URGENT' ? '#ffe4e6' :
+                (program.clientPriority || program.priority) === 'HIGH' ? '#fef3c7' :
+                (program.clientPriority || program.priority) === 'LOW' ? '#f1f5f9' : '#dbeafe'
+              }; color: ${
+                (program.clientPriority || program.priority) === 'URGENT' ? '#9f1239' :
+                (program.clientPriority || program.priority) === 'HIGH' ? '#92400e' :
+                (program.clientPriority || program.priority) === 'LOW' ? '#334155' : '#1e40af'
+              }; border: 1px solid ${
+                (program.clientPriority || program.priority) === 'URGENT' ? '#fecdd3' :
+                (program.clientPriority || program.priority) === 'HIGH' ? '#fde68a' :
+                (program.clientPriority || program.priority) === 'LOW' ? '#cbd5e1' : '#bfdbfe'
+              };">
+                ${(program.clientPriority || program.priority || 'NORMAL').toUpperCase()}
+              </span>
+            </td>
           </tr>
           <tr>
-            <th>Sub Style</th>
-            <td>${subStyle}</td>
-          </tr>
-          <tr>
-            <th>Pattern / Cut</th>
-            <td>${pattern}</td>
-          </tr>
-          <tr>
-            <th>Base Design Type</th>
-            <td>${baseDesignType}</td>
+            <th>Queue Classification</th>
+            <td style="font-size: 8.5px; color: #475569;">
+              ${
+                (program.clientPriority || program.priority) === 'URGENT' ? 'Immediate shopfloor dispatch & top operational priority across all units' :
+                (program.clientPriority || program.priority) === 'HIGH' ? 'Expedited production pipeline for urgent delivery deadline' :
+                (program.clientPriority || program.priority) === 'LOW' ? 'Routine manufacturing backlog, flexible lead time' :
+                'Standard production queue and standard dispatch commitment'
+              }
+            </td>
           </tr>
           <tr>
             <th>Product Category</th>
@@ -403,8 +414,25 @@ export function generateProductionSheetHtml(program: any): string {
       </div>
     </div>
 
-    <!-- SECTION 3: WILCOM & EMBROIDERY -->
-    <div class="section-title">Section 3 · Wilcom &amp; Technical Embroidery Parameters</div>
+    <!-- STYLE SPECIFICATIONS -->
+    <div class="section-title">Style Specifications</div>
+    <table class="spec-table">
+      <tr>
+        <th style="width: 20%;">Main Style</th>
+        <td style="width: 30%; font-weight: 700;">${mainStyle}</td>
+        <th style="width: 20%;">Sub Style</th>
+        <td style="width: 30%;">${subStyle}</td>
+      </tr>
+      <tr>
+        <th>Pattern / Cut Ref</th>
+        <td class="font-mono">${pattern}</td>
+        <th>Base Design Type</th>
+        <td>${baseDesignType}</td>
+      </tr>
+    </table>
+
+    <!-- WILCOM & TECHNICAL EMBROIDERY -->
+    <div class="section-title">Wilcom &amp; Technical Embroidery Parameters</div>
     <table class="spec-table">
       <tr>
         <th style="width: 20%;">Wilcom Design #</th>
@@ -428,10 +456,10 @@ export function generateProductionSheetHtml(program: any): string {
       </tr>` : ''}
     </table>
 
-    <!-- SECTION 4 & 5: FABRIC & DYEING -->
+    <!-- FABRIC & DYEING -->
     <div class="grid-2">
       <div>
-        <div class="section-title">Section 4 · Fabric Master Details</div>
+        <div class="section-title">Fabric Master Details</div>
         <table class="spec-table">
           <tr>
             <th>Fabric Name / Quality</th>
@@ -465,19 +493,15 @@ export function generateProductionSheetHtml(program: any): string {
       </div>
 
       <div>
-        <div class="section-title">Section 5 · Dyeing &amp; Processing</div>
+        <div class="section-title">Dyeing &amp; Routing</div>
         <table class="spec-table">
           <tr>
-            <th>Dyeing Required</th>
-            <td><strong style="color: ${fabricDyeingRequired === 'YES' ? '#0369a1' : '#475569'};">${fabricDyeingRequired}</strong></td>
+            <th>Is Dyeing Required?</th>
+            <td><strong style="color: ${fabricDyeingRequired === 'YES' ? '#0369a1' : '#166534'};">${fabricDyeingRequired}</strong></td>
           </tr>
           <tr>
-            <th>Fabric Issued to Dyeing</th>
-            <td class="font-mono">${fabricIssuedToDyeing} Mtr</td>
-          </tr>
-          <tr>
-            <th>Fabric Sent to Dyeing</th>
-            <td class="font-mono">${fabricSentToDyeing} Mtr</td>
+            <th>Next Department Flow</th>
+            <td style="font-weight: 700; color: ${fabricDyeingRequired === 'YES' ? '#b45309' : '#15803d'};">${fabricDyeingRequired === 'YES' ? 'DYEING DEPARTMENT' : 'EMBROIDERY DEPARTMENT'}</td>
           </tr>
           <tr>
             <th>Total Color Quantity</th>
@@ -491,32 +515,33 @@ export function generateProductionSheetHtml(program: any): string {
             <th>Special Material Qty</th>
             <td>${specialMaterialQty}</td>
           </tr>
-          <tr>
-            <th>Rejection Tolerance</th>
-            <td class="font-mono" style="color: #b91c1c; font-weight: 700;">${piecesRejection} PCS</td>
-          </tr>
         </table>
       </div>
     </div>
 
-    <!-- SECTION 7 & 8: SCHEDULE & COMMENTS -->
-    <div class="section-title">Sections 7 &amp; 8 · Schedule, Quality &amp; Operator Notes</div>
+    <!-- PRODUCTION QUANTITY SUMMARY -->
+    <div class="section-title">Production Quantity Summary</div>
+    <table class="spec-table">
+      <tr>
+        <th style="width: 20%;">Total Color Quantity</th>
+        <td style="width: 30%;" class="font-mono highlight-cell"><strong>${colorQty} ${qtyUnit}</strong></td>
+        <th style="width: 20%;">Special Material / Trims</th>
+        <td style="width: 30%;">${specialMaterial}</td>
+      </tr>
+      <tr>
+        <th>Special Material Quantity</th>
+        <td colspan="3">${specialMaterialQty}</td>
+      </tr>
+    </table>
+
+    <!-- PRODUCTION SCHEDULE -->
+    <div class="section-title">Production Schedule</div>
     <table class="spec-table">
       <tr>
         <th style="width: 20%;">Design Release Date</th>
         <td style="width: 30%;">${prodDesignDate}</td>
         <th style="width: 20%;">Projected Floor End Date</th>
         <td style="width: 30%;">${prodEndDate}</td>
-      </tr>
-      <tr>
-        <th>Rejection Reason / Notes</th>
-        <td colspan="3">${rejectionReason}</td>
-      </tr>
-      <tr>
-        <th>Technical Comments &amp; Instructions</th>
-        <td colspan="3" style="font-style: italic; background: #fffbeb; padding: 6px 8px;">
-          ${comments}
-        </td>
       </tr>
     </table>
 

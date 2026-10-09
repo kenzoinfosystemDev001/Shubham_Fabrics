@@ -161,7 +161,7 @@ export function DyeingNavigation() {
           </span>
         </div>
 
-        {/* NAVIGATION ITEMS: Dashboard, Floor Board, My Work ONLY */}
+        {/* NAVIGATION ITEMS: Dashboard, My Work (Incoming Challans, Create Challan to QC1), Floor Board */}
         <nav className="flex-1 px-3 space-y-1 overflow-y-auto pt-2">
           {/* 1. Dashboard */}
           <Link
@@ -173,7 +173,45 @@ export function DyeingNavigation() {
             <span>Dashboard</span>
           </Link>
 
-          {/* 2. Floor Board */}
+          {/* 2. My Work */}
+          <div>
+            <Link
+              href="/dyeing/my-work"
+              onClick={() => setMobileOpen(false)}
+              className={linkClass('/dyeing/my-work', false)}
+            >
+              <Briefcase className="w-4 h-4 text-emerald-400" />
+              <span>My Work</span>
+            </Link>
+
+            {/* Sublinks matching handwritten sheet */}
+            <div className="ml-7 pl-2.5 border-l border-slate-700/80 space-y-0.5 my-1">
+              <Link
+                href="/dyeing/my-work?tab=incoming"
+                onClick={() => setMobileOpen(false)}
+                className={`flex items-center gap-2 px-2 py-1.5 rounded text-[11px] font-medium transition ${
+                  pathname === '/dyeing/my-work'
+                    ? 'text-purple-300 hover:text-white hover:bg-slate-800/60'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
+                }`}
+              >
+                <span>Incoming Challans</span>
+              </Link>
+              <Link
+                href="/dyeing/my-work?tab=create-challan"
+                onClick={() => setMobileOpen(false)}
+                className={`flex items-center gap-2 px-2 py-1.5 rounded text-[11px] font-medium transition ${
+                  pathname === '/dyeing/my-work'
+                    ? 'text-purple-300 hover:text-white hover:bg-slate-800/60'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
+                }`}
+              >
+                <span>Create Challan to QC1</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* 3. Floor Board */}
           <Link
             href="/dyeing/floor-board"
             onClick={() => setMobileOpen(false)}
@@ -181,16 +219,6 @@ export function DyeingNavigation() {
           >
             <Kanban className="w-4 h-4 text-amber-400" />
             <span>Floor Board</span>
-          </Link>
-
-          {/* 3. My Work */}
-          <Link
-            href="/dyeing/my-work"
-            onClick={() => setMobileOpen(false)}
-            className={linkClass('/dyeing/my-work', false)}
-          >
-            <Briefcase className="w-4 h-4 text-emerald-400" />
-            <span>My Work</span>
           </Link>
         </nav>
 

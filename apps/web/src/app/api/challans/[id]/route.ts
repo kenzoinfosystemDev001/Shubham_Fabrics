@@ -125,3 +125,47 @@ export async function DELETE(
     );
   }
 }
+
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const body = await request.json();
+    const { status, remarks, toDepartment, fromDepartment } = body;
+
+    const updateData: any = {};
+    if (status) {
+      updateData.status = status;
+      if (status === 'RECEIVED') {
+        updateData.receivedDate = new Date();
+      } else if (status === 'COMPLETED') {
+        updateData.completedDate = new Date();
+      }
+    }
+    if (remarks) updateData.remarks = remarks;
+    if (toDepartment) updateData.toDepartment = toDepartment;
+    if (fromDepartment) updateData.fromDepartment = fromDepartment;
+
+    const updated = await prisma.challan.update({
+      where: { id },
+      data: updateData,
+      include: {
+        program: true,
+        items: true,
+        fromDeptRel: true,
+        toDeptRel: true,
+      },
+    });
+
+    return NextResponse.json(updated);
+  } catch (error: any) {
+    console.error('Error updating challan:', error);
+    return NextResponse.json(
+      { error: error.message || 'Failed to update challan' },
+      { status: 500 }
+    );
+  }
+}
+

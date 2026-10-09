@@ -200,13 +200,13 @@ export default function ProgramDetailPage() {
           </div>
         </div>
 
-        {/* 8-SECTION SPECIFICATION CARDS */}
+        {/* SPECIFICATION DETAILS */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
-          {/* SEC 1: PROGRAM INFORMATION */}
+          {/* PROGRAM INFORMATION */}
           <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-3">
             <span className="text-[10px] font-bold uppercase tracking-wider text-blue-900 bg-blue-50 px-2 py-0.5 rounded">
-              Section 1 · Program Identification
+              Program Identification
             </span>
             <div className="grid grid-cols-2 gap-3 text-xs pt-1">
               <div>
@@ -222,16 +222,63 @@ export default function ProgramDetailPage() {
                 <span className="text-slate-700">{program.startDate ? new Date(program.startDate).toLocaleDateString() : '—'}</span>
               </div>
               <div>
-                <span className="text-slate-400 block text-[11px]">Client Priority</span>
-                <span className="font-bold text-amber-700">{program.clientPriority || program.priority || 'NORMAL'}</span>
+                <span className="text-slate-400 block text-[11px]">Delivery Date</span>
+                <span className="font-semibold text-rose-700">{program.deliveryDate ? new Date(program.deliveryDate).toLocaleDateString() : '—'}</span>
               </div>
             </div>
           </div>
 
-          {/* SEC 2: STYLE INFORMATION */}
+          {/* PRIORITY */}
+          <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-3">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-rose-900 bg-rose-50 px-2 py-0.5 rounded">
+              Priority &amp; Dispatch Urgency
+            </span>
+            <div className="pt-1">
+              {(() => {
+                const priority = (program.clientPriority || program.priority || 'NORMAL').toUpperCase();
+                const config: Record<string, { badge: string; border: string; desc: string }> = {
+                  LOW: {
+                    badge: 'bg-slate-100 text-slate-800 border-slate-300',
+                    border: 'border-slate-200 bg-slate-50/50',
+                    desc: 'Routine manufacturing queue, flexible lead time',
+                  },
+                  NORMAL: {
+                    badge: 'bg-blue-100 text-blue-900 border-blue-300',
+                    border: 'border-blue-200 bg-blue-50/40',
+                    desc: 'Standard production pipeline and dispatch schedule',
+                  },
+                  HIGH: {
+                    badge: 'bg-amber-100 text-amber-900 border-amber-300',
+                    border: 'border-amber-200 bg-amber-50/40',
+                    desc: 'Priority queue for expedited delivery commitments',
+                  },
+                  URGENT: {
+                    badge: 'bg-rose-100 text-rose-900 border-rose-300',
+                    border: 'border-rose-200 bg-rose-50/40',
+                    desc: 'Immediate dispatch & top floor priority across departments',
+                  },
+                };
+                const current = config[priority] || config.NORMAL;
+                return (
+                  <div className={`p-3 rounded-lg border ${current.border} flex items-center justify-between`}>
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`text-xs font-black px-2.5 py-0.5 rounded border ${current.badge}`}>
+                          {priority}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-600">{current.desc}</p>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+
+          {/* STYLE INFORMATION */}
           <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-3">
             <span className="text-[10px] font-bold uppercase tracking-wider text-amber-900 bg-amber-50 px-2 py-0.5 rounded">
-              Section 2 · Style &amp; Pattern
+              Style &amp; Pattern
             </span>
             <div className="grid grid-cols-2 gap-3 text-xs pt-1">
               <div>
@@ -253,10 +300,10 @@ export default function ProgramDetailPage() {
             </div>
           </div>
 
-          {/* SEC 3: WILCOM & EMBROIDERY */}
+          {/* WILCOM & EMBROIDERY */}
           <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-3">
             <span className="text-[10px] font-bold uppercase tracking-wider text-purple-900 bg-purple-50 px-2 py-0.5 rounded">
-              Section 3 · Wilcom &amp; Embroidery
+              Wilcom &amp; Embroidery
             </span>
             <div className="grid grid-cols-2 gap-3 text-xs pt-1">
               <div>
@@ -278,10 +325,10 @@ export default function ProgramDetailPage() {
             </div>
           </div>
 
-          {/* SEC 4: FABRIC SPECIFICATIONS */}
+          {/* FABRIC SPECIFICATIONS */}
           <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-3">
             <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-900 bg-emerald-50 px-2 py-0.5 rounded">
-              Section 4 · Fabric Specifications
+              Fabric Specifications
             </span>
             <div className="grid grid-cols-2 gap-3 text-xs pt-1">
               <div>
@@ -311,10 +358,10 @@ export default function ProgramDetailPage() {
             </div>
           </div>
 
-          {/* SEC 5: DYEING */}
+          {/* DYEING */}
           <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-3">
             <span className="text-[10px] font-bold uppercase tracking-wider text-rose-900 bg-rose-50 px-2 py-0.5 rounded">
-              Section 5 · Dyeing Requirements
+              Dyeing Requirements
             </span>
             <div className="grid grid-cols-2 gap-3 text-xs pt-1">
               <div>
@@ -324,16 +371,18 @@ export default function ProgramDetailPage() {
                 </span>
               </div>
               <div>
-                <span className="text-slate-400 block text-[11px]">Sent to Dyeing</span>
-                <span className="font-mono text-slate-700">{program.fabricSentToDyeing || 0} Mtr</span>
+                <span className="text-slate-400 block text-[11px]">Next Department Flow</span>
+                <span className={`font-bold ${program.fabricDyeingRequired ? 'text-amber-700' : 'text-emerald-700'}`}>
+                  {program.fabricDyeingRequired ? 'Dyeing Department' : 'Embroidery Department'}
+                </span>
               </div>
             </div>
           </div>
 
-          {/* SEC 6: PRODUCTION QUANTITY & TRIMS */}
+          {/* PRODUCTION QUANTITY & TRIMS */}
           <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-3">
             <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-900 bg-indigo-50 px-2 py-0.5 rounded">
-              Section 6 · Quantities &amp; Special Materials
+              Quantities &amp; Special Materials
             </span>
             <div className="grid grid-cols-2 gap-3 text-xs pt-1">
               <div>
@@ -351,12 +400,12 @@ export default function ProgramDetailPage() {
             </div>
           </div>
 
-          {/* SEC 7 & 8: DATES & REJECTION REMARKS */}
+          {/* PRODUCTION DATES */}
           <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-3 md:col-span-2">
             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-900 bg-slate-100 px-2 py-0.5 rounded">
-              Sections 7 &amp; 8 · Schedule, Quality Tolerances &amp; Comments
+              Production Dates
             </span>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs pt-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs pt-1">
               <div>
                 <span className="text-slate-400 block text-[11px]">Production Design Date</span>
                 <span className="text-slate-800">{program.productionDesignDate ? new Date(program.productionDesignDate).toLocaleDateString() : '—'}</span>
@@ -364,14 +413,6 @@ export default function ProgramDetailPage() {
               <div>
                 <span className="text-slate-400 block text-[11px]">Projected End Date</span>
                 <span className="text-slate-800">{program.productionEndDate ? new Date(program.productionEndDate).toLocaleDateString() : '—'}</span>
-              </div>
-              <div>
-                <span className="text-slate-400 block text-[11px]">Pieces Rejection Tolerance</span>
-                <span className="font-mono font-bold text-rose-700">{program.piecesRejection || 0} PCS</span>
-              </div>
-              <div className="sm:col-span-3">
-                <span className="text-slate-400 block text-[11px]">Comments &amp; Operator Instructions</span>
-                <p className="text-slate-700 font-serif italic mt-0.5">{program.comments || program.remarks || 'No special comments noted.'}</p>
               </div>
             </div>
           </div>

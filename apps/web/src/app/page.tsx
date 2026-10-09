@@ -16,7 +16,10 @@ import {
   Layers,
   Sparkles,
   Printer,
-  Download
+  Download,
+  Search,
+  History,
+  X
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { 
@@ -30,6 +33,7 @@ export default function ProgrammingDashboardPage() {
   const [programs, setPrograms] = useState<any[]>([]);
   const [challans, setChallans] = useState<any[]>([]);
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const loadData = async () => {
     try {
@@ -86,6 +90,28 @@ export default function ProgrammingDashboardPage() {
     if (!p.deliveryDate) return false;
     const diffDays = (new Date(p.deliveryDate).getTime() - now.getTime()) / (1000 * 3600 * 24);
     return diffDays >= 0 && diffDays <= 7 && p.status !== 'COMPLETED';
+  });
+
+  // Client-side quick search
+  const filteredPrograms = programs.filter((p) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
+    const serial = (p.programSerialNo || p.programNumber || '').toLowerCase();
+    const client = (p.clientName || p.buyerName || '').toLowerCase();
+    const design = (p.designNumber || p.designName || '').toLowerCase();
+    const wilcom = (p.wilcomDesignNumber || '').toLowerCase();
+    const style = (p.mainStyle || p.styleCode || '').toLowerCase();
+    const fabric = (p.fabricName || '').toLowerCase();
+    const color = (p.fabricColor || '').toLowerCase();
+    return (
+      serial.includes(q) ||
+      client.includes(q) ||
+      design.includes(q) ||
+      wilcom.includes(q) ||
+      style.includes(q) ||
+      fabric.includes(q) ||
+      color.includes(q)
+    );
   });
 
   return (
@@ -206,21 +232,67 @@ export default function ProgrammingDashboardPage() {
             
             {/* PRODUCTION SHEETS TABLE */}
             <div className="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
-              <div className="p-4 border-b border-slate-200/80 flex items-center justify-between">
+              <div className="p-4 border-b border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <h2 className="text-sm font-bold text-slate-900">
-                    Production Sheets / Production Programs
+                  <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                    <span>Production Sheets / Production Programs</span>
                   </h2>
                   <p className="text-[11px] text-slate-500 mt-0.5">
                     Official technical production specifications authored by Programming
                   </p>
                 </div>
-                <Link
-                  href="/my-work/create-production-sheet"
-                  className="text-xs font-semibold text-blue-700 hover:text-blue-900 flex items-center gap-1"
-                >
-                  <span>+ New Sheet</span>
-                </Link>
+                <div className="flex items-center gap-2">
+                  <Link
+                    href="/production-history"
+                    className="text-xs font-semibold text-slate-700 hover:text-blue-900 bg-slate-100 hover:bg-slate-200 px-2.5 py-1.5 rounded-md flex items-center gap-1.5 transition"
+                  >
+                    <History className="w-3.5 h-3.5 text-amber-600" />
+                    <span>Production History Archive</span>
+                  </Link>
+                  <Link
+                    href="/my-work/create-production-sheet"
+                    className="text-xs font-semibold text-white bg-[#163767] hover:bg-[#0F264A] px-2.5 py-1.5 rounded-md flex items-center gap-1 transition shadow-xs"
+                  >
+                    <span>+ New Sheet</span>
+                  </Link>
+                </div>
+              </div>
+
+              {/* SEARCH FILTER BAR */}
+              <div className="p-3 bg-slate-50/80 border-b border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                <div className="relative flex-1 max-w-md">
+                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-8 pr-8 py-1.5 bg-white border border-slate-200 rounded-md text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-[#163767]"
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery('')}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+                <div className="text-[11px] text-slate-500 flex items-center justify-between sm:justify-end gap-3">
+                  <span>
+                    Showing <strong className="text-slate-800">{filteredPrograms.length}</strong> of{' '}
+                    <strong className="text-slate-800">{programs.length}</strong> sheets
+                  </span>
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery('')}
+                      className="text-blue-700 hover:underline font-semibold"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
               </div>
 
               {loading ? (
@@ -240,6 +312,14 @@ export default function ProgrammingDashboardPage() {
                     <span>Create Production Sheet</span>
                   </Link>
                 </div>
+              ) : filteredPrograms.length === 0 ? (
+                <div className="p-10 text-center space-y-2">
+                  <Search className="w-8 h-8 text-slate-300 mx-auto" />
+                  <p className="text-xs font-semibold text-slate-700">No matching production sheets found</p>
+                  <p className="text-[11px] text-slate-500">
+                    Try another search term or click &quot;Clear&quot; to reset.
+                  </p>
+                </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
@@ -256,7 +336,7 @@ export default function ProgrammingDashboardPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 text-slate-700">
-                      {programs.slice(0, 10).map((prog) => {
+                      {filteredPrograms.slice(0, 15).map((prog) => {
                         const isDraft = prog.status === 'DRAFT';
                         const isReady = prog.status === 'READY_FOR_ISSUE' || prog.status === 'APPROVED';
                         const isIssued = prog.status === 'ISSUED' || prog.status === 'IN_PRODUCTION';
@@ -474,63 +554,7 @@ export default function ProgrammingDashboardPage() {
               </div>
             </div>
 
-            {/* UPCOMING DELIVERY DEADLINES */}
-            <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-amber-600" />
-                  <span>Approaching Deadlines</span>
-                </h3>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-rose-600 bg-rose-50 px-2 py-0.5 rounded">
-                  {upcomingDeadlines.length} Due Soon
-                </span>
-              </div>
 
-              {upcomingDeadlines.length === 0 ? (
-                <p className="text-xs text-slate-400 py-3 text-center">
-                  No programs approaching critical deadline.
-                </p>
-              ) : (
-                <div className="space-y-2 pt-1">
-                  {upcomingDeadlines.slice(0, 4).map((p) => (
-                    <div
-                      key={p.id}
-                      className="p-2.5 rounded-lg border border-amber-200 bg-amber-50/40 text-xs flex items-center justify-between"
-                    >
-                      <div>
-                        <span className="font-mono font-bold text-slate-900 block">
-                          {p.programSerialNo || p.programNumber}
-                        </span>
-                        <span className="text-[11px] text-slate-600 block">
-                          {p.clientName || p.buyerName} · {p.mainStyle || p.styleCode}
-                        </span>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-xs font-bold text-rose-700 block">
-                          {new Date(p.deliveryDate).toLocaleDateString()}
-                        </span>
-                        <span className="text-[10px] text-amber-700 font-semibold">
-                          Due soon
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* SPECIFICATION GUIDELINES */}
-            <div className="bg-[#FAF8F5] border border-[#E5E0D8] rounded-xl p-5 space-y-2">
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A66E22] block">
-                PRODUCTION STANDARD NOTICE
-              </span>
-              <h4 className="text-xs font-bold text-slate-900">
-                Department Gate Enforcement
-              </h4>
-              <p className="text-xs text-slate-600 leading-relaxed font-serif">
-                Production Sheets issued by Programming initiate the material routing for Shubham Fabrics. Ensure all Wilcom numbers, pattern parameters, and dyeing requirements are audited before issuing Challans.
-              </p>
-            </div>
 
           </div>
 

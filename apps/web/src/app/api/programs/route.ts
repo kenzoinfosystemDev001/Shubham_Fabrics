@@ -13,14 +13,21 @@ export async function GET(request: Request) {
     if (status) {
       where.status = status;
     }
-    if (search) {
+    if (search && search.trim()) {
+      const term = search.trim();
       where.OR = [
-        { programNumber: { contains: search, mode: 'insensitive' } },
-        { buyerName: { contains: search, mode: 'insensitive' } },
-        { orderNumber: { contains: search, mode: 'insensitive' } },
-        { styleCode: { contains: search, mode: 'insensitive' } },
-        { designName: { contains: search, mode: 'insensitive' } },
-        { clientName: { contains: search, mode: 'insensitive' } },
+        { programNumber: { contains: term, mode: 'insensitive' } },
+        { programSerialNo: { contains: term, mode: 'insensitive' } },
+        { buyerName: { contains: term, mode: 'insensitive' } },
+        { clientName: { contains: term, mode: 'insensitive' } },
+        { orderNumber: { contains: term, mode: 'insensitive' } },
+        { styleCode: { contains: term, mode: 'insensitive' } },
+        { mainStyle: { contains: term, mode: 'insensitive' } },
+        { designName: { contains: term, mode: 'insensitive' } },
+        { designNumber: { contains: term, mode: 'insensitive' } },
+        { wilcomDesignNumber: { contains: term, mode: 'insensitive' } },
+        { fabricName: { contains: term, mode: 'insensitive' } },
+        { fabricColor: { contains: term, mode: 'insensitive' } },
       ];
     }
 
@@ -34,6 +41,22 @@ export async function GET(request: Request) {
         fabrics: true,
         sizes: true,
         colours: true,
+        challans: {
+          select: {
+            id: true,
+            challanNumber: true,
+            challanType: true,
+            fromDepartment: true,
+            toDepartment: true,
+            status: true,
+            priority: true,
+            issuedDate: true,
+            receivedDate: true,
+            remarks: true,
+            items: true,
+          },
+          orderBy: { createdAt: 'desc' },
+        },
         routes: {
           include: {
             steps: { orderBy: { sequenceOrder: 'asc' } },
@@ -44,7 +67,7 @@ export async function GET(request: Request) {
       orderBy: { createdAt: 'desc' },
     });
 
-    const mapped = programs.map((p) => ({
+    const mapped = programs.map((p: any) => ({
       ...p,
       buyer: p.clientName || p.buyerName,
       buyerName: p.clientName || p.buyerName,

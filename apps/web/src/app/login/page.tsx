@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ShubhamLogo } from '@/components/ShubhamLogo';
 import { api } from '@/lib/api';
-import { Shield, Cpu, Warehouse, Lock, ArrowRight, User, Droplet } from 'lucide-react';
+import { Shield, Cpu, Warehouse, Lock, ArrowRight, User, Droplet, CheckCircle2 } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -96,7 +96,7 @@ export default function LoginPage() {
             <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">
               Select Factory Station / Role
             </p>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               <button
                 type="button"
                 onClick={() => selectPreset('admin', '1234')}
@@ -151,6 +151,20 @@ export default function LoginPage() {
                 <Droplet className={`w-4 h-4 ${username === 'dyeing' ? 'text-purple-600' : 'text-slate-500'}`} />
                 <span className="text-xs leading-none">Dyeing</span>
                 <span className="text-[9px] text-slate-400 font-mono">dyeing</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => selectPreset('qc1', '1234')}
+                className={`p-2.5 rounded-xl border text-center transition flex flex-col items-center gap-1.5 ${
+                  username === 'qc1' || username === 'qc_insp'
+                    ? 'border-emerald-600 bg-emerald-50/80 text-emerald-950 font-bold shadow-xs'
+                    : 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700'
+                }`}
+              >
+                <CheckCircle2 className={`w-4 h-4 ${username === 'qc1' || username === 'qc_insp' ? 'text-emerald-600' : 'text-slate-500'}`} />
+                <span className="text-xs leading-none">QC1 Dept</span>
+                <span className="text-[9px] text-slate-400 font-mono">qc1</span>
               </button>
             </div>
           </div>

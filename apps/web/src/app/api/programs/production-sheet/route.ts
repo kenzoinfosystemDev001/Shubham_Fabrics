@@ -3,19 +3,101 @@ import { prisma } from '@subham/database';
 
 export const dynamic = 'force-dynamic';
 
+function parseSafeDate(val: any, fallback?: Date | null): Date | null {
+  if (!val) return fallback !== undefined ? fallback : null;
+  if (val instanceof Date) {
+    return isNaN(val.getTime()) ? (fallback !== undefined ? fallback : null) : val;
+  }
+  if (typeof val === 'string') {
+    const trimmed = val.trim();
+    if (!trimmed) return fallback !== undefined ? fallback : null;
+
+    // Handle DD-MM-YYYY or DD/MM/YYYY or DD.MM.YYYY
+    const dmyMatch = trimmed.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/);
+    if (dmyMatch) {
+      const day = parseInt(dmyMatch[1], 10);
+      const month = parseInt(dmyMatch[2], 10) - 1;
+      const year = parseInt(dmyMatch[3], 10);
+      const d = new Date(Date.UTC(year, month, day, 12, 0, 0));
+      if (!isNaN(d.getTime())) return d;
+    }
+
+    // Handle YYYY-MM-DD
+    const ymdMatch = trimmed.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})$/);
+    if (ymdMatch) {
+      const year = parseInt(ymdMatch[1], 10);
+      const month = parseInt(ymdMatch[2], 10) - 1;
+      const day = parseInt(ymdMatch[3], 10);
+      const d = new Date(Date.UTC(year, month, day, 12, 0, 0));
+      if (!isNaN(d.getTime())) return d;
+    }
+
+    // Fallback to standard Date parsing
+    const parsed = new Date(trimmed);
+    if (!isNaN(parsed.getTime())) return parsed;
+  }
+  return fallback !== undefined ? fallback : null;
+}
+
 export async function POST(request: Request) {
   try {
     const data = await request.json();
 
-    // Generate or use provided number
-    let programNumber = data.programNumber || data.programSerialNo;
+    // Check if updating an existing program by ID
+    let existing: any = null;
+    if (data.id) {
+      existing = await prisma.program.findUnique({
+        where: { id: data.id },
+        select: { id: true, programNumber: true },
+      });
+    }
+
+    // Determine unique programNumber
+    let programNumber = data.programNumber;
+    if (existing) {
+      programNumber = existing.programNumber;
+    } else if (programNumber) {
+      // Check if user-provided programNumber already exists
+      const conflict = await prisma.program.findUnique({
+        where: { programNumber },
+        select: { id: true },
+      });
+      if (conflict) {
+        existing = conflict;
+      }
+    } else if (data.programSerialNo) {
+      // If user typed a serial number, see if it can be used as programNumber
+      const conflict = await prisma.program.findUnique({
+        where: { programNumber: data.programSerialNo },
+        select: { id: true },
+      });
+      if (!conflict) {
+        programNumber = data.programSerialNo;
+      }
+    }
+
+    // If still no programNumber, generate a guaranteed-unique one
     if (!programNumber) {
       const year = new Date().getFullYear();
       const prefix = `PRG-${year}-`;
       const count = await prisma.program.count({
         where: { programNumber: { startsWith: prefix } },
       });
-      programNumber = `${prefix}${String(count + 1).padStart(5, '0')}`;
+      let candidateNumber = `${prefix}${String(count + 1).padStart(5, '0')}`;
+      let conflict = await prisma.program.findUnique({
+        where: { programNumber: candidateNumber },
+        select: { id: true },
+      });
+      let inc = 1;
+      while (conflict) {
+        inc++;
+        candidateNumber = `${prefix}${String(count + inc).padStart(5, '0')}`;
+        conflict = await prisma.program.findUnique({
+          where: { programNumber: candidateNumber },
+          select: { id: true },
+        });
+      }
+      programNumber = candidateNumber;
     }
 
     // Find default programmer user or admin guaranteed in the database
@@ -40,16 +122,12 @@ export async function POST(request: Request) {
     }
     const actorId = user.id;
 
-    const startDate = data.startDate ? new Date(data.startDate) : new Date();
-    const deliveryDate = data.deliveryDate ? new Date(data.deliveryDate) : new Date(Date.now() + 14 * 86400000);
-    const prodDesignDate = data.productionDesignDate ? new Date(data.productionDesignDate) : null;
-    const prodEndDate = data.productionEndDate ? new Date(data.productionEndDate) : null;
-    const targetQty = Math.round(Number(data.targetQuantity || data.colorQuantity || 1));
-
-    const existing = await prisma.program.findUnique({
-      where: { programNumber },
-      select: { id: true },
-    });
+    // Safe dates
+    const startDate = parseSafeDate(data.startDate, new Date()) || new Date();
+    const deliveryDate = parseSafeDate(data.deliveryDate, new Date(Date.now() + 14 * 86400000)) || new Date(Date.now() + 14 * 86400000);
+    const prodDesignDate = parseSafeDate(data.productionDesignDate, null);
+    const prodEndDate = parseSafeDate(data.productionEndDate, null);
+    const targetQty = Math.max(1, Math.round(Number(data.targetQuantity || data.colorQuantity || 1)));
 
     const programData = {
       programNumber,
@@ -62,7 +140,7 @@ export async function POST(request: Request) {
       buyerName: data.clientName || data.buyerName || 'Standard Client',
       clientPriority: data.clientPriority || data.priority || 'NORMAL',
       priority: data.clientPriority || data.priority || 'NORMAL',
-      orderNumber: data.orderNumber || `ORD-${programNumber}`,
+      orderNumber: data.orderNumber || (data.programSerialNo ? `ORD-${data.programSerialNo}` : `ORD-${programNumber}`),
       designName: data.embroideryDesign || data.designName || 'Standard Embroidery',
       styleCode: data.mainStyle || data.styleCode || 'STYLE-01',
       productCategory: data.productCategory || 'GARMENT',

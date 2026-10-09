@@ -17,13 +17,15 @@ export async function POST(request: Request) {
       );
     }
 
-    // 1. Ensure core users (admin, program, store) are present in DB
+    // 1. Ensure core users (admin, program, store, dyeing, qc1) are present in DB
     const coreUserMap: Record<string, { role: string; dept: string; name: string }> = {
       admin: { role: 'ADMIN', dept: 'ADMIN', name: 'System Administrator' },
       program: { role: 'PROGRAMMING_INCHARGE', dept: 'PROGRAMMING', name: 'Programming Department' },
       programmer: { role: 'PROGRAMMING_INCHARGE', dept: 'PROGRAMMING', name: 'Programming Department' },
       store: { role: 'FABRIC_STORE', dept: 'STORE', name: 'Fabric Store Department' },
       dyeing: { role: 'DYEING_INCHARGE', dept: 'DYEING', name: 'Dyeing Incharge' },
+      qc1: { role: 'QC_INSPECTOR', dept: 'QC1', name: 'QC1 Quality Inspector' },
+      qc_insp: { role: 'QC_INSPECTOR', dept: 'QC1', name: 'Vikram Singh' },
     };
 
     // 2. Query user from Neon DB
@@ -58,7 +60,7 @@ export async function POST(request: Request) {
       await prisma.department.upsert({
         where: { code: info.dept },
         update: { name: info.name },
-        create: { code: info.dept, name: info.name, sequenceOrder: 1 },
+        create: { code: info.dept, name: info.name, sequenceOrder: 3 },
       });
 
       user = await prisma.user.create({
@@ -145,8 +147,21 @@ export async function POST(request: Request) {
         roleCodes.includes('DYEING_INCHARGE') ||
         roleCodes.includes('DYEING_OPERATOR'));
 
+    const isQC1 =
+      !isAdmin &&
+      !isStore &&
+      !isProgramming &&
+      !isDyeing &&
+      (user.username.toLowerCase() === 'qc1' ||
+        user.username.toLowerCase() === 'qc_insp' ||
+        user.departmentCode === 'QC1' ||
+        roleCodes.includes('QC_INSPECTOR') ||
+        roleCodes.includes('QC1_INSPECTOR'));
+
     const normalizedRole = isAdmin
       ? 'ADMIN'
+      : isQC1
+      ? 'QC_INSPECTOR'
       : isDyeing
       ? 'DYEING_INCHARGE'
       : isStore
@@ -157,16 +172,20 @@ export async function POST(request: Request) {
 
     const normalizedDept = isAdmin
       ? 'ADMIN'
+      : isQC1
+      ? 'QC1'
       : isDyeing
       ? 'DYEING'
       : isStore
       ? 'STORE'
       : isProgramming
       ? 'PROGRAMMING'
-      : user.departmentCode || 'STORE';
+      : user.departmentCode || 'QC1';
 
     const defaultRedirect = isAdmin
       ? '/admin'
+      : isQC1
+      ? '/qc1'
       : isDyeing
       ? '/dyeing'
       : isStore

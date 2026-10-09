@@ -15,7 +15,8 @@ import {
   UserCircle,
   Building2,
   Menu,
-  X
+  X,
+  History
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { isAdminUser } from '@/lib/rbac';
@@ -75,8 +76,8 @@ export function Navigation() {
     router.push('/login');
   };
 
-  // Do not render sidebar on login page, fabric-store workspace, admin workspace, or dyeing workspace
-  if (pathname === '/login' || pathname.startsWith('/fabric-store') || pathname.startsWith('/admin') || pathname.startsWith('/dyeing')) {
+  // Do not render sidebar on login page, fabric-store workspace, admin workspace, dyeing workspace, or qc1 workspace
+  if (pathname === '/login' || pathname.startsWith('/fabric-store') || pathname.startsWith('/admin') || pathname.startsWith('/dyeing') || pathname.startsWith('/qc1')) {
     return null;
   }
 
@@ -85,6 +86,7 @@ export function Navigation() {
   const isIssueChallanActive = pathname === '/my-work/issue-challan';
   const isMyWorkRootActive = pathname === '/my-work';
   const isFloorBoardActive = pathname === '/floor-board';
+  const isHistoryActive = pathname === '/production-history';
   const isAdmin = isAdminUser(currentUser);
 
   return (
@@ -242,7 +244,21 @@ export function Navigation() {
             )}
           </div>
 
-          {/* 3. Floor Board */}
+          {/* 3. Production History */}
+          <Link
+            href="/production-history"
+            onClick={() => setMobileOpen(false)}
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition ${
+              isHistoryActive
+                ? 'bg-[#1E293B] text-white border-l-2 border-amber-400 pl-2.5 shadow-xs'
+                : 'text-slate-300 hover:bg-slate-800/60 hover:text-white'
+            }`}
+          >
+            <History className="w-4 h-4 text-amber-400/90" />
+            <span>Production History</span>
+          </Link>
+
+          {/* 4. Floor Board */}
           <Link
             href="/floor-board"
             onClick={() => setMobileOpen(false)}

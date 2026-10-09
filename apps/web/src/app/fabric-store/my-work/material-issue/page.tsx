@@ -1,16 +1,20 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { ArrowUpFromLine, RefreshCw, CheckCircle2, Layers, AlertCircle, Send } from 'lucide-react';
 
-export default function MaterialIssuePage() {
+function MaterialIssueContent() {
+  const searchParams = useSearchParams();
+  const preselectedProgramId = searchParams?.get('programId');
+
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [rolls, setRolls] = useState<any[]>([]);
   const [programs, setPrograms] = useState<any[]>([]);
   const [selectedRollIds, setSelectedRollIds] = useState<string[]>([]);
-  const [targetProgramId, setTargetProgramId] = useState('');
+  const [targetProgramId, setTargetProgramId] = useState(preselectedProgramId || '');
   const [issueRemarks, setIssueRemarks] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -31,7 +35,12 @@ export default function MaterialIssuePage() {
       const programsJson = await programsRes.json();
 
       setRolls(rollsJson.data || []);
-      setPrograms(Array.isArray(programsJson) ? programsJson : []);
+      const progList = Array.isArray(programsJson) ? programsJson : [];
+      setPrograms(progList);
+
+      if (preselectedProgramId) {
+        setTargetProgramId(preselectedProgramId);
+      }
     } catch (err: any) {
       console.error('Failed to load issue data:', err);
     } finally {
@@ -41,7 +50,7 @@ export default function MaterialIssuePage() {
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [preselectedProgramId]);
 
   const toggleSelectRoll = (id: string) => {
     if (selectedRollIds.includes(id)) {
@@ -346,3 +355,12 @@ export default function MaterialIssuePage() {
     </div>
   );
 }
+
+export default function MaterialIssuePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#F0FAF9] flex items-center justify-center text-xs text-slate-500">Loading Material Issue...</div>}>
+      <MaterialIssueContent />
+    </Suspense>
+  );
+}
+

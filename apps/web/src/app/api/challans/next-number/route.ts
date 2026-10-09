@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const department = searchParams.get('department') || 'PROGRAMMING';
-    const deptCode = department === 'PROGRAMMING' ? 'PRG' : department;
+    const deptCode = department === 'PROGRAMMING' ? 'PRG' : department === 'STORE' ? 'STR' : department === 'DYEING' ? 'DYE' : department;
     const year = new Date().getFullYear();
     const prefix = `CH-${deptCode}-${year}-`;
     const count = await prisma.challan.count({

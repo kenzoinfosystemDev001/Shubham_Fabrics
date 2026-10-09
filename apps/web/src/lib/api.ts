@@ -114,7 +114,7 @@ class ApiClient {
         let errorMessage = `HTTP ${res.status} ${res.statusText}`;
         try {
           const errorBody = await res.json();
-          errorMessage = errorBody.message || errorMessage;
+          errorMessage = errorBody.error || errorBody.message || errorMessage;
         } catch {
           // fallback
         }

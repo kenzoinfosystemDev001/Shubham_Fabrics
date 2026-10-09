@@ -99,6 +99,26 @@ export function isDyeingUser(user: MESUser | null): boolean {
   );
 }
 
+export function isQc1User(user: MESUser | null): boolean {
+  if (!user) return false;
+  if (isAdminUser(user)) return true; // Admins have all access
+
+  const username = (user.username || '').toLowerCase();
+  const dept = (user.departmentCode || '').toUpperCase();
+  const role = (user.role || '').toUpperCase();
+  const roles = (user.roles || []).map((r) => r.toUpperCase());
+
+  return (
+    username === 'qc1' ||
+    username === 'qc_insp' ||
+    dept === 'QC1' ||
+    role === 'QC_INSPECTOR' ||
+    role === 'QC1_INSPECTOR' ||
+    roles.includes('QC_INSPECTOR') ||
+    roles.includes('QC1_INSPECTOR')
+  );
+}
+
 /**
  * Checks if the current user has access to a specific route pathname.
  * Returns { allowed: boolean, redirectTarget: string, reason?: string }
@@ -122,7 +142,9 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
   }
 
   const defaultUserHome =
-    user.departmentCode === 'DYEING'
+    user.departmentCode === 'QC1'
+      ? '/qc1'
+      : user.departmentCode === 'DYEING'
       ? '/dyeing'
       : user.departmentCode === 'STORE'
       ? '/fabric-store'
@@ -134,6 +156,18 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
       allowed: false,
       redirectTarget: defaultUserHome,
       reason: 'Access Restricted: Admin Console is restricted to System Administrators.',
+    };
+  }
+
+  // QC1 Department routes protection
+  if (pathname.startsWith('/qc1')) {
+    if (isQc1User(user)) {
+      return { allowed: true, redirectTarget: pathname };
+    }
+    return {
+      allowed: false,
+      redirectTarget: defaultUserHome,
+      reason: 'Access Restricted: You are not authorized for the QC1 Department. Access is restricted to QC1 Quality personnel and Admins.',
     };
   }
 
@@ -169,7 +203,8 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
     pathname.startsWith('/programs') ||
     (pathname.startsWith('/floor-board') &&
       !pathname.startsWith('/fabric-store/floor-board') &&
-      !pathname.startsWith('/dyeing/floor-board'));
+      !pathname.startsWith('/dyeing/floor-board') &&
+      !pathname.startsWith('/qc1/floor-board'));
 
   if (isProgrammingRoute) {
     if (isProgrammingUser(user)) {

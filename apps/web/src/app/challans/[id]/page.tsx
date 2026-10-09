@@ -12,7 +12,8 @@ import {
   Calendar, 
   AlertCircle,
   ShieldCheck,
-  FileText
+  FileText,
+  Download
 } from 'lucide-react';
 import { api } from '@/lib/api';
 
@@ -93,7 +94,14 @@ export default function ChallanDetailPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 print:hidden">
+          <button
+            onClick={() => window.print()}
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-md shadow-xs transition"
+          >
+            <Download className="w-4 h-4" />
+            <span>Download PDF</span>
+          </button>
           <button
             onClick={() => window.print()}
             className="flex items-center gap-1.5 px-3.5 py-2 bg-[#163767] hover:bg-[#0F264A] text-white text-xs font-semibold rounded-md shadow-xs transition"
@@ -103,6 +111,20 @@ export default function ChallanDetailPage() {
           </button>
         </div>
       </header>
+
+      {/* PRINT STYLES */}
+      <style jsx global>{`
+        @media print {
+          header, aside, nav, .print\\:hidden {
+            display: none !important;
+          }
+          body, main {
+            background: white !important;
+            padding: 0 !important;
+            margin: 0 !important;
+          }
+        }
+      `}</style>
 
       {/* PRINTABLE VOUCHER */}
       <main className="p-4 sm:p-8 max-w-4xl mx-auto space-y-6">
@@ -144,8 +166,18 @@ export default function ChallanDetailPage() {
               )}
             </div>
 
-            <div className="text-right">
-              <span className="font-mono font-bold text-lg text-slate-900 block">
+            <div className="text-right flex flex-col items-end">
+              {/* SVG Barcode */}
+              <div className="mb-1">
+                <svg viewBox="0 0 160 30" className="h-7 w-auto max-w-[140px]">
+                  {Array.from({ length: 32 }).map((_, i) => {
+                    const width = (i * 3 + (challan.challanNumber || '').length) % 3 === 0 ? 3 : (i % 2 === 0 ? 1.5 : 2);
+                    const x = 5 + i * 4.5;
+                    return <rect key={i} x={x} y="2" width={width} height="26" fill="#0f172a" />;
+                  })}
+                </svg>
+              </div>
+              <span className="font-mono font-bold text-lg text-slate-900 block leading-tight">
                 {challan.challanNumber}
               </span>
               <span className="text-xs text-slate-500 block">

@@ -230,28 +230,20 @@ export function FabricStoreNavigation() {
                   <span>Incoming Challans</span>
                 </Link>
                 <Link
-                  href="/fabric-store/my-work/material-receipt"
+                  href="/fabric-store/my-work/challan-to-dyeing"
                   onClick={() => setMobileOpen(false)}
-                  className={subLinkClass('/fabric-store/my-work/material-receipt')}
+                  className={subLinkClass('/fabric-store/my-work/challan-to-dyeing')}
                 >
-                  <ArrowDownToLine className="w-3.5 h-3.5 text-blue-400" />
-                  <span>Material Receipt</span>
+                  <Send className="w-3.5 h-3.5 text-indigo-400" />
+                  <span>Store to Dyeing</span>
                 </Link>
                 <Link
-                  href="/fabric-store/my-work/qc-inspections"
+                  href="/fabric-store/my-work/challan-to-embroidery"
                   onClick={() => setMobileOpen(false)}
-                  className={subLinkClass('/fabric-store/my-work/qc-inspections')}
-                >
-                  <ClipboardCheck className="w-3.5 h-3.5 text-amber-400" />
-                  <span>QC Inspections</span>
-                </Link>
-                <Link
-                  href="/fabric-store/my-work/issue-challan"
-                  onClick={() => setMobileOpen(false)}
-                  className={subLinkClass('/fabric-store/my-work/issue-challan')}
+                  className={subLinkClass('/fabric-store/my-work/challan-to-embroidery')}
                 >
                   <Send className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Issue Challan</span>
+                  <span>Store to Embroidery</span>
                 </Link>
               </div>
             )}
@@ -276,36 +268,12 @@ export function FabricStoreNavigation() {
                   <span>Stock Overview</span>
                 </Link>
                 <Link
-                  href="/fabric-store/inventory/rolls"
-                  onClick={() => setMobileOpen(false)}
-                  className={subLinkClass('/fabric-store/inventory/rolls')}
-                >
-                  <ListChecks className="w-3.5 h-3.5 text-blue-400" />
-                  <span>Rolls Registry</span>
-                </Link>
-                <Link
-                  href="/fabric-store/inventory/batches"
-                  onClick={() => setMobileOpen(false)}
-                  className={subLinkClass('/fabric-store/inventory/batches')}
-                >
-                  <PackageCheck className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Batches</span>
-                </Link>
-                <Link
                   href="/fabric-store/inventory/defected-shelf"
                   onClick={() => setMobileOpen(false)}
                   className={subLinkClass('/fabric-store/inventory/defected-shelf')}
                 >
                   <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
                   <span>Defected Shelf</span>
-                </Link>
-                <Link
-                  href="/fabric-store/inventory/stock-ledger"
-                  onClick={() => setMobileOpen(false)}
-                  className={subLinkClass('/fabric-store/inventory/stock-ledger')}
-                >
-                  <BookOpen className="w-3.5 h-3.5 text-purple-400" />
-                  <span>Stock Ledger</span>
                 </Link>
               </div>
             )}
