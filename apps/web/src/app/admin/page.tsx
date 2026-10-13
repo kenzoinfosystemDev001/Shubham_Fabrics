@@ -195,6 +195,69 @@ export default function AdminConsolePage() {
     }
   };
 
+  // Delete ALL Program Sheets (Admin only)
+  const handleDeleteAllPrograms = async () => {
+    const confirmation = prompt('DANGER: This will permanently delete ALL production sheets and all linked records from the database.\n\nType "DELETE ALL" to confirm:');
+    if (confirmation !== 'DELETE ALL') {
+      if (confirmation !== null) alert('Action cancelled. Deletion code did not match.');
+      return;
+    }
+    try {
+      setLoading(true);
+      const res = await fetch('/api/admin/programs/delete-all', { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete all programs');
+      showNotification('All production sheets permanently deleted from database.');
+      loadData();
+    } catch (err: any) {
+      showNotification(err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Delete ALL Challans (Admin only)
+  const handleDeleteAllChallans = async () => {
+    const confirmation = prompt('DANGER: This will permanently delete ALL factory challans and movement records from the database.\n\nType "DELETE ALL" to confirm:');
+    if (confirmation !== 'DELETE ALL') {
+      if (confirmation !== null) alert('Action cancelled. Deletion code did not match.');
+      return;
+    }
+    try {
+      setLoading(true);
+      const res = await fetch('/api/admin/challans/delete-all', { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete all challans');
+      showNotification('All challans permanently deleted from database.');
+      loadData();
+    } catch (err: any) {
+      showNotification(err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Clear ALL Factory Data (Factory Reset)
+  const handleClearAllFactoryData = async () => {
+    const confirmation = prompt('CRITICAL WARNING: This will completely wipe ALL production sheets, challans, dyeing orders, inventory, defect logs, and audit logs from the database, resetting the system to a clean initial state.\n\nType "WIPE ALL DATA" to confirm:');
+    if (confirmation !== 'WIPE ALL DATA') {
+      if (confirmation !== null) alert('Action cancelled. Confirmation text did not match.');
+      return;
+    }
+    try {
+      setLoading(true);
+      const res = await fetch('/api/admin/clear-all-data', { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to clear factory data');
+      showNotification('All factory data successfully cleared. Database is in pristine initial state.');
+      loadData();
+    } catch (err: any) {
+      showNotification(err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Create Supplier handler
   const handleCreateSupplier = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -324,6 +387,23 @@ export default function AdminConsolePage() {
             <Building2 className="w-3.5 h-3.5" />
             <span>Embroidery</span>
           </Link>
+
+          <Link
+            href="/dyeing"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-500/10 text-purple-300 border border-purple-500/30 hover:bg-purple-500/20 transition"
+          >
+            <Building2 className="w-3.5 h-3.5" />
+            <span>Dyeing</span>
+          </Link>
+
+          <button
+            onClick={handleClearAllFactoryData}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-600/90 hover:bg-rose-700 text-white shadow-xs transition"
+            title="Wipe all production sheets, challans, and operational data (Factory Reset)"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>Wipe All Data</span>
+          </button>
 
           <button
             onClick={handleSignOut}
@@ -546,13 +626,24 @@ export default function AdminConsolePage() {
                       View, print traveler cards, and delete/remove production sheets.
                     </p>
                   </div>
-                  <Link
-                    href="/my-work/create-production-sheet"
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#163767] hover:bg-[#0F264A] text-white rounded-lg text-xs font-semibold shadow-xs"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>+ Add Production Sheet</span>
-                  </Link>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={handleDeleteAllPrograms}
+                      disabled={programs.length === 0}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-600 hover:bg-rose-700 disabled:opacity-40 text-white rounded-lg text-xs font-bold shadow-xs transition"
+                      title="Permanently Delete All Production Sheets"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Delete All Sheets</span>
+                    </button>
+                    <Link
+                      href="/my-work/create-production-sheet"
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-[#163767] hover:bg-[#0F264A] text-white rounded-lg text-xs font-semibold shadow-xs"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>+ Add Production Sheet</span>
+                    </Link>
+                  </div>
                 </div>
 
                 <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
@@ -637,7 +728,16 @@ export default function AdminConsolePage() {
                       Track inter-department dispatches and station handoffs.
                     </p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={handleDeleteAllChallans}
+                      disabled={challans.length === 0}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-600 hover:bg-rose-700 disabled:opacity-40 text-white rounded-lg text-xs font-bold shadow-xs transition"
+                      title="Permanently Delete All Factory Challans"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Delete All Challans</span>
+                    </button>
                     <Link
                       href="/my-work/issue-challan"
                       className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-semibold shadow-xs"

@@ -271,6 +271,12 @@ export async function POST(request: Request) {
         await syncInboundChallansToDyeingOrders();
       } catch (syncErr) {
         console.warn('Auto-sync to dyeing skipped or warning:', syncErr);
+    // If dispatched to Dyeing, immediately sync to DyeingOrders
+    if (toDept === 'DYEING' || toDept.includes('DYE')) {
+      try {
+        await syncInboundChallansToDyeingOrders();
+      } catch (syncErr) {
+        console.warn('Auto-sync to Dyeing notification:', syncErr);
       }
     }
 
@@ -280,6 +286,7 @@ export async function POST(request: Request) {
         program: true,
         items: true,
         createdBy: { select: { id: true, username: true, fullName: true } },
+        dyeingInboundOrders: true,
       },
     });
 
