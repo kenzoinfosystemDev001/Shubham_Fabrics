@@ -280,6 +280,7 @@ export async function POST(request: Request) {
         program: true,
         items: true,
         createdBy: { select: { id: true, username: true, fullName: true } },
+        dyeingInboundOrders: true,
       },
     });
 
