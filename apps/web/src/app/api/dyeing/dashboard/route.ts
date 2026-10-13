@@ -19,6 +19,10 @@ export async function GET() {
             buyerName: true,
             styleCode: true,
             mainStyle: true,
+            designNumber: true,
+            wilcomDesignNumber: true,
+            wilcomDesignPhoto: true,
+            baseDesignPhoto: true,
             fabricName: true,
             fabricColor: true,
             targetQuantity: true,
@@ -166,6 +170,7 @@ export async function GET() {
         priorityWork,
         upcomingDelivery,
         recentActivity: recentTransactions,
+        receivedProductions: orders.slice(0, 10),
       },
     });
   } catch (error: any) {

@@ -13,34 +13,38 @@ export async function GET() {
     const [
       totalRolls,
       rollsInStock,
-      rollsOnHold,
       rollsIssued,
-      pendingQC,
-      todayReceipts,
-      todayIssues,
-      recentGRNs,
+      incomingChallansCount,
+      incomingChallans,
       recentIssues,
     ] = await Promise.all([
       prisma.fabricStoreRoll.count(),
       prisma.fabricStoreRoll.count({ where: { status: 'IN_STOCK' } }),
-      prisma.fabricStoreRoll.count({ where: { status: 'QC_HOLD' } }),
       prisma.fabricStoreRoll.count({ where: { status: 'ISSUED' } }),
-      prisma.fabricStoreRoll.count({ where: { qcStatus: 'PENDING' } }),
-      prisma.materialReceipt.count({
-        where: { receivedAt: { gte: today, lt: tomorrow } },
-      }),
-      prisma.fabricStockLedger.count({
-        where: {
-          transactionType: 'ISSUE',
-          transactedAt: { gte: today, lt: tomorrow },
-        },
-      }),
-      prisma.materialReceipt.findMany({
-        take: 5,
+      prisma.challan.count({ where: { toDepartment: 'STORE' } }),
+      prisma.challan.findMany({
+        take: 8,
+        where: { toDepartment: 'STORE' },
         orderBy: { createdAt: 'desc' },
         include: {
-          batch: { select: { batchNumber: true, fabricType: true, fabricDescription: true } },
-          receivedBy: { select: { fullName: true } },
+          program: {
+            select: {
+              id: true,
+              programNumber: true,
+              programSerialNo: true,
+              buyerName: true,
+              clientName: true,
+              styleCode: true,
+              mainStyle: true,
+              fabricName: true,
+              fabricColor: true,
+              fabricDyeingRequired: true,
+              colorQuantity: true,
+              targetQuantity: true,
+            },
+          },
+          fromDeptRel: true,
+          items: true,
         },
       }),
       prisma.fabricStockLedger.findMany({
@@ -60,13 +64,10 @@ export async function GET() {
         kpis: {
           totalRolls,
           rollsInStock,
-          rollsOnHold,
           rollsIssued,
-          pendingQC,
-          todayReceipts,
-          todayIssues,
+          incomingChallansCount,
         },
-        recentGRNs,
+        incomingChallans,
         recentIssues,
       },
     });

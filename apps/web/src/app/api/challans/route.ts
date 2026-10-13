@@ -55,16 +55,54 @@ export async function GET(request: Request) {
   }
 }
 
+function parseSafeDate(val: any, fallback?: Date | null): Date | null {
+  if (!val) return fallback !== undefined ? fallback : null;
+  if (val instanceof Date) {
+    return isNaN(val.getTime()) ? (fallback !== undefined ? fallback : null) : val;
+  }
+  if (typeof val === 'string') {
+    const trimmed = val.trim();
+    if (!trimmed) return fallback !== undefined ? fallback : null;
+
+    const dmyMatch = trimmed.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/);
+    if (dmyMatch) {
+      const day = parseInt(dmyMatch[1], 10);
+      const month = parseInt(dmyMatch[2], 10) - 1;
+      const year = parseInt(dmyMatch[3], 10);
+      const d = new Date(Date.UTC(year, month, day, 12, 0, 0));
+      if (!isNaN(d.getTime())) return d;
+    }
+
+    const ymdMatch = trimmed.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})$/);
+    if (ymdMatch) {
+      const year = parseInt(ymdMatch[1], 10);
+      const month = parseInt(ymdMatch[2], 10) - 1;
+      const day = parseInt(ymdMatch[3], 10);
+      const d = new Date(Date.UTC(year, month, day, 12, 0, 0));
+      if (!isNaN(d.getTime())) return d;
+    }
+
+    const parsed = new Date(trimmed);
+    if (!isNaN(parsed.getTime())) return parsed;
+  }
+  return fallback !== undefined ? fallback : null;
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
 
     // 1. Resolve Actor ID reliably
-    let user = await prisma.user.findFirst({
-      where: { OR: [{ username: 'programmer' }, { username: 'admin' }, { username: 'jitender' }] },
-      select: { id: true },
-      orderBy: { username: 'asc' },
-    });
+    let user = null;
+    if (body.issuedById) {
+      user = await prisma.user.findUnique({ where: { id: body.issuedById }, select: { id: true } }).catch(() => null);
+    }
+    if (!user) {
+      user = await prisma.user.findFirst({
+        where: { OR: [{ username: 'store' }, { username: 'programmer' }, { username: 'admin' }, { username: 'jitender' }] },
+        select: { id: true },
+      });
+    }
     if (!user) {
       user = await prisma.user.findFirst({ select: { id: true } });
     }
@@ -74,7 +112,7 @@ export async function POST(request: Request) {
           username: 'programmer',
           email: 'programmer@subhamfabrics.com',
           fullName: 'Programming Incharge',
-          passwordHash: 'dummy',
+          passwordHash: '$2b$10$e7v1vT7Qf0K6bSubhamFabricsMESSecureHash',
           departmentCode: 'PROGRAMMING',
         },
         select: { id: true },
@@ -142,7 +180,7 @@ export async function POST(request: Request) {
 
     // 4. Resolve Unique Challan Number
     const year = new Date().getFullYear();
-    const deptPrefixCode = fromDept === 'PROGRAMMING' ? 'PRG' : fromDept;
+    const deptPrefixCode = fromDept === 'PROGRAMMING' ? 'PRG' : fromDept === 'STORE' ? 'STR' : fromDept === 'DYEING' ? 'DYE' : fromDept;
     const prefix = `CH-${deptPrefixCode}-${year}-`;
 
     let challanNumber = body.challanNumber;
@@ -175,7 +213,7 @@ export async function POST(request: Request) {
           priority: body.priority || 'NORMAL',
           createdById: actorId,
           issuedById: actorId,
-          issuedDate: new Date(),
+          issuedDate: parseSafeDate(body.issuedDate, new Date()) || new Date(),
           remarks: [
             body.remarks,
             body.vehicleNumber ? `Vehicle: ${body.vehicleNumber}` : null,
@@ -204,7 +242,7 @@ export async function POST(request: Request) {
             itemDescription: item.itemDescription || item.description || 'Production Material Lot',
             unitType: item.unitType || 'ROLL',
             quantity: Number(item.quantity || 1),
-            uom: item.uom || 'PCS',
+            uom: item.uom || 'MTR',
             fabricCode: item.fabricCode || null,
             colour: item.colour || null,
             shade: item.shade || null,
@@ -227,6 +265,12 @@ export async function POST(request: Request) {
       return challan;
     });
 
+    // Auto-sync to Dyeing if targeted to Dyeing department
+    if (toDept === 'DYEING') {
+      try {
+        await syncInboundChallansToDyeingOrders();
+      } catch (syncErr) {
+        console.warn('Auto-sync to dyeing skipped or warning:', syncErr);
     // If dispatched to Dyeing, immediately sync to DyeingOrders
     if (toDept === 'DYEING' || toDept.includes('DYE')) {
       try {

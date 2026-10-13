@@ -20,6 +20,7 @@ import {
   FileText
 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 
 export default function DyeingDashboard() {
   const router = useRouter();
@@ -87,14 +88,21 @@ export default function DyeingDashboard() {
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] pb-16">
-      {/* TOP HEADER */}
-      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+      {/* TOP HEADER (REAL DB BACKGROUND) */}
+      <header
+        style={{
+          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.70)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+        className="border-b border-slate-700/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md text-white"
+      >
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-purple-700 block">
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-purple-400 block drop-shadow-sm">
             SHUBHAM FABRICS MES · PRODUCTION COMMAND
           </span>
-          <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-            <Droplet className="w-5 h-5 text-purple-600" />
+          <h1 className="text-xl font-bold text-white flex items-center gap-2 drop-shadow-sm">
+            <Droplet className="w-5 h-5 text-purple-400" />
             <span>Dyeing Department Dashboard</span>
           </h1>
         </div>
@@ -103,7 +111,7 @@ export default function DyeingDashboard() {
           <button
             onClick={loadData}
             disabled={loading}
-            className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg border border-slate-200 transition"
+            className="p-2 text-slate-300 hover:text-white hover:bg-slate-800/80 rounded-lg border border-slate-700/60 transition"
             title="Refresh Dashboard"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -111,15 +119,15 @@ export default function DyeingDashboard() {
 
           <Link
             href="/dyeing/floor-board"
-            className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold rounded-lg transition"
+            className="flex items-center gap-1.5 px-3 py-2 bg-slate-800/90 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg border border-slate-700 transition"
           >
-            <Kanban className="w-4 h-4 text-slate-600" />
+            <Kanban className="w-4 h-4 text-purple-300" />
             <span>Floor Board</span>
           </Link>
 
           <Link
             href="/dyeing/my-work"
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-purple-700 hover:bg-purple-800 text-white text-xs font-semibold rounded-lg shadow-xs transition"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold rounded-lg shadow-xs transition"
           >
             <Briefcase className="w-4 h-4" />
             <span>My Work Queue</span>
@@ -159,6 +167,114 @@ export default function DyeingDashboard() {
               Live Neon DB Link
             </span>
           </div>
+        </div>
+      </div>
+
+      {/* PRODUCTION RECEIVED FROM FABRIC STORE (VISUAL IMAGE PREVIEW AS PER HANDWRITTEN SPEC) */}
+      <div className="px-4 sm:px-8 pt-6 max-w-7xl mx-auto">
+        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-purple-600 animate-pulse"></span>
+                <h2 className="text-sm font-bold text-slate-900 tracking-tight">
+                  Production Received from Fabric Store
+                </h2>
+              </div>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Visual design cards and traveler specs of incoming production lots dispatched from Fabric Store
+              </p>
+            </div>
+            <Link
+              href="/dyeing/my-work?tab=incoming"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-700 hover:text-purple-900 transition"
+            >
+              <span>View All Inward Lots ({data?.receivedProductions?.length || 0})</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          {(!data?.receivedProductions || data.receivedProductions.length === 0) ? (
+            <div className="py-10 text-center text-xs text-slate-400 bg-slate-50/60 rounded-xl border border-dashed border-slate-200">
+              No production lots currently received from Fabric Store. Dispatch a challan from Store to Dyeing to populate here.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {data.receivedProductions.map((item: any) => {
+                const prog = item.program;
+                const imgUrl = prog?.wilcomDesignPhoto || prog?.baseDesignPhoto || '/shubham-logo.jpg';
+                return (
+                  <div
+                    key={item.id}
+                    className="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/40 hover:border-purple-300 hover:shadow-xs transition flex flex-col"
+                  >
+                    {/* PRODUCTION IMAGE PREVIEW */}
+                    <div className="h-36 bg-slate-100 relative overflow-hidden flex items-center justify-center border-b border-slate-200">
+                      {prog?.wilcomDesignPhoto || prog?.baseDesignPhoto ? (
+                        <img
+                          src={imgUrl}
+                          alt={prog?.mainStyle || prog?.styleCode || 'Production Design'}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex flex-col items-center justify-center p-4 text-center">
+                          <FileText className="w-8 h-8 text-purple-400 mb-1" />
+                          <span className="text-[10px] font-mono font-bold text-slate-700">
+                            {prog?.designNumber || prog?.wilcomDesignNumber || prog?.styleCode || 'Design Art'}
+                          </span>
+                          <span className="text-[9px] text-slate-400 uppercase">Style: {prog?.mainStyle || 'Standard'}</span>
+                        </div>
+                      )}
+                      <div className="absolute top-2 left-2 bg-slate-900/80 backdrop-blur-2xs text-white px-2 py-0.5 rounded text-[10px] font-mono font-bold">
+                        {prog?.programSerialNo || prog?.programNumber || item.orderNumber}
+                      </div>
+                      <div className="absolute top-2 right-2">
+                        <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
+                          item.status === 'RECEIVED'
+                            ? 'bg-blue-100 text-blue-900 border border-blue-200'
+                            : 'bg-emerald-100 text-emerald-900 border border-emerald-200'
+                        }`}>
+                          {item.status}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* CARD DETAILS */}
+                    <div className="p-3.5 flex-1 flex flex-col justify-between space-y-2.5 text-xs">
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <span className="font-semibold text-slate-900 truncate">
+                            {prog?.clientName || prog?.buyerName || 'Buyer Client'}
+                          </span>
+                          <span className="text-[10px] font-mono text-purple-700 font-bold">
+                            {item.requiredQuantity} {item.uom}
+                          </span>
+                        </div>
+                        <div className="text-[11px] text-slate-600 truncate mt-0.5">
+                          Style: <strong className="text-slate-800">{prog?.mainStyle || prog?.styleCode || '—'}</strong>
+                        </div>
+                        <div className="text-[11px] text-slate-500 truncate mt-0.5">
+                          Fabric: <span className="font-medium text-slate-800">{item.fabricName}</span> · Color: <span className="font-bold text-purple-800">{item.targetColor}</span>
+                        </div>
+                      </div>
+
+                      <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between gap-2">
+                        <span className="text-[10px] font-mono text-slate-500">
+                          {item.inboundChallan?.challanNumber ? `Ch: ${item.inboundChallan.challanNumber}` : 'Inward Lot'}
+                        </span>
+                        <Link
+                          href={`/dyeing/my-work?tab=incoming&programId=${prog?.id || ''}`}
+                          className="px-2.5 py-1 bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 rounded text-[11px] font-bold transition"
+                        >
+                          Process →
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
 

@@ -29,8 +29,8 @@ function IssueChallanContent() {
   const [challanNumber, setChallanNumber] = useState('');
   const [destinationDept, setDestinationDept] = useState('STORE');
   const [itemDescription, setItemDescription] = useState('');
-  const [quantity, setQuantity] = useState('500');
-  const [uom, setUom] = useState('PCS');
+  const [quantity, setQuantity] = useState('');
+  const [uom, setUom] = useState('');
   const [remarks, setRemarks] = useState('');
   const [priority, setPriority] = useState('NORMAL');
   const [error, setError] = useState<string | null>(null);
@@ -41,15 +41,8 @@ function IssueChallanContent() {
     const init = async () => {
       try {
         setFetchingChallanNo(true);
-        const [programsList, nextChallanRes] = await Promise.all([
-          api.getPrograms().catch(() => []),
-          api.getNextChallanNumber('PROGRAMMING').catch(() => ({ nextNumber: 'CH-PRG-2026-00001' })),
-        ]);
-
+        const programsList = await api.getPrograms().catch(() => []);
         setPrograms(programsList || []);
-        if (nextChallanRes?.nextNumber) {
-          setChallanNumber(nextChallanRes.nextNumber);
-        }
 
         // If preselected program provided via query param
         if (preselectedProgramId && programsList.length > 0) {
@@ -69,9 +62,9 @@ function IssueChallanContent() {
 
   const handleSelectProgram = (prog: any) => {
     setSelectedProgram(prog);
-    const qty = prog.colorQuantity || prog.targetQuantity || 500;
-    setQuantity(String(qty));
-    setUom(prog.quantityMeasurement || 'PCS');
+    const qty = prog.colorQuantity || prog.targetQuantity || '';
+    setQuantity(qty ? String(qty) : '');
+    setUom(prog.quantityMeasurement || '');
     setPriority(prog.clientPriority || prog.priority || 'NORMAL');
     
     // Auto-compose descriptive transfer item name
@@ -81,12 +74,8 @@ function IssueChallanContent() {
     const wilcom = prog.wilcomDesignNumber ? ` [Wilcom: ${prog.wilcomDesignNumber}]` : '';
     setItemDescription(`${style} - ${fabric} (${color})${wilcom}`);
 
-    // Set appropriate destination based on dyeing flag
-    if (prog.fabricDyeingRequired) {
-      setDestinationDept('DYEING');
-    } else {
-      setDestinationDept('STORE');
-    }
+    // Set destination department: all challans from Programming are dispatched directly to FABRIC STORE (STORE)
+    setDestinationDept('STORE');
   };
 
   const handleIssueChallan = async (e: React.FormEvent) => {
@@ -114,7 +103,7 @@ function IssueChallanContent() {
         toDepartment: destinationDept,
         priority,
         status: 'ISSUED',
-        remarks: remarks || `Dispatched from Programming for Program ${selectedProgram.programSerialNo || selectedProgram.programNumber}`,
+        remarks: remarks || `Dispatched from Programming to Fabric Store for Program ${selectedProgram.programSerialNo || selectedProgram.programNumber}`,
         items: [
           {
             itemDescription: itemDescription.trim() || `${selectedProgram.mainStyle || 'Style'} Production Lot`,
@@ -154,17 +143,11 @@ function IssueChallanContent() {
           </Link>
           <div>
             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A66E22] block">
-              MY WORK · FORM 02
+              MY WORK · DISPATCH CHALLAN
             </span>
             <h1 className="text-xl font-bold text-slate-900">
               Issue Challan
             </h1>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="px-3 py-1.5 bg-blue-50 border border-blue-200 rounded text-xs font-mono font-bold text-blue-900">
-            {challanNumber || 'CH-PRG-2026-XXXXX'}
           </div>
         </div>
       </header>
@@ -190,7 +173,7 @@ function IssueChallanContent() {
                 </div>
                 <div>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 block">
-                    CHALLAN SUCCESSFULLY ISSUED &amp; AUDITED
+                    CHALLAN SUCCESSFULLY DISPATCHED TO FABRIC STORE
                   </span>
                   <h2 className="text-xl font-bold font-mono text-slate-900">
                     {issuedChallan.challanNumber}
@@ -198,13 +181,22 @@ function IssueChallanContent() {
                 </div>
               </div>
 
-              <button
-                onClick={() => window.print()}
-                className="flex items-center gap-2 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded text-xs font-semibold border border-slate-300 transition"
-              >
-                <Printer className="w-4 h-4" />
-                <span>Print Challan Slip</span>
-              </button>
+              <div className="flex items-center gap-2">
+                <Link
+                  href={`/challans/${issuedChallan.id}`}
+                  className="flex items-center gap-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded text-xs font-semibold border border-slate-300 transition"
+                >
+                  <FileText className="w-4 h-4" />
+                  <span>View Voucher</span>
+                </Link>
+                <button
+                  onClick={() => window.print()}
+                  className="flex items-center gap-2 px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded text-xs font-semibold shadow-xs transition"
+                >
+                  <Printer className="w-4 h-4" />
+                  <span>Print Challan Slip</span>
+                </button>
+              </div>
             </div>
 
             {/* VOUCHER DETAILS */}
@@ -215,7 +207,9 @@ function IssueChallanContent() {
               </div>
               <div>
                 <span className="text-slate-400 block font-medium">Destination Department</span>
-                <span className="font-bold text-blue-900">{issuedChallan.toDepartment}</span>
+                <span className="font-bold text-blue-900">
+                  {issuedChallan.toDepartment === 'STORE' ? 'FABRIC STORE' : issuedChallan.toDepartment}
+                </span>
               </div>
               <div>
                 <span className="text-slate-400 block font-medium">Production Program</span>
@@ -253,42 +247,46 @@ function IssueChallanContent() {
               </table>
             </div>
 
-            <div className="pt-4 flex items-center justify-between">
+            <div className="pt-4 flex flex-wrap items-center justify-between gap-3">
               <Link
-                href="/"
+                href="/programming"
                 className="text-xs font-semibold text-slate-600 hover:text-slate-900"
               >
                 ← Return to Dashboard
               </Link>
 
-              <button
-                type="button"
-                onClick={() => {
-                  setIssuedChallan(null);
-                  setSelectedProgram(null);
-                  setItemDescription('');
-                  router.push('/my-work/issue-challan');
-                }}
-                className="px-4 py-2 bg-[#163767] hover:bg-[#0F264A] text-white text-xs font-semibold rounded-md shadow-xs transition"
-              >
-                Issue Another Challan
-              </button>
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/fabric-store/my-work/incoming-challans"
+                  className="px-3.5 py-2 bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold rounded-md shadow-xs transition flex items-center gap-1.5"
+                >
+                  <span>Open in Fabric Store →</span>
+                </Link>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIssuedChallan(null);
+                    setSelectedProgram(null);
+                    setItemDescription('');
+                    router.push('/my-work/issue-challan');
+                  }}
+                  className="px-4 py-2 bg-[#163767] hover:bg-[#0F264A] text-white text-xs font-semibold rounded-md shadow-xs transition"
+                >
+                  Issue Another Challan
+                </button>
+              </div>
             </div>
           </div>
         ) : (
           <form onSubmit={handleIssueChallan} className="space-y-6">
             
-            {/* STEP 1: SELECT PRODUCTION SHEET */}
+            {/* SELECT PRODUCTION SHEET */}
             <div className="bg-white border border-slate-200/90 rounded-xl p-6 shadow-xs space-y-4">
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded bg-blue-100 text-blue-900 font-bold text-xs flex items-center justify-center">
-                    1
-                  </div>
-                  <div>
-                    <h2 className="text-sm font-bold text-slate-900">Select Production Sheet</h2>
-                    <p className="text-[11px] text-slate-500">Pick the validated Production Sheet to dispatch</p>
-                  </div>
+                <div>
+                  <h2 className="text-sm font-bold text-slate-900">Select Production Sheet</h2>
+                  <p className="text-[11px] text-slate-500">Pick the validated Production Sheet to dispatch</p>
                 </div>
 
                 <Link
@@ -350,25 +348,15 @@ function IssueChallanContent() {
                       <span className="font-mono font-bold text-purple-900">{selectedProgram.wilcomDesignNumber || 'WLC-N/A'}</span>
                     </div>
                   </div>
-                  {selectedProgram.fabricDyeingRequired && (
-                    <div className="mt-2 p-2 bg-rose-50 border border-rose-200 rounded text-rose-800 font-semibold text-[11px] flex items-center gap-1.5">
-                      <span>• Notice: This program specifies undyed fabric requiring preliminary Dyeing. Destination default set to DYEING.</span>
-                    </div>
-                  )}
                 </div>
               )}
             </div>
 
-            {/* STEP 2: MOVEMENT & CHALLAN DETAILS */}
+            {/* MOVEMENT & CHALLAN DETAILS */}
             <div className="bg-white border border-slate-200/90 rounded-xl p-6 shadow-xs space-y-4">
-              <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                <div className="w-6 h-6 rounded bg-emerald-100 text-emerald-900 font-bold text-xs flex items-center justify-center">
-                  2
-                </div>
-                <div>
-                  <h2 className="text-sm font-bold text-slate-900">Movement &amp; Dispatch Routing</h2>
-                  <p className="text-[11px] text-slate-500">Destination department and physical transfer quantities</p>
-                </div>
+              <div className="pb-3 border-b border-slate-100">
+                <h2 className="text-sm font-bold text-slate-900">Movement &amp; Dispatch Routing</h2>
+                <p className="text-[11px] text-slate-500">Destination department and physical transfer quantities</p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -392,10 +380,9 @@ function IssueChallanContent() {
                     required
                     value={destinationDept}
                     onChange={(e) => setDestinationDept(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-300 rounded text-xs text-blue-900 font-bold focus:outline-none focus:ring-1 focus:ring-blue-800"
+                    className="w-full px-3 py-2 border border-slate-300 rounded text-xs text-blue-900 font-bold focus:outline-none focus:ring-1 focus:ring-blue-800 bg-slate-50"
                   >
                     <option value="STORE">FABRIC STORE (Raw Material &amp; Inventory)</option>
-                    <option value="DYEING">DYEING (Undyed / Kora Processing Unit)</option>
                   </select>
                 </div>
 
@@ -408,7 +395,6 @@ function IssueChallanContent() {
                     required
                     value={itemDescription}
                     onChange={(e) => setItemDescription(e.target.value)}
-                    placeholder="e.g. Approved Production Sheet & Pattern Marker for Polo Shirt"
                     className="w-full px-3 py-2 border border-slate-300 rounded text-xs text-slate-900 font-medium focus:outline-none focus:ring-1 focus:ring-blue-800"
                   />
                 </div>
@@ -422,7 +408,6 @@ function IssueChallanContent() {
                     required
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
-                    placeholder="500"
                     className="w-full px-3 py-2 border border-slate-300 rounded text-xs text-slate-900 font-mono font-bold"
                   />
                 </div>
@@ -436,6 +421,7 @@ function IssueChallanContent() {
                     onChange={(e) => setUom(e.target.value)}
                     className="w-full px-3 py-2 border border-slate-300 rounded text-xs text-slate-800 font-medium"
                   >
+                    <option value="">Select UOM</option>
                     <option value="PCS">PCS (Pieces)</option>
                     <option value="MTR">MTR (Meters)</option>
                     <option value="KG">KG (Kilograms)</option>
@@ -451,7 +437,6 @@ function IssueChallanContent() {
                     rows={2}
                     value={remarks}
                     onChange={(e) => setRemarks(e.target.value)}
-                    placeholder="Add any instructions for Fabric Store or Dyeing supervisors..."
                     className="w-full px-3 py-2 border border-slate-300 rounded text-xs text-slate-800"
                   />
                 </div>

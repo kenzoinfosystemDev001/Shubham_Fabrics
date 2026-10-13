@@ -315,7 +315,7 @@ export default function AdminConsolePage() {
       document.cookie = 'subham_mes_role=; path=/; max-age=0';
       document.cookie = 'subham_mes_dept=; path=/; max-age=0';
     }
-    router.push('/login');
+    router.replace('/login');
   };
 
   return (
@@ -342,10 +342,11 @@ export default function AdminConsolePage() {
         </div>
 
         {/* WORKSPACE SWITCHER & CONTROLS */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2">
           <Link
-            href="/"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/30 hover:bg-amber-500/20 transition"
+            href="/programming"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/30 hover:bg-amber-500/20 transition"
+            title="Open Programming Department"
           >
             <Building2 className="w-3.5 h-3.5" />
             <span>Programming</span>
@@ -353,10 +354,38 @@ export default function AdminConsolePage() {
 
           <Link
             href="/fabric-store"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-teal-500/10 text-teal-300 border border-teal-500/30 hover:bg-teal-500/20 transition"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-teal-500/10 text-teal-300 border border-teal-500/30 hover:bg-teal-500/20 transition"
+            title="Open Store Department"
           >
             <Building2 className="w-3.5 h-3.5" />
-            <span>Fabric Store</span>
+            <span>Store</span>
+          </Link>
+
+          <Link
+            href="/dyeing"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-purple-500/10 text-purple-300 border border-purple-500/30 hover:bg-purple-500/20 transition"
+            title="Open Dyeing Department"
+          >
+            <Building2 className="w-3.5 h-3.5" />
+            <span>Dyeing</span>
+          </Link>
+
+          <Link
+            href="/qc1"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/20 transition"
+            title="Open QC1 Department"
+          >
+            <Building2 className="w-3.5 h-3.5" />
+            <span>QC1</span>
+          </Link>
+
+          <Link
+            href="/embroidery"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-fuchsia-500/10 text-fuchsia-300 border border-fuchsia-500/30 hover:bg-fuchsia-500/20 transition"
+            title="Open Embroidery Department"
+          >
+            <Building2 className="w-3.5 h-3.5" />
+            <span>Embroidery</span>
           </Link>
 
           <Link
@@ -378,7 +407,7 @@ export default function AdminConsolePage() {
 
           <button
             onClick={handleSignOut}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-rose-950/60 text-slate-300 hover:text-rose-200 border border-slate-700 transition"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-rose-950/60 text-slate-300 hover:text-rose-200 border border-slate-700 transition ml-1"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Sign Out</span>

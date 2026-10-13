@@ -7,6 +7,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['var(--font-manrope)', 'Manrope', 'sans-serif'],
+      },
       colors: {
         factory: {
           50: '#f8fafc',

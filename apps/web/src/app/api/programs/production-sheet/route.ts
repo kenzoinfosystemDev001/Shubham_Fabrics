@@ -3,19 +3,200 @@ import { prisma } from '@subham/database';
 
 export const dynamic = 'force-dynamic';
 
+async function getFabricAvailability(
+  fabricName: string,
+  fabricColor: string,
+  requiredMeters: number,
+) {
+  const rolls = await prisma.fabricStoreRoll.findMany({
+    where: {
+      status: 'IN_STOCK',
+      qcStatus: 'PASSED',
+      batch: {
+        is: {
+          fabricDescription: { equals: fabricName, mode: 'insensitive' },
+          ...(fabricColor
+            ? { colorName: { equals: fabricColor, mode: 'insensitive' } }
+            : {}),
+        },
+      },
+    },
+    select: { length: true },
+  });
+  const availableMeters = rolls.reduce((total, roll) => total + Number(roll.length), 0);
+
+  return {
+    fabricName,
+    fabricColor: fabricColor || null,
+    availableMeters,
+    requiredMeters,
+    matchingRollCount: rolls.length,
+    sufficient: availableMeters >= requiredMeters,
+  };
+}
+
+function parseSafeDate(val: any, fallback?: Date | null): Date | null {
+  if (!val) return fallback !== undefined ? fallback : null;
+  if (val instanceof Date) {
+    return isNaN(val.getTime()) ? (fallback !== undefined ? fallback : null) : val;
+  }
+  if (typeof val === 'string') {
+    const trimmed = val.trim();
+    if (!trimmed) return fallback !== undefined ? fallback : null;
+
+    // Handle DD-MM-YYYY or DD/MM/YYYY or DD.MM.YYYY
+    const dmyMatch = trimmed.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/);
+    if (dmyMatch) {
+      const day = parseInt(dmyMatch[1], 10);
+      const month = parseInt(dmyMatch[2], 10) - 1;
+      const year = parseInt(dmyMatch[3], 10);
+      const d = new Date(Date.UTC(year, month, day, 12, 0, 0));
+      if (!isNaN(d.getTime())) return d;
+    }
+
+    // Handle YYYY-MM-DD
+    const ymdMatch = trimmed.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})$/);
+    if (ymdMatch) {
+      const year = parseInt(ymdMatch[1], 10);
+      const month = parseInt(ymdMatch[2], 10) - 1;
+      const day = parseInt(ymdMatch[3], 10);
+      const d = new Date(Date.UTC(year, month, day, 12, 0, 0));
+      if (!isNaN(d.getTime())) return d;
+    }
+
+    // Fallback to standard Date parsing
+    const parsed = new Date(trimmed);
+    if (!isNaN(parsed.getTime())) return parsed;
+  }
+  return fallback !== undefined ? fallback : null;
+}
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const fabricName = searchParams.get('fabricName')?.trim() || '';
+  const fabricColor = searchParams.get('fabricColor')?.trim() || '';
+  const fabricAverage = Number(searchParams.get('fabricAverage'));
+  const productionQuantity = Number(searchParams.get('productionQuantity'));
+
+  if (!fabricName || !Number.isFinite(fabricAverage) || fabricAverage <= 0 ||
+      !Number.isInteger(productionQuantity) || productionQuantity <= 0) {
+    return NextResponse.json(
+      { error: 'Fabric name, meters per piece, and a positive production quantity are required.' },
+      { status: 400 },
+    );
+  }
+
+  try {
+    const availability = await getFabricAvailability(
+      fabricName,
+      fabricColor,
+      fabricAverage * productionQuantity,
+    );
+    return NextResponse.json(availability);
+  } catch (error: any) {
+    console.error('Error checking fabric availability:', error);
+    return NextResponse.json(
+      { error: error.message || 'Failed to check Fabric Store availability.' },
+      { status: 500 },
+    );
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const data = await request.json();
+    const targetStatus = data.status || 'DRAFT';
+    const fabricName = String(data.fabricName || data.fabric || '').trim();
+    const fabricAverage = Number(data.fabricAverage);
+    const productionQuantity = Number(data.targetQuantity || data.colorQuantity);
 
-    // Generate or use provided number
-    let programNumber = data.programNumber || data.programSerialNo;
+    if (targetStatus === 'READY_FOR_ISSUE') {
+      if (!fabricName || !Number.isFinite(fabricAverage) || fabricAverage <= 0 ||
+          !Number.isInteger(productionQuantity) || productionQuantity <= 0) {
+        return NextResponse.json(
+          { error: 'Enter the fabric name, fabric average in meters per piece, and production quantity before marking the sheet ready.' },
+          { status: 400 },
+        );
+      }
+
+      if (data.fabricColorAvailable !== 'IN_STOCK') {
+        return NextResponse.json(
+          { error: 'A production sheet can only be marked ready when the selected fabric is available in the Fabric Store.' },
+          { status: 422 },
+        );
+      }
+
+      const availability = await getFabricAvailability(
+        fabricName,
+        String(data.fabricColor || '').trim(),
+        fabricAverage * productionQuantity,
+      );
+      if (!availability.sufficient) {
+        return NextResponse.json(
+          {
+            error: `Insufficient Fabric Store stock for ${fabricName}${availability.fabricColor ? ` (${availability.fabricColor})` : ''}: ${availability.availableMeters.toFixed(2)} m available, ${availability.requiredMeters.toFixed(2)} m required.`,
+            availability,
+          },
+          { status: 422 },
+        );
+      }
+    }
+
+    // Check if updating an existing program by ID
+    let existing: any = null;
+    if (data.id) {
+      existing = await prisma.program.findUnique({
+        where: { id: data.id },
+        select: { id: true, programNumber: true },
+      });
+    }
+
+    // Determine unique programNumber
+    let programNumber = data.programNumber;
+    if (existing) {
+      programNumber = existing.programNumber;
+    } else if (programNumber) {
+      // Check if user-provided programNumber already exists
+      const conflict = await prisma.program.findUnique({
+        where: { programNumber },
+        select: { id: true },
+      });
+      if (conflict) {
+        existing = conflict;
+      }
+    } else if (data.programSerialNo) {
+      // If user typed a serial number, see if it can be used as programNumber
+      const conflict = await prisma.program.findUnique({
+        where: { programNumber: data.programSerialNo },
+        select: { id: true },
+      });
+      if (!conflict) {
+        programNumber = data.programSerialNo;
+      }
+    }
+
+    // If still no programNumber, generate a guaranteed-unique one
     if (!programNumber) {
       const year = new Date().getFullYear();
       const prefix = `PRG-${year}-`;
       const count = await prisma.program.count({
         where: { programNumber: { startsWith: prefix } },
       });
-      programNumber = `${prefix}${String(count + 1).padStart(5, '0')}`;
+      let candidateNumber = `${prefix}${String(count + 1).padStart(5, '0')}`;
+      let conflict = await prisma.program.findUnique({
+        where: { programNumber: candidateNumber },
+        select: { id: true },
+      });
+      let inc = 1;
+      while (conflict) {
+        inc++;
+        candidateNumber = `${prefix}${String(count + inc).padStart(5, '0')}`;
+        conflict = await prisma.program.findUnique({
+          where: { programNumber: candidateNumber },
+          select: { id: true },
+        });
+      }
+      programNumber = candidateNumber;
     }
 
     // Find default programmer user or admin guaranteed in the database
@@ -40,16 +221,12 @@ export async function POST(request: Request) {
     }
     const actorId = user.id;
 
-    const startDate = data.startDate ? new Date(data.startDate) : new Date();
-    const deliveryDate = data.deliveryDate ? new Date(data.deliveryDate) : new Date(Date.now() + 14 * 86400000);
-    const prodDesignDate = data.productionDesignDate ? new Date(data.productionDesignDate) : null;
-    const prodEndDate = data.productionEndDate ? new Date(data.productionEndDate) : null;
-    const targetQty = Math.round(Number(data.targetQuantity || data.colorQuantity || 1));
-
-    const existing = await prisma.program.findUnique({
-      where: { programNumber },
-      select: { id: true },
-    });
+    // Safe dates
+    const startDate = parseSafeDate(data.startDate, new Date()) || new Date();
+    const deliveryDate = parseSafeDate(data.deliveryDate, new Date(Date.now() + 14 * 86400000)) || new Date(Date.now() + 14 * 86400000);
+    const prodDesignDate = parseSafeDate(data.productionDesignDate, null);
+    const prodEndDate = parseSafeDate(data.productionEndDate, null);
+    const targetQty = Math.max(1, Math.round(Number(data.targetQuantity || data.colorQuantity || 1)));
 
     const programData = {
       programNumber,
@@ -62,12 +239,12 @@ export async function POST(request: Request) {
       buyerName: data.clientName || data.buyerName || 'Standard Client',
       clientPriority: data.clientPriority || data.priority || 'NORMAL',
       priority: data.clientPriority || data.priority || 'NORMAL',
-      orderNumber: data.orderNumber || `ORD-${programNumber}`,
+      orderNumber: data.orderNumber || (data.programSerialNo ? `ORD-${data.programSerialNo}` : `ORD-${programNumber}`),
       designName: data.embroideryDesign || data.designName || 'Standard Embroidery',
       styleCode: data.mainStyle || data.styleCode || 'STYLE-01',
       productCategory: data.productCategory || 'GARMENT',
       targetQuantity: targetQty,
-      status: data.status || 'DRAFT',
+      status: targetStatus,
       remarks: data.comments || data.remarks || null,
       createdById: actorId,
 
@@ -135,7 +312,7 @@ export async function POST(request: Request) {
       if (data.fabricName || data.fabric) {
         const fabName = data.fabricName || data.fabric;
         const avg = parseFloat(data.fabricAverage) || 1.25;
-        const requiredQty = Math.round(targetQty * avg);
+        const requiredQty = targetQty * avg;
         await tx.programFabric.create({
           data: {
             programId: created.id,
@@ -146,7 +323,7 @@ export async function POST(request: Request) {
             gsm: 180,
             colour: data.fabricColor || data.color || 'Standard',
             requiredQuantity: requiredQty,
-            uom: 'KG',
+            uom: 'MTR',
           },
         });
       }

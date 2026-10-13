@@ -2,11 +2,51 @@
 
 import React, { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { checkRouteAccess, getCurrentUser, MESUser } from '@/lib/rbac';
+import { checkRouteAccess, getCurrentUser, isAdminUser, getUserStationHome, MESUser } from '@/lib/rbac';
 import { ShieldAlert } from 'lucide-react';
 
 interface GuardProps {
   children: React.ReactNode;
+}
+
+export type DepartmentScope =
+  | 'EMBROIDERY'
+  | 'THREAD_CUTTING'
+  | 'DYEING'
+  | 'FABRIC_STORE'
+  | 'QC1'
+  | 'QC2'
+  | 'PROGRAMMING'
+  | 'ADMIN'
+  | 'AUTH'
+  | 'SHARED';
+
+export function getDepartmentScope(path: string): DepartmentScope {
+  if (!path || path === '/' || path === '/login' || path === '/signup') return 'AUTH';
+  if (path.startsWith('/embroidery')) return 'EMBROIDERY';
+  if (path.startsWith('/thread-cutting')) return 'THREAD_CUTTING';
+  if (path.startsWith('/dyeing')) return 'DYEING';
+  if (path.startsWith('/fabric-store')) return 'FABRIC_STORE';
+  if (path.startsWith('/qc1')) return 'QC1';
+  if (path.startsWith('/qc2')) return 'QC2';
+  if (path.startsWith('/programming')) return 'PROGRAMMING';
+  if (path.startsWith('/admin')) return 'ADMIN';
+  if (path.startsWith('/challans') || path.startsWith('/programs')) return 'SHARED';
+  return 'SHARED';
+}
+
+export function getDepartmentRoot(scope: DepartmentScope): string {
+  switch (scope) {
+    case 'EMBROIDERY': return '/embroidery';
+    case 'THREAD_CUTTING': return '/thread-cutting';
+    case 'DYEING': return '/dyeing';
+    case 'FABRIC_STORE': return '/fabric-store';
+    case 'QC1': return '/qc1';
+    case 'QC2': return '/qc2';
+    case 'PROGRAMMING': return '/programming';
+    case 'ADMIN': return '/admin';
+    default: return '/login';
+  }
 }
 
 export function DepartmentGuard({ children }: GuardProps) {
@@ -15,52 +55,154 @@ export function DepartmentGuard({ children }: GuardProps) {
   const [authorized, setAuthorized] = useState(false);
   const [denialReason, setDenialReason] = useState<string | null>(null);
 
+  // 1. Synchronize active department context in sessionStorage
   useEffect(() => {
-    // Skip guard for login page
-    if (pathname === '/login') {
-      setAuthorized(true);
+    if (typeof window === 'undefined') return;
+    const scope = getDepartmentScope(pathname);
+    if (scope !== 'AUTH' && scope !== 'SHARED') {
+      sessionStorage.setItem('active_department', scope);
+      sessionStorage.setItem('active_department_root', getDepartmentRoot(scope));
+    }
+  }, [pathname]);
+
+  // 2. Strict Department Navigation & Route Authorization Check
+  useEffect(() => {
+    const user = getCurrentUser();
+    if (pathname === '/') {
+      router.replace('/login');
       return;
     }
 
-    const user = getCurrentUser();
     if (!user) {
-      router.push('/login');
+      if (pathname === '/login' || pathname === '/signup') {
+        setAuthorized(true);
+        setDenialReason(null);
+        return;
+      }
+      router.replace('/login');
+      return;
+    }
+
+    // Allow user to land on /login or /signup if they navigated or pressed back to it
+    if (pathname === '/login' || pathname === '/signup') {
+      setAuthorized(true);
+      setDenialReason(null);
       return;
     }
 
     const check = checkRouteAccess(pathname, user);
 
     if (!check.allowed) {
-      setDenialReason(check.reason || 'Access denied for your role.');
-      const timer = setTimeout(() => {
-        router.push(check.redirectTarget);
-      }, 1500);
-      return () => clearTimeout(timer);
+      router.replace(check.redirectTarget);
+      return;
     } else {
       setAuthorized(true);
       setDenialReason(null);
     }
   }, [pathname, router]);
 
+  // 3. Intercept browser back/forward buttons (popstate)
+  // RULE: Going back only stays within that individual department, or at last exits to /login.
+  // NEVER allows crossing into a different department (e.g. from Embroidery to Programming).
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handlePopState = () => {
+      const activeDept = sessionStorage.getItem('active_department') as DepartmentScope | null;
+      const targetPath = window.location.pathname;
+      const targetDept = getDepartmentScope(targetPath);
+
+      // Keep the active department while on the login page so older history entries
+      // cannot take the user into a different department.
+      if (targetPath === '/login' || targetPath === '/signup') {
+        if (targetPath === '/login') {
+          sessionStorage.setItem('allow_login_after_back', 'true');
+        }
+        return;
+      }
+
+      if (activeDept && activeDept !== 'AUTH') {
+        const activeRoot = getDepartmentRoot(activeDept);
+
+        if (targetDept === activeDept) {
+          return;
+        }
+
+        if (targetDept === 'SHARED') {
+          return;
+        }
+
+        const currentScope = getDepartmentScope(pathname);
+        const fallbackPath =
+          pathname === activeRoot || currentScope === 'AUTH' ? '/login' : activeRoot;
+
+        if (fallbackPath === '/login') {
+          sessionStorage.setItem('allow_login_after_back', 'true');
+        }
+        window.history.replaceState(null, '', fallbackPath);
+        router.replace(fallbackPath);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [pathname, router]);
+
+  const handleSignOut = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('subham_mes_token');
+      localStorage.removeItem('subham_mes_user');
+      sessionStorage.removeItem('active_department');
+      sessionStorage.removeItem('active_department_root');
+      document.cookie = 'subham_mes_token=; path=/; max-age=0';
+      document.cookie = 'subham_mes_role=; path=/; max-age=0';
+      document.cookie = 'subham_mes_dept=; path=/; max-age=0';
+    }
+    router.replace('/login');
+  };
+
   if (denialReason) {
+    const user = getCurrentUser();
+    const stationHome = getUserStationHome(user);
+
     return (
       <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center p-6">
-        <div className="max-w-md w-full bg-slate-800 border border-rose-500/40 rounded-2xl p-6 shadow-2xl text-center">
-          <div className="w-14 h-14 rounded-full bg-rose-500/20 border border-rose-500/50 mx-auto flex items-center justify-center mb-4 text-rose-400">
+        <div className="max-w-md w-full bg-slate-800 border border-rose-500/40 rounded-2xl p-6 shadow-2xl text-center space-y-4">
+          <div className="w-14 h-14 rounded-full bg-rose-500/20 border border-rose-500/50 mx-auto flex items-center justify-center text-rose-400">
             <ShieldAlert className="w-7 h-7" />
           </div>
-          <h2 className="text-lg font-bold text-white mb-2">Access Restricted (RBAC)</h2>
-          <p className="text-xs text-slate-300 leading-relaxed mb-4">{denialReason}</p>
+          <div>
+            <h2 className="text-lg font-bold text-white mb-2">Access Restricted (RBAC)</h2>
+            <p className="text-xs text-slate-300 leading-relaxed">{denialReason}</p>
+          </div>
           <div className="inline-flex items-center gap-2 text-xs text-amber-400 bg-amber-950/40 px-3 py-1.5 rounded-lg border border-amber-800/40">
             <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
             Redirecting to your authorized station...
+          </div>
+          <div className="pt-2 flex flex-col sm:flex-row gap-2 justify-center">
+            <button
+              onClick={() => router.replace(stationHome)}
+              className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-xs font-semibold transition"
+            >
+              Return to My Department
+            </button>
+            <button
+              onClick={handleSignOut}
+              className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-semibold transition"
+            >
+              Sign Out to Switch
+            </button>
           </div>
         </div>
       </div>
     );
   }
 
-  if (!authorized && pathname !== '/login') {
+  if (pathname === '/') {
+    return <>{children}</>;
+  }
+
+  if (!authorized && pathname !== '/login' && pathname !== '/signup') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="flex flex-col items-center gap-3">
