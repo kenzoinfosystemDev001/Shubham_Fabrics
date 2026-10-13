@@ -85,7 +85,9 @@ export async function syncInboundChallansToDyeingOrders() {
             uom,
             inchargeId: dyeingUser?.id || null,
             inchargeName: dyeingUser?.fullName || dyeingUser?.username || 'Dyeing Incharge',
-            processRemarks: `Received on Fabric Store Challan ${challan.challanNumber}`,
+            processRemarks: challan.challanType === 'REWORK_RETURN'
+              ? `QC1 Rework Return: ${challan.challanNumber} (${challan.remarks || 'Shade/Dyeing correction required'})`
+              : `Received on Inbound Challan ${challan.challanNumber}`,
           },
         });
       }

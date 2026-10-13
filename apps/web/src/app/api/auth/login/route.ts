@@ -26,6 +26,7 @@ export async function POST(request: Request) {
       dyeing: { role: 'DYEING_INCHARGE', dept: 'DYEING', name: 'Dyeing Incharge' },
       qc1: { role: 'QC_INSPECTOR', dept: 'QC1', name: 'QC1 Quality Inspector' },
       qc_insp: { role: 'QC_INSPECTOR', dept: 'QC1', name: 'Vikram Singh' },
+      embroidery: { role: 'EMBROIDERY_INCHARGE', dept: 'EMBROIDERY', name: 'Embroidery Department' },
     };
 
     // 2. Query user from Neon DB
@@ -158,6 +159,17 @@ export async function POST(request: Request) {
         roleCodes.includes('QC_INSPECTOR') ||
         roleCodes.includes('QC1_INSPECTOR'));
 
+    const isEmbroidery =
+      !isAdmin &&
+      !isStore &&
+      !isProgramming &&
+      !isDyeing &&
+      !isQC1 &&
+      (user.username.toLowerCase() === 'embroidery' ||
+        user.departmentCode === 'EMBROIDERY' ||
+        roleCodes.includes('EMBROIDERY_INCHARGE') ||
+        roleCodes.includes('EMBROIDERY_OPERATOR'));
+
     const normalizedRole = isAdmin
       ? 'ADMIN'
       : isQC1
@@ -166,6 +178,8 @@ export async function POST(request: Request) {
       ? 'DYEING_INCHARGE'
       : isStore
       ? 'FABRIC_STORE'
+      : isEmbroidery
+      ? 'EMBROIDERY_INCHARGE'
       : isProgramming
       ? 'PROGRAMMER'
       : roleCodes[0] || 'USER';
@@ -178,6 +192,8 @@ export async function POST(request: Request) {
       ? 'DYEING'
       : isStore
       ? 'STORE'
+      : isEmbroidery
+      ? 'EMBROIDERY'
       : isProgramming
       ? 'PROGRAMMING'
       : user.departmentCode || 'QC1';
@@ -190,7 +206,9 @@ export async function POST(request: Request) {
       ? '/dyeing'
       : isStore
       ? '/fabric-store'
-      : '/';
+      : isEmbroidery
+      ? '/embroidery'
+      : '/programming';
 
     const token = `mes_jwt_${user.id}_${Date.now()}`;
 

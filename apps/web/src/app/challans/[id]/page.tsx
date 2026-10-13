@@ -13,9 +13,28 @@ import {
   AlertCircle,
   ShieldCheck,
   FileText,
-  Download
+  Download,
+  Barcode as BarcodeIcon,
+  Tag
 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { 
+  getCurrentUser, 
+  isAdminUser, 
+  isDyeingUser, 
+  isFabricStoreUser, 
+  isQc1User, 
+  isEmbroideryUser,
+  isThreadCuttingUser
+} from '@/lib/rbac';
+import BarcodeStickerCard from '@/components/BarcodeStickerCard';
+import { 
+  BarcodeStickerParams, 
+  downloadBarcodeStickerPng, 
+  downloadBarcodeStickerSvg, 
+  printBarcodeSticker,
+  generateCode128SvgBars 
+} from '@/lib/barcode';
 
 export default function ChallanDetailPage() {
   const { id } = useParams() as { id: string };
@@ -23,6 +42,81 @@ export default function ChallanDetailPage() {
   const [challan, setChallan] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [user, setUser] = useState<any>(null);
+  const [downloadingBarcode, setDownloadingBarcode] = useState(false);
+
+  useEffect(() => {
+    setUser(getCurrentUser());
+  }, []);
+
+  const handleBack = () => {
+    if (typeof window !== 'undefined') {
+      const activeDept = sessionStorage.getItem('active_department');
+      const activeRoot = sessionStorage.getItem('active_department_root');
+      if (activeDept === 'EMBROIDERY') {
+        router.push('/embroidery');
+        return;
+      }
+      if (activeDept === 'THREAD_CUTTING') {
+        router.push('/thread-cutting/my-work');
+        return;
+      }
+      if (activeDept === 'DYEING') {
+        router.push('/dyeing/my-work');
+        return;
+      }
+      if (activeDept === 'FABRIC_STORE') {
+        router.push('/fabric-store/my-work/incoming-challans');
+        return;
+      }
+      if (activeDept === 'QC1') {
+        router.push('/qc1/my-work');
+        return;
+      }
+      if (activeDept === 'PROGRAMMING') {
+        router.push('/programming');
+        return;
+      }
+      if (activeRoot) {
+        router.push(activeRoot);
+        return;
+      }
+    }
+
+    if (challan) {
+      if (challan.fromDepartment === 'EMBROIDERY' || challan.toDepartment === 'EMBROIDERY') {
+        router.push('/embroidery');
+        return;
+      }
+      if (challan.fromDepartment === 'THREAD_CUTTING' || challan.toDepartment === 'THREAD_CUTTING') {
+        router.push('/thread-cutting/my-work');
+        return;
+      }
+      if (challan.fromDepartment === 'DYEING' || challan.toDepartment === 'DYEING') {
+        router.push('/dyeing/my-work');
+        return;
+      }
+      if (challan.fromDepartment === 'STORE' || challan.toDepartment === 'STORE') {
+        router.push('/fabric-store');
+        return;
+      }
+      if (challan.fromDepartment === 'QC1' || challan.toDepartment === 'QC1') {
+        router.push('/qc1/my-work');
+        return;
+      }
+    }
+
+    if (isEmbroideryUser(user)) { router.push('/embroidery'); return; }
+    if (isThreadCuttingUser(user)) { router.push('/thread-cutting/my-work'); return; }
+    if (isDyeingUser(user)) { router.push('/dyeing/my-work'); return; }
+    if (isFabricStoreUser(user)) { router.push('/fabric-store/my-work/incoming-challans'); return; }
+    if (isQc1User(user)) { router.push('/qc1/my-work'); return; }
+
+    router.push('/login');
+  };
+
+  const isProgUser = user?.departmentCode === 'PROGRAMMING';
+  const paddingClass = isProgUser ? 'pl-0 md:pl-64' : 'pl-0';
 
   const loadChallan = async () => {
     try {
@@ -42,7 +136,7 @@ export default function ChallanDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] pl-0 md:pl-64 flex items-center justify-center">
+      <div className={`min-h-screen bg-[#F8FAFC] ${paddingClass} flex items-center justify-center`}>
         <div className="text-xs text-slate-500 font-mono animate-pulse">
           Loading Challan Document...
         </div>
@@ -52,33 +146,94 @@ export default function ChallanDetailPage() {
 
   if (error || !challan) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] pl-0 md:pl-64 p-4 sm:p-8">
+      <div className={`min-h-screen bg-[#F8FAFC] ${paddingClass} p-4 sm:p-8`}>
         <div className="max-w-xl mx-auto p-6 bg-rose-50 border border-rose-200 rounded-xl text-center space-y-3">
           <AlertCircle className="w-8 h-8 text-rose-600 mx-auto" />
           <h2 className="text-sm font-bold text-rose-900">Error Loading Challan</h2>
           <p className="text-xs text-rose-700">{error || 'Challan not found'}</p>
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 px-3.5 py-2 bg-rose-900 text-white rounded text-xs font-semibold"
+          <button
+            onClick={handleBack}
+            className="inline-flex items-center gap-2 px-3.5 py-2 bg-rose-900 text-white rounded text-xs font-semibold cursor-pointer"
           >
-            ← Return to Dashboard
-          </Link>
+            ← Return to Station
+          </button>
         </div>
       </div>
     );
   }
 
+  // PRODUCTION SHEET DESIGN NUMBER (Mandatory on Barcode as per business rule)
+  const designNumber = 
+    challan?.program?.designNumber || 
+    challan?.program?.designName || 
+    challan?.program?.wilcomDesignNumber || 
+    challan?.program?.embroideryDesign || 
+    challan?.program?.mainStyle || 
+    'STANDARD DESIGN';
+
+  const deptLabels: Record<string, string> = {
+    STORE: 'FABRIC STORE',
+    FABRIC_STORE: 'FABRIC STORE',
+    DYEING: 'DYEING',
+    QC1: 'QC1',
+    EMBROIDERY: 'EMBROIDERY',
+    THREAD_CUTTING: 'THREAD CUTTING',
+    CUTTING: 'CUTTING',
+    QC2: 'QC2',
+    FINISHING: 'FINISHING',
+    PACKING: 'PACKING'
+  };
+
+  const deptDisplay = challan ? (deptLabels[challan.fromDepartment] || challan.fromDepartment || 'PRODUCTION') : 'PRODUCTION';
+
+  const totalPieces = challan ? (challan.items || []).reduce(
+    (sum: number, it: any) => sum + (Number(it.quantity) || 0),
+    0
+  ) : 0;
+
+  const barcodeStickerParams: BarcodeStickerParams | null = challan ? {
+    challanNumber: challan.challanNumber,
+    designNumber: designNumber,
+    departmentName: deptDisplay,
+    fromDepartment: challan.fromDepartment,
+    toDepartment: challan.toDepartment,
+    programSerialNo: challan.program?.programSerialNo || challan.program?.programNumber || '—',
+    clientName: challan.program?.clientName || challan.program?.buyerName || 'Standard Client',
+    mainStyle: challan.program?.mainStyle || challan.program?.styleCode || '—',
+    totalQuantity: totalPieces,
+    uom: challan.items?.[0]?.uom || 'PCS',
+    date: challan.createdAt ? new Date(challan.createdAt).toLocaleDateString('en-IN') : new Date().toLocaleDateString('en-IN')
+  } : null;
+
+  const handleDownloadBarcodePng = async () => {
+    if (!barcodeStickerParams) return;
+    try {
+      setDownloadingBarcode(true);
+      await downloadBarcodeStickerPng(barcodeStickerParams);
+    } catch (e) {
+      console.error('Failed to download barcode sticker PNG:', e);
+    } finally {
+      setDownloadingBarcode(false);
+    }
+  };
+
+  const handlePrintBarcodeSticker = () => {
+    if (!barcodeStickerParams) return;
+    printBarcodeSticker(barcodeStickerParams);
+  };
+
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pl-0 md:pl-64 pb-20">
+    <div className={`min-h-screen bg-[#F8FAFC] ${paddingClass} pb-20`}>
       {/* HEADER */}
       <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div className="flex items-center gap-4">
-          <Link
-            href="/"
-            className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-md transition"
+          <button
+            onClick={handleBack}
+            className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-md transition cursor-pointer"
+            title="Back to my department station"
           >
             <ArrowLeft className="w-4 h-4" />
-          </Link>
+          </button>
           <div>
             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A66E22] block">
               SHUBHAM FABRICS · DISPATCH CHALLAN
@@ -94,7 +249,33 @@ export default function ChallanDetailPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3 print:hidden">
+        {/* TOP ACTION BAR: CHALLAN PRINT + STANDALONE BARCODE DOWNLOADS */}
+        <div className="flex items-center gap-2.5 print:hidden flex-wrap">
+          {/* 1. STANDALONE BARCODE DOWNLOAD (RULE: DOWNLOADABLE ALAG SE) */}
+          {barcodeStickerParams && (
+            <>
+              <button
+                type="button"
+                onClick={handleDownloadBarcodePng}
+                disabled={downloadingBarcode}
+                className="flex items-center gap-1.5 px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-md shadow-xs transition cursor-pointer"
+                title="Download standalone barcode sticker with Design Number as PNG"
+              >
+                <BarcodeIcon className="w-4 h-4" />
+                <span>{downloadingBarcode ? 'Downloading...' : 'Download Barcode (PNG)'}</span>
+              </button>
+              <button
+                type="button"
+                onClick={handlePrintBarcodeSticker}
+                className="flex items-center gap-1.5 px-3 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-md shadow-xs transition cursor-pointer"
+                title="Print 4x2.5 thermal sticker label directly"
+              >
+                <Printer className="w-4 h-4" />
+                <span>Print Barcode Sticker</span>
+              </button>
+            </>
+          )}
+
           <button
             onClick={() => window.print()}
             className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-md shadow-xs transition"
@@ -132,7 +313,7 @@ export default function ChallanDetailPage() {
         <div className="bg-white border border-slate-300 rounded-xl p-4 sm:p-8 shadow-sm space-y-6">
           
           {/* VOUCHER TOP HEADER */}
-          <div className="flex items-start justify-between pb-6 border-b-2 border-slate-900">
+          <div className="flex items-start justify-between pb-6 border-b-2 border-slate-900 gap-4">
             <div>
               <span className="text-[11px] font-bold tracking-[0.2em] text-[#A66E22] block mb-1">
                 SHUBHAM FABRICS INDIA PVT. LTD.
@@ -154,6 +335,23 @@ export default function ChallanDetailPage() {
                     Inter-department manufacturing transfer &amp; quality check dispatch slip
                   </p>
                 </div>
+              ) : challan.fromDepartment === 'THREAD_CUTTING' && challan.toDepartment === 'QC2' ? (
+                <div>
+                  <h2 className="text-xl font-serif font-black text-slate-900 tracking-wide">
+                    THREAD CUTTING DEPARTMENT
+                  </h2>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-sm font-black font-mono tracking-wider text-cyan-900 bg-cyan-50 px-2 py-0.5 rounded border border-cyan-200">
+                      THREAD CUTTING → QC2 (QUALITY CHECK 2)
+                    </span>
+                    <span className="text-sm font-bold text-slate-800 tracking-widest">
+                      CHALLAN
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Quality inspection handover slip — checking will be done on specified piece count
+                  </p>
+                </div>
               ) : (
                 <div>
                   <h2 className="text-2xl font-serif font-black text-slate-900">
@@ -166,26 +364,149 @@ export default function ChallanDetailPage() {
               )}
             </div>
 
+            {/* VOUCHER RIGHT SIDE: SCANNABLE CODE-128 BARCODE + DESIGN NUMBER + DEPARTMENT NAME */}
             <div className="text-right flex flex-col items-end">
-              {/* SVG Barcode */}
-              <div className="mb-1">
-                <svg viewBox="0 0 160 30" className="h-7 w-auto max-w-[140px]">
-                  {Array.from({ length: 32 }).map((_, i) => {
-                    const width = (i * 3 + (challan.challanNumber || '').length) % 3 === 0 ? 3 : (i % 2 === 0 ? 1.5 : 2);
-                    const x = 5 + i * 4.5;
-                    return <rect key={i} x={x} y="2" width={width} height="26" fill="#0f172a" />;
-                  })}
-                </svg>
+              {/* Authenticated Code-128 Barcode with Quiet Zones */}
+              {(() => {
+                const { svgBars, totalWidth: barW, totalHeight: barH } = generateCode128SvgBars(challan.challanNumber, 1.4, 30);
+                return (
+                  <div className="mb-1 bg-white p-1 rounded border border-slate-200 shadow-2xs">
+                    <svg viewBox={`0 0 ${barW} ${barH}`} className="h-7 w-auto max-w-[150px]">
+                      <g dangerouslySetInnerHTML={{ __html: svgBars }} />
+                    </svg>
+                  </div>
+                );
+              })()}
+
+              {/* Department Badge on Barcode Area */}
+              <span className="text-[10px] font-black uppercase tracking-wider text-amber-900 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 mb-0.5">
+                DEPT: {deptDisplay}
+              </span>
+
+              {/* Production Sheet Design Number on Barcode Area */}
+              <div className="flex items-center gap-1 justify-end text-[11px] mb-0.5">
+                <span className="text-slate-500 font-bold text-[9px] uppercase tracking-wider">DESIGN NO:</span>
+                <strong className="font-mono font-black text-slate-900">
+                  {designNumber}
+                </strong>
               </div>
-              <span className="font-mono font-bold text-lg text-slate-900 block leading-tight">
+
+              <span className="font-mono font-bold text-base text-slate-900 block leading-tight">
                 {challan.challanNumber}
               </span>
-              <span className="text-xs text-slate-500 block">
-                Date: {challan.createdAt ? new Date(challan.createdAt).toLocaleDateString() : '—'}
+
+              <span className="text-[11px] text-slate-500 block">
+                Date: {challan.createdAt ? new Date(challan.createdAt).toLocaleDateString('en-IN') : '—'}
               </span>
-              <span className="inline-block mt-1 px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-800">
-                PRIORITY: {challan.priority || 'NORMAL'}
-              </span>
+
+              {/* Quick Standalone Barcode Download Action Links */}
+              {barcodeStickerParams && (
+                <div className="mt-1 flex items-center gap-1.5 print:hidden">
+                  <button
+                    type="button"
+                    onClick={handleDownloadBarcodePng}
+                    className="text-[10px] font-bold text-amber-700 hover:text-amber-900 hover:underline flex items-center gap-0.5 cursor-pointer"
+                  >
+                    <Download className="w-2.5 h-2.5" />
+                    <span>Barcode PNG</span>
+                  </button>
+                  <span className="text-slate-300">·</span>
+                  <button
+                    type="button"
+                    onClick={handlePrintBarcodeSticker}
+                    className="text-[10px] font-bold text-emerald-700 hover:text-emerald-900 hover:underline flex items-center gap-0.5 cursor-pointer"
+                  >
+                    <Printer className="w-2.5 h-2.5" />
+                    <span>Sticker</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* TRACEABILITY & GENEALOGY BAR (BUSINESS RULE 1 & 2) */}
+          <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-2.5">
+              <div className="flex items-center gap-2">
+                <FileText className="w-4 h-4 text-emerald-700" />
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                  Master Production Sheet Traceability (Rule 1 &amp; 2)
+                </span>
+              </div>
+              {challan.program && (
+                <Link
+                  href={`/programs/${challan.program.id}`}
+                  className="inline-flex items-center gap-1.5 text-xs text-blue-700 hover:text-blue-900 font-bold bg-white px-2.5 py-1 rounded border border-blue-200 shadow-2xs transition"
+                >
+                  <span>View Master Sheet ({challan.program.programSerialNo || challan.program.programNumber})</span>
+                  <ArrowLeft className="w-3.5 h-3.5 rotate-180" />
+                </Link>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+              {/* 1. Master Sheet Details */}
+              <div className="p-2.5 bg-white border border-slate-200 rounded-lg">
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">Master Production Record</span>
+                <span className="font-mono font-bold text-slate-900 text-sm block">
+                  {challan.program?.programSerialNo || challan.program?.programNumber || '—'}
+                </span>
+                <span className="text-slate-600 text-[11px] block mt-0.5">
+                  Buyer: <strong>{challan.program?.clientName || challan.program?.buyerName || 'Standard'}</strong> | Style: <strong>{challan.program?.mainStyle || challan.program?.styleCode || '—'}</strong>
+                </span>
+              </div>
+
+              {/* 2. Previous Movement Trace */}
+              <div className="p-2.5 bg-white border border-slate-200 rounded-lg">
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">Previous Movement Trace</span>
+                {challan.parentChallan ? (
+                  <div>
+                    <Link
+                      href={`/challans/${challan.parentChallan.id}`}
+                      className="font-mono font-bold text-blue-700 hover:underline text-xs flex items-center gap-1"
+                    >
+                      <span>{challan.parentChallan.challanNumber}</span>
+                      <span className="text-[10px] text-slate-500 font-normal">
+                        ({challan.parentChallan.fromDepartment} → {challan.parentChallan.toDepartment})
+                      </span>
+                    </Link>
+                    <span className="text-[11px] text-emerald-700 font-medium block mt-0.5">
+                      ✓ Direct Chain of Custody Established
+                    </span>
+                  </div>
+                ) : (
+                  <div>
+                    <span className="font-semibold text-slate-800 text-xs block">
+                      Originating Lot
+                    </span>
+                    <span className="text-[11px] text-slate-500 block mt-0.5">
+                      Initial dispatch from {challan.fromDepartment || 'Fabric Store'}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* 3. Downstream Movements Trace */}
+              <div className="p-2.5 bg-white border border-slate-200 rounded-lg">
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">Subsequent Movements Trace</span>
+                {challan.childChallans && challan.childChallans.length > 0 ? (
+                  <div className="space-y-1">
+                    {challan.childChallans.map((child: any) => (
+                      <Link
+                        key={child.id}
+                        href={`/challans/${child.id}`}
+                        className="font-mono font-bold text-blue-700 hover:underline text-xs block truncate"
+                      >
+                        → {child.challanNumber} ({child.fromDepartment} → {child.toDepartment})
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="text-slate-500 text-xs italic block mt-1">
+                    Current active stage ({challan.toDepartment})
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
@@ -221,69 +542,153 @@ export default function ChallanDetailPage() {
             </div>
           </div>
 
-          {/* ITEMS TRANSFER TABLE */}
-          <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 mb-2">
-              Transferred Work Items &amp; Materials
-            </h3>
-            <div className="border border-slate-200 rounded-lg overflow-hidden">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-slate-100 text-slate-700 font-semibold border-b border-slate-200">
-                  <tr>
-                    <th className="py-2.5 px-4">#</th>
-                    <th className="py-2.5 px-4">Description</th>
-                    <th className="py-2.5 px-4">Color</th>
-                    <th className="py-2.5 px-4 text-right">Quantity</th>
-                    <th className="py-2.5 px-4">UOM</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 text-slate-800">
-                  {(challan.items || []).map((item: any, idx: number) => (
-                    <tr key={item.id || idx}>
-                      <td className="py-3 px-4 font-mono text-slate-500">{idx + 1}</td>
-                      <td className="py-3 px-4 font-medium text-slate-900">{item.itemDescription}</td>
-                      <td className="py-3 px-4">{item.colour || 'Standard'}</td>
-                      <td className="py-3 px-4 text-right font-mono font-bold">{item.quantity}</td>
-                      <td className="py-3 px-4">{item.uom || 'PCS'}</td>
-                    </tr>
-                  ))}
-                  {(!challan.items || challan.items.length === 0) && (
-                    <tr>
-                      <td colSpan={5} className="py-4 text-center text-slate-400">
-                        No item records attached to this Challan.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* REMARKS */}
-          {challan.remarks && (
-            <div className="p-3.5 bg-slate-50 rounded-lg border border-slate-200 text-xs">
-              <span className="font-bold text-slate-700 block mb-0.5">Remarks / Instructions:</span>
-              <p className="text-slate-600 italic font-serif">{challan.remarks}</p>
-            </div>
+          {/* STANDALONE DOWNLOADABLE BARCODE DISPATCH STICKER & LOT TAG (RULE: DOWNLOADABLE ALAG SE) */}
+          {barcodeStickerParams && (
+            <BarcodeStickerCard 
+              params={barcodeStickerParams}
+              title={`${deptDisplay} Barcode Dispatch Sticker & Lot Tag`}
+            />
           )}
 
-          {/* PHYSICAL SIGNATURE BLOCKS FOR FACTORY HANDOFF */}
-          <div className="pt-8 border-t border-slate-200 grid grid-cols-2 gap-8 text-xs">
-            <div className="border-t border-dashed border-slate-400 pt-2 text-center">
-              <span className="font-bold text-slate-800 block">
-                {challan.fromDepartment === 'DYEING' || challan.toDepartment === 'QC1'
-                  ? 'Dyeing Department'
-                  : challan.fromDepartment
-                  ? `${challan.fromDepartment} Department`
-                  : 'Dispatch Department'}
-              </span>
-              <span className="text-[10px] text-slate-500">Authorized Issuer Signature</span>
-            </div>
-            <div className="border-t border-dashed border-slate-400 pt-2 text-center">
-              <span className="font-bold text-slate-800 block">{challan.toDepartment} Supervisor</span>
-              <span className="text-[10px] text-slate-500">Receiver Gate Inward Stamp &amp; Signature</span>
-            </div>
-          </div>
+          {/* TOTAL PIECES CALCULATION & QC2 CHECKING DIRECTIVE */}
+          {(() => {
+            const totalQuantity = (challan.items || []).reduce(
+              (sum: number, it: any) => sum + (Number(it.quantity) || 0),
+              0
+            );
+            const isThreadCuttingToQc2 =
+              challan.fromDepartment === 'THREAD_CUTTING' && challan.toDepartment === 'QC2';
+
+            return (
+              <>
+                {/* QC2 MANDATORY INSPECTION HANDOVER DIRECTIVE */}
+                {isThreadCuttingToQc2 && (
+                  <div className="p-4 bg-gradient-to-r from-emerald-50 via-teal-50 to-cyan-50 border-2 border-emerald-400 rounded-xl space-y-2.5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-emerald-200 pb-2.5">
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck className="w-5 h-5 text-emerald-700 shrink-0" />
+                        <div>
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 block">
+                            QUALITY ASSURANCE DIRECTIVE
+                          </span>
+                          <h4 className="text-sm font-bold text-slate-900">
+                            QC2 Piece-by-Piece Quality Inspection Basis
+                          </h4>
+                        </div>
+                      </div>
+                      <div className="text-left sm:text-right bg-white px-3.5 py-1.5 rounded-xl border border-emerald-300">
+                        <span className="text-[10px] uppercase font-bold text-slate-500 block">Pieces Dispatched to QC2</span>
+                        <strong className="text-lg font-mono font-black text-emerald-800">
+                          {totalQuantity} PCS
+                        </strong>
+                      </div>
+                    </div>
+                    <p className="text-xs text-emerald-950 leading-relaxed font-medium">
+                      <strong>MANDATORY INSPECTION CRITERIA:</strong> Exactly <strong>{totalQuantity} PCS</strong> have been dispatched from Thread Cutting after trimming and defect segregation. 
+                      QC2 Quality Checking and defect auditing must be conducted according to these specified <strong>{totalQuantity} pieces</strong>.
+                    </p>
+                  </div>
+                )}
+
+                {/* ITEMS TRANSFER TABLE */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                      Transferred Work Items &amp; Materials
+                    </h3>
+                    {isThreadCuttingToQc2 && (
+                      <span className="text-[11px] font-mono font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded border border-emerald-200">
+                        Dispatched Pieces: {totalQuantity} PCS
+                      </span>
+                    )}
+                  </div>
+                  <div className="border border-slate-200 rounded-lg overflow-hidden">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-slate-100 text-slate-700 font-semibold border-b border-slate-200">
+                        <tr>
+                          <th className="py-2.5 px-4">#</th>
+                          <th className="py-2.5 px-4">Description</th>
+                          <th className="py-2.5 px-4">Color</th>
+                          <th className="py-2.5 px-4 text-right">Quantity</th>
+                          <th className="py-2.5 px-4">UOM</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 text-slate-800">
+                        {(challan.items || []).map((item: any, idx: number) => (
+                          <tr key={item.id || idx}>
+                            <td className="py-3 px-4 font-mono text-slate-500">{idx + 1}</td>
+                            <td className="py-3 px-4 font-medium text-slate-900">{item.itemDescription}</td>
+                            <td className="py-3 px-4">{item.colour || 'Standard'}</td>
+                            <td className="py-3 px-4 text-right font-mono font-bold">{item.quantity}</td>
+                            <td className="py-3 px-4">{item.uom || 'PCS'}</td>
+                          </tr>
+                        ))}
+                        {(!challan.items || challan.items.length === 0) && (
+                          <tr>
+                            <td colSpan={5} className="py-4 text-center text-slate-400">
+                              No item records attached to this Challan.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                      {/* TABLE FOOTER WITH EXPLICIT TOTAL PIECES */}
+                      <tfoot className="bg-slate-50 border-t-2 border-slate-300 font-bold text-xs text-slate-800">
+                        <tr>
+                          <td colSpan={3} className="py-2.5 px-4 text-right uppercase text-[11px] tracking-wider text-slate-700">
+                            {isThreadCuttingToQc2
+                              ? 'Total Dispatched Pieces for QC2 Inspection:'
+                              : 'Total Material Quantity:'}
+                          </td>
+                          <td className="py-2.5 px-4 text-right font-mono text-sm font-black text-slate-900">
+                            {totalQuantity}
+                          </td>
+                          <td className="py-2.5 px-4 font-bold text-slate-700">
+                            {challan.items?.[0]?.uom || 'PCS'}
+                          </td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                </div>
+
+                {/* REMARKS */}
+                {challan.remarks && (
+                  <div className="p-3.5 bg-slate-50 rounded-lg border border-slate-200 text-xs">
+                    <span className="font-bold text-slate-700 block mb-0.5">Remarks / Instructions:</span>
+                    <p className="text-slate-600 italic font-serif">{challan.remarks}</p>
+                  </div>
+                )}
+
+                {/* PHYSICAL SIGNATURE BLOCKS FOR FACTORY HANDOFF */}
+                <div className="pt-8 border-t border-slate-200 grid grid-cols-2 gap-8 text-xs">
+                  <div className="border-t border-dashed border-slate-400 pt-2 text-center space-y-1">
+                    <span className="font-bold text-slate-800 block">
+                      {isThreadCuttingToQc2
+                        ? 'Thread Cutting Incharge'
+                        : challan.fromDepartment === 'DYEING' || challan.toDepartment === 'QC1'
+                        ? 'Dyeing Department'
+                        : challan.fromDepartment
+                        ? `${challan.fromDepartment} Department`
+                        : 'Dispatch Department'}
+                    </span>
+                    <span className="text-[10px] text-slate-500 block">
+                      Authorized Issuer Signature (Dispatched: {totalQuantity} PCS)
+                    </span>
+                  </div>
+                  <div className="border-t border-dashed border-slate-400 pt-2 text-center space-y-1">
+                    <span className="font-bold text-slate-800 block">
+                      {challan.toDepartment === 'QC2' ? 'QC2 Quality Inspector' : `${challan.toDepartment} Supervisor`}
+                    </span>
+                    <span className="text-[10px] text-slate-500 block">
+                      {challan.toDepartment === 'QC2'
+                        ? `Checking Basis: ${totalQuantity} PCS | Checked: ____ | Passed: ____ | Defective: ____`
+                        : 'Receiver Gate Inward Stamp & Signature'}
+                    </span>
+                  </div>
+                </div>
+              </>
+            );
+          })()}
 
         </div>
 

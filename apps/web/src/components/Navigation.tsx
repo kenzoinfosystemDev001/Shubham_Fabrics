@@ -19,7 +19,9 @@ import {
   History
 } from 'lucide-react';
 import { api } from '@/lib/api';
-import { isAdminUser } from '@/lib/rbac';
+import { isAdminUser, isProgrammingUser } from '@/lib/rbac';
+import { DepartmentSwitcher } from '@/components/DepartmentSwitcher';
+import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 
 export function Navigation() {
   const pathname = usePathname();
@@ -73,21 +75,37 @@ export function Navigation() {
       document.cookie = 'subham_mes_role=; path=/; max-age=0';
       document.cookie = 'subham_mes_dept=; path=/; max-age=0';
     }
-    router.push('/login');
+    router.replace('/login');
   };
 
-  // Do not render sidebar on login page, fabric-store workspace, admin workspace, dyeing workspace, or qc1 workspace
-  if (pathname === '/login' || pathname.startsWith('/fabric-store') || pathname.startsWith('/admin') || pathname.startsWith('/dyeing') || pathname.startsWith('/qc1')) {
+  const isAdmin = isAdminUser(currentUser);
+  const isProg = isProgrammingUser(currentUser);
+
+  // Do not render sidebar on root, login page, or workspaces belonging to other departments
+  if (
+    pathname === '/' ||
+    pathname === '/login' ||
+    pathname.startsWith('/fabric-store') ||
+    pathname.startsWith('/admin') ||
+    pathname.startsWith('/dyeing') ||
+    pathname.startsWith('/qc1') ||
+    pathname.startsWith('/embroidery') ||
+    pathname.startsWith('/thread-cutting')
+  ) {
     return null;
   }
 
-  const isDashboardActive = pathname === '/' || pathname === '/dashboard';
+  // If viewing a shared route (like /challans/[id]), only show programming sidebar to programming users/admins
+  if (pathname.startsWith('/challans') && !isProg && !isAdmin) {
+    return null;
+  }
+
+  const isDashboardActive = pathname === '/programming' || pathname === '/dashboard';
   const isCreateSheetActive = pathname === '/my-work/create-production-sheet';
   const isIssueChallanActive = pathname === '/my-work/issue-challan';
   const isMyWorkRootActive = pathname === '/my-work';
   const isFloorBoardActive = pathname === '/floor-board';
   const isHistoryActive = pathname === '/production-history';
-  const isAdmin = isAdminUser(currentUser);
 
   return (
     <>
@@ -135,12 +153,18 @@ export function Navigation() {
 
       {/* SIDEBAR ASIDE (responsive drawer on mobile, fixed w-64 on md+) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-72 md:w-64 bg-[#0F172A] text-slate-300 flex flex-col border-r border-slate-800 select-none transform transition-transform duration-300 ease-in-out ${
+        style={{
+          backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.40), rgba(10, 15, 29, 0.60)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+        className={`fixed inset-y-0 left-0 z-50 w-72 md:w-64 text-slate-100 flex flex-col border-r border-slate-700/80 select-none transform transition-transform duration-300 ease-in-out shadow-2xl backdrop-blur-xs ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
         {/* BRANDING HEADER WITH OFFICIAL IMG 3 LOGO */}
-        <div className="p-4 border-b border-slate-800 bg-[#0A0F1D] flex items-center justify-between">
+        <div className="p-4 border-b border-slate-700/60 bg-slate-950/40 backdrop-blur-sm flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-white p-0.5 border border-amber-500/40 flex items-center justify-center shadow-sm overflow-hidden shrink-0">
               <img
@@ -168,23 +192,27 @@ export function Navigation() {
           </button>
         </div>
 
-        {/* DEPARTMENT TITLE */}
-        <div className="px-5 pt-4 pb-2 border-b border-slate-800/60">
-          <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-amber-500/90 block">
-            PROGRAMMING DEPARTMENT
-          </span>
+        {/* DEPARTMENT TITLE & WORKSPACE SWITCHER */}
+        <div className="relative px-3 pt-3 pb-2.5 border-b border-slate-700/60 bg-slate-950/20 backdrop-blur-xs">
+          <div className="relative z-10">
+            <DepartmentSwitcher
+              currentDepartmentName="Programming Department"
+              accentColor="amber"
+              onNavigate={() => setMobileOpen(false)}
+            />
+          </div>
         </div>
 
         {/* NAVIGATION ITEMS */}
-        <nav className="flex-1 px-3 space-y-1 overflow-y-auto pt-1">
+        <nav className="flex-1 px-3 space-y-1 overflow-y-auto pt-2">
           {/* 1. Dashboard */}
           <Link
-            href="/"
+            href="/programming"
             onClick={() => setMobileOpen(false)}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition ${
               isDashboardActive
-                ? 'bg-[#1E293B] text-white border-l-2 border-amber-400 pl-2.5 shadow-xs'
-                : 'text-slate-300 hover:bg-slate-800/60 hover:text-white'
+                ? 'bg-amber-500/25 text-white border-l-2 border-amber-400 pl-2.5 shadow-sm backdrop-blur-xs'
+                : 'text-slate-200 hover:bg-white/10 hover:text-white'
             }`}
           >
             <LayoutDashboard className="w-4 h-4 text-slate-400" />
@@ -274,22 +302,22 @@ export function Navigation() {
         </nav>
 
         {/* USER & SIGN OUT FOOTER */}
-        <div className="p-4 border-t border-slate-800 bg-[#0A0F1D]/80">
+        <div className="p-4 border-t border-slate-700/60 bg-slate-950/50 backdrop-blur-md">
           <div className="flex items-center gap-3 mb-3">
-            <UserCircle className="w-8 h-8 text-slate-400" />
+            <UserCircle className="w-8 h-8 text-amber-400/90" />
             <div className="flex-1 min-w-0">
-              <span className="text-xs font-semibold text-white truncate block">
-                {currentUser.fullName || currentUser.username || 'Programming User'}
+              <span className="text-xs font-semibold text-white truncate block drop-shadow-xs">
+                {currentUser.fullName || (isAdmin ? 'System Administrator' : 'Programming Incharge')}
               </span>
-              <span className="text-[10px] text-amber-400/90 font-medium tracking-wide block truncate">
-                {isAdmin ? 'System Administrator' : 'Programming Department'}
+              <span className="text-[10px] text-amber-400 font-bold tracking-wide block truncate drop-shadow-xs">
+                Programming Department
               </span>
             </div>
           </div>
 
           <button
             onClick={handleSignOut}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-slate-800/80 hover:bg-rose-950/40 hover:text-rose-300 hover:border-rose-900 border border-slate-700/60 rounded-lg text-xs text-slate-300 transition"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-slate-900/70 hover:bg-rose-950/50 hover:text-rose-200 hover:border-rose-700/60 border border-slate-700/60 rounded-lg text-xs text-slate-200 transition shadow-xs"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Sign Out</span>

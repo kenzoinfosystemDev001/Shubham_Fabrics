@@ -93,11 +93,16 @@ export async function POST(request: Request) {
     const body = await request.json();
 
     // 1. Resolve Actor ID reliably
-    let user = await prisma.user.findFirst({
-      where: { OR: [{ username: 'programmer' }, { username: 'admin' }, { username: 'jitender' }] },
-      select: { id: true },
-      orderBy: { username: 'asc' },
-    });
+    let user = null;
+    if (body.issuedById) {
+      user = await prisma.user.findUnique({ where: { id: body.issuedById }, select: { id: true } }).catch(() => null);
+    }
+    if (!user) {
+      user = await prisma.user.findFirst({
+        where: { OR: [{ username: 'store' }, { username: 'programmer' }, { username: 'admin' }, { username: 'jitender' }] },
+        select: { id: true },
+      });
+    }
     if (!user) {
       user = await prisma.user.findFirst({ select: { id: true } });
     }
@@ -107,7 +112,7 @@ export async function POST(request: Request) {
           username: 'programmer',
           email: 'programmer@subhamfabrics.com',
           fullName: 'Programming Incharge',
-          passwordHash: 'dummy',
+          passwordHash: '$2b$10$e7v1vT7Qf0K6bSubhamFabricsMESSecureHash',
           departmentCode: 'PROGRAMMING',
         },
         select: { id: true },

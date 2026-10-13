@@ -40,36 +40,11 @@ class ApiClient {
 
   async ensureValidToken(): Promise<string> {
     const existing = this.getToken();
-    if (existing && !existing.startsWith('demo_token_')) {
-      return existing;
-    }
-    try {
-      const res = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ usernameOrEmail: 'programmer', password: '1234' }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.accessToken) {
-          this.setToken(data.accessToken);
-          if (data.user && typeof window !== 'undefined') {
-            localStorage.setItem('subham_mes_user', JSON.stringify(data.user));
-          }
-          return data.accessToken;
-        }
-      }
-    } catch {
-      // offline fallback
-    }
     return existing || '';
   }
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    let token = this.getToken();
-    if (!token && endpoint !== '/auth/login') {
-      token = await this.ensureValidToken();
-    }
+    const token = this.getToken();
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -87,28 +62,12 @@ class ApiClient {
     const timer = setTimeout(() => controller.abort(), 8000);
 
     try {
-      let res = await fetch(url, {
+      const res = await fetch(url, {
         ...options,
         headers,
         signal: options.signal || controller.signal,
       });
       clearTimeout(timer);
-
-      // Automatic 401 recovery: token expired or invalid, auto re-authenticate and retry once
-      if (res.status === 401 && endpoint !== '/auth/login') {
-        this.clearToken();
-        const freshToken = await this.ensureValidToken();
-        if (freshToken) {
-          const retryHeaders = {
-            ...headers,
-            'Authorization': `Bearer ${freshToken}`,
-          };
-          res = await fetch(url, {
-            ...options,
-            headers: retryHeaders,
-          });
-        }
-      }
 
       if (!res.ok) {
         let errorMessage = `HTTP ${res.status} ${res.statusText}`;
@@ -213,7 +172,44 @@ class ApiClient {
           roles: ['QC_INSPECTOR', 'USER'],
           permissions: ['quality.inspect', 'defects.create', 'defects.review'],
           departmentCode: 'QC1',
+          defaultRedirect: '/qc1',
           validPins: ['Admin@12345', 'admin@12345', '1234'],
+        },
+        qc1: {
+          id: 'usr-qc-002',
+          username: 'qc1',
+          fullName: 'QC1 Quality Inspector',
+          email: 'qc1@subhamfabrics.com',
+          role: 'QC_INSPECTOR',
+          roles: ['QC_INSPECTOR', 'USER'],
+          permissions: ['quality.inspect', 'defects.create', 'defects.review'],
+          departmentCode: 'QC1',
+          defaultRedirect: '/qc1',
+          validPins: ['Admin@12345', 'admin@12345', '1234', '1111', '0000'],
+        },
+        dyeing: {
+          id: 'usr-dye-001',
+          username: 'dyeing',
+          fullName: 'Dyeing Incharge',
+          email: 'dyeing@subhamfabrics.com',
+          role: 'DYEING_INCHARGE',
+          roles: ['DYEING_INCHARGE', 'USER'],
+          permissions: ['dyeing.*', 'challans.receive', 'challans.issue'],
+          departmentCode: 'DYEING',
+          defaultRedirect: '/dyeing',
+          validPins: ['Admin@12345', 'admin@12345', '1234', '1111', '0000'],
+        },
+        embroidery: {
+          id: 'usr-emb-001',
+          username: 'embroidery',
+          fullName: 'Embroidery Incharge',
+          email: 'embroidery@subhamfabrics.com',
+          role: 'EMBROIDERY_INCHARGE',
+          roles: ['EMBROIDERY_INCHARGE', 'USER'],
+          permissions: ['embroidery.*', 'challans.receive', 'production.*'],
+          departmentCode: 'EMBROIDERY',
+          defaultRedirect: '/embroidery',
+          validPins: ['Admin@12345', 'admin@12345', '1234', '1111', '0000'],
         },
       };
 
@@ -319,6 +315,28 @@ class ApiClient {
       method: 'POST',
       body: JSON.stringify(data),
     });
+  }
+
+  async getFabricAvailability(params: {
+    fabricName: string;
+    fabricColor?: string;
+    fabricAverage: number;
+    productionQuantity: number;
+  }) {
+    const query = new URLSearchParams({
+      fabricName: params.fabricName,
+      fabricAverage: String(params.fabricAverage),
+      productionQuantity: String(params.productionQuantity),
+    });
+    if (params.fabricColor) query.set('fabricColor', params.fabricColor);
+    return this.request<{
+      fabricName: string;
+      fabricColor: string | null;
+      availableMeters: number;
+      requiredMeters: number;
+      matchingRollCount: number;
+      sufficient: boolean;
+    }>(`/programs/production-sheet?${query.toString()}`);
   }
 
   async updateProductionSheet(id: string, data: any) {

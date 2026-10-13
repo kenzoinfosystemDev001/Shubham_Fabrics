@@ -38,6 +38,14 @@ export default function CreateProductionSheetPage() {
   const [success, setSuccess] = useState<any | null>(null);
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [createdProgramId, setCreatedProgramId] = useState<string | null>(null);
+  const [fabricAvailability, setFabricAvailability] = useState<{
+    availableMeters: number;
+    requiredMeters: number;
+    matchingRollCount: number;
+    sufficient: boolean;
+  } | null>(null);
+  const [checkingFabricAvailability, setCheckingFabricAvailability] = useState(false);
+  const [fabricAvailabilityError, setFabricAvailabilityError] = useState<string | null>(null);
 
   // FORM STATE - All 8 Sections of Shubham Fabrics Production Sheet
   const [formData, setFormData] = useState({
@@ -100,9 +108,73 @@ export default function CreateProductionSheetPage() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  useEffect(() => {
+    const fabricName = formData.fabricName.trim();
+    const fabricAverage = Number(formData.fabricAverage);
+    const productionQuantity = Number(formData.colorQuantity);
+
+    setFabricAvailability(null);
+    setFabricAvailabilityError(null);
+
+    if (
+      !fabricName ||
+      !Number.isFinite(fabricAverage) ||
+      fabricAverage <= 0 ||
+      !Number.isInteger(productionQuantity) ||
+      productionQuantity <= 0
+    ) {
+      setCheckingFabricAvailability(false);
+      return;
+    }
+
+    let active = true;
+    setCheckingFabricAvailability(true);
+    const timeout = window.setTimeout(() => {
+      api.getFabricAvailability({
+        fabricName,
+        fabricColor: formData.fabricColor.trim(),
+        fabricAverage,
+        productionQuantity,
+      })
+        .then((availability) => {
+          if (active) setFabricAvailability(availability);
+        })
+        .catch((err: Error) => {
+          if (active) setFabricAvailabilityError(err.message || 'Unable to check Fabric Store stock.');
+        })
+        .finally(() => {
+          if (active) setCheckingFabricAvailability(false);
+        });
+    }, 300);
+
+    return () => {
+      active = false;
+      window.clearTimeout(timeout);
+    };
+  }, [
+    formData.fabricName,
+    formData.fabricColor,
+    formData.fabricAverage,
+    formData.colorQuantity,
+  ]);
+
+  const canMarkReady =
+    formData.fabricColorAvailable === 'IN_STOCK' &&
+    fabricAvailability?.sufficient === true &&
+    !checkingFabricAvailability &&
+    !fabricAvailabilityError;
+
   const handleSubmit = async (targetStatus: 'DRAFT' | 'IN_PROGRESS' | 'READY_FOR_ISSUE') => {
     setError(null);
     setSuccess(null);
+
+    if (targetStatus === 'READY_FOR_ISSUE' && !canMarkReady) {
+      setError(
+        fabricAvailabilityError ||
+          'A production sheet can only be marked ready when enough matching, QC-passed fabric is available in the Fabric Store.',
+      );
+      return;
+    }
 
     // Basic required field validations
     if (targetStatus !== 'DRAFT') {
@@ -196,7 +268,7 @@ export default function CreateProductionSheetPage() {
           <button
             type="button"
             onClick={() => handleSubmit('READY_FOR_ISSUE')}
-            disabled={loading}
+            disabled={loading || !canMarkReady}
             className="px-4 py-2 bg-[#163767] hover:bg-[#0F264A] text-white text-xs font-semibold rounded-md shadow-xs transition flex items-center gap-1.5"
           >
             <CheckCircle2 className="w-4 h-4" />
@@ -272,7 +344,7 @@ export default function CreateProductionSheetPage() {
               </Link>
 
               <Link
-                href="/"
+                href="/programming"
                 className="px-3 py-2 bg-white border border-slate-200 text-slate-600 text-xs font-medium rounded-md hover:bg-slate-50 transition"
               >
                 Go to Dashboard
@@ -621,7 +693,7 @@ export default function CreateProductionSheetPage() {
 
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Fabric Average (Consumption)
+                  Fabric Average (Meters per Piece)
                 </label>
                 <input
                   type="number"
@@ -655,6 +727,38 @@ export default function CreateProductionSheetPage() {
                   className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
                 />
               </div>
+            </div>
+
+            <div
+              className={`rounded-lg border p-3 text-xs ${
+                fabricAvailabilityError || (fabricAvailability && !fabricAvailability.sufficient) ||
+                formData.fabricColorAvailable !== 'IN_STOCK'
+                  ? 'border-amber-200 bg-amber-50 text-amber-900'
+                  : fabricAvailability?.sufficient
+                    ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
+                    : 'border-slate-200 bg-slate-50 text-slate-700'
+              }`}
+              role="status"
+              aria-live="polite"
+            >
+              <strong className="block mb-1">Fabric Store availability</strong>
+              {formData.fabricColorAvailable !== 'IN_STOCK' ? (
+                <span>Set Fabric Color Available to “IN STOCK” before marking this sheet ready.</span>
+              ) : fabricAvailabilityError ? (
+                <span>Could not verify stock: {fabricAvailabilityError}</span>
+              ) : checkingFabricAvailability ? (
+                <span>Checking matching QC-passed fabric rolls in the store…</span>
+              ) : fabricAvailability ? (
+                <span>
+                  {fabricAvailability.sufficient ? 'Sufficient stock' : 'Insufficient stock'} —{' '}
+                  {fabricAvailability.availableMeters.toFixed(2)} m available of{' '}
+                  {fabricAvailability.requiredMeters.toFixed(2)} m required
+                  {' '}({fabricAvailability.matchingRollCount} matching roll
+                  {fabricAvailability.matchingRollCount === 1 ? '' : 's'}).
+                </span>
+              ) : (
+                <span>Enter fabric name, meters per piece, and production quantity to check stock.</span>
+              )}
             </div>
           </div>
 
@@ -832,7 +936,7 @@ export default function CreateProductionSheetPage() {
           <button
             type="button"
             onClick={() => handleSubmit('READY_FOR_ISSUE')}
-            disabled={loading}
+            disabled={loading || !canMarkReady}
             className="px-6 py-2.5 bg-[#163767] hover:bg-[#0F264A] text-white text-xs font-semibold rounded-md shadow-sm transition flex items-center gap-2"
           >
             <CheckCircle2 className="w-4 h-4" />

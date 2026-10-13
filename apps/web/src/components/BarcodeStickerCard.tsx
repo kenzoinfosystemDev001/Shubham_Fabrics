@@ -1,0 +1,179 @@
+'use client';
+
+import React, { useState } from 'react';
+import { 
+  Download, 
+  Printer, 
+  Barcode as BarcodeIcon, 
+  Check, 
+  ExternalLink,
+  ShieldCheck,
+  Tag,
+  Sparkles
+} from 'lucide-react';
+import { 
+  BarcodeStickerParams, 
+  generateBarcodeStickerSvg, 
+  downloadBarcodeStickerPng, 
+  downloadBarcodeStickerSvg, 
+  printBarcodeSticker 
+} from '@/lib/barcode';
+
+interface BarcodeStickerCardProps {
+  params: BarcodeStickerParams;
+  title?: string;
+  compact?: boolean;
+}
+
+export default function BarcodeStickerCard({
+  params,
+  title = 'Department Barcode Dispatch Tag',
+  compact = false
+}: BarcodeStickerCardProps) {
+  const [downloading, setDownloading] = useState(false);
+  const [downloadSuccess, setDownloadSuccess] = useState<string | null>(null);
+
+  const svgMarkup = generateBarcodeStickerSvg(params);
+
+  const handleDownloadPng = async () => {
+    try {
+      setDownloading(true);
+      await downloadBarcodeStickerPng(params);
+      setDownloadSuccess('PNG Downloaded');
+      setTimeout(() => setDownloadSuccess(null), 3000);
+    } catch (err) {
+      console.error('Failed to download barcode PNG:', err);
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  const handleDownloadSvg = () => {
+    try {
+      downloadBarcodeStickerSvg(params);
+      setDownloadSuccess('SVG Downloaded');
+      setTimeout(() => setDownloadSuccess(null), 3000);
+    } catch (err) {
+      console.error('Failed to download barcode SVG:', err);
+    }
+  };
+
+  const handlePrint = () => {
+    printBarcodeSticker(params);
+  };
+
+  const deptDisplay = params.departmentName || params.fromDepartment || 'PRODUCTION';
+
+  return (
+    <div className="bg-white border-2 border-slate-300 rounded-2xl p-4 sm:p-5 shadow-xs space-y-4">
+      {/* CARD HEADER */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-[#163767] text-amber-300 flex items-center justify-center shrink-0 shadow-2xs">
+            <BarcodeIcon className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                DEPT: {deptDisplay}
+              </span>
+              <span className="text-[10px] font-mono font-bold text-slate-500">
+                Code-128
+              </span>
+            </div>
+            <h4 className="text-sm font-bold text-slate-900 mt-0.5">
+              {title}
+            </h4>
+          </div>
+        </div>
+
+        {/* ACTION BUTTONS (DOWNLOADABLE SEPARATELY) */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            type="button"
+            onClick={handleDownloadPng}
+            disabled={downloading}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#163767] hover:bg-[#0F264A] text-white rounded-lg text-xs font-bold shadow-2xs transition cursor-pointer"
+            title="Download standalone high-resolution barcode sticker as PNG"
+          >
+            {downloadSuccess === 'PNG Downloaded' ? (
+              <Check className="w-3.5 h-3.5 text-emerald-300" />
+            ) : (
+              <Download className="w-3.5 h-3.5" />
+            )}
+            <span>{downloadSuccess === 'PNG Downloaded' ? 'Saved PNG!' : 'Download Barcode (PNG)'}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleDownloadSvg}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-bold transition cursor-pointer"
+            title="Download vector SVG"
+          >
+            <Download className="w-3.5 h-3.5 text-slate-600" />
+            <span>SVG</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handlePrint}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-bold shadow-2xs transition cursor-pointer"
+            title="Print 4x2.5 thermal sticker label directly"
+          >
+            <Printer className="w-3.5 h-3.5" />
+            <span>Print Sticker</span>
+          </button>
+        </div>
+      </div>
+
+      {/* METADATA HIGHLIGHT BAR */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs p-3 bg-slate-50 rounded-xl border border-slate-200">
+        <div>
+          <span className="text-[10px] uppercase font-bold text-slate-400 block">Design Number (Sheet)</span>
+          <strong className="text-sm font-mono font-black text-slate-900 block truncate">
+            {params.designNumber || 'STANDARD'}
+          </strong>
+        </div>
+        <div>
+          <span className="text-[10px] uppercase font-bold text-slate-400 block">Department</span>
+          <strong className="text-xs font-bold text-blue-900 block truncate">
+            {deptDisplay}
+          </strong>
+        </div>
+        <div>
+          <span className="text-[10px] uppercase font-bold text-slate-400 block">Movement</span>
+          <span className="text-xs font-mono font-bold text-slate-700 block truncate">
+            {params.fromDepartment && params.toDepartment ? `${params.fromDepartment} → ${params.toDepartment}` : 'INTER-DEPT'}
+          </span>
+        </div>
+        <div>
+          <span className="text-[10px] uppercase font-bold text-slate-400 block">Dispatched Pieces</span>
+          <strong className="text-sm font-mono font-black text-emerald-800 block">
+            {params.totalQuantity || '—'} {params.uom || 'PCS'}
+          </strong>
+        </div>
+      </div>
+
+      {/* LIVE SCANNABLE SVG BARCODE STICKER PREVIEW */}
+      <div className="flex justify-center p-2 sm:p-4 bg-slate-100/70 rounded-xl border border-slate-200 overflow-x-auto">
+        <div 
+          className="shadow-sm rounded-xl overflow-hidden bg-white max-w-full"
+          dangerouslySetInnerHTML={{ __html: svgMarkup }}
+        />
+      </div>
+
+      {/* FACTORY NOTICE */}
+      <div className="flex items-center justify-between text-[11px] text-slate-500 px-1">
+        <div className="flex items-center gap-1.5">
+          <Tag className="w-3.5 h-3.5 text-amber-700" />
+          <span>
+            This barcode contains the Production Sheet Design Number (<strong>{params.designNumber}</strong>) and department name (<strong>{deptDisplay}</strong>).
+          </span>
+        </div>
+        <span className="text-[10px] font-mono text-slate-400 hidden sm:inline">
+          Format: ISO/IEC 15417 Code-128
+        </span>
+      </div>
+    </div>
+  );
+}

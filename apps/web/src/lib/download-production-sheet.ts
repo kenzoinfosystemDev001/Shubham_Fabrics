@@ -3,6 +3,55 @@
  * Shubham Fabrics India Pvt. Ltd. MES - Programming Department
  */
 
+async function embedImage(source: string, label: string): Promise<string> {
+  if (source.startsWith('data:image/')) return source;
+
+  const imageUrl = new URL(source, window.location.href);
+  const response = await fetch(imageUrl, { credentials: 'omit' });
+  if (!response.ok) {
+    throw new Error(`${label} could not be loaded (HTTP ${response.status}).`);
+  }
+
+  const image = await response.blob();
+  if (!image.type.startsWith('image/')) {
+    throw new Error(`${label} did not return a valid image.`);
+  }
+
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') resolve(reader.result);
+      else reject(new Error(`${label} could not be embedded in the production sheet.`));
+    };
+    reader.onerror = () => reject(new Error(`${label} could not be embedded in the production sheet.`));
+    reader.readAsDataURL(image);
+  });
+}
+
+async function prepareProductionSheetImages(program: any) {
+  const preparedProgram = { ...program };
+  const designImages = [
+    ['baseDesignPhoto', 'Base design photo'],
+    ['wilcomDesignPhoto', 'Wilcom design photo'],
+  ] as const;
+
+  await Promise.all(
+    designImages.map(async ([field, label]) => {
+      const source = preparedProgram[field];
+      if (source) preparedProgram[field] = await embedImage(source, label);
+    }),
+  );
+
+  const logoUrl = new URL('/shubham-logo.jpg', window.location.origin).href;
+  try {
+    preparedProgram.companyLogo = await embedImage(logoUrl, 'Company logo');
+  } catch {
+    preparedProgram.companyLogo = logoUrl;
+  }
+
+  return preparedProgram;
+}
+
 export function generateProductionSheetHtml(program: any): string {
   const serialNo = program.programSerialNo || program.programNumber || 'PRG-DRAFT';
   const clientName = program.clientName || program.buyerName || '—';
@@ -322,7 +371,7 @@ export function generateProductionSheetHtml(program: any): string {
     <!-- HEADER -->
     <div class="sheet-header">
       <div style="display: flex; align-items: center; gap: 12px;">
-        <img src="/shubham-logo.jpg" alt="Logo" style="height: 52px; width: auto; object-fit: contain; border-radius: 4px;" />
+        <img src="${program.companyLogo || '/shubham-logo.jpg'}" alt="Logo" style="height: 52px; width: auto; object-fit: contain; border-radius: 4px;" />
         <div>
           <div class="company-title">SHUBHAM FABRICS INDIA PVT. LTD.</div>
           <div class="company-sub">Manufacturing Execution System &middot; Production Sheet</div>
@@ -449,8 +498,8 @@ export function generateProductionSheetHtml(program: any): string {
         <th>Design Attachments</th>
         <td colspan="3" style="padding: 6px;">
           <div style="display: flex; gap: 12px; align-items: center;">
-            ${program.baseDesignPhoto ? `<div><span style="font-size: 8px; font-weight: bold; display: block; color: #64748b;">BASE DESIGN:</span><img src="${program.baseDesignPhoto}" style="max-height: 90px; max-width: 140px; object-fit: contain; border: 1px solid #cbd5e1; border-radius: 4px;" /></div>` : ''}
-            ${program.wilcomDesignPhoto ? `<div><span style="font-size: 8px; font-weight: bold; display: block; color: #64748b;">WILCOM TECHNICAL:</span><img src="${program.wilcomDesignPhoto}" style="max-height: 90px; max-width: 140px; object-fit: contain; border: 1px solid #cbd5e1; border-radius: 4px;" /></div>` : ''}
+            ${program.baseDesignPhoto ? `<div><span style="font-size: 8px; font-weight: bold; display: block; color: #64748b;">BASE DESIGN:</span><img class="design-photo" src="${program.baseDesignPhoto}" style="max-height: 90px; max-width: 140px; object-fit: contain; border: 1px solid #cbd5e1; border-radius: 4px;" /></div>` : ''}
+            ${program.wilcomDesignPhoto ? `<div><span style="font-size: 8px; font-weight: bold; display: block; color: #64748b;">WILCOM TECHNICAL:</span><img class="design-photo" src="${program.wilcomDesignPhoto}" style="max-height: 90px; max-width: 140px; object-fit: contain; border: 1px solid #cbd5e1; border-radius: 4px;" /></div>` : ''}
           </div>
         </td>
       </tr>` : ''}
@@ -589,37 +638,53 @@ export function generateProductionSheetHtml(program: any): string {
 /**
  * Download Production Sheet as an offline HTML file
  */
-export function downloadProductionSheetHtml(program: any) {
-  const html = generateProductionSheetHtml(program);
-  const serialNo = program.programSerialNo || program.programNumber || 'PRG-SHEET';
-  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `Production_Sheet_${serialNo}.html`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+export async function downloadProductionSheetHtml(program: any) {
+  try {
+    const preparedProgram = await prepareProductionSheetImages(program);
+    const html = generateProductionSheetHtml(preparedProgram);
+    const serialNo = program.programSerialNo || program.programNumber || 'PRG-SHEET';
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Production_Sheet_${serialNo}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'The design photos could not be loaded.';
+    window.alert(`Production sheet download failed: ${message}`);
+  }
 }
 
 /**
  * Open print window for the Production Sheet
  */
 export function printProductionSheet(program: any) {
-  const html = generateProductionSheetHtml(program);
   const printWindow = window.open('', '_blank');
   if (printWindow) {
-    printWindow.document.open();
-    printWindow.document.write(html);
-    printWindow.document.close();
-    printWindow.focus();
-    // Allow styles to render before triggering print
-    setTimeout(() => {
-      printWindow.print();
-    }, 350);
+    void (async () => {
+      try {
+        const preparedProgram = await prepareProductionSheetImages(program);
+        printWindow.document.open();
+        printWindow.document.write(generateProductionSheetHtml(preparedProgram));
+        printWindow.document.close();
+        await Promise.all(
+          Array.from(
+            printWindow.document.querySelectorAll<HTMLImageElement>('.design-photo'),
+            (image) => image.decode(),
+          ),
+        );
+        printWindow.focus();
+        printWindow.print();
+      } catch (error) {
+        printWindow.close();
+        const message = error instanceof Error ? error.message : 'The design photos could not be loaded.';
+        window.alert(`Production sheet print failed: ${message}`);
+      }
+    })();
   } else {
-    // If pop-up is blocked, fallback to downloading
-    downloadProductionSheetHtml(program);
+    void downloadProductionSheetHtml(program);
   }
 }

@@ -249,7 +249,7 @@ function IssueChallanContent() {
 
             <div className="pt-4 flex flex-wrap items-center justify-between gap-3">
               <Link
-                href="/"
+                href="/programming"
                 className="text-xs font-semibold text-slate-600 hover:text-slate-900"
               >
                 ← Return to Dashboard

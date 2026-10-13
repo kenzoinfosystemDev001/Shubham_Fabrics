@@ -23,6 +23,7 @@ import {
   PackageCheck
 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 
 export default function QC1Dashboard() {
   const router = useRouter();
@@ -91,14 +92,21 @@ export default function QC1Dashboard() {
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] pb-16">
-      {/* TOP HEADER */}
-      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+      {/* TOP HEADER (REAL DB BACKGROUND) */}
+      <header
+        style={{
+          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.70)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+        className="border-b border-slate-700/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md text-white"
+      >
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-700 block">
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-400 block drop-shadow-sm">
             SHUBHAM FABRICS MES · QUALITY ASSURANCE
           </span>
-          <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-            <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+          <h1 className="text-xl font-bold text-white flex items-center gap-2 drop-shadow-sm">
+            <CheckCircle2 className="w-5 h-5 text-emerald-400" />
             <span>QC1 Department Dashboard</span>
           </h1>
         </div>
@@ -107,7 +115,7 @@ export default function QC1Dashboard() {
           <button
             onClick={loadData}
             disabled={loading}
-            className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg border border-slate-200 transition"
+            className="p-2 text-slate-300 hover:text-white hover:bg-slate-800/80 rounded-lg border border-slate-700/60 transition"
             title="Refresh Dashboard"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -115,15 +123,15 @@ export default function QC1Dashboard() {
 
           <Link
             href="/qc1/floor-board"
-            className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold rounded-lg transition"
+            className="flex items-center gap-1.5 px-3 py-2 bg-slate-800/90 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg border border-slate-700 transition"
           >
-            <Kanban className="w-4 h-4 text-slate-600" />
+            <Kanban className="w-4 h-4 text-emerald-300" />
             <span>Floor Board</span>
           </Link>
 
           <Link
             href="/qc1/my-work"
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-lg shadow-xs transition"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow-xs transition"
           >
             <Briefcase className="w-4 h-4" />
             <span>My Work</span>

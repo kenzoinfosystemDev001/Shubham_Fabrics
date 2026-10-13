@@ -20,6 +20,7 @@ import {
   FileText
 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 
 export default function DyeingDashboard() {
   const router = useRouter();
@@ -87,14 +88,21 @@ export default function DyeingDashboard() {
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] pb-16">
-      {/* TOP HEADER */}
-      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+      {/* TOP HEADER (REAL DB BACKGROUND) */}
+      <header
+        style={{
+          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.70)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+        className="border-b border-slate-700/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md text-white"
+      >
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-purple-700 block">
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-purple-400 block drop-shadow-sm">
             SHUBHAM FABRICS MES · PRODUCTION COMMAND
           </span>
-          <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-            <Droplet className="w-5 h-5 text-purple-600" />
+          <h1 className="text-xl font-bold text-white flex items-center gap-2 drop-shadow-sm">
+            <Droplet className="w-5 h-5 text-purple-400" />
             <span>Dyeing Department Dashboard</span>
           </h1>
         </div>
@@ -103,7 +111,7 @@ export default function DyeingDashboard() {
           <button
             onClick={loadData}
             disabled={loading}
-            className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg border border-slate-200 transition"
+            className="p-2 text-slate-300 hover:text-white hover:bg-slate-800/80 rounded-lg border border-slate-700/60 transition"
             title="Refresh Dashboard"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -111,15 +119,15 @@ export default function DyeingDashboard() {
 
           <Link
             href="/dyeing/floor-board"
-            className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold rounded-lg transition"
+            className="flex items-center gap-1.5 px-3 py-2 bg-slate-800/90 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg border border-slate-700 transition"
           >
-            <Kanban className="w-4 h-4 text-slate-600" />
+            <Kanban className="w-4 h-4 text-purple-300" />
             <span>Floor Board</span>
           </Link>
 
           <Link
             href="/dyeing/my-work"
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-purple-700 hover:bg-purple-800 text-white text-xs font-semibold rounded-lg shadow-xs transition"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold rounded-lg shadow-xs transition"
           >
             <Briefcase className="w-4 h-4" />
             <span>My Work Queue</span>

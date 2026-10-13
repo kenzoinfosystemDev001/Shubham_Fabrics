@@ -6,10 +6,10 @@ export default function NotFound() {
       <h2 className="text-2xl font-bold text-slate-800 mb-2">Page Not Found</h2>
       <p className="text-xs text-slate-500 mb-4">Could not find the requested resource.</p>
       <Link
-        href="/"
+        href="/login"
         className="px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold rounded-lg shadow-xs transition"
       >
-        Return Home
+        Return to Login
       </Link>
     </div>
   );

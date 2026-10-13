@@ -93,8 +93,8 @@ export default function QC1MyWorkPage() {
     quantityPassed: '',
     quantityFailed: '',
     quantityRework: '',
-    quantityHold: '',
-    result: 'PASS' as 'PASS' | 'REJECT' | 'REWORK' | 'HOLD' | 'FAIL',
+    quantityHold: '0',
+    result: 'PASS' as 'PASS' | 'REWORK' | 'REJECT',
     observedColor: '',
     defectType: 'SHADE_VARIATION',
     defectRemarks: '',
@@ -237,35 +237,37 @@ export default function QC1MyWorkPage() {
       return;
     }
 
-    const sumCategories = qPassed + qFailed + qRework + qHold;
+    const sumCategories = qPassed + qFailed + qRework;
     if (sumCategories > qInspected + 0.001) {
       setInspectionError(
-        `Sum of Passed (${qPassed}) + Failed (${qFailed}) + Rework (${qRework}) + Hold (${qHold}) = ${sumCategories}, which exceeds Quantity Inspected (${qInspected}).`
+        `Sum of Passed (${qPassed}) + Failed (${qFailed}) + Rework (${qRework}) = ${sumCategories}, which exceeds Quantity Inspected (${qInspected}).`
       );
       setSubmittingInspection(false);
       return;
     }
 
+    // Rule 4: Mandatory remarks for all decisions
+    const effectiveRemarks = (inspectionForm.remarks || inspectionForm.defectRemarks || inspectionForm.reworkReason).trim();
+    if (!effectiveRemarks) {
+      setInspectionError('A remark from the QC Incharge is strictly required for every decision (PASS, REWORK, or REJECT).');
+      setSubmittingInspection(false);
+      return;
+    }
+
     if (inspectionForm.result === 'PASS' && qPassed <= 0) {
-      setInspectionError('Result is set to PASS, but Passed Quantity is 0.');
+      setInspectionError('Result is set to PASS, but Passed Quantity is 0. Please enter the quantity approved for Embroidery.');
       setSubmittingInspection(false);
       return;
     }
 
-    if ((inspectionForm.result === 'REJECT' || inspectionForm.result === 'FAIL') && (qFailed <= 0 || (!inspectionForm.defectRemarks && !inspectionForm.remarks))) {
-      setInspectionError('Rejected quantity and a defect reason are strictly required for sending material to the Defective Shelf in Fabric Store.');
+    if (inspectionForm.result === 'REJECT' && qFailed <= 0) {
+      setInspectionError('Result is set to REJECT, but Rejected quantity is 0. Please enter the defective quantity for the Fabric Store Defective Shelf.');
       setSubmittingInspection(false);
       return;
     }
 
-    if (inspectionForm.result === 'REWORK' && (qRework <= 0 || (!inspectionForm.reworkReason && !inspectionForm.remarks))) {
-      setInspectionError('Rework quantity and a rework reason are required when sending material for Dyeing rework.');
-      setSubmittingInspection(false);
-      return;
-    }
-
-    if (inspectionForm.result === 'HOLD' && (qHold <= 0 || (!inspectionForm.holdReason && !inspectionForm.remarks))) {
-      setInspectionError('Hold quantity and a reason are required for HOLD.');
+    if (inspectionForm.result === 'REWORK' && qRework <= 0) {
+      setInspectionError('Result is set to REWORK, but Rework quantity is 0. Please enter the quantity to return to Dyeing.');
       setSubmittingInspection(false);
       return;
     }
@@ -290,7 +292,7 @@ export default function QC1MyWorkPage() {
                 {
                   defectType: inspectionForm.defectType,
                   count: Math.round(qFailed + qRework),
-                  severity: (inspectionForm.result === 'REJECT' || inspectionForm.result === 'FAIL') ? 'CRITICAL' : 'MAJOR',
+                  severity: inspectionForm.result === 'REJECT' ? 'CRITICAL' : 'MAJOR',
                 },
               ]
             : [],
@@ -1503,12 +1505,15 @@ export default function QC1MyWorkPage() {
                               <div className="flex items-center justify-between mb-1">
                                 <span className="text-sm font-black tracking-wide flex items-center gap-1.5 text-emerald-800">
                                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                                  PASS
+                                  1. PASS
                                 </span>
                               </div>
-                              <p className="text-xs text-emerald-900 font-semibold mt-1">
-                                it will go to Embroidery Department
+                              <p className="text-xs text-emerald-950 font-semibold mt-1">
+                                Dispatches to Embroidery Department
                               </p>
+                              <span className="text-[10px] text-emerald-700 block mt-0.5">
+                                Generates QC1 → Embroidery Dispatch Challan
+                              </span>
                             </div>
                           </button>
 
@@ -1536,12 +1541,15 @@ export default function QC1MyWorkPage() {
                               <div className="flex items-center justify-between mb-1">
                                 <span className="text-sm font-black tracking-wide flex items-center gap-1.5 text-purple-800">
                                   <RotateCcw className="w-4 h-4 text-purple-600 shrink-0" />
-                                  REWORK
+                                  2. REWORK
                                 </span>
                               </div>
-                              <p className="text-xs text-purple-900 font-semibold mt-1">
-                                Go back to Dyeing
+                              <p className="text-xs text-purple-950 font-semibold mt-1">
+                                Returns material to Dyeing
                               </p>
+                              <span className="text-[10px] text-purple-700 block mt-0.5">
+                                Must re-undergo QC1 inspection before reaching Embroidery
+                              </span>
                             </div>
                           </button>
 
@@ -1560,7 +1568,7 @@ export default function QC1MyWorkPage() {
                               });
                             }}
                             className={`p-4 rounded-xl border-2 text-left transition flex flex-col justify-between ${
-                              inspectionForm.result === 'REJECT' || inspectionForm.result === 'FAIL'
+                              inspectionForm.result === 'REJECT'
                                 ? 'border-rose-600 bg-rose-50/80 text-rose-950 font-bold shadow-xs ring-2 ring-rose-500/30'
                                 : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700'
                             }`}
@@ -1569,12 +1577,15 @@ export default function QC1MyWorkPage() {
                               <div className="flex items-center justify-between mb-1">
                                 <span className="text-sm font-black tracking-wide flex items-center gap-1.5 text-rose-800">
                                   <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0" />
-                                  REJECT
+                                  3. REJECT
                                 </span>
                               </div>
-                              <p className="text-xs text-rose-900 font-semibold mt-1">
-                                Go to defective shelf in fabric store
+                              <p className="text-xs text-rose-950 font-semibold mt-1">
+                                Fabric Store Defective Shelf
                               </p>
+                              <span className="text-[10px] text-rose-700 block mt-0.5">
+                                Barred from Embroidery approved stock
+                              </span>
                             </div>
                           </button>
                         </div>
@@ -1582,9 +1593,12 @@ export default function QC1MyWorkPage() {
 
                       {/* REMARKS INPUT FOR CHOSEN OUTCOME */}
                       <div className="space-y-1.5 pt-1">
-                        <label className="block text-xs font-bold text-slate-700">
-                          Remarks <span className="text-rose-500">*</span>
+                        <label className="block text-xs font-bold text-slate-800">
+                          QC Incharge Remark <span className="text-rose-500">*</span>
                         </label>
+                        <p className="text-[11px] text-slate-500">
+                          Mandatory for every decision (PASS, REWORK, or REJECT). Please enter observation notes or correction instructions.
+                        </p>
                         <textarea
                           rows={2}
                           value={inspectionForm.remarks}
@@ -1592,6 +1606,7 @@ export default function QC1MyWorkPage() {
                             setInspectionForm({ ...inspectionForm, remarks: e.target.value })
                           }
                           required
+                          placeholder="Enter mandatory QC Incharge remark..."
                           className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-1 focus:ring-emerald-500 focus:outline-none"
                         />
                       </div>

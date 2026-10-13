@@ -3,6 +3,38 @@ import { prisma } from '@subham/database';
 
 export const dynamic = 'force-dynamic';
 
+async function getFabricAvailability(
+  fabricName: string,
+  fabricColor: string,
+  requiredMeters: number,
+) {
+  const rolls = await prisma.fabricStoreRoll.findMany({
+    where: {
+      status: 'IN_STOCK',
+      qcStatus: 'PASSED',
+      batch: {
+        is: {
+          fabricDescription: { equals: fabricName, mode: 'insensitive' },
+          ...(fabricColor
+            ? { colorName: { equals: fabricColor, mode: 'insensitive' } }
+            : {}),
+        },
+      },
+    },
+    select: { length: true },
+  });
+  const availableMeters = rolls.reduce((total, roll) => total + Number(roll.length), 0);
+
+  return {
+    fabricName,
+    fabricColor: fabricColor || null,
+    availableMeters,
+    requiredMeters,
+    matchingRollCount: rolls.length,
+    sufficient: availableMeters >= requiredMeters,
+  };
+}
+
 function parseSafeDate(val: any, fallback?: Date | null): Date | null {
   if (!val) return fallback !== undefined ? fallback : null;
   if (val instanceof Date) {
@@ -39,9 +71,76 @@ function parseSafeDate(val: any, fallback?: Date | null): Date | null {
   return fallback !== undefined ? fallback : null;
 }
 
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const fabricName = searchParams.get('fabricName')?.trim() || '';
+  const fabricColor = searchParams.get('fabricColor')?.trim() || '';
+  const fabricAverage = Number(searchParams.get('fabricAverage'));
+  const productionQuantity = Number(searchParams.get('productionQuantity'));
+
+  if (!fabricName || !Number.isFinite(fabricAverage) || fabricAverage <= 0 ||
+      !Number.isInteger(productionQuantity) || productionQuantity <= 0) {
+    return NextResponse.json(
+      { error: 'Fabric name, meters per piece, and a positive production quantity are required.' },
+      { status: 400 },
+    );
+  }
+
+  try {
+    const availability = await getFabricAvailability(
+      fabricName,
+      fabricColor,
+      fabricAverage * productionQuantity,
+    );
+    return NextResponse.json(availability);
+  } catch (error: any) {
+    console.error('Error checking fabric availability:', error);
+    return NextResponse.json(
+      { error: error.message || 'Failed to check Fabric Store availability.' },
+      { status: 500 },
+    );
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const data = await request.json();
+    const targetStatus = data.status || 'DRAFT';
+    const fabricName = String(data.fabricName || data.fabric || '').trim();
+    const fabricAverage = Number(data.fabricAverage);
+    const productionQuantity = Number(data.targetQuantity || data.colorQuantity);
+
+    if (targetStatus === 'READY_FOR_ISSUE') {
+      if (!fabricName || !Number.isFinite(fabricAverage) || fabricAverage <= 0 ||
+          !Number.isInteger(productionQuantity) || productionQuantity <= 0) {
+        return NextResponse.json(
+          { error: 'Enter the fabric name, fabric average in meters per piece, and production quantity before marking the sheet ready.' },
+          { status: 400 },
+        );
+      }
+
+      if (data.fabricColorAvailable !== 'IN_STOCK') {
+        return NextResponse.json(
+          { error: 'A production sheet can only be marked ready when the selected fabric is available in the Fabric Store.' },
+          { status: 422 },
+        );
+      }
+
+      const availability = await getFabricAvailability(
+        fabricName,
+        String(data.fabricColor || '').trim(),
+        fabricAverage * productionQuantity,
+      );
+      if (!availability.sufficient) {
+        return NextResponse.json(
+          {
+            error: `Insufficient Fabric Store stock for ${fabricName}${availability.fabricColor ? ` (${availability.fabricColor})` : ''}: ${availability.availableMeters.toFixed(2)} m available, ${availability.requiredMeters.toFixed(2)} m required.`,
+            availability,
+          },
+          { status: 422 },
+        );
+      }
+    }
 
     // Check if updating an existing program by ID
     let existing: any = null;
@@ -145,7 +244,7 @@ export async function POST(request: Request) {
       styleCode: data.mainStyle || data.styleCode || 'STYLE-01',
       productCategory: data.productCategory || 'GARMENT',
       targetQuantity: targetQty,
-      status: data.status || 'DRAFT',
+      status: targetStatus,
       remarks: data.comments || data.remarks || null,
       createdById: actorId,
 
@@ -213,7 +312,7 @@ export async function POST(request: Request) {
       if (data.fabricName || data.fabric) {
         const fabName = data.fabricName || data.fabric;
         const avg = parseFloat(data.fabricAverage) || 1.25;
-        const requiredQty = Math.round(targetQty * avg);
+        const requiredQty = targetQty * avg;
         await tx.programFabric.create({
           data: {
             programId: created.id,
@@ -224,7 +323,7 @@ export async function POST(request: Request) {
             gsm: 180,
             colour: data.fabricColor || data.color || 'Standard',
             requiredQuantity: requiredQty,
-            uom: 'KG',
+            uom: 'MTR',
           },
         });
       }

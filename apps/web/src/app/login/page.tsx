@@ -2,9 +2,96 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ShubhamLogo } from '@/components/ShubhamLogo';
 import { api } from '@/lib/api';
-import { Shield, Cpu, Warehouse, Lock, ArrowRight, User, Droplet, CheckCircle2 } from 'lucide-react';
+import { getUserStationHome } from '@/lib/rbac';
+import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
+import {
+  Shield,
+  Cpu,
+  Warehouse,
+  Lock,
+  ArrowRight,
+  User,
+  Droplet,
+  CheckCircle2,
+  Scissors,
+} from 'lucide-react';
+
+interface StationOption {
+  id: string;
+  name: string;
+  username: string;
+  icon: React.ComponentType<{ className?: string }>;
+  accentColor: string;
+  borderActive: string;
+  bgActive: string;
+}
+
+const STATIONS: StationOption[] = [
+  {
+    id: 'admin',
+    name: 'Admin',
+    username: 'admin',
+    icon: Shield,
+    accentColor: 'text-indigo-400',
+    borderActive: 'border-indigo-500/80 shadow-[0_0_15px_rgba(99,102,241,0.25)]',
+    bgActive: 'bg-indigo-500/15 text-white',
+  },
+  {
+    id: 'program',
+    name: 'Programming',
+    username: 'program',
+    icon: Cpu,
+    accentColor: 'text-amber-400',
+    borderActive: 'border-amber-500/80 shadow-[0_0_15px_rgba(245,158,11,0.25)]',
+    bgActive: 'bg-amber-500/15 text-white',
+  },
+  {
+    id: 'store',
+    name: 'Fabric Store',
+    username: 'store',
+    icon: Warehouse,
+    accentColor: 'text-teal-400',
+    borderActive: 'border-teal-500/80 shadow-[0_0_15px_rgba(20,184,166,0.25)]',
+    bgActive: 'bg-teal-500/15 text-white',
+  },
+  {
+    id: 'dyeing',
+    name: 'Dyeing',
+    username: 'dyeing',
+    icon: Droplet,
+    accentColor: 'text-purple-400',
+    borderActive: 'border-purple-500/80 shadow-[0_0_15px_rgba(168,85,247,0.25)]',
+    bgActive: 'bg-purple-500/15 text-white',
+  },
+  {
+    id: 'qc1',
+    name: 'QC1 Dept',
+    username: 'qc1',
+    icon: CheckCircle2,
+    accentColor: 'text-emerald-400',
+    borderActive: 'border-emerald-500/80 shadow-[0_0_15px_rgba(16,185,129,0.25)]',
+    bgActive: 'bg-emerald-500/15 text-white',
+  },
+  {
+    id: 'embroidery',
+    name: 'Embroidery',
+    username: 'embroidery',
+    icon: Scissors,
+    accentColor: 'text-fuchsia-400',
+    borderActive: 'border-fuchsia-500/80 shadow-[0_0_15px_rgba(217,70,239,0.25)]',
+    bgActive: 'bg-fuchsia-500/15 text-white',
+  },
+  {
+    id: 'cutting',
+    name: 'Thread Cutting',
+    username: 'cutting',
+    icon: Scissors,
+    accentColor: 'text-cyan-400',
+    borderActive: 'border-cyan-500/80 shadow-[0_0_15px_rgba(6,182,212,0.25)]',
+    bgActive: 'bg-cyan-500/15 text-white',
+  },
+];
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,10 +100,9 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Quick switch role preset
-  const selectPreset = (u: string, p: string) => {
-    setUsername(u);
-    setPin(p);
+  const selectStation = (stationUsername: string) => {
+    setUsername(stationUsername);
+    setPin('1234');
     setError(null);
   };
 
@@ -39,208 +125,147 @@ export default function LoginPage() {
         document.cookie = `subham_mes_dept=${res.user.departmentCode}; path=/; max-age=604800; SameSite=Lax`;
       }
 
-      // Role-based redirect
-      const target =
-        res.user.defaultRedirect ||
-        (res.user.role === 'ADMIN'
-          ? '/admin'
-          : res.user.departmentCode === 'STORE' || res.user.role === 'FABRIC_STORE'
-          ? '/fabric-store'
-          : '/');
-
-      router.push(target);
+      const target = res.user.defaultRedirect || getUserStationHome(res.user);
+      router.replace(target);
     } catch (err: any) {
-      setError(err.message || 'Invalid username or PIN. Please verify credentials.');
+      setError(err.message || 'Invalid credentials. Please verify username and PIN.');
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div className="min-h-screen w-full flex flex-col md:flex-row bg-[#FAF8F5]">
-      {/* LEFT BRANDING PANEL */}
-      <div className="w-full md:w-1/2 flex items-center justify-center p-8 lg:p-16 border-b md:border-b-0 md:border-r border-[#E5E0D8]/80 bg-[#FAF8F5]">
-        <div className="w-full max-w-lg flex flex-col items-center justify-center">
-          <ShubhamLogo size="hero" showSubtitle={true} />
+  const activeStation = STATIONS.find(
+    (s) =>
+      s.username.toLowerCase() === username.trim().toLowerCase() ||
+      (s.username === 'program' && username.trim().toLowerCase() === 'programmer')
+  );
 
-          <div className="mt-8 text-center max-w-sm">
-            <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#163767]/80 block mb-1">
-              Enterprise MES Architecture
-            </span>
-            <p className="text-xs text-slate-600 leading-relaxed font-serif">
-              Digital Production Program, Challan Management &amp; Shop-Floor Execution System
-            </p>
+  return (
+    <div className="relative min-h-screen w-full flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-[#090D16] overflow-hidden select-none font-sans">
+      {/* BACKGROUND TEXTURE & AMBIENT GLOWS */}
+      <div
+        className="absolute inset-0 opacity-15 bg-center bg-cover pointer-events-none filter blur-xs"
+        style={{
+          backgroundImage: `url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+        }}
+      />
+      <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
+      <div className="absolute inset-0 bg-radial-gradient from-transparent via-[#090D16]/70 to-[#090D16] pointer-events-none" />
+
+      {/* CENTERED PREMIUM GLASS CARD */}
+      <div className="relative z-10 w-full max-w-[460px] bg-slate-900/80 backdrop-blur-xl border border-slate-700/60 rounded-3xl p-7 sm:p-9 shadow-2xl shadow-black/60">
+        
+        {/* BRANDING HEADER */}
+        <div className="flex flex-col items-center text-center mb-7">
+          <div className="w-16 h-16 rounded-2xl bg-white p-1.5 shadow-lg border border-amber-500/30 flex items-center justify-center mb-3.5 transition-transform hover:scale-105">
+            <img
+              src="/shubham-logo.jpg"
+              alt="Shubham Fabrics"
+              className="w-full h-full object-contain"
+            />
+          </div>
+          <h1 className="text-base sm:text-lg font-bold tracking-[0.18em] uppercase text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-white to-amber-100">
+            Shubham Fabrics
+          </h1>
+          <span className="text-[10px] font-semibold tracking-[0.25em] uppercase text-slate-400 mt-0.5">
+            Enterprise Portal
+          </span>
+        </div>
+
+        {/* REFINED STATION SELECTOR */}
+        <div className="mb-6">
+          <div className="grid grid-cols-3 gap-2">
+            {STATIONS.map((station) => {
+              const Icon = station.icon;
+              const isSelected = activeStation?.id === station.id;
+              return (
+                <button
+                  key={station.id}
+                  type="button"
+                  onClick={() => selectStation(station.username)}
+                  className={`relative p-2.5 rounded-xl border text-center transition-all duration-200 flex flex-col items-center gap-1.5 cursor-pointer ${
+                    isSelected
+                      ? `${station.borderActive} ${station.bgActive}`
+                      : 'border-slate-800 bg-slate-800/40 hover:bg-slate-800/70 text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <Icon
+                    className={`w-4 h-4 ${
+                      isSelected ? station.accentColor : 'text-slate-500'
+                    }`}
+                  />
+                  <span className="text-xs font-semibold tracking-wide">
+                    {station.name}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
-      </div>
 
-      {/* RIGHT SIGN IN PANEL */}
-      <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-6 lg:p-16 bg-[#F4F5F7]">
-        <div className="w-full max-w-[440px] bg-white rounded-2xl shadow-md border border-slate-200/90 p-8 sm:p-10">
-          
-          {/* Header */}
-          <div className="mb-6">
-            <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#A66E22] block mb-1">
-              SHUBHAM FABRICS INDIA PVT. LTD.
-            </span>
-            <h2 className="text-2xl font-bold tracking-tight text-slate-900">
-              Manufacturing Execution System
-            </h2>
-            <p className="text-xs text-slate-500 mt-1">
-              Sign in with your authorized station credentials or PIN.
-            </p>
+        {/* ERROR MESSAGE */}
+        {error && (
+          <div className="mb-5 p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-xs text-rose-300 flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0"></span>
+            <span>{error}</span>
           </div>
+        )}
 
-          {/* QUICK ROLE SELECTOR TABS */}
-          <div className="mb-6">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">
-              Select Factory Station / Role
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              <button
-                type="button"
-                onClick={() => selectPreset('admin', '1234')}
-                className={`p-2.5 rounded-xl border text-center transition flex flex-col items-center gap-1.5 ${
-                  username === 'admin'
-                    ? 'border-indigo-600 bg-indigo-50/80 text-indigo-950 font-bold shadow-xs'
-                    : 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700'
-                }`}
-              >
-                <Shield className={`w-4 h-4 ${username === 'admin' ? 'text-indigo-600' : 'text-slate-500'}`} />
-                <span className="text-xs leading-none">Admin</span>
-                <span className="text-[9px] text-slate-400 font-mono">admin</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => selectPreset('program', '1234')}
-                className={`p-2.5 rounded-xl border text-center transition flex flex-col items-center gap-1.5 ${
-                  username === 'program' || username === 'programmer'
-                    ? 'border-blue-600 bg-blue-50/80 text-blue-950 font-bold shadow-xs'
-                    : 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700'
-                }`}
-              >
-                <Cpu className={`w-4 h-4 ${username === 'program' || username === 'programmer' ? 'text-blue-600' : 'text-slate-500'}`} />
-                <span className="text-xs leading-none">Programming</span>
-                <span className="text-[9px] text-slate-400 font-mono">program</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => selectPreset('store', '1234')}
-                className={`p-2.5 rounded-xl border text-center transition flex flex-col items-center gap-1.5 ${
-                  username === 'store'
-                    ? 'border-teal-600 bg-teal-50/80 text-teal-950 font-bold shadow-xs'
-                    : 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700'
-                }`}
-              >
-                <Warehouse className={`w-4 h-4 ${username === 'store' ? 'text-teal-600' : 'text-slate-500'}`} />
-                <span className="text-xs leading-none">Fabric Store</span>
-                <span className="text-[9px] text-slate-400 font-mono">store</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => selectPreset('dyeing', '1234')}
-                className={`p-2.5 rounded-xl border text-center transition flex flex-col items-center gap-1.5 ${
-                  username === 'dyeing'
-                    ? 'border-purple-600 bg-purple-50/80 text-purple-950 font-bold shadow-xs'
-                    : 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700'
-                }`}
-              >
-                <Droplet className={`w-4 h-4 ${username === 'dyeing' ? 'text-purple-600' : 'text-slate-500'}`} />
-                <span className="text-xs leading-none">Dyeing</span>
-                <span className="text-[9px] text-slate-400 font-mono">dyeing</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => selectPreset('qc1', '1234')}
-                className={`p-2.5 rounded-xl border text-center transition flex flex-col items-center gap-1.5 ${
-                  username === 'qc1' || username === 'qc_insp'
-                    ? 'border-emerald-600 bg-emerald-50/80 text-emerald-950 font-bold shadow-xs'
-                    : 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700'
-                }`}
-              >
-                <CheckCircle2 className={`w-4 h-4 ${username === 'qc1' || username === 'qc_insp' ? 'text-emerald-600' : 'text-slate-500'}`} />
-                <span className="text-xs leading-none">QC1 Dept</span>
-                <span className="text-[9px] text-slate-400 font-mono">qc1</span>
-              </button>
+        {/* SIGN IN FORM */}
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div>
+            <div className="relative">
+              <input
+                type="text"
+                required
+                autoComplete="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Station ID"
+                className="w-full pl-10 pr-4 py-3 bg-slate-950/60 border border-slate-700/60 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400/80 focus:ring-1 focus:ring-amber-400/40 transition"
+              />
+              <User className="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5" />
             </div>
           </div>
 
-          {error && (
-            <div className="mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl flex items-center gap-2">
-              <span className="font-bold">Error:</span> {error}
-            </div>
-          )}
-
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-wider">
-                Username / Station ID
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  required
-                  autoComplete="username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="admin, program, store..."
-                  className="w-full pl-9 pr-3.5 py-2.5 bg-[#EFF4FA] border border-[#D5E1F0] rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#163767] focus:border-transparent transition"
-                />
-                <User className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-wider">
-                PIN / Station Password
-              </label>
-              <div className="relative">
-                <input
-                  type="password"
-                  required
-                  autoComplete="current-password"
-                  value={pin}
-                  onChange={(e) => setPin(e.target.value)}
-                  placeholder="••••"
-                  className="w-full pl-9 pr-3.5 py-2.5 bg-[#EFF4FA] border border-[#D5E1F0] rounded-xl text-sm text-slate-900 placeholder-slate-400 tracking-widest focus:outline-none focus:ring-2 focus:ring-[#163767] focus:border-transparent transition"
-                />
-                <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full mt-3 py-3 px-4 bg-[#163767] hover:bg-[#0F264A] text-white text-sm font-semibold rounded-xl shadow-sm transition flex items-center justify-center gap-2 disabled:opacity-50"
-            >
-              {loading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Authenticating Station...</span>
-                </>
-              ) : (
-                <>
-                  <span>Sign In to MES</span>
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </button>
-          </form>
-
-          {/* Quick PIN Info */}
-          <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-            <div>
-              <span className="font-semibold text-slate-700">Station PIN: </span>
-              <span className="font-mono text-slate-600 font-bold">1234</span>
-            </div>
-            <div className="text-[11px] text-slate-400">
-              Role-Based Access Control (RBAC)
+          <div>
+            <div className="relative">
+              <input
+                type="password"
+                required
+                autoComplete="current-password"
+                value={pin}
+                onChange={(e) => setPin(e.target.value)}
+                placeholder="Security PIN"
+                className="w-full pl-10 pr-4 py-3 bg-slate-950/60 border border-slate-700/60 rounded-xl text-sm text-white placeholder-slate-500 tracking-wider focus:outline-none focus:border-amber-400/80 focus:ring-1 focus:ring-amber-400/40 transition"
+              />
+              <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5" />
             </div>
           </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full mt-2 py-3.5 px-4 bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-400 hover:via-amber-500 hover:to-amber-600 text-slate-950 font-bold text-xs uppercase tracking-[0.14em] rounded-xl shadow-lg shadow-amber-500/20 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+          >
+            {loading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></div>
+                <span>Signing In...</span>
+              </>
+            ) : (
+              <>
+                <span>Sign In</span>
+                <ArrowRight className="w-4 h-4" />
+              </>
+            )}
+          </button>
+        </form>
+
+        {/* MINIMAL FOOTER */}
+        <div className="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-center text-[11px] text-slate-500 tracking-wide">
+          <span>Protected Enterprise Session</span>
         </div>
       </div>
     </div>
