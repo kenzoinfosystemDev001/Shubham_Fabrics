@@ -1,3 +1,4 @@
+
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import { syncInboundChallansToDyeingOrders } from '@/lib/dyeing-sync';
@@ -14,12 +15,14 @@ export async function GET(request: Request) {
     const programId = searchParams.get('programId');
 
     const where: any = {};
+
     if (department) {
       where.OR = [
         { fromDepartment: department },
         { toDepartment: department },
       ];
     }
+
     if (fromDepartment) where.fromDepartment = fromDepartment;
     if (toDepartment) where.toDepartment = toDepartment;
     if (status) where.status = status;
@@ -42,7 +45,13 @@ export async function GET(request: Request) {
         },
         fromDeptRel: true,
         toDeptRel: true,
-        createdBy: { select: { id: true, username: true, fullName: true } },
+        createdBy: {
+          select: {
+            id: true,
+            username: true,
+            fullName: true,
+          },
+        },
         items: true,
       },
       orderBy: { createdAt: 'desc' },
@@ -51,40 +60,63 @@ export async function GET(request: Request) {
     return NextResponse.json(challans);
   } catch (error: any) {
     console.error('Error fetching challans:', error);
-    return NextResponse.json({ error: error.message || 'Failed to fetch challans' }, { status: 500 });
+
+    return NextResponse.json(
+      { error: error.message || 'Failed to fetch challans' },
+      { status: 500 }
+    );
   }
 }
 
 function parseSafeDate(val: any, fallback?: Date | null): Date | null {
-  if (!val) return fallback !== undefined ? fallback : null;
-  if (val instanceof Date) {
-    return isNaN(val.getTime()) ? (fallback !== undefined ? fallback : null) : val;
+  if (!val) {
+    return fallback !== undefined ? fallback : null;
   }
+
+  if (val instanceof Date) {
+    return isNaN(val.getTime())
+      ? fallback !== undefined ? fallback : null
+      : val;
+  }
+
   if (typeof val === 'string') {
     const trimmed = val.trim();
-    if (!trimmed) return fallback !== undefined ? fallback : null;
 
-    const dmyMatch = trimmed.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/);
+    if (!trimmed) {
+      return fallback !== undefined ? fallback : null;
+    }
+
+    const dmyMatch = trimmed.match(
+      /^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/
+    );
+
     if (dmyMatch) {
       const day = parseInt(dmyMatch[1], 10);
       const month = parseInt(dmyMatch[2], 10) - 1;
       const year = parseInt(dmyMatch[3], 10);
       const d = new Date(Date.UTC(year, month, day, 12, 0, 0));
+
       if (!isNaN(d.getTime())) return d;
     }
 
-    const ymdMatch = trimmed.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})$/);
+    const ymdMatch = trimmed.match(
+      /^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})$/
+    );
+
     if (ymdMatch) {
       const year = parseInt(ymdMatch[1], 10);
       const month = parseInt(ymdMatch[2], 10) - 1;
       const day = parseInt(ymdMatch[3], 10);
       const d = new Date(Date.UTC(year, month, day, 12, 0, 0));
+
       if (!isNaN(d.getTime())) return d;
     }
 
     const parsed = new Date(trimmed);
+
     if (!isNaN(parsed.getTime())) return parsed;
   }
+
   return fallback !== undefined ? fallback : null;
 }
 
@@ -94,18 +126,34 @@ export async function POST(request: Request) {
 
     // 1. Resolve Actor ID reliably
     let user = null;
+
     if (body.issuedById) {
-      user = await prisma.user.findUnique({ where: { id: body.issuedById }, select: { id: true } }).catch(() => null);
+      user = await prisma.user.findUnique({
+        where: { id: body.issuedById },
+        select: { id: true },
+      }).catch(() => null);
     }
+
     if (!user) {
       user = await prisma.user.findFirst({
-        where: { OR: [{ username: 'store' }, { username: 'programmer' }, { username: 'admin' }, { username: 'jitender' }] },
+        where: {
+          OR: [
+            { username: 'store' },
+            { username: 'programmer' },
+            { username: 'admin' },
+            { username: 'jitender' },
+          ],
+        },
         select: { id: true },
       });
     }
+
     if (!user) {
-      user = await prisma.user.findFirst({ select: { id: true } });
+      user = await prisma.user.findFirst({
+        select: { id: true },
+      });
     }
+
     if (!user) {
       user = await prisma.user.create({
         data: {
@@ -118,10 +166,12 @@ export async function POST(request: Request) {
         select: { id: true },
       });
     }
+
     const actorId = user.id;
 
     // 2. Resolve Program ID reliably
     let resolvedProgramId = body.programId;
+
     if (resolvedProgramId) {
       const prog = await prisma.program.findFirst({
         where: {
@@ -133,26 +183,35 @@ export async function POST(request: Request) {
         },
         select: { id: true },
       });
+
       if (prog) {
         resolvedProgramId = prog.id;
       } else {
-        // Fallback to first available program if passed an invalid id
-        const firstProg = await prisma.program.findFirst({ select: { id: true } });
+        const firstProg = await prisma.program.findFirst({
+          select: { id: true },
+        });
+
         if (firstProg) resolvedProgramId = firstProg.id;
       }
     } else {
-      const firstProg = await prisma.program.findFirst({ select: { id: true } });
+      const firstProg = await prisma.program.findFirst({
+        select: { id: true },
+      });
+
       if (firstProg) resolvedProgramId = firstProg.id;
     }
 
     if (!resolvedProgramId) {
       return NextResponse.json(
-        { error: 'Cannot issue challan without an active Program in the database.' },
+        {
+          error:
+            'Cannot issue challan without an active Program in the database.',
+        },
         { status: 400 }
       );
     }
 
-    // 3. Ensure fromDepartment and toDepartment exist in Department table (Foreign Key safety)
+    // 3. Ensure departments exist in the Department table
     const fromDept = (body.fromDepartment || 'PROGRAMMING').toUpperCase();
     const toDept = (body.toDepartment || 'STORE').toUpperCase();
 
@@ -161,7 +220,10 @@ export async function POST(request: Request) {
       update: {},
       create: {
         code: fromDept,
-        name: fromDept === 'PROGRAMMING' ? 'Programming Department' : `${fromDept} Department`,
+        name:
+          fromDept === 'PROGRAMMING'
+            ? 'Programming Department'
+            : `${fromDept} Department`,
         sequenceOrder: fromDept === 'PROGRAMMING' ? 0 : 99,
         description: `${fromDept} MES Department`,
       },
@@ -172,35 +234,52 @@ export async function POST(request: Request) {
       update: {},
       create: {
         code: toDept,
-        name: toDept === 'STORE' ? 'Raw Material & Fabric Store' : `${toDept} Department`,
+        name:
+          toDept === 'STORE'
+            ? 'Raw Material & Fabric Store'
+            : `${toDept} Department`,
         sequenceOrder: toDept === 'STORE' ? 1 : 99,
         description: `${toDept} MES Department`,
       },
     });
 
-    // 4. Resolve Unique Challan Number
+    // 4. Resolve unique challan number
     const year = new Date().getFullYear();
-    const deptPrefixCode = fromDept === 'PROGRAMMING' ? 'PRG' : fromDept === 'STORE' ? 'STR' : fromDept === 'DYEING' ? 'DYE' : fromDept;
+
+    const deptPrefixCode =
+      fromDept === 'PROGRAMMING'
+        ? 'PRG'
+        : fromDept === 'STORE'
+          ? 'STR'
+          : fromDept === 'DYEING'
+            ? 'DYE'
+            : fromDept;
+
     const prefix = `CH-${deptPrefixCode}-${year}-`;
 
     let challanNumber = body.challanNumber;
+
     if (!challanNumber) {
       const count = await prisma.challan.count({
-        where: { challanNumber: { startsWith: prefix } },
+        where: {
+          challanNumber: { startsWith: prefix },
+        },
       });
+
       challanNumber = `${prefix}${String(count + 1).padStart(5, '0')}`;
     }
 
-    // Collision check to prevent unique constraint crash
+    // Collision check
     const existingChallan = await prisma.challan.findUnique({
       where: { challanNumber },
       select: { id: true },
     });
+
     if (existingChallan) {
       challanNumber = `${prefix}${Date.now().toString().slice(-5)}`;
     }
 
-    // 5. Transactional Challan Creation
+    // 5. Transactional challan creation
     const created = await prisma.$transaction(async (tx) => {
       const challan = await tx.challan.create({
         data: {
@@ -214,20 +293,25 @@ export async function POST(request: Request) {
           createdById: actorId,
           issuedById: actorId,
           issuedDate: parseSafeDate(body.issuedDate, new Date()) || new Date(),
-          remarks: [
-            body.remarks,
-            body.vehicleNumber ? `Vehicle: ${body.vehicleNumber}` : null,
-            body.driverName ? `Driver: ${body.driverName}` : null,
-          ].filter(Boolean).join(' | ') || null,
+          remarks:
+            [
+              body.remarks,
+              body.vehicleNumber ? `Vehicle: ${body.vehicleNumber}` : null,
+              body.driverName ? `Driver: ${body.driverName}` : null,
+            ]
+              .filter(Boolean)
+              .join(' | ') || null,
         },
       });
 
       // Prepare items
-      const rawItems = (Array.isArray(body.items) && body.items.length > 0)
-        ? body.items
-        : [
+      const rawItems =
+        Array.isArray(body.items) && body.items.length > 0
+          ? body.items
+          : [
             {
-              itemDescription: body.itemDescription || 'Production Material Lot',
+              itemDescription:
+                body.itemDescription || 'Production Material Lot',
               unitType: 'ROLL',
               quantity: Number(body.quantity || 1),
               uom: body.uom || 'PCS',
@@ -239,7 +323,10 @@ export async function POST(request: Request) {
         await tx.challanItem.create({
           data: {
             challanId: challan.id,
-            itemDescription: item.itemDescription || item.description || 'Production Material Lot',
+            itemDescription:
+              item.itemDescription ||
+              item.description ||
+              'Production Material Lot',
             unitType: item.unitType || 'ROLL',
             quantity: Number(item.quantity || 1),
             uom: item.uom || 'MTR',
@@ -252,7 +339,7 @@ export async function POST(request: Request) {
         });
       }
 
-      // Update linked program status to ISSUED
+      // Update linked program status
       try {
         await tx.program.update({
           where: { id: resolvedProgramId },
@@ -266,6 +353,7 @@ export async function POST(request: Request) {
     });
 
     // If dispatched to Dyeing, immediately sync to DyeingOrders
+    // 6. Sync inbound challans to DyeingOrders once when sent to Dyeing
     if (toDept === 'DYEING' || toDept.includes('DYE')) {
       try {
         await syncInboundChallansToDyeingOrders();
@@ -274,12 +362,19 @@ export async function POST(request: Request) {
       }
     }
 
+    // 7. Return the complete challan
     const fullChallan = await prisma.challan.findUnique({
       where: { id: created.id },
       include: {
         program: true,
         items: true,
-        createdBy: { select: { id: true, username: true, fullName: true } },
+        createdBy: {
+          select: {
+            id: true,
+            username: true,
+            fullName: true,
+          },
+        },
         dyeingInboundOrders: true,
       },
     });
@@ -287,6 +382,10 @@ export async function POST(request: Request) {
     return NextResponse.json(fullChallan, { status: 201 });
   } catch (error: any) {
     console.error('Error creating challan:', error);
-    return NextResponse.json({ error: error.message || 'Failed to create challan' }, { status: 500 });
+
+    return NextResponse.json(
+      { error: error.message || 'Failed to create challan' },
+      { status: 500 }
+    );
   }
 }

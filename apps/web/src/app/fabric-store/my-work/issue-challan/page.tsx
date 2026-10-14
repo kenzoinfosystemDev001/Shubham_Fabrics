@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
@@ -277,7 +277,7 @@ function FabricStoreIssueChallanContent() {
       if (destinationDept === 'DYEING') {
         try {
           await fetch('/api/dyeing/sync', { method: 'POST' });
-        } catch {}
+        } catch { }
       }
 
       setIssuedChallan({
@@ -325,7 +325,7 @@ function FabricStoreIssueChallanContent() {
           </div>
           <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2 mt-0.5">
             <Send className="w-5 h-5 text-emerald-600" />
-            Issue Challan to Production (Fabric Store → Dyeing / Embroidery)
+            Issue Challan to Production (Fabric Store â†’ Dyeing / Embroidery)
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
             Dispatches approved fabric lots along with linked Production Sheet traveler directly to Dyeing or Embroidery
@@ -433,7 +433,7 @@ function FabricStoreIssueChallanContent() {
                   className="flex items-center gap-2 px-4 py-2.5 bg-purple-700 hover:bg-purple-800 text-white text-xs font-semibold rounded-lg shadow-xs transition"
                 >
                   <Droplet className="w-4 h-4" />
-                  <span>Open in Dyeing Department →</span>
+                  <span>Open in Dyeing Department â†’</span>
                 </Link>
               )}
 
@@ -509,7 +509,7 @@ function FabricStoreIssueChallanContent() {
                   >
                     {programs.map((p) => (
                       <option key={p.id} value={p.id}>
-                        {p.programNumber || p.programSerialNo} — {p.clientName || p.buyerName} ({p.mainStyle || p.styleCode || 'Style'}) · {p.targetQuantity || p.colorQuantity || 0} PCS
+                        {p.programNumber || p.programSerialNo} â€” {p.clientName || p.buyerName} ({p.mainStyle || p.styleCode || 'Style'}) Â· {p.targetQuantity || p.colorQuantity || 0} PCS
                       </option>
                     ))}
                   </select>
@@ -547,32 +547,31 @@ function FabricStoreIssueChallanContent() {
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs">
                     <div>
                       <span className="text-slate-500 block text-[10px] uppercase">Buyer / Client</span>
-                      <strong className="text-slate-900 font-semibold">{selectedProgram.clientName || selectedProgram.buyerName || '—'}</strong>
+                      <strong className="text-slate-900 font-semibold">{selectedProgram.clientName || selectedProgram.buyerName || 'â€”'}</strong>
                     </div>
                     <div>
                       <span className="text-slate-500 block text-[10px] uppercase">Main Style</span>
-                      <strong className="text-slate-900 font-semibold">{selectedProgram.mainStyle || selectedProgram.styleCode || '—'}</strong>
+                      <strong className="text-slate-900 font-semibold">{selectedProgram.mainStyle || selectedProgram.styleCode || 'â€”'}</strong>
                     </div>
                     <div>
                       <span className="text-slate-500 block text-[10px] uppercase">Wilcom Design #</span>
-                      <strong className="font-mono text-teal-900">{selectedProgram.wilcomDesignNumber || '—'}</strong>
+                      <strong className="font-mono text-teal-900">{selectedProgram.wilcomDesignNumber || 'â€”'}</strong>
                     </div>
                     <div>
                       <span className="text-slate-500 block text-[10px] uppercase">Fabric Quality</span>
-                      <strong className="text-slate-900 font-semibold">{selectedProgram.fabricName || '—'}</strong>
+                      <strong className="text-slate-900 font-semibold">{selectedProgram.fabricName || 'â€”'}</strong>
                     </div>
                     <div>
                       <span className="text-slate-500 block text-[10px] uppercase">Fabric Composition</span>
-                      <span className="text-slate-700">{selectedProgram.fabricType || '—'}</span>
+                      <span className="text-slate-700">{selectedProgram.fabricType || 'â€”'}</span>
                     </div>
                     <div>
                       <span className="text-slate-500 block text-[10px] uppercase">Dyeing Required</span>
                       <span
-                        className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold ${
-                          selectedProgram.fabricDyeingRequired
+                        className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold ${selectedProgram.fabricDyeingRequired
                             ? 'bg-purple-100 text-purple-800'
                             : 'bg-slate-200 text-slate-700'
-                        }`}
+                          }`}
                       >
                         {selectedProgram.fabricDyeingRequired ? 'YES (Dyeing Needed)' : 'NO (Pre-Dyed/Ready)'}
                       </span>
@@ -582,7 +581,7 @@ function FabricStoreIssueChallanContent() {
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs pt-1 border-t border-slate-200/60">
                     <div>
                       <span className="text-slate-500 block text-[10px] uppercase">Fabric Color / Shade</span>
-                      <strong className="text-slate-800">{selectedProgram.fabricColor || '—'}</strong>
+                      <strong className="text-slate-800">{selectedProgram.fabricColor || 'â€”'}</strong>
                     </div>
                     <div>
                       <span className="text-slate-500 block text-[10px] uppercase">Target Qty</span>
@@ -593,13 +592,13 @@ function FabricStoreIssueChallanContent() {
                     <div>
                       <span className="text-slate-500 block text-[10px] uppercase">Fabric Average</span>
                       <span className="font-mono text-slate-700">
-                        {selectedProgram.fabricAverage ? `${selectedProgram.fabricAverage} ${selectedProgram.fabricAverageType || 'Mtr/Pc'}` : '—'}
+                        {selectedProgram.fabricAverage ? `${selectedProgram.fabricAverage} ${selectedProgram.fabricAverageType || 'Mtr/Pc'}` : 'â€”'}
                       </span>
                     </div>
                     <div>
                       <span className="text-slate-500 block text-[10px] uppercase">Delivery Target</span>
                       <span className="font-mono text-slate-700">
-                        {selectedProgram.deliveryDate ? new Date(selectedProgram.deliveryDate).toLocaleDateString() : '—'}
+                        {selectedProgram.deliveryDate ? new Date(selectedProgram.deliveryDate).toLocaleDateString() : 'â€”'}
                       </span>
                     </div>
                   </div>
@@ -624,11 +623,10 @@ function FabricStoreIssueChallanContent() {
               {/* RECOMMENDATION BANNER */}
               {selectedProgram && (
                 <div
-                  className={`p-3 rounded-xl border text-xs flex items-center gap-2 ${
-                    selectedProgram.fabricDyeingRequired
+                  className={`p-3 rounded-xl border text-xs flex items-center gap-2 ${selectedProgram.fabricDyeingRequired
                       ? 'bg-purple-50/80 border-purple-200 text-purple-900'
                       : 'bg-emerald-50/80 border-emerald-200 text-emerald-900'
-                  }`}
+                    }`}
                 >
                   <Sparkles className="w-4 h-4 shrink-0" />
                   <span>
@@ -649,20 +647,18 @@ function FabricStoreIssueChallanContent() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div
                   onClick={() => setDestinationDept('DYEING')}
-                  className={`p-4 rounded-xl border-2 cursor-pointer transition relative ${
-                    destinationDept === 'DYEING'
+                  className={`p-4 rounded-xl border-2 cursor-pointer transition relative ${destinationDept === 'DYEING'
                       ? 'border-purple-600 bg-purple-50/40 shadow-xs'
                       : 'border-slate-200 hover:border-slate-300 bg-white'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
                       <div
-                        className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                          destinationDept === 'DYEING'
+                        className={`w-10 h-10 rounded-lg flex items-center justify-center ${destinationDept === 'DYEING'
                             ? 'bg-purple-600 text-white'
                             : 'bg-slate-100 text-slate-600'
-                        }`}
+                          }`}
                       >
                         <Droplet className="w-5 h-5" />
                       </div>
@@ -686,20 +682,18 @@ function FabricStoreIssueChallanContent() {
 
                 <div
                   onClick={() => setDestinationDept('EMBROIDERY')}
-                  className={`p-4 rounded-xl border-2 cursor-pointer transition relative ${
-                    destinationDept === 'EMBROIDERY'
+                  className={`p-4 rounded-xl border-2 cursor-pointer transition relative ${destinationDept === 'EMBROIDERY'
                       ? 'border-emerald-600 bg-emerald-50/40 shadow-xs'
                       : 'border-slate-200 hover:border-slate-300 bg-white'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
                       <div
-                        className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                          destinationDept === 'EMBROIDERY'
+                        className={`w-10 h-10 rounded-lg flex items-center justify-center ${destinationDept === 'EMBROIDERY'
                             ? 'bg-emerald-600 text-white'
                             : 'bg-slate-100 text-slate-600'
-                        }`}
+                          }`}
                       >
                         <Building2 className="w-5 h-5" />
                       </div>
@@ -743,22 +737,20 @@ function FabricStoreIssueChallanContent() {
                   <button
                     type="button"
                     onClick={() => setDispatchMode('DIRECT_LOT')}
-                    className={`px-3 py-1.5 rounded-md font-semibold transition ${
-                      dispatchMode === 'DIRECT_LOT'
+                    className={`px-3 py-1.5 rounded-md font-semibold transition ${dispatchMode === 'DIRECT_LOT'
                         ? 'bg-white text-slate-900 shadow-xs'
                         : 'text-slate-600 hover:text-slate-900'
-                    }`}
+                      }`}
                   >
                     Direct Fabric Lot / Meters
                   </button>
                   <button
                     type="button"
                     onClick={() => setDispatchMode('ROLLS')}
-                    className={`px-3 py-1.5 rounded-md font-semibold transition ${
-                      dispatchMode === 'ROLLS'
+                    className={`px-3 py-1.5 rounded-md font-semibold transition ${dispatchMode === 'ROLLS'
                         ? 'bg-white text-slate-900 shadow-xs'
                         : 'text-slate-600 hover:text-slate-900'
-                    }`}
+                      }`}
                   >
                     Select Scanned Rolls ({availableRolls.length})
                   </button>
@@ -874,7 +866,7 @@ function FabricStoreIssueChallanContent() {
                         onClick={() => setDispatchMode('DIRECT_LOT')}
                         className="px-3.5 py-1.5 bg-teal-700 text-white rounded-md text-xs font-semibold"
                       >
-                        Switch to Direct Fabric Lot / Meters Mode →
+                        Switch to Direct Fabric Lot / Meters Mode â†’
                       </button>
                     </div>
                   ) : (
@@ -906,15 +898,14 @@ function FabricStoreIssueChallanContent() {
                               <tr
                                 key={roll.id}
                                 onClick={() => toggleRoll(roll.id)}
-                                className={`cursor-pointer transition ${
-                                  isChecked ? 'bg-teal-50/60' : 'hover:bg-slate-50/60'
-                                }`}
+                                className={`cursor-pointer transition ${isChecked ? 'bg-teal-50/60' : 'hover:bg-slate-50/60'
+                                  }`}
                               >
                                 <td className="py-3 px-4 text-center">
                                   <input
                                     type="checkbox"
                                     checked={isChecked}
-                                    onChange={() => {}} // handled by row click
+                                    onChange={() => { }} // handled by row click
                                     className="rounded text-teal-700"
                                   />
                                 </td>
@@ -922,7 +913,7 @@ function FabricStoreIssueChallanContent() {
                                   {roll.rollNumber}
                                 </td>
                                 <td className="py-3 px-4 font-mono text-[11px]">
-                                  {roll.batch?.batchNumber || '—'}
+                                  {roll.batch?.batchNumber || 'â€”'}
                                 </td>
                                 <td className="py-3 px-4">
                                   <span className="font-semibold text-slate-800 block">
@@ -932,7 +923,7 @@ function FabricStoreIssueChallanContent() {
                                     {roll.batch?.fabricDescription}
                                   </span>
                                 </td>
-                                <td className="py-3 px-4">{roll.batch?.colorName || '—'}</td>
+                                <td className="py-3 px-4">{roll.batch?.colorName || 'â€”'}</td>
                                 <td className="py-3 px-4 font-mono font-bold text-slate-900">
                                   {parseFloat(roll.length).toFixed(2)} m
                                 </td>
@@ -1036,7 +1027,7 @@ function FabricStoreIssueChallanContent() {
                   <span>
                     {submitting
                       ? 'Dispatching Challan...'
-                      : `Dispatch Challan to ${destinationDept === 'DYEING' ? 'Dyeing' : 'Embroidery'} →`}
+                      : `Dispatch Challan to ${destinationDept === 'DYEING' ? 'Dyeing' : 'Embroidery'} â†’`}
                   </span>
                 </button>
               </div>
@@ -1079,7 +1070,7 @@ function FabricStoreIssueChallanContent() {
                     onClick={() => setShowSheetModal(false)}
                     className="p-1.5 text-slate-400 hover:text-slate-700 text-lg font-bold ml-2"
                   >
-                    ✕
+                    âœ•
                   </button>
                 </div>
               </div>
@@ -1110,27 +1101,27 @@ function FabricStoreIssueChallanContent() {
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   <div className="p-2.5 bg-slate-50 rounded">
                     <span className="text-[10px] text-slate-500 font-bold uppercase block">Client / Buyer</span>
-                    <strong className="text-slate-900">{selectedProgram.clientName || selectedProgram.buyerName || '—'}</strong>
+                    <strong className="text-slate-900">{selectedProgram.clientName || selectedProgram.buyerName || 'â€”'}</strong>
                   </div>
                   <div className="p-2.5 bg-slate-50 rounded">
                     <span className="text-[10px] text-slate-500 font-bold uppercase block">Main Style</span>
-                    <strong className="text-slate-900">{selectedProgram.mainStyle || selectedProgram.styleCode || '—'}</strong>
+                    <strong className="text-slate-900">{selectedProgram.mainStyle || selectedProgram.styleCode || 'â€”'}</strong>
                   </div>
                   <div className="p-2.5 bg-slate-50 rounded">
                     <span className="text-[10px] text-slate-500 font-bold uppercase block">Wilcom Design #</span>
-                    <strong className="font-mono text-teal-900">{selectedProgram.wilcomDesignNumber || '—'}</strong>
+                    <strong className="font-mono text-teal-900">{selectedProgram.wilcomDesignNumber || 'â€”'}</strong>
                   </div>
                   <div className="p-2.5 bg-slate-50 rounded">
                     <span className="text-[10px] text-slate-500 font-bold uppercase block">Fabric Quality</span>
-                    <strong className="text-slate-900">{selectedProgram.fabricName || '—'}</strong>
+                    <strong className="text-slate-900">{selectedProgram.fabricName || 'â€”'}</strong>
                   </div>
                   <div className="p-2.5 bg-slate-50 rounded">
                     <span className="text-[10px] text-slate-500 font-bold uppercase block">Fabric Composition</span>
-                    <span className="text-slate-700">{selectedProgram.fabricType || '—'}</span>
+                    <span className="text-slate-700">{selectedProgram.fabricType || 'â€”'}</span>
                   </div>
                   <div className="p-2.5 bg-slate-50 rounded">
                     <span className="text-[10px] text-slate-500 font-bold uppercase block">Fabric Color</span>
-                    <strong className="text-slate-900">{selectedProgram.fabricColor || '—'}</strong>
+                    <strong className="text-slate-900">{selectedProgram.fabricColor || 'â€”'}</strong>
                   </div>
                   <div className="p-2.5 bg-slate-50 rounded">
                     <span className="text-[10px] text-slate-500 font-bold uppercase block">Target Quantity</span>
@@ -1142,7 +1133,7 @@ function FabricStoreIssueChallanContent() {
                   <div className="p-2.5 bg-slate-50 rounded">
                     <span className="text-[10px] text-slate-500 font-bold uppercase block">Delivery Target Date</span>
                     <span className="font-mono text-slate-700">
-                      {selectedProgram.deliveryDate ? new Date(selectedProgram.deliveryDate).toLocaleDateString() : '—'}
+                      {selectedProgram.deliveryDate ? new Date(selectedProgram.deliveryDate).toLocaleDateString() : 'â€”'}
                     </span>
                   </div>
                   <div className="p-2.5 bg-slate-50 rounded">
