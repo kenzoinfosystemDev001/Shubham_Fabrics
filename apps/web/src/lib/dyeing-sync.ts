@@ -145,6 +145,11 @@ export async function syncInboundChallansToDyeingOrders() {
           }
         }
 
+          let orderNumber = `DYE-${year}-${String(nextSeq).padStart(4, '0')}`;
+          while (await prisma.dyeingOrder.findUnique({ where: { orderNumber } })) {
+            nextSeq++;
+            orderNumber = `DYE-${year}-${String(nextSeq).padStart(4, '0')}`;
+          }
         let orderNumber = `DYE-${year}-${String(nextSeq).padStart(4, '0')}`;
 
         // Check for an existing order number before using it.
@@ -197,6 +202,25 @@ export async function syncInboundChallansToDyeingOrders() {
           await prisma.program.update({
             where: { id: challan.programId },
             data: {
+              orderNumber,
+              programId: challan.programId,
+              inboundChallanId: challan.id,
+              status: 'RECEIVED',
+              priority: challan.priority || challan.program?.priority || 'NORMAL',
+              fabricName,
+              fabricType,
+              targetColor,
+              requiredQuantity: requiredQty,
+              dyedQuantity: 0,
+              undyedQuantity: requiredQty,
+              readyForQc1Quantity: 0,
+              sentToQc1Quantity: 0,
+              uom,
+              inchargeId: dyeingUser?.id || null,
+              inchargeName: dyeingUser?.fullName || dyeingUser?.username || 'Dyeing Incharge',
+              processRemarks: challan.challanType === 'REWORK_RETURN'
+                ? `QC1 Rework Return: ${challan.challanNumber} (${challan.remarks || 'Shade/Dyeing correction required'})`
+                : `Received from ${challan.fromDepartment || 'Fabric Store'} on Challan ${challan.challanNumber}`,
               fabricSentToDyeing: requiredQty,
               status: 'IN_PRODUCTION',
             },

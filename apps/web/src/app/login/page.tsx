@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { getUserStationHome } from '@/lib/rbac';
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
+import { InstallAppButton } from '@/components/InstallAppButton';
 import {
   Shield,
   Cpu,
@@ -264,8 +265,9 @@ export default function LoginPage() {
         </form>
 
         {/* MINIMAL FOOTER */}
-        <div className="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-center text-[11px] text-slate-500 tracking-wide">
-          <span>Protected Enterprise Session</span>
+        <div className="mt-6 pt-4 border-t border-slate-800/80 flex flex-col items-center justify-center gap-3">
+          <InstallAppButton variant="button" className="w-full justify-center bg-slate-800/80 hover:bg-slate-700 border-slate-700" />
+          <span className="text-[11px] text-slate-500 tracking-wide">Protected Enterprise Session</span>
         </div>
       </div>
     </div>

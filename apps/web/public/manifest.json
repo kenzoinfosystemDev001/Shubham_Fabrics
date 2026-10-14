@@ -1,0 +1,39 @@
+{
+  "name": "Shubham Fabrics MES",
+  "short_name": "Shubham MES",
+  "description": "Enterprise Manufacturing Execution System - Shubham Fabrics India Pvt. Ltd.",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0284c7",
+  "orientation": "any",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/shubham-logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "/shubham-logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "/shubham-logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/shubham-logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["business", "productivity", "utilities"]
+}

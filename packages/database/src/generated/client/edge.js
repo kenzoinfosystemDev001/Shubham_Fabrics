@@ -1138,7 +1138,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "D:\\Shubham-v1\\Shubham_Fabrics\\packages\\database\\src\\generated\\client",
+      "value": "C:\\Users\\sujal.kumar\\Downloads\\Shubham_Fabrics\\packages\\database\\src\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -1156,12 +1156,11 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "D:\\Shubham-v1\\Shubham_Fabrics\\packages\\database\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\sujal.kumar\\Downloads\\Shubham_Fabrics\\packages\\database\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null,
-    "schemaEnvPath": "../../../.env"
+    "rootEnvPath": null
   },
   "relativePath": "../../../prisma",
   "clientVersion": "6.19.3",

@@ -352,6 +352,7 @@ export async function POST(request: Request) {
       return challan;
     });
 
+    // If dispatched to Dyeing, immediately sync to DyeingOrders
     // 6. Sync inbound challans to DyeingOrders once when sent to Dyeing
     if (toDept === 'DYEING' || toDept.includes('DYE')) {
       try {

@@ -1,11 +1,12 @@
 import React from 'react';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Manrope } from 'next/font/google';
 // @ts-ignore -- Next.js resolves global CSS imports at build time.
 import './globals.css';
 import { Navigation } from '@/components/Navigation';
 import { ThemeProvider } from '@/components/ThemeContext';
 import { DepartmentGuard } from '@/components/DepartmentGuard';
+import { InstallAppButton } from '@/components/InstallAppButton';
 
 const manrope = Manrope({
   subsets: ['latin'],
@@ -14,12 +15,32 @@ const manrope = Manrope({
   display: 'swap',
 });
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+  themeColor: '#0284c7',
+};
+
 export const metadata: Metadata = {
   title: 'Shubham Fabrics | MES',
   description: 'Enterprise Manufacturing Execution System - Shubham Fabrics India Pvt. Ltd.',
+  manifest: '/manifest.json',
   icons: {
     icon: '/shubham-logo.jpg',
     shortcut: '/shubham-logo.jpg',
+    apple: '/shubham-logo.jpg',
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Shubham MES',
+  },
+  applicationName: 'Shubham Fabrics MES',
+  formatDetection: {
+    telephone: false,
   },
 };
 
@@ -38,6 +59,7 @@ export default function RootLayout({
               {children}
             </main>
           </DepartmentGuard>
+          <InstallAppButton variant="floating" />
         </ThemeProvider>
       </body>
     </html>
