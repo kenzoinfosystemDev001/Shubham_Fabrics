@@ -27,6 +27,7 @@ import { api } from '@/lib/api';
 import { isAdminUser } from '@/lib/rbac';
 import { DepartmentSwitcher } from '@/components/DepartmentSwitcher';
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
+import { InstallAppButton } from '@/components/InstallAppButton';
 
 export function FabricStoreNavigation() {
   const pathname = usePathname();
@@ -146,13 +147,16 @@ export function FabricStoreNavigation() {
           </div>
         </div>
 
-        <button
-          onClick={handleSignOut}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"
-          title="Sign Out"
-        >
-          <LogOut className="w-4 h-4" />
-        </button>
+        <div className="flex items-center gap-2">
+          <InstallAppButton variant="nav" />
+          <button
+            onClick={handleSignOut}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"
+            title="Sign Out"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       {/* BACKDROP OVERLAY FOR MOBILE */}
@@ -316,6 +320,10 @@ export function FabricStoreNavigation() {
                 Store Department
               </span>
             </div>
+          </div>
+
+          <div className="mb-3">
+            <InstallAppButton variant="nav" className="w-full justify-center" />
           </div>
 
           <button

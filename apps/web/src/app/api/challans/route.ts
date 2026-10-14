@@ -265,12 +265,6 @@ export async function POST(request: Request) {
       return challan;
     });
 
-    // Auto-sync to Dyeing if targeted to Dyeing department
-    if (toDept === 'DYEING') {
-      try {
-        await syncInboundChallansToDyeingOrders();
-      } catch (syncErr) {
-        console.warn('Auto-sync to dyeing skipped or warning:', syncErr);
     // If dispatched to Dyeing, immediately sync to DyeingOrders
     if (toDept === 'DYEING' || toDept.includes('DYE')) {
       try {

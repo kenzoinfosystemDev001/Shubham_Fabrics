@@ -174,7 +174,7 @@ export default function ProgrammingFloorBoardPage() {
           </div>
 
           {/* COLUMN 2: IN PROGRESS */}
-          <div className="bg-slate-100/70 border border-slate-200 rounded-xl p-3 flex flex-col h-[calc(100vh-230px)]">
+          <div className="bg-slate-100/70 border border-slate-200 rounded-xl p-3 flex flex-col min-h-[400px] md:h-[calc(100vh-230px)]">
             <div className="flex items-center justify-between pb-3 px-2 border-b border-slate-200">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
@@ -233,7 +233,7 @@ export default function ProgrammingFloorBoardPage() {
           </div>
 
           {/* COLUMN 3: READY FOR ISSUE */}
-          <div className="bg-indigo-50/40 border border-indigo-200 rounded-xl p-3 flex flex-col h-[calc(100vh-230px)]">
+          <div className="bg-indigo-50/40 border border-indigo-200 rounded-xl p-3 flex flex-col min-h-[400px] md:h-[calc(100vh-230px)]">
             <div className="flex items-center justify-between pb-3 px-2 border-b border-indigo-200">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-indigo-600 animate-pulse"></span>
@@ -297,7 +297,7 @@ export default function ProgrammingFloorBoardPage() {
           </div>
 
           {/* COLUMN 4: ISSUED & ACTIVE */}
-          <div className="bg-emerald-50/40 border border-emerald-200 rounded-xl p-3 flex flex-col h-[calc(100vh-230px)]">
+          <div className="bg-emerald-50/40 border border-emerald-200 rounded-xl p-3 flex flex-col min-h-[400px] md:h-[calc(100vh-230px)]">
             <div className="flex items-center justify-between pb-3 px-2 border-b border-emerald-200">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>

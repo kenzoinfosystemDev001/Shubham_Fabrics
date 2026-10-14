@@ -28,6 +28,7 @@ import { api } from '@/lib/api';
 import { getCurrentUser, isAdminUser } from '@/lib/rbac';
 import { ShubhamLogo } from '@/components/ShubhamLogo';
 import { printProductionSheet } from '@/lib/download-production-sheet';
+import { InstallAppButton } from '@/components/InstallAppButton';
 
 export default function AdminConsolePage() {
   const router = useRouter();
@@ -321,31 +322,45 @@ export default function AdminConsolePage() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col">
       {/* TOP HEADER */}
-      <header className="bg-[#0F172A] text-white border-b border-slate-800 px-6 py-3.5 sticky top-0 z-40 shadow-sm flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-lg bg-white p-0.5 border border-indigo-500/40 flex items-center justify-center overflow-hidden shrink-0 shadow-xs">
-            <img src="/shubham-logo.jpg" alt="Logo" className="w-full h-full object-contain" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold tracking-[0.16em] text-white uppercase">
-                SHUBHAM FABRICS INDIA PVT. LTD.
-              </span>
-              <span className="text-[10px] bg-indigo-600 text-white font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-                Admin Console
-              </span>
+      <header className="bg-[#0F172A] text-white border-b border-slate-800 px-4 md:px-6 py-3.5 sticky top-0 z-40 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 md:w-10 md:h-10 rounded-lg bg-white p-0.5 border border-indigo-500/40 flex items-center justify-center overflow-hidden shrink-0 shadow-xs">
+              <img src="/shubham-logo.jpg" alt="Logo" className="w-full h-full object-contain" />
             </div>
-            <p className="text-[11px] text-slate-400 font-mono">
-              Manufacturing Execution System · Full Factory Access
-            </p>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold tracking-[0.16em] text-white uppercase">
+                  SHUBHAM FABRICS INDIA PVT. LTD.
+                </span>
+                <span className="text-[10px] bg-indigo-600 text-white font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                  Admin Console
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-400 font-mono">
+                Manufacturing Execution System · Full Factory Access
+              </p>
+            </div>
+          </div>
+
+          {/* Quick mobile action */}
+          <div className="flex md:hidden items-center gap-2">
+            <InstallAppButton variant="nav" />
+            <button
+              onClick={handleSignOut}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"
+              title="Sign Out"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
         </div>
 
         {/* WORKSPACE SWITCHER & CONTROLS */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
           <Link
             href="/programming"
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/30 hover:bg-amber-500/20 transition"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/30 hover:bg-amber-500/20 transition shrink-0"
             title="Open Programming Department"
           >
             <Building2 className="w-3.5 h-3.5" />
@@ -354,7 +369,7 @@ export default function AdminConsolePage() {
 
           <Link
             href="/fabric-store"
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-teal-500/10 text-teal-300 border border-teal-500/30 hover:bg-teal-500/20 transition"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-teal-500/10 text-teal-300 border border-teal-500/30 hover:bg-teal-500/20 transition shrink-0"
             title="Open Store Department"
           >
             <Building2 className="w-3.5 h-3.5" />
@@ -363,7 +378,7 @@ export default function AdminConsolePage() {
 
           <Link
             href="/dyeing"
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-purple-500/10 text-purple-300 border border-purple-500/30 hover:bg-purple-500/20 transition"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-purple-500/10 text-purple-300 border border-purple-500/30 hover:bg-purple-500/20 transition shrink-0"
             title="Open Dyeing Department"
           >
             <Building2 className="w-3.5 h-3.5" />
@@ -372,7 +387,7 @@ export default function AdminConsolePage() {
 
           <Link
             href="/qc1"
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/20 transition"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/20 transition shrink-0"
             title="Open QC1 Department"
           >
             <Building2 className="w-3.5 h-3.5" />
@@ -381,24 +396,20 @@ export default function AdminConsolePage() {
 
           <Link
             href="/embroidery"
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-fuchsia-500/10 text-fuchsia-300 border border-fuchsia-500/30 hover:bg-fuchsia-500/20 transition"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-fuchsia-500/10 text-fuchsia-300 border border-fuchsia-500/30 hover:bg-fuchsia-500/20 transition shrink-0"
             title="Open Embroidery Department"
           >
             <Building2 className="w-3.5 h-3.5" />
             <span>Embroidery</span>
           </Link>
 
-          <Link
-            href="/dyeing"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-500/10 text-purple-300 border border-purple-500/30 hover:bg-purple-500/20 transition"
-          >
-            <Building2 className="w-3.5 h-3.5" />
-            <span>Dyeing</span>
-          </Link>
+          <div className="hidden md:flex items-center gap-2">
+            <InstallAppButton variant="button" />
+          </div>
 
           <button
             onClick={handleClearAllFactoryData}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-600/90 hover:bg-rose-700 text-white shadow-xs transition"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-600/90 hover:bg-rose-700 text-white shadow-xs transition shrink-0"
             title="Wipe all production sheets, challans, and operational data (Factory Reset)"
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -407,7 +418,7 @@ export default function AdminConsolePage() {
 
           <button
             onClick={handleSignOut}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-rose-950/60 text-slate-300 hover:text-rose-200 border border-slate-700 transition ml-1"
+            className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-rose-950/60 text-slate-300 hover:text-rose-200 border border-slate-700 transition ml-1 shrink-0"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Sign Out</span>
@@ -541,8 +552,8 @@ export default function AdminConsolePage() {
                   </button>
                 </div>
 
-                <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-                  <table className="w-full text-left text-xs">
+                <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-x-auto">
+                  <table className="w-full text-left text-xs min-w-[640px]">
                     <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase tracking-wider text-[10px]">
                       <tr>
                         <th className="py-3 px-4 font-bold">Username</th>
@@ -646,8 +657,8 @@ export default function AdminConsolePage() {
                   </div>
                 </div>
 
-                <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-                  <table className="w-full text-left text-xs">
+                <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-x-auto">
+                  <table className="w-full text-left text-xs min-w-[720px]">
                     <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase tracking-wider text-[10px]">
                       <tr>
                         <th className="py-3 px-4 font-bold">Sheet / Program #</th>
@@ -753,8 +764,8 @@ export default function AdminConsolePage() {
                   </div>
                 </div>
 
-                <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-                  <table className="w-full text-left text-xs">
+                <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-x-auto">
+                  <table className="w-full text-left text-xs min-w-[720px]">
                     <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase tracking-wider text-[10px]">
                       <tr>
                         <th className="py-3 px-4 font-bold">Challan Number</th>
@@ -848,8 +859,8 @@ export default function AdminConsolePage() {
                   </button>
                 </div>
 
-                <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-                  <table className="w-full text-left text-xs">
+                <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-x-auto">
+                  <table className="w-full text-left text-xs min-w-[640px]">
                     <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase tracking-wider text-[10px]">
                       <tr>
                         <th className="py-3 px-4 font-bold">Code</th>
@@ -906,8 +917,8 @@ export default function AdminConsolePage() {
                   </button>
                 </div>
 
-                <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-                  <table className="w-full text-left text-xs">
+                <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-x-auto">
+                  <table className="w-full text-left text-xs min-w-[640px]">
                     <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase tracking-wider text-[10px]">
                       <tr>
                         <th className="py-3 px-4 font-bold">Code</th>
@@ -997,11 +1008,11 @@ export default function AdminConsolePage() {
                 </div>
 
                 {/* Rolls Table */}
-                <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+                <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-x-auto">
                   <div className="p-3 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-800">Rolls In Stock</span>
                   </div>
-                  <table className="w-full text-left text-xs">
+                  <table className="w-full text-left text-xs min-w-[640px]">
                     <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase tracking-wider text-[10px]">
                       <tr>
                         <th className="py-2.5 px-4 font-bold">Roll Barcode</th>
