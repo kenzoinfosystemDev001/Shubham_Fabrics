@@ -92,6 +92,15 @@ const STATIONS: StationOption[] = [
     borderActive: 'border-cyan-500/80 shadow-[0_0_15px_rgba(6,182,212,0.25)]',
     bgActive: 'bg-cyan-500/15 text-white',
   },
+  {
+    id: 'qc2',
+    name: 'QC2 Dept',
+    username: 'qc2',
+    icon: CheckCircle2,
+    accentColor: 'text-emerald-400',
+    borderActive: 'border-emerald-500/80 shadow-[0_0_15px_rgba(16,185,129,0.25)]',
+    bgActive: 'bg-emerald-500/15 text-white',
+  },
 ];
 
 export default function LoginPage() {

@@ -27,6 +27,9 @@ export async function POST(request: Request) {
       qc1: { role: 'QC_INSPECTOR', dept: 'QC1', name: 'QC1 Quality Inspector' },
       qc_insp: { role: 'QC_INSPECTOR', dept: 'QC1', name: 'Vikram Singh' },
       embroidery: { role: 'EMBROIDERY_INCHARGE', dept: 'EMBROIDERY', name: 'Embroidery Department' },
+      cutting: { role: 'THREAD_CUTTING_INCHARGE', dept: 'THREAD_CUTTING', name: 'Thread Cutting Department' },
+      qc2: { role: 'QC2_INSPECTOR', dept: 'QC2', name: 'QC2 Quality Inspector' },
+      qc2_insp: { role: 'QC2_INSPECTOR', dept: 'QC2', name: 'QC2 Quality Inspector' },
     };
 
     // 2. Query user from Neon DB

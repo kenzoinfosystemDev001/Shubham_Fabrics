@@ -408,11 +408,20 @@ export default function AdminConsolePage() {
           </div>
           <Link
             href="/thread-cutting"
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-orange-500/10 text-orange-300 border border-orange-500/30 hover:bg-orange-500/20 transition"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/20 transition shrink-0"
             title="Open Thread Cutting Department"
           >
             <Building2 className="w-3.5 h-3.5" />
             <span>Thread Cutting</span>
+          </Link>
+
+          <Link
+            href="/qc2"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/20 transition shrink-0"
+            title="Open QC2 Department"
+          >
+            <Building2 className="w-3.5 h-3.5" />
+            <span>QC2</span>
           </Link>
 
           <button
@@ -1124,7 +1133,10 @@ export default function AdminConsolePage() {
                     <option value="PROGRAMMING">PROGRAMMING</option>
                     <option value="STORE">FABRIC STORE</option>
                     <option value="DYEING">DYEING</option>
+                    <option value="QC1">QC1</option>
                     <option value="EMBROIDERY">EMBROIDERY</option>
+                    <option value="THREAD_CUTTING">THREAD CUTTING</option>
+                    <option value="QC2">QC2</option>
                     <option value="ADMIN">ADMIN</option>
                   </select>
                 </div>
@@ -1143,7 +1155,10 @@ export default function AdminConsolePage() {
                   <option value="FABRIC_STORE">FABRIC_STORE</option>
                   <option value="ADMIN">ADMIN (Full Access)</option>
                   <option value="DYEING_OPERATOR">DYEING_OPERATOR</option>
+                  <option value="QC_INSPECTOR">QC1_INSPECTOR</option>
                   <option value="EMBROIDERY_OPERATOR">EMBROIDERY_OPERATOR</option>
+                  <option value="THREAD_CUTTING_INCHARGE">THREAD_CUTTING_INCHARGE</option>
+                  <option value="QC2_INSPECTOR">QC2_INSPECTOR</option>
                 </select>
               </div>
 

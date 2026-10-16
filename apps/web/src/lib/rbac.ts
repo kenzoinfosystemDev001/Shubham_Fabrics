@@ -150,6 +150,25 @@ export function isQc1User(user: MESUser | null): boolean {
   );
 }
 
+export function isQc2User(user: MESUser | null): boolean {
+  if (!user) return false;
+  if (isAdminUser(user)) return true; // Admins have all access
+
+  const username = (user.username || '').toLowerCase();
+  const dept = (user.departmentCode || '').toUpperCase();
+  const role = (user.role || '').toUpperCase();
+  const roles = (user.roles || []).map((r) => r.toUpperCase());
+
+  return (
+    username === 'qc2' ||
+    username === 'qc2_insp' ||
+    dept === 'QC2' ||
+    role === 'QC2_INSPECTOR' ||
+    role === 'QC_INSPECTOR' ||
+    roles.includes('QC2_INSPECTOR')
+  );
+}
+
 export function isEmbroideryUser(user: MESUser | null): boolean {
   if (!user) return false;
   if (isAdminUser(user)) return true; // Admins have all access
@@ -194,6 +213,7 @@ export function getUserStationHome(user: MESUser | null): string {
   if (!user) return '/login';
   if (isAdminUser(user)) return '/admin';
   if (isQc1User(user)) return '/qc1';
+  if (isQc2User(user)) return '/qc2';
   if (isDyeingUser(user)) return '/dyeing';
   if (isFabricStoreUser(user)) return '/fabric-store';
   if (isEmbroideryUser(user)) return '/embroidery';
@@ -279,6 +299,18 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
     };
   }
 
+  // QC2 Department routes protection
+  if (pathname.startsWith('/qc2')) {
+    if (isQc2User(user)) {
+      return { allowed: true, redirectTarget: pathname };
+    }
+    return {
+      allowed: false,
+      redirectTarget: defaultUserHome,
+      reason: 'Access Restricted: You are not authorized for the QC2 Department. Access is restricted to QC2 Quality personnel and Admins.',
+    };
+  }
+
   // Dyeing Department routes protection
   if (pathname.startsWith('/dyeing')) {
     if (isDyeingUser(user)) {
@@ -314,7 +346,9 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
       !pathname.startsWith('/fabric-store/floor-board') &&
       !pathname.startsWith('/dyeing/floor-board') &&
       !pathname.startsWith('/qc1/floor-board') &&
-      !pathname.startsWith('/embroidery/floor-board'));
+      !pathname.startsWith('/qc2/floor-board') &&
+      !pathname.startsWith('/embroidery/floor-board') &&
+      !pathname.startsWith('/thread-cutting/floor-board'));
 
   if (isProgrammingRoute) {
     if (isProgrammingUser(user)) {

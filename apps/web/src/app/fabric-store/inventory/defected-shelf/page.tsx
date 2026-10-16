@@ -57,7 +57,10 @@ export default function DefectedShelfPage() {
         const returns = challans.filter(
           (c) =>
             c.challanType === 'DEFECT_RETURN' ||
+            c.challanType === 'DEFECTIVE_RETURN' ||
             c.fromDepartment === 'THREAD_CUTTING' ||
+            c.fromDepartment === 'QC2' ||
+            c.fromDepartment === 'QC1' ||
             (c.remarks && c.remarks.toLowerCase().includes('defective'))
         );
         setDefectReturns(returns);
@@ -504,7 +507,7 @@ export default function DefectedShelfPage() {
             <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />
             <p className="text-sm font-semibold text-slate-800">No Department Defect Returns</p>
             <p className="text-xs text-slate-500 max-w-md mx-auto">
-              Thread Cutting has not dispatched any defective pieces to the Fabric Store defective shelf.
+              No factory departments (Thread Cutting / QC2 / QC1) have dispatched defective pieces to the Fabric Store defective shelf.
             </p>
           </div>
         ) : (
