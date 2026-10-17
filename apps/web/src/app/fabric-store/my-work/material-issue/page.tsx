@@ -118,9 +118,15 @@ function MaterialIssueContent() {
       setSuccess(json.message || 'Rolls successfully issued to production program!');
       setSelectedRollIds([]);
       setIssueRemarks('');
-      await loadData();
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      loadData();
     } catch (err: any) {
       setError(err.message);
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     } finally {
       setSubmitting(false);
     }
@@ -192,7 +198,7 @@ function MaterialIssueContent() {
               </label>
               <input
                 type="text"
-                placeholder="Issue note, job order, or operator tag"
+                placeholder=""
                 value={issueRemarks}
                 onChange={(e) => setIssueRemarks(e.target.value)}
                 className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 focus:ring-1 focus:ring-blue-500"
@@ -343,11 +349,15 @@ function MaterialIssueContent() {
           </div>
           <button
             type="button"
-            disabled={submitting || !targetProgramId}
+            disabled={submitting}
             onClick={handleIssueSubmit}
-            className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-bold rounded-lg shadow-sm transition"
+            className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-bold rounded-lg shadow-sm transition cursor-pointer"
           >
-            <Send className="w-4 h-4" />
+            {submitting ? (
+              <RefreshCw className="w-4 h-4 animate-spin text-blue-200" />
+            ) : (
+              <Send className="w-4 h-4" />
+            )}
             <span>{submitting ? 'Issuing Rolls...' : 'Confirm Issue to Program'}</span>
           </button>
         </div>

@@ -87,6 +87,16 @@ export function isProgrammingUser(user: MESUser | null): boolean {
   );
 }
 
+/**
+ * Only Programming and Admin departments are authorized to view the Client Code.
+ * All other departments (Fabric Store, Dyeing, QC1, Embroidery, Thread Cutting, etc.)
+ * are strictly restricted from seeing client code.
+ */
+export function canViewClientCode(user: MESUser | null): boolean {
+  if (!user) return false;
+  return isAdminUser(user) || isProgrammingUser(user);
+}
+
 export function isFabricStoreUser(user: MESUser | null): boolean {
   if (!user) return false;
   if (isAdminUser(user)) return true; // Admins have all access
@@ -295,7 +305,7 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
     return {
       allowed: false,
       redirectTarget: defaultUserHome,
-      reason: 'Access Restricted: You are not authorized for the QC1 Department. Access is restricted to QC1 Quality personnel and Admins.',
+      reason: 'Access Restricted: You are not authorized for the Dyeing QC Department. Access is restricted to Dyeing QC personnel and Admins.',
     };
   }
 

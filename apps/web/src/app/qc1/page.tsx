@@ -88,7 +88,7 @@ export default function QC1Dashboard() {
   const inspectorName =
     currentUser?.fullName ||
     currentUser?.username ||
-    'QC1 Inspector';
+    'Dyeing QC Inspector';
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] pb-16">
@@ -107,7 +107,7 @@ export default function QC1Dashboard() {
           </span>
           <h1 className="text-xl font-bold text-white flex items-center gap-2 drop-shadow-sm">
             <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-            <span>QC1 Department Dashboard</span>
+            <span>Dyeing QC Dashboard</span>
           </h1>
         </div>
 
@@ -156,7 +156,7 @@ export default function QC1Dashboard() {
           <div className="flex items-center justify-between mb-3">
             <div>
               <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                QC1 Operational Status Summary
+                Dyeing QC Operational Status Summary
               </h2>
               <p className="text-[11px] text-slate-500">
                 Active workflow stage metrics for dyed fabric inspection

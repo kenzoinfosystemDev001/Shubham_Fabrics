@@ -45,7 +45,7 @@ const DEPARTMENTS = [
     activeBg: 'bg-purple-500/15 text-purple-300 font-bold',
   },
   {
-    name: 'QC1 Department',
+    name: 'Dyeing QC',
     code: 'QC1',
     href: '/qc1',
     color: 'emerald',
@@ -75,6 +75,14 @@ const DEPARTMENTS = [
     activeBg: 'bg-cyan-500/15 text-cyan-300 font-bold',
   },
   {
+    name: 'Thread Cut QC',
+    code: 'QC2',
+    href: '/thread-cutting',
+    color: 'amber',
+    badge: 'QC2',
+    dotClass: 'bg-amber-400',
+    hoverClass: 'hover:bg-amber-500/10 hover:text-amber-300',
+    activeBg: 'bg-amber-500/15 text-amber-300 font-bold',
     name: 'QC2 Department',
     code: 'QC2',
     href: '/qc2',

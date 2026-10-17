@@ -658,6 +658,16 @@ model Challan {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
+  // Fabric / Piece In & Out Auto-Detection Tracking across Departments
+  fabricIn               Float?
+  fabricOut              Float?
+  fabricUnit             String?   @default("MTR")
+  defectivePieces        Float?    @default(0)
+  defectiveShelfLocation String?
+  defectReason           String?
+  detectedFromChallanId  String?
+  detectedFromDepartment String?
+
   items           ChallanItem[]
   productionLogs  ProductionTransaction[]
   inspections     QualityInspection[]

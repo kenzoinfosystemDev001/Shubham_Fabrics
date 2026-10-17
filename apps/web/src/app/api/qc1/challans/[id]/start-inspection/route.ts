@@ -77,7 +77,7 @@ export async function POST(
           toStatus: 'UNDER_INSPECTION',
           action: 'START_INSPECTION',
           actorId,
-          notes: notes || `QC1 Inspection initiated by ${actorUser?.fullName || 'QC Inspector'}`,
+          notes: notes || `Dyeing QC Inspection initiated by ${actorUser?.fullName || 'Dyeing QC Inspector'}`,
         },
       });
 

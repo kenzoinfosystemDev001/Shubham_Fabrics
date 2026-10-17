@@ -225,7 +225,7 @@ function CreateGRNContent() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Vardhman Textiles Ltd."
+                  placeholder=""
                   value={supplierName}
                   onChange={(e) => setSupplierName(e.target.value)}
                   className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-teal-500"
@@ -237,7 +237,7 @@ function CreateGRNContent() {
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. RJ-14-GA-1234"
+                  placeholder=""
                   value={vehicleNumber}
                   onChange={(e) => setVehicleNumber(e.target.value)}
                   className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-teal-500 font-mono"
@@ -267,7 +267,7 @@ function CreateGRNContent() {
               </label>
               <input
                 type="text"
-                placeholder="Gate pass number, delivery notes, or external invoice ref"
+                placeholder=""
                 value={remarks}
                 onChange={(e) => setRemarks(e.target.value)}
                 className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-teal-500"
@@ -304,7 +304,7 @@ function CreateGRNContent() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. 60x60 Cambric 100% Cotton 58''"
+                  placeholder=""
                   value={fabricDescription}
                   onChange={(e) => setFabricDescription(e.target.value)}
                   className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-teal-500"
@@ -316,7 +316,7 @@ function CreateGRNContent() {
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Off-White / Natural"
+                  placeholder=""
                   value={colorName}
                   onChange={(e) => setColorName(e.target.value)}
                   className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-teal-500"
@@ -330,9 +330,6 @@ function CreateGRNContent() {
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
                 <h2 className="text-sm font-bold text-slate-900">3. Individual Roll Verification</h2>
-                <p className="text-[11px] text-slate-500">
-                  Every roll is tracked individually and will enter PENDING QC upon GRN generation.
-                </p>
               </div>
               <button
                 type="button"
@@ -367,7 +364,7 @@ function CreateGRNContent() {
                           type="number"
                           step="0.01"
                           required
-                          placeholder="e.g. 100.5"
+                          placeholder=""
                           value={roll.length}
                           onChange={(e) => updateRoll(idx, 'length', e.target.value)}
                           className="w-36 text-xs border border-slate-300 rounded px-2.5 py-1.5 font-mono focus:ring-1 focus:ring-teal-500"
@@ -377,7 +374,7 @@ function CreateGRNContent() {
                         <input
                           type="number"
                           step="0.1"
-                          placeholder="e.g. 147"
+                          placeholder=""
                           value={roll.width}
                           onChange={(e) => updateRoll(idx, 'width', e.target.value)}
                           className="w-28 text-xs border border-slate-300 rounded px-2.5 py-1.5 font-mono focus:ring-1 focus:ring-teal-500"
@@ -387,7 +384,7 @@ function CreateGRNContent() {
                         <input
                           type="number"
                           step="0.001"
-                          placeholder="e.g. 18.2"
+                          placeholder=""
                           value={roll.weight}
                           onChange={(e) => updateRoll(idx, 'weight', e.target.value)}
                           className="w-28 text-xs border border-slate-300 rounded px-2.5 py-1.5 font-mono focus:ring-1 focus:ring-teal-500"
@@ -396,7 +393,7 @@ function CreateGRNContent() {
                       <td className="py-2.5 px-3">
                         <input
                           type="text"
-                          placeholder="Condition, mill mark, tag #"
+                          placeholder=""
                           value={roll.remarks}
                           onChange={(e) => updateRoll(idx, 'remarks', e.target.value)}
                           className="w-full text-xs border border-slate-300 rounded px-2.5 py-1.5 focus:ring-1 focus:ring-teal-500"

@@ -104,7 +104,7 @@ export function QC1Navigation() {
             </div>
             <div>
               <span className="text-xs font-bold text-white tracking-wide block leading-none">SHUBHAM FABRICS</span>
-              <span className="text-[9px] font-bold text-emerald-400 tracking-wider uppercase block">QC1 DEPT</span>
+              <span className="text-[9px] font-bold text-emerald-400 tracking-wider uppercase block">Dyeing QC</span>
             </div>
           </div>
         </div>
@@ -166,7 +166,7 @@ export function QC1Navigation() {
         <div className="relative px-3 pt-3 pb-2.5 border-b border-slate-700/60 bg-slate-950/20 backdrop-blur-xs">
           <div className="relative z-10">
             <DepartmentSwitcher
-              currentDepartmentName="QC1 Department"
+              currentDepartmentName="Dyeing QC"
               accentColor="emerald"
               onNavigate={() => setMobileOpen(false)}
             />
@@ -212,10 +212,10 @@ export function QC1Navigation() {
             <UserCircle className="w-8 h-8 text-emerald-400/90" />
             <div className="flex-1 min-w-0">
               <span className="text-xs font-semibold text-white truncate block drop-shadow-xs">
-                {currentUser.fullName || (isAdmin ? 'System Administrator' : 'QC1 Inspector')}
+                {currentUser.fullName || (isAdmin ? 'System Administrator' : 'Dyeing QC Inspector')}
               </span>
               <span className="text-[10px] text-emerald-400 font-bold tracking-wide block truncate drop-shadow-xs">
-                QC1 Department
+                Dyeing QC
               </span>
             </div>
           </div>

@@ -1,145 +1,665 @@
 /**
  * Production Sheet Generator & Downloader
  * Shubham Fabrics India Pvt. Ltd. MES - Programming Department
+ *
+ * Implements the authentic factory floor traveler specification sheet
+ * layout (Production Sheet format) with sub-style averages and multi-color breakdown grid.
  */
+import { getCurrentUser, canViewClientCode } from '@/lib/rbac';
+
+export interface SubStyleAverage {
+  name: string;
+  average: number | string;
+}
+
+export interface ProductionGridItem {
+  id?: string;
+  color: string;
+  pcs: number | string;
+  mtr: number | string;
+  sizes: Record<string, string>;
+}
+
+export interface SwatchItem {
+  id?: string;
+  name: string;
+  color: string;
+  isCustom?: boolean;
+}
+
+export const SWATCH_CLIP_PATH = 'polygon(0% 4%, 4% 0%, 8% 4%, 12% 0%, 16% 4%, 20% 0%, 24% 4%, 28% 0%, 32% 4%, 36% 0%, 40% 4%, 44% 0%, 48% 4%, 52% 0%, 56% 4%, 60% 0%, 64% 4%, 68% 0%, 72% 4%, 76% 0%, 80% 4%, 84% 0%, 88% 4%, 92% 0%, 96% 4%, 100% 0%, 96% 4%, 100% 8%, 96% 12%, 100% 16%, 96% 20%, 100% 24%, 96% 28%, 100% 32%, 96% 36%, 100% 40%, 96% 44%, 100% 48%, 96% 52%, 100% 56%, 96% 60%, 100% 64%, 96% 68%, 100% 72%, 96% 76%, 100% 80%, 96% 84%, 100% 88%, 96% 92%, 100% 96%, 96% 100%, 100% 96%, 96% 100%, 92% 96%, 88% 100%, 84% 96%, 80% 100%, 76% 96%, 72% 100%, 68% 96%, 64% 100%, 60% 96%, 56% 100%, 52% 96%, 48% 100%, 44% 96%, 40% 100%, 36% 96%, 32% 100%, 28% 96%, 24% 100%, 20% 96%, 16% 100%, 12% 96%, 8% 100%, 4% 96%, 0% 100%, 4% 96%, 0% 92%, 4% 88%, 0% 84%, 4% 80%, 0% 76%, 4% 72%, 0% 68%, 4% 64%, 0% 60%, 4% 56%, 0% 52%, 4% 48%, 0% 44%, 4% 40%, 0% 36%, 4% 32%, 0% 28%, 4% 24%, 0% 20%, 4% 16%, 0% 12%, 4% 8%, 0% 4%)';
+
+export const FABRIC_COLOR_PALETTE: Record<string, string> = {
+  camel: '#D4BAA1',
+  khaki: '#C3B091',
+  beige: '#D9C5B2',
+  cream: '#FFFDD0',
+  ivory: '#FFFFF0',
+  white: '#F8FAFC',
+  offwhite: '#FAF9F6',
+  'off-white': '#FAF9F6',
+  black: '#18181B',
+  grey: '#6B7280',
+  gray: '#6B7280',
+  charcoal: '#374151',
+  brown: '#5C4033',
+  chocolate: '#3D2314',
+  tan: '#D2B48C',
+  fawn: '#C8A97E',
+  navy: '#1E2530',
+  'dark navy': '#161E2E',
+  'navy blue': '#1E3A8A',
+  blue: '#2563EB',
+  'royal blue': '#1D4ED8',
+  'sky blue': '#7DD3FC',
+  cyan: '#06B6D4',
+  teal: '#0D9488',
+  turquoise: '#14B8A6',
+  indigo: '#4338CA',
+  sage: '#9BB19D',
+  'dusty sage': '#9BB19D',
+  'sage green': '#94A684',
+  olive: '#888448',
+  'olive mustard': '#857F43',
+  'olive green': '#556B2F',
+  green: '#15803D',
+  'bottle green': '#0F4D2A',
+  'dark green': '#0B3D20',
+  mint: '#A7F3D0',
+  emerald: '#059669',
+  pista: '#A2C579',
+  mehndi: '#606C38',
+  red: '#DC2626',
+  maroon: '#6B1124',
+  wine: '#5B172B',
+  burgundy: '#5B172B',
+  pink: '#F472B6',
+  'baby pink': '#FBCFE8',
+  'dusty rose': '#C98B96',
+  peach: '#FDBA74',
+  coral: '#FB7185',
+  magenta: '#BE185D',
+  purple: '#7E22CE',
+  violet: '#6D28D9',
+  lavender: '#C084FC',
+  plum: '#4A154B',
+  yellow: '#EAB308',
+  mustard: '#CA8A04',
+  gold: '#D97706',
+  orange: '#EA580C',
+  rust: '#B45309',
+  copper: '#B87333',
+  lemon: '#FEF08A',
+};
+
+export function getSwatchColorHex(name?: string, fallback?: string): string {
+  if (!name || !name.trim()) return fallback || '#CBD5E1';
+  const clean = name.trim().toLowerCase();
+  if (FABRIC_COLOR_PALETTE[clean]) return FABRIC_COLOR_PALETTE[clean];
+
+  for (const [key, hex] of Object.entries(FABRIC_COLOR_PALETTE)) {
+    if (clean.includes(key) || key.includes(clean)) {
+      return hex;
+    }
+  }
+
+  if (fallback) return fallback;
+
+  let hash = 0;
+  for (let i = 0; i < clean.length; i++) {
+    hash = clean.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const hue = Math.abs(hash % 360);
+  return `hsl(${hue}, 40%, 55%)`;
+}
+
+export type GarmentCategory = 'TOP' | 'BOTTOM' | 'DUPATTA';
+
+export interface ComponentSheetData {
+  enabled: boolean;
+  forwarded: boolean;
+  category: GarmentCategory;
+  styleName: string;
+  fabricName: string;
+  fabricWidth: string;
+  subStyles: SubStyleAverage[];
+  productionGrid: ProductionGridItem[];
+  swatches?: SwatchItem[];
+  note?: string;
+  totalMtrAverage?: number;
+  totalPieces?: number;
+  totalFabricMeters?: number;
+}
+
+export interface WilcomEntry {
+  id: string;
+  category: GarmentCategory;
+  styleName: string;
+  wilcomDesignNumber: string;
+  photoUrl?: string;
+  remarks?: string;
+  createdAt?: string;
+}
+
+export const DEFAULT_SUB_STYLES: SubStyleAverage[] = [
+  { name: 'FRONT', average: '' },
+  { name: 'BACK', average: '' },
+  { name: 'SLEAVE', average: '' },
+  { name: 'COLLAR', average: '' },
+  { name: 'GHERA', average: '' },
+  { name: 'PATTI', average: '' },
+];
+
+export const DEFAULT_BOTTOM_SUB_STYLES: SubStyleAverage[] = [
+  { name: 'FRONT', average: '' },
+  { name: 'BACK', average: '' },
+  { name: 'BELT', average: '' },
+  { name: 'POCKET', average: '' },
+  { name: 'BOTTOM', average: '' },
+  { name: 'PATTI', average: '' },
+];
+
+export const DEFAULT_DUPATTA_SUB_STYLES: SubStyleAverage[] = [
+  { name: 'BODY', average: '' },
+  { name: 'PALLU', average: '' },
+  { name: 'BORDER', average: '' },
+  { name: 'CORNER', average: '' },
+  { name: 'LACE', average: '' },
+  { name: 'TASSEL', average: '' },
+];
+
+export function getDefaultSubStylesForCategory(category: GarmentCategory): SubStyleAverage[] {
+  if (category === 'BOTTOM') return DEFAULT_BOTTOM_SUB_STYLES.map(s => ({ ...s }));
+  if (category === 'DUPATTA') return DEFAULT_DUPATTA_SUB_STYLES.map(s => ({ ...s }));
+  return DEFAULT_SUB_STYLES.map(s => ({ ...s }));
+}
 
 async function embedImage(source: string, label: string): Promise<string> {
+  if (!source) return '';
   if (source.startsWith('data:image/')) return source;
 
-  const imageUrl = new URL(source, window.location.href);
-  const response = await fetch(imageUrl, { credentials: 'omit' });
-  if (!response.ok) {
-    throw new Error(`${label} could not be loaded (HTTP ${response.status}).`);
-  }
+  try {
+    const imageUrl = new URL(source, window.location.href);
+    const response = await fetch(imageUrl, { credentials: 'omit' });
+    if (!response.ok) return source;
 
-  const image = await response.blob();
-  if (!image.type.startsWith('image/')) {
-    throw new Error(`${label} did not return a valid image.`);
+    const image = await response.blob();
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === 'string') resolve(reader.result);
+        else resolve(source);
+      };
+      reader.onerror = () => resolve(source);
+      reader.readAsDataURL(image);
+    });
+  } catch {
+    return source;
   }
-
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === 'string') resolve(reader.result);
-      else reject(new Error(`${label} could not be embedded in the production sheet.`));
-    };
-    reader.onerror = () => reject(new Error(`${label} could not be embedded in the production sheet.`));
-    reader.readAsDataURL(image);
-  });
 }
 
 async function prepareProductionSheetImages(program: any) {
   const preparedProgram = { ...program };
-  const designImages = [
-    ['baseDesignPhoto', 'Base design photo'],
-    ['wilcomDesignPhoto', 'Wilcom design photo'],
-  ] as const;
-
-  await Promise.all(
-    designImages.map(async ([field, label]) => {
-      const source = preparedProgram[field];
-      if (source) preparedProgram[field] = await embedImage(source, label);
-    }),
-  );
-
-  const logoUrl = new URL('/shubham-logo.jpg', window.location.origin).href;
-  try {
-    preparedProgram.companyLogo = await embedImage(logoUrl, 'Company logo');
-  } catch {
-    preparedProgram.companyLogo = logoUrl;
+  if (preparedProgram.baseDesignPhoto) {
+    preparedProgram.baseDesignPhoto = await embedImage(preparedProgram.baseDesignPhoto, 'Base design photo');
   }
-
+  if (preparedProgram.wilcomDesignPhoto) {
+    preparedProgram.wilcomDesignPhoto = await embedImage(preparedProgram.wilcomDesignPhoto, 'Wilcom design photo');
+  }
   return preparedProgram;
 }
 
-export function generateProductionSheetHtml(program: any): string {
-  const serialNo = program.programSerialNo || program.programNumber || 'PRG-DRAFT';
-  const clientName = program.clientName || program.buyerName || '—';
-  const designNo = program.designNumber || program.designName || '—';
-  const wilcomNo = program.wilcomDesignNumber || '—';
-  const mainStyle = program.mainStyle || program.styleCode || '—';
-  const subStyle = program.subStyle || '—';
-  const pattern = program.pattern || '—';
-  const baseDesignType = program.baseDesignType || '—';
-  const embroideryDesign = program.embroideryDesign || program.designName || '—';
-  const embroiderySize = program.embroideryDesignSize || '—';
-  const fabricName = program.fabricName || program.fabrics?.[0]?.fabricName || '—';
-  const fabricType = program.fabricType || program.fabrics?.[0]?.composition || '—';
-  const fabricWidth = program.fabricWidth || (program.fabricWidthInches ? `${program.fabricWidthInches} Inches` : '—');
-  const fabricColor = program.fabricColor || program.colours?.[0]?.colorName || '—';
-  const fabricColorAvailable = program.fabricColorAvailable || 'IN_STOCK';
-  const fabricAverage = program.fabricAverage || '—';
-  const fabricAverageType = program.fabricAverageType || 'Meters/Piece';
-  const fabricAverageMeasurement = program.fabricAverageMeasurement || 'Standard';
-  const fabricDyeingRequired = program.fabricDyeingRequired ? 'YES' : 'NO';
-  const fabricIssuedToDyeing = program.fabricIssuedToDyeing || 0;
-  const fabricSentToDyeing = program.fabricSentToDyeing || 0;
-  const colorQty = program.colorQuantity || program.targetQuantity || 0;
-  const qtyUnit = program.quantityMeasurement || 'PCS';
-  const specialMaterial = program.specialMaterial || 'None';
-  const specialMaterialQty = program.specialMaterialQuantity || '—';
-  const prodDesignDate = program.productionDesignDate ? new Date(program.productionDesignDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
-  const prodEndDate = program.productionEndDate ? new Date(program.productionEndDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
-  const deliveryDate = program.deliveryDate ? new Date(program.deliveryDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
-  const startDate = program.startDate || program.programDate ? new Date(program.startDate || program.programDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
-  const piecesRejection = program.piecesRejection || 0;
-  const rejectionReason = program.rejectionReason || '—';
-  const comments = program.comments || program.remarks || 'No special remarks entered.';
-  const authorName = program.createdBy?.fullName || 'Programming Incharge';
-  const printDate = new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+export function extractSubStylesAndGrid(program: any, category: GarmentCategory = 'TOP'): {
+  subStylesWithAverages: SubStyleAverage[];
+  productionGrid: ProductionGridItem[];
+  swatches: SwatchItem[];
+  topName: string;
+  serialNoCounter: string;
+  noteText: string;
+  totalMtrAverage: number;
+  clientCode?: string;
+  fabricName: string;
+  fabricWidth: string;
+  category: GarmentCategory;
+  allComponents?: Record<GarmentCategory, ComponentSheetData>;
+  forwardedComponents: string[];
+  wilcomEntries: WilcomEntry[];
+  isEnabled: boolean;
+  isForwarded: boolean;
+} {
+  let subStylesWithAverages: SubStyleAverage[] = [];
+  let productionGrid: ProductionGridItem[] = [];
+  let swatches: SwatchItem[] = [];
+  let topName = program.topName || program.mainStyle || program.styleCode || '';
+  let serialNoCounter = program.serialNoCounter || '';
+  let noteText = program.note || program.comments || program.remarks || '';
+  let clientCode = program.clientCode || '';
+  let fabricName = program.fabricName || program.fabric || (program.fabrics?.[0]?.fabricName) || '';
+  let fabricWidth = program.fabricWidth || (program.fabricWidthInches ? `${program.fabricWidthInches}"` : '') || '';
+  let allComponents: Record<GarmentCategory, ComponentSheetData> | undefined;
+  let forwardedComponents: string[] = ['TOP'];
+  let wilcomEntries: WilcomEntry[] = [];
+  let isEnabled = true;
+  let isForwarded = true;
 
-  // Simple SVG Barcode simulation for the program serial number
-  const barcodeLines = Array.from({ length: 42 })
-    .map((_, i) => {
-      const width = (i * 7 + serialNo.length) % 3 === 0 ? 3 : (i % 2 === 0 ? 1.5 : 2);
-      const x = 15 + i * 5;
-      return `<rect x="${x}" y="5" width="${width}" height="32" fill="#111827" />`;
-    })
-    .join('');
+  if (program.metadataJson) {
+    try {
+      const meta = typeof program.metadataJson === 'string' ? JSON.parse(program.metadataJson) : program.metadataJson;
+      if (meta?.components) {
+        allComponents = meta.components;
+      }
+      if (Array.isArray(meta?.forwardedComponents)) {
+        forwardedComponents = meta.forwardedComponents;
+      }
+      if (Array.isArray(meta?.wilcomEntries)) {
+        wilcomEntries = meta.wilcomEntries;
+      }
+      if (meta?.clientCode) clientCode = meta.clientCode;
+      if (meta?.serialNoCounter) serialNoCounter = meta.serialNoCounter;
+
+      const comp = meta?.components?.[category];
+      if (comp) {
+        isEnabled = comp.enabled !== false;
+        isForwarded = comp.forwarded !== false || forwardedComponents.includes(category);
+        if (comp.styleName) topName = comp.styleName;
+        if (comp.fabricName) fabricName = comp.fabricName;
+        if (comp.fabricWidth) fabricWidth = comp.fabricWidth;
+        if (Array.isArray(comp.subStyles) && comp.subStyles.length > 0) {
+          subStylesWithAverages = comp.subStyles;
+        }
+        if (Array.isArray(comp.productionGrid) && comp.productionGrid.length > 0) {
+          productionGrid = comp.productionGrid;
+        }
+        if (Array.isArray(comp.swatches) && comp.swatches.length > 0) {
+          swatches = comp.swatches;
+        }
+        if (comp.note) noteText = comp.note;
+      } else {
+        // Fallback for single sheet legacy metadata
+        if (Array.isArray(meta?.subStylesWithAverages) && meta.subStylesWithAverages.length > 0) {
+          subStylesWithAverages = meta.subStylesWithAverages;
+        }
+        if (Array.isArray(meta?.productionGrid) && meta.productionGrid.length > 0) {
+          productionGrid = meta.productionGrid;
+        }
+        if (Array.isArray(meta?.swatches) && meta.swatches.length > 0) {
+          swatches = meta.swatches;
+        }
+        if (meta?.topName) topName = meta.topName;
+        if (meta?.note) noteText = meta.note;
+      }
+    } catch {}
+  }
+
+  // Fallback for subStylesWithAverages if not found
+  if (subStylesWithAverages.length === 0) {
+    let rawSubStyles: string[] = Array.isArray(program.subStyles) ? program.subStyles : [];
+    if (rawSubStyles.length === 0 && program.subStyle) {
+      rawSubStyles = String(program.subStyle).split(',').map((s) => s.trim()).filter(Boolean);
+    }
+    if (rawSubStyles.length > 0) {
+      const defaultAvg = Number(program.fabricAverage) ? Number(program.fabricAverage) / rawSubStyles.length : 0.25;
+      subStylesWithAverages = rawSubStyles.map((s) => ({
+        name: s.toUpperCase(),
+        average: Math.round(defaultAvg * 100) / 100,
+      }));
+    } else {
+      subStylesWithAverages = getDefaultSubStylesForCategory(category);
+    }
+  }
+
+  // Calculate sum of averages
+  const totalMtrAverage = Math.round(
+    subStylesWithAverages.reduce((acc, it) => acc + (Number(it.average) || 0), 0) * 100
+  ) / 100;
+
+  // Fallback for productionGrid from program.items or colours
+  if (productionGrid.length === 0) {
+    let programItems: any[] = Array.isArray(program.items) ? program.items : [];
+    if (programItems.length === 0 && program.metadataJson) {
+      try {
+        const meta = typeof program.metadataJson === 'string' ? JSON.parse(program.metadataJson) : program.metadataJson;
+        if (Array.isArray(meta?.items)) programItems = meta.items;
+      } catch {}
+    }
+
+    if (programItems.length > 0) {
+      productionGrid = programItems.map((it, idx) => {
+        const pcs = Number(it.measurement) || 0;
+        const avg = Number(it.fabricAverage) || totalMtrAverage || 1.25;
+        const mtr = Math.round(pcs * avg * 100) / 100;
+        const sizes: Record<string, string> = {};
+        for (const sub of subStylesWithAverages) {
+          sizes[sub.name] = it.fabricWidth || 'Free';
+        }
+        return {
+          id: `row-${idx}`,
+          color: String(it.color || `Color ${idx + 1}`),
+          pcs: pcs || '',
+          mtr: mtr || '',
+          sizes,
+        };
+      });
+    } else if (Array.isArray(program.colours) && program.colours.length > 0) {
+      productionGrid = program.colours.map((c: any, idx: number) => {
+        const pcs = Number(c.targetQuantity) || 0;
+        const mtr = Math.round(pcs * totalMtrAverage * 100) / 100;
+        const sizes: Record<string, string> = {};
+        return {
+          id: `row-${idx}`,
+          color: String(c.colorName || `Color ${idx + 1}`),
+          pcs: pcs || '',
+          mtr: mtr || '',
+          sizes,
+        };
+      });
+    }
+  }
+
+  // Derive swatches dynamically from productionGrid colors
+  if (swatches.length === 0 && productionGrid.length > 0) {
+    const uniqueColors = Array.from(
+      new Set(
+        productionGrid
+          .map((r) => (r.color || '').trim())
+          .filter(Boolean)
+      )
+    );
+    swatches = uniqueColors.map((colorName) => ({
+      name: colorName,
+      color: getSwatchColorHex(colorName),
+    }));
+  }
+
+  return {
+    subStylesWithAverages,
+    productionGrid,
+    swatches,
+    topName,
+    serialNoCounter,
+    noteText,
+    totalMtrAverage,
+    clientCode,
+    fabricName,
+    fabricWidth,
+    category,
+    allComponents,
+    forwardedComponents,
+    wilcomEntries,
+    isEnabled,
+    isForwarded,
+  };
+}
+
+export function generateProductionSheetHtml(program: any, category: GarmentCategory | 'ALL' = 'TOP'): string {
+  const currentUser = typeof window !== 'undefined' ? getCurrentUser() : null;
+  const canSeeClientCode = canViewClientCode(currentUser) && Boolean(program.clientCode);
+
+  const serialNo = program.programSerialNo || program.programNumber || '';
+  const designNo = program.designNumber || program.designName || '';
+  const dateVal = program.startDate || program.programDate 
+    ? new Date(program.startDate || program.programDate).toLocaleDateString('en-GB') 
+    : new Date().toLocaleDateString('en-GB');
+
+  let meta: any = null;
+  if (program.metadataJson) {
+    try {
+      meta = typeof program.metadataJson === 'string' ? JSON.parse(program.metadataJson) : program.metadataJson;
+    } catch {}
+  }
+
+  let targetCategories: GarmentCategory[] = [];
+  if (category === 'ALL') {
+    if (Array.isArray(meta?.forwardedComponents) && meta.forwardedComponents.length > 0) {
+      targetCategories = meta.forwardedComponents;
+    } else if (meta?.components) {
+      targetCategories = (['TOP', 'BOTTOM', 'DUPATTA'] as GarmentCategory[]).filter(
+        (c) => meta.components[c]?.enabled !== false
+      );
+    }
+    if (targetCategories.length === 0) {
+      targetCategories = ['TOP'];
+    }
+  } else {
+    targetCategories = [category];
+  }
+
+  const renderSingleSheet = (activeCategory: GarmentCategory) => {
+    const {
+      subStylesWithAverages,
+      productionGrid,
+      swatches,
+      topName,
+      noteText,
+      totalMtrAverage,
+      fabricName,
+      fabricWidth,
+    } = extractSubStylesAndGrid(program, activeCategory);
+
+    const subStyleColumns = subStylesWithAverages.map((s) => s.name);
+
+    // Generate 14 rows total (matching the paper sheet grid)
+    const TOTAL_GRID_ROWS = 14;
+    const gridRows: {
+      color: string;
+      pcs: string | number;
+      mtr: string | number;
+      sizes: Record<string, string>;
+    }[] = [];
+
+    for (let i = 0; i < TOTAL_GRID_ROWS; i++) {
+      if (i < productionGrid.length) {
+        gridRows.push({
+          color: productionGrid[i].color || '',
+          pcs: productionGrid[i].pcs !== undefined ? productionGrid[i].pcs : '',
+          mtr: productionGrid[i].mtr !== undefined ? productionGrid[i].mtr : '',
+          sizes: productionGrid[i].sizes || {},
+        });
+      } else {
+        gridRows.push({
+          color: '',
+          pcs: '',
+          mtr: '',
+          sizes: {},
+        });
+      }
+    }
+
+    return `
+    <div class="sheet-wrapper">
+      <div>
+        <!-- TITLE (IN PLACE OF JBBJ) -->
+        <div class="header-title">PRODUCTION SHEET &mdash; ${activeCategory}</div>
+
+        <!-- HEADER META: DESIGN NO, COMPONENT STYLE, DATE, SERIAL NO -->
+        <div class="top-meta-row">
+          <div class="meta-col-left">
+            <div class="field-row">
+              <span class="label-bold">DESIGN NO.</span>
+              <div class="box-input">${designNo}</div>
+            </div>
+            <div class="field-row" style="margin-top: 10px;">
+              <span class="label-bold">${activeCategory}:-</span>
+              <div class="line-underline">${topName}</div>
+            </div>
+            ${canSeeClientCode ? `
+            <div class="field-row" style="margin-top: 8px;">
+              <span class="label-bold" style="color: #92400e;">CLIENT CODE:</span>
+              <div class="box-input" style="width: 120px; font-weight: 900; background: #fef3c7; border: 1.5px solid #000000; color: #78350f;">
+                ${program.clientCode}
+              </div>
+              <span style="font-size: 8px; font-weight: 800; margin-left: 6px; color: #92400e; background: #fef3c7; padding: 2px 5px; border: 1px solid #f59e0b; border-radius: 3px;">
+                CONFIDENTIAL: ADMIN &amp; PROG ONLY
+              </span>
+            </div>
+            ` : ''}
+          </div>
+
+          <div class="meta-col-right">
+            <div class="field-row-right">
+              <span class="label-bold">DATE:</span>
+              <div class="box-input">${dateVal}</div>
+            </div>
+            <div class="field-row-right" style="margin-top: 10px;">
+              <span class="label-bold">SERIAL NO.</span>
+              <div class="box-serial">${serialNo}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FABRIC & WIDTH BOX -->
+        <div class="fabric-section">
+          <table class="fabric-table">
+            <tr>
+              <td class="fabric-label">FABRIC</td>
+              <td class="fabric-value">${fabricName}</td>
+            </tr>
+            <tr>
+              <td class="fabric-label">WIDTH</td>
+              <td class="fabric-value">${fabricWidth}</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- AVERAGE TABLE (SUB STYLES & AVERAGES) -->
+        <div class="average-heading">AVERAGE</div>
+        <table class="average-table">
+          <thead>
+            <tr>
+              ${subStylesWithAverages.map((s) => `<th>${s.name}</th>`).join('')}
+              <th>TOTAL MTR</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="average-val-row">
+              ${subStylesWithAverages.map((s) => `<td>${s.average ? Number(s.average).toFixed(2) : ''}</td>`).join('')}
+              <td style="font-weight: 900;">${totalMtrAverage > 0 ? totalMtrAverage.toFixed(2) : ''}</td>
+            </tr>
+            <tr class="average-empty-row">
+              ${subStylesWithAverages.map(() => `<td></td>`).join('')}
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- MAIN COLOR & SIZE BREAKDOWN GRID -->
+        <table class="production-grid">
+          <thead>
+            <tr>
+              <th rowspan="2" class="col-color-header">COLOR</th>
+              <th colspan="2">QTY</th>
+              <th colspan="${subStyleColumns.length}">SIZE</th>
+            </tr>
+            <tr>
+              <th class="col-qty-pcs">PCS</th>
+              <th class="col-qty-mtr">MTR</th>
+              ${subStyleColumns.map((col) => `<th>${col}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${gridRows.map((row) => `
+              <tr class="grid-data-row">
+                <td class="cell-color">${row.color}</td>
+                <td class="cell-number">${row.pcs !== '' && row.pcs !== undefined ? row.pcs : ''}</td>
+                <td class="cell-number">${row.mtr !== '' && row.mtr !== undefined ? row.mtr : ''}</td>
+                ${subStyleColumns.map((col) => `<td>${row.sizes?.[col] || ''}</td>`).join('')}
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- FOOTER: NOTE, SWATCHES, SIGNATURE -->
+      <div class="footer-block">
+        <div class="footer-left">
+          <div class="note-heading">NOTE:-</div>
+          ${noteText ? `<div class="note-content">${noteText}</div>` : ''}
+
+          <!-- COLOR SWATCHES -->
+          <div class="swatches-section">
+            <div class="swatches-title">COLOR SWATCHES:</div>
+            <div class="swatches-row">
+              ${swatches.length > 0
+                ? swatches.map((s) => `
+                  <div class="swatch-card">
+                    <div class="fabric-swatch" style="background-color: ${s.color || '#e2e8f0'};">
+                      <span class="swatch-staple"></span>
+                    </div>
+                    ${s.name ? `<span class="swatch-name" title="${s.name}">${s.name}</span>` : ''}
+                  </div>
+                `).join('')
+                : `
+                  <div class="swatch-card">
+                    <div class="swatch-empty-box"><span class="swatch-staple"></span></div>
+                    <span class="swatch-name">Attach Swatch</span>
+                  </div>
+                  <div class="swatch-card">
+                    <div class="swatch-empty-box"><span class="swatch-staple"></span></div>
+                    <span class="swatch-name">Attach Swatch</span>
+                  </div>
+                  <div class="swatch-card">
+                    <div class="swatch-empty-box"><span class="swatch-staple"></span></div>
+                    <span class="swatch-name">Attach Swatch</span>
+                  </div>
+                  <div class="swatch-card">
+                    <div class="swatch-empty-box"><span class="swatch-staple"></span></div>
+                    <span class="swatch-name">Attach Swatch</span>
+                  </div>
+                `
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-right">
+          <div class="signature-title">SIGNATURE</div>
+          <div class="signature-line"></div>
+        </div>
+      </div>
+
+    </div>
+    `;
+  };
+
+
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Production Sheet - ${serialNo} - Shubham Fabrics</title>
+  <title>Production Sheet - ${serialNo} (${targetCategories.join(', ')})</title>
   <style>
     @page {
       size: A4 portrait;
-      margin: 10mm 12mm 10mm 12mm;
+      margin: 8mm 10mm 8mm 10mm;
     }
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
     }
     body {
-      background-color: #f3f4f6;
-      color: #111827;
+      background-color: #f1f5f9;
+      color: #000000;
+      font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
       font-size: 11px;
-      line-height: 1.4;
-      padding: 20px;
-    }
-    .sheet-container {
-      max-width: 210mm;
-      margin: 0 auto;
-      background: #ffffff;
-      padding: 12mm 14mm;
-      border: 1px solid #d1d5db;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      position: relative;
+      line-height: 1.2;
+      padding: 16px;
     }
     .no-print-bar {
       max-width: 210mm;
-      margin: 0 auto 16px auto;
+      margin: 0 auto 12px auto;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #1e293b;
+      background: #111827;
       color: #ffffff;
-      padding: 10px 16px;
+      padding: 8px 16px;
       border-radius: 6px;
+      font-size: 12px;
     }
     .btn {
       cursor: pointer;
@@ -149,202 +669,358 @@ export function generateProductionSheetHtml(program: any): string {
       padding: 6px 14px;
       border-radius: 4px;
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 700;
       border: none;
-      transition: background 0.15s;
+      transition: opacity 0.15s;
     }
     .btn-primary {
       background: #2563eb;
       color: #ffffff;
     }
-    .btn-primary:hover {
-      background: #1d4ed8;
-    }
     .btn-outline {
-      background: #334155;
+      background: #374151;
       color: #ffffff;
     }
-    .btn-outline:hover {
-      background: #475569;
+    .btn:hover {
+      opacity: 0.9;
     }
 
-    /* SHEET HEADER */
-    .sheet-header {
-      border-bottom: 2px solid #163767;
-      padding-bottom: 10px;
-      margin-bottom: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-    }
-    .company-title {
-      font-size: 18px;
-      font-weight: 800;
-      color: #163767;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-    }
-    .company-sub {
-      font-size: 9px;
-      color: #64748b;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      font-weight: 700;
-      margin-top: 1px;
-    }
-    .doc-badge {
-      display: inline-block;
-      margin-top: 4px;
-      padding: 2px 8px;
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
-      border-radius: 3px;
-      font-size: 9px;
-      font-weight: 700;
-      color: #0f172a;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-    .header-meta {
-      text-align: right;
-    }
-    .prog-number {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 16px;
-      font-weight: 800;
-      color: #163767;
-    }
-    .status-pill {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 9px;
-      font-weight: 800;
-      text-transform: uppercase;
-      background: #dbeafe;
-      color: #1e40af;
-      margin-top: 3px;
-    }
-
-    /* SECTIONS */
-    .section-title {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-left: 4px solid #163767;
-      padding: 3px 8px;
-      font-size: 10px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: #163767;
-      margin-top: 8px;
-      margin-bottom: 4px;
-    }
-    .spec-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 6px;
-    }
-    .spec-table th, .spec-table td {
-      border: 1px solid #e2e8f0;
-      padding: 4px 8px;
-      text-align: left;
-      vertical-align: top;
-    }
-    .spec-table th {
-      background: #f1f5f9;
-      color: #475569;
-      font-size: 9px;
-      text-transform: uppercase;
-      font-weight: 700;
-      letter-spacing: 0.03em;
-      width: 25%;
-    }
-    .spec-table td {
-      color: #0f172a;
-      font-size: 10px;
-    }
-    .font-mono {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-weight: 600;
-    }
-    .highlight-cell {
-      background: #f8fafc;
-      font-weight: 700;
-      color: #163767;
-    }
-
-    /* TWO-COLUMN GRID */
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    /* SIGNATURE BLOCK */
-    .sign-section {
-      margin-top: 14px;
-      padding-top: 8px;
-      border-top: 1px dashed #cbd5e1;
-    }
-    .sign-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin-top: 6px;
-    }
-    .sign-box {
-      border: 1px solid #cbd5e1;
-      background: #fafafa;
-      border-radius: 4px;
-      padding: 6px;
-      height: 60px;
+    /* AUTHENTIC SPEC SHEET CONTAINER */
+    .sheet-wrapper {
+      max-width: 200mm;
+      min-height: 280mm;
+      margin: 0 auto;
+      background: #ffffff;
+      border: 2px solid #000000;
+      padding: 16px 20px;
+      position: relative;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
     }
-    .sign-role {
-      font-size: 8.5px;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: #475569;
-      border-bottom: 1px solid #e2e8f0;
-      padding-bottom: 2px;
-    }
-    .sign-line {
-      font-size: 8px;
-      color: #94a3b8;
+
+    /* TOP HEADER: PRODUCTION SHEET (IN PLACE OF JBBJ) */
+    .header-title {
       text-align: center;
-      border-top: 1px dotted #94a3b8;
-      padding-top: 2px;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 0.25em;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      border-bottom: 1.5px solid #000000;
+      padding-bottom: 4px;
     }
 
-    /* FOOTER */
-    .sheet-footer {
-      margin-top: 12px;
-      padding-top: 6px;
-      border-top: 1px solid #e2e8f0;
+    .top-meta-row {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      font-size: 8.5px;
-      color: #64748b;
+      align-items: flex-start;
+      margin-bottom: 12px;
     }
 
-    /* PRINT SPECIFIC */
+    .meta-col-left {
+      width: 48%;
+    }
+    .meta-col-right {
+      width: 42%;
+      text-align: right;
+    }
+
+    .field-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .field-row-right {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      margin-bottom: 8px;
+    }
+
+    .label-bold {
+      font-weight: 900;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      margin-right: 8px;
+      white-space: nowrap;
+    }
+
+    .box-input {
+      border: 1.5px solid #000000;
+      height: 30px;
+      width: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: inherit;
+      padding: 0 6px;
+      background: #ffffff;
+    }
+
+    .box-serial {
+      border: 1.5px solid #000000;
+      height: 30px;
+      width: 110px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 900;
+      background: #ffffff;
+      letter-spacing: 0.05em;
+    }
+
+    .line-underline {
+      border-bottom: 1.5px solid #000000;
+      min-width: 190px;
+      flex: 1;
+      height: 22px;
+      font-weight: 700;
+      font-size: 13px;
+      padding-left: 6px;
+      display: flex;
+      align-items: flex-end;
+    }
+
+    /* FABRIC & WIDTH BOX */
+    .fabric-section {
+      margin-bottom: 14px;
+    }
+
+    .fabric-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1.5px solid #000000;
+    }
+    .fabric-table td {
+      border: 1.5px solid #000000;
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+    .fabric-label {
+      width: 110px;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .fabric-value {
+      font-weight: 700;
+    }
+
+    /* AVERAGE SUB-STYLES TABLE */
+    .average-heading {
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .average-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1.5px solid #000000;
+      margin-bottom: 14px;
+      text-align: center;
+    }
+    .average-table th, .average-table td {
+      border: 1.5px solid #000000;
+      padding: 5px 4px;
+      font-size: 11px;
+    }
+    .average-table th {
+      font-weight: 900;
+      background: #ffffff;
+      letter-spacing: 0.04em;
+    }
+    .average-val-row td {
+      height: 24px;
+      font-weight: 700;
+      font-size: 12px;
+    }
+    .average-empty-row td {
+      height: 22px;
+    }
+
+    /* MAIN COLOR & SIZE BREAKDOWN TABLE */
+    .production-grid {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1.5px solid #000000;
+      margin-bottom: 14px;
+      text-align: center;
+    }
+    .production-grid th, .production-grid td {
+      border: 1.5px solid #000000;
+      padding: 3.5px 3px;
+      font-size: 11px;
+    }
+    .production-grid th {
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: #ffffff;
+    }
+
+    .col-color-header {
+      width: 15%;
+      font-size: 13px;
+      font-weight: 900;
+    }
+    .col-qty-pcs {
+      width: 9%;
+      font-weight: 900;
+    }
+    .col-qty-mtr {
+      width: 10%;
+      font-weight: 900;
+    }
+
+    .grid-data-row {
+      height: 25px;
+    }
+    .grid-data-row td {
+      height: 25px;
+      font-weight: 700;
+    }
+    .cell-color {
+      text-align: left;
+      padding-left: 8px !important;
+      font-weight: 800 !important;
+    }
+    .cell-number {
+      font-family: inherit;
+    }
+
+    /* FOOTER SECTION: NOTE, SWATCHES, SIGNATURE */
+    .footer-block {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding-top: 6px;
+    }
+
+    .footer-left {
+      width: 60%;
+    }
+    .note-heading {
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+    }
+    .note-content {
+      font-size: 11px;
+      color: #1f2937;
+      margin-bottom: 10px;
+      min-height: 18px;
+    }
+
+    /* COLOR SWATCH SAMPLES */
+    .swatches-section {
+      margin-top: 8px;
+    }
+    .swatches-title {
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      color: #1e3a8a;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .swatches-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .swatch-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+    .fabric-swatch {
+      width: 44px;
+      height: 44px;
+      position: relative;
+      clip-path: polygon(0% 4%, 4% 0%, 8% 4%, 12% 0%, 16% 4%, 20% 0%, 24% 4%, 28% 0%, 32% 4%, 36% 0%, 40% 4%, 44% 0%, 48% 4%, 52% 0%, 56% 4%, 60% 0%, 64% 4%, 68% 0%, 72% 4%, 76% 0%, 80% 4%, 84% 0%, 88% 4%, 92% 0%, 96% 4%, 100% 0%, 96% 4%, 100% 8%, 96% 12%, 100% 16%, 96% 20%, 100% 24%, 96% 28%, 100% 32%, 96% 36%, 100% 40%, 96% 44%, 100% 48%, 96% 52%, 100% 56%, 96% 60%, 100% 64%, 96% 68%, 100% 72%, 96% 76%, 100% 80%, 96% 84%, 100% 88%, 96% 92%, 100% 96%, 96% 100%, 100% 96%, 96% 100%, 92% 96%, 88% 100%, 84% 96%, 80% 100%, 76% 96%, 72% 100%, 68% 96%, 64% 100%, 60% 96%, 56% 100%, 52% 96%, 48% 100%, 44% 96%, 40% 100%, 36% 96%, 32% 100%, 28% 96%, 24% 100%, 20% 96%, 16% 100%, 12% 96%, 8% 100%, 4% 96%, 0% 100%, 4% 96%, 0% 92%, 4% 88%, 0% 84%, 4% 80%, 0% 76%, 4% 72%, 0% 68%, 4% 64%, 0% 60%, 4% 56%, 0% 52%, 4% 48%, 0% 44%, 4% 40%, 0% 36%, 4% 32%, 0% 28%, 4% 24%, 0% 20%, 4% 16%, 0% 12%, 4% 8%, 0% 4%);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+    }
+    .swatch-staple {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 14px;
+      height: 2px;
+      background-color: #334155;
+      border-radius: 1px;
+      box-shadow: 0 1px 1px rgba(0,0,0,0.4);
+    }
+    .swatch-empty-box {
+      width: 44px;
+      height: 44px;
+      border: 1.5px dashed #64748b;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #f8fafc;
+    }
+    .swatch-name {
+      font-size: 8.5px;
+      font-weight: 700;
+      color: #334155;
+      text-align: center;
+      max-width: 55px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .footer-right {
+      width: 32%;
+      text-align: center;
+    }
+    .signature-title {
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      margin-bottom: 24px;
+    }
+    .signature-line {
+      border-bottom: 1.5px solid #000000;
+      width: 100%;
+      margin: 0 auto 4px auto;
+    }
+
+    /* PRINT RULES */
     @media print {
       body {
-        background-color: #ffffff;
+        background: transparent;
         padding: 0;
       }
       .no-print-bar {
         display: none !important;
       }
-      .sheet-container {
-        border: none;
-        box-shadow: none;
-        padding: 0;
+      .sheet-wrapper {
+        border: 2px solid #000000 !important;
+        margin: 0 0 20px 0;
+        padding: 14px 18px;
+        width: 100%;
         max-width: 100%;
+        min-height: 285mm;
+        box-shadow: none;
+        page-break-after: always;
+        break-after: page;
+      }
+      .sheet-wrapper:last-child {
+        page-break-after: auto;
+        break-after: auto;
+        margin-bottom: 0;
       }
     }
   </style>
@@ -354,7 +1030,7 @@ export function generateProductionSheetHtml(program: any): string {
   <!-- Top Action Bar for interactive browser preview -->
   <div class="no-print-bar">
     <div>
-      <strong>Shubham Fabrics MES</strong> &middot; Production Sheet ${serialNo}
+      <strong>Production Sheet</strong> &middot; Serial No. ${serialNo} (${targetCategories.join(', ')})
     </div>
     <div style="display: flex; gap: 8px;">
       <button class="btn btn-primary" onclick="window.print()">
@@ -366,270 +1042,7 @@ export function generateProductionSheetHtml(program: any): string {
     </div>
   </div>
 
-  <div class="sheet-container">
-    
-    <!-- HEADER -->
-    <div class="sheet-header">
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <img src="${program.companyLogo || '/shubham-logo.jpg'}" alt="Logo" style="height: 52px; width: auto; object-fit: contain; border-radius: 4px;" />
-        <div>
-          <div class="company-title">SHUBHAM FABRICS INDIA PVT. LTD.</div>
-          <div class="company-sub">Manufacturing Execution System &middot; Production Sheet</div>
-          <div class="doc-badge">Department: Programming &middot; Factory Traveler Card</div>
-        </div>
-      </div>
-      <div class="header-meta">
-        <div class="prog-number">${serialNo}</div>
-        <div><span class="status-pill">${program.status || 'DRAFT'}</span></div>
-        <div style="margin-top: 4px;">
-          <svg width="220" height="36" viewBox="0 0 240 40">
-            ${barcodeLines}
-          </svg>
-        </div>
-      </div>
-    </div>
-
-    <!-- ORDER & PRIORITY -->
-    <div class="grid-2">
-      <div>
-        <div class="section-title">Order &amp; Commercial Info</div>
-        <table class="spec-table">
-          <tr>
-            <th>Program Serial #</th>
-            <td class="font-mono highlight-cell">${serialNo}</td>
-          </tr>
-          <tr>
-            <th>Client / Buyer</th>
-            <td style="font-weight: 700;">${clientName}</td>
-          </tr>
-          <tr>
-            <th>Design Number</th>
-            <td class="font-mono">${designNo}</td>
-          </tr>
-          <tr>
-            <th>Target Delivery Date</th>
-            <td class="font-mono" style="font-weight: 700; color: #b91c1c;">${deliveryDate}</td>
-          </tr>
-          <tr>
-            <th>Program Start Date</th>
-            <td>${startDate}</td>
-          </tr>
-        </table>
-      </div>
-
-      <div>
-        <div class="section-title">Priority &amp; Dispatch Urgency</div>
-        <table class="spec-table">
-          <tr>
-            <th>Priority Level</th>
-            <td>
-              <span style="display: inline-block; padding: 4px 10px; border-radius: 4px; font-weight: 800; font-size: 11px; letter-spacing: 0.05em; background: ${
-                (program.clientPriority || program.priority) === 'URGENT' ? '#ffe4e6' :
-                (program.clientPriority || program.priority) === 'HIGH' ? '#fef3c7' :
-                (program.clientPriority || program.priority) === 'LOW' ? '#f1f5f9' : '#dbeafe'
-              }; color: ${
-                (program.clientPriority || program.priority) === 'URGENT' ? '#9f1239' :
-                (program.clientPriority || program.priority) === 'HIGH' ? '#92400e' :
-                (program.clientPriority || program.priority) === 'LOW' ? '#334155' : '#1e40af'
-              }; border: 1px solid ${
-                (program.clientPriority || program.priority) === 'URGENT' ? '#fecdd3' :
-                (program.clientPriority || program.priority) === 'HIGH' ? '#fde68a' :
-                (program.clientPriority || program.priority) === 'LOW' ? '#cbd5e1' : '#bfdbfe'
-              };">
-                ${(program.clientPriority || program.priority || 'NORMAL').toUpperCase()}
-              </span>
-            </td>
-          </tr>
-          <tr>
-            <th>Queue Classification</th>
-            <td style="font-size: 8.5px; color: #475569;">
-              ${
-                (program.clientPriority || program.priority) === 'URGENT' ? 'Immediate shopfloor dispatch & top operational priority across all units' :
-                (program.clientPriority || program.priority) === 'HIGH' ? 'Expedited production pipeline for urgent delivery deadline' :
-                (program.clientPriority || program.priority) === 'LOW' ? 'Routine manufacturing backlog, flexible lead time' :
-                'Standard production queue and standard dispatch commitment'
-              }
-            </td>
-          </tr>
-          <tr>
-            <th>Product Category</th>
-            <td>${program.productCategory || 'GARMENT'}</td>
-          </tr>
-          <tr>
-            <th>Order Ref #</th>
-            <td class="font-mono">${program.orderNumber || '—'}</td>
-          </tr>
-        </table>
-      </div>
-    </div>
-
-    <!-- STYLE SPECIFICATIONS -->
-    <div class="section-title">Style Specifications</div>
-    <table class="spec-table">
-      <tr>
-        <th style="width: 20%;">Main Style</th>
-        <td style="width: 30%; font-weight: 700;">${mainStyle}</td>
-        <th style="width: 20%;">Sub Style</th>
-        <td style="width: 30%;">${subStyle}</td>
-      </tr>
-      <tr>
-        <th>Pattern / Cut Ref</th>
-        <td class="font-mono">${pattern}</td>
-        <th>Base Design Type</th>
-        <td>${baseDesignType}</td>
-      </tr>
-    </table>
-
-    <!-- WILCOM & TECHNICAL EMBROIDERY -->
-    <div class="section-title">Wilcom &amp; Technical Embroidery Parameters</div>
-    <table class="spec-table">
-      <tr>
-        <th style="width: 20%;">Wilcom Design #</th>
-        <td style="width: 30%;" class="font-mono highlight-cell">${wilcomNo}</td>
-        <th style="width: 20%;">Embroidery Size / Frame</th>
-        <td style="width: 30%;" class="font-mono">${embroiderySize}</td>
-      </tr>
-      <tr>
-        <th>Embroidery Description</th>
-        <td colspan="3" style="font-weight: 600;">${embroideryDesign}</td>
-      </tr>
-      ${program.wilcomDesignPhoto || program.baseDesignPhoto ? `
-      <tr>
-        <th>Design Attachments</th>
-        <td colspan="3" style="padding: 6px;">
-          <div style="display: flex; gap: 12px; align-items: center;">
-            ${program.baseDesignPhoto ? `<div><span style="font-size: 8px; font-weight: bold; display: block; color: #64748b;">BASE DESIGN:</span><img class="design-photo" src="${program.baseDesignPhoto}" style="max-height: 90px; max-width: 140px; object-fit: contain; border: 1px solid #cbd5e1; border-radius: 4px;" /></div>` : ''}
-            ${program.wilcomDesignPhoto ? `<div><span style="font-size: 8px; font-weight: bold; display: block; color: #64748b;">WILCOM TECHNICAL:</span><img class="design-photo" src="${program.wilcomDesignPhoto}" style="max-height: 90px; max-width: 140px; object-fit: contain; border: 1px solid #cbd5e1; border-radius: 4px;" /></div>` : ''}
-          </div>
-        </td>
-      </tr>` : ''}
-    </table>
-
-    <!-- FABRIC & DYEING -->
-    <div class="grid-2">
-      <div>
-        <div class="section-title">Fabric Master Details</div>
-        <table class="spec-table">
-          <tr>
-            <th>Fabric Name / Quality</th>
-            <td style="font-weight: 700;">${fabricName}</td>
-          </tr>
-          <tr>
-            <th>Fabric Composition</th>
-            <td>${fabricType}</td>
-          </tr>
-          <tr>
-            <th>Fabric Width</th>
-            <td class="font-mono">${fabricWidth}</td>
-          </tr>
-          <tr>
-            <th>Fabric Color / Shade</th>
-            <td style="font-weight: 700;">${fabricColor}</td>
-          </tr>
-          <tr>
-            <th>Color Stock Status</th>
-            <td>${fabricColorAvailable}</td>
-          </tr>
-          <tr>
-            <th>Fabric Avg Consumption</th>
-            <td class="font-mono"><strong>${fabricAverage}</strong> ${fabricAverageType}</td>
-          </tr>
-          <tr>
-            <th>Avg Measurement Basis</th>
-            <td>${fabricAverageMeasurement}</td>
-          </tr>
-        </table>
-      </div>
-
-      <div>
-        <div class="section-title">Dyeing &amp; Routing</div>
-        <table class="spec-table">
-          <tr>
-            <th>Is Dyeing Required?</th>
-            <td><strong style="color: ${fabricDyeingRequired === 'YES' ? '#0369a1' : '#166534'};">${fabricDyeingRequired}</strong></td>
-          </tr>
-          <tr>
-            <th>Next Department Flow</th>
-            <td style="font-weight: 700; color: ${fabricDyeingRequired === 'YES' ? '#b45309' : '#15803d'};">${fabricDyeingRequired === 'YES' ? 'DYEING DEPARTMENT' : 'EMBROIDERY DEPARTMENT'}</td>
-          </tr>
-          <tr>
-            <th>Total Color Quantity</th>
-            <td class="font-mono highlight-cell">${colorQty} ${qtyUnit}</td>
-          </tr>
-          <tr>
-            <th>Special Material / Thread</th>
-            <td>${specialMaterial}</td>
-          </tr>
-          <tr>
-            <th>Special Material Qty</th>
-            <td>${specialMaterialQty}</td>
-          </tr>
-        </table>
-      </div>
-    </div>
-
-    <!-- PRODUCTION QUANTITY SUMMARY -->
-    <div class="section-title">Production Quantity Summary</div>
-    <table class="spec-table">
-      <tr>
-        <th style="width: 20%;">Total Color Quantity</th>
-        <td style="width: 30%;" class="font-mono highlight-cell"><strong>${colorQty} ${qtyUnit}</strong></td>
-        <th style="width: 20%;">Special Material / Trims</th>
-        <td style="width: 30%;">${specialMaterial}</td>
-      </tr>
-      <tr>
-        <th>Special Material Quantity</th>
-        <td colspan="3">${specialMaterialQty}</td>
-      </tr>
-    </table>
-
-    <!-- PRODUCTION SCHEDULE -->
-    <div class="section-title">Production Schedule</div>
-    <table class="spec-table">
-      <tr>
-        <th style="width: 20%;">Design Release Date</th>
-        <td style="width: 30%;">${prodDesignDate}</td>
-        <th style="width: 20%;">Projected Floor End Date</th>
-        <td style="width: 30%;">${prodEndDate}</td>
-      </tr>
-    </table>
-
-    <!-- SIGNATURE AUTHORIZATIONS -->
-    <div class="sign-section">
-      <div style="font-size: 9px; font-weight: 800; text-transform: uppercase; color: #163767;">
-        Department Sign-off &amp; Material Movement Authorization
-      </div>
-      <div class="sign-grid">
-        <div class="sign-box">
-          <div class="sign-role">1. Prepared By (Programming)</div>
-          <div style="font-size: 9px; font-weight: 600; color: #1e293b;">${authorName}</div>
-          <div class="sign-line">Signature &amp; Date</div>
-        </div>
-        <div class="sign-box">
-          <div class="sign-role">2. Fabric Store Incharge</div>
-          <div style="font-size: 8px; color: #64748b;">Rolls Issued / Verified</div>
-          <div class="sign-line">Signature &amp; Date</div>
-        </div>
-        <div class="sign-box">
-          <div class="sign-role">3. Floor Master / Embroidery</div>
-          <div style="font-size: 8px; color: #64748b;">Job Received on Machine</div>
-          <div class="sign-line">Signature &amp; Date</div>
-        </div>
-        <div class="sign-box">
-          <div class="sign-role">4. QA / Factory Manager</div>
-          <div style="font-size: 8px; color: #64748b;">Final Clearance</div>
-          <div class="sign-line">Signature &amp; Date</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- FOOTER -->
-    <div class="sheet-footer">
-      <div>Shubham Fabrics India Pvt. Ltd. &middot; Programming Department MES Traveler Sheet</div>
-      <div>Printed: ${printDate} &middot; Confidential Factory Floor Document</div>
-    </div>
-
-  </div>
+  ${targetCategories.map((cat) => renderSingleSheet(cat)).join('\n')}
 
 </body>
 </html>`;
@@ -638,22 +1051,22 @@ export function generateProductionSheetHtml(program: any): string {
 /**
  * Download Production Sheet as an offline HTML file
  */
-export async function downloadProductionSheetHtml(program: any) {
+export async function downloadProductionSheetHtml(program: any, category: GarmentCategory | 'ALL' = 'TOP') {
   try {
     const preparedProgram = await prepareProductionSheetImages(program);
-    const html = generateProductionSheetHtml(preparedProgram);
+    const html = generateProductionSheetHtml(preparedProgram, category);
     const serialNo = program.programSerialNo || program.programNumber || 'PRG-SHEET';
     const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Production_Sheet_${serialNo}.html`;
+    a.download = `Production_Sheet_${category}_${serialNo}.html`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'The design photos could not be loaded.';
+    const message = error instanceof Error ? error.message : 'The production sheet could not be downloaded.';
     window.alert(`Production sheet download failed: ${message}`);
   }
 }
@@ -661,30 +1074,384 @@ export async function downloadProductionSheetHtml(program: any) {
 /**
  * Open print window for the Production Sheet
  */
-export function printProductionSheet(program: any) {
+export function printProductionSheet(program: any, category: GarmentCategory | 'ALL' = 'TOP') {
   const printWindow = window.open('', '_blank');
   if (printWindow) {
     void (async () => {
       try {
         const preparedProgram = await prepareProductionSheetImages(program);
         printWindow.document.open();
-        printWindow.document.write(generateProductionSheetHtml(preparedProgram));
+        printWindow.document.write(generateProductionSheetHtml(preparedProgram, category));
         printWindow.document.close();
-        await Promise.all(
-          Array.from(
-            printWindow.document.querySelectorAll<HTMLImageElement>('.design-photo'),
-            (image) => image.decode(),
-          ),
-        );
         printWindow.focus();
         printWindow.print();
       } catch (error) {
         printWindow.close();
-        const message = error instanceof Error ? error.message : 'The design photos could not be loaded.';
+        const message = error instanceof Error ? error.message : 'Failed to print production sheet.';
         window.alert(`Production sheet print failed: ${message}`);
       }
     })();
   } else {
-    void downloadProductionSheetHtml(program);
+    void downloadProductionSheetHtml(program, category);
+  }
+}
+
+/**
+ * Generate authentic Wilcom Form document HTML
+ */
+export function generateWilcomFormHtml(program: any, filterCategory: GarmentCategory | 'ALL' = 'ALL'): string {
+  const serialNo = program.programSerialNo || program.programNumber || '';
+  const designNo = program.designNumber || program.designName || '';
+  const clientName = program.clientName || program.buyerName || '';
+  const dateVal = program.startDate || program.programDate 
+    ? new Date(program.startDate || program.programDate).toLocaleDateString('en-GB') 
+    : new Date().toLocaleDateString('en-GB');
+
+  let wilcomEntries: WilcomEntry[] = [];
+  if (program.metadataJson) {
+    try {
+      const meta = typeof program.metadataJson === 'string' ? JSON.parse(program.metadataJson) : program.metadataJson;
+      if (Array.isArray(meta?.wilcomEntries)) {
+        wilcomEntries = meta.wilcomEntries;
+      }
+    } catch {}
+  }
+
+  // Fallback for single wilcom design
+  if (wilcomEntries.length === 0 && (program.wilcomDesignNumber || program.embroideryDesign)) {
+    wilcomEntries = [
+      {
+        id: 'legacy-1',
+        category: 'TOP',
+        styleName: program.topName || program.mainStyle || 'Primary Top Style',
+        wilcomDesignNumber: program.wilcomDesignNumber || program.embroideryDesign || '',
+        photoUrl: program.wilcomDesignPhoto || program.baseDesignPhoto || '',
+        remarks: program.remarks || program.comments || '',
+      },
+    ];
+  }
+
+  const filtered = filterCategory === 'ALL'
+    ? wilcomEntries
+    : wilcomEntries.filter((e) => e.category === filterCategory);
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wilcom Form - ${serialNo}</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 10mm;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    body {
+      background-color: #f1f5f9;
+      color: #000000;
+      font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+      padding: 16px;
+      font-size: 12px;
+    }
+    .no-print-bar {
+      max-width: 200mm;
+      margin: 0 auto 12px auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #111827;
+      color: #ffffff;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+    .btn {
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      border: none;
+    }
+    .btn-primary { background: #7c3aed; color: #ffffff; }
+    .btn-outline { background: #374151; color: #ffffff; }
+    .card-wrapper {
+      max-width: 200mm;
+      min-height: 275mm;
+      margin: 0 auto;
+      background: #ffffff;
+      border: 2px solid #000000;
+      padding: 20px;
+    }
+    .header-box {
+      border-bottom: 2px solid #000000;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .company-title {
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .doc-title {
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.15em;
+      color: #4338ca;
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      border: 1.5px solid #000;
+      padding: 10px;
+      margin-bottom: 16px;
+      background: #f8fafc;
+    }
+    .meta-item { display: flex; flex-direction: column; }
+    .meta-label { font-size: 10px; font-weight: 900; text-transform: uppercase; color: #475569; }
+    .meta-val { font-size: 12px; font-weight: 800; color: #000; }
+    .entries-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .wilcom-card {
+      border: 1.5px solid #000000;
+      border-radius: 4px;
+      padding: 12px;
+      background: #ffffff;
+      page-break-inside: avoid;
+    }
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #cbd5e1;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+    }
+    .cat-badge {
+      font-size: 11px;
+      font-weight: 900;
+      padding: 3px 8px;
+      border-radius: 3px;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .cat-TOP { background: #2563eb; }
+    .cat-BOTTOM { background: #059669; }
+    .cat-DUPATTA { background: #d97706; }
+    .wilcom-no {
+      font-size: 15px;
+      font-weight: 900;
+      font-family: monospace;
+      letter-spacing: 0.05em;
+      color: #1e1b4b;
+    }
+    .card-body {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+    .photo-box {
+      width: 160px;
+      height: 160px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f8fafc;
+      overflow: hidden;
+    }
+    .photo-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .info-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .info-row {
+      display: flex;
+      gap: 6px;
+    }
+    .info-key {
+      font-weight: 800;
+      min-width: 90px;
+      color: #334155;
+    }
+    .info-val {
+      font-weight: 600;
+      color: #000000;
+    }
+    @media print {
+      body { background: transparent; padding: 0; }
+      .no-print-bar { display: none !important; }
+      .card-wrapper { border: 2px solid #000; min-height: 280mm; width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="no-print-bar">
+    <div>
+      <strong>Wilcom Embroidery Form</strong> &middot; Serial No. ${serialNo}
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <button class="btn btn-primary" onclick="window.print()">
+        🖨️ Print Form (A4)
+      </button>
+      <button class="btn btn-outline" onclick="window.close()">
+        ✕ Close
+      </button>
+    </div>
+  </div>
+
+  <div class="card-wrapper">
+    <div class="header-box">
+      <div class="company-title">SHUBHAM FABRICS INDIA PVT. LTD.</div>
+      <div class="doc-title">WILCOM EMBROIDERY SPECIFICATION FORM</div>
+    </div>
+
+    <div class="meta-grid">
+      <div class="meta-item">
+        <span class="meta-label">DESIGN NO:</span>
+        <span class="meta-val">${designNo || '—'}</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">SERIAL NO:</span>
+        <span class="meta-val">${serialNo || '—'}</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">DATE:</span>
+        <span class="meta-val">${dateVal}</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">CLIENT / BUYER:</span>
+        <span class="meta-val">${clientName || 'Standard Client'}</span>
+      </div>
+    </div>
+
+    ${filtered.length === 0 ? `
+      <div style="padding: 40px; text-align: center; border: 2px dashed #94a3b8; border-radius: 6px; color: #64748b; font-weight: 700;">
+        No Wilcom embroidery designs recorded for ${filterCategory === 'ALL' ? 'this production order' : filterCategory}.
+      </div>
+    ` : `
+      <div class="entries-grid">
+        ${filtered.map((entry, idx) => `
+          <div class="wilcom-card">
+            <div class="card-head">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="cat-badge cat-${entry.category}">${entry.category}</span>
+                <span style="font-weight: 800; font-size: 13px;">Entry #${idx + 1} &middot; ${entry.styleName || 'Garment Style'}</span>
+              </div>
+              <div class="wilcom-no">
+                WILCOM #: ${entry.wilcomDesignNumber || 'N/A'}
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="photo-box">
+                ${entry.photoUrl ? `
+                  <img src="${entry.photoUrl}" alt="${entry.wilcomDesignNumber}" />
+                ` : `
+                  <span style="font-size: 10px; font-weight: 700; color: #94a3b8; text-align: center; padding: 8px;">
+                    No Photo Attached
+                  </span>
+                `}
+              </div>
+              <div class="info-list">
+                <div class="info-row">
+                  <span class="info-key">Category:</span>
+                  <span class="info-val">${entry.category} Garment Component</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-key">Style Details:</span>
+                  <span class="info-val">${entry.styleName || 'Standard Style'}</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-key">Wilcom Design:</span>
+                  <span class="info-val font-mono" style="font-weight: 900;">${entry.wilcomDesignNumber || '—'}</span>
+                </div>
+                ${entry.remarks ? `
+                <div class="info-row">
+                  <span class="info-key">Remarks:</span>
+                  <span class="info-val">${entry.remarks}</span>
+                </div>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `}
+  </div>
+</body>
+</html>`;
+}
+
+/**
+ * Download Wilcom Form as an offline HTML file
+ */
+export async function downloadWilcomFormHtml(program: any, filterCategory: GarmentCategory | 'ALL' = 'ALL') {
+  try {
+    const preparedProgram = await prepareProductionSheetImages(program);
+    const html = generateWilcomFormHtml(preparedProgram, filterCategory);
+    const serialNo = program.programSerialNo || program.programNumber || 'PRG-SHEET';
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Wilcom_Form_${filterCategory}_${serialNo}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'The Wilcom form could not be downloaded.';
+    window.alert(`Wilcom form download failed: ${message}`);
+  }
+}
+
+/**
+ * Open print window for the Wilcom Form
+ */
+export function printWilcomForm(program: any, filterCategory: GarmentCategory | 'ALL' = 'ALL') {
+  const printWindow = window.open('', '_blank');
+  if (printWindow) {
+    void (async () => {
+      try {
+        const preparedProgram = await prepareProductionSheetImages(program);
+        printWindow.document.open();
+        printWindow.document.write(generateWilcomFormHtml(preparedProgram, filterCategory));
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+      } catch (error) {
+        printWindow.close();
+        const message = error instanceof Error ? error.message : 'Failed to print Wilcom form.';
+        window.alert(`Wilcom form print failed: ${message}`);
+      }
+    })();
+  } else {
+    void downloadWilcomFormHtml(program, filterCategory);
   }
 }

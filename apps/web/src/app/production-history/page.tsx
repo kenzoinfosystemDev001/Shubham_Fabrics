@@ -45,9 +45,7 @@ export default function ProductionHistoryPage() {
   const fetchHistory = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/programs');
-      if (!res.ok) throw new Error('Failed to fetch programs');
-      const data = await res.json();
+      const data = await api.getPrograms();
       setPrograms(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Failed to load production history:', err);
@@ -382,6 +380,12 @@ export default function ProductionHistoryPage() {
                             <span className="font-semibold text-slate-900">
                               {prog.clientName || prog.buyerName || 'Direct Client'}
                             </span>
+                            {prog.clientCode && (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-amber-900 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+                                <span>🔒</span>
+                                <span>{prog.clientCode}</span>
+                              </span>
+                            )}
                             <span className="text-slate-300">·</span>
                             <span>
                               Design: <strong className="text-slate-800">{prog.designNumber || prog.designName || 'Standard'}</strong>

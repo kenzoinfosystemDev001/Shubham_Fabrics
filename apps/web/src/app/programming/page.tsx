@@ -115,6 +115,7 @@ export default function ProgrammingDashboardPage() {
     const design = (p.designNumber || p.designName || '').toLowerCase();
     const wilcom = (p.wilcomDesignNumber || '').toLowerCase();
     const style = (p.mainStyle || p.styleCode || '').toLowerCase();
+    const subStyle = (p.subStyle || (Array.isArray(p.subStyles) ? p.subStyles.join(' ') : '')).toLowerCase();
     const fabric = (p.fabricName || '').toLowerCase();
     const color = (p.fabricColor || '').toLowerCase();
     return (
@@ -123,6 +124,7 @@ export default function ProgrammingDashboardPage() {
       design.includes(q) ||
       wilcom.includes(q) ||
       style.includes(q) ||
+      subStyle.includes(q) ||
       fabric.includes(q) ||
       color.includes(q)
     );
@@ -368,7 +370,13 @@ export default function ProgrammingDashboardPage() {
                               {prog.programSerialNo || prog.programNumber}
                             </td>
                             <td className="py-3 px-4 font-medium text-slate-900">
-                              {prog.clientName || prog.buyerName || '—'}
+                              <div>{prog.clientName || prog.buyerName || '—'}</div>
+                              {prog.clientCode && (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-amber-900 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 mt-0.5">
+                                  <span>🔒</span>
+                                  <span>{prog.clientCode}</span>
+                                </span>
+                              )}
                             </td>
                             <td className="py-3 px-4">
                               <span className="font-semibold block text-slate-900">
@@ -384,12 +392,31 @@ export default function ProgrammingDashboardPage() {
                               <span className="block font-medium text-slate-800">
                                 {prog.mainStyle || prog.styleCode || '—'}
                               </span>
-                              <span className="text-[10px] text-slate-500">
-                                {prog.fabricName || 'Cotton'} · {prog.fabricColor || 'Natural'}
+                              {prog.subStyle && (
+                                <span className="text-[10px] text-amber-900 font-semibold block truncate max-w-[180px]" title={prog.subStyle}>
+                                  Sub: {prog.subStyle}
+                                </span>
+                              )}
+                              <span className="text-[10px] text-slate-500 block">
+                                {prog.fabricName || 'Cotton'}
                               </span>
+                              {prog.items && prog.items.length > 1 ? (
+                                <span className="inline-flex items-center gap-1 text-[10px] text-blue-700 font-semibold bg-blue-50 px-1.5 py-0.5 rounded mt-0.5">
+                                  {prog.items.length} Items &middot; {Array.from(new Set(prog.items.map((it: any) => String(it.color || '').trim()).filter(Boolean))).length} Colors
+                                </span>
+                              ) : (
+                                <span className="text-[10px] text-slate-500">
+                                  {prog.fabricColor || 'Natural'}
+                                </span>
+                              )}
                             </td>
                             <td className="py-3 px-4 font-mono font-semibold">
-                              {prog.colorQuantity || prog.targetQuantity} {prog.quantityMeasurement || 'PCS'}
+                              <div>{prog.colorQuantity || prog.targetQuantity} {prog.quantityMeasurement || 'PCS'}</div>
+                              {prog.items && prog.items.length > 1 && (
+                                <span className="text-[10px] text-slate-400 block font-normal">
+                                  {prog.items.length} colorways
+                                </span>
+                              )}
                             </td>
                             <td className="py-3 px-4 text-[11px]">
                               {prog.deliveryDate ? new Date(prog.deliveryDate).toLocaleDateString() : '—'}

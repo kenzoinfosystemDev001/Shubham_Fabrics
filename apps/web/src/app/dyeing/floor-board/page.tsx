@@ -633,7 +633,7 @@ export default function DyeingFloorBoardPage() {
                       required
                       value={updateForm.dyedColor}
                       onChange={(e) => setUpdateForm({ ...updateForm, dyedColor: e.target.value })}
-                      placeholder={`e.g. ${selectedOrderForUpdate.targetColor}`}
+                      placeholder=""
                       className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#163767]"
                     />
                   </div>
@@ -678,7 +678,7 @@ export default function DyeingFloorBoardPage() {
                       type="text"
                       value={updateForm.machineNumber}
                       onChange={(e) => setUpdateForm({ ...updateForm, machineNumber: e.target.value })}
-                      placeholder="e.g. M/C-02"
+                      placeholder=""
                       className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#163767]"
                     />
                   </div>
@@ -691,7 +691,7 @@ export default function DyeingFloorBoardPage() {
                       type="text"
                       value={updateForm.batchNumber}
                       onChange={(e) => setUpdateForm({ ...updateForm, batchNumber: e.target.value })}
-                      placeholder="e.g. LOT-A12"
+                      placeholder=""
                       className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#163767]"
                     />
                   </div>
@@ -705,7 +705,7 @@ export default function DyeingFloorBoardPage() {
                     rows={2}
                     value={updateForm.processRemarks}
                     onChange={(e) => setUpdateForm({ ...updateForm, processRemarks: e.target.value })}
-                    placeholder="Enter temperature, shade verification notes, or instructions..."
+                    placeholder=""
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#163767]"
                   />
                 </div>
@@ -850,7 +850,7 @@ export default function DyeingFloorBoardPage() {
                       type="text"
                       value={challanForm.vehicleNumber}
                       onChange={(e) => setChallanForm({ ...challanForm, vehicleNumber: e.target.value })}
-                      placeholder="e.g. Trolley-04"
+                      placeholder=""
                       className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#163767]"
                     />
                   </div>
@@ -864,7 +864,7 @@ export default function DyeingFloorBoardPage() {
                     rows={2}
                     value={challanForm.remarks}
                     onChange={(e) => setChallanForm({ ...challanForm, remarks: e.target.value })}
-                    placeholder="Enter dispatch notes, shade verification remarks for QC1..."
+                    placeholder=""
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#163767]"
                   />
                 </div>

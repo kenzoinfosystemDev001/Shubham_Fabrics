@@ -20,10 +20,16 @@ import {
   X,
   Send,
   AlertCircle,
-  Barcode as BarcodeIcon
+  Barcode as BarcodeIcon,
+  Download
 } from 'lucide-react';
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { downloadBarcodeStickerPng } from '@/lib/barcode';
+import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
+import { 
+  downloadProductionSheetHtml, 
+  printProductionSheet 
+} from '@/lib/download-production-sheet';
 
 export default function EmbroideryIncomingChallansPage() {
   const [loading, setLoading] = useState(true);
@@ -69,6 +75,38 @@ export default function EmbroideryIncomingChallansPage() {
 
       if (res.ok) {
         setActionSuccess(`Challan ${challan.challanNumber} inspection PASSED & accepted onto Embroidery floor!`);
+        setInspectModalChallan(null);
+        setInspectionRemark('');
+        loadData();
+        setTimeout(() => setActionSuccess(null), 4500);
+      } else {
+        alert('Failed to update challan status. Please try again.');
+      }
+    } catch (err: any) {
+      console.error(err);
+      alert('Error updating status: ' + err.message);
+    } finally {
+      setInspecting(false);
+    }
+  };
+
+  const handleRejectToDefectiveShelf = async (challan: any) => {
+    if (!confirm(`Are you sure you want to REJECT Challan ${challan.challanNumber} to Fabric Store Defective Shelf?`)) {
+      return;
+    }
+    try {
+      setInspecting(true);
+      const res = await fetch(`/api/challans/${challan.id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: 'REJECTED',
+          notes: inspectionRemark || 'REJECTED at Embroidery Incoming Gate -> Moved to Fabric Store Defective Shelf.',
+        }),
+      });
+
+      if (res.ok) {
+        setActionSuccess(`Challan ${challan.challanNumber} REJECTED and dispatched to Fabric Store Defective Shelf.`);
         setInspectModalChallan(null);
         setInspectionRemark('');
         loadData();
@@ -199,10 +237,10 @@ export default function EmbroideryIncomingChallansPage() {
                 </div>
                 <div>
                   <span className="text-xs font-bold block uppercase tracking-wide">
-                    From Fabric Store (Undyed)
+                    From Fabric Store (No Dyeing Required)
                   </span>
                   <p className="text-[11px] text-slate-500">
-                    Direct Greige / Kora Fabric for direct embroidery stitching
+                    Pre-dyed / mill-finished fabric routed from Fabric Store
                   </p>
                 </div>
               </div>
@@ -232,10 +270,10 @@ export default function EmbroideryIncomingChallansPage() {
                 </div>
                 <div>
                   <span className="text-xs font-bold block uppercase tracking-wide">
-                    From Dyeing Department (QC1 Passed)
+                    From QC 1 (Post-Dyeing Passed)
                   </span>
                   <p className="text-[11px] text-slate-500">
-                    Dyed Fabric verified and passed by QC1 Quality Inspector
+                    Dyed fabric inspected, approved, and released by QC 1 Gate
                   </p>
                 </div>
               </div>
@@ -563,7 +601,7 @@ export default function EmbroideryIncomingChallansPage() {
                   type="text"
                   value={inspectionRemark}
                   onChange={(e) => setInspectionRemark(e.target.value)}
-                  placeholder="e.g. Checked &amp; approved. Ready for multi-head stitching."
+                  placeholder=""
                   className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-fuchsia-500 focus:outline-none"
                 />
               </div>
@@ -580,6 +618,15 @@ export default function EmbroideryIncomingChallansPage() {
               <button
                 type="button"
                 disabled={inspecting}
+                onClick={() => handleRejectToDefectiveShelf(inspectModalChallan)}
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-lg text-xs font-semibold transition"
+              >
+                <AlertCircle className="w-4 h-4 text-rose-600" />
+                <span>REJECT to Defective Shelf</span>
+              </button>
+              <button
+                type="button"
+                disabled={inspecting}
                 onClick={() => handlePassAndReceive(inspectModalChallan)}
                 className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs transition"
               >
@@ -591,75 +638,13 @@ export default function EmbroideryIncomingChallansPage() {
         </div>
       )}
 
-      {/* MASTER PRODUCTION SHEET MODAL */}
+      {/* FULL ACCOMPANYING PRODUCTION SHEET PREVIEW & PRINT MODAL */}
       {selectedSheetModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="max-w-3xl w-full bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden space-y-4 p-6 my-8">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                  Master Production Sheet Record (Rule 1)
-                </span>
-                <h3 className="text-base font-bold text-slate-900 font-mono">
-                  Sheet #{selectedSheetModal.programSerialNo || selectedSheetModal.programNumber}
-                </h3>
-              </div>
-              <button
-                onClick={() => setSelectedSheetModal(null)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="space-y-4 text-xs">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
-                <div>
-                  <span className="text-slate-400 text-[10px] block">Buyer</span>
-                  <strong className="text-slate-800">{selectedSheetModal.clientName || selectedSheetModal.buyerName || 'Standard'}</strong>
-                </div>
-                <div>
-                  <span className="text-slate-400 text-[10px] block">Style Code</span>
-                  <strong className="text-slate-800">{selectedSheetModal.mainStyle || '—'}</strong>
-                </div>
-                <div>
-                  <span className="text-slate-400 text-[10px] block">Wilcom Design #</span>
-                  <strong className="text-fuchsia-700 font-mono">{selectedSheetModal.wilcomDesignNumber || 'WILCOM-STD'}</strong>
-                </div>
-                <div>
-                  <span className="text-slate-400 text-[10px] block">Target Quantity</span>
-                  <strong className="text-slate-800 font-mono">{selectedSheetModal.targetQuantity || 0} PCS</strong>
-                </div>
-              </div>
-
-              <div className="p-3 bg-fuchsia-50/60 border border-fuchsia-200 rounded-xl space-y-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-fuchsia-900 block">
-                  Wilcom Embroidery Specifications
-                </span>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div>
-                    <span className="text-slate-500 block text-[10px]">Design Name / Notes</span>
-                    <strong className="text-slate-800">{selectedSheetModal.embroideryDesign || 'Logo & Pattern Embroidery'}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 block text-[10px]">Frame / Size</span>
-                    <strong className="text-slate-800">{selectedSheetModal.embroideryDesignSize || 'Standard 12x12 cm'}</strong>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-2 flex justify-end border-t border-slate-200">
-              <button
-                type="button"
-                onClick={() => setSelectedSheetModal(null)}
-                className="px-4 py-2 bg-slate-800 text-white rounded-lg text-xs font-semibold hover:bg-slate-900 transition"
-              >
-                Close Sheet
-              </button>
-            </div>
-          </div>
-        </div>
+        <ProductionSheetPrintModal
+          program={selectedSheetModal}
+          isOpen={Boolean(selectedSheetModal)}
+          onClose={() => setSelectedSheetModal(null)}
+        />
       )}
     </div>
   );

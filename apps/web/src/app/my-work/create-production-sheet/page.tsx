@@ -1,35 +1,91 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { 
   ArrowLeft, 
-  Save, 
   CheckCircle2, 
   AlertCircle, 
-  Layers, 
-  Palette, 
-  Cpu, 
-  Scissors, 
-  Droplet, 
-  Hash, 
-  Calendar, 
-  MessageSquare,
-  Sparkles,
   RefreshCw,
   Printer,
   Download,
   Eye,
-  ExternalLink
+  ExternalLink,
+  Plus,
+  Trash2,
+  Layers,
+  Sparkles,
+  Upload,
+  Image as ImageIcon,
+  Edit3,
+  Check,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
-import { ImageUpload } from '@/components/ImageUpload';
 import { api } from '@/lib/api';
+import { getCurrentUser, canViewClientCode } from '@/lib/rbac';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { 
   downloadProductionSheetHtml, 
-  printProductionSheet 
+  printProductionSheet,
+  downloadWilcomFormHtml,
+  printWilcomForm,
+  DEFAULT_SUB_STYLES,
+  DEFAULT_BOTTOM_SUB_STYLES,
+  DEFAULT_DUPATTA_SUB_STYLES,
+  getDefaultSubStylesForCategory,
+  SubStyleAverage,
+  ProductionGridItem,
+  SWATCH_CLIP_PATH,
+  getSwatchColorHex,
+  SwatchItem,
+  GarmentCategory,
+  WilcomEntry,
+  ComponentSheetData
 } from '@/lib/download-production-sheet';
+
+interface ComponentState {
+  enabled: boolean;
+  styleName: string;
+  fabricName: string;
+  fabricWidth: string;
+  subStyles: SubStyleAverage[];
+  productionGrid: ProductionGridItem[];
+  swatchColorOverrides: Record<string, string>;
+  noteText: string;
+  signatureName: string;
+}
+
+const CATEGORY_META: Record<GarmentCategory, {
+  label: string;
+  badgeBg: string;
+  badgeText: string;
+  accentBorder: string;
+  subHeader: string;
+}> = {
+  TOP: {
+    label: 'TOP Production Sheet',
+    badgeBg: 'bg-blue-100',
+    badgeText: 'text-blue-900',
+    accentBorder: 'border-blue-700',
+    subHeader: 'TOP:-',
+  },
+  BOTTOM: {
+    label: 'BOTTOM Production Sheet',
+    badgeBg: 'bg-emerald-100',
+    badgeText: 'text-emerald-900',
+    accentBorder: 'border-emerald-900',
+    subHeader: 'BOTTOM:-',
+  },
+  DUPATTA: {
+    label: 'DUPATTA Production Sheet',
+    badgeBg: 'bg-purple-100',
+    badgeText: 'text-purple-900',
+    accentBorder: 'border-purple-800',
+    subHeader: 'DUPATTA:-',
+  },
+};
 
 export default function CreateProductionSheetPage() {
   const router = useRouter();
@@ -38,6 +94,84 @@ export default function CreateProductionSheetPage() {
   const [success, setSuccess] = useState<any | null>(null);
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [createdProgramId, setCreatedProgramId] = useState<string | null>(null);
+
+  // Common / Shared Order Header Fields
+  const [designNumber, setDesignNumber] = useState('');
+  const [sheetDate, setSheetDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [programSerialNo, setProgramSerialNo] = useState('');
+  const [serialNoCounter, setSerialNoCounter] = useState('');
+  const [fabricName, setFabricName] = useState('');
+  const [fabricWidth, setFabricWidth] = useState('');
+
+  // Three Garment Components: TOP, BOTTOM, DUPATTA
+  // Starts clean with NO dummy data
+  const [components, setComponents] = useState<Record<GarmentCategory, ComponentState>>({
+    TOP: {
+      enabled: true,
+      styleName: '',
+      fabricName: '',
+      fabricWidth: '',
+      subStyles: DEFAULT_SUB_STYLES.map((s) => ({ ...s, average: '' })),
+      productionGrid: [{ id: 'top-row-1', color: '', pcs: '', mtr: '', sizes: {} }],
+      swatchColorOverrides: {},
+      noteText: '',
+      signatureName: '',
+    },
+    BOTTOM: {
+      enabled: false,
+      styleName: '',
+      fabricName: '',
+      fabricWidth: '',
+      subStyles: DEFAULT_BOTTOM_SUB_STYLES.map((s) => ({ ...s, average: '' })),
+      productionGrid: [{ id: 'bottom-row-1', color: '', pcs: '', mtr: '', sizes: {} }],
+      swatchColorOverrides: {},
+      noteText: '',
+      signatureName: '',
+    },
+    DUPATTA: {
+      enabled: false,
+      styleName: '',
+      fabricName: '',
+      fabricWidth: '',
+      subStyles: DEFAULT_DUPATTA_SUB_STYLES.map((s) => ({ ...s, average: '' })),
+      productionGrid: [{ id: 'dupatta-row-1', color: '', pcs: '', mtr: '', sizes: {} }],
+      swatchColorOverrides: {},
+      noteText: '',
+      signatureName: '',
+    },
+  });
+
+  // Forwarding Selection State: select which sheets to forward to the next department
+  const [forwardedComponents, setForwardedComponents] = useState<GarmentCategory[]>(['TOP']);
+
+  // Wilcom Form Stage Management State
+  const [wilcomEntries, setWilcomEntries] = useState<WilcomEntry[]>([]);
+  const [wilcomCategory, setWilcomCategory] = useState<GarmentCategory>('TOP');
+  const [wilcomStyleName, setWilcomStyleName] = useState('');
+  const [wilcomDesignNumber, setWilcomDesignNumber] = useState('');
+  const [wilcomPhotoUrl, setWilcomPhotoUrl] = useState('');
+  const [wilcomRemarks, setWilcomRemarks] = useState('');
+  const [editingWilcomId, setEditingWilcomId] = useState<string | null>(null);
+
+  // MES Routing & Commercial Fields
+  const [clientName, setClientName] = useState('');
+  const [clientCode, setClientCode] = useState('');
+  const [clientPriority, setClientPriority] = useState('NORMAL');
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
+  useEffect(() => {
+    setCurrentUser(getCurrentUser());
+  }, []);
+
+  const [deliveryDate, setDeliveryDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 14);
+    return d.toISOString().split('T')[0];
+  });
+  const [fabricDyeingRequired, setFabricDyeingRequired] = useState(false);
+  const [fabricColorAvailable, setFabricColorAvailable] = useState('IN_STOCK');
+
+  // Live Fabric Store Availability State
   const [fabricAvailability, setFabricAvailability] = useState<{
     availableMeters: number;
     requiredMeters: number;
@@ -47,82 +181,381 @@ export default function CreateProductionSheetPage() {
   const [checkingFabricAvailability, setCheckingFabricAvailability] = useState(false);
   const [fabricAvailabilityError, setFabricAvailabilityError] = useState<string | null>(null);
 
-  // FORM STATE - All 8 Sections of Shubham Fabrics Production Sheet
-  const [formData, setFormData] = useState({
-    // SECTION 1: Program Information
-    programSerialNo: '',
-    startDate: '',
-    designNumber: '',
-    clientName: '',
-    clientPriority: 'NORMAL',
-    deliveryDate: '',
-
-    // SECTION 2: Style Information
-    mainStyle: '',
-    subStyle: '',
-    pattern: '',
-    baseDesignType: '',
-    baseDesignPhoto: '',
-
-    // SECTION 3: Design Information
-    wilcomDesignNumber: '',
-    wilcomDesignPhoto: '',
-    embroideryDesign: '',
-    embroideryDesignSize: '',
-
-    // SECTION 4: Fabric Information
-    fabricName: '',
-    fabric: '',
-    fabricType: '',
-    fabricWidth: '',
-    fabricWidthInches: '',
-    fabricColor: '',
-    fabricColorAvailable: 'IN_STOCK',
-    fabricAverage: '',
-    fabricAverageType: '',
-    fabricAverageMeasurement: '',
-
-    // SECTION 5: Dyeing Information
-    fabricDyeingRequired: false,
-    fabricIssuedToDyeing: '',
-    fabricSentToDyeing: '',
-
-    // SECTION 6: Production Quantity
-    color: '',
-    colorQuantity: '',
-    quantityMeasurement: 'PCS',
-    specialMaterial: '',
-    specialMaterialQuantity: '',
-
-    // SECTION 7: Production Dates
-    productionDesignDate: '',
-    productionEndDate: '',
-
-    // SECTION 8: Rejection / Remarks
-    piecesRejection: '',
-    rejectionReason: '',
-    comments: '',
-  });
-
-  const handleChange = (field: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+  // Component Helper Functions
+  const getTotalMtrAverage = (cat: GarmentCategory): number => {
+    const sum = components[cat].subStyles.reduce((acc, it) => acc + (Number(it.average) || 0), 0);
+    return Math.round(sum * 100) / 100;
   };
 
-  useEffect(() => {
-    const fabricName = formData.fabricName.trim();
-    const fabricAverage = Number(formData.fabricAverage);
-    const productionQuantity = Number(formData.colorQuantity);
+  const getTotalPieces = (cat: GarmentCategory): number => {
+    return components[cat].productionGrid.reduce((acc, row) => acc + (Number(row.pcs) || 0), 0);
+  };
 
+  const getTotalFabricMeters = (cat: GarmentCategory): number => {
+    const pieces = getTotalPieces(cat);
+    const avg = getTotalMtrAverage(cat);
+    return Math.round(pieces * avg * 100) / 100;
+  };
+
+  const getDisplaySwatches = (cat: GarmentCategory): SwatchItem[] => {
+    const result: SwatchItem[] = [];
+    const seen = new Set<string>();
+    const overrides = components[cat].swatchColorOverrides;
+
+    components[cat].productionGrid.forEach((row) => {
+      const trimmed = (row.color || '').trim();
+      if (trimmed && !seen.has(trimmed.toLowerCase())) {
+        seen.add(trimmed.toLowerCase());
+        const hex = overrides[trimmed] || getSwatchColorHex(trimmed);
+        result.push({
+          id: `swatch-${cat}-${trimmed}`,
+          name: trimmed,
+          color: hex,
+        });
+      }
+    });
+
+    return result;
+  };
+
+  // Overall totals across enabled components
+  const overallTotalPieces = useMemo(() => {
+    let sum = 0;
+    (['TOP', 'BOTTOM', 'DUPATTA'] as GarmentCategory[]).forEach((cat) => {
+      if (components[cat].enabled) {
+        sum += getTotalPieces(cat);
+      }
+    });
+    return sum;
+  }, [components]);
+
+  const overallFabricMeters = useMemo(() => {
+    let sum = 0;
+    (['TOP', 'BOTTOM', 'DUPATTA'] as GarmentCategory[]).forEach((cat) => {
+      if (components[cat].enabled) {
+        sum += getTotalFabricMeters(cat);
+      }
+    });
+    return Math.round(sum * 100) / 100;
+  }, [components]);
+
+  // Handle Component Enable/Disable
+  const handleToggleComponent = (cat: GarmentCategory) => {
+    const willEnable = !components[cat].enabled;
+    setComponents((prev) => ({
+      ...prev,
+      [cat]: {
+        ...prev[cat],
+        enabled: willEnable,
+      },
+    }));
+
+    if (willEnable) {
+      if (!forwardedComponents.includes(cat)) {
+        setForwardedComponents((prev) => [...prev, cat]);
+      }
+    } else {
+      setForwardedComponents((prev) => prev.filter((c) => c !== cat));
+    }
+  };
+
+  // Handle Forwarding Selection
+  const handleToggleForwarding = (cat: GarmentCategory) => {
+    if (forwardedComponents.includes(cat)) {
+      if (forwardedComponents.length === 1) {
+        alert('At least one Production Sheet must be selected for forwarding.');
+        return;
+      }
+      setForwardedComponents((prev) => prev.filter((c) => c !== cat));
+    } else {
+      if (!components[cat].enabled) {
+        // Auto-enable if user selects for forwarding
+        setComponents((prev) => ({
+          ...prev,
+          [cat]: { ...prev[cat], enabled: true },
+        }));
+      }
+      setForwardedComponents((prev) => [...prev, cat]);
+    }
+  };
+
+  // Component SubStyle Changes
+  const handleSubStyleAverageChange = (cat: GarmentCategory, index: number, newAverage: number | string) => {
+    const updatedSubStyles = [...components[cat].subStyles];
+    updatedSubStyles[index] = { ...updatedSubStyles[index], average: newAverage };
+
+    const newTotal = Math.round(
+      updatedSubStyles.reduce((acc, it) => acc + (Number(it.average) || 0), 0) * 100
+    ) / 100;
+
+    const updatedGrid = components[cat].productionGrid.map((row) => ({
+      ...row,
+      mtr: row.pcs !== '' && Number(row.pcs) > 0 ? Math.round(Number(row.pcs) * newTotal * 100) / 100 : '',
+    }));
+
+    setComponents((prev) => ({
+      ...prev,
+      [cat]: {
+        ...prev[cat],
+        subStyles: updatedSubStyles,
+        productionGrid: updatedGrid,
+      },
+    }));
+  };
+
+  const handleSubStyleNameChange = (cat: GarmentCategory, index: number, newName: string) => {
+    const oldName = components[cat].subStyles[index].name;
+    const cleanName = newName.toUpperCase();
+    const updatedSubStyles = [...components[cat].subStyles];
+    updatedSubStyles[index] = { ...updatedSubStyles[index], name: cleanName };
+
+    const updatedGrid = components[cat].productionGrid.map((row) => {
+      const nextSizes = { ...row.sizes };
+      if (oldName && oldName in nextSizes) {
+        nextSizes[cleanName] = nextSizes[oldName];
+        delete nextSizes[oldName];
+      } else if (cleanName) {
+        nextSizes[cleanName] = '';
+      }
+      return { ...row, sizes: nextSizes };
+    });
+
+    setComponents((prev) => ({
+      ...prev,
+      [cat]: {
+        ...prev[cat],
+        subStyles: updatedSubStyles,
+        productionGrid: updatedGrid,
+      },
+    }));
+  };
+
+  const handleAddSubStyle = (cat: GarmentCategory) => {
+    const nextNum = components[cat].subStyles.length + 1;
+    const newName = `PART-${nextNum}`;
+    const updatedSubStyles = [...components[cat].subStyles, { name: newName, average: '' }];
+
+    setComponents((prev) => ({
+      ...prev,
+      [cat]: {
+        ...prev[cat],
+        subStyles: updatedSubStyles,
+      },
+    }));
+  };
+
+  const handleRemoveSubStyle = (cat: GarmentCategory, indexToRemove: number) => {
+    if (components[cat].subStyles.length <= 1) {
+      alert('At least one sub-style component is required.');
+      return;
+    }
+    const removedName = components[cat].subStyles[indexToRemove].name;
+    const updatedSubStyles = components[cat].subStyles.filter((_, idx) => idx !== indexToRemove);
+
+    const newTotal = Math.round(
+      updatedSubStyles.reduce((acc, it) => acc + (Number(it.average) || 0), 0) * 100
+    ) / 100;
+
+    const updatedGrid = components[cat].productionGrid.map((row) => {
+      const nextSizes = { ...row.sizes };
+      delete nextSizes[removedName];
+      return {
+        ...row,
+        mtr: row.pcs !== '' && Number(row.pcs) > 0 ? Math.round(Number(row.pcs) * newTotal * 100) / 100 : '',
+        sizes: nextSizes,
+      };
+    });
+
+    setComponents((prev) => ({
+      ...prev,
+      [cat]: {
+        ...prev[cat],
+        subStyles: updatedSubStyles,
+        productionGrid: updatedGrid,
+      },
+    }));
+  };
+
+  // Component Grid Operations
+  const handleGridRowChange = (cat: GarmentCategory, index: number, field: 'color' | 'pcs' | 'mtr', value: any) => {
+    const totalAvg = getTotalMtrAverage(cat);
+    const updatedGrid = [...components[cat].productionGrid];
+    const target = { ...updatedGrid[index] };
+
+    if (field === 'pcs') {
+      const numPcs = Number(value);
+      target.pcs = value;
+      target.mtr = value !== '' && Number.isFinite(numPcs) && numPcs > 0 ? Math.round(numPcs * totalAvg * 100) / 100 : '';
+    } else {
+      (target as any)[field] = value;
+    }
+
+    updatedGrid[index] = target;
+
+    setComponents((prev) => ({
+      ...prev,
+      [cat]: {
+        ...prev[cat],
+        productionGrid: updatedGrid,
+      },
+    }));
+  };
+
+  const handleGridSizeChange = (cat: GarmentCategory, rowIndex: number, subStyleName: string, sizeVal: string) => {
+    const updatedGrid = [...components[cat].productionGrid];
+    const target = { ...updatedGrid[rowIndex] };
+    target.sizes = { ...target.sizes, [subStyleName]: sizeVal };
+    updatedGrid[rowIndex] = target;
+
+    setComponents((prev) => ({
+      ...prev,
+      [cat]: {
+        ...prev[cat],
+        productionGrid: updatedGrid,
+      },
+    }));
+  };
+
+  const handleAddGridRow = (cat: GarmentCategory, presetColor?: string) => {
+    const initialSizes: Record<string, string> = {};
+    for (const sub of components[cat].subStyles) {
+      initialSizes[sub.name] = '';
+    }
+    const newRow: ProductionGridItem = {
+      id: `${cat.toLowerCase()}-row-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+      color: presetColor || '',
+      pcs: '',
+      mtr: '',
+      sizes: initialSizes,
+    };
+
+    setComponents((prev) => ({
+      ...prev,
+      [cat]: {
+        ...prev[cat],
+        productionGrid: [...prev[cat].productionGrid, newRow],
+      },
+    }));
+  };
+
+  const handleRemoveGridRow = (cat: GarmentCategory, indexToRemove: number) => {
+    if (components[cat].productionGrid.length <= 1) {
+      alert('At least one color production row is required.');
+      return;
+    }
+
+    setComponents((prev) => ({
+      ...prev,
+      [cat]: {
+        ...prev[cat],
+        productionGrid: prev[cat].productionGrid.filter((_, idx) => idx !== indexToRemove),
+      },
+    }));
+  };
+
+  const handleUpdateSwatchColor = (cat: GarmentCategory, swatchName: string, newHex: string) => {
+    setComponents((prev) => ({
+      ...prev,
+      [cat]: {
+        ...prev[cat],
+        swatchColorOverrides: {
+          ...prev[cat].swatchColorOverrides,
+          [swatchName]: newHex,
+        },
+      },
+    }));
+  };
+
+  // Wilcom Photo Upload Handler
+  const handleWilcomPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Photo must be less than 5MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        setWilcomPhotoUrl(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSaveWilcomEntry = () => {
+    if (!wilcomDesignNumber.trim()) {
+      alert('Please enter a Wilcom Design Number.');
+      return;
+    }
+
+    if (editingWilcomId) {
+      setWilcomEntries((prev) =>
+        prev.map((entry) =>
+          entry.id === editingWilcomId
+            ? {
+                ...entry,
+                category: wilcomCategory,
+                styleName: wilcomStyleName.trim(),
+                wilcomDesignNumber: wilcomDesignNumber.trim(),
+                photoUrl: wilcomPhotoUrl,
+                remarks: wilcomRemarks.trim(),
+              }
+            : entry
+        )
+      );
+      setEditingWilcomId(null);
+    } else {
+      const newEntry: WilcomEntry = {
+        id: `wilcom-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+        category: wilcomCategory,
+        styleName: wilcomStyleName.trim() || `${wilcomCategory} Embroidery Design`,
+        wilcomDesignNumber: wilcomDesignNumber.trim(),
+        photoUrl: wilcomPhotoUrl,
+        remarks: wilcomRemarks.trim(),
+        createdAt: new Date().toISOString(),
+      };
+      setWilcomEntries((prev) => [...prev, newEntry]);
+    }
+
+    setWilcomStyleName('');
+    setWilcomDesignNumber('');
+    setWilcomPhotoUrl('');
+    setWilcomRemarks('');
+  };
+
+  const handleEditWilcomEntry = (entry: WilcomEntry) => {
+    setEditingWilcomId(entry.id);
+    setWilcomCategory(entry.category);
+    setWilcomStyleName(entry.styleName || '');
+    setWilcomDesignNumber(entry.wilcomDesignNumber || '');
+    setWilcomPhotoUrl(entry.photoUrl || '');
+    setWilcomRemarks(entry.remarks || '');
+  };
+
+  const handleDeleteWilcomEntry = (id: string) => {
+    if (confirm('Are you sure you want to remove this Wilcom design entry?')) {
+      setWilcomEntries((prev) => prev.filter((e) => e.id !== id));
+      if (editingWilcomId === id) {
+        setEditingWilcomId(null);
+        setWilcomStyleName('');
+        setWilcomDesignNumber('');
+        setWilcomPhotoUrl('');
+        setWilcomRemarks('');
+      }
+    }
+  };
+
+  // Real-time fabric availability check
+  useEffect(() => {
+    const trimmedFabric = (fabricName || components.TOP.fabricName).trim();
     setFabricAvailability(null);
     setFabricAvailabilityError(null);
 
-    if (
-      !fabricName ||
-      !Number.isFinite(fabricAverage) ||
-      fabricAverage <= 0 ||
-      !Number.isInteger(productionQuantity) ||
-      productionQuantity <= 0
-    ) {
+    const primaryColor = components.TOP.productionGrid[0]?.color || '';
+    const topAvg = getTotalMtrAverage('TOP');
+
+    if (!trimmedFabric || overallFabricMeters <= 0 || overallTotalPieces <= 0) {
       setCheckingFabricAvailability(false);
       return;
     }
@@ -131,88 +564,162 @@ export default function CreateProductionSheetPage() {
     setCheckingFabricAvailability(true);
     const timeout = window.setTimeout(() => {
       api.getFabricAvailability({
-        fabricName,
-        fabricColor: formData.fabricColor.trim(),
-        fabricAverage,
-        productionQuantity,
+        fabricName: trimmedFabric,
+        fabricColor: primaryColor,
+        fabricAverage: topAvg > 0 ? topAvg : 1.25,
+        productionQuantity: overallTotalPieces,
       })
         .then((availability) => {
           if (active) setFabricAvailability(availability);
         })
         .catch((err: Error) => {
-          if (active) setFabricAvailabilityError(err.message || 'Unable to check Fabric Store stock.');
+          if (active) setFabricAvailabilityError(err.message || 'Unable to check stock.');
         })
         .finally(() => {
           if (active) setCheckingFabricAvailability(false);
         });
-    }, 300);
+    }, 250);
 
     return () => {
       active = false;
       window.clearTimeout(timeout);
     };
-  }, [
-    formData.fabricName,
-    formData.fabricColor,
-    formData.fabricAverage,
-    formData.colorQuantity,
-  ]);
+  }, [fabricName, components, overallTotalPieces, overallFabricMeters]);
 
-  const canMarkReady =
-    formData.fabricColorAvailable === 'IN_STOCK' &&
-    fabricAvailability?.sufficient === true &&
-    !checkingFabricAvailability &&
-    !fabricAvailabilityError;
-
+  // Form Submission
   const handleSubmit = async (targetStatus: 'DRAFT' | 'IN_PROGRESS' | 'READY_FOR_ISSUE') => {
     setError(null);
     setSuccess(null);
 
-    if (targetStatus === 'READY_FOR_ISSUE' && !canMarkReady) {
-      setError(
-        fabricAvailabilityError ||
-          'A production sheet can only be marked ready when enough matching, QC-passed fabric is available in the Fabric Store.',
-      );
+    if (!designNumber.trim()) {
+      setError('Design No. is required.');
+      if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
-    // Basic required field validations
-    if (targetStatus !== 'DRAFT') {
-      if (!formData.clientName.trim()) {
-        setError('Client Name is mandatory.');
+    const enabledCats = (['TOP', 'BOTTOM', 'DUPATTA'] as GarmentCategory[]).filter((c) => components[c].enabled);
+    if (enabledCats.length === 0) {
+      setError('Please enable at least one Production Sheet (TOP, BOTTOM, or DUPATTA).');
+      if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    // Verify pieces in enabled components
+    for (const cat of enabledCats) {
+      const pcs = getTotalPieces(cat);
+      if (pcs <= 0) {
+        setError(`Please enter at least one color row with positive PCS quantity for ${cat} Production Sheet.`);
+        if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
-      if (!formData.mainStyle.trim()) {
-        setError('Main Style is mandatory.');
-        return;
-      }
-      if (!formData.wilcomDesignNumber.trim()) {
-        setError('Wilcom Design Number is mandatory for embroidery manufacturing.');
-        return;
-      }
-    } else {
-      if (!formData.clientName.trim() && !formData.programSerialNo.trim() && !formData.designNumber.trim()) {
-        setError('Please enter at least Client Name, Design #, or Serial # to save as draft.');
+    }
+
+    // Verify forwarded components
+    if (forwardedComponents.length === 0) {
+      setError('Please select at least one Production Sheet to forward to the next department.');
+      if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    for (const fCat of forwardedComponents) {
+      if (!components[fCat].enabled) {
+        setError(`Cannot forward ${fCat} Production Sheet because it is not enabled.`);
+        if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
     }
 
     setLoading(true);
     try {
+      const componentsPayload: Record<GarmentCategory, ComponentSheetData> = {
+        TOP: {
+          enabled: components.TOP.enabled,
+          forwarded: forwardedComponents.includes('TOP'),
+          category: 'TOP',
+          styleName: components.TOP.styleName.trim(),
+          fabricName: components.TOP.fabricName.trim() || fabricName.trim(),
+          fabricWidth: components.TOP.fabricWidth.trim() || fabricWidth.trim(),
+          subStyles: components.TOP.subStyles,
+          productionGrid: components.TOP.productionGrid,
+          swatches: getDisplaySwatches('TOP'),
+          note: components.TOP.noteText.trim(),
+          totalMtrAverage: getTotalMtrAverage('TOP'),
+          totalPieces: getTotalPieces('TOP'),
+          totalFabricMeters: getTotalFabricMeters('TOP'),
+        },
+        BOTTOM: {
+          enabled: components.BOTTOM.enabled,
+          forwarded: forwardedComponents.includes('BOTTOM'),
+          category: 'BOTTOM',
+          styleName: components.BOTTOM.styleName.trim(),
+          fabricName: components.BOTTOM.fabricName.trim() || fabricName.trim(),
+          fabricWidth: components.BOTTOM.fabricWidth.trim() || fabricWidth.trim(),
+          subStyles: components.BOTTOM.subStyles,
+          productionGrid: components.BOTTOM.productionGrid,
+          swatches: getDisplaySwatches('BOTTOM'),
+          note: components.BOTTOM.noteText.trim(),
+          totalMtrAverage: getTotalMtrAverage('BOTTOM'),
+          totalPieces: getTotalPieces('BOTTOM'),
+          totalFabricMeters: getTotalFabricMeters('BOTTOM'),
+        },
+        DUPATTA: {
+          enabled: components.DUPATTA.enabled,
+          forwarded: forwardedComponents.includes('DUPATTA'),
+          category: 'DUPATTA',
+          styleName: components.DUPATTA.styleName.trim(),
+          fabricName: components.DUPATTA.fabricName.trim() || fabricName.trim(),
+          fabricWidth: components.DUPATTA.fabricWidth.trim() || fabricWidth.trim(),
+          subStyles: components.DUPATTA.subStyles,
+          productionGrid: components.DUPATTA.productionGrid,
+          swatches: getDisplaySwatches('DUPATTA'),
+          note: components.DUPATTA.noteText.trim(),
+          totalMtrAverage: getTotalMtrAverage('DUPATTA'),
+          totalPieces: getTotalPieces('DUPATTA'),
+          totalFabricMeters: getTotalFabricMeters('DUPATTA'),
+        },
+      };
+
+      const primaryCat: GarmentCategory = components.TOP.enabled 
+        ? 'TOP' 
+        : (components.BOTTOM.enabled ? 'BOTTOM' : 'DUPATTA');
+      const primary = components[primaryCat];
+      const primaryAvg = getTotalMtrAverage(primaryCat);
+      const primaryPieces = getTotalPieces(primaryCat);
+
       const payload: any = {
-        ...formData,
         id: createdProgramId || undefined,
-        programNumber: formData.programSerialNo.trim() || undefined,
-        programSerialNo: formData.programSerialNo.trim() || undefined,
+        programNumber: programSerialNo.trim() || undefined,
+        programSerialNo: programSerialNo.trim(),
+        designNumber: designNumber.trim(),
+        topName: components.TOP.styleName.trim() || designNumber.trim(),
+        mainStyle: primary.styleName.trim() || designNumber.trim(),
+        startDate: sheetDate,
+        deliveryDate: deliveryDate,
+        clientName: clientName.trim(),
+        clientCode: canViewClientCode(currentUser) ? clientCode.trim() : undefined,
+        clientPriority: clientPriority,
+        serialNoCounter: serialNoCounter.trim() || '000',
+        fabricName: (primary.fabricName.trim() || fabricName.trim()),
+        fabric: (primary.fabricName.trim() || fabricName.trim()),
+        fabricWidth: (primary.fabricWidth.trim() || fabricWidth.trim()),
+        fabricAverage: primaryAvg > 0 ? primaryAvg : 1.25,
+        subStylesWithAverages: primary.subStyles,
+        subStyles: primary.subStyles.map((s) => s.name),
+        subStyle: primary.subStyles.map((s) => s.name).join(', '),
+        productionGrid: primary.productionGrid,
+        colorQuantity: primaryPieces > 0 ? primaryPieces : 1,
+        targetQuantity: overallTotalPieces > 0 ? overallTotalPieces : primaryPieces,
+        swatches: getDisplaySwatches(primaryCat).map((s) => ({ name: s.name, color: s.color })),
+        note: primary.noteText.trim(),
+        comments: primary.noteText.trim(),
+        fabricDyeingRequired: Boolean(fabricDyeingRequired),
+        fabricColorAvailable: fabricColorAvailable,
         status: targetStatus,
-        fabricDyeingRequired: Boolean(formData.fabricDyeingRequired),
-        fabricWidthInches: formData.fabricWidthInches ? parseFloat(formData.fabricWidthInches) : null,
-        fabricAverage: formData.fabricAverage ? parseFloat(formData.fabricAverage) : null,
-        colorQuantity: formData.colorQuantity ? parseInt(formData.colorQuantity, 10) : 0,
-        targetQuantity: formData.colorQuantity ? parseInt(formData.colorQuantity, 10) : 0,
-        piecesRejection: formData.piecesRejection ? parseInt(formData.piecesRejection, 10) : 0,
-        fabricIssuedToDyeing: formData.fabricIssuedToDyeing ? parseFloat(formData.fabricIssuedToDyeing) : 0,
-        fabricSentToDyeing: formData.fabricSentToDyeing ? parseFloat(formData.fabricSentToDyeing) : 0,
+        components: componentsPayload,
+        forwardedComponents: forwardedComponents,
+        wilcomEntries: wilcomEntries,
+        wilcomDesignNumber: wilcomEntries[0]?.wilcomDesignNumber || '',
+        wilcomDesignPhoto: wilcomEntries[0]?.photoUrl || '',
       };
 
       const result = await api.createProductionSheet(payload);
@@ -220,69 +727,73 @@ export default function CreateProductionSheetPage() {
         setCreatedProgramId(result.id);
       }
       setSuccess(result);
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     } catch (err: any) {
-      setError(err.message || 'Failed to save Production Sheet.');
+      setError(err.message || 'Failed to save Production Sheets.');
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pl-0 md:pl-64 pb-20">
-      {/* TOP HEADER */}
-      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
-        <div className="flex items-center gap-4">
+    <div className="min-h-screen bg-[#F1F5F9] pl-0 md:pl-64 pb-24">
+      {/* TOP STICKY BAR */}
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 sm:px-8 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+        <div className="flex items-center gap-3">
           <Link
             href="/my-work"
-            className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-md transition"
+            className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-md transition"
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A66E22] block">
-              MY WORK · PRODUCTION SHEET
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#A66E22] block">
+              SHUBHAM FABRICS &middot; PROGRAMMING DEPARTMENT
             </span>
-            <h1 className="text-xl font-bold text-slate-900">
-              Create Production Sheet
+            <h1 className="text-lg font-black text-slate-900 flex items-center gap-2">
+              <span>Production Sheet &amp; Wilcom Management</span>
+              {designNumber && (
+                <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-300">
+                  {designNumber}
+                </span>
+              )}
             </h1>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           <button
             type="button"
             onClick={() => handleSubmit('DRAFT')}
             disabled={loading}
-            className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-md border border-slate-300 shadow-xs transition"
+            className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded border border-slate-300 shadow-2xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
           >
-            Save as Draft
-          </button>
-          <button
-            type="button"
-            onClick={() => handleSubmit('IN_PROGRESS')}
-            disabled={loading}
-            className="px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-900 text-xs font-semibold rounded-md border border-blue-300 shadow-xs transition"
-          >
-            Mark In Progress
+            {loading ? <RefreshCw className="w-3.5 h-3.5 animate-spin text-slate-500" /> : null}
+            <span>{loading ? 'Saving...' : 'Save Draft'}</span>
           </button>
           <button
             type="button"
             onClick={() => handleSubmit('READY_FOR_ISSUE')}
-            disabled={loading || !canMarkReady}
-            className="px-4 py-2 bg-[#163767] hover:bg-[#0F264A] text-white text-xs font-semibold rounded-md shadow-xs transition flex items-center gap-1.5"
+            disabled={loading}
+            className="px-4 py-1.5 bg-[#163767] hover:bg-[#0F264A] disabled:opacity-50 text-white text-xs font-bold rounded shadow-2xs transition flex items-center gap-1.5 cursor-pointer"
           >
-            <CheckCircle2 className="w-4 h-4" />
-            <span>Submit Ready for Issue</span>
+            {loading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+            <span>{loading ? 'Submitting...' : 'Complete & Submit Ready'}</span>
           </button>
         </div>
       </header>
 
-      {/* FORM BODY */}
-      <main className="p-4 sm:p-8 max-w-5xl mx-auto space-y-6">
+      {/* MAIN CONTAINER */}
+      <main className="p-4 sm:p-6 max-w-5xl mx-auto space-y-6">
         
-        {/* Error State */}
+        {/* Error Banner */}
         {error && (
-          <div className="p-4 bg-rose-50 border border-rose-200 rounded-lg text-rose-800 text-xs flex items-center gap-2">
+          <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-lg text-rose-800 text-xs flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
             <span>{error}</span>
           </div>
@@ -290,47 +801,65 @@ export default function CreateProductionSheetPage() {
 
         {/* Success Modal / Banner */}
         {success && (
-          <div className="p-6 bg-emerald-50 border border-emerald-300 rounded-xl text-emerald-950 space-y-3">
+          <div className="p-5 bg-emerald-50 border border-emerald-300 rounded-xl text-emerald-950 space-y-3 shadow-xs">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-emerald-600" />
               <h3 className="text-sm font-bold">
-                Production Sheet Successfully Created: {success.programSerialNo || success.programNumber}
+                Production Sheets Saved Successfully &middot; Serial #{success.programSerialNo || success.programNumber}
               </h3>
             </div>
-            <p className="text-xs text-emerald-800 leading-relaxed font-serif">
-              Status is marked as <strong className="font-bold">{success.status}</strong>. You can now immediately issue a Challan for downstream factory movement or return to the dashboard.
+            <p className="text-xs text-emerald-800 leading-relaxed font-sans">
+              Status is marked as <strong className="font-bold">{success.status}</strong>. Forwarded sheets: <strong className="font-bold">{forwardedComponents.join(', ')}</strong>. Wilcom designs attached: <strong className="font-bold">{wilcomEntries.length}</strong>.
             </p>
-            <div className="pt-2 flex flex-wrap items-center gap-2.5">
+            <div className="pt-1 flex flex-wrap items-center gap-2">
               <button
                 type="button"
-                onClick={() => printProductionSheet(success)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-md shadow-xs transition cursor-pointer"
+                onClick={() => printProductionSheet(success, 'ALL')}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
               >
                 <Printer className="w-3.5 h-3.5" />
-                <span>Print Sheet (A4)</span>
+                <span>Print All Forwarded Sheets (A4)</span>
               </button>
 
               <button
                 type="button"
-                onClick={() => downloadProductionSheetHtml(success)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-md shadow-xs transition cursor-pointer"
+                onClick={() => printWilcomForm(success)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Print Wilcom Form (A4)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => downloadProductionSheetHtml(success, 'ALL')}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>Download File (.html / PDF)</span>
+                <span>Download Sheets (.html)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => downloadWilcomFormHtml(success)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-black text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Download Wilcom (.html)</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setShowPrintModal(true)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-emerald-300 text-emerald-800 text-xs font-semibold rounded-md hover:bg-emerald-100/60 transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-emerald-300 text-emerald-900 text-xs font-bold rounded hover:bg-emerald-100/50 transition cursor-pointer"
               >
                 <Eye className="w-3.5 h-3.5" />
-                <span>Preview Document</span>
+                <span>Preview Documents</span>
               </button>
 
               <Link
                 href={`/programs/${success.id}`}
-                className="inline-flex items-center gap-1 px-3 py-2 bg-white border border-slate-300 text-slate-700 text-xs font-semibold rounded-md hover:bg-slate-50 transition"
+                className="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-slate-300 text-slate-700 text-xs font-semibold rounded hover:bg-slate-50 transition"
               >
                 <span>View Details</span>
                 <ExternalLink className="w-3 h-3" />
@@ -338,590 +867,1126 @@ export default function CreateProductionSheetPage() {
 
               <Link
                 href={`/my-work/issue-challan?programId=${success.id}`}
-                className="px-3.5 py-2 bg-[#163767] hover:bg-[#0F264A] text-white text-xs font-semibold rounded-md shadow-xs transition"
+                className="px-3.5 py-1.5 bg-[#163767] hover:bg-[#0F264A] text-white text-xs font-bold rounded shadow-2xs transition"
               >
-                Proceed to Issue Challan →
-              </Link>
-
-              <Link
-                href="/programming"
-                className="px-3 py-2 bg-white border border-slate-200 text-slate-600 text-xs font-medium rounded-md hover:bg-slate-50 transition"
-              >
-                Go to Dashboard
+                Issue Challan →
               </Link>
             </div>
           </div>
         )}
 
-        {/* PRODUCTION SHEET FORM */}
-        <div className="space-y-6">
+        {/* SHARED PRODUCTION ORDER HEADER */}
+        <section className="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-4">
+          <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
+            <div>
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 block">
+                PRODUCTION ORDER SPECIFICATION
+              </span>
+              <h2 className="text-sm font-black text-slate-900 uppercase tracking-wide">
+                Master Order Information
+              </h2>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-slate-500">Components Active:</span>
+              {(['TOP', 'BOTTOM', 'DUPATTA'] as GarmentCategory[]).map((cat) => (
+                <span
+                  key={cat}
+                  className={`text-[10px] font-black px-2 py-0.5 rounded border ${
+                    components[cat].enabled
+                      ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                      : 'bg-slate-50 text-slate-400 border-slate-200'
+                  }`}
+                >
+                  {cat} {components[cat].enabled ? '✓' : '—'}
+                </span>
+              ))}
+            </div>
+          </div>
 
-          {/* PROGRAM INFORMATION */}
-          <div className="bg-white border border-slate-200/90 rounded-xl p-6 shadow-xs space-y-4">
-            <div className="pb-3 border-b border-slate-100">
-              <h2 className="text-sm font-bold text-slate-900">Program Information</h2>
-              <p className="text-[11px] text-slate-500">Core manufacturing order identification</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+            {/* DESIGN NO. */}
+            <div>
+              <label className="block text-[11px] font-black uppercase text-slate-700 mb-1">
+                DESIGN NO. *
+              </label>
+              <input
+                type="text"
+                value={designNumber}
+                onChange={(e) => setDesignNumber(e.target.value)}
+                onFocus={(e) => e.target.select()}
+                placeholder=""
+                className="w-full px-3 py-1.5 border-[1.5px] border-black rounded text-xs font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-800"
+              />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {/* SERIAL NO. */}
+            <div>
+              <label className="block text-[11px] font-black uppercase text-slate-700 mb-1">
+                SERIAL NO. / TRAVELER NO.
+              </label>
+              <input
+                type="text"
+                value={programSerialNo}
+                onChange={(e) => setProgramSerialNo(e.target.value)}
+                onFocus={(e) => e.target.select()}
+                placeholder=""
+                className="w-full px-3 py-1.5 border-[1.5px] border-black rounded text-xs font-black text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-800 font-mono"
+              />
+            </div>
+
+            {/* DATE */}
+            <div>
+              <label className="block text-[11px] font-black uppercase text-slate-700 mb-1">
+                DATE
+              </label>
+              <input
+                type="date"
+                value={sheetDate}
+                onChange={(e) => setSheetDate(e.target.value)}
+                className="w-full px-3 py-1.5 border-[1.5px] border-black rounded text-xs font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-800"
+              />
+            </div>
+
+            {/* CLIENT CODE (CONFIDENTIAL) */}
+            {canViewClientCode(currentUser) ? (
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Program Serial #
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-[11px] font-black uppercase text-amber-900">
+                    CLIENT CODE
+                  </label>
+                  <span className="text-[9px] font-bold px-1 rounded bg-amber-100 text-amber-900 border border-amber-300">
+                    🔒 Admin &amp; Prog
+                  </span>
+                </div>
                 <input
                   type="text"
-                  value={formData.programSerialNo}
-                  onChange={(e) => handleChange('programSerialNo', e.target.value)}
+                  value={clientCode}
+                  onChange={(e) => setClientCode(e.target.value)}
+                  onFocus={(e) => e.target.select()}
                   placeholder=""
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded text-xs font-mono font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-800"
+                  className="w-full px-3 py-1.5 border-[1.5px] border-amber-500 bg-amber-50/70 rounded text-xs font-mono font-bold text-amber-950 focus:outline-none focus:ring-1 focus:ring-amber-800"
                 />
               </div>
-
+            ) : (
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Program Start Date *
-                </label>
-                <input
-                  type="date"
-                  required
-                  value={formData.startDate}
-                  onChange={(e) => handleChange('startDate', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Program Design # *
+                <label className="block text-[11px] font-black uppercase text-slate-700 mb-1">
+                  ORDER COUNTER
                 </label>
                 <input
                   type="text"
-                  required
-                  value={formData.designNumber}
-                  onChange={(e) => handleChange('designNumber', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
+                  value={serialNoCounter}
+                  onChange={(e) => setSerialNoCounter(e.target.value)}
+                  placeholder=""
+                  className="w-full px-3 py-1.5 border border-slate-200 rounded text-xs font-bold text-slate-900 focus:outline-none"
                 />
               </div>
+            )}
 
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Client Name *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.clientName}
-                  onChange={(e) => handleChange('clientName', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
-                />
-              </div>
+            {/* DEFAULT FABRIC */}
+            <div>
+              <label className="block text-[11px] font-black uppercase text-slate-700 mb-1">
+                DEFAULT FABRIC
+              </label>
+              <input
+                type="text"
+                value={fabricName}
+                onChange={(e) => setFabricName(e.target.value)}
+                onFocus={(e) => e.target.select()}
+                placeholder=""
+                className="w-full px-3 py-1.5 border border-slate-300 rounded text-xs font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-800"
+              />
+            </div>
 
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Client Delivery Date *
-                </label>
-                <input
-                  type="date"
-                  required
-                  value={formData.deliveryDate}
-                  onChange={(e) => handleChange('deliveryDate', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
-                />
-              </div>
+            {/* DEFAULT WIDTH */}
+            <div>
+              <label className="block text-[11px] font-black uppercase text-slate-700 mb-1">
+                FABRIC WIDTH
+              </label>
+              <input
+                type="text"
+                value={fabricWidth}
+                onChange={(e) => setFabricWidth(e.target.value)}
+                onFocus={(e) => e.target.select()}
+                placeholder=""
+                className="w-full px-3 py-1.5 border border-slate-300 rounded text-xs font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-800"
+              />
+            </div>
+
+            {/* CLIENT / BUYER NAME */}
+            <div>
+              <label className="block text-[11px] font-black uppercase text-slate-700 mb-1">
+                CLIENT / BUYER NAME *
+              </label>
+              <input
+                type="text"
+                value={clientName}
+                onChange={(e) => setClientName(e.target.value)}
+                placeholder=""
+                className="w-full px-3 py-1.5 border border-slate-300 rounded text-xs font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-800"
+              />
+            </div>
+
+            {/* DELIVERY TARGET DATE */}
+            <div>
+              <label className="block text-[11px] font-black uppercase text-slate-700 mb-1">
+                DELIVERY TARGET DATE *
+              </label>
+              <input
+                type="date"
+                value={deliveryDate}
+                onChange={(e) => setDeliveryDate(e.target.value)}
+                className="w-full px-3 py-1.5 border border-slate-300 rounded text-xs font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-800"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* ========================================================================= */}
+        {/* THREE PRODUCTION SHEET CREATION OPTIONS (DISPLAYED VERTICALLY)            */}
+        {/* TOP Production Sheet, BOTTOM Production Sheet, DUPATTA Production Sheet   */}
+        {/* ========================================================================= */}
+        <section className="space-y-6">
+          <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+            <div>
+              <span className="text-[10px] font-black uppercase tracking-wider text-[#A66E22] block">
+                STAGE 1 &middot; PRODUCTION SHEET MANAGEMENT
+              </span>
+              <h2 className="text-base font-black text-slate-900 uppercase">
+                Garment Component Production Sheets
+              </h2>
             </div>
           </div>
 
-          {/* PRIORITY */}
-          <div className="bg-white border border-slate-200/90 rounded-xl p-6 shadow-xs space-y-4">
-            <div className="pb-3 border-b border-slate-100">
-              <h2 className="text-sm font-bold text-slate-900">Priority</h2>
-              <p className="text-[11px] text-slate-500">Order execution urgency and shopfloor production scheduling</p>
-            </div>
+          {(['TOP', 'BOTTOM', 'DUPATTA'] as GarmentCategory[]).map((cat, index) => {
+            const comp = components[cat];
+            const meta = CATEGORY_META[cat];
+            const catAvg = getTotalMtrAverage(cat);
+            const catPieces = getTotalPieces(cat);
+            const catMeters = getTotalFabricMeters(cat);
+            const catSwatches = getDisplaySwatches(cat);
+            const isForwarded = forwardedComponents.includes(cat);
 
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-              {[
-                {
-                  id: 'LOW',
-                  label: 'LOW',
-                  desc: 'Routine manufacturing queue, flexible lead time',
-                  color: 'border-slate-200 hover:border-slate-400 text-slate-700',
-                  activeBg: 'bg-slate-50 border-slate-600 ring-2 ring-slate-400/20 text-slate-900',
-                  badge: 'bg-slate-100 text-slate-700',
-                },
-                {
-                  id: 'NORMAL',
-                  label: 'NORMAL',
-                  desc: 'Standard production pipeline and dispatch schedule',
-                  color: 'border-slate-200 hover:border-blue-400 text-slate-700',
-                  activeBg: 'bg-blue-50/80 border-blue-600 ring-2 ring-blue-500/20 text-blue-950',
-                  badge: 'bg-blue-100 text-blue-800',
-                },
-                {
-                  id: 'HIGH',
-                  label: 'HIGH',
-                  desc: 'Priority queue for expedited delivery commitments',
-                  color: 'border-slate-200 hover:border-amber-400 text-slate-700',
-                  activeBg: 'bg-amber-50/80 border-amber-600 ring-2 ring-amber-500/20 text-amber-950',
-                  badge: 'bg-amber-100 text-amber-900',
-                },
-                {
-                  id: 'URGENT',
-                  label: 'URGENT',
-                  desc: 'Immediate dispatch & top floor priority across departments',
-                  color: 'border-slate-200 hover:border-rose-400 text-slate-700',
-                  activeBg: 'bg-rose-50/80 border-rose-600 ring-2 ring-rose-500/20 text-rose-950',
-                  badge: 'bg-rose-100 text-rose-900',
-                },
-              ].map((lvl) => {
-                const isSelected = formData.clientPriority === lvl.id;
-                return (
-                  <button
-                    key={lvl.id}
-                    type="button"
-                    onClick={() => {
-                      handleChange('clientPriority', lvl.id);
-                    }}
-                    className={`p-3.5 rounded-xl border text-left transition flex flex-col justify-between cursor-pointer ${
-                      isSelected ? lvl.activeBg : `bg-white ${lvl.color}`
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className={`text-[11px] font-bold px-2 py-0.5 rounded ${lvl.badge}`}>
-                        {lvl.label}
+            return (
+              <div 
+                key={cat}
+                className={`bg-white border-2 ${comp.enabled ? 'border-black' : 'border-slate-300 bg-slate-50/50'} rounded-md shadow-xs transition-all overflow-hidden`}
+              >
+                {/* COMPONENT ENABLER HEADER BAR */}
+                <div 
+                  className={`px-5 py-3 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                    comp.enabled 
+                      ? `${meta.badgeBg} border-black` 
+                      : 'bg-slate-100 border-slate-300 text-slate-500'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={comp.enabled}
+                        onChange={() => handleToggleComponent(cat)}
+                        className="w-4 h-4 text-blue-900 rounded border-slate-300 focus:ring-blue-700 cursor-pointer"
+                      />
+                      <span className={`text-sm font-black uppercase tracking-wider ${comp.enabled ? meta.badgeText : 'text-slate-600'}`}>
+                        {index + 1}. {meta.label}
                       </span>
-                      {isSelected && (
-                        <span className="w-2 h-2 rounded-full bg-current animate-pulse" />
-                      )}
+                    </label>
+
+                    {comp.enabled && (
+                      <span className="text-[10px] font-black px-2 py-0.5 rounded bg-white border border-black/20 text-black">
+                        {catPieces} PCS &middot; {catMeters.toFixed(2)} MTR
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    {comp.enabled && (
+                      <label className="flex items-center gap-1.5 cursor-pointer text-xs font-bold select-none">
+                        <input
+                          type="checkbox"
+                          checked={isForwarded}
+                          onChange={() => handleToggleForwarding(cat)}
+                          className="w-3.5 h-3.5 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer"
+                        />
+                        <span className={isForwarded ? 'text-emerald-950 font-black' : 'text-slate-600'}>
+                          {isForwarded ? '✓ Included for Forwarding' : 'Forward Later'}
+                        </span>
+                      </label>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={() => handleToggleComponent(cat)}
+                      className={`text-xs font-bold px-2.5 py-1 rounded transition cursor-pointer ${
+                        comp.enabled
+                          ? 'bg-white hover:bg-slate-100 text-slate-800 border border-slate-300'
+                          : 'bg-blue-900 hover:bg-blue-950 text-white shadow-2xs'
+                      }`}
+                    >
+                      {comp.enabled ? 'Enabled' : '+ Enable Sheet'}
+                    </button>
+                  </div>
+                </div>
+
+                {/* EXPANDED PRODUCTION SHEET FORM (MATCHING PHYSICAL SPEC SHEET) */}
+                {comp.enabled ? (
+                  <div className="p-6 sm:p-8 space-y-5 text-black font-sans">
+                    {/* SHEET BANNER TITLE */}
+                    <div className="text-center font-black text-2xl sm:text-3xl tracking-[0.25em] uppercase text-black select-none border-b border-black/10 pb-2">
+                      {cat} PRODUCTION SHEET
                     </div>
-                    <p className="text-[11px] text-slate-600 leading-snug">
-                      {lvl.desc}
-                    </p>
-                  </button>
-                );
-              })}
+
+                    {/* TOP META ROW: DESIGN NO., [CAT]:-, DATE, SERIAL NO. */}
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                      {/* Left: DESIGN NO. & [COMPONENT]:- */}
+                      <div className="w-full sm:w-1/2 space-y-3">
+                        <div className="flex items-center gap-2">
+                          <label className="font-black text-xs tracking-wider uppercase whitespace-nowrap min-w-[90px]">
+                            DESIGN NO.
+                          </label>
+                          <input
+                            type="text"
+                            value={designNumber}
+                            onChange={(e) => setDesignNumber(e.target.value)}
+                            onFocus={(e) => e.target.select()}
+                            placeholder=""
+                            className="border-[1.5px] border-black px-3 py-1 h-8 w-44 font-bold text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600"
+                          />
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <label className="font-black text-xs tracking-wider uppercase whitespace-nowrap min-w-[90px]">
+                            {meta.subHeader}
+                          </label>
+                          <input
+                            type="text"
+                            value={comp.styleName}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setComponents((prev) => ({
+                                ...prev,
+                                [cat]: { ...prev[cat], styleName: val },
+                              }));
+                            }}
+                            onFocus={(e) => e.target.select()}
+                            placeholder=""
+                            className="border-b-[1.5px] border-black border-t-0 border-l-0 border-r-0 px-2 py-1 h-8 flex-1 font-bold text-xs bg-transparent text-black focus:outline-none focus:border-blue-600 rounded-none"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Right: DATE & SERIAL NO */}
+                      <div className="w-full sm:w-1/2 space-y-3 flex flex-col items-start sm:items-end">
+                        <div className="flex items-center gap-2">
+                          <label className="font-black text-xs tracking-wider uppercase whitespace-nowrap min-w-[75px] text-left sm:text-right">
+                            DATE:
+                          </label>
+                          <input
+                            type="date"
+                            value={sheetDate}
+                            onChange={(e) => setSheetDate(e.target.value)}
+                            className="border-[1.5px] border-black px-3 py-1 h-8 w-44 font-bold text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600"
+                          />
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <label className="font-black text-xs tracking-wider uppercase whitespace-nowrap min-w-[75px] text-left sm:text-right">
+                            SERIAL NO.
+                          </label>
+                          <input
+                            type="text"
+                            value={programSerialNo ? `${programSerialNo}${cat === 'TOP' ? '' : `-${cat}`}` : ''}
+                            onChange={(e) => setProgramSerialNo(e.target.value.replace(new RegExp(`-${cat}$`, 'i'), ''))}
+                            onFocus={(e) => e.target.select()}
+                            placeholder=""
+                            className="border-[1.5px] border-black px-3 py-1 h-8 w-36 font-black text-center text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600 font-mono"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* FABRIC & WIDTH TABLE */}
+                    <div className="pt-1">
+                      <table className="w-full border-collapse border-[1.5px] border-black text-xs">
+                        <tbody>
+                          <tr>
+                            <td className="border-[1.5px] border-black px-3 py-1.5 font-black uppercase w-28 bg-white select-none">
+                              FABRIC
+                            </td>
+                            <td className="border-[1.5px] border-black p-1">
+                              <input
+                                type="text"
+                                value={comp.fabricName || fabricName}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setComponents((prev) => ({
+                                    ...prev,
+                                    [cat]: { ...prev[cat], fabricName: val },
+                                  }));
+                                }}
+                                onFocus={(e) => e.target.select()}
+                                placeholder=""
+                                className="w-full px-2 py-1 font-bold text-xs text-black border-none focus:outline-none focus:bg-blue-50/50"
+                              />
+                            </td>
+                          </tr>
+                          <tr>
+                            <td className="border-[1.5px] border-black px-3 py-1.5 font-black uppercase w-28 bg-white select-none">
+                              WIDTH
+                            </td>
+                            <td className="border-[1.5px] border-black p-1">
+                              <input
+                                type="text"
+                                value={comp.fabricWidth || fabricWidth}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setComponents((prev) => ({
+                                    ...prev,
+                                    [cat]: { ...prev[cat], fabricWidth: val },
+                                  }));
+                                }}
+                                onFocus={(e) => e.target.select()}
+                                placeholder=""
+                                className="w-full px-2 py-1 font-bold text-xs text-black border-none focus:outline-none focus:bg-blue-50/50"
+                              />
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* AVERAGE SECTION (SUB STYLES & CONSUMPTION) */}
+                    <div className="pt-2">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-black text-xs uppercase tracking-wider">AVERAGE</span>
+                        <button
+                          type="button"
+                          onClick={() => handleAddSubStyle(cat)}
+                          className="text-[10px] font-bold text-blue-700 hover:text-blue-900 flex items-center gap-1 cursor-pointer"
+                        >
+                          <Plus className="w-3 h-3" />
+                          <span>Add Sub Style</span>
+                        </button>
+                      </div>
+
+                      <div className="overflow-x-auto">
+                        <table className="w-full border-collapse border-[1.5px] border-black text-center text-xs">
+                          <thead>
+                            <tr className="bg-white">
+                              {comp.subStyles.map((sub, sIdx) => (
+                                <th key={sIdx} className="border-[1.5px] border-black p-1.5 font-black text-[11px] tracking-wider uppercase relative">
+                                  <div className="flex items-center justify-center gap-1">
+                                    <input
+                                      type="text"
+                                      value={sub.name}
+                                      onChange={(e) => handleSubStyleNameChange(cat, sIdx, e.target.value)}
+                                      onFocus={(e) => e.target.select()}
+                                      placeholder=""
+                                      className="font-black text-[11px] text-center w-full uppercase bg-transparent border-none focus:outline-none focus:bg-blue-50"
+                                    />
+                                    {comp.subStyles.length > 1 && (
+                                      <button
+                                        type="button"
+                                        onClick={() => handleRemoveSubStyle(cat, sIdx)}
+                                        className="text-slate-300 hover:text-rose-600 transition p-0.5 cursor-pointer"
+                                        title={`Remove ${sub.name}`}
+                                      >
+                                        &times;
+                                      </button>
+                                    )}
+                                  </div>
+                                </th>
+                              ))}
+                              <th className="border-[1.5px] border-black p-1.5 font-black text-[11px] tracking-wider uppercase bg-slate-50 w-24">
+                                TOTAL MTR
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr className="h-8 font-bold text-xs">
+                              {comp.subStyles.map((sub, sIdx) => (
+                                <td key={sIdx} className="border-[1.5px] border-black p-1">
+                                  <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={sub.average}
+                                    onChange={(e) => handleSubStyleAverageChange(cat, sIdx, e.target.value)}
+                                    onFocus={(e) => e.target.select()}
+                                    placeholder=""
+                                    className="w-full text-center font-bold text-xs py-1 px-1 border-none focus:outline-none focus:bg-blue-50/60"
+                                  />
+                                </td>
+                              ))}
+                              <td className="border-[1.5px] border-black p-1 font-black text-sm bg-slate-50 text-blue-950">
+                                {catAvg > 0 ? catAvg.toFixed(2) : ''}
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    {/* PRODUCTION BREAKDOWN GRID */}
+                    <div className="pt-2">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-black text-xs uppercase tracking-wider">
+                          PRODUCTION BREAKDOWN GRID ({comp.productionGrid.length} COLOR LOTS)
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleAddGridRow(cat)}
+                            className="text-[10px] font-bold text-blue-700 hover:text-blue-900 flex items-center gap-1 cursor-pointer"
+                          >
+                            <Plus className="w-3 h-3" />
+                            <span>Add Color Row</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="overflow-x-auto">
+                        <table className="w-full border-collapse border-[1.5px] border-black text-center text-xs">
+                          <thead>
+                            <tr className="bg-white">
+                              <th rowSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase w-32">
+                                COLOR
+                              </th>
+                              <th colSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase">
+                                QTY
+                              </th>
+                              <th colSpan={comp.subStyles.length} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase">
+                                SIZE
+                              </th>
+                              <th rowSpan={2} className="border-[1.5px] border-black p-1 font-bold text-[10px] w-8">
+                                &nbsp;
+                              </th>
+                            </tr>
+                            <tr className="bg-white">
+                              <th className="border-[1.5px] border-black p-1 font-black text-[11px] w-16">PCS</th>
+                              <th className="border-[1.5px] border-black p-1 font-black text-[11px] w-16">MTR</th>
+                              {comp.subStyles.map((sub, sIdx) => (
+                                <th key={sIdx} className="border-[1.5px] border-black p-1 font-black text-[11px] uppercase">
+                                  {sub.name}
+                                </th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {comp.productionGrid.map((row, rIdx) => (
+                              <tr key={row.id || rIdx} className="h-8">
+                                {/* COLOR */}
+                                <td className="border-[1.5px] border-black p-0.5">
+                                  <input
+                                    type="text"
+                                    value={row.color}
+                                    onChange={(e) => handleGridRowChange(cat, rIdx, 'color', e.target.value)}
+                                    onFocus={(e) => e.target.select()}
+                                    placeholder=""
+                                    className="w-full px-2 py-1 font-bold text-xs text-black border-none focus:outline-none focus:bg-blue-50"
+                                  />
+                                </td>
+
+                                {/* PCS */}
+                                <td className="border-[1.5px] border-black p-0.5">
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    value={row.pcs}
+                                    onChange={(e) => handleGridRowChange(cat, rIdx, 'pcs', e.target.value)}
+                                    onFocus={(e) => e.target.select()}
+                                    placeholder=""
+                                    className="w-full px-1 py-1 font-bold text-center text-xs text-black border-none focus:outline-none focus:bg-blue-50"
+                                  />
+                                </td>
+
+                                {/* MTR */}
+                                <td className="border-[1.5px] border-black p-0.5 font-bold text-center text-xs bg-slate-50/50">
+                                  <input
+                                    type="number"
+                                    step="0.01"
+                                    value={row.mtr}
+                                    onChange={(e) => handleGridRowChange(cat, rIdx, 'mtr', e.target.value)}
+                                    onFocus={(e) => e.target.select()}
+                                    placeholder=""
+                                    className="w-full px-1 py-1 font-bold text-center text-xs text-black border-none focus:outline-none focus:bg-blue-50 bg-transparent"
+                                  />
+                                </td>
+
+                                {/* SIZE CELLS */}
+                                {comp.subStyles.map((sub, sIdx) => (
+                                  <td key={sIdx} className="border-[1.5px] border-black p-0.5">
+                                    <input
+                                      type="text"
+                                      value={row.sizes?.[sub.name] || ''}
+                                      onChange={(e) => handleGridSizeChange(cat, rIdx, sub.name, e.target.value)}
+                                      onFocus={(e) => e.target.select()}
+                                      placeholder=""
+                                      className="w-full px-1 py-1 text-center font-medium text-xs text-black border-none focus:outline-none focus:bg-blue-50"
+                                    />
+                                  </td>
+                                ))}
+
+                                {/* REMOVE ROW */}
+                                <td className="border-[1.5px] border-black p-0.5">
+                                  {comp.productionGrid.length > 1 && (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleRemoveGridRow(cat, rIdx)}
+                                      className="text-slate-300 hover:text-rose-600 transition p-1 cursor-pointer"
+                                      title="Remove color row"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+
+                          <tfoot>
+                            <tr className="bg-slate-100 font-bold border-t-[1.5px] border-black text-xs">
+                              <td className="border-[1.5px] border-black p-1.5 text-right font-black uppercase text-[10px]">
+                                {cat} TOTALS:
+                              </td>
+                              <td className="border-[1.5px] border-black p-1.5 text-center font-black text-sm text-[#163767]">
+                                {catPieces > 0 ? catPieces : ''}
+                              </td>
+                              <td className="border-[1.5px] border-black p-1.5 text-center font-black text-sm text-emerald-800">
+                                {catMeters > 0 ? catMeters.toFixed(2) : ''}
+                              </td>
+                              <td colSpan={comp.subStyles.length + 1} className="border-[1.5px] border-black p-1.5 text-right text-[10px] text-slate-500 italic">
+                                {catAvg > 0 ? `Fabric consumption @ ${catAvg.toFixed(2)} Mtr/Pc` : ''}
+                              </td>
+                            </tr>
+                          </tfoot>
+                        </table>
+                      </div>
+
+                      {/* QUICK COLOR CHIPS */}
+                      <div className="pt-2 flex flex-wrap items-center gap-1.5">
+                        <span className="text-[10px] font-black uppercase text-slate-500 mr-1 flex items-center gap-1">
+                          <Sparkles className="w-3 h-3 text-amber-600" />
+                          <span>Quick Add Color:</span>
+                        </span>
+                        {['Camel', 'Dusty Sage', 'Olive Green', 'Dark Navy', 'Maroon', 'Bottle Green', 'White', 'Black'].map((clr) => (
+                          <button
+                            key={clr}
+                            type="button"
+                            onClick={() => handleAddGridRow(cat, clr)}
+                            className="text-[10px] font-bold px-2 py-0.5 rounded border border-slate-300 bg-white hover:border-blue-500 hover:text-blue-900 transition cursor-pointer"
+                          >
+                            + {clr}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* FOOTER: NOTE, SWATCHES, SIGNATURE */}
+                    <div className="flex flex-col sm:flex-row justify-between items-end gap-6 pt-3 border-t border-black/10">
+                      {/* Left: NOTE & SWATCH SAMPLES */}
+                      <div className="w-full sm:w-3/5 space-y-3">
+                        <div>
+                          <label className="font-black text-xs tracking-wider uppercase block mb-1">
+                            NOTE:-
+                          </label>
+                          <textarea
+                            rows={2}
+                            value={comp.noteText}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setComponents((prev) => ({
+                                ...prev,
+                                [cat]: { ...prev[cat], noteText: val },
+                              }));
+                            }}
+                            placeholder=""
+                            className="w-full px-2.5 py-1.5 border-[1.5px] border-black text-xs font-sans text-black focus:outline-none focus:ring-1 focus:ring-blue-600 resize-none"
+                          />
+                        </div>
+
+                        {/* SWATCH SAMPLES */}
+                        <div className="pt-2">
+                          <label className="font-black text-xs tracking-wider uppercase text-[#163767] block mb-2">
+                            COLOR SWATCHES:
+                          </label>
+
+                          <div className="flex flex-wrap items-center gap-3 p-2.5 bg-slate-50/70 border border-slate-200 rounded-lg min-h-[64px]">
+                            {catSwatches.length > 0 ? (
+                              catSwatches.map((swatch) => (
+                                <div key={swatch.id} className="group relative flex flex-col items-center gap-1">
+                                  <label
+                                    className="relative w-11 h-11 cursor-pointer transition-transform hover:scale-105 active:scale-95 shadow-2xs block"
+                                    style={{
+                                      backgroundColor: swatch.color,
+                                      clipPath: SWATCH_CLIP_PATH,
+                                    }}
+                                    title={`Click to pick shade for "${swatch.name}"`}
+                                  >
+                                    <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-[2px] bg-slate-800 shadow-2xs pointer-events-none" />
+                                    <input
+                                      type="color"
+                                      value={swatch.color.startsWith('#') ? swatch.color : '#CBD5E1'}
+                                      onChange={(e) => handleUpdateSwatchColor(cat, swatch.name, e.target.value)}
+                                      className="sr-only"
+                                    />
+                                  </label>
+                                  <span className="text-[8.5px] font-bold text-slate-800 truncate max-w-[65px] text-center">
+                                    {swatch.name}
+                                  </span>
+                                </div>
+                              ))
+                            ) : (
+                              <div className="flex items-center gap-3">
+                                {[1, 2, 3, 4].map((i) => (
+                                  <div key={i} className="flex flex-col items-center gap-1">
+                                    <div className="w-11 h-11 border-[1.5px] border-dashed border-slate-400 bg-white relative flex items-center justify-center rounded-xs shadow-2xs">
+                                      <span className="w-3.5 h-[2px] bg-slate-400 opacity-60" />
+                                    </div>
+                                    <span className="text-[8px] font-bold text-slate-400">Attach Swatch</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Right: SIGNATURE */}
+                      <div className="w-full sm:w-1/3 text-center space-y-3">
+                        <div className="font-black text-xs tracking-wider uppercase">
+                          SIGNATURE
+                        </div>
+                        <input
+                          type="text"
+                          value={comp.signatureName}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setComponents((prev) => ({
+                              ...prev,
+                              [cat]: { ...prev[cat], signatureName: val },
+                            }));
+                          }}
+                          onFocus={(e) => e.target.select()}
+                          placeholder=""
+                          className="w-full text-center font-bold text-xs border-none focus:outline-none focus:bg-blue-50/50 py-1"
+                        />
+                        <div className="border-b-[1.5px] border-black w-full mx-auto" />
+                      </div>
+                    </div>
+
+                  </div>
+                ) : (
+                  <div className="p-4 text-center">
+                    <button
+                      type="button"
+                      onClick={() => handleToggleComponent(cat)}
+                      className="px-3 py-1.5 bg-blue-900 text-white rounded text-xs font-bold hover:bg-blue-950 transition cursor-pointer"
+                    >
+                      + Enable {meta.label}
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </section>
+
+        {/* ========================================================================= */}
+        {/* FORWARDING PRODUCTION SHEETS SELECTION                                     */}
+        {/* ========================================================================= */}
+        <section className="bg-white border-2 border-[#163767] rounded-xl p-5 sm:p-6 shadow-xs space-y-4">
+          <div className="border-b border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <span className="text-[10px] font-black uppercase tracking-wider text-[#163767] block">
+                WORKFLOW ROUTING &middot; FORWARDING ACTION
+              </span>
+              <h2 className="text-base font-black text-slate-900 uppercase">
+                Forwarding Production Sheets
+              </h2>
+            </div>
+            <div className="text-xs font-bold text-slate-600 bg-blue-50 border border-blue-200 px-3 py-1 rounded-full">
+              Selected to Forward: <strong className="text-blue-950 font-black">{forwardedComponents.join(' + ')}</strong>
             </div>
           </div>
 
-          {/* STYLE INFORMATION */}
-          <div className="bg-white border border-slate-200/90 rounded-xl p-6 shadow-xs space-y-4">
-            <div className="pb-3 border-b border-slate-100">
-              <h2 className="text-sm font-bold text-slate-900">Style Information</h2>
-              <p className="text-[11px] text-slate-500">Pattern cut, style taxonomy, and base artwork</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+            {(['TOP', 'BOTTOM', 'DUPATTA'] as GarmentCategory[]).map((cat) => {
+              const isEnabled = components[cat].enabled;
+              const isForwarded = forwardedComponents.includes(cat);
+
+              return (
+                <div
+                  key={cat}
+                  onClick={() => {
+                    if (isEnabled) handleToggleForwarding(cat);
+                  }}
+                  className={`p-4 rounded-lg border-2 transition cursor-pointer flex flex-col justify-between gap-3 ${
+                    isForwarded
+                      ? 'border-[#163767] bg-blue-50/60 shadow-xs'
+                      : isEnabled
+                        ? 'border-slate-300 bg-white hover:border-slate-400'
+                        : 'border-slate-200 bg-slate-50 opacity-60 cursor-not-allowed'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={isForwarded}
+                        disabled={!isEnabled}
+                        onChange={() => handleToggleForwarding(cat)}
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-4 h-4 text-blue-900 rounded border-slate-300 focus:ring-blue-700 cursor-pointer"
+                      />
+                      <span className="text-xs font-black uppercase text-slate-900">
+                        Forward {cat} Sheet
+                      </span>
+                    </div>
+
+                    <span className={`text-[10px] font-black px-1.5 py-0.5 rounded ${
+                      isForwarded ? 'bg-[#163767] text-white' : 'bg-slate-200 text-slate-700'
+                    }`}>
+                      {isForwarded ? 'ACTIVE' : 'EXCLUDED'}
+                    </span>
+                  </div>
+
+                  <div className="text-[11px] text-slate-500">
+                    {isEnabled ? (
+                      <span>{getTotalPieces(cat)} PCS &middot; {getTotalMtrAverage(cat)} Mtr/Pc</span>
+                    ) : (
+                      <span className="italic">Sheet not yet enabled</span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* ========================================================================= */}
+        {/* STAGE 2: WILCOM FORM MANAGEMENT                                            */}
+        {/* ========================================================================= */}
+        <section className="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-5">
+          <div className="border-b border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <span className="text-[10px] font-black uppercase tracking-wider text-purple-700 block">
+                STAGE 2 &middot; WILCOM FORM MANAGEMENT
+              </span>
+              <h2 className="text-base font-black text-slate-900 uppercase">
+                Wilcom Embroidery Design Specifications
+              </h2>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Main Style *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.mainStyle}
-                  onChange={(e) => handleChange('mainStyle', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Sub Style
-                </label>
-                <input
-                  type="text"
-                  value={formData.subStyle}
-                  onChange={(e) => handleChange('subStyle', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Pattern # / Marker Ref
-                </label>
-                <input
-                  type="text"
-                  value={formData.pattern}
-                  onChange={(e) => handleChange('pattern', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Base Design Type
-                </label>
-                <input
-                  type="text"
-                  value={formData.baseDesignType}
-                  onChange={(e) => handleChange('baseDesignType', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
-                />
-              </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-slate-500">Total Wilcom Entries:</span>
+              <span className="px-2 py-0.5 rounded-full text-xs font-black bg-purple-100 text-purple-900 border border-purple-200">
+                {wilcomEntries.length}
+              </span>
             </div>
           </div>
 
-          {/* DESIGN INFORMATION (WILCOM) */}
-          <div className="bg-white border border-slate-200/90 rounded-xl p-6 shadow-xs space-y-4">
-            <div className="pb-3 border-b border-slate-100">
-              <h2 className="text-sm font-bold text-slate-900">Design Information (Embroidery &amp; Wilcom)</h2>
-              <p className="text-[11px] text-slate-500">Multi-head embroidery machine digitizing parameters</p>
+          {/* WILCOM ENTRY CREATION / EDITING FORM */}
+          <div className="p-4 sm:p-5 bg-purple-50/40 border border-purple-200 rounded-xl space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-black uppercase tracking-wide text-purple-950 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                <span>{editingWilcomId ? 'Edit Wilcom Design Entry' : '+ Add Wilcom Design Entry'}</span>
+              </h3>
+              {editingWilcomId && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingWilcomId(null);
+                    setWilcomStyleName('');
+                    setWilcomDesignNumber('');
+                    setWilcomPhotoUrl('');
+                    setWilcomRemarks('');
+                  }}
+                  className="text-xs text-rose-600 font-bold hover:underline cursor-pointer"
+                >
+                  Cancel Edit
+                </button>
+              )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+              {/* Garment Category */}
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
+                <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
+                  Garment Category *
+                </label>
+                <select
+                  value={wilcomCategory}
+                  onChange={(e) => setWilcomCategory(e.target.value as GarmentCategory)}
+                  className="w-full px-3 py-1.5 border border-purple-300 rounded font-bold text-xs bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-purple-700"
+                >
+                  <option value="TOP">TOP</option>
+                  <option value="BOTTOM">BOTTOM</option>
+                  <option value="DUPATTA">DUPATTA</option>
+                </select>
+              </div>
+
+              {/* Style Name or Style Details */}
+              <div>
+                <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
+                  Style Name or Details *
+                </label>
+                <input
+                  type="text"
+                  value={wilcomStyleName}
+                  onChange={(e) => setWilcomStyleName(e.target.value)}
+                  placeholder=""
+                  className="w-full px-3 py-1.5 border border-purple-300 rounded text-xs font-bold text-slate-900 bg-white focus:outline-none focus:ring-1 focus:ring-purple-700"
+                />
+              </div>
+
+              {/* Wilcom Design Number */}
+              <div>
+                <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
                   Wilcom Design Number *
                 </label>
                 <input
                   type="text"
-                  required
-                  value={formData.wilcomDesignNumber}
-                  onChange={(e) => handleChange('wilcomDesignNumber', e.target.value)}
-                  className="w-full px-3 py-2 font-mono font-bold border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Embroidery Design Name
-                </label>
-                <input
-                  type="text"
-                  value={formData.embroideryDesign}
-                  onChange={(e) => handleChange('embroideryDesign', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Embroidery Design Size
-                </label>
-                <input
-                  type="text"
-                  value={formData.embroideryDesignSize}
-                  onChange={(e) => handleChange('embroideryDesignSize', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
-                />
-              </div>
-
-              <div>
-                <ImageUpload
-                  label="Wilcom Design / Embroidery Technical Photo (Cloudinary)"
-                  value={formData.wilcomDesignPhoto}
-                  onChange={(url) => handleChange('wilcomDesignPhoto', url)}
-                  folder="wilcom-designs"
-                  helpText="Upload Wilcom screenshot or digitizer proof"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* FABRIC INFORMATION */}
-          <div className="bg-white border border-slate-200/90 rounded-xl p-6 shadow-xs space-y-4">
-            <div className="pb-3 border-b border-slate-100">
-              <h2 className="text-sm font-bold text-slate-900">Fabric Information</h2>
-              <p className="text-[11px] text-slate-500">Fabric specifications, roll widths, and consumption averages</p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Fabric Name *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.fabricName}
-                  onChange={(e) => handleChange('fabricName', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Fabric Type
-                </label>
-                <input
-                  type="text"
-                  value={formData.fabricType}
-                  onChange={(e) => handleChange('fabricType', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Fabric Width (Inches)
-                </label>
-                <input
-                  type="number"
-                  step="0.5"
-                  value={formData.fabricWidthInches}
-                  onChange={(e) => handleChange('fabricWidthInches', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Fabric Color
-                </label>
-                <input
-                  type="text"
-                  value={formData.fabricColor}
-                  onChange={(e) => handleChange('fabricColor', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Fabric Color Available
-                </label>
-                <select
-                  value={formData.fabricColorAvailable}
-                  onChange={(e) => handleChange('fabricColorAvailable', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
-                >
-                  <option value="IN_STOCK">IN STOCK (STORE)</option>
-                  <option value="PROCUREMENT_PENDING">PROCUREMENT PENDING</option>
-                  <option value="DYEING_REQUIRED">DYEING REQUIRED (KORA)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Fabric Average (Meters per Piece)
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={formData.fabricAverage}
-                  onChange={(e) => handleChange('fabricAverage', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Fabric Average Type
-                </label>
-                <input
-                  type="text"
-                  value={formData.fabricAverageType}
-                  onChange={(e) => handleChange('fabricAverageType', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
-                />
-              </div>
-
-              <div className="sm:col-span-2">
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Fabric Average Measurement Description
-                </label>
-                <input
-                  type="text"
-                  value={formData.fabricAverageMeasurement}
-                  onChange={(e) => handleChange('fabricAverageMeasurement', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-800"
+                  value={wilcomDesignNumber}
+                  onChange={(e) => setWilcomDesignNumber(e.target.value)}
+                  placeholder=""
+                  className="w-full px-3 py-1.5 border border-purple-300 rounded text-xs font-mono font-bold text-slate-900 bg-white focus:outline-none focus:ring-1 focus:ring-purple-700 uppercase"
                 />
               </div>
             </div>
 
-            <div
-              className={`rounded-lg border p-3 text-xs ${
-                fabricAvailabilityError || (fabricAvailability && !fabricAvailability.sufficient) ||
-                formData.fabricColorAvailable !== 'IN_STOCK'
-                  ? 'border-amber-200 bg-amber-50 text-amber-900'
-                  : fabricAvailability?.sufficient
-                    ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
-                    : 'border-slate-200 bg-slate-50 text-slate-700'
-              }`}
-              role="status"
-              aria-live="polite"
-            >
-              <strong className="block mb-1">Fabric Store availability</strong>
-              {formData.fabricColorAvailable !== 'IN_STOCK' ? (
-                <span>Set Fabric Color Available to “IN STOCK” before marking this sheet ready.</span>
-              ) : fabricAvailabilityError ? (
-                <span>Could not verify stock: {fabricAvailabilityError}</span>
-              ) : checkingFabricAvailability ? (
-                <span>Checking matching QC-passed fabric rolls in the store…</span>
-              ) : fabricAvailability ? (
-                <span>
-                  {fabricAvailability.sufficient ? 'Sufficient stock' : 'Insufficient stock'} —{' '}
-                  {fabricAvailability.availableMeters.toFixed(2)} m available of{' '}
-                  {fabricAvailability.requiredMeters.toFixed(2)} m required
-                  {' '}({fabricAvailability.matchingRollCount} matching roll
-                  {fabricAvailability.matchingRollCount === 1 ? '' : 's'}).
-                </span>
-              ) : (
-                <span>Enter fabric name, meters per piece, and production quantity to check stock.</span>
-              )}
-            </div>
-          </div>
-
-          {/* DYEING INFORMATION (CONDITIONAL ROUTING) */}
-          <div className="bg-white border border-slate-200/90 rounded-xl p-6 shadow-xs space-y-4">
-            <div className="pb-3 border-b border-slate-100">
-              <h2 className="text-sm font-bold text-slate-900">Dyeing Information</h2>
-              <p className="text-[11px] text-slate-500">Route to Dyeing department (YES) or directly to Embroidery department (NO)</p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Is Dyeing Required? *
+            {/* Photo Upload & Preview + Remarks */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs items-start">
+              {/* Photo Upload */}
+              <div className="space-y-2">
+                <label className="block text-[11px] font-bold uppercase text-slate-700">
+                  Design Photo / Reference Upload
                 </label>
-                <select
-                  value={formData.fabricDyeingRequired ? 'YES' : 'NO'}
-                  onChange={(e) => handleChange('fabricDyeingRequired', e.target.value === 'YES')}
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs font-bold text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-blue-800"
-                >
-                  <option value="NO">NO</option>
-                  <option value="YES">YES</option>
-                </select>
-              </div>
+                <div className="flex items-center gap-3">
+                  <label className="px-3.5 py-2 bg-white border border-purple-300 hover:border-purple-600 rounded text-xs font-bold text-purple-900 flex items-center gap-2 cursor-pointer shadow-2xs transition">
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>Choose Image File</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleWilcomPhotoChange}
+                      className="sr-only"
+                    />
+                  </label>
 
-              <div className="pt-1">
-                {formData.fabricDyeingRequired ? (
-                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-900 text-xs flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
-                    <div>
-                      <strong className="font-semibold">Next Station: Dyeing Department</strong>
-                      <p className="text-[11px] text-amber-700 mt-0.5">Fabric requires dyeing/coloring before embroidery.</p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-900 text-xs flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-                    <div>
-                      <strong className="font-semibold">Next Station: Embroidery Department</strong>
-                      <p className="text-[11px] text-emerald-700 mt-0.5">Fabric skips dyeing and will go directly to embroidery.</p>
-                    </div>
+                  {wilcomPhotoUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setWilcomPhotoUrl('')}
+                      className="text-xs text-rose-600 font-bold hover:underline cursor-pointer"
+                    >
+                      Remove Photo
+                    </button>
+                  )}
+                </div>
+
+                {/* Thumbnail Preview */}
+                {wilcomPhotoUrl && (
+                  <div className="w-24 h-24 border border-purple-300 rounded-md overflow-hidden bg-white relative shadow-2xs mt-2">
+                    <img
+                      src={wilcomPhotoUrl}
+                      alt="Wilcom preview"
+                      className="w-full h-full object-contain"
+                    />
                   </div>
                 )}
               </div>
+
+              {/* Remarks */}
+              <div>
+                <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
+                  Embroidery Remarks / Notes
+                </label>
+                <textarea
+                  rows={3}
+                  value={wilcomRemarks}
+                  onChange={(e) => setWilcomRemarks(e.target.value)}
+                  placeholder=""
+                  className="w-full px-3 py-2 border border-purple-300 rounded text-xs font-sans text-slate-900 bg-white focus:outline-none focus:ring-1 focus:ring-purple-700 resize-none"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <button
+                type="button"
+                onClick={handleSaveWilcomEntry}
+                className="px-4 py-2 bg-purple-800 hover:bg-purple-900 text-white rounded text-xs font-bold shadow-2xs transition flex items-center gap-1.5 cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>{editingWilcomId ? 'Update Wilcom Entry' : '+ Add Wilcom Design'}</span>
+              </button>
             </div>
           </div>
 
-          {/* PRODUCTION QUANTITY */}
-          <div className="bg-white border border-slate-200/90 rounded-xl p-6 shadow-xs space-y-4">
-            <div className="pb-3 border-b border-slate-100">
-              <h2 className="text-sm font-bold text-slate-900">Production Quantity &amp; Special Materials</h2>
-              <p className="text-[11px] text-slate-500">Target volume, measurement unit, and trims</p>
+          {/* LIST OF CREATED WILCOM ENTRIES */}
+          <div className="space-y-3 pt-2">
+            <h3 className="text-xs font-black uppercase tracking-wider text-slate-700">
+              Attached Wilcom Design Entries ({wilcomEntries.length})
+            </h3>
+
+            {wilcomEntries.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {wilcomEntries.map((entry, idx) => (
+                  <div
+                    key={entry.id || idx}
+                    className="p-4 bg-white border border-slate-200 rounded-xl shadow-2xs hover:shadow-xs transition space-y-3"
+                  >
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[10px] font-black px-2 py-0.5 rounded text-white ${
+                          entry.category === 'TOP'
+                            ? 'bg-blue-600'
+                            : entry.category === 'BOTTOM'
+                              ? 'bg-emerald-600'
+                              : 'bg-purple-600'
+                        }`}>
+                          {entry.category}
+                        </span>
+                        <span className="text-xs font-bold text-slate-900">
+                          {entry.styleName || 'Garment Style'}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => handleEditWilcomEntry(entry)}
+                          className="p-1 text-slate-400 hover:text-blue-700 rounded transition cursor-pointer"
+                          title="Edit Entry"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteWilcomEntry(entry.id)}
+                          className="p-1 text-slate-400 hover:text-rose-600 rounded transition cursor-pointer"
+                          title="Delete Entry"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      {/* Photo Thumbnail */}
+                      <div className="w-20 h-20 shrink-0 border border-slate-200 rounded-md bg-slate-50 flex items-center justify-center overflow-hidden">
+                        {entry.photoUrl ? (
+                          <img
+                            src={entry.photoUrl}
+                            alt={entry.wilcomDesignNumber}
+                            className="w-full h-full object-contain"
+                          />
+                        ) : (
+                          <ImageIcon className="w-6 h-6 text-slate-300" />
+                        )}
+                      </div>
+
+                      {/* Details */}
+                      <div className="space-y-1 text-xs">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-slate-400 text-[11px] font-bold">WILCOM NO:</span>
+                          <span className="font-mono font-black text-slate-900 text-sm">
+                            {entry.wilcomDesignNumber}
+                          </span>
+                        </div>
+                        {entry.remarks && (
+                          <div className="text-slate-600 text-[11px] line-clamp-2">
+                            {entry.remarks}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="p-8 text-center border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 text-slate-500 text-xs">
+                <span>No Wilcom designs added yet</span>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* ========================================================================= */}
+        {/* FACTORY ROUTING & INVENTORY CLEARANCE                                     */}
+        {/* ========================================================================= */}
+        <section className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-4">
+          <div className="border-b border-slate-100 pb-2.5 flex items-center justify-between">
+            <h2 className="text-xs font-black uppercase tracking-wider text-slate-800">
+              Factory Routing &amp; Inventory Clearance
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+            {/* Order Priority */}
+            <div>
+              <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
+                Order Priority
+              </label>
+              <select
+                value={clientPriority}
+                onChange={(e) => setClientPriority(e.target.value)}
+                className="w-full px-3 py-2 border border-slate-200 rounded text-xs font-bold text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-blue-800"
+              >
+                <option value="LOW">LOW</option>
+                <option value="NORMAL">NORMAL</option>
+                <option value="HIGH">HIGH (Expedited)</option>
+                <option value="URGENT">URGENT (Top Floor)</option>
+              </select>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Color / Shade Variant
-                </label>
-                <input
-                  type="text"
-                  value={formData.color}
-                  onChange={(e) => handleChange('color', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800"
-                />
-              </div>
+            {/* Dyeing Required */}
+            <div>
+              <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
+                Is Dyeing Required? *
+              </label>
+              <select
+                value={fabricDyeingRequired ? 'YES' : 'NO'}
+                onChange={(e) => setFabricDyeingRequired(e.target.value === 'YES')}
+                className="w-full px-3 py-2 border border-slate-200 rounded text-xs font-bold text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-blue-800"
+              >
+                <option value="NO">NO (Pre-Dyed)</option>
+                <option value="YES">YES (Kora)</option>
+              </select>
+            </div>
 
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Color Quantity *
-                </label>
-                <input
-                  type="number"
-                  required
-                  value={formData.colorQuantity}
-                  onChange={(e) => handleChange('colorQuantity', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800 font-bold font-mono"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Qty Measurement Unit
-                </label>
-                <select
-                  value={formData.quantityMeasurement}
-                  onChange={(e) => handleChange('quantityMeasurement', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800"
-                >
-                  <option value="PCS">PCS (Pieces)</option>
-                  <option value="MTR">MTR (Meters)</option>
-                  <option value="KG">KG (Kilograms)</option>
-                  <option value="YDS">YDS (Yards)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Special Material Required
-                </label>
-                <input
-                  type="text"
-                  value={formData.specialMaterial}
-                  onChange={(e) => handleChange('specialMaterial', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800"
-                />
-              </div>
-
-              <div className="sm:col-span-2">
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Special Material Quantity
-                </label>
-                <input
-                  type="text"
-                  value={formData.specialMaterialQuantity}
-                  onChange={(e) => handleChange('specialMaterialQuantity', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800"
-                />
-              </div>
+            {/* Fabric Color Availability */}
+            <div>
+              <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
+                Fabric Color Availability
+              </label>
+              <select
+                value={fabricColorAvailable}
+                onChange={(e) => setFabricColorAvailable(e.target.value)}
+                className="w-full px-3 py-2 border border-slate-200 rounded text-xs font-bold text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-blue-800"
+              >
+                <option value="IN_STOCK">IN STOCK</option>
+                <option value="PROCUREMENT_PENDING">PROCUREMENT PENDING</option>
+                <option value="DYEING_REQUIRED">DYEING REQUIRED</option>
+              </select>
             </div>
           </div>
 
-          {/* PRODUCTION DATES */}
-          <div className="bg-white border border-slate-200/90 rounded-xl p-6 shadow-xs space-y-4">
-            <div className="pb-3 border-b border-slate-100">
-              <h2 className="text-sm font-bold text-slate-900">Production Dates</h2>
-              <p className="text-[11px] text-slate-500">Design release and projected factory completion schedule</p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Production Design Date
-                </label>
-                <input
-                  type="date"
-                  value={formData.productionDesignDate}
-                  onChange={(e) => handleChange('productionDesignDate', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                  Production End Date
-                </label>
-                <input
-                  type="date"
-                  value={formData.productionEndDate}
-                  onChange={(e) => handleChange('productionEndDate', e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded text-xs text-slate-800"
-                />
-              </div>
-            </div>
+          {/* Store Stock Availability Clearance Bar */}
+          <div className="flex items-center justify-between p-3 rounded-lg border border-slate-200 bg-slate-50 text-xs">
+            <span className="font-bold text-slate-700">Fabric Store Stock Clearance:</span>
+            <span className="text-[10px] font-bold px-2.5 py-0.5 rounded bg-emerald-100 text-emerald-900 border border-emerald-300">
+              Movement Allowed
+            </span>
           </div>
+        </section>
 
-        </div>
-
-        {/* BOTTOM ACTION BAR */}
-        <div className="pt-4 flex items-center justify-end gap-3">
+        {/* BOTTOM ACTION BUTTONS */}
+        <div className="pt-2 flex items-center justify-end gap-3">
           <Link
             href="/my-work"
-            className="px-4 py-2.5 bg-white border border-slate-300 text-slate-700 text-xs font-semibold rounded-md shadow-xs hover:bg-slate-50 transition"
+            className="px-4 py-2 bg-white border border-slate-300 text-slate-700 text-xs font-semibold rounded shadow-2xs hover:bg-slate-50 transition"
           >
             Cancel
           </Link>
@@ -929,18 +1994,19 @@ export default function CreateProductionSheetPage() {
             type="button"
             onClick={() => handleSubmit('DRAFT')}
             disabled={loading}
-            className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold rounded-md border border-slate-300 shadow-xs transition"
+            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded border border-slate-300 shadow-2xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
           >
-            Save Draft
+            {loading ? <RefreshCw className="w-3.5 h-3.5 animate-spin text-slate-500" /> : null}
+            <span>{loading ? 'Saving...' : 'Save as Draft'}</span>
           </button>
           <button
             type="button"
             onClick={() => handleSubmit('READY_FOR_ISSUE')}
-            disabled={loading || !canMarkReady}
-            className="px-6 py-2.5 bg-[#163767] hover:bg-[#0F264A] text-white text-xs font-semibold rounded-md shadow-sm transition flex items-center gap-2"
+            disabled={loading}
+            className="px-6 py-2 bg-[#163767] hover:bg-[#0F264A] disabled:opacity-50 text-white text-xs font-bold rounded shadow-xs transition flex items-center gap-2 cursor-pointer"
           >
-            <CheckCircle2 className="w-4 h-4" />
-            <span>Complete &amp; Submit Ready for Issue</span>
+            {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+            <span>{loading ? 'Submitting Ready for Issue...' : 'Complete & Submit Ready for Issue'}</span>
           </button>
         </div>
 

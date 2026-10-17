@@ -550,7 +550,15 @@ exports.Prisma.ChallanScalarFieldEnum = {
   approvedById: 'approvedById',
   remarks: 'remarks',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  fabricIn: 'fabricIn',
+  fabricOut: 'fabricOut',
+  fabricUnit: 'fabricUnit',
+  defectivePieces: 'defectivePieces',
+  defectiveShelfLocation: 'defectiveShelfLocation',
+  defectReason: 'defectReason',
+  detectedFromChallanId: 'detectedFromChallanId',
+  detectedFromDepartment: 'detectedFromDepartment'
 };
 
 exports.Prisma.ChallanItemScalarFieldEnum = {

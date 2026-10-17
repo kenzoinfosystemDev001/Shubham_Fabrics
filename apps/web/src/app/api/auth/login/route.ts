@@ -17,16 +17,21 @@ export async function POST(request: Request) {
       );
     }
 
-    // 1. Ensure core users (admin, program, store, dyeing, qc1) are present in DB
+    // 1. Ensure core users (admin, program, store, dyeing, qc1, embroidery, thread-cutting, qc2) are present in DB
     const coreUserMap: Record<string, { role: string; dept: string; name: string }> = {
       admin: { role: 'ADMIN', dept: 'ADMIN', name: 'System Administrator' },
       program: { role: 'PROGRAMMING_INCHARGE', dept: 'PROGRAMMING', name: 'Programming Department' },
       programmer: { role: 'PROGRAMMING_INCHARGE', dept: 'PROGRAMMING', name: 'Programming Department' },
       store: { role: 'FABRIC_STORE', dept: 'STORE', name: 'Fabric Store Department' },
       dyeing: { role: 'DYEING_INCHARGE', dept: 'DYEING', name: 'Dyeing Incharge' },
-      qc1: { role: 'QC_INSPECTOR', dept: 'QC1', name: 'QC1 Quality Inspector' },
-      qc_insp: { role: 'QC_INSPECTOR', dept: 'QC1', name: 'Vikram Singh' },
+      qc1: { role: 'QC_INSPECTOR', dept: 'QC1', name: 'Dyeing QC Inspector' },
+      qc_insp: { role: 'QC_INSPECTOR', dept: 'QC1', name: 'Dyeing QC Inspector' },
       embroidery: { role: 'EMBROIDERY_INCHARGE', dept: 'EMBROIDERY', name: 'Embroidery Department' },
+      'thread-cutting': { role: 'THREAD_CUTTING_INCHARGE', dept: 'THREAD_CUTTING', name: 'Thread Cutting Department' },
+      cutting: { role: 'THREAD_CUTTING_INCHARGE', dept: 'THREAD_CUTTING', name: 'Thread Cutting Department' },
+      qc2: { role: 'QC_INSPECTOR', dept: 'QC2', name: 'Thread Cut QC Inspector' },
+      qc3: { role: 'QC_INSPECTOR', dept: 'QC3', name: 'Washing QC Inspector' },
+      final_check: { role: 'QC_INSPECTOR', dept: 'FINAL_CHECK', name: 'Final check Inspector' },
       cutting: { role: 'THREAD_CUTTING_INCHARGE', dept: 'THREAD_CUTTING', name: 'Thread Cutting Department' },
       qc2: { role: 'QC2_INSPECTOR', dept: 'QC2', name: 'QC2 Quality Inspector' },
       qc2_insp: { role: 'QC2_INSPECTOR', dept: 'QC2', name: 'QC2 Quality Inspector' },
@@ -173,6 +178,31 @@ export async function POST(request: Request) {
         roleCodes.includes('EMBROIDERY_INCHARGE') ||
         roleCodes.includes('EMBROIDERY_OPERATOR'));
 
+    const isThreadCutting =
+      !isAdmin &&
+      !isStore &&
+      !isProgramming &&
+      !isDyeing &&
+      !isQC1 &&
+      !isEmbroidery &&
+      (user.username.toLowerCase() === 'thread-cutting' ||
+        user.username.toLowerCase() === 'cutting' ||
+        user.departmentCode === 'THREAD_CUTTING' ||
+        roleCodes.includes('THREAD_CUTTING_INCHARGE') ||
+        roleCodes.includes('THREAD_CUTTER'));
+
+    const isQC2 =
+      !isAdmin &&
+      !isStore &&
+      !isProgramming &&
+      !isDyeing &&
+      !isQC1 &&
+      !isEmbroidery &&
+      !isThreadCutting &&
+      (user.username.toLowerCase() === 'qc2' ||
+        user.departmentCode === 'QC2' ||
+        roleCodes.includes('QC2_INSPECTOR'));
+
     const normalizedRole = isAdmin
       ? 'ADMIN'
       : isQC1
@@ -183,6 +213,10 @@ export async function POST(request: Request) {
       ? 'FABRIC_STORE'
       : isEmbroidery
       ? 'EMBROIDERY_INCHARGE'
+      : isThreadCutting
+      ? 'THREAD_CUTTING_INCHARGE'
+      : isQC2
+      ? 'QC_INSPECTOR'
       : isProgramming
       ? 'PROGRAMMER'
       : roleCodes[0] || 'USER';
@@ -197,6 +231,10 @@ export async function POST(request: Request) {
       ? 'STORE'
       : isEmbroidery
       ? 'EMBROIDERY'
+      : isThreadCutting
+      ? 'THREAD_CUTTING'
+      : isQC2
+      ? 'QC2'
       : isProgramming
       ? 'PROGRAMMING'
       : user.departmentCode || 'QC1';
@@ -211,6 +249,10 @@ export async function POST(request: Request) {
       ? '/fabric-store'
       : isEmbroidery
       ? '/embroidery'
+      : isThreadCutting
+      ? '/thread-cutting'
+      : isQC2
+      ? '/qc2'
       : '/programming';
 
     const token = `mes_jwt_${user.id}_${Date.now()}`;

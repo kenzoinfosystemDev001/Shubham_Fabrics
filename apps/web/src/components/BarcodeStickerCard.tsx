@@ -161,19 +161,6 @@ export default function BarcodeStickerCard({
           dangerouslySetInnerHTML={{ __html: svgMarkup }}
         />
       </div>
-
-      {/* FACTORY NOTICE */}
-      <div className="flex items-center justify-between text-[11px] text-slate-500 px-1">
-        <div className="flex items-center gap-1.5">
-          <Tag className="w-3.5 h-3.5 text-amber-700" />
-          <span>
-            This barcode contains the Production Sheet Design Number (<strong>{params.designNumber}</strong>) and department name (<strong>{deptDisplay}</strong>).
-          </span>
-        </div>
-        <span className="text-[10px] font-mono text-slate-400 hidden sm:inline">
-          Format: ISO/IEC 15417 Code-128
-        </span>
-      </div>
     </div>
   );
 }

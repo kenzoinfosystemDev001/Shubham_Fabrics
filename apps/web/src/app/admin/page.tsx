@@ -28,7 +28,6 @@ import { api } from '@/lib/api';
 import { getCurrentUser, isAdminUser } from '@/lib/rbac';
 import { ShubhamLogo } from '@/components/ShubhamLogo';
 import { printProductionSheet } from '@/lib/download-production-sheet';
-import { InstallAppButton } from '@/components/InstallAppButton';
 
 export default function AdminConsolePage() {
   const router = useRouter();
@@ -80,6 +79,7 @@ export default function AdminConsolePage() {
   });
 
   const [actionMessage, setActionMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const [submittingModal, setSubmittingModal] = useState(false);
 
   // Load all admin data
   const loadData = async () => {
@@ -130,6 +130,7 @@ export default function AdminConsolePage() {
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      setSubmittingModal(true);
       const res = await fetch('/api/admin/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -151,6 +152,8 @@ export default function AdminConsolePage() {
       loadData();
     } catch (err: any) {
       showNotification(err.message, 'error');
+    } finally {
+      setSubmittingModal(false);
     }
   };
 
@@ -263,6 +266,7 @@ export default function AdminConsolePage() {
   const handleCreateSupplier = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      setSubmittingModal(true);
       const res = await fetch('/api/admin/suppliers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -276,6 +280,8 @@ export default function AdminConsolePage() {
       loadData();
     } catch (err: any) {
       showNotification(err.message, 'error');
+    } finally {
+      setSubmittingModal(false);
     }
   };
 
@@ -283,6 +289,7 @@ export default function AdminConsolePage() {
   const handleCreateFabric = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      setSubmittingModal(true);
       const res = await fetch('/api/admin/fabrics', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -304,6 +311,8 @@ export default function AdminConsolePage() {
       loadData();
     } catch (err: any) {
       showNotification(err.message, 'error');
+    } finally {
+      setSubmittingModal(false);
     }
   };
 
@@ -345,7 +354,6 @@ export default function AdminConsolePage() {
 
           {/* Quick mobile action */}
           <div className="flex md:hidden items-center gap-2">
-            <InstallAppButton variant="nav" />
             <button
               onClick={handleSignOut}
               className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"
@@ -388,10 +396,10 @@ export default function AdminConsolePage() {
           <Link
             href="/qc1"
             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/20 transition shrink-0"
-            title="Open QC1 Department"
+            title="Open Dyeing QC Department"
           >
             <Building2 className="w-3.5 h-3.5" />
-            <span>QC1</span>
+            <span>Dyeing QC</span>
           </Link>
 
           <Link
@@ -403,9 +411,6 @@ export default function AdminConsolePage() {
             <span>Embroidery</span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-2">
-            <InstallAppButton variant="button" />
-          </div>
           <Link
             href="/thread-cutting"
             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/20 transition shrink-0"
@@ -1070,13 +1075,10 @@ export default function AdminConsolePage() {
       {showAddUserModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 p-6 animate-in fade-in zoom-in-95">
-            <h3 className="text-base font-bold text-slate-900 mb-1 flex items-center gap-2">
+            <h3 className="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
               <UserPlus className="w-5 h-5 text-indigo-600" />
               Add New Factory User (RBAC)
             </h3>
-            <p className="text-xs text-slate-500 mb-4">
-              Assign username, station PIN, department affinity, and security role.
-            </p>
 
             <form onSubmit={handleCreateUser} className="space-y-3.5">
               <div>
@@ -1086,7 +1088,7 @@ export default function AdminConsolePage() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. cutting_op, dyeing_sup..."
+                  placeholder=""
                   value={newUser.username}
                   onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono focus:ring-2 focus:ring-indigo-600 focus:outline-none"
@@ -1100,7 +1102,7 @@ export default function AdminConsolePage() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Ramesh Patel"
+                  placeholder=""
                   value={newUser.fullName}
                   onChange={(e) => setNewUser({ ...newUser, fullName: e.target.value })}
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none"
@@ -1115,7 +1117,7 @@ export default function AdminConsolePage() {
                   <input
                     type="password"
                     required
-                    placeholder="1234"
+                    placeholder=""
                     value={newUser.pin}
                     onChange={(e) => setNewUser({ ...newUser, pin: e.target.value })}
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono tracking-widest focus:ring-2 focus:ring-indigo-600 focus:outline-none"
@@ -1172,9 +1174,10 @@ export default function AdminConsolePage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-xs transition"
+                  disabled={submittingModal}
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer"
                 >
-                  Save User
+                  {submittingModal ? 'Saving...' : 'Save User'}
                 </button>
               </div>
             </form>
@@ -1186,11 +1189,10 @@ export default function AdminConsolePage() {
       {showAddSupplierModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 p-6 animate-in fade-in zoom-in-95">
-            <h3 className="text-base font-bold text-slate-900 mb-1 flex items-center gap-2">
+            <h3 className="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
               <Building className="w-5 h-5 text-indigo-600" />
               Add Approved Supplier
             </h3>
-            <p className="text-xs text-slate-500 mb-4">Register a mill or raw material vendor.</p>
 
             <form onSubmit={handleCreateSupplier} className="space-y-3.5">
               <div>
@@ -1200,7 +1202,7 @@ export default function AdminConsolePage() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Vardhman Textiles Ltd."
+                  placeholder=""
                   value={newSupplier.name}
                   onChange={(e) => setNewSupplier({ ...newSupplier, name: e.target.value })}
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none"
@@ -1214,7 +1216,7 @@ export default function AdminConsolePage() {
                   </label>
                   <input
                     type="text"
-                    placeholder="SUP-001"
+                    placeholder=""
                     value={newSupplier.code}
                     onChange={(e) => setNewSupplier({ ...newSupplier, code: e.target.value })}
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono focus:ring-2 focus:ring-indigo-600 focus:outline-none"
@@ -1226,7 +1228,7 @@ export default function AdminConsolePage() {
                   </label>
                   <input
                     type="text"
-                    placeholder="Mr. Sharma"
+                    placeholder=""
                     value={newSupplier.contactPerson}
                     onChange={(e) => setNewSupplier({ ...newSupplier, contactPerson: e.target.value })}
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none"
@@ -1241,7 +1243,7 @@ export default function AdminConsolePage() {
                   </label>
                   <input
                     type="text"
-                    placeholder="+91 98765 43210"
+                    placeholder=""
                     value={newSupplier.phone}
                     onChange={(e) => setNewSupplier({ ...newSupplier, phone: e.target.value })}
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono focus:ring-2 focus:ring-indigo-600 focus:outline-none"
@@ -1253,7 +1255,7 @@ export default function AdminConsolePage() {
                   </label>
                   <input
                     type="text"
-                    placeholder="07AAAAA0000A1Z5"
+                    placeholder=""
                     value={newSupplier.taxNumber}
                     onChange={(e) => setNewSupplier({ ...newSupplier, taxNumber: e.target.value })}
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono uppercase focus:ring-2 focus:ring-indigo-600 focus:outline-none"
@@ -1271,9 +1273,10 @@ export default function AdminConsolePage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-xs transition"
+                  disabled={submittingModal}
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer"
                 >
-                  Save Supplier
+                  {submittingModal ? 'Saving...' : 'Save Supplier'}
                 </button>
               </div>
             </form>
@@ -1285,11 +1288,10 @@ export default function AdminConsolePage() {
       {showAddFabricModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 p-6 animate-in fade-in zoom-in-95">
-            <h3 className="text-base font-bold text-slate-900 mb-1 flex items-center gap-2">
+            <h3 className="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
               <Layers className="w-5 h-5 text-indigo-600" />
               Add Fabric Specification
             </h3>
-            <p className="text-xs text-slate-500 mb-4">Register new fabric type into catalog.</p>
 
             <form onSubmit={handleCreateFabric} className="space-y-3.5">
               <div>
@@ -1299,7 +1301,7 @@ export default function AdminConsolePage() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. 100% Cotton Bio-Washed Pique"
+                  placeholder=""
                   value={newFabric.name}
                   onChange={(e) => setNewFabric({ ...newFabric, name: e.target.value })}
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none"
@@ -1313,7 +1315,7 @@ export default function AdminConsolePage() {
                   </label>
                   <input
                     type="text"
-                    placeholder="100% Cotton"
+                    placeholder=""
                     value={newFabric.composition}
                     onChange={(e) => setNewFabric({ ...newFabric, composition: e.target.value })}
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none"
@@ -1344,7 +1346,7 @@ export default function AdminConsolePage() {
                   </label>
                   <input
                     type="number"
-                    placeholder="220"
+                    placeholder=""
                     value={newFabric.gsm}
                     onChange={(e) => setNewFabric({ ...newFabric, gsm: parseFloat(e.target.value) || 220 })}
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono focus:ring-2 focus:ring-indigo-600 focus:outline-none"
@@ -1356,7 +1358,7 @@ export default function AdminConsolePage() {
                   </label>
                   <input
                     type="number"
-                    placeholder="60"
+                    placeholder=""
                     value={newFabric.widthInInches}
                     onChange={(e) => setNewFabric({ ...newFabric, widthInInches: parseFloat(e.target.value) || 60 })}
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono focus:ring-2 focus:ring-indigo-600 focus:outline-none"
@@ -1374,9 +1376,10 @@ export default function AdminConsolePage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-xs transition"
+                  disabled={submittingModal}
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer"
                 >
-                  Save Fabric
+                  {submittingModal ? 'Saving...' : 'Save Fabric'}
                 </button>
               </div>
             </form>

@@ -34,7 +34,62 @@ export async function GET(
       return NextResponse.json({ error: 'Program not found' }, { status: 404 });
     }
 
-    return NextResponse.json(program);
+    let items: any[] = [];
+    let subStyles: string[] = [];
+    let subStylesWithAverages: any[] = [];
+    let productionGrid: any[] = [];
+    let topName = '';
+    let serialNoCounter = '000';
+    let note = '';
+    let clientCode = '';
+
+    try {
+      if (program.metadataJson) {
+        const parsed = JSON.parse(program.metadataJson);
+        if (Array.isArray(parsed.items)) items = parsed.items;
+        if (Array.isArray(parsed.subStyles)) subStyles = parsed.subStyles;
+        if (Array.isArray(parsed.subStylesWithAverages)) subStylesWithAverages = parsed.subStylesWithAverages;
+        if (Array.isArray(parsed.productionGrid)) productionGrid = parsed.productionGrid;
+        if (parsed.topName) topName = parsed.topName;
+        if (parsed.serialNoCounter) serialNoCounter = parsed.serialNoCounter;
+        if (parsed.note) note = parsed.note;
+        if (parsed.clientCode) clientCode = parsed.clientCode;
+      }
+    } catch {}
+
+    if (subStyles.length === 0 && program.subStyle) {
+      subStyles = program.subStyle.split(',').map((s: string) => s.trim()).filter(Boolean);
+    }
+
+    // Role/department access restriction: ONLY Programming and Admin can see clientCode
+    const cookieHeader = request.headers.get('cookie') || '';
+    const deptHeader = request.headers.get('x-user-department') || '';
+    const roleHeader = request.headers.get('x-user-role') || '';
+
+    const isAuthorized = 
+      deptHeader.toUpperCase() === 'ADMIN' ||
+      deptHeader.toUpperCase() === 'PROGRAMMING' ||
+      roleHeader.toUpperCase() === 'ADMIN' ||
+      roleHeader.toUpperCase() === 'SUPER_ADMIN' ||
+      roleHeader.toUpperCase() === 'PROGRAMMER' ||
+      roleHeader.toUpperCase() === 'PROGRAMMING_INCHARGE' ||
+      cookieHeader.includes('subham_mes_dept=ADMIN') ||
+      cookieHeader.includes('subham_mes_dept=PROGRAMMING') ||
+      cookieHeader.includes('subham_mes_role=ADMIN') ||
+      cookieHeader.includes('subham_mes_role=SUPER_ADMIN') ||
+      cookieHeader.includes('subham_mes_role=PROGRAMMER');
+
+    return NextResponse.json({ 
+      ...program, 
+      items, 
+      subStyles,
+      subStylesWithAverages,
+      productionGrid,
+      topName: topName || program.mainStyle || program.styleCode,
+      serialNoCounter,
+      note: note || program.comments || program.remarks || '',
+      clientCode: isAuthorized ? clientCode : null,
+    });
   } catch (error: any) {
     console.error('Error fetching program:', error);
     return NextResponse.json({ error: error.message || 'Failed to fetch program' }, { status: 500 });

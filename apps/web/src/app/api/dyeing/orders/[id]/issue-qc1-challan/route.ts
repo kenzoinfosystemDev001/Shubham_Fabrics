@@ -145,7 +145,7 @@ export async function POST(
           issuedById: actorId,
           issuedDate: new Date(),
           remarks: [
-            `Dyeing → QC1 Inspection Dispatch for Sheet ${order.program.programSerialNo || order.program.programNumber}`,
+            `Dyeing → Dyeing QC Inspection Dispatch for Sheet ${order.program.programSerialNo || order.program.programNumber}`,
             remarks,
             vehicleNumber ? `Vehicle: ${vehicleNumber}` : null,
             driverName ? `Driver: ${driverName}` : null,

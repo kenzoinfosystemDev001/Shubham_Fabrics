@@ -154,7 +154,7 @@ export default function EmbroideryDashboard() {
             <div className="flex items-center gap-2.5">
               <PackageCheck className="w-4 h-4 text-fuchsia-600" />
               <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
-                Incoming Challans from Store &amp; Dyeing Departments
+                Incoming Challans from Fabric Store &amp; QC 1 Departments
               </h2>
             </div>
             <Link
@@ -170,7 +170,7 @@ export default function EmbroideryDashboard() {
             <div className="p-8 text-center text-slate-500 text-xs">
               <Scissors className="w-8 h-8 mx-auto text-slate-300 mb-2" />
               <p className="font-semibold text-slate-700">No incoming challans currently staged for Embroidery</p>
-              <p className="text-slate-400 mt-1">Challans issued from Store Department to Embroidery will appear here automatically.</p>
+              <p className="text-slate-400 mt-1">Challans issued from Fabric Store (Pre-Dyed) or QC 1 (Post-Dyeing Passed) will appear here automatically with their Production Sheet.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">

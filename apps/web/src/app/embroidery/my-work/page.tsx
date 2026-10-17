@@ -22,22 +22,25 @@ import {
   RefreshCw,
   X,
   Warehouse,
-  ArrowRight
+  ArrowRight,
+  AlertTriangle,
+  Archive,
+  Boxes,
 } from 'lucide-react';
+import { DepartmentStockView } from '@/components/DepartmentStockView';
+import {
+  ColorFabricMeasurementTable,
+  ChallanItemData,
+  createBlankChallanItem,
+  DepartmentInOutTracking,
+} from '@/components/ColorFabricMeasurementTable';
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
-
-interface ItemRow {
-  fabricDetails: string; // Color / Fabric / Measurement (Dyed/undyed)
-  colorCodeWidth: string; // Color code / Width
-  quantity: number;
-  uom: string;
-  remarks: string;
-}
+import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 
 export default function EmbroideryMyWorkPage() {
-  const [activeWorkflow, setActiveWorkflow] = useState<'CREATE_CHALLAN' | 'PRODUCTION_SHEETS' | 'INCOMING_CHECK'>(
-    'CREATE_CHALLAN'
-  );
+  const [activeWorkflow, setActiveWorkflow] = useState<
+    'CREATE_CHALLAN' | 'PRODUCTION_SHEETS' | 'INCOMING_CHECK' | 'STOCK' | 'DEFECTIVE_SHELF'
+  >('CREATE_CHALLAN');
 
   // Form State: "Challan from Embroidery to Thread Cutting"
   const [challanNumber, setChallanNumber] = useState('');
@@ -54,15 +57,24 @@ export default function EmbroideryMyWorkPage() {
   const [serialNumber, setSerialNumber] = useState('');
   const [inchargeName, setInchargeName] = useState('Embroidery Incharge');
 
-  // Dynamic Item Table
-  const [items, setItems] = useState<ItemRow[]>([
-    {
-      fabricDetails: 'Dyed Cotton Satin / 58" / Embroidered Panel',
-      colorCodeWidth: 'CC-BLK-04 / 58 INCH',
-      quantity: 120,
-      uom: 'PCS',
-      remarks: 'Multi-head embroidered panel ready for thread trimming',
-    },
+  // In / Out Tracking across departments
+  const [tracking, setTracking] = useState<DepartmentInOutTracking>({
+    fabricIn: 0,
+    fabricOut: 0,
+    fabricUnit: 'PCS',
+    defectivePieces: 0,
+    defectiveShelfLocation: 'DEF-SHELF-EMBROIDERY (Embroidery Station Defective Shelf)',
+    defectReason: 'Broken Stitch / Needle Holes',
+    detectedFromDept: null,
+    detectedFromChallanId: null,
+    detectedFromChallanNumber: null,
+  });
+  const [embroideryDefects, setEmbroideryDefects] = useState<any[]>([]);
+  const [formError, setFormError] = useState<string | null>(null);
+
+  // Universal Color / Fabric / Measurement table items (Default blank)
+  const [items, setItems] = useState<ChallanItemData[]>(() => [
+    createBlankChallanItem('EMBROIDERY_THREAD_CUTTING'),
   ]);
 
   // Modals & Data
@@ -76,6 +88,7 @@ export default function EmbroideryMyWorkPage() {
   const [searchSheet, setSearchSheet] = useState('');
   const [incomingChallans, setIncomingChallans] = useState<any[]>([]);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [receivingId, setReceivingId] = useState<string | null>(null);
 
   // Fetch initial next-number and active programs
   const loadInitialData = async () => {
@@ -103,10 +116,42 @@ export default function EmbroideryMyWorkPage() {
       if (dashData.data?.challans) {
         setIncomingChallans(dashData.data.challans);
       }
+
+      // 3. Fetch Embroidery station defective records
+      const defRes = await fetch('/api/defective-shelves?department=EMBROIDERY');
+      const defJson = await defRes.json();
+      if (defJson.success && defJson.data?.challans) {
+        setEmbroideryDefects(defJson.data.challans);
+      }
     } catch (err) {
       console.error('Error loading embroidery initial data:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleReceiveIncoming = async (ch: any) => {
+    try {
+      setReceivingId(ch.id);
+      const res = await fetch(`/api/challans/${ch.id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: 'RECEIVED',
+          notes: 'Material received onto Embroidery floor. Floor stock updated.',
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.error || 'Failed to receive material');
+      }
+      setSuccessMsg(`Challan ${ch.challanNumber} received successfully! Embroidery stock updated on-hand.`);
+      setTimeout(() => setSuccessMsg(null), 4500);
+      await loadInitialData();
+    } catch (err: any) {
+      alert(err.message || 'Error receiving challan');
+    } finally {
+      setReceivingId(null);
     }
   };
 
@@ -117,79 +162,59 @@ export default function EmbroideryMyWorkPage() {
   const applyProgramToForm = (prog: any) => {
     setSelectedProgram(prog);
     setSerialNumber(prog.programSerialNo || prog.programNumber || '');
-    setDesignNumber(prog.wilcomDesignNumber || prog.embroideryDesign || 'WILCOM-DES-01');
-
-    // Auto-populate item table with production sheet specs
-    if (prog.fabricColor || prog.mainStyle) {
-      setItems([
-        {
-          fabricDetails: `${prog.fabricColor ? 'Dyed ' + prog.fabricColor : 'Dyed / Undyed Kora'} / ${prog.mainStyle || 'Garment Panel'} / ${prog.embroideryDesignSize || 'Standard Size'}`,
-          colorCodeWidth: `${prog.wilcomDesignNumber || 'WLC-01'} / Width 58"`,
-          quantity: prog.targetQuantity || 100,
-          uom: 'PCS',
-          remarks: `Embroidery completed per sheet #${prog.programSerialNo || prog.programNumber}`,
-        },
-      ]);
-    }
-  };
-
-  const addItemRow = () => {
-    setItems((prev) => [
-      ...prev,
-      {
-        fabricDetails: 'Dyed / Undyed / Panel',
-        colorCodeWidth: 'CC-STD / 58"',
-        quantity: 50,
-        uom: 'PCS',
-        remarks: 'Panel stitch completed',
-      },
-    ]);
-  };
-
-  const removeItemRow = (idx: number) => {
-    if (items.length <= 1) {
-      alert('A minimum of one item must be present in the Challan.');
-      return;
-    }
-    setItems((prev) => prev.filter((_, i) => i !== idx));
-  };
-
-  const updateItemRow = (idx: number, field: keyof ItemRow, val: any) => {
-    setItems((prev) =>
-      prev.map((row, i) => (i === idx ? { ...row, [field]: val } : row))
-    );
+    setDesignNumber(prog.wilcomDesignNumber || prog.embroideryDesign || '');
+    if (prog.priority) setPriority(prog.priority);
   };
 
   const handleSubmitChallan = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!selectedProgram) {
+      setFormError('Please select a Production Sheet first.');
+      return;
+    }
     if (!challanNumber.trim()) {
-      alert('Please enter a valid Challan Number.');
+      setFormError('Please provide a Challan Number.');
       return;
     }
     if (items.length === 0) {
-      alert('Please add at least one item row to the Challan.');
+      setFormError('Please add at least one item to the Challan.');
       return;
     }
 
     try {
       setSubmitting(true);
+      setFormError(null);
+
+      const effectiveItems = items.map((it) => ({
+        itemDescription: `${it.fabric || 'Embroidered Panel'} — ${it.color || 'Processed'}`,
+        unitType: 'ROLL',
+        quantity: parseFloat(String(it.measurement)) || tracking.fabricOut || 1,
+        uom: it.unit || tracking.fabricUnit || 'PCS',
+        fabricCode: it.fabric || selectedProgram.fabricName || 'EMB-FABRIC',
+        colour: it.color || selectedProgram.fabricColor || 'Dyed',
+        remarks: it.remarks || null,
+      }));
+
       const payload = {
         challanNumber: challanNumber.trim(),
         challanType: 'INTER_DEPARTMENT',
+        programId: selectedProgram.id,
+        parentChallanId: tracking.detectedFromChallanId || null,
         fromDepartment: 'EMBROIDERY',
         toDepartment: 'THREAD_CUTTING',
-        priority: priority,
+        priority: priority || 'NORMAL',
+        status: 'ISSUED',
         issuedDate: challanDate,
-        programId: selectedProgram?.id || serialNumber,
-        remarks: `Challan from Embroidery to Thread Cutting | Design: ${designNumber} | Sheet: ${serialNumber} | Incharge: ${inchargeName}`,
-        items: items.map((it) => ({
-          itemDescription: it.fabricDetails,
-          colour: it.fabricDetails.includes('Dyed') ? 'Dyed' : 'Undyed',
-          fabricCode: it.colorCodeWidth,
-          quantity: Number(it.quantity) || 1,
-          uom: it.uom || 'PCS',
-          remarks: it.remarks,
-        })),
+        fabricIn: tracking.fabricIn,
+        defectivePieces: tracking.defectivePieces,
+        defectiveShelfLocation: tracking.defectiveShelfLocation,
+        defectReason: tracking.defectReason,
+        fabricOut: tracking.fabricOut,
+        fabricUnit: tracking.fabricUnit,
+        detectedFromDepartment: tracking.detectedFromDept || 'QC1',
+        detectedFromChallanId: tracking.detectedFromChallanId,
+        remarks: `Embroidery Handover to Thread Cutting | Design: ${designNumber} | Sheet: ${serialNumber} | Incharge: ${inchargeName} | Accounting: In: ${tracking.fabricIn} ${tracking.fabricUnit}, Defective Cut: ${tracking.defectivePieces} ${tracking.fabricUnit} (To ${tracking.defectiveShelfLocation}), Leftover Out: ${tracking.fabricOut} ${tracking.fabricUnit} (To Thread Cutting)`,
+        items: effectiveItems,
       };
 
       const res = await fetch('/api/challans', {
@@ -200,18 +225,20 @@ export default function EmbroideryMyWorkPage() {
 
       const json = await res.json();
       if (!res.ok) {
-        throw new Error(json.error || 'Failed to issue challan');
+        throw new Error(json.error || 'Failed to dispatch Challan to Thread Cutting');
       }
 
       setCreatedChallanModal(json);
-      setSuccessMsg(`Challan ${json.challanNumber} generated successfully to Thread Cutting!`);
-      setTimeout(() => setSuccessMsg(null), 5000);
-
-      // Refresh next number for future issuance
+      setSuccessMsg(`Challan ${json.challanNumber} to Thread Cutting created successfully! Dispatched ${tracking.fabricOut} ${tracking.fabricUnit}.`);
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
       loadInitialData();
     } catch (err: any) {
-      console.error(err);
-      alert('Error creating challan: ' + err.message);
+      setFormError(err.message || 'Error creating challan');
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     } finally {
       setSubmitting(false);
     }
@@ -275,11 +302,11 @@ export default function EmbroideryMyWorkPage() {
             - See production sheet
             - Checking of Incoming Challans */}
         <div className="bg-white border border-slate-200 rounded-2xl p-2 shadow-xs">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2">
             <button
               type="button"
               onClick={() => setActiveWorkflow('CREATE_CHALLAN')}
-              className={`p-3 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 transition ${
+              className={`p-3 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer ${
                 activeWorkflow === 'CREATE_CHALLAN'
                   ? 'bg-fuchsia-50/90 border-fuchsia-400 text-fuchsia-950 shadow-xs'
                   : 'bg-slate-50/60 border-slate-200 text-slate-600 hover:bg-slate-100'
@@ -292,7 +319,7 @@ export default function EmbroideryMyWorkPage() {
             <button
               type="button"
               onClick={() => setActiveWorkflow('PRODUCTION_SHEETS')}
-              className={`p-3 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 transition ${
+              className={`p-3 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer ${
                 activeWorkflow === 'PRODUCTION_SHEETS'
                   ? 'bg-fuchsia-50/90 border-fuchsia-400 text-fuchsia-950 shadow-xs'
                   : 'bg-slate-50/60 border-slate-200 text-slate-600 hover:bg-slate-100'
@@ -305,7 +332,7 @@ export default function EmbroideryMyWorkPage() {
             <button
               type="button"
               onClick={() => setActiveWorkflow('INCOMING_CHECK')}
-              className={`p-3 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 transition ${
+              className={`p-3 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer ${
                 activeWorkflow === 'INCOMING_CHECK'
                   ? 'bg-fuchsia-50/90 border-fuchsia-400 text-fuchsia-950 shadow-xs'
                   : 'bg-slate-50/60 border-slate-200 text-slate-600 hover:bg-slate-100'
@@ -313,6 +340,32 @@ export default function EmbroideryMyWorkPage() {
             >
               <Layers className="w-4 h-4 text-emerald-600" />
               <span>Checking of Incoming Challans</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveWorkflow('STOCK')}
+              className={`p-3 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer ${
+                activeWorkflow === 'STOCK'
+                  ? 'bg-fuchsia-50/90 border-fuchsia-400 text-fuchsia-950 shadow-xs'
+                  : 'bg-slate-50/60 border-slate-200 text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              <Boxes className="w-4 h-4 text-purple-600" />
+              <span>Embroidery Stock &amp; Balance</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveWorkflow('DEFECTIVE_SHELF')}
+              className={`p-3 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer ${
+                activeWorkflow === 'DEFECTIVE_SHELF'
+                  ? 'bg-rose-50/90 border-rose-400 text-rose-950 shadow-xs'
+                  : 'bg-slate-50/60 border-slate-200 text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              <AlertTriangle className="w-4 h-4 text-rose-600" />
+              <span>Defective Shelf (DEF-SHELF-EMBROIDERY)</span>
             </button>
           </div>
         </div>
@@ -394,7 +447,7 @@ export default function EmbroideryMyWorkPage() {
                     required
                     value={challanNumber}
                     onChange={(e) => setChallanNumber(e.target.value)}
-                    placeholder="e.g. CH-EMB-TC-2026-00001"
+                    placeholder=""
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-fuchsia-600 transition"
                   />
                 </div>
@@ -478,7 +531,7 @@ export default function EmbroideryMyWorkPage() {
                     required
                     value={designNumber}
                     onChange={(e) => setDesignNumber(e.target.value)}
-                    placeholder="e.g. WILCOM-DES-104"
+                    placeholder=""
                     className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl font-mono font-bold text-fuchsia-800 focus:outline-none focus:ring-2 focus:ring-fuchsia-600 transition"
                   />
                 </div>
@@ -493,125 +546,32 @@ export default function EmbroideryMyWorkPage() {
                     required
                     value={serialNumber}
                     onChange={(e) => setSerialNumber(e.target.value)}
-                    placeholder="e.g. PS-2026-00042"
+                    placeholder=""
                     className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-fuchsia-600 transition"
                   />
                 </div>
               </div>
 
-              {/* TABLE FORM AS CLEARLY SPECIFIED WITH (add item) BUTTON */}
-              <div className="space-y-3 pt-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                      Material / Panel Items (Table Form)
-                    </h3>
-                    <p className="text-[11px] text-slate-500">
-                      Specify dyed/undyed status, fabric measurements, color code and width.
-                    </p>
-                  </div>
-
-                  {/* (add item) BUTTON */}
-                  <button
-                    type="button"
-                    onClick={addItemRow}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-lg text-xs border border-slate-300 transition"
-                  >
-                    <Plus className="w-3.5 h-3.5 text-slate-600" />
-                    <span>add item</span>
-                  </button>
-                </div>
-
-                <div className="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
-                  <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-100/80 border-b border-slate-200 text-slate-600 font-bold text-[10px] uppercase">
-                      <tr>
-                        <th className="py-2.5 px-3 w-10 text-center">#</th>
-                        <th className="py-2.5 px-3">
-                          Color / Fabric / Measurement (Dyed/undyed) *
-                        </th>
-                        <th className="py-2.5 px-3">
-                          Color code / width *
-                        </th>
-                        <th className="py-2.5 px-3 w-28">Quantity</th>
-                        <th className="py-2.5 px-3 w-24">UOM</th>
-                        <th className="py-2.5 px-3">Remarks</th>
-                        <th className="py-2.5 px-3 w-12 text-center">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {items.map((row, idx) => (
-                        <tr key={idx} className="hover:bg-slate-50/60 transition">
-                          <td className="py-2.5 px-3 text-center text-slate-400 font-bold font-mono">
-                            {idx + 1}
-                          </td>
-                          <td className="py-2.5 px-3">
-                            <input
-                              type="text"
-                              required
-                              value={row.fabricDetails}
-                              onChange={(e) => updateItemRow(idx, 'fabricDetails', e.target.value)}
-                              placeholder="e.g. Dyed Navy Cotton 58 Inch Embroidered Panel"
-                              className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-fuchsia-600"
-                            />
-                          </td>
-                          <td className="py-2.5 px-3">
-                            <input
-                              type="text"
-                              required
-                              value={row.colorCodeWidth}
-                              onChange={(e) => updateItemRow(idx, 'colorCodeWidth', e.target.value)}
-                              placeholder="e.g. CC-NV-01 / 58 INCH"
-                              className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-mono text-slate-900 focus:outline-none focus:ring-1 focus:ring-fuchsia-600"
-                            />
-                          </td>
-                          <td className="py-2.5 px-3">
-                            <input
-                              type="number"
-                              min="1"
-                              required
-                              value={row.quantity}
-                              onChange={(e) => updateItemRow(idx, 'quantity', e.target.value)}
-                              className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-fuchsia-600"
-                            />
-                          </td>
-                          <td className="py-2.5 px-3">
-                            <select
-                              value={row.uom}
-                              onChange={(e) => updateItemRow(idx, 'uom', e.target.value)}
-                              className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-fuchsia-600"
-                            >
-                              <option value="PCS">PCS</option>
-                              <option value="MTR">MTR</option>
-                              <option value="ROLLS">ROLLS</option>
-                              <option value="PANELS">PANELS</option>
-                            </select>
-                          </td>
-                          <td className="py-2.5 px-3">
-                            <input
-                              type="text"
-                              value={row.remarks}
-                              onChange={(e) => updateItemRow(idx, 'remarks', e.target.value)}
-                              placeholder="Trimming notes"
-                              className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-fuchsia-600"
-                            />
-                          </td>
-                          <td className="py-2.5 px-3 text-center">
-                            <button
-                              type="button"
-                              onClick={() => removeItemRow(idx)}
-                              className="p-1.5 text-slate-400 hover:text-rose-600 rounded-md hover:bg-rose-50 transition"
-                              title="Delete row"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+              {/* UNIVERSAL COLOR / FABRIC / MEASUREMENT TABLE WITH IN/OUT AUTO-DETECTION & DEFECTIVE SHELF CONTROLLER */}
+              <div className="pt-3">
+                <ColorFabricMeasurementTable
+                  items={items}
+                  onChange={setItems}
+                  context="EMBROIDERY_THREAD_CUTTING"
+                  programId={selectedProgram?.id}
+                  currentDepartment="EMBROIDERY"
+                  tracking={tracking}
+                  onTrackingChange={setTracking}
+                  showInOutController={true}
+                />
               </div>
+
+              {formError && (
+                <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-xs font-semibold flex items-center gap-2">
+                  <X className="w-4 h-4 text-rose-600 shrink-0" />
+                  <span>{formError}</span>
+                </div>
+              )}
 
               {/* FOOTER: EMBROIDERY INCHARGE & SUBMIT BUTTON */}
               <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -624,19 +584,28 @@ export default function EmbroideryMyWorkPage() {
                     required
                     value={inchargeName}
                     onChange={(e) => setInchargeName(e.target.value)}
-                    placeholder="Embroidery Incharge Signature / Name"
+                    placeholder=""
                     className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-fuchsia-600 transition"
                   />
                 </div>
 
-                {/* Submit BUTTON */}
+                {/* Submit BUTTON: Active Dispatch to Thread Cutting */}
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full sm:w-auto px-8 py-3 bg-fuchsia-600 hover:bg-fuchsia-700 text-white font-bold text-sm rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto px-6 py-3 bg-fuchsia-700 hover:bg-fuchsia-800 disabled:opacity-50 active:scale-98 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 cursor-pointer transition"
+                  title="Issue Challan and dispatch verified leftover pieces to Thread Cutting"
                 >
-                  <Send className="w-4 h-4" />
-                  <span>{submitting ? 'Generating Challan...' : 'Submit Challan'}</span>
+                  {submitting ? (
+                    <RefreshCw className="w-4 h-4 animate-spin text-fuchsia-200" />
+                  ) : (
+                    <Send className="w-4 h-4" />
+                  )}
+                  <span>
+                    {submitting
+                      ? 'Dispatching Challan…'
+                      : `Dispatch to Thread Cutting (${tracking.fabricOut} ${tracking.fabricUnit})`}
+                  </span>
                 </button>
               </div>
             </form>
@@ -811,7 +780,295 @@ export default function EmbroideryMyWorkPage() {
                 </Link>
               </div>
             </div>
+
+            {/* LIVE INCOMING CHALLANS TABLE WITH RECEIVE ACTIONS */}
+            <div className="pt-2 space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900">
+                    Incoming Lots Addressed to Embroidery
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    Click <strong>Receive Material</strong> to officially accept into Embroidery floor stock and material balance.
+                  </p>
+                </div>
+                <span className="text-xs font-mono font-bold text-slate-600">
+                  {incomingChallans.length} Challan{incomingChallans.length === 1 ? '' : 's'}
+                </span>
+              </div>
+
+              {incomingChallans.length === 0 ? (
+                <div className="p-12 text-center border border-dashed border-slate-200 rounded-xl bg-slate-50/50 space-y-2">
+                  <CheckCircle2 className="w-8 h-8 text-slate-300 mx-auto" />
+                  <p className="text-xs font-semibold text-slate-700">No incoming challans pending receipt</p>
+                  <p className="text-[11px] text-slate-400">
+                    Challans issued from Fabric Store or QC1 to Embroidery will appear here automatically.
+                  </p>
+                </div>
+              ) : (
+                <div className="border border-slate-200 rounded-xl overflow-hidden shadow-2xs overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200 uppercase text-[10px]">
+                      <tr>
+                        <th className="py-2.5 px-3">Challan #</th>
+                        <th className="py-2.5 px-3">From Station</th>
+                        <th className="py-2.5 px-3">Program / Style</th>
+                        <th className="py-2.5 px-3">Fabric &amp; Color</th>
+                        <th className="py-2.5 px-3 text-right">Quantity</th>
+                        <th className="py-2.5 px-3 text-center">Status</th>
+                        <th className="py-2.5 px-3 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {incomingChallans.map((ch) => {
+                        const totalQty = (ch.items || []).reduce(
+                          (sum: number, it: any) => sum + (Number(it.quantity) || 0),
+                          0
+                        );
+                        const effectiveQty = Number(ch.fabricIn) || totalQty || ch.program?.targetQuantity || 0;
+                        const isReceived = ['RECEIVED', 'IN_PROCESS', 'COMPLETED'].includes(ch.status);
+
+                        return (
+                          <tr key={ch.id} className="hover:bg-slate-50/80 transition">
+                            <td className="py-3 px-3 font-mono">
+                              <span className="font-bold text-slate-900 block">{ch.challanNumber}</span>
+                              <span className="text-[10px] text-slate-500 font-sans">
+                                {new Date(ch.issuedDate || ch.createdAt).toLocaleDateString('en-GB')}
+                              </span>
+                            </td>
+                            <td className="py-3 px-3">
+                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-800 border border-slate-200">
+                                {ch.fromDepartment}
+                              </span>
+                            </td>
+                            <td className="py-3 px-3">
+                              <span className="font-semibold text-slate-800 block">
+                                {ch.program?.clientName || ch.program?.buyerName || 'Standard'}
+                              </span>
+                              <span className="text-[10px] text-slate-500 block">
+                                Style: {ch.program?.mainStyle || ch.program?.styleCode || '—'} · Sheet #{ch.program?.programSerialNo || ch.program?.programNumber || '—'}
+                              </span>
+                            </td>
+                            <td className="py-3 px-3">
+                              <span className="font-medium text-slate-800 block">
+                                {ch.items?.[0]?.itemDescription || ch.program?.fabricName || 'Fabric Lot'}
+                              </span>
+                              <span className="text-[10px] text-slate-500">
+                                {ch.items?.[0]?.colour || ch.program?.fabricColor || 'Standard'}
+                              </span>
+                            </td>
+                            <td className="py-3 px-3 text-right font-mono font-bold text-slate-900">
+                              {effectiveQty} {ch.fabricUnit || ch.items?.[0]?.uom || 'PCS'}
+                            </td>
+                            <td className="py-3 px-3 text-center">
+                              {isReceived ? (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                  <span>{ch.status}</span>
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300">
+                                  <span>Pending Receipt</span>
+                                </span>
+                              )}
+                            </td>
+                            <td className="py-3 px-3 text-right">
+                              <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                                {!isReceived ? (
+                                  <button
+                                    type="button"
+                                    disabled={receivingId === ch.id}
+                                    onClick={() => handleReceiveIncoming(ch)}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-xs transition cursor-pointer"
+                                    title="Receive material and book onto Embroidery floor stock"
+                                  >
+                                    {receivingId === ch.id ? (
+                                      <>
+                                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                                        <span>Receiving...</span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <CheckCircle2 className="w-3.5 h-3.5" />
+                                        <span>Receive &amp; Accept</span>
+                                      </>
+                                    )}
+                                  </button>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      if (ch.program) applyProgramToForm(ch.program);
+                                      setActiveWorkflow('CREATE_CHALLAN');
+                                    }}
+                                    className="inline-flex items-center gap-1 px-2.5 py-1 bg-fuchsia-600 hover:bg-fuchsia-700 text-white rounded-lg text-xs font-bold transition shadow-2xs cursor-pointer"
+                                    title="Use this received lot in a new Challan to Thread Cutting"
+                                  >
+                                    <Send className="w-3 h-3" />
+                                    <span>To Thread Cutting</span>
+                                  </button>
+                                )}
+
+                                <Link
+                                  href={`/challans/${ch.id}`}
+                                  className="inline-flex items-center gap-1 p-1 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded transition"
+                                  title="View Challan Details"
+                                >
+                                  <ExternalLink className="w-3.5 h-3.5" />
+                                </Link>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
           </div>
+        )}
+
+        {/* WORKFLOW 4: EMBROIDERY DEFECTIVE SHELF (DEF-SHELF-EMBROIDERY) */}
+        {activeWorkflow === 'DEFECTIVE_SHELF' && (
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 gap-3">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-rose-600 block">
+                  DEPARTMENT ISOLATION SHELF
+                </span>
+                <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                  <Archive className="w-5 h-5 text-rose-600" />
+                  <span>Embroidery Defective Shelf (DEF-SHELF-EMBROIDERY)</span>
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Quarantine record of panels cut due to embroidery defects. Automatically logged in the Fabric Store Master Defective Shelf (DEF-SHELF-CENTRAL).
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-500 font-mono">
+                  Shelf Code: <strong className="text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">DEF-SHELF-EMBROIDERY</strong>
+                </span>
+              </div>
+            </div>
+
+            {/* SUMMARY TILES */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="p-4 bg-rose-50/70 border border-rose-200 rounded-xl space-y-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-rose-800">
+                  Total Defective Pieces Cut
+                </span>
+                <div className="text-2xl font-mono font-bold text-rose-900">
+                  {embroideryDefects.reduce((acc, c) => acc + (Number(c.defectivePieces) || 0), 0)} PCS
+                </div>
+                <span className="text-[10px] text-rose-600">
+                  Separated from Thread Cutting handovers
+                </span>
+              </div>
+
+              <div className="p-4 bg-purple-50/70 border border-purple-200 rounded-xl space-y-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-purple-800">
+                  Fabric Store Master Log
+                </span>
+                <div className="text-base font-bold text-purple-900 flex items-center gap-1.5 mt-1">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <span>Synchronized with Central Store</span>
+                </div>
+                <span className="text-[10px] text-purple-700">
+                  Auto-mirrored to DEF-SHELF-CENTRAL
+                </span>
+              </div>
+
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+                  Logged Incidents
+                </span>
+                <div className="text-2xl font-mono font-bold text-slate-900">
+                  {embroideryDefects.length} Records
+                </div>
+                <span className="text-[10px] text-slate-500">
+                  Audited with zero-loss balance math
+                </span>
+              </div>
+            </div>
+
+            {/* TABLE */}
+            {embroideryDefects.length === 0 ? (
+              <div className="p-16 text-center space-y-3 border border-dashed border-slate-200 rounded-xl">
+                <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />
+                <p className="text-sm font-semibold text-slate-800">Embroidery Defective Shelf is Clean</p>
+                <p className="text-xs text-slate-500 max-w-md mx-auto">
+                  No defective pieces have been cut in Embroidery yet. All embroidery runs have passed cleanly.
+                </p>
+              </div>
+            ) : (
+              <div className="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200 uppercase text-[10px]">
+                    <tr>
+                      <th className="py-2.5 px-3">Challan #</th>
+                      <th className="py-2.5 px-3">Sheet / Style</th>
+                      <th className="py-2.5 px-3 text-center">Defective Cut</th>
+                      <th className="py-2.5 px-3">Station Defective Shelf</th>
+                      <th className="py-2.5 px-3">Defect Reason</th>
+                      <th className="py-2.5 px-3">Date</th>
+                      <th className="py-2.5 px-3 text-right">Audit</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {embroideryDefects.map((ch) => (
+                      <tr key={ch.id} className="hover:bg-rose-50/30 transition">
+                        <td className="py-3 px-3 font-mono font-bold text-slate-900">
+                          {ch.challanNumber}
+                        </td>
+                        <td className="py-3 px-3">
+                          <span className="font-semibold text-slate-800 block">
+                            {ch.program?.mainStyle || ch.program?.clientName || 'General Style'}
+                          </span>
+                          <span className="text-[10px] font-mono text-fuchsia-700">
+                            Sheet: {ch.program?.programSerialNo || ch.program?.programNumber || '—'}
+                          </span>
+                        </td>
+                        <td className="py-3 px-3 text-center font-mono font-bold text-rose-700 text-sm">
+                          {ch.defectivePieces || 0} {ch.fabricUnit || 'PCS'}
+                        </td>
+                        <td className="py-3 px-3">
+                          <span className="px-2 py-0.5 rounded font-mono text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
+                            {ch.defectiveShelfLocation || 'DEF-SHELF-EMBROIDERY'}
+                          </span>
+                        </td>
+                        <td className="py-3 px-3 text-slate-700 max-w-xs">
+                          <div className="font-semibold text-[11px]">{ch.defectReason || 'Broken Stitch'}</div>
+                          <p className="truncate text-[10px] text-slate-500">{ch.remarks || '—'}</p>
+                        </td>
+                        <td className="py-3 px-3 text-slate-600 font-mono text-[11px]">
+                          {new Date(ch.createdAt).toLocaleDateString('en-GB')}
+                        </td>
+                        <td className="py-3 px-3 text-right">
+                          <Link
+                            href={`/challans/${ch.id}`}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-semibold transition"
+                          >
+                            <FileText className="w-3.5 h-3.5 text-slate-600" />
+                            <span>View Challan</span>
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* WORKFLOW 5: EMBROIDERY DEPARTMENT STOCK & MATERIAL BALANCE */}
+        {activeWorkflow === 'STOCK' && (
+          <DepartmentStockView
+            department="EMBROIDERY"
+            createChallanUrl="/embroidery/my-work"
+          />
         )}
       </main>
 
@@ -883,86 +1140,12 @@ export default function EmbroideryMyWorkPage() {
         </div>
       )}
 
-      {/* POPUP MODAL: VIEW PRODUCTION SHEET DETAILS */}
-      {showSheetDetailModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="max-w-3xl w-full bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden space-y-4 p-6 my-8">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-teal-600 block">
-                  Master Production Sheet Specifications
-                </span>
-                <h3 className="text-base font-bold text-slate-900 font-mono">
-                  Sheet #{showSheetDetailModal.programSerialNo || showSheetDetailModal.programNumber}
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowSheetDetailModal(null)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
-              <div>
-                <span className="text-slate-400 text-[10px] block">Buyer Name</span>
-                <strong className="text-slate-800">{showSheetDetailModal.clientName || showSheetDetailModal.buyerName || 'Standard'}</strong>
-              </div>
-              <div>
-                <span className="text-slate-400 text-[10px] block">Style Code</span>
-                <strong className="text-slate-800">{showSheetDetailModal.mainStyle || 'Standard'}</strong>
-              </div>
-              <div>
-                <span className="text-slate-400 text-[10px] block">Wilcom Design #</span>
-                <strong className="text-fuchsia-700 font-mono">{showSheetDetailModal.wilcomDesignNumber || 'WILCOM-STD'}</strong>
-              </div>
-              <div>
-                <span className="text-slate-400 text-[10px] block">Target Quantity</span>
-                <strong className="text-slate-800 font-mono">{showSheetDetailModal.targetQuantity || 0} PCS</strong>
-              </div>
-            </div>
-
-            <div className="p-4 bg-fuchsia-50/70 border border-fuchsia-200 rounded-xl text-xs space-y-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-fuchsia-900 block">
-                Wilcom Pattern &amp; Stitch Details
-              </span>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <span className="text-slate-500 text-[10px] block">Description</span>
-                  <strong className="text-slate-800">{showSheetDetailModal.embroideryDesign || 'Logo & Branding Stitch'}</strong>
-                </div>
-                <div>
-                  <span className="text-slate-500 text-[10px] block">Frame Size</span>
-                  <strong className="text-slate-800">{showSheetDetailModal.embroideryDesignSize || 'Standard 12x12 cm'}</strong>
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-2 flex justify-end gap-2 border-t border-slate-200">
-              <button
-                type="button"
-                onClick={() => setShowSheetDetailModal(null)}
-                className="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50"
-              >
-                Close
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  applyProgramToForm(showSheetDetailModal);
-                  setShowSheetDetailModal(null);
-                  setActiveWorkflow('CREATE_CHALLAN');
-                }}
-                className="px-4 py-2 bg-fuchsia-600 hover:bg-fuchsia-700 text-white rounded-lg text-xs font-bold shadow-xs"
-              >
-                Use This Sheet
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* POPUP MODAL: PRODUCTION SHEET TRAVELER (MOVES ALONG WITH CHALLAN) */}
+      <ProductionSheetPrintModal
+        program={showSheetDetailModal}
+        isOpen={!!showSheetDetailModal}
+        onClose={() => setShowSheetDetailModal(null)}
+      />
 
       {/* POPUP MODAL: CHALLAN CREATED SUCCESSFULLY WITH BARCODE & PRINT (RULE 2) */}
       {createdChallanModal && (
@@ -1029,6 +1212,16 @@ export default function EmbroideryMyWorkPage() {
               >
                 Create Another Challan
               </button>
+              {selectedProgram && (
+                <button
+                  type="button"
+                  onClick={() => setShowSheetDetailModal(selectedProgram)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-300 rounded-lg text-xs font-bold transition"
+                >
+                  <FileText className="w-3.5 h-3.5 text-teal-700" />
+                  <span>View Production Sheet</span>
+                </button>
+              )}
               <Link
                 href={`/challans/${createdChallanModal.id}`}
                 className="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-bold shadow-xs transition"

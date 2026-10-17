@@ -13,11 +13,13 @@ import {
   ArrowUpFromLine, 
   Eye 
 } from 'lucide-react';
+import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 
 export default function IncomingChallansPage() {
   const [loading, setLoading] = useState(true);
   const [challans, setChallans] = useState<any[]>([]);
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
+  const [selectedSheetModal, setSelectedSheetModal] = useState<any | null>(null);
 
   const loadChallans = async () => {
     try {
@@ -243,6 +245,18 @@ export default function IncomingChallansPage() {
                               </>
                             )}
 
+                            {ch.program && (
+                              <button
+                                type="button"
+                                onClick={() => setSelectedSheetModal(ch.program)}
+                                className="inline-flex items-center gap-1 text-[11px] font-bold text-teal-800 hover:text-teal-900 bg-teal-50 hover:bg-teal-100 border border-teal-200 px-2 py-1 rounded transition cursor-pointer"
+                                title="View accompanying Production Sheet from Programming"
+                              >
+                                <FileText className="w-3.5 h-3.5 text-teal-700" />
+                                <span>View Sheet</span>
+                              </button>
+                            )}
+
                             <Link
                               href={`/challans/${ch.id}`}
                               className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded transition"
@@ -255,37 +269,19 @@ export default function IncomingChallansPage() {
                       </tr>
                     );
                   })}
-                  {challans.map((ch: any) => (
-                    <tr key={ch.id} className="hover:bg-slate-50/60 transition">
-                      <td className="py-3 px-4 font-mono font-bold text-teal-800">{ch.challanNumber}</td>
-                      <td className="py-3 px-4 font-mono text-slate-600">{ch.program?.programNumber || '—'}</td>
-                      <td className="py-3 px-4 font-semibold">{ch.fromDepartment}</td>
-                      <td className="py-3 px-4 text-[11px]">{new Date(ch.createdAt).toLocaleDateString()}</td>
-                      <td className="py-3 px-4 text-[11px]">{ch.items?.[0]?.itemDescription || '—'}</td>
-                      <td className="py-3 px-4">{statusBadge(ch.status)}</td>
-                      <td className="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
-                        <Link
-                          href={`/fabric-store/my-work/issue-challan?programId=${ch.programId}&dest=DYEING`}
-                          className="inline-flex items-center gap-1 text-[11px] font-bold text-purple-700 hover:text-purple-900 bg-purple-50 hover:bg-purple-100 border border-purple-200 px-2 py-1 rounded transition"
-                          title="Dispatch to Dyeing Department"
-                        >
-                          To Dyeing →
-                        </Link>
-                        <Link
-                          href={`/fabric-store/my-work/material-receipt/create?challanId=${ch.id}`}
-                          className="inline-flex items-center gap-1 text-[11px] font-bold text-teal-700 hover:text-teal-900 bg-teal-50 hover:bg-teal-100 px-2 py-1 rounded transition"
-                        >
-                          Create GRN
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
                 </tbody>
               </table>
             </div>
           )}
         </div>
       </main>
+
+      {/* Production Sheet Print & Download Modal */}
+      <ProductionSheetPrintModal
+        program={selectedSheetModal}
+        isOpen={!!selectedSheetModal}
+        onClose={() => setSelectedSheetModal(null)}
+      />
     </div>
   );
 }
