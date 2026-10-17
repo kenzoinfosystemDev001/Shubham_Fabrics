@@ -15,6 +15,7 @@ import {
   Droplet,
   CheckCircle2,
   Scissors,
+  Waves,
 } from 'lucide-react';
 
 interface StationOption {
@@ -99,6 +100,15 @@ const STATIONS: StationOption[] = [
     accentColor: 'text-emerald-400',
     borderActive: 'border-emerald-500/80 shadow-[0_0_15px_rgba(16,185,129,0.25)]',
     bgActive: 'bg-emerald-500/15 text-white',
+  },
+  {
+    id: 'washing',
+    name: 'Washing',
+    username: 'washing',
+    icon: Waves,
+    accentColor: 'text-sky-400',
+    borderActive: 'border-sky-500/80 shadow-[0_0_15px_rgba(14,165,233,0.25)]',
+    bgActive: 'bg-sky-500/15 text-white',
   },
 ];
 

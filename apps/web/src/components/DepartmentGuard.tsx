@@ -16,6 +16,7 @@ export type DepartmentScope =
   | 'FABRIC_STORE'
   | 'QC1'
   | 'QC2'
+  | 'WASHING'
   | 'PROGRAMMING'
   | 'ADMIN'
   | 'AUTH'
@@ -29,6 +30,7 @@ export function getDepartmentScope(path: string): DepartmentScope {
   if (path.startsWith('/fabric-store')) return 'FABRIC_STORE';
   if (path.startsWith('/qc1')) return 'QC1';
   if (path.startsWith('/qc2')) return 'QC2';
+  if (path.startsWith('/washing')) return 'WASHING';
   if (path.startsWith('/programming')) return 'PROGRAMMING';
   if (path.startsWith('/admin')) return 'ADMIN';
   if (path.startsWith('/challans') || path.startsWith('/programs')) return 'SHARED';
@@ -43,6 +45,7 @@ export function getDepartmentRoot(scope: DepartmentScope): string {
     case 'FABRIC_STORE': return '/fabric-store';
     case 'QC1': return '/qc1';
     case 'QC2': return '/qc2';
+    case 'WASHING': return '/washing';
     case 'PROGRAMMING': return '/programming';
     case 'ADMIN': return '/admin';
     default: return '/login';

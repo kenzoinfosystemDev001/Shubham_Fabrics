@@ -91,13 +91,14 @@ export function Navigation() {
     pathname.startsWith('/qc1') ||
     pathname.startsWith('/embroidery') ||
     pathname.startsWith('/thread-cutting') ||
-    pathname.startsWith('/qc2')
+    pathname.startsWith('/qc2') ||
+    pathname.startsWith('/washing')
   ) {
     return null;
   }
 
-  // If viewing a shared route (like /challans/[id]), only show programming sidebar to programming users/admins
-  if (pathname.startsWith('/challans') && !isProg && !isAdmin) {
+  // If viewing a shared route (like /challans/[id] or /programs/[id]), only show programming sidebar to programming users/admins
+  if ((pathname.startsWith('/challans') || pathname.startsWith('/programs')) && !isProg && !isAdmin) {
     return null;
   }
 

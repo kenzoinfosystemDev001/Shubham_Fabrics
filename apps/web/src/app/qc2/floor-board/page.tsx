@@ -16,9 +16,11 @@ import {
   ShieldAlert,
   RotateCcw,
   Scissors,
-  PackageCheck
+  PackageCheck,
+  FileText
 } from 'lucide-react';
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
+import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 
 export default function QC2FloorBoard() {
   const [loading, setLoading] = useState(true);
@@ -45,6 +47,7 @@ export default function QC2FloorBoard() {
   });
   const [search, setSearch] = useState('');
   const [error, setError] = useState('');
+  const [selectedSheetForView, setSelectedSheetForView] = useState<any | null>(null);
 
   const loadBoard = async () => {
     try {
@@ -202,12 +205,25 @@ export default function QC2FloorBoard() {
                       </div>
                       <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
                         <span className="font-mono font-bold text-slate-800">{qty} PCS</span>
-                        <Link
-                          href={`/qc2/my-work?challanId=${c.id}`}
-                          className="text-[10px] font-bold text-emerald-700 hover:underline flex items-center gap-0.5"
-                        >
-                          <span>Inspect →</span>
-                        </Link>
+                        <div className="flex items-center gap-2">
+                          {c.program && (
+                            <button
+                              type="button"
+                              onClick={() => setSelectedSheetForView(c.program)}
+                              className="text-[10px] font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-0.5 hover:underline"
+                              title="View Production Sheet"
+                            >
+                              <FileText className="w-3 h-3" />
+                              <span>Sheet</span>
+                            </button>
+                          )}
+                          <Link
+                            href={`/qc2/my-work?challanId=${c.id}`}
+                            className="text-[10px] font-bold text-emerald-700 hover:underline flex items-center gap-0.5"
+                          >
+                            <span>Inspect →</span>
+                          </Link>
+                        </div>
                       </div>
                     </div>
                   );
@@ -257,12 +273,25 @@ export default function QC2FloorBoard() {
                       </div>
                       <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
                         <span className="font-mono font-bold text-slate-800">{qty} PCS</span>
-                        <Link
-                          href={`/qc2/my-work?challanId=${c.id}`}
-                          className="px-2 py-0.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-[10px] font-semibold"
-                        >
-                          Resume
-                        </Link>
+                        <div className="flex items-center gap-2">
+                          {c.program && (
+                            <button
+                              type="button"
+                              onClick={() => setSelectedSheetForView(c.program)}
+                              className="text-[10px] font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-0.5 hover:underline"
+                              title="View Production Sheet"
+                            >
+                              <FileText className="w-3 h-3" />
+                              <span>Sheet</span>
+                            </button>
+                          )}
+                          <Link
+                            href={`/qc2/my-work?challanId=${c.id}`}
+                            className="px-2 py-0.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-[10px] font-semibold"
+                          >
+                            Resume
+                          </Link>
+                        </div>
                       </div>
                     </div>
                   );
@@ -312,7 +341,20 @@ export default function QC2FloorBoard() {
                       </div>
                       <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
                         <span className="font-mono font-bold text-emerald-700">{qty} PCS Good</span>
-                        <span className="text-[10px] text-slate-400">QC Verified ✓</span>
+                        <div className="flex items-center gap-2">
+                          {c.program && (
+                            <button
+                              type="button"
+                              onClick={() => setSelectedSheetForView(c.program)}
+                              className="text-[10px] font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-0.5 hover:underline"
+                              title="View Production Sheet"
+                            >
+                              <FileText className="w-3 h-3" />
+                              <span>Sheet</span>
+                            </button>
+                          )}
+                          <span className="text-[10px] text-slate-400">QC Verified ✓</span>
+                        </div>
                       </div>
                     </div>
                   );
@@ -362,9 +404,22 @@ export default function QC2FloorBoard() {
                       </div>
                       <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
                         <span className="font-mono font-bold text-rose-700">{qty} PCS Defective</span>
-                        <span className="text-[10px] font-mono font-bold text-rose-600 bg-rose-50 px-1 py-0.5 rounded">
-                          DEF-SHELF
-                        </span>
+                        <div className="flex items-center gap-2">
+                          {c.program && (
+                            <button
+                              type="button"
+                              onClick={() => setSelectedSheetForView(c.program)}
+                              className="text-[10px] font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-0.5 hover:underline"
+                              title="View Production Sheet"
+                            >
+                              <FileText className="w-3 h-3" />
+                              <span>Sheet</span>
+                            </button>
+                          )}
+                          <span className="text-[10px] font-mono font-bold text-rose-600 bg-rose-50 px-1 py-0.5 rounded">
+                            DEF-SHELF
+                          </span>
+                        </div>
                       </div>
                     </div>
                   );
@@ -414,7 +469,20 @@ export default function QC2FloorBoard() {
                       </div>
                       <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
                         <span className="font-mono font-bold text-amber-700">{qty} PCS</span>
-                        <span className="text-[10px] text-slate-400">Re-trim</span>
+                        <div className="flex items-center gap-2">
+                          {c.program && (
+                            <button
+                              type="button"
+                              onClick={() => setSelectedSheetForView(c.program)}
+                              className="text-[10px] font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-0.5 hover:underline"
+                              title="View Production Sheet"
+                            >
+                              <FileText className="w-3 h-3" />
+                              <span>Sheet</span>
+                            </button>
+                          )}
+                          <span className="text-[10px] text-slate-400">Re-trim</span>
+                        </div>
                       </div>
                     </div>
                   );
@@ -424,6 +492,15 @@ export default function QC2FloorBoard() {
           </div>
         </div>
       </div>
+
+      {/* PRODUCTION SHEET PRINT / TRAVELER MODAL */}
+      {selectedSheetForView && (
+        <ProductionSheetPrintModal
+          program={selectedSheetForView}
+          isOpen={!!selectedSheetForView}
+          onClose={() => setSelectedSheetForView(null)}
+        />
+      )}
     </div>
   );
 }

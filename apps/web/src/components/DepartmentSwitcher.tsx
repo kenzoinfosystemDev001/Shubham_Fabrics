@@ -75,14 +75,6 @@ const DEPARTMENTS = [
     activeBg: 'bg-cyan-500/15 text-cyan-300 font-bold',
   },
   {
-    name: 'Thread Cut QC',
-    code: 'QC2',
-    href: '/thread-cutting',
-    color: 'amber',
-    badge: 'QC2',
-    dotClass: 'bg-amber-400',
-    hoverClass: 'hover:bg-amber-500/10 hover:text-amber-300',
-    activeBg: 'bg-amber-500/15 text-amber-300 font-bold',
     name: 'QC2 Department',
     code: 'QC2',
     href: '/qc2',
@@ -91,6 +83,16 @@ const DEPARTMENTS = [
     dotClass: 'bg-emerald-400',
     hoverClass: 'hover:bg-emerald-500/10 hover:text-emerald-300',
     activeBg: 'bg-emerald-500/15 text-emerald-300 font-bold',
+  },
+  {
+    name: 'Washing Department',
+    code: 'WASHING',
+    href: '/washing',
+    color: 'teal',
+    badge: 'WSH',
+    dotClass: 'bg-sky-400',
+    hoverClass: 'hover:bg-sky-500/10 hover:text-sky-300',
+    activeBg: 'bg-sky-500/15 text-sky-300 font-bold',
   },
 ];
 

@@ -15,6 +15,8 @@ export async function GET(request: Request) {
       department === 'THREAD_CUTTING' ? 'THC' :
       department === 'QC1' ? 'QC1' :
       department === 'QC2' ? 'QC2' :
+      department === 'WASHING' ? 'WSH' :
+      department === 'FINISHING' ? 'FIN' :
       department;
     const year = new Date().getFullYear();
     const prefix = `CH-${deptCode}-${year}-`;

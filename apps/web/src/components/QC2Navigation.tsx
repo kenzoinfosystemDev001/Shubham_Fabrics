@@ -12,7 +12,8 @@ import {
   Menu,
   X,
   ShieldCheck,
-  CheckCircle2
+  CheckCircle2,
+  FileText
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { isAdminUser } from '@/lib/rbac';
@@ -208,6 +209,16 @@ export function QC2Navigation() {
           >
             <Kanban className="w-4 h-4 text-amber-400" />
             <span>Floor Board</span>
+          </Link>
+
+          {/* 4. Production Sheets */}
+          <Link
+            href="/qc2/my-work?tab=PRODUCTION_SHEETS"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/qc2/my-work?tab=PRODUCTION_SHEETS', false)}
+          >
+            <FileText className="w-4 h-4 text-emerald-400" />
+            <span>Production Sheets</span>
           </Link>
         </nav>
 

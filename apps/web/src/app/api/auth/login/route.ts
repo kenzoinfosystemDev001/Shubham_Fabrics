@@ -29,12 +29,12 @@ export async function POST(request: Request) {
       embroidery: { role: 'EMBROIDERY_INCHARGE', dept: 'EMBROIDERY', name: 'Embroidery Department' },
       'thread-cutting': { role: 'THREAD_CUTTING_INCHARGE', dept: 'THREAD_CUTTING', name: 'Thread Cutting Department' },
       cutting: { role: 'THREAD_CUTTING_INCHARGE', dept: 'THREAD_CUTTING', name: 'Thread Cutting Department' },
-      qc2: { role: 'QC_INSPECTOR', dept: 'QC2', name: 'Thread Cut QC Inspector' },
-      qc3: { role: 'QC_INSPECTOR', dept: 'QC3', name: 'Washing QC Inspector' },
-      final_check: { role: 'QC_INSPECTOR', dept: 'FINAL_CHECK', name: 'Final check Inspector' },
-      cutting: { role: 'THREAD_CUTTING_INCHARGE', dept: 'THREAD_CUTTING', name: 'Thread Cutting Department' },
       qc2: { role: 'QC2_INSPECTOR', dept: 'QC2', name: 'QC2 Quality Inspector' },
       qc2_insp: { role: 'QC2_INSPECTOR', dept: 'QC2', name: 'QC2 Quality Inspector' },
+      qc3: { role: 'QC_INSPECTOR', dept: 'QC3', name: 'Washing QC Inspector' },
+      final_check: { role: 'QC_INSPECTOR', dept: 'FINAL_CHECK', name: 'Final check Inspector' },
+      washing: { role: 'WASHING_INCHARGE', dept: 'WASHING', name: 'Washing Department' },
+      washing_incharge: { role: 'WASHING_INCHARGE', dept: 'WASHING', name: 'Washing Department' },
     };
 
     // 2. Query user from Neon DB
@@ -189,7 +189,8 @@ export async function POST(request: Request) {
         user.username.toLowerCase() === 'cutting' ||
         user.departmentCode === 'THREAD_CUTTING' ||
         roleCodes.includes('THREAD_CUTTING_INCHARGE') ||
-        roleCodes.includes('THREAD_CUTTER'));
+        roleCodes.includes('THREAD_CUTTER') ||
+        roleCodes.includes('CUTTING_INCHARGE'));
 
     const isQC2 =
       !isAdmin &&
@@ -200,11 +201,34 @@ export async function POST(request: Request) {
       !isEmbroidery &&
       !isThreadCutting &&
       (user.username.toLowerCase() === 'qc2' ||
+        user.username.toLowerCase() === 'qc2_insp' ||
         user.departmentCode === 'QC2' ||
-        roleCodes.includes('QC2_INSPECTOR'));
+        roleCodes.includes('QC2_INSPECTOR') ||
+        roleCodes.includes('QC_INSPECTOR'));
+
+    const isWashing =
+      !isAdmin &&
+      !isStore &&
+      !isProgramming &&
+      !isDyeing &&
+      !isQC1 &&
+      !isEmbroidery &&
+      !isThreadCutting &&
+      !isQC2 &&
+      (user.username.toLowerCase() === 'washing' ||
+        user.username.toLowerCase() === 'washing_incharge' ||
+        user.departmentCode === 'WASHING' ||
+        roleCodes.includes('WASHING_INCHARGE') ||
+        roleCodes.includes('WASHING_OPERATOR'));
 
     const normalizedRole = isAdmin
       ? 'ADMIN'
+      : isWashing
+      ? 'WASHING_INCHARGE'
+      : isQC2
+      ? 'QC2_INSPECTOR'
+      : isThreadCutting
+      ? 'THREAD_CUTTING_INCHARGE'
       : isQC1
       ? 'QC_INSPECTOR'
       : isDyeing
@@ -213,16 +237,18 @@ export async function POST(request: Request) {
       ? 'FABRIC_STORE'
       : isEmbroidery
       ? 'EMBROIDERY_INCHARGE'
-      : isThreadCutting
-      ? 'THREAD_CUTTING_INCHARGE'
-      : isQC2
-      ? 'QC_INSPECTOR'
       : isProgramming
       ? 'PROGRAMMER'
       : roleCodes[0] || 'USER';
 
     const normalizedDept = isAdmin
       ? 'ADMIN'
+      : isWashing
+      ? 'WASHING'
+      : isQC2
+      ? 'QC2'
+      : isThreadCutting
+      ? 'THREAD_CUTTING'
       : isQC1
       ? 'QC1'
       : isDyeing
@@ -231,16 +257,18 @@ export async function POST(request: Request) {
       ? 'STORE'
       : isEmbroidery
       ? 'EMBROIDERY'
-      : isThreadCutting
-      ? 'THREAD_CUTTING'
-      : isQC2
-      ? 'QC2'
       : isProgramming
       ? 'PROGRAMMING'
-      : user.departmentCode || 'QC1';
+      : user.departmentCode || 'WASHING';
 
     const defaultRedirect = isAdmin
       ? '/admin'
+      : isWashing
+      ? '/washing'
+      : isQC2
+      ? '/qc2'
+      : isThreadCutting
+      ? '/thread-cutting'
       : isQC1
       ? '/qc1'
       : isDyeing
@@ -249,10 +277,6 @@ export async function POST(request: Request) {
       ? '/fabric-store'
       : isEmbroidery
       ? '/embroidery'
-      : isThreadCutting
-      ? '/thread-cutting'
-      : isQC2
-      ? '/qc2'
       : '/programming';
 
     const token = `mes_jwt_${user.id}_${Date.now()}`;

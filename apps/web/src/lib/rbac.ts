@@ -219,9 +219,30 @@ export function isThreadCuttingUser(user: MESUser | null): boolean {
   );
 }
 
+export function isWashingUser(user: MESUser | null): boolean {
+  if (!user) return false;
+  if (isAdminUser(user)) return true; // Admins have all access
+
+  const username = (user.username || '').toLowerCase();
+  const dept = (user.departmentCode || '').toUpperCase();
+  const role = (user.role || '').toUpperCase();
+  const roles = (user.roles || []).map((r) => r.toUpperCase());
+
+  return (
+    username === 'washing' ||
+    username === 'washing_incharge' ||
+    dept === 'WASHING' ||
+    role === 'WASHING_INCHARGE' ||
+    role === 'WASHING_OPERATOR' ||
+    roles.includes('WASHING_INCHARGE') ||
+    roles.includes('WASHING_OPERATOR')
+  );
+}
+
 export function getUserStationHome(user: MESUser | null): string {
   if (!user) return '/login';
   if (isAdminUser(user)) return '/admin';
+  if (isWashingUser(user)) return '/washing';
   if (isQc1User(user)) return '/qc1';
   if (isQc2User(user)) return '/qc2';
   if (isDyeingUser(user)) return '/dyeing';
@@ -270,6 +291,23 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
       allowed: false,
       redirectTarget: defaultUserHome,
       reason: 'Access Restricted: Admin Console is restricted to System Administrators.',
+    };
+  }
+
+  // Shared Production Sheets access: QC2, Washing, and all authenticated stations must be able to view Production Sheets
+  if (pathname.startsWith('/programs')) {
+    return { allowed: true, redirectTarget: pathname };
+  }
+
+  // Washing Department routes protection
+  if (pathname.startsWith('/washing')) {
+    if (isWashingUser(user)) {
+      return { allowed: true, redirectTarget: pathname };
+    }
+    return {
+      allowed: false,
+      redirectTarget: defaultUserHome,
+      reason: 'Access Restricted: You are not authorized for the Washing Department. Access is restricted to Washing personnel and Admins.',
     };
   }
 
@@ -345,18 +383,18 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
     };
   }
 
-  // Programming department routes protection (/programming, my-work, programs, floor-board)
+  // Programming department routes protection (/programming, my-work, floor-board)
   const isProgrammingRoute =
     pathname === '/programming' ||
     pathname.startsWith('/programming/') ||
     pathname === '/dashboard' ||
     pathname.startsWith('/my-work') ||
-    pathname.startsWith('/programs') ||
     (pathname.startsWith('/floor-board') &&
       !pathname.startsWith('/fabric-store/floor-board') &&
       !pathname.startsWith('/dyeing/floor-board') &&
       !pathname.startsWith('/qc1/floor-board') &&
       !pathname.startsWith('/qc2/floor-board') &&
+      !pathname.startsWith('/washing/floor-board') &&
       !pathname.startsWith('/embroidery/floor-board') &&
       !pathname.startsWith('/thread-cutting/floor-board'));
 
