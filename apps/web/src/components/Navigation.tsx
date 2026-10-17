@@ -90,7 +90,8 @@ export function Navigation() {
     pathname.startsWith('/dyeing') ||
     pathname.startsWith('/qc1') ||
     pathname.startsWith('/embroidery') ||
-    pathname.startsWith('/thread-cutting')
+    pathname.startsWith('/thread-cutting') ||
+    pathname.startsWith('/qc2')
   ) {
     return null;
   }
