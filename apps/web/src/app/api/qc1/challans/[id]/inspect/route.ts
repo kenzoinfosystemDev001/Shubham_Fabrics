@@ -288,7 +288,7 @@ export async function POST(
             unitOfMeasure: uom,
             reworkReason: reworkReason || null,
             rejectReason: defectRemarks || (normalizedResult === 'REJECT' ? effectiveRemark : null),
-            notes: effectiveRemark || `QC1 Inspection complete: ${normalizedResult}. Passed: ${qPassed} ${uom}`,
+            notes: effectiveRemark || `Dyeing QC Inspection complete: ${normalizedResult}. Passed: ${qPassed} ${uom}`,
             recordedAt: new Date(),
           },
         });
@@ -357,20 +357,28 @@ export async function POST(
               createdById: actorId,
               issuedById: actorId,
               issuedDate: new Date(),
-              remarks: `QC1 Defective Return to Fabric Store Defective Shelf (DEF-SHELF-01) for Sheet ${challan.program.programSerialNo || challan.program.programNumber}. Reason: ${defectRemarks || effectiveRemark}. Strictly forbidden for Embroidery.`,
+              fabricIn: qFailed,
+              defectivePieces: qFailed,
+              fabricOut: 0,
+              fabricUnit: uom,
+              defectiveShelfLocation: 'DEF-SHELF-STORE (Fabric Store Quarantined Shelf · DEF-SHELF-CENTRAL)',
+              defectReason: defectRemarks || effectiveRemark,
+              detectedFromDepartment: 'QC1',
+              detectedFromChallanId: challan.id,
+              remarks: `QC1 Defective Return to Fabric Store Defective Shelf (DEF-SHELF-STORE) for Sheet ${challan.program.programSerialNo || challan.program.programNumber}. Reason: ${defectRemarks || effectiveRemark}. Strictly forbidden for Embroidery.`,
             },
           });
 
           await tx.challanItem.create({
             data: {
               challanId: rejectReturnChallan.id,
-              itemDescription: `${primaryItem?.itemDescription || 'Dyed Fabric'} - DEFECTIVE SHELF (DEF-SHELF-01)`,
+              itemDescription: `${primaryItem?.itemDescription || 'Dyed Fabric'} - DEFECTIVE SHELF (DEF-SHELF-STORE)`,
               fabricCode: primaryItem?.fabricCode || 'KNIT',
               colour: effectiveColor,
               unitType: 'ROLL',
               quantity: qFailed,
               uom,
-              remarks: `QC_REJECTED: Allocated to Fabric Store Defective Shelf. Not approved for Embroidery. Reason: ${defectRemarks || effectiveRemark}`,
+              remarks: `QC_REJECTED: Allocated to Fabric Store Defective Shelf (DEF-SHELF-STORE). Not approved for Embroidery. Reason: ${defectRemarks || effectiveRemark}`,
             },
           });
         }
@@ -398,6 +406,12 @@ export async function POST(
               createdById: actorId,
               issuedById: actorId,
               issuedDate: new Date(),
+              fabricIn: qPassed,
+              defectivePieces: 0,
+              fabricOut: qPassed,
+              fabricUnit: uom,
+              detectedFromDepartment: 'QC1',
+              detectedFromChallanId: challan.id,
               remarks: `QC1 Passed Fabric — Approved for Embroidery Department for Sheet ${challan.program?.programSerialNo || challan.program?.programNumber || ''}. QC Incharge Remark: ${effectiveRemark}`,
             },
           });
@@ -429,6 +443,12 @@ export async function POST(
           data: {
             status: newChallanStatus,
             completedDate: new Date(),
+            fabricIn: challan.fabricIn ?? qInspected,
+            defectivePieces: (challan.defectivePieces || 0) + qFailed,
+            fabricOut: qPassed,
+            fabricUnit: uom,
+            defectiveShelfLocation: qFailed > 0 ? 'DEF-SHELF-STORE (Fabric Store Quarantined Shelf · DEF-SHELF-CENTRAL)' : challan.defectiveShelfLocation,
+            defectReason: qFailed > 0 ? (defectRemarks || effectiveRemark) : challan.defectReason,
             remarks: [
               challan.remarks,
               `QC1 Result: ${normalizedResult} (Pass: ${qPassed} → Embroidery | Rework: ${qRework} → Dyeing | Reject: ${qFailed} → Store Defective Shelf ${uom}) | QC Remark: ${effectiveRemark}`,

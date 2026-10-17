@@ -45,6 +45,19 @@ export async function GET(request: Request) {
         },
         fromDeptRel: true,
         toDeptRel: true,
+        parentChallan: {
+          select: {
+            id: true,
+            challanNumber: true,
+            fromDepartment: true,
+            toDepartment: true,
+            fabricIn: true,
+            fabricOut: true,
+            fabricUnit: true,
+            defectivePieces: true,
+            status: true,
+          },
+        },
         createdBy: {
           select: {
             id: true,
@@ -279,13 +292,92 @@ export async function POST(request: Request) {
       challanNumber = `${prefix}${Date.now().toString().slice(-5)}`;
     }
 
-    // 5. Transactional challan creation
+    // 5. Auto-Detection of Fabric / Pieces In from Previous Department
+    let detectedFabricIn: number | null = null;
+    let detectedFromDept: string | null = body.detectedFromDepartment || null;
+    let detectedFromChallanId: string | null = body.detectedFromChallanId || body.parentChallanId || null;
+    let detectedUnit: string = body.fabricUnit || body.uom || 'MTR';
+
+    if (body.parentChallanId) {
+      const parent = await prisma.challan.findUnique({
+        where: { id: body.parentChallanId },
+        include: { items: true },
+      });
+      if (parent) {
+        const pItemsTotal = parent.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
+        detectedFabricIn = parent.fabricOut ?? (pItemsTotal > 0 ? pItemsTotal : parent.fabricIn ?? 0);
+        detectedFromDept = parent.fromDepartment;
+        detectedFromChallanId = parent.id;
+        if (parent.fabricUnit) detectedUnit = parent.fabricUnit;
+        else if (parent.items[0]?.uom) detectedUnit = parent.items[0].uom;
+      }
+    } else if (resolvedProgramId && fromDept !== 'PROGRAMMING') {
+      const priorChallan = await prisma.challan.findFirst({
+        where: {
+          programId: resolvedProgramId,
+          toDepartment: { contains: fromDept, mode: 'insensitive' },
+        },
+        orderBy: { createdAt: 'desc' },
+        include: { items: true },
+      });
+      if (priorChallan) {
+        const prItemsTotal = priorChallan.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
+        detectedFabricIn = priorChallan.fabricOut ?? (prItemsTotal > 0 ? prItemsTotal : priorChallan.fabricIn ?? 0);
+        detectedFromDept = priorChallan.fromDepartment;
+        detectedFromChallanId = priorChallan.id;
+        if (priorChallan.fabricUnit) detectedUnit = priorChallan.fabricUnit;
+        else if (priorChallan.items[0]?.uom) detectedUnit = priorChallan.items[0].uom;
+      }
+    }
+
+    const rawItemsSum = (Array.isArray(body.items) ? body.items : []).reduce(
+      (sum: number, it: any) => sum + (Number(it.quantity ?? it.measurement) || 0),
+      0
+    );
+
+    const fabricIn = body.fabricIn !== undefined && body.fabricIn !== null && body.fabricIn !== ''
+      ? Number(body.fabricIn)
+      : (detectedFabricIn ?? (rawItemsSum || Number(body.quantity || 1)));
+
+    const defectivePieces = Number(body.defectivePieces || 0);
+
+    const fabricOut = body.fabricOut !== undefined && body.fabricOut !== null && body.fabricOut !== ''
+      ? Number(body.fabricOut)
+      : Math.max(0, fabricIn - defectivePieces);
+
+    const fabricUnit = body.fabricUnit || detectedUnit || body.uom || 'MTR';
+    const getDefaultDefectiveShelf = (dept: string) => {
+      const up = dept.toUpperCase();
+      if (up.includes('QC1') || up.includes('DYEING QC') || up.includes('DYE QC'))
+        return 'DEF-SHELF-QC1 (Dyeing QC Defective Shelf)';
+      if (up.includes('DYE')) return 'DEF-SHELF-DYEING (Dyeing Station Defective Shelf)';
+      if (up.includes('EMB')) return 'DEF-SHELF-EMBROIDERY (Embroidery Station Defective Shelf)';
+      if (up.includes('QC2') || up.includes('THREAD CUT QC') || up.includes('THREAD CUTTING QC'))
+        return 'DEF-SHELF-QC2 (Thread Cut QC Defective Shelf)';
+      if (up.includes('THREAD') || up.includes('CUTTING') || up.includes('THC'))
+        return 'DEF-SHELF-THREAD-CUTTING (Thread Cutting Trimming Shelf)';
+      if (up.includes('QC3') || up.includes('WASHING QC') || up.includes('WASH QC'))
+        return 'DEF-SHELF-QC3 (Washing QC Defective Shelf)';
+      if (up.includes('FINAL') || up.includes('FINAL_CHECK') || up.includes('FINAL CHECK'))
+        return 'DEF-SHELF-FINAL-CHECK (Final check Defective Shelf)';
+      return 'DEF-SHELF-STORE (Fabric Store Quarantined Shelf)';
+    };
+
+    const defectiveShelfLocation = defectivePieces > 0
+      ? (body.defectiveShelfLocation || getDefaultDefectiveShelf(fromDept))
+      : null;
+    const defectReason = defectivePieces > 0
+      ? (body.defectReason || 'Quality Defect / In-Process Segregation')
+      : null;
+
+    // 6. Transactional challan creation
     const created = await prisma.$transaction(async (tx) => {
       const challan = await tx.challan.create({
         data: {
           challanNumber,
-          challanType: body.challanType || 'INTER_DEPARTMENT',
+          challanType: body.challanType || (defectivePieces > 0 && fabricOut === 0 ? 'DEFECT_RETURN' : 'INTER_DEPARTMENT'),
           programId: resolvedProgramId,
+          parentChallanId: body.parentChallanId || detectedFromChallanId || null,
           fromDepartment: fromDept,
           toDepartment: toDept,
           status: body.status || 'ISSUED',
@@ -293,9 +385,23 @@ export async function POST(request: Request) {
           createdById: actorId,
           issuedById: actorId,
           issuedDate: parseSafeDate(body.issuedDate, new Date()) || new Date(),
+          fabricIn,
+          fabricOut,
+          fabricUnit,
+          defectivePieces,
+          defectiveShelfLocation,
+          defectReason,
+          detectedFromChallanId,
+          detectedFromDepartment: detectedFromDept,
           remarks:
             [
               body.remarks,
+              defectivePieces > 0
+                ? `[DEFECT ISOLATION: ${defectivePieces} ${fabricUnit} cut & routed to ${defectiveShelfLocation} (Reason: ${defectReason}). Net Out: ${fabricOut} ${fabricUnit}]`
+                : null,
+              detectedFromDept
+                ? `[Auto-detected from ${detectedFromDept}: In ${fabricIn} ${fabricUnit}]`
+                : null,
               body.vehicleNumber ? `Vehicle: ${body.vehicleNumber}` : null,
               body.driverName ? `Driver: ${body.driverName}` : null,
             ]
@@ -303,6 +409,29 @@ export async function POST(request: Request) {
               .join(' | ') || null,
         },
       });
+
+      // If defective pieces cut, create DefectRecord for full audit trail & defective shelf tracking
+      if (defectivePieces > 0) {
+        try {
+          await tx.defectRecord.create({
+            data: {
+              defectCode: `DEF-${fromDept}-${Date.now().toString().slice(-4)}`,
+              programId: resolvedProgramId,
+              challanId: challan.id,
+              departmentCode: fromDept,
+              itemDescription: `Defective pieces cut in ${fromDept} — Quarantined on ${defectiveShelfLocation}`,
+              severity: 'MAJOR',
+              quantity: Math.max(1, Math.round(defectivePieces)),
+              reason: defectReason || 'Defective piece cut during department processing',
+              detectedById: actorId,
+              status: 'OPEN',
+              resolutionNotes: `Defective ${defectivePieces} ${fabricUnit} segregated to ${defectiveShelfLocation}. Leftover ${fabricOut} ${fabricUnit} dispatched to ${toDept}.`,
+            },
+          });
+        } catch (defectErr) {
+          console.warn('Defect record creation note:', defectErr);
+        }
+      }
 
       // Prepare items
       const rawItems =
@@ -320,21 +449,29 @@ export async function POST(request: Request) {
           ];
 
       for (const item of rawItems) {
+        const itemRemarks = [
+          item.remarks,
+          item.requiredDyeQuantity ? `Req Dye Qty: ${item.requiredDyeQuantity}` : null,
+          item.actualDyedColor ? `Actual Dyed Color: ${item.actualDyedColor}` : null,
+          item.fabricProcessingStatus ? `Status: ${item.fabricProcessingStatus}` : null,
+        ].filter(Boolean).join(' · ');
+
         await tx.challanItem.create({
           data: {
             challanId: challan.id,
             itemDescription:
               item.itemDescription ||
               item.description ||
-              'Production Material Lot',
+              `${item.fabric || item.fabricCode || 'Fabric'} — ${item.colour || item.color || 'Standard'}`,
             unitType: item.unitType || 'ROLL',
-            quantity: Number(item.quantity || 1),
-            uom: item.uom || 'MTR',
-            fabricCode: item.fabricCode || null,
-            colour: item.colour || null,
-            shade: item.shade || null,
+            quantity: Number(item.quantity ?? item.measurement ?? 1),
+            uom: item.uom || item.unit || 'MTR',
+            fabricCode: item.fabricCode || item.fabric || null,
+            colour: item.colour || item.color || null,
+            shade: item.shade || item.requiredDyeColor || null,
             size: item.size || null,
-            remarks: item.remarks || null,
+            rollNumber: item.rollNumber || null,
+            remarks: itemRemarks || null,
           },
         });
       }

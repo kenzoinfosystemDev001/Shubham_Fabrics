@@ -32,3 +32,25 @@ logs/
 # OS
 .DS_Store
 Thumbs.db
+
+# Strict Prohibition on Testing, Example, Dummy, and Scratch Files
+test/
+tests/
+__tests__/
+*.test.*
+*.spec.*
+example/
+examples/
+*.example.*
+*.sample.*
+*.sample
+*.example
+scratch/
+dummy/
+*.dummy.*
+*.dummy
+mock/
+mocks/
+*.mock.*
+*.backup
+*.tmp*

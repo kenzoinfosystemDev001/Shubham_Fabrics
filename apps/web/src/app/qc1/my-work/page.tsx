@@ -25,8 +25,18 @@ import {
   RotateCcw,
   PauseCircle,
   Send,
-  Droplet
+  Droplet,
+  Boxes,
+  Archive,
+  AlertTriangle,
+  Trash2,
 } from 'lucide-react';
+import { DepartmentStockView } from '@/components/DepartmentStockView';
+import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
+import { 
+  downloadProductionSheetHtml, 
+  printProductionSheet 
+} from '@/lib/download-production-sheet';
 
 interface QC1Challan {
   id: string;
@@ -77,6 +87,11 @@ export default function QC1MyWorkPage() {
   const [error, setError] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
 
+  // Navigation Tabs: 'inspection' | 'stock' | 'defective-shelf'
+  const [activeTab, setActiveTab] = useState<'inspection' | 'stock' | 'defective-shelf'>('inspection');
+  const [qc1Defects, setQc1Defects] = useState<any[]>([]);
+  const [loadingDefects, setLoadingDefects] = useState(false);
+
   // Filters
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [priorityFilter, setPriorityFilter] = useState('ALL');
@@ -109,6 +124,22 @@ export default function QC1MyWorkPage() {
 
   // Receiving state
   const [receivingId, setReceivingId] = useState<string | null>(null);
+
+  // Fetch QC1 Defective Shelf Records
+  const loadQc1Defects = async () => {
+    try {
+      setLoadingDefects(true);
+      const res = await fetch('/api/defective-shelves?department=QC1');
+      const json = await res.json();
+      if (json.success && json.data?.challans) {
+        setQc1Defects(json.data.challans);
+      }
+    } catch (err) {
+      console.error('Error fetching QC1 defects:', err);
+    } finally {
+      setLoadingDefects(false);
+    }
+  };
 
   // Fetch QC1 Challans
   const loadChallans = async () => {
@@ -155,6 +186,7 @@ export default function QC1MyWorkPage() {
       }
     }
     loadChallans();
+    loadQc1Defects();
   }, [statusFilter, priorityFilter]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -310,7 +342,11 @@ export default function QC1MyWorkPage() {
       }
 
       setInspectionSuccess(resJson.data);
-      await loadChallans();
+      setSubmittingInspection(false);
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      loadChallans();
     } catch (err: any) {
       console.error('Inspection submit error:', err);
       setInspectionError(err.message || 'Error submitting inspection.');
@@ -351,7 +387,7 @@ export default function QC1MyWorkPage() {
           </span>
           <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
             <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-            <span>QC1 — My Work Workspace</span>
+            <span>Dyeing QC — My Work Workspace</span>
           </h1>
         </div>
 
@@ -382,86 +418,130 @@ export default function QC1MyWorkPage() {
         </div>
       </header>
 
-      {/* FILTER & SEARCH BAR */}
-      <div className="bg-white border-b border-slate-200 px-4 sm:px-8 py-3">
-        <form
-          onSubmit={handleSearchSubmit}
-          className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs"
-        >
-          {/* SEARCH */}
-          <div className="relative flex-1 max-w-md">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search by Challan #, Production Sheet #, Fabric, Color, Client..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-8 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500 transition"
-            />
-          </div>
+      {/* MAIN CONTAINER */}
+      <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
+        {/* ============================================================== */}
+        {/* NAVIGATION TABS: Inspection Queue | Stock | Defective Shelf    */}
+        {/* ============================================================== */}
+        <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-2">
+          <button
+            type="button"
+            onClick={() => setActiveTab('inspection')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+              activeTab === 'inspection'
+                ? 'bg-emerald-700 text-white shadow-xs'
+                : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
+            }`}
+          >
+            <CheckCircle2 className="w-4 h-4" />
+            <span>Inspection Queue ({challans.length})</span>
+          </button>
 
-          {/* STATUS & PRIORITY DROPDOWNS */}
-          <div className="flex flex-wrap items-center gap-2.5">
-            <div className="flex items-center gap-1.5">
-              <Filter className="w-3.5 h-3.5 text-slate-400" />
-              <span className="text-[11px] font-bold uppercase text-slate-500">Status:</span>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-              >
-                <option value="ALL">All Statuses</option>
-                <option value="ISSUED">Sent to QC1 (Pending Receipt)</option>
-                <option value="RECEIVED">Received by QC1</option>
-                <option value="UNDER_INSPECTION">Under Inspection</option>
-                <option value="QC_APPROVED">Passed (QC Approved)</option>
-                <option value="QC_REJECTED">Failed (Rejected)</option>
-                <option value="REWORK_REQUESTED">Rework (To Dyeing)</option>
-                <option value="ON_HOLD">On Hold</option>
-              </select>
-            </div>
+          <button
+            type="button"
+            onClick={() => setActiveTab('stock')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+              activeTab === 'stock'
+                ? 'bg-emerald-700 text-white shadow-xs'
+                : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
+            }`}
+          >
+            <Boxes className="w-4 h-4" />
+            <span>Dyeing QC Stock &amp; Material Balance</span>
+          </button>
 
-            <div className="flex items-center gap-1.5">
-              <span className="text-[11px] font-bold uppercase text-slate-500">Priority:</span>
-              <select
-                value={priorityFilter}
-                onChange={(e) => setPriorityFilter(e.target.value)}
-                className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-              >
-                <option value="ALL">All Priorities</option>
-                <option value="NORMAL">Normal</option>
-                <option value="HIGH">High</option>
-                <option value="URGENT">Urgent</option>
-              </select>
-            </div>
-          </div>
-        </form>
-      </div>
-
-      {/* ERROR */}
-      {error && (
-        <div className="mx-4 sm:mx-8 mt-4 p-4 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-3 text-rose-800 text-xs">
-          <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
-          <span>{error}</span>
-          <button onClick={loadChallans} className="ml-auto underline font-bold">
-            Retry
+          <button
+            type="button"
+            onClick={() => setActiveTab('defective-shelf')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+              activeTab === 'defective-shelf'
+                ? 'bg-rose-700 text-white shadow-xs'
+                : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
+            }`}
+          >
+            <AlertTriangle className="w-4 h-4 text-rose-500" />
+            <span>Defective Shelf (DEF-SHELF-QC1) ({qc1Defects.length})</span>
           </button>
         </div>
-      )}
 
-      {/* MAIN CONTENT WORKSPACE */}
-      <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-4">
+        {/* ERROR */}
+        {error && (
+          <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-3 text-rose-800 text-xs">
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+            <span>{error}</span>
+            <button onClick={loadChallans} className="ml-auto underline font-bold">
+              Retry
+            </button>
+          </div>
+        )}
+
+        {/* ============================================================== */}
+        {/* TAB 1: INSPECTION QUEUE                                       */}
+        {/* ============================================================== */}
+        {activeTab === 'inspection' && (
+          <div className="space-y-4">
+            {/* FILTER & SEARCH BAR */}
+            <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-xs">
+              <form
+                onSubmit={handleSearchSubmit}
+                className="flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs"
+              >
+                {/* SEARCH */}
+                <div className="relative flex-1 max-w-md">
+                  <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Search by Challan #, Production Sheet #, Fabric, Color, Client..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-8 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500 transition"
+                  />
+                </div>
+
+                {/* STATUS & PRIORITY DROPDOWNS */}
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <div className="flex items-center gap-1.5">
+                    <Filter className="w-3.5 h-3.5 text-slate-400" />
+                    <span className="text-[11px] font-bold uppercase text-slate-500">Status:</span>
+                    <select
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value)}
+                      className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    >
+                      <option value="ALL">All Statuses</option>
+                      <option value="ISSUED">Sent to QC1 (Pending Receipt)</option>
+                      <option value="RECEIVED">Received by QC1</option>
+                      <option value="UNDER_INSPECTION">Under Inspection</option>
+                      <option value="QC_APPROVED">Passed (QC Approved)</option>
+                      <option value="QC_REJECTED">Failed (Rejected)</option>
+                      <option value="REWORK_REQUESTED">Rework (To Dyeing)</option>
+                      <option value="ON_HOLD">On Hold</option>
+                    </select>
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[11px] font-bold uppercase text-slate-500">Priority:</span>
+                    <select
+                      value={priorityFilter}
+                      onChange={(e) => setPriorityFilter(e.target.value)}
+                      className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    >
+                      <option value="ALL">All Priorities</option>
+                      <option value="NORMAL">Normal</option>
+                      <option value="HIGH">High</option>
+                      <option value="URGENT">Urgent</option>
+                    </select>
+                  </div>
+                </div>
+              </form>
+            </div>
         {/* WORKSPACE BANNER */}
         <div className="bg-white border border-slate-200/90 rounded-xl p-4 sm:p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>Incoming Dyed Material for QC1 Inspection</span>
+              <span>Incoming Material for QC1 Inspection</span>
             </h2>
-            <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-              Verify actual dyed yardage against the master Production Sheet. Acknowledge receiving, inspect for shade matching
-              and knitting defects, and record verified PASS, FAIL, REWORK, or HOLD outcomes.
-            </p>
           </div>
 
           <div className="flex items-center gap-4 text-xs font-mono shrink-0">
@@ -485,10 +565,6 @@ export default function QC1MyWorkPage() {
             <h3 className="text-base font-bold text-slate-800">
               No material currently waiting for QC1 inspection.
             </h3>
-            <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
-              When the Dyeing Department completes fabric dyeing and issues an inter-department Challan to QC1,
-              it will immediately appear here with full Production Sheet traceability.
-            </p>
             <div className="pt-2">
               <Link
                 href="/dyeing/my-work"
@@ -718,6 +794,161 @@ export default function QC1MyWorkPage() {
                 </tbody>
               </table>
             </div>
+          </div>
+        )}
+          </div>
+        )}
+
+        {/* ============================================================== */}
+        {/* TAB 2: QC1 DEPARTMENT STOCK VIEW                              */}
+        {/* ============================================================== */}
+        {activeTab === 'stock' && (
+          <DepartmentStockView department="QC1" />
+        )}
+
+        {/* ============================================================== */}
+        {/* TAB 3: QC1 DEFECTIVE SHELF (DEF-SHELF-QC1)                     */}
+        {/* ============================================================== */}
+        {activeTab === 'defective-shelf' && (
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 gap-3">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-rose-600 block">
+                  DEPARTMENT ISOLATION SHELF
+                </span>
+                <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2 mt-0.5">
+                  <Archive className="w-5 h-5 text-rose-600" />
+                  <span>Dyeing QC Defective Shelf (DEF-SHELF-QC1)</span>
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Segregated rolls, cuts, and patches rejected during shade matching and knitting inspection. Automatically synced with Fabric Store Master Defective Shelf (DEF-SHELF-CENTRAL).
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-500 font-mono">
+                  Shelf Code: <strong className="text-rose-700 bg-rose-50 px-2.5 py-1 rounded border border-rose-200">DEF-SHELF-QC1</strong>
+                </span>
+                <button
+                  onClick={loadQc1Defects}
+                  disabled={loadingDefects}
+                  className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-md border border-slate-200 transition cursor-pointer"
+                  title="Refresh Defective Shelf"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${loadingDefects ? 'animate-spin' : ''}`} />
+                </button>
+              </div>
+            </div>
+
+            {/* STAT CARDS */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="p-4 bg-rose-50/70 border border-rose-200 rounded-xl space-y-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-rose-800">
+                  Total QC1 Defective Cut
+                </span>
+                <div className="text-2xl font-mono font-bold text-rose-900">
+                  {qc1Defects.reduce((acc, c) => acc + (Number(c.defectivePieces) || 0), 0)} MTR / PCS
+                </div>
+                <span className="text-[10px] text-rose-600">
+                  Quarantined from downstream Embroidery handover
+                </span>
+              </div>
+
+              <div className="p-4 bg-purple-50/70 border border-purple-200 rounded-xl space-y-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-purple-800">
+                  Fabric Store Master Sync
+                </span>
+                <div className="text-base font-bold text-purple-900 flex items-center gap-1.5 mt-1">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <span>Auto-Synced with Central Store</span>
+                </div>
+                <span className="text-[10px] text-purple-700">
+                  Visible in Fabric Store DEF-SHELF-CENTRAL
+                </span>
+              </div>
+
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+                  Quarantined Incidents
+                </span>
+                <div className="text-2xl font-mono font-bold text-slate-800">
+                  {qc1Defects.length} Lots
+                </div>
+                <span className="text-[10px] text-slate-500">
+                  Recorded with defect classification
+                </span>
+              </div>
+            </div>
+
+            {/* DEFECTIVE ITEMS TABLE */}
+            {qc1Defects.length === 0 ? (
+              <div className="p-10 border border-dashed border-slate-200 rounded-xl text-center space-y-2">
+                <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto" />
+                <h4 className="text-xs font-bold text-slate-800">No defective pieces on DEF-SHELF-QC1</h4>
+                <p className="text-[11px] text-slate-500 max-w-sm mx-auto">
+                  When fabric inspections identify shade mismatch, patchy dyeing, or knitting holes, defective cuts are isolated here and synchronized with the Fabric Store master shelf.
+                </p>
+              </div>
+            ) : (
+              <div className="border border-slate-200 rounded-xl overflow-hidden shadow-xs">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
+                      <tr>
+                        <th className="py-2.5 px-3">Challan #</th>
+                        <th className="py-2.5 px-3">Production Sheet #</th>
+                        <th className="py-2.5 px-3">Fabric &amp; Color</th>
+                        <th className="py-2.5 px-3">Defect Reason</th>
+                        <th className="py-2.5 px-3 text-right">Defective Cut</th>
+                        <th className="py-2.5 px-3">Isolation Shelf</th>
+                        <th className="py-2.5 px-3">Date</th>
+                        <th className="py-2.5 px-3 text-center">Store Sync</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {qc1Defects.map((def, idx) => (
+                        <tr key={def.id || idx} className="hover:bg-slate-50/70 transition">
+                          <td className="py-2.5 px-3 font-mono font-bold text-slate-900">
+                            {def.challanNumber}
+                          </td>
+                          <td className="py-2.5 px-3 font-mono text-emerald-700">
+                            {def.program?.programSerialNo || def.program?.programNumber || '—'}
+                          </td>
+                          <td className="py-2.5 px-3">
+                            <span className="font-medium text-slate-800 block">
+                              {def.program?.fabricName || def.fabric || 'Dyed Fabric'}
+                            </span>
+                            <span className="text-[10px] text-slate-500">
+                              {def.program?.fabricColor || def.color || 'Standard'}
+                            </span>
+                          </td>
+                          <td className="py-2.5 px-3">
+                            <span className="inline-block px-2 py-0.5 rounded bg-rose-50 text-rose-800 border border-rose-200 font-medium text-[11px]">
+                              {def.defectReason || def.remarks || 'Shade Variation'}
+                            </span>
+                          </td>
+                          <td className="py-2.5 px-3 text-right font-mono font-bold text-rose-700">
+                            {def.defectivePieces || def.failedQuantity || 0} {def.fabricUnit || 'MTR'}
+                          </td>
+                          <td className="py-2.5 px-3 font-mono text-[11px] text-slate-600">
+                            {def.defectiveShelfLocation || 'DEF-SHELF-QC1'}
+                          </td>
+                          <td className="py-2.5 px-3 text-slate-500 text-[11px]">
+                            {new Date(def.createdAt || def.issuedDate || Date.now()).toLocaleDateString()}
+                          </td>
+                          <td className="py-2.5 px-3 text-center">
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                              <span>Master Synced</span>
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -1046,6 +1277,27 @@ export default function QC1MyWorkPage() {
                     <span className="text-[10px] text-slate-500 block truncate">
                       {selectedChallanForView.clientName}
                     </span>
+                    {selectedChallanForView.program && (
+                      <div className="mt-1 flex items-center gap-1.5 print:hidden">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedSheetForModal(selectedChallanForView.program)}
+                          className="text-[10px] font-bold text-indigo-700 hover:text-indigo-900 underline flex items-center gap-0.5 cursor-pointer"
+                        >
+                          <Eye className="w-2.5 h-2.5" />
+                          <span>View Sheet</span>
+                        </button>
+                        <span className="text-slate-300">·</span>
+                        <button
+                          type="button"
+                          onClick={() => printProductionSheet(selectedChallanForView.program)}
+                          className="text-[10px] font-bold text-blue-700 hover:text-blue-900 underline flex items-center gap-0.5 cursor-pointer"
+                        >
+                          <Printer className="w-2.5 h-2.5" />
+                          <span>Print</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   <div>
@@ -1596,9 +1848,6 @@ export default function QC1MyWorkPage() {
                         <label className="block text-xs font-bold text-slate-800">
                           QC Incharge Remark <span className="text-rose-500">*</span>
                         </label>
-                        <p className="text-[11px] text-slate-500">
-                          Mandatory for every decision (PASS, REWORK, or REJECT). Please enter observation notes or correction instructions.
-                        </p>
                         <textarea
                           rows={2}
                           value={inspectionForm.remarks}
@@ -1606,7 +1855,7 @@ export default function QC1MyWorkPage() {
                             setInspectionForm({ ...inspectionForm, remarks: e.target.value })
                           }
                           required
-                          placeholder="Enter mandatory QC Incharge remark..."
+                          placeholder=""
                           className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-1 focus:ring-emerald-500 focus:outline-none"
                         />
                       </div>
@@ -1619,15 +1868,15 @@ export default function QC1MyWorkPage() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                           <input
                             type="text"
-                            value={currentUser?.fullName || currentUser?.username || 'QC1 Inspector'}
+                            value={currentUser?.fullName || currentUser?.username || ''}
                             onChange={(e) => {}}
-                            placeholder="Name"
+                            placeholder=""
                             className="w-full text-xs font-medium border border-slate-300 rounded-lg px-3 py-2 bg-white"
                           />
                           <input
                             type="text"
                             defaultValue=""
-                            placeholder="Contact"
+                            placeholder=""
                             className="w-full text-xs font-mono border border-slate-300 rounded-lg px-3 py-2 bg-white"
                           />
                         </div>
@@ -1650,14 +1899,14 @@ export default function QC1MyWorkPage() {
                     <button
                       type="submit"
                       disabled={submittingInspection}
-                      className="flex items-center gap-1.5 px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold shadow-xs disabled:opacity-50 transition"
+                      className="flex items-center gap-1.5 px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer"
                     >
                       {submittingInspection ? (
-                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin text-emerald-200" />
                       ) : (
                         <CheckCircle2 className="w-3.5 h-3.5" />
                       )}
-                      <span>Submit</span>
+                      <span>{submittingInspection ? 'Submitting Inspection...' : 'Submit Inspection'}</span>
                     </button>
                   </div>
                 )}
@@ -1666,6 +1915,15 @@ export default function QC1MyWorkPage() {
           </div>
         )}
       </main>
+
+      {/* ACCOMPANYING PRODUCTION SHEET PREVIEW & PRINT MODAL */}
+      {selectedSheetForModal && (
+        <ProductionSheetPrintModal
+          program={selectedSheetForModal}
+          isOpen={Boolean(selectedSheetForModal)}
+          onClose={() => setSelectedSheetForModal(null)}
+        />
+      )}
     </div>
   );
 }

@@ -15,8 +15,14 @@ import {
   FileText,
   Download,
   Barcode as BarcodeIcon,
-  Tag
+  Tag,
+  Eye
 } from 'lucide-react';
+import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
+import { 
+  downloadProductionSheetHtml, 
+  printProductionSheet 
+} from '@/lib/download-production-sheet';
 import { api } from '@/lib/api';
 import { 
   getCurrentUser, 
@@ -44,6 +50,7 @@ export default function ChallanDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<any>(null);
   const [downloadingBarcode, setDownloadingBarcode] = useState(false);
+  const [showSheetModal, setShowSheetModal] = useState(false);
 
   useEffect(() => {
     setUser(getCurrentUser());
@@ -276,6 +283,19 @@ export default function ChallanDetailPage() {
             </>
           )}
 
+          {/* 2. ACCOMPANYING PRODUCTION SHEET ACTION */}
+          {challan.program && (
+            <button
+              type="button"
+              onClick={() => setShowSheetModal(true)}
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-indigo-700 hover:bg-indigo-800 text-white text-xs font-bold rounded-md shadow-xs transition cursor-pointer"
+              title="View the accompanying Production Sheet for this Challan"
+            >
+              <FileText className="w-4 h-4" />
+              <span>View Production Sheet</span>
+            </button>
+          )}
+
           <button
             onClick={() => window.print()}
             className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-md shadow-xs transition"
@@ -331,9 +351,6 @@ export default function ChallanDetailPage() {
                       CHALLAN
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 mt-1">
-                    Raw material / kora fabric dispatch slip to Dyeing Department
-                  </p>
                 </div>
               ) : challan.fromDepartment === 'DYEING' || challan.toDepartment === 'QC1' || (challan.challanNumber && challan.challanNumber.startsWith('CH-DYE-')) ? (
                 <div>
@@ -348,9 +365,6 @@ export default function ChallanDetailPage() {
                       CHALLAN
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 mt-1">
-                    Inter-department manufacturing transfer &amp; quality check dispatch slip
-                  </p>
                 </div>
               ) : challan.fromDepartment === 'THREAD_CUTTING' && challan.toDepartment === 'QC2' ? (
                 <div>
@@ -365,18 +379,12 @@ export default function ChallanDetailPage() {
                       CHALLAN
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 mt-1">
-                    Quality inspection handover slip — checking will be done on specified piece count
-                  </p>
                 </div>
               ) : (
                 <div>
                   <h2 className="text-2xl font-serif font-black text-slate-900">
                     MATERIAL DISPATCH CHALLAN
                   </h2>
-                  <p className="text-xs text-slate-500 mt-1">
-                    Inter-department manufacturing transfer &amp; chain of custody
-                  </p>
                 </div>
               )}
             </div>
@@ -441,23 +449,44 @@ export default function ChallanDetailPage() {
             </div>
           </div>
 
-          {/* TRACEABILITY & GENEALOGY BAR (BUSINESS RULE 1 & 2) */}
+          {/* TRACEABILITY & GENEALOGY BAR (PRODUCTION SHEET ACCOMPANIES THIS CHALLAN) */}
           <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-2.5">
               <div className="flex items-center gap-2">
                 <FileText className="w-4 h-4 text-emerald-700" />
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                  Master Production Sheet Traceability (Rule 1 &amp; 2)
+                  Accompanying Production Sheet
                 </span>
               </div>
               {challan.program && (
-                <Link
-                  href={`/programs/${challan.program.id}`}
-                  className="inline-flex items-center gap-1.5 text-xs text-blue-700 hover:text-blue-900 font-bold bg-white px-2.5 py-1 rounded border border-blue-200 shadow-2xs transition"
-                >
-                  <span>View Master Sheet ({challan.program.programSerialNo || challan.program.programNumber})</span>
-                  <ArrowLeft className="w-3.5 h-3.5 rotate-180" />
-                </Link>
+                <div className="flex items-center gap-2 print:hidden">
+                  <button
+                    type="button"
+                    onClick={() => setShowSheetModal(true)}
+                    className="inline-flex items-center gap-1.5 text-xs text-indigo-700 hover:text-indigo-900 font-bold bg-white px-2.5 py-1 rounded border border-indigo-200 shadow-2xs transition cursor-pointer"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>Preview Production Sheet</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => printProductionSheet(challan.program)}
+                    className="inline-flex items-center gap-1 text-xs text-blue-700 hover:text-blue-900 font-bold bg-white px-2 py-1 rounded border border-blue-200 shadow-2xs transition cursor-pointer"
+                    title="Print Production Sheet (A4)"
+                  >
+                    <Printer className="w-3.5 h-3.5" />
+                    <span>Print Sheet</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => downloadProductionSheetHtml(challan.program)}
+                    className="inline-flex items-center gap-1 text-xs text-slate-700 hover:text-slate-900 font-bold bg-white px-2 py-1 rounded border border-slate-300 shadow-2xs transition cursor-pointer"
+                    title="Download Production Sheet HTML/PDF"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Download</span>
+                  </button>
+                </div>
               )}
             </div>
 
@@ -487,17 +516,11 @@ export default function ChallanDetailPage() {
                         ({challan.parentChallan.fromDepartment} → {challan.parentChallan.toDepartment})
                       </span>
                     </Link>
-                    <span className="text-[11px] text-emerald-700 font-medium block mt-0.5">
-                      ✓ Direct Chain of Custody Established
-                    </span>
                   </div>
                 ) : (
                   <div>
                     <span className="font-semibold text-slate-800 text-xs block">
                       Originating Lot
-                    </span>
-                    <span className="text-[11px] text-slate-500 block mt-0.5">
-                      Initial dispatch from {challan.fromDepartment || 'Fabric Store'}
                     </span>
                   </div>
                 )}
@@ -600,12 +623,102 @@ export default function ChallanDetailPage() {
                         </strong>
                       </div>
                     </div>
-                    <p className="text-xs text-emerald-950 leading-relaxed font-medium">
-                      <strong>MANDATORY INSPECTION CRITERIA:</strong> Exactly <strong>{totalQuantity} PCS</strong> have been dispatched from Thread Cutting after trimming and defect segregation. 
-                      QC2 Quality Checking and defect auditing must be conducted according to these specified <strong>{totalQuantity} pieces</strong>.
-                    </p>
                   </div>
                 )}
+
+                {/* DEPARTMENT PIECE / FABRIC IN & OUT AUTO-DETECTION & DEFECTIVE SHELF AUDIT CARD */}
+                {(() => {
+                  const fIn = challan.fabricIn ?? (challan.parentChallan?.fabricOut || totalQuantity);
+                  const fOut = challan.fabricOut ?? totalQuantity;
+                  const fDef = challan.defectivePieces ?? 0;
+                  const fUnit = challan.fabricUnit || challan.items?.[0]?.uom || 'MTR';
+                  const shelf = challan.defectiveShelfLocation || 'DEF-SHELF-01 (Fabric Store Quarantined Shelf)';
+                  const reason = challan.defectReason || 'Quality Defect / Trimming Rejection';
+                  const detectedSource = challan.detectedFromDepartment || challan.parentChallan?.fromDepartment;
+
+                  return (
+                    <div className="p-4 bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 text-white rounded-xl shadow-xs border border-slate-700/80 space-y-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-700 pb-2.5">
+                        <div className="flex items-center gap-2">
+                          <span className="p-1.5 bg-amber-400/20 text-amber-300 rounded border border-amber-400/30 text-[10px] font-bold font-mono">
+                            FLOW AUDIT
+                          </span>
+                          <span className="text-xs font-bold uppercase tracking-wider text-amber-300">
+                            Department Fabric &amp; Piece Transfer Ledger
+                          </span>
+                        </div>
+                        {detectedSource && (
+                          <span className="text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30 self-start sm:self-auto">
+                            ⚡ Auto-detected from {detectedSource}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                        {/* 1. FABRIC IN */}
+                        <div className="bg-slate-800/90 border border-slate-700 rounded-lg p-3 space-y-1">
+                          <span className="text-[10px] uppercase font-bold text-slate-400 block">
+                            1. Fabric / Pieces IN
+                          </span>
+                          <div className="text-xl font-mono font-bold text-white">
+                            {fIn} <span className="text-xs font-normal text-slate-400">{fUnit}</span>
+                          </div>
+                          <span className="text-[10px] text-slate-400 block truncate">
+                            {detectedSource ? `Source: ${detectedSource}` : `From: ${challan.fromDepartment}`}
+                          </span>
+                        </div>
+
+                        {/* 2. DEFECTIVE CUT */}
+                        <div className="bg-rose-950/40 border border-rose-800/60 rounded-lg p-3 space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] uppercase font-bold text-rose-300 block">
+                              2. Defective Cut Pieces
+                            </span>
+                            <span className="text-[9px] font-mono text-rose-300 bg-rose-500/20 px-1 py-0.5 rounded">
+                              To Shelf
+                            </span>
+                          </div>
+                          <div className="text-xl font-mono font-bold text-rose-300">
+                            {fDef} <span className="text-xs font-normal text-rose-400">{fUnit}</span>
+                          </div>
+                          <span className="text-[10px] text-rose-200/90 block truncate" title={shelf}>
+                            {fDef > 0 ? `Station Shelf: ${shelf} | Central Hub: DEF-SHELF-CENTRAL` : 'Zero defects cut'}
+                          </span>
+                        </div>
+
+                        {/* 3. FABRIC OUT */}
+                        <div className="bg-emerald-950/40 border border-emerald-800/60 rounded-lg p-3 space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] uppercase font-bold text-emerald-300 block">
+                              3. Pieces Left (OUT)
+                            </span>
+                            <span className="text-[9px] font-mono text-emerald-300 bg-emerald-500/20 px-1 py-0.5 rounded">
+                              To {challan.toDepartment}
+                            </span>
+                          </div>
+                          <div className="text-xl font-mono font-black text-emerald-300">
+                            {fOut} <span className="text-xs font-normal text-emerald-400">{fUnit}</span>
+                          </div>
+                          <span className="text-[10px] text-emerald-300/80 block truncate">
+                            Auto-detected by {challan.toDepartment}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* BALANCE BAR */}
+                      <div className="pt-2 border-t border-slate-700/80 flex items-center justify-between text-[11px] font-mono text-slate-300">
+                        <span>
+                          Accounting: <strong>{fIn} {fUnit} IN</strong> = <strong>{fDef} {fUnit} CUT</strong> (To Shelf) + <strong>{fOut} {fUnit} OUT</strong> (To {challan.toDepartment})
+                        </span>
+                        {fDef > 0 && (
+                          <span className="text-amber-300 text-[10px]">
+                            Reason: {reason}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 {/* ITEMS TRANSFER TABLE */}
                 <div>
@@ -710,6 +823,15 @@ export default function ChallanDetailPage() {
         </div>
 
       </main>
+
+      {/* ACCOMPANYING PRODUCTION SHEET PREVIEW & PRINT MODAL */}
+      {challan?.program && (
+        <ProductionSheetPrintModal
+          program={challan.program}
+          isOpen={showSheetModal}
+          onClose={() => setShowSheetModal(false)}
+        />
+      )}
     </div>
   );
 }

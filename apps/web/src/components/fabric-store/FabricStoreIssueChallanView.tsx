@@ -26,15 +26,14 @@ import {
   downloadProductionSheetHtml,
   printProductionSheet,
 } from '@/lib/download-production-sheet';
+import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 
-interface ChallanItemRow {
-  id: string;
-  colour: string;
-  colorCode: string;
-  fabric: string;
-  width: string;
-  measurement: string;
-}
+import {
+  ColorFabricMeasurementTable,
+  ChallanItemData,
+  createBlankChallanItem,
+  DepartmentInOutTracking,
+} from '@/components/ColorFabricMeasurementTable';
 
 interface FabricStoreIssueChallanViewProps {
   fixedTarget?: 'DYEING' | 'EMBROIDERY';
@@ -50,12 +49,14 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
     fixedTarget ||
     (queryTo === 'EMBROIDERY' ? 'EMBROIDERY' : 'DYEING');
 
+  const challanContext = destinationDepartment === 'DYEING' ? 'STORE_DYEING' : 'STORE_EMBROIDERY';
+
   // Loading & base data
   const [loading, setLoading] = useState(true);
   const [programs, setPrograms] = useState<any[]>([]);
   const [selectedProgramId, setSelectedProgramId] = useState<string>(preselectedProgramId || '');
 
-  // Form Fields as per handwritten specification
+  // Form Fields
   const [challanNumber, setChallanNumber] = useState('');
   const [challanDate, setChallanDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [sourceDept] = useState('Fabric Store');
@@ -65,17 +66,21 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
   const [designNumber, setDesignNumber] = useState('');
   const [serialNumber, setSerialNumber] = useState('');
 
-  // Dynamic table items: Color / Fabric / Measurement (Table form)
-  const [items, setItems] = useState<ChallanItemRow[]>([
-    {
-      id: 'row-1',
-      colour: '',
-      colorCode: '',
-      fabric: '',
-      width: '',
-      measurement: '',
-    },
-  ]);
+  // In / Out Tracking across departments
+  const [storeTracking, setStoreTracking] = useState<DepartmentInOutTracking>({
+    fabricIn: 0,
+    fabricOut: 0,
+    fabricUnit: 'MTR',
+    defectivePieces: 0,
+    defectiveShelfLocation: 'DEF-SHELF-STORE (Fabric Store Quarantined Shelf)',
+    defectReason: 'Weaving Slub / Fabric Tear',
+    detectedFromDept: 'PROGRAMMING',
+    detectedFromChallanId: null,
+    detectedFromChallanNumber: null,
+  });
+
+  // Reusable Color / Fabric / Measurement items (Default blank)
+  const [items, setItems] = useState<ChallanItemData[]>(() => [createBlankChallanItem(challanContext)]);
 
   // Store Incharge (Name / Contact)
   const [storeInchargeName, setStoreInchargeName] = useState('Fabric Store Incharge');
@@ -103,7 +108,6 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
 
       let progList: any[] = Array.isArray(progData) ? progData : [];
 
-      // Sort programs: if target is DYEING, put dyeing-required programs first
       if (destinationDepartment === 'DYEING') {
         progList = [...progList].sort((a, b) => {
           if (a.fabricDyeingRequired === b.fabricDyeingRequired) return 0;
@@ -116,7 +120,6 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
         setChallanNumber(numData.nextNumber);
       }
 
-      // Check current user from localStorage for incharge name
       if (typeof window !== 'undefined') {
         try {
           const savedUser = localStorage.getItem('subham_mes_user');
@@ -128,7 +131,6 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
         } catch {}
       }
 
-      // Pre-select program if requested or select first
       const targetProg = preselectedProgramId
         ? progList.find((p) => p.id === preselectedProgramId)
         : progList[0];
@@ -147,7 +149,8 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
     loadData();
   }, [preselectedProgramId, destinationDepartment]);
 
-  // Synchronize form fields when a Production Sheet / Serial Number is selected
+  // Synchronize form reference fields when a Production Sheet / Serial Number is selected
+  // All business entry fields remain blank as per Master Prompt rules
   const handleProgramSelect = (prog: any) => {
     if (!prog) return;
     setSelectedProgramId(prog.id);
@@ -162,63 +165,17 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
       setDeliveryDate('');
     }
 
-    // Auto-populate table row from the Production Sheet specifications
-    const initialItem: ChallanItemRow = {
-      id: 'row-1',
-      colour: prog.fabricColor || prog.colours?.[0]?.colorName || '',
-      colorCode: prog.colours?.[0]?.colourCode || prog.colours?.[0]?.colorCode || '',
-      fabric: prog.fabricName || prog.fabrics?.[0]?.fabricName || '',
-      width: prog.fabricWidth || (prog.fabricWidthInches ? `${prog.fabricWidthInches}"` : '') || '',
-      measurement: String(
-        prog.fabricIssuedToDyeing ||
-        prog.fabricSentToDyeing ||
-        prog.targetQuantity ||
-        prog.colorQuantity ||
-        ''
-      ),
-    };
-
-    setItems([initialItem]);
+    const targetQ = Number(prog.targetQuantity || prog.fabricIssuedToDyeing || 0);
+    setStoreTracking((prev) => ({
+      ...prev,
+      fabricIn: targetQ,
+      fabricOut: Math.max(0, targetQ - prev.defectivePieces),
+      fabricUnit: prog.quantityMeasurement === 'PCS' ? 'PCS' : 'MTR',
+      detectedFromDept: 'PROGRAMMING',
+    }));
   };
 
   const selectedProgram = programs.find((p) => p.id === selectedProgramId);
-
-  // Table row actions
-  const handleAddItem = () => {
-    const newRow: ChallanItemRow = {
-      id: `row-${Date.now()}`,
-      colour: '',
-      colorCode: '',
-      fabric: selectedProgram?.fabricName || '',
-      width: selectedProgram?.fabricWidth || (selectedProgram?.fabricWidthInches ? `${selectedProgram.fabricWidthInches}"` : '') || '',
-      measurement: '',
-    };
-    setItems((prev) => [...prev, newRow]);
-  };
-
-  const handleRemoveItem = (id: string) => {
-    if (items.length <= 1) {
-      // Keep at least one row, just clear its fields
-      setItems([
-        {
-          id: 'row-1',
-          colour: '',
-          colorCode: '',
-          fabric: '',
-          width: '',
-          measurement: '',
-        },
-      ]);
-      return;
-    }
-    setItems((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  const handleUpdateItem = (id: string, field: keyof ChallanItemRow, value: string) => {
-    setItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
-    );
-  };
 
   // Submit Challan Store to Dyeing
   const handleSubmit = async (e: React.FormEvent) => {
@@ -236,7 +193,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
 
     // Filter valid items
     const validItems = items.filter(
-      (it) => it.fabric.trim() || it.colour.trim() || parseFloat(it.measurement) > 0
+      (it) => it.fabric.trim() || it.color.trim() || parseFloat(String(it.measurement)) > 0
     );
 
     if (validItems.length === 0) {
@@ -248,26 +205,26 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
       setSubmitting(true);
       setError('');
 
-      // Map table items to ChallanItem database schema
+      // Map ColorFabricMeasurementTable items to ChallanItem database schema
       const challanItems = validItems.map((item) => ({
-        itemDescription: `${item.fabric || 'Fabric'} — ${item.colour || 'Standard'}`,
+        itemDescription: `${item.fabric || 'Fabric'} — ${item.color || 'Standard'}`,
         unitType: 'ROLL',
-        quantity: parseFloat(item.measurement) || 1,
-        uom: selectedProgram.quantityMeasurement || 'MTR',
+        quantity: parseFloat(String(item.measurement)) || storeTracking.fabricOut || 1,
+        uom: item.unit || storeTracking.fabricUnit || selectedProgram.quantityMeasurement || 'MTR',
         fabricCode: item.fabric || selectedProgram.fabricName || 'FABRIC',
-        colour: item.colour || null,
-        remarks: [
-          item.colorCode ? `Color Code: ${item.colorCode}` : null,
-          item.width ? `Width: ${item.width}` : null,
-        ]
-          .filter(Boolean)
-          .join(' · '),
+        colour: item.color || null,
+        shade: item.requiredDyeColor || null,
+        requiredDyeQuantity: item.requiredDyeQuantity || null,
+        fabricProcessingStatus: destinationDepartment === 'EMBROIDERY' ? 'Undyed' : undefined,
+        rollNumber: item.rollNumber || null,
+        remarks: item.remarks || null,
       }));
 
       const inchargeInfo = [
         storeInchargeName ? `Store Incharge: ${storeInchargeName}` : null,
         storeInchargeContact ? `Contact: ${storeInchargeContact}` : null,
         designNumber ? `Design #: ${designNumber}` : null,
+        `Accounting: In: ${storeTracking.fabricIn} ${storeTracking.fabricUnit} | Defective Cut: ${storeTracking.defectivePieces} ${storeTracking.fabricUnit} (${storeTracking.defectiveShelfLocation}) | Leftover Out to ${destinationDepartment}: ${storeTracking.fabricOut} ${storeTracking.fabricUnit}`,
       ]
         .filter(Boolean)
         .join(' · ');
@@ -280,6 +237,13 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
         toDepartment: destinationDepartment,
         priority: priority || 'NORMAL',
         issuedDate: challanDate,
+        fabricIn: storeTracking.fabricIn,
+        defectivePieces: storeTracking.defectivePieces,
+        defectiveShelfLocation: storeTracking.defectiveShelfLocation,
+        defectReason: storeTracking.defectReason,
+        fabricOut: storeTracking.fabricOut,
+        fabricUnit: storeTracking.fabricUnit,
+        detectedFromDepartment: storeTracking.detectedFromDept || 'PROGRAMMING',
         remarks: inchargeInfo,
         items: challanItems,
       };
@@ -303,8 +267,14 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
         storeInchargeContact,
         tableItems: validItems,
       });
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     } catch (err: any) {
       setError(err.message || 'Error submitting challan');
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     } finally {
       setSubmitting(false);
     }
@@ -396,7 +366,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                   Challan {issuedChallan.challanNumber} Dispatched to {issuedChallan.destinationDepartment === 'DYEING' ? 'Dyeing' : 'Embroidery'} Department
                 </h2>
                 <p className="text-xs text-slate-600 mt-1">
-                  The Production Sheet and Challan items have been transferred to the Dyeing department worklist.
+                  The Production Sheet and Challan items have been transferred to the {destDept} department worklist.
                 </p>
               </div>
             </div>
@@ -467,11 +437,11 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                 <span>Download HTML</span>
               </button>
               <Link
-                href="/dyeing/my-work"
+                href={destinationDepartment === 'DYEING' ? '/dyeing/my-work' : '/embroidery/my-work'}
                 className="flex items-center gap-1.5 px-3.5 py-2 bg-teal-50 hover:bg-teal-100 border border-teal-300 text-teal-900 text-xs font-bold rounded-lg transition"
               >
                 <Eye className="w-3.5 h-3.5 text-teal-700" />
-                <span>View in Dyeing Worklist →</span>
+                <span>View in {destDept} Worklist →</span>
               </Link>
               <button
                 type="button"
@@ -654,93 +624,18 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                 </div>
               </div>
 
-              {/* 9. COLOR / FABRIC / MEASUREMENT (Table form) */}
+              {/* 9. COLOR / FABRIC / MEASUREMENT (Universal Challan Item Component with In/Cut/Out Tracking) */}
               <div className="pt-3 border-t border-slate-200">
-                <div className="flex items-center justify-between mb-2.5">
-                  <label className="text-xs font-bold text-slate-900 uppercase tracking-wide">
-                    Color / Fabric / Measurement (Table form)
-                  </label>
-                  <button
-                    type="button"
-                    onClick={handleAddItem}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-300 rounded-lg text-xs font-bold transition shadow-2xs"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>add item</span>
-                  </button>
-                </div>
-
-                {/* TABLE CONTAINER */}
-                <div className="overflow-x-auto border border-slate-200 rounded-xl bg-white shadow-2xs">
-                  <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200 uppercase tracking-wider text-[11px]">
-                      <tr>
-                        <th className="py-2.5 px-3">Colour</th>
-                        <th className="py-2.5 px-3">Colour code</th>
-                        <th className="py-2.5 px-3">Fabric</th>
-                        <th className="py-2.5 px-3">Width</th>
-                        <th className="py-2.5 px-3">Measurement</th>
-                        <th className="py-2.5 px-2 text-center w-12">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {items.map((item, idx) => (
-                        <tr key={item.id} className="hover:bg-slate-50/50 transition">
-                          <td className="py-2 px-2.5">
-                            <input
-                              type="text"
-                              value={item.colour}
-                              onChange={(e) => handleUpdateItem(item.id, 'colour', e.target.value)}
-                              className="w-full text-xs border border-slate-300 rounded px-2.5 py-1.5 bg-white focus:outline-hidden focus:ring-1 focus:ring-teal-600 focus:border-teal-600 transition"
-                            />
-                          </td>
-                          <td className="py-2 px-2.5">
-                            <input
-                              type="text"
-                              value={item.colorCode}
-                              onChange={(e) => handleUpdateItem(item.id, 'colorCode', e.target.value)}
-                              className="w-full text-xs font-mono border border-slate-300 rounded px-2.5 py-1.5 bg-white focus:outline-hidden focus:ring-1 focus:ring-teal-600 focus:border-teal-600 transition"
-                            />
-                          </td>
-                          <td className="py-2 px-2.5">
-                            <input
-                              type="text"
-                              value={item.fabric}
-                              onChange={(e) => handleUpdateItem(item.id, 'fabric', e.target.value)}
-                              className="w-full text-xs font-medium border border-slate-300 rounded px-2.5 py-1.5 bg-white focus:outline-hidden focus:ring-1 focus:ring-teal-600 focus:border-teal-600 transition"
-                            />
-                          </td>
-                          <td className="py-2 px-2.5">
-                            <input
-                              type="text"
-                              value={item.width}
-                              onChange={(e) => handleUpdateItem(item.id, 'width', e.target.value)}
-                              className="w-full text-xs border border-slate-300 rounded px-2.5 py-1.5 bg-white focus:outline-hidden focus:ring-1 focus:ring-teal-600 focus:border-teal-600 transition"
-                            />
-                          </td>
-                          <td className="py-2 px-2.5">
-                            <input
-                              type="text"
-                              value={item.measurement}
-                              onChange={(e) => handleUpdateItem(item.id, 'measurement', e.target.value)}
-                              className="w-full text-xs font-mono font-bold border border-slate-300 rounded px-2.5 py-1.5 bg-white focus:outline-hidden focus:ring-1 focus:ring-teal-600 focus:border-teal-600 transition"
-                            />
-                          </td>
-                          <td className="py-2 px-2 text-center">
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveItem(item.id)}
-                              className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded transition"
-                              title="Delete row"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <ColorFabricMeasurementTable
+                  items={items}
+                  onChange={setItems}
+                  context={challanContext}
+                  programId={selectedProgram?.id}
+                  currentDepartment="STORE"
+                  tracking={storeTracking}
+                  onTrackingChange={setStoreTracking}
+                  showInOutController={true}
+                />
               </div>
 
               {/* 10. STORE INCHARGE (Name / Contact) */}
@@ -754,14 +649,14 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                       type="text"
                       value={storeInchargeName}
                       onChange={(e) => setStoreInchargeName(e.target.value)}
-                      placeholder="Name"
+                      placeholder=""
                       className="w-full text-xs font-medium border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-teal-600 focus:border-transparent transition"
                     />
                     <input
                       type="text"
                       value={storeInchargeContact}
                       onChange={(e) => setStoreInchargeContact(e.target.value)}
-                      placeholder="Contact Number"
+                      placeholder=""
                       className="w-full text-xs font-mono border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-teal-600 focus:border-transparent transition"
                     />
                   </div>
@@ -770,18 +665,18 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
             </div>
 
             {/* 11. SUBMIT BUTTON */}
-            <div className="pt-4 border-t border-slate-200 flex items-center justify-between">
-              <span className="text-xs text-slate-500">
-                Submitting will send this Challan and Production Sheet to the Dyeing department.
-              </span>
-
+            <div className="pt-4 border-t border-slate-200 flex items-center justify-end">
               <button
                 type="submit"
-                disabled={submitting || !selectedProgram}
-                className="inline-flex items-center gap-2 px-7 py-3 bg-teal-700 hover:bg-teal-800 disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-xs transition"
+                disabled={submitting}
+                className="inline-flex items-center gap-2 px-7 py-3 bg-teal-700 hover:bg-teal-800 disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer"
               >
-                <Send className="w-4 h-4" />
-                <span>{submitting ? 'Submitting...' : 'Submit'}</span>
+                {submitting ? (
+                  <RefreshCw className="w-4 h-4 animate-spin text-teal-200" />
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
+                <span>{submitting ? 'Submitting Challan...' : 'Submit Challan to Dyeing'}</span>
               </button>
             </div>
           </form>
@@ -790,137 +685,11 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
         {/* ============================================================== */}
         {/* MODAL: MASTER PRODUCTION SHEET TRAVELER                       */}
         {/* ============================================================== */}
-        {showSheetModal && selectedProgram && (
-          <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-2xs flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-5 shadow-2xl space-y-4">
-              <div className="flex items-center justify-between border-b pb-3 border-slate-200">
-                <div className="flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-teal-700" />
-                  <div>
-                    <h3 className="text-sm font-bold text-slate-900">
-                      Production Sheet Traveler &middot; {selectedProgram.programNumber || selectedProgram.programSerialNo}
-                    </h3>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => printProductionSheet(selectedProgram)}
-                    className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow-2xs"
-                  >
-                    <Printer className="w-3.5 h-3.5" />
-                    <span>Print</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => downloadProductionSheetHtml(selectedProgram)}
-                    className="flex items-center gap-1 px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-semibold shadow-2xs"
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    <span>Download</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowSheetModal(false)}
-                    className="p-1 text-slate-400 hover:text-slate-700 text-lg font-bold ml-2"
-                  >
-                    ✕
-                  </button>
-                </div>
-              </div>
-
-              {/* MODAL SHEET CONTENT */}
-              <div className="border border-slate-200 rounded-xl p-4 bg-white space-y-3.5 text-xs">
-                <div className="flex justify-between items-start border-b-2 border-slate-800 pb-2.5">
-                  <div>
-                    <h2 className="text-base font-black text-slate-900">
-                      SHUBHAM FABRICS INDIA PVT. LTD.
-                    </h2>
-                    <span className="text-[10px] uppercase font-bold text-slate-500 block">
-                      Production Sheet
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <span className="font-mono text-sm font-bold text-teal-800 block">
-                      {selectedProgram.programNumber || selectedProgram.programSerialNo}
-                    </span>
-                    <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-100 text-blue-800">
-                      {selectedProgram.status || 'ACTIVE'}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                  <div className="p-2 bg-slate-50 rounded">
-                    <span className="text-[10px] text-slate-500 font-bold uppercase block">Buyer / Client</span>
-                    <strong className="text-slate-900">{selectedProgram.clientName || selectedProgram.buyerName || '—'}</strong>
-                  </div>
-                  <div className="p-2 bg-slate-50 rounded">
-                    <span className="text-[10px] text-slate-500 font-bold uppercase block">Main Style</span>
-                    <strong className="text-slate-900">{selectedProgram.mainStyle || selectedProgram.styleCode || '—'}</strong>
-                  </div>
-                  <div className="p-2 bg-slate-50 rounded">
-                    <span className="text-[10px] text-slate-500 font-bold uppercase block">Wilcom Design #</span>
-                    <strong className="font-mono text-teal-900">{selectedProgram.wilcomDesignNumber || '—'}</strong>
-                  </div>
-                  <div className="p-2 bg-slate-50 rounded">
-                    <span className="text-[10px] text-slate-500 font-bold uppercase block">Fabric Quality</span>
-                    <strong className="text-slate-900">{selectedProgram.fabricName || '—'}</strong>
-                  </div>
-                  <div className="p-2 bg-slate-50 rounded">
-                    <span className="text-[10px] text-slate-500 font-bold uppercase block">Fabric Color</span>
-                    <strong className="text-slate-900">{selectedProgram.fabricColor || '—'}</strong>
-                  </div>
-                  <div className="p-2 bg-slate-50 rounded">
-                    <span className="text-[10px] text-slate-500 font-bold uppercase block">Dyeing Required</span>
-                    <strong className={selectedProgram.fabricDyeingRequired ? 'text-blue-700' : 'text-emerald-700'}>
-                      {selectedProgram.fabricDyeingRequired ? 'YES' : 'NO'}
-                    </strong>
-                  </div>
-                  <div className="p-2 bg-slate-50 rounded">
-                    <span className="text-[10px] text-slate-500 font-bold uppercase block">Target Qty</span>
-                    <strong className="font-mono text-slate-900">
-                      {selectedProgram.colorQuantity || selectedProgram.targetQuantity || 0} PCS
-                    </strong>
-                  </div>
-                  <div className="p-2 bg-slate-50 rounded">
-                    <span className="text-[10px] text-slate-500 font-bold uppercase block">Average Consumption</span>
-                    <span className="font-mono text-slate-700">
-                      {selectedProgram.fabricAverage ? `${selectedProgram.fabricAverage} ${selectedProgram.fabricAverageType || 'Mtr/Pc'}` : '—'}
-                    </span>
-                  </div>
-                  <div className="p-2 bg-slate-50 rounded">
-                    <span className="text-[10px] text-slate-500 font-bold uppercase block">Delivery Target Date</span>
-                    <span className="font-mono text-slate-700">
-                      {selectedProgram.deliveryDate ? new Date(selectedProgram.deliveryDate).toLocaleDateString() : '—'}
-                    </span>
-                  </div>
-                </div>
-
-                {selectedProgram.comments && (
-                  <div className="p-2.5 bg-amber-50 rounded border border-amber-200">
-                    <span className="text-[10px] text-amber-900 font-bold uppercase block mb-0.5">
-                      Comments / Notes
-                    </span>
-                    <p className="text-xs text-amber-950 font-medium">
-                      {selectedProgram.comments}
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex justify-end pt-1">
-                <button
-                  type="button"
-                  onClick={() => setShowSheetModal(false)}
-                  className="px-4 py-2 bg-slate-800 text-white rounded-lg text-xs font-semibold hover:bg-slate-900 transition"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        <ProductionSheetPrintModal
+          program={selectedProgram}
+          isOpen={showSheetModal}
+          onClose={() => setShowSheetModal(false)}
+        />
       </main>
     </div>
   );

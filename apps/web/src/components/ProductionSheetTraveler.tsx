@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { ShubhamLogo } from './ShubhamLogo';
+import { getCurrentUser, canViewClientCode } from '@/lib/rbac';
 
 interface ProductionSheetProps {
   program: any;
@@ -17,6 +18,9 @@ export function ProductionSheetTraveler({
   onClose,
 }: ProductionSheetProps) {
   if (!program) return null;
+
+  const currentUser = typeof window !== 'undefined' ? getCurrentUser() : null;
+  const canSeeClientCode = canViewClientCode(currentUser) && Boolean(program.clientCode);
 
   const handlePrint = () => {
     window.print();
@@ -92,6 +96,11 @@ export function ProductionSheetTraveler({
           <div>
             <span className="text-[10px] uppercase font-bold text-slate-500 block">Buyer / Customer</span>
             <span className="font-semibold text-slate-900">{program.customer?.name || program.buyerName || 'Standard Client'}</span>
+            {canSeeClientCode && (
+              <span className="text-[10px] text-amber-900 font-mono font-bold block mt-0.5">
+                🔒 Code: {program.clientCode}
+              </span>
+            )}
           </div>
           <div>
             <span className="text-[10px] uppercase font-bold text-slate-500 block">Order Number</span>

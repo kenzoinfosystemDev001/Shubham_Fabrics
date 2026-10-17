@@ -43376,8 +43376,22 @@ export namespace Prisma {
 
   export type AggregateChallan = {
     _count: ChallanCountAggregateOutputType | null
+    _avg: ChallanAvgAggregateOutputType | null
+    _sum: ChallanSumAggregateOutputType | null
     _min: ChallanMinAggregateOutputType | null
     _max: ChallanMaxAggregateOutputType | null
+  }
+
+  export type ChallanAvgAggregateOutputType = {
+    fabricIn: number | null
+    fabricOut: number | null
+    defectivePieces: number | null
+  }
+
+  export type ChallanSumAggregateOutputType = {
+    fabricIn: number | null
+    fabricOut: number | null
+    defectivePieces: number | null
   }
 
   export type ChallanMinAggregateOutputType = {
@@ -43400,6 +43414,14 @@ export namespace Prisma {
     remarks: string | null
     createdAt: Date | null
     updatedAt: Date | null
+    fabricIn: number | null
+    fabricOut: number | null
+    fabricUnit: string | null
+    defectivePieces: number | null
+    defectiveShelfLocation: string | null
+    defectReason: string | null
+    detectedFromChallanId: string | null
+    detectedFromDepartment: string | null
   }
 
   export type ChallanMaxAggregateOutputType = {
@@ -43422,6 +43444,14 @@ export namespace Prisma {
     remarks: string | null
     createdAt: Date | null
     updatedAt: Date | null
+    fabricIn: number | null
+    fabricOut: number | null
+    fabricUnit: string | null
+    defectivePieces: number | null
+    defectiveShelfLocation: string | null
+    defectReason: string | null
+    detectedFromChallanId: string | null
+    detectedFromDepartment: string | null
   }
 
   export type ChallanCountAggregateOutputType = {
@@ -43444,9 +43474,29 @@ export namespace Prisma {
     remarks: number
     createdAt: number
     updatedAt: number
+    fabricIn: number
+    fabricOut: number
+    fabricUnit: number
+    defectivePieces: number
+    defectiveShelfLocation: number
+    defectReason: number
+    detectedFromChallanId: number
+    detectedFromDepartment: number
     _all: number
   }
 
+
+  export type ChallanAvgAggregateInputType = {
+    fabricIn?: true
+    fabricOut?: true
+    defectivePieces?: true
+  }
+
+  export type ChallanSumAggregateInputType = {
+    fabricIn?: true
+    fabricOut?: true
+    defectivePieces?: true
+  }
 
   export type ChallanMinAggregateInputType = {
     id?: true
@@ -43468,6 +43518,14 @@ export namespace Prisma {
     remarks?: true
     createdAt?: true
     updatedAt?: true
+    fabricIn?: true
+    fabricOut?: true
+    fabricUnit?: true
+    defectivePieces?: true
+    defectiveShelfLocation?: true
+    defectReason?: true
+    detectedFromChallanId?: true
+    detectedFromDepartment?: true
   }
 
   export type ChallanMaxAggregateInputType = {
@@ -43490,6 +43548,14 @@ export namespace Prisma {
     remarks?: true
     createdAt?: true
     updatedAt?: true
+    fabricIn?: true
+    fabricOut?: true
+    fabricUnit?: true
+    defectivePieces?: true
+    defectiveShelfLocation?: true
+    defectReason?: true
+    detectedFromChallanId?: true
+    detectedFromDepartment?: true
   }
 
   export type ChallanCountAggregateInputType = {
@@ -43512,6 +43578,14 @@ export namespace Prisma {
     remarks?: true
     createdAt?: true
     updatedAt?: true
+    fabricIn?: true
+    fabricOut?: true
+    fabricUnit?: true
+    defectivePieces?: true
+    defectiveShelfLocation?: true
+    defectReason?: true
+    detectedFromChallanId?: true
+    detectedFromDepartment?: true
     _all?: true
   }
 
@@ -43553,6 +43627,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: ChallanAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ChallanSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: ChallanMinAggregateInputType
@@ -43583,6 +43669,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: ChallanCountAggregateInputType | true
+    _avg?: ChallanAvgAggregateInputType
+    _sum?: ChallanSumAggregateInputType
     _min?: ChallanMinAggregateInputType
     _max?: ChallanMaxAggregateInputType
   }
@@ -43607,7 +43695,17 @@ export namespace Prisma {
     remarks: string | null
     createdAt: Date
     updatedAt: Date
+    fabricIn: number | null
+    fabricOut: number | null
+    fabricUnit: string | null
+    defectivePieces: number | null
+    defectiveShelfLocation: string | null
+    defectReason: string | null
+    detectedFromChallanId: string | null
+    detectedFromDepartment: string | null
     _count: ChallanCountAggregateOutputType | null
+    _avg: ChallanAvgAggregateOutputType | null
+    _sum: ChallanSumAggregateOutputType | null
     _min: ChallanMinAggregateOutputType | null
     _max: ChallanMaxAggregateOutputType | null
   }
@@ -43646,6 +43744,14 @@ export namespace Prisma {
     remarks?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    fabricIn?: boolean
+    fabricOut?: boolean
+    fabricUnit?: boolean
+    defectivePieces?: boolean
+    defectiveShelfLocation?: boolean
+    defectReason?: boolean
+    detectedFromChallanId?: boolean
+    detectedFromDepartment?: boolean
     program?: boolean | ProgramDefaultArgs<ExtArgs>
     parentChallan?: boolean | Challan$parentChallanArgs<ExtArgs>
     childChallans?: boolean | Challan$childChallansArgs<ExtArgs>
@@ -43686,6 +43792,14 @@ export namespace Prisma {
     remarks?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    fabricIn?: boolean
+    fabricOut?: boolean
+    fabricUnit?: boolean
+    defectivePieces?: boolean
+    defectiveShelfLocation?: boolean
+    defectReason?: boolean
+    detectedFromChallanId?: boolean
+    detectedFromDepartment?: boolean
     program?: boolean | ProgramDefaultArgs<ExtArgs>
     parentChallan?: boolean | Challan$parentChallanArgs<ExtArgs>
     fromDeptRel?: boolean | DepartmentDefaultArgs<ExtArgs>
@@ -43716,6 +43830,14 @@ export namespace Prisma {
     remarks?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    fabricIn?: boolean
+    fabricOut?: boolean
+    fabricUnit?: boolean
+    defectivePieces?: boolean
+    defectiveShelfLocation?: boolean
+    defectReason?: boolean
+    detectedFromChallanId?: boolean
+    detectedFromDepartment?: boolean
     program?: boolean | ProgramDefaultArgs<ExtArgs>
     parentChallan?: boolean | Challan$parentChallanArgs<ExtArgs>
     fromDeptRel?: boolean | DepartmentDefaultArgs<ExtArgs>
@@ -43746,9 +43868,17 @@ export namespace Prisma {
     remarks?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    fabricIn?: boolean
+    fabricOut?: boolean
+    fabricUnit?: boolean
+    defectivePieces?: boolean
+    defectiveShelfLocation?: boolean
+    defectReason?: boolean
+    detectedFromChallanId?: boolean
+    detectedFromDepartment?: boolean
   }
 
-  export type ChallanOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "challanNumber" | "challanType" | "programId" | "parentChallanId" | "fromDepartment" | "toDepartment" | "status" | "priority" | "issuedDate" | "receivedDate" | "completedDate" | "createdById" | "issuedById" | "receivedById" | "approvedById" | "remarks" | "createdAt" | "updatedAt", ExtArgs["result"]["challan"]>
+  export type ChallanOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "challanNumber" | "challanType" | "programId" | "parentChallanId" | "fromDepartment" | "toDepartment" | "status" | "priority" | "issuedDate" | "receivedDate" | "completedDate" | "createdById" | "issuedById" | "receivedById" | "approvedById" | "remarks" | "createdAt" | "updatedAt" | "fabricIn" | "fabricOut" | "fabricUnit" | "defectivePieces" | "defectiveShelfLocation" | "defectReason" | "detectedFromChallanId" | "detectedFromDepartment", ExtArgs["result"]["challan"]>
   export type ChallanInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     program?: boolean | ProgramDefaultArgs<ExtArgs>
     parentChallan?: boolean | Challan$parentChallanArgs<ExtArgs>
@@ -43831,6 +43961,14 @@ export namespace Prisma {
       remarks: string | null
       createdAt: Date
       updatedAt: Date
+      fabricIn: number | null
+      fabricOut: number | null
+      fabricUnit: string | null
+      defectivePieces: number | null
+      defectiveShelfLocation: string | null
+      defectReason: string | null
+      detectedFromChallanId: string | null
+      detectedFromDepartment: string | null
     }, ExtArgs["result"]["challan"]>
     composites: {}
   }
@@ -44290,6 +44428,14 @@ export namespace Prisma {
     readonly remarks: FieldRef<"Challan", 'String'>
     readonly createdAt: FieldRef<"Challan", 'DateTime'>
     readonly updatedAt: FieldRef<"Challan", 'DateTime'>
+    readonly fabricIn: FieldRef<"Challan", 'Float'>
+    readonly fabricOut: FieldRef<"Challan", 'Float'>
+    readonly fabricUnit: FieldRef<"Challan", 'String'>
+    readonly defectivePieces: FieldRef<"Challan", 'Float'>
+    readonly defectiveShelfLocation: FieldRef<"Challan", 'String'>
+    readonly defectReason: FieldRef<"Challan", 'String'>
+    readonly detectedFromChallanId: FieldRef<"Challan", 'String'>
+    readonly detectedFromDepartment: FieldRef<"Challan", 'String'>
   }
     
 
@@ -80042,7 +80188,15 @@ export namespace Prisma {
     approvedById: 'approvedById',
     remarks: 'remarks',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    fabricIn: 'fabricIn',
+    fabricOut: 'fabricOut',
+    fabricUnit: 'fabricUnit',
+    defectivePieces: 'defectivePieces',
+    defectiveShelfLocation: 'defectiveShelfLocation',
+    defectReason: 'defectReason',
+    detectedFromChallanId: 'detectedFromChallanId',
+    detectedFromDepartment: 'detectedFromDepartment'
   };
 
   export type ChallanScalarFieldEnum = (typeof ChallanScalarFieldEnum)[keyof typeof ChallanScalarFieldEnum]
@@ -83593,6 +83747,14 @@ export namespace Prisma {
     remarks?: StringNullableFilter<"Challan"> | string | null
     createdAt?: DateTimeFilter<"Challan"> | Date | string
     updatedAt?: DateTimeFilter<"Challan"> | Date | string
+    fabricIn?: FloatNullableFilter<"Challan"> | number | null
+    fabricOut?: FloatNullableFilter<"Challan"> | number | null
+    fabricUnit?: StringNullableFilter<"Challan"> | string | null
+    defectivePieces?: FloatNullableFilter<"Challan"> | number | null
+    defectiveShelfLocation?: StringNullableFilter<"Challan"> | string | null
+    defectReason?: StringNullableFilter<"Challan"> | string | null
+    detectedFromChallanId?: StringNullableFilter<"Challan"> | string | null
+    detectedFromDepartment?: StringNullableFilter<"Challan"> | string | null
     program?: XOR<ProgramScalarRelationFilter, ProgramWhereInput>
     parentChallan?: XOR<ChallanNullableScalarRelationFilter, ChallanWhereInput> | null
     childChallans?: ChallanListRelationFilter
@@ -83632,6 +83794,14 @@ export namespace Prisma {
     remarks?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    fabricIn?: SortOrderInput | SortOrder
+    fabricOut?: SortOrderInput | SortOrder
+    fabricUnit?: SortOrderInput | SortOrder
+    defectivePieces?: SortOrderInput | SortOrder
+    defectiveShelfLocation?: SortOrderInput | SortOrder
+    defectReason?: SortOrderInput | SortOrder
+    detectedFromChallanId?: SortOrderInput | SortOrder
+    detectedFromDepartment?: SortOrderInput | SortOrder
     program?: ProgramOrderByWithRelationInput
     parentChallan?: ChallanOrderByWithRelationInput
     childChallans?: ChallanOrderByRelationAggregateInput
@@ -83674,6 +83844,14 @@ export namespace Prisma {
     remarks?: StringNullableFilter<"Challan"> | string | null
     createdAt?: DateTimeFilter<"Challan"> | Date | string
     updatedAt?: DateTimeFilter<"Challan"> | Date | string
+    fabricIn?: FloatNullableFilter<"Challan"> | number | null
+    fabricOut?: FloatNullableFilter<"Challan"> | number | null
+    fabricUnit?: StringNullableFilter<"Challan"> | string | null
+    defectivePieces?: FloatNullableFilter<"Challan"> | number | null
+    defectiveShelfLocation?: StringNullableFilter<"Challan"> | string | null
+    defectReason?: StringNullableFilter<"Challan"> | string | null
+    detectedFromChallanId?: StringNullableFilter<"Challan"> | string | null
+    detectedFromDepartment?: StringNullableFilter<"Challan"> | string | null
     program?: XOR<ProgramScalarRelationFilter, ProgramWhereInput>
     parentChallan?: XOR<ChallanNullableScalarRelationFilter, ChallanWhereInput> | null
     childChallans?: ChallanListRelationFilter
@@ -83713,9 +83891,19 @@ export namespace Prisma {
     remarks?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    fabricIn?: SortOrderInput | SortOrder
+    fabricOut?: SortOrderInput | SortOrder
+    fabricUnit?: SortOrderInput | SortOrder
+    defectivePieces?: SortOrderInput | SortOrder
+    defectiveShelfLocation?: SortOrderInput | SortOrder
+    defectReason?: SortOrderInput | SortOrder
+    detectedFromChallanId?: SortOrderInput | SortOrder
+    detectedFromDepartment?: SortOrderInput | SortOrder
     _count?: ChallanCountOrderByAggregateInput
+    _avg?: ChallanAvgOrderByAggregateInput
     _max?: ChallanMaxOrderByAggregateInput
     _min?: ChallanMinOrderByAggregateInput
+    _sum?: ChallanSumOrderByAggregateInput
   }
 
   export type ChallanScalarWhereWithAggregatesInput = {
@@ -83741,6 +83929,14 @@ export namespace Prisma {
     remarks?: StringNullableWithAggregatesFilter<"Challan"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Challan"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Challan"> | Date | string
+    fabricIn?: FloatNullableWithAggregatesFilter<"Challan"> | number | null
+    fabricOut?: FloatNullableWithAggregatesFilter<"Challan"> | number | null
+    fabricUnit?: StringNullableWithAggregatesFilter<"Challan"> | string | null
+    defectivePieces?: FloatNullableWithAggregatesFilter<"Challan"> | number | null
+    defectiveShelfLocation?: StringNullableWithAggregatesFilter<"Challan"> | string | null
+    defectReason?: StringNullableWithAggregatesFilter<"Challan"> | string | null
+    detectedFromChallanId?: StringNullableWithAggregatesFilter<"Challan"> | string | null
+    detectedFromDepartment?: StringNullableWithAggregatesFilter<"Challan"> | string | null
   }
 
   export type ChallanItemWhereInput = {
@@ -89751,6 +89947,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     program: ProgramCreateNestedOneWithoutChallansInput
     parentChallan?: ChallanCreateNestedOneWithoutChildChallansInput
     childChallans?: ChallanCreateNestedManyWithoutParentChallanInput
@@ -89790,6 +89994,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     childChallans?: ChallanUncheckedCreateNestedManyWithoutParentChallanInput
     items?: ChallanItemUncheckedCreateNestedManyWithoutChallanInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutChallanInput
@@ -89813,6 +90025,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     program?: ProgramUpdateOneRequiredWithoutChallansNestedInput
     parentChallan?: ChallanUpdateOneWithoutChildChallansNestedInput
     childChallans?: ChallanUpdateManyWithoutParentChallanNestedInput
@@ -89852,6 +90072,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     childChallans?: ChallanUncheckedUpdateManyWithoutParentChallanNestedInput
     items?: ChallanItemUncheckedUpdateManyWithoutChallanNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutChallanNestedInput
@@ -89883,6 +90111,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
   }
 
   export type ChallanUpdateManyMutationInput = {
@@ -89897,6 +90133,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ChallanUncheckedUpdateManyInput = {
@@ -89919,6 +90163,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ChallanItemCreateInput = {
@@ -95273,6 +95525,20 @@ export namespace Prisma {
     remarks?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    fabricIn?: SortOrder
+    fabricOut?: SortOrder
+    fabricUnit?: SortOrder
+    defectivePieces?: SortOrder
+    defectiveShelfLocation?: SortOrder
+    defectReason?: SortOrder
+    detectedFromChallanId?: SortOrder
+    detectedFromDepartment?: SortOrder
+  }
+
+  export type ChallanAvgOrderByAggregateInput = {
+    fabricIn?: SortOrder
+    fabricOut?: SortOrder
+    defectivePieces?: SortOrder
   }
 
   export type ChallanMaxOrderByAggregateInput = {
@@ -95295,6 +95561,14 @@ export namespace Prisma {
     remarks?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    fabricIn?: SortOrder
+    fabricOut?: SortOrder
+    fabricUnit?: SortOrder
+    defectivePieces?: SortOrder
+    defectiveShelfLocation?: SortOrder
+    defectReason?: SortOrder
+    detectedFromChallanId?: SortOrder
+    detectedFromDepartment?: SortOrder
   }
 
   export type ChallanMinOrderByAggregateInput = {
@@ -95317,6 +95591,20 @@ export namespace Prisma {
     remarks?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    fabricIn?: SortOrder
+    fabricOut?: SortOrder
+    fabricUnit?: SortOrder
+    defectivePieces?: SortOrder
+    defectiveShelfLocation?: SortOrder
+    defectReason?: SortOrder
+    detectedFromChallanId?: SortOrder
+    detectedFromDepartment?: SortOrder
+  }
+
+  export type ChallanSumOrderByAggregateInput = {
+    fabricIn?: SortOrder
+    fabricOut?: SortOrder
+    defectivePieces?: SortOrder
   }
 
   export type ChallanScalarRelationFilter = {
@@ -103870,6 +104158,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     program: ProgramCreateNestedOneWithoutChallansInput
     parentChallan?: ChallanCreateNestedOneWithoutChildChallansInput
     childChallans?: ChallanCreateNestedManyWithoutParentChallanInput
@@ -103907,6 +104203,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     childChallans?: ChallanUncheckedCreateNestedManyWithoutParentChallanInput
     items?: ChallanItemUncheckedCreateNestedManyWithoutChallanInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutChallanInput
@@ -103940,6 +104244,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     program: ProgramCreateNestedOneWithoutChallansInput
     parentChallan?: ChallanCreateNestedOneWithoutChildChallansInput
     childChallans?: ChallanCreateNestedManyWithoutParentChallanInput
@@ -103977,6 +104289,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     childChallans?: ChallanUncheckedCreateNestedManyWithoutParentChallanInput
     items?: ChallanItemUncheckedCreateNestedManyWithoutChallanInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutChallanInput
@@ -104010,6 +104330,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     program: ProgramCreateNestedOneWithoutChallansInput
     parentChallan?: ChallanCreateNestedOneWithoutChildChallansInput
     childChallans?: ChallanCreateNestedManyWithoutParentChallanInput
@@ -104047,6 +104375,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     childChallans?: ChallanUncheckedCreateNestedManyWithoutParentChallanInput
     items?: ChallanItemUncheckedCreateNestedManyWithoutChallanInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutChallanInput
@@ -104080,6 +104416,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     program: ProgramCreateNestedOneWithoutChallansInput
     parentChallan?: ChallanCreateNestedOneWithoutChildChallansInput
     childChallans?: ChallanCreateNestedManyWithoutParentChallanInput
@@ -104117,6 +104461,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     childChallans?: ChallanUncheckedCreateNestedManyWithoutParentChallanInput
     items?: ChallanItemUncheckedCreateNestedManyWithoutChallanInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutChallanInput
@@ -105124,6 +105476,14 @@ export namespace Prisma {
     remarks?: StringNullableFilter<"Challan"> | string | null
     createdAt?: DateTimeFilter<"Challan"> | Date | string
     updatedAt?: DateTimeFilter<"Challan"> | Date | string
+    fabricIn?: FloatNullableFilter<"Challan"> | number | null
+    fabricOut?: FloatNullableFilter<"Challan"> | number | null
+    fabricUnit?: StringNullableFilter<"Challan"> | string | null
+    defectivePieces?: FloatNullableFilter<"Challan"> | number | null
+    defectiveShelfLocation?: StringNullableFilter<"Challan"> | string | null
+    defectReason?: StringNullableFilter<"Challan"> | string | null
+    detectedFromChallanId?: StringNullableFilter<"Challan"> | string | null
+    detectedFromDepartment?: StringNullableFilter<"Challan"> | string | null
   }
 
   export type ChallanUpsertWithWhereUniqueWithoutIssuedByInput = {
@@ -106304,6 +106664,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     program: ProgramCreateNestedOneWithoutChallansInput
     parentChallan?: ChallanCreateNestedOneWithoutChildChallansInput
     childChallans?: ChallanCreateNestedManyWithoutParentChallanInput
@@ -106341,6 +106709,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     childChallans?: ChallanUncheckedCreateNestedManyWithoutParentChallanInput
     items?: ChallanItemUncheckedCreateNestedManyWithoutChallanInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutChallanInput
@@ -106374,6 +106750,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     program: ProgramCreateNestedOneWithoutChallansInput
     parentChallan?: ChallanCreateNestedOneWithoutChildChallansInput
     childChallans?: ChallanCreateNestedManyWithoutParentChallanInput
@@ -106411,6 +106795,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     childChallans?: ChallanUncheckedCreateNestedManyWithoutParentChallanInput
     items?: ChallanItemUncheckedCreateNestedManyWithoutChallanInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutChallanInput
@@ -108913,6 +109305,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     parentChallan?: ChallanCreateNestedOneWithoutChildChallansInput
     childChallans?: ChallanCreateNestedManyWithoutParentChallanInput
     fromDeptRel: DepartmentCreateNestedOneWithoutFromChallansInput
@@ -108950,6 +109350,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     childChallans?: ChallanUncheckedCreateNestedManyWithoutParentChallanInput
     items?: ChallanItemUncheckedCreateNestedManyWithoutChallanInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutChallanInput
@@ -113233,6 +113641,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     program: ProgramCreateNestedOneWithoutChallansInput
     parentChallan?: ChallanCreateNestedOneWithoutChildChallansInput
     fromDeptRel: DepartmentCreateNestedOneWithoutFromChallansInput
@@ -113271,6 +113687,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     items?: ChallanItemUncheckedCreateNestedManyWithoutChallanInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutChallanInput
     inspections?: QualityInspectionUncheckedCreateNestedManyWithoutChallanInput
@@ -113298,6 +113722,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     program: ProgramCreateNestedOneWithoutChallansInput
     childChallans?: ChallanCreateNestedManyWithoutParentChallanInput
     fromDeptRel: DepartmentCreateNestedOneWithoutFromChallansInput
@@ -113335,6 +113767,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     childChallans?: ChallanUncheckedCreateNestedManyWithoutParentChallanInput
     items?: ChallanItemUncheckedCreateNestedManyWithoutChallanInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutChallanInput
@@ -114350,6 +114790,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     program?: ProgramUpdateOneRequiredWithoutChallansNestedInput
     parentChallan?: ChallanUpdateOneWithoutChildChallansNestedInput
     fromDeptRel?: DepartmentUpdateOneRequiredWithoutFromChallansNestedInput
@@ -114388,6 +114836,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     items?: ChallanItemUncheckedUpdateManyWithoutChallanNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutChallanNestedInput
     inspections?: QualityInspectionUncheckedUpdateManyWithoutChallanNestedInput
@@ -114995,6 +115451,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     program: ProgramCreateNestedOneWithoutChallansInput
     parentChallan?: ChallanCreateNestedOneWithoutChildChallansInput
     childChallans?: ChallanCreateNestedManyWithoutParentChallanInput
@@ -115033,6 +115497,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     childChallans?: ChallanUncheckedCreateNestedManyWithoutParentChallanInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutChallanInput
     inspections?: QualityInspectionUncheckedCreateNestedManyWithoutChallanInput
@@ -115071,6 +115543,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     program?: ProgramUpdateOneRequiredWithoutChallansNestedInput
     parentChallan?: ChallanUpdateOneWithoutChildChallansNestedInput
     childChallans?: ChallanUpdateManyWithoutParentChallanNestedInput
@@ -115109,6 +115589,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     childChallans?: ChallanUncheckedUpdateManyWithoutParentChallanNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutChallanNestedInput
     inspections?: QualityInspectionUncheckedUpdateManyWithoutChallanNestedInput
@@ -115288,6 +115776,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     program: ProgramCreateNestedOneWithoutChallansInput
     parentChallan?: ChallanCreateNestedOneWithoutChildChallansInput
     childChallans?: ChallanCreateNestedManyWithoutParentChallanInput
@@ -115326,6 +115822,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     childChallans?: ChallanUncheckedCreateNestedManyWithoutParentChallanInput
     items?: ChallanItemUncheckedCreateNestedManyWithoutChallanInput
     inspections?: QualityInspectionUncheckedCreateNestedManyWithoutChallanInput
@@ -115604,6 +116108,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     program?: ProgramUpdateOneRequiredWithoutChallansNestedInput
     parentChallan?: ChallanUpdateOneWithoutChildChallansNestedInput
     childChallans?: ChallanUpdateManyWithoutParentChallanNestedInput
@@ -115642,6 +116154,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     childChallans?: ChallanUncheckedUpdateManyWithoutParentChallanNestedInput
     items?: ChallanItemUncheckedUpdateManyWithoutChallanNestedInput
     inspections?: QualityInspectionUncheckedUpdateManyWithoutChallanNestedInput
@@ -115747,6 +116267,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     program: ProgramCreateNestedOneWithoutChallansInput
     parentChallan?: ChallanCreateNestedOneWithoutChildChallansInput
     childChallans?: ChallanCreateNestedManyWithoutParentChallanInput
@@ -115785,6 +116313,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     childChallans?: ChallanUncheckedCreateNestedManyWithoutParentChallanInput
     items?: ChallanItemUncheckedCreateNestedManyWithoutChallanInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutChallanInput
@@ -115960,6 +116496,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     program?: ProgramUpdateOneRequiredWithoutChallansNestedInput
     parentChallan?: ChallanUpdateOneWithoutChildChallansNestedInput
     childChallans?: ChallanUpdateManyWithoutParentChallanNestedInput
@@ -115998,6 +116542,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     childChallans?: ChallanUncheckedUpdateManyWithoutParentChallanNestedInput
     items?: ChallanItemUncheckedUpdateManyWithoutChallanNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutChallanNestedInput
@@ -116231,6 +116783,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     program: ProgramCreateNestedOneWithoutChallansInput
     parentChallan?: ChallanCreateNestedOneWithoutChildChallansInput
     childChallans?: ChallanCreateNestedManyWithoutParentChallanInput
@@ -116269,6 +116829,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     childChallans?: ChallanUncheckedCreateNestedManyWithoutParentChallanInput
     items?: ChallanItemUncheckedCreateNestedManyWithoutChallanInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutChallanInput
@@ -116384,6 +116952,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     program?: ProgramUpdateOneRequiredWithoutChallansNestedInput
     parentChallan?: ChallanUpdateOneWithoutChildChallansNestedInput
     childChallans?: ChallanUpdateManyWithoutParentChallanNestedInput
@@ -116422,6 +116998,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     childChallans?: ChallanUncheckedUpdateManyWithoutParentChallanNestedInput
     items?: ChallanItemUncheckedUpdateManyWithoutChallanNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutChallanNestedInput
@@ -117652,6 +118236,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     program: ProgramCreateNestedOneWithoutChallansInput
     parentChallan?: ChallanCreateNestedOneWithoutChildChallansInput
     childChallans?: ChallanCreateNestedManyWithoutParentChallanInput
@@ -117690,6 +118282,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     childChallans?: ChallanUncheckedCreateNestedManyWithoutParentChallanInput
     items?: ChallanItemUncheckedCreateNestedManyWithoutChallanInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutChallanInput
@@ -118102,6 +118702,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     program?: ProgramUpdateOneRequiredWithoutChallansNestedInput
     parentChallan?: ChallanUpdateOneWithoutChildChallansNestedInput
     childChallans?: ChallanUpdateManyWithoutParentChallanNestedInput
@@ -118140,6 +118748,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     childChallans?: ChallanUncheckedUpdateManyWithoutParentChallanNestedInput
     items?: ChallanItemUncheckedUpdateManyWithoutChallanNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutChallanNestedInput
@@ -119703,6 +120319,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     program: ProgramCreateNestedOneWithoutChallansInput
     parentChallan?: ChallanCreateNestedOneWithoutChildChallansInput
     childChallans?: ChallanCreateNestedManyWithoutParentChallanInput
@@ -119741,6 +120365,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     childChallans?: ChallanUncheckedCreateNestedManyWithoutParentChallanInput
     items?: ChallanItemUncheckedCreateNestedManyWithoutChallanInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutChallanInput
@@ -120162,6 +120794,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     program?: ProgramUpdateOneRequiredWithoutChallansNestedInput
     parentChallan?: ChallanUpdateOneWithoutChildChallansNestedInput
     childChallans?: ChallanUpdateManyWithoutParentChallanNestedInput
@@ -120200,6 +120840,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     childChallans?: ChallanUncheckedUpdateManyWithoutParentChallanNestedInput
     items?: ChallanItemUncheckedUpdateManyWithoutChallanNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutChallanNestedInput
@@ -125050,6 +125698,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     program: ProgramCreateNestedOneWithoutChallansInput
     parentChallan?: ChallanCreateNestedOneWithoutChildChallansInput
     childChallans?: ChallanCreateNestedManyWithoutParentChallanInput
@@ -125088,6 +125744,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     childChallans?: ChallanUncheckedCreateNestedManyWithoutParentChallanInput
     items?: ChallanItemUncheckedCreateNestedManyWithoutChallanInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutChallanInput
@@ -125192,6 +125856,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     program: ProgramCreateNestedOneWithoutChallansInput
     parentChallan?: ChallanCreateNestedOneWithoutChildChallansInput
     childChallans?: ChallanCreateNestedManyWithoutParentChallanInput
@@ -125230,6 +125902,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
     childChallans?: ChallanUncheckedCreateNestedManyWithoutParentChallanInput
     items?: ChallanItemUncheckedCreateNestedManyWithoutChallanInput
     productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutChallanInput
@@ -125431,6 +126111,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     program?: ProgramUpdateOneRequiredWithoutChallansNestedInput
     parentChallan?: ChallanUpdateOneWithoutChildChallansNestedInput
     childChallans?: ChallanUpdateManyWithoutParentChallanNestedInput
@@ -125469,6 +126157,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     childChallans?: ChallanUncheckedUpdateManyWithoutParentChallanNestedInput
     items?: ChallanItemUncheckedUpdateManyWithoutChallanNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutChallanNestedInput
@@ -125585,6 +126281,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     program?: ProgramUpdateOneRequiredWithoutChallansNestedInput
     parentChallan?: ChallanUpdateOneWithoutChildChallansNestedInput
     childChallans?: ChallanUpdateManyWithoutParentChallanNestedInput
@@ -125623,6 +126327,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     childChallans?: ChallanUncheckedUpdateManyWithoutParentChallanNestedInput
     items?: ChallanItemUncheckedUpdateManyWithoutChallanNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutChallanNestedInput
@@ -125797,6 +126509,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
   }
 
   export type ChallanCreateManyIssuedByInput = {
@@ -125818,6 +126538,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
   }
 
   export type ChallanCreateManyReceivedByInput = {
@@ -125839,6 +126567,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
   }
 
   export type ChallanCreateManyApprovedByInput = {
@@ -125860,6 +126596,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
   }
 
   export type ProductionTransactionCreateManyOperatorInput = {
@@ -126670,6 +127414,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     program?: ProgramUpdateOneRequiredWithoutChallansNestedInput
     parentChallan?: ChallanUpdateOneWithoutChildChallansNestedInput
     childChallans?: ChallanUpdateManyWithoutParentChallanNestedInput
@@ -126707,6 +127459,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     childChallans?: ChallanUncheckedUpdateManyWithoutParentChallanNestedInput
     items?: ChallanItemUncheckedUpdateManyWithoutChallanNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutChallanNestedInput
@@ -126737,6 +127497,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ChallanUpdateWithoutIssuedByInput = {
@@ -126751,6 +127519,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     program?: ProgramUpdateOneRequiredWithoutChallansNestedInput
     parentChallan?: ChallanUpdateOneWithoutChildChallansNestedInput
     childChallans?: ChallanUpdateManyWithoutParentChallanNestedInput
@@ -126788,6 +127564,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     childChallans?: ChallanUncheckedUpdateManyWithoutParentChallanNestedInput
     items?: ChallanItemUncheckedUpdateManyWithoutChallanNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutChallanNestedInput
@@ -126818,6 +127602,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ChallanUpdateWithoutReceivedByInput = {
@@ -126832,6 +127624,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     program?: ProgramUpdateOneRequiredWithoutChallansNestedInput
     parentChallan?: ChallanUpdateOneWithoutChildChallansNestedInput
     childChallans?: ChallanUpdateManyWithoutParentChallanNestedInput
@@ -126869,6 +127669,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     childChallans?: ChallanUncheckedUpdateManyWithoutParentChallanNestedInput
     items?: ChallanItemUncheckedUpdateManyWithoutChallanNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutChallanNestedInput
@@ -126899,6 +127707,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ChallanUpdateWithoutApprovedByInput = {
@@ -126913,6 +127729,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     program?: ProgramUpdateOneRequiredWithoutChallansNestedInput
     parentChallan?: ChallanUpdateOneWithoutChildChallansNestedInput
     childChallans?: ChallanUpdateManyWithoutParentChallanNestedInput
@@ -126950,6 +127774,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     childChallans?: ChallanUncheckedUpdateManyWithoutParentChallanNestedInput
     items?: ChallanItemUncheckedUpdateManyWithoutChallanNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutChallanNestedInput
@@ -126980,6 +127812,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ProductionTransactionUpdateWithoutOperatorInput = {
@@ -127999,6 +128839,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
   }
 
   export type ChallanCreateManyToDeptRelInput = {
@@ -128020,6 +128868,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
   }
 
   export type WorkCenterUpdateWithoutDepartmentInput = {
@@ -128137,6 +128993,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     program?: ProgramUpdateOneRequiredWithoutChallansNestedInput
     parentChallan?: ChallanUpdateOneWithoutChildChallansNestedInput
     childChallans?: ChallanUpdateManyWithoutParentChallanNestedInput
@@ -128174,6 +129038,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     childChallans?: ChallanUncheckedUpdateManyWithoutParentChallanNestedInput
     items?: ChallanItemUncheckedUpdateManyWithoutChallanNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutChallanNestedInput
@@ -128204,6 +129076,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ChallanUpdateWithoutToDeptRelInput = {
@@ -128218,6 +129098,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     program?: ProgramUpdateOneRequiredWithoutChallansNestedInput
     parentChallan?: ChallanUpdateOneWithoutChildChallansNestedInput
     childChallans?: ChallanUpdateManyWithoutParentChallanNestedInput
@@ -128255,6 +129143,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     childChallans?: ChallanUncheckedUpdateManyWithoutParentChallanNestedInput
     items?: ChallanItemUncheckedUpdateManyWithoutChallanNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutChallanNestedInput
@@ -128285,6 +129181,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type MachineCreateManyWorkCenterInput = {
@@ -129754,6 +130658,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
   }
 
   export type ProductionTransactionCreateManyProgramInput = {
@@ -130217,6 +131129,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     parentChallan?: ChallanUpdateOneWithoutChildChallansNestedInput
     childChallans?: ChallanUpdateManyWithoutParentChallanNestedInput
     fromDeptRel?: DepartmentUpdateOneRequiredWithoutFromChallansNestedInput
@@ -130254,6 +131174,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     childChallans?: ChallanUncheckedUpdateManyWithoutParentChallanNestedInput
     items?: ChallanItemUncheckedUpdateManyWithoutChallanNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutChallanNestedInput
@@ -130284,6 +131212,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ProductionTransactionUpdateWithoutProgramInput = {
@@ -131056,6 +131992,14 @@ export namespace Prisma {
     remarks?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
   }
 
   export type ChallanItemCreateManyChallanInput = {
@@ -131237,6 +132181,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     program?: ProgramUpdateOneRequiredWithoutChallansNestedInput
     childChallans?: ChallanUpdateManyWithoutParentChallanNestedInput
     fromDeptRel?: DepartmentUpdateOneRequiredWithoutFromChallansNestedInput
@@ -131274,6 +132226,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
     childChallans?: ChallanUncheckedUpdateManyWithoutParentChallanNestedInput
     items?: ChallanItemUncheckedUpdateManyWithoutChallanNestedInput
     productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutChallanNestedInput
@@ -131304,6 +132264,14 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ChallanItemUpdateWithoutChallanInput = {

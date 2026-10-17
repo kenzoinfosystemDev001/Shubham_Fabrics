@@ -26,6 +26,13 @@ export async function GET(
             status: true,
             issuedDate: true,
             remarks: true,
+            fabricIn: true,
+            fabricOut: true,
+            fabricUnit: true,
+            defectivePieces: true,
+            defectiveShelfLocation: true,
+            defectReason: true,
+            items: true,
           },
         },
         childChallans: {
@@ -38,8 +45,16 @@ export async function GET(
             status: true,
             issuedDate: true,
             remarks: true,
+            fabricIn: true,
+            fabricOut: true,
+            fabricUnit: true,
+            defectivePieces: true,
+            defectiveShelfLocation: true,
+            defectReason: true,
+            items: true,
           },
         },
+        defects: true,
         createdBy: { select: { id: true, username: true, fullName: true } },
         issuedBy: { select: { id: true, username: true, fullName: true } },
       },
@@ -180,7 +195,18 @@ export async function PATCH(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { status, remarks, toDepartment, fromDepartment } = body;
+    const {
+      status,
+      remarks,
+      toDepartment,
+      fromDepartment,
+      fabricIn,
+      fabricOut,
+      fabricUnit,
+      defectivePieces,
+      defectiveShelfLocation,
+      defectReason,
+    } = body;
 
     const updateData: any = {};
     if (status) {
@@ -191,19 +217,80 @@ export async function PATCH(
         updateData.completedDate = new Date();
       }
     }
-    if (remarks) updateData.remarks = remarks;
+    if (remarks !== undefined) updateData.remarks = remarks;
     if (toDepartment) updateData.toDepartment = toDepartment;
     if (fromDepartment) updateData.fromDepartment = fromDepartment;
 
-    const updated = await prisma.challan.update({
-      where: { id },
-      data: updateData,
-      include: {
-        program: true,
-        items: true,
-        fromDeptRel: true,
-        toDeptRel: true,
-      },
+    if (fabricIn !== undefined && fabricIn !== null) updateData.fabricIn = Number(fabricIn);
+    if (fabricUnit !== undefined) updateData.fabricUnit = fabricUnit;
+    if (defectivePieces !== undefined && defectivePieces !== null) {
+      updateData.defectivePieces = Number(defectivePieces);
+      if (Number(defectivePieces) > 0) {
+        const upDept = (fromDepartment || '').toUpperCase();
+        let defaultDeptShelf = 'DEF-SHELF-STORE (Fabric Store Quarantined Shelf)';
+        if (upDept.includes('QC1') || upDept.includes('DYEING QC') || upDept.includes('DYE QC'))
+          defaultDeptShelf = 'DEF-SHELF-QC1 (Dyeing QC Defective Shelf)';
+        else if (upDept.includes('DYE')) defaultDeptShelf = 'DEF-SHELF-DYEING (Dyeing Station Defective Shelf)';
+        else if (upDept.includes('EMB')) defaultDeptShelf = 'DEF-SHELF-EMBROIDERY (Embroidery Station Defective Shelf)';
+        else if (upDept.includes('QC2') || upDept.includes('THREAD CUT QC') || upDept.includes('THREAD CUTTING QC'))
+          defaultDeptShelf = 'DEF-SHELF-QC2 (Thread Cut QC Defective Shelf)';
+        else if (upDept.includes('THREAD') || upDept.includes('CUTTING') || upDept.includes('THC'))
+          defaultDeptShelf = 'DEF-SHELF-THREAD-CUTTING (Thread Cutting Trimming Shelf)';
+        else if (upDept.includes('QC3') || upDept.includes('WASHING QC') || upDept.includes('WASH QC'))
+          defaultDeptShelf = 'DEF-SHELF-QC3 (Washing QC Defective Shelf)';
+        else if (upDept.includes('FINAL') || upDept.includes('FINAL_CHECK') || upDept.includes('FINAL CHECK'))
+          defaultDeptShelf = 'DEF-SHELF-FINAL-CHECK (Final check Defective Shelf)';
+
+        updateData.defectiveShelfLocation =
+          defectiveShelfLocation || defaultDeptShelf;
+        updateData.defectReason = defectReason || 'Quality Defect / Trimming Rejection';
+      }
+    }
+    if (fabricOut !== undefined && fabricOut !== null) {
+      updateData.fabricOut = Number(fabricOut);
+    } else if (updateData.fabricIn !== undefined && updateData.defectivePieces !== undefined) {
+      updateData.fabricOut = Math.max(0, updateData.fabricIn - updateData.defectivePieces);
+    }
+
+    const updated = await prisma.$transaction(async (tx) => {
+      const ch = await tx.challan.update({
+        where: { id },
+        data: updateData,
+        include: {
+          program: true,
+          items: true,
+          fromDeptRel: true,
+          toDeptRel: true,
+        },
+      });
+
+      // If defective pieces were cut, ensure DefectRecord exists or is logged
+      if (updateData.defectivePieces && updateData.defectivePieces > 0) {
+        const actor = await tx.user.findFirst({ select: { id: true } });
+        if (actor) {
+          try {
+            await tx.defectRecord.create({
+              data: {
+                defectCode: `DEF-${ch.fromDepartment}-${Date.now().toString().slice(-4)}`,
+                programId: ch.programId,
+                challanId: ch.id,
+                departmentCode: ch.fromDepartment,
+                itemDescription: `Defective pieces cut in ${ch.fromDepartment} — Stored in ${updateData.defectiveShelfLocation || 'DEF-SHELF-01'}`,
+                severity: 'MAJOR',
+                quantity: Math.max(1, Math.round(updateData.defectivePieces)),
+                reason: updateData.defectReason || 'Quality Defect / Segregation',
+                detectedById: actor.id,
+                status: 'OPEN',
+                resolutionNotes: `Defective ${updateData.defectivePieces} ${updateData.fabricUnit || ch.fabricUnit || 'PCS'} cut to ${updateData.defectiveShelfLocation || 'DEF-SHELF-01'}. Leftover ${updateData.fabricOut || ch.fabricOut} sent forward.`,
+              },
+            });
+          } catch (e) {
+            console.warn('Defect record log error:', e);
+          }
+        }
+      }
+
+      return ch;
     });
 
     return NextResponse.json(updated);

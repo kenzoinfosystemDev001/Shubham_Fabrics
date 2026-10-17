@@ -6,7 +6,6 @@ import './globals.css';
 import { Navigation } from '@/components/Navigation';
 import { ThemeProvider } from '@/components/ThemeContext';
 import { DepartmentGuard } from '@/components/DepartmentGuard';
-import { InstallAppButton } from '@/components/InstallAppButton';
 
 const manrope = Manrope({
   subsets: ['latin'],
@@ -59,7 +58,6 @@ export default function RootLayout({
               {children}
             </main>
           </DepartmentGuard>
-          <InstallAppButton variant="floating" />
         </ThemeProvider>
       </body>
     </html>

@@ -55,6 +55,21 @@ class ApiClient {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
+    if (typeof window !== 'undefined') {
+      try {
+        const rawUser = localStorage.getItem('subham_mes_user');
+        if (rawUser) {
+          const u = JSON.parse(rawUser);
+          if (u.departmentCode && !headers['x-user-department']) {
+            headers['x-user-department'] = u.departmentCode;
+          }
+          if (u.role && !headers['x-user-role']) {
+            headers['x-user-role'] = u.role;
+          }
+        }
+      } catch {}
+    }
+
     const url = `${API_BASE_URL}${endpoint}`;
     
     // Safety 8-second timeout to prevent requests hanging indefinitely

@@ -2,9 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Boxes, RefreshCw, Eye, Layers, Filter } from 'lucide-react';
+import { Boxes, RefreshCw, Eye, Layers, Filter, AlertTriangle } from 'lucide-react';
+import { DepartmentStockView } from '@/components/DepartmentStockView';
 
 export default function InventoryStockPage() {
+  const [activeView, setActiveView] = useState<'balance' | 'batches'>('balance');
   const [loading, setLoading] = useState(true);
   const [batches, setBatches] = useState<any[]>([]);
   const [statusFilter, setStatusFilter] = useState('');
@@ -90,8 +92,59 @@ export default function InventoryStockPage() {
       </header>
 
       <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
-        {/* Filters */}
-        <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-xs flex flex-wrap items-center justify-between gap-4">
+        {/* VIEW TABS: Store Balance & Stock | Batch Stock Ledger */}
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-2">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setActiveView('balance')}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+                activeView === 'balance'
+                  ? 'bg-teal-700 text-white shadow-xs'
+                  : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
+              }`}
+            >
+              <Boxes className="w-4 h-4" />
+              <span>Store Material Balance &amp; Stock</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveView('batches')}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+                activeView === 'batches'
+                  ? 'bg-teal-700 text-white shadow-xs'
+                  : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
+              }`}
+            >
+              <Layers className="w-4 h-4" />
+              <span>Batch-wise Stock Ledger ({filteredBatches.length})</span>
+            </button>
+          </div>
+
+          <Link
+            href="/fabric-store/inventory/defected-shelf"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 rounded-xl text-xs font-bold transition"
+          >
+            <AlertTriangle className="w-4 h-4 text-rose-600" />
+            <span>Master Defective Shelf (DEF-SHELF-CENTRAL)</span>
+          </Link>
+        </div>
+
+        {/* VIEW 1: STORE MATERIAL BALANCE & REAL-TIME LEDGER */}
+        {activeView === 'balance' && (
+          <DepartmentStockView
+            department="STORE"
+            title="Raw Fabric Store Stock &amp; Material Ledger"
+            createChallanUrl="/fabric-store/my-work/challan-to-dyeing"
+          />
+        )}
+
+        {/* VIEW 2: BATCH-WISE STOCK LEDGER */}
+        {activeView === 'batches' && (
+          <div className="space-y-6">
+            {/* Filters */}
+            <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-xs flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold text-slate-700">Fabric Type:</span>
@@ -195,6 +248,8 @@ export default function InventoryStockPage() {
             </div>
           )}
         </div>
+          </div>
+        )}
 
         {/* Batch Details Modal */}
         {selectedBatch && (

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import {
   AlertTriangle,
@@ -17,14 +17,95 @@ import {
   Scissors,
   FileText,
   ExternalLink,
+  Sparkles,
+  Building2,
+  Package,
+  Filter,
+  Check,
+  Eye,
 } from 'lucide-react';
+
+interface DepartmentShelfInfo {
+  code: string;
+  name: string;
+  deptKey: string;
+  badgeColor: string;
+  borderLight: string;
+}
+
+const DEPARTMENT_SHELVES: DepartmentShelfInfo[] = [
+  {
+    code: 'DEF-SHELF-STORE',
+    name: 'Raw Fabric Store Quarantined Shelf',
+    deptKey: 'STORE',
+    badgeColor: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+    borderLight: 'border-emerald-200',
+  },
+  {
+    code: 'DEF-SHELF-DYEING',
+    name: 'Dyeing Station Defective Shelf',
+    deptKey: 'DYEING',
+    badgeColor: 'bg-blue-100 text-blue-900 border-blue-300',
+    borderLight: 'border-blue-200',
+  },
+  {
+    code: 'DEF-SHELF-QC1',
+    name: 'Dyeing QC Defective Shelf',
+    deptKey: 'QC1',
+    badgeColor: 'bg-indigo-100 text-indigo-900 border-indigo-300',
+    borderLight: 'border-indigo-200',
+  },
+  {
+    code: 'DEF-SHELF-EMBROIDERY',
+    name: 'Embroidery Station Defective Shelf',
+    deptKey: 'EMBROIDERY',
+    badgeColor: 'bg-purple-100 text-purple-900 border-purple-300',
+    borderLight: 'border-purple-200',
+  },
+  {
+    code: 'DEF-SHELF-THREAD-CUTTING',
+    name: 'Thread Cutting Trimming & Snip Shelf',
+    deptKey: 'THREAD_CUTTING',
+    badgeColor: 'bg-amber-100 text-amber-900 border-amber-300',
+    borderLight: 'border-amber-200',
+  },
+  {
+    code: 'DEF-SHELF-QC2',
+    name: 'Thread Cut QC Defective Shelf',
+    deptKey: 'QC2',
+    badgeColor: 'bg-rose-100 text-rose-900 border-rose-300',
+    borderLight: 'border-rose-200',
+  },
+  {
+    code: 'DEF-SHELF-QC3',
+    name: 'Washing QC Defective Shelf',
+    deptKey: 'QC3',
+    badgeColor: 'bg-sky-100 text-sky-900 border-sky-300',
+    borderLight: 'border-sky-200',
+  },
+  {
+    code: 'DEF-SHELF-FINAL-CHECK',
+    name: 'Final check Defective Shelf',
+    deptKey: 'FINAL_CHECK',
+    badgeColor: 'bg-orange-100 text-orange-900 border-orange-300',
+    borderLight: 'border-orange-200',
+  },
+];
 
 export default function DefectedShelfPage() {
   const [loading, setLoading] = useState(true);
+  const [shelfSection, setShelfSection] = useState<'MASTER_CENTRAL' | 'ROLLS' | 'DEPARTMENT_RETURNS'>('MASTER_CENTRAL');
+  
+  // Master Central Defective Data from API
+  const [masterData, setMasterData] = useState<any>(null);
+  const [allChallans, setAllChallans] = useState<any[]>([]);
+  const [allDefectRecords, setAllDefectRecords] = useState<any[]>([]);
+  const [selectedDeptFilter, setSelectedDeptFilter] = useState<string>('ALL');
+
+  // Fabric Store Rolls State
   const [rolls, setRolls] = useState<any[]>([]);
   const [defectReturns, setDefectReturns] = useState<any[]>([]);
-  const [shelfSection, setShelfSection] = useState<'ROLLS' | 'DEPARTMENT_RETURNS'>('ROLLS');
-  const [filterStatus, setFilterStatus] = useState<string>('ALL');
+  const [filterRollStatus, setFilterRollStatus] = useState<string>('ALL');
   const [search, setSearch] = useState('');
   const [selectedRoll, setSelectedRoll] = useState<any>(null);
   const [actionType, setActionType] = useState<'RELEASE' | 'MOVE' | 'SCRAP' | null>(null);
@@ -36,21 +117,18 @@ export default function DefectedShelfPage() {
   const loadData = async () => {
     try {
       setLoading(true);
-      // 1. Fetch defected rolls
-      const res = await fetch('/api/fabric-store/rolls?limit=200');
-      const json = await res.json();
-      const allRolls: any[] = json.data || [];
-      // Defected shelf consists of rolls with QC_HOLD, QC_REJECTED, qcStatus ON_HOLD, or qcStatus FAILED
-      const defected = allRolls.filter(
-        (r) =>
-          r.status === 'QC_HOLD' ||
-          r.status === 'QC_REJECTED' ||
-          r.qcStatus === 'ON_HOLD' ||
-          r.qcStatus === 'FAILED'
-      );
-      setRolls(defected);
 
-      // 2. Fetch defective returns to store (e.g. from Thread Cutting)
+      // 1. Fetch Consolidated Defective Shelves Data from All Departments
+      const masterRes = await fetch('/api/defective-shelves');
+      const masterJson = await masterRes.json();
+      if (masterJson.success && masterJson.data) {
+        setMasterData(masterJson.data);
+        setAllChallans(masterJson.data.challans || []);
+        setAllDefectRecords(masterJson.data.defectRecords || []);
+        setRolls(masterJson.data.defectedRolls || []);
+      }
+
+      // 2. Fetch direct returns to STORE
       const challanRes = await fetch('/api/challans?toDepartment=STORE');
       const challans = await challanRes.json();
       if (Array.isArray(challans)) {
@@ -63,7 +141,7 @@ export default function DefectedShelfPage() {
         setDefectReturns(returns);
       }
     } catch (err: any) {
-      console.error('Failed to load defected shelf data:', err);
+      console.error('Failed to load defective shelf data:', err);
     } finally {
       setLoading(false);
     }
@@ -73,26 +151,56 @@ export default function DefectedShelfPage() {
     loadData();
   }, []);
 
-  const filteredRolls = rolls.filter((r) => {
-    const matchesStatus =
-      filterStatus === 'ALL' ||
-      (filterStatus === 'QC_HOLD' && (r.status === 'QC_HOLD' || r.qcStatus === 'ON_HOLD')) ||
-      (filterStatus === 'QC_REJECTED' && (r.status === 'QC_REJECTED' || r.qcStatus === 'FAILED'));
+  // Filter Master Department Defect Items
+  const filteredMasterChallans = useMemo(() => {
+    return allChallans.filter((ch) => {
+      const matchDept =
+        selectedDeptFilter === 'ALL' ||
+        (ch.fromDepartment && ch.fromDepartment.toUpperCase().includes(selectedDeptFilter)) ||
+        (ch.defectiveShelfLocation && ch.defectiveShelfLocation.toUpperCase().includes(selectedDeptFilter));
 
-    const searchLower = search.toLowerCase();
-    const matchesSearch =
-      !search ||
-      r.rollNumber?.toLowerCase().includes(searchLower) ||
-      r.batch?.batchNumber?.toLowerCase().includes(searchLower) ||
-      r.batch?.fabricDescription?.toLowerCase().includes(searchLower) ||
-      r.qcRemarks?.toLowerCase().includes(searchLower);
+      const s = search.toLowerCase();
+      const matchSearch =
+        !search ||
+        ch.challanNumber?.toLowerCase().includes(s) ||
+        ch.fromDepartment?.toLowerCase().includes(s) ||
+        ch.program?.programNumber?.toLowerCase().includes(s) ||
+        ch.program?.programSerialNo?.toLowerCase().includes(s) ||
+        ch.program?.clientName?.toLowerCase().includes(s) ||
+        ch.program?.mainStyle?.toLowerCase().includes(s) ||
+        ch.defectReason?.toLowerCase().includes(s) ||
+        ch.defectiveShelfLocation?.toLowerCase().includes(s) ||
+        ch.remarks?.toLowerCase().includes(s);
 
-    return matchesStatus && matchesSearch;
-  });
+      return matchDept && matchSearch;
+    });
+  }, [allChallans, selectedDeptFilter, search]);
+
+  // Filter Rolls
+  const filteredRolls = useMemo(() => {
+    return rolls.filter((r) => {
+      const matchesStatus =
+        filterRollStatus === 'ALL' ||
+        (filterRollStatus === 'QC_HOLD' && (r.status === 'QC_HOLD' || r.qcStatus === 'ON_HOLD')) ||
+        (filterRollStatus === 'QC_REJECTED' && (r.status === 'QC_REJECTED' || r.qcStatus === 'FAILED'));
+
+      const searchLower = search.toLowerCase();
+      const matchesSearch =
+        !search ||
+        r.rollNumber?.toLowerCase().includes(searchLower) ||
+        r.batch?.batchNumber?.toLowerCase().includes(searchLower) ||
+        r.batch?.fabricDescription?.toLowerCase().includes(searchLower) ||
+        r.qcRemarks?.toLowerCase().includes(searchLower);
+
+      return matchesStatus && matchesSearch;
+    });
+  }, [rolls, filterRollStatus, search]);
 
   const totalLength = rolls.reduce((acc, r) => acc + (parseFloat(r.length) || 0), 0);
   const holdCount = rolls.filter((r) => r.status === 'QC_HOLD' || r.qcStatus === 'ON_HOLD').length;
   const rejectedCount = rolls.filter((r) => r.status === 'QC_REJECTED' || r.qcStatus === 'FAILED').length;
+  const factoryTotalPieces = masterData?.summary?.factoryTotalDefectivePieces || 0;
+  const deptStats = masterData?.summary?.departmentStats || {};
 
   const handleActionSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -161,36 +269,30 @@ export default function DefectedShelfPage() {
             </Link>
             <span className="text-slate-300">/</span>
             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-rose-700">
-              INVENTORY
+              CENTRAL DEFECTIVE GOVERNANCE
             </span>
           </div>
           <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2 mt-0.5">
             <AlertTriangle className="w-5 h-5 text-rose-600" />
-            Defected Shelf &amp; Quarantine Storage
+            <span>Fabric Store Central Defective Shelf &amp; Department Master Audit</span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Isolated storage for rejected, on-hold, and defective fabric rolls segregated from production stock
+            Centralized factory-wide registry recording every department&apos;s defective shelf, quarantined rolls, and cutting snips.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+
+        <div className="flex items-center gap-2.5">
           <button
             onClick={loadData}
             disabled={loading}
-            className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-md transition"
-            title="Refresh"
+            className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg border border-slate-200 transition"
+            title="Refresh All Defective Shelves"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
           <Link
-            href="/fabric-store/my-work/qc-inspections"
-            className="flex items-center gap-2 px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-md shadow-xs transition"
-          >
-            <Clock className="w-4 h-4" />
-            <span>QC Inspection Queue</span>
-          </Link>
-          <Link
             href="/fabric-store/inventory/stock"
-            className="flex items-center gap-2 px-3.5 py-2 bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold rounded-md shadow-xs transition"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold rounded-lg shadow-xs transition"
           >
             <Layers className="w-4 h-4" />
             <span>Regular Stock</span>
@@ -217,385 +319,652 @@ export default function DefectedShelfPage() {
           </div>
         )}
 
-        {/* STATS TILES */}
+        {/* 1. TOP SUMMARY TILES ACROSS ENTIRE FACTORY */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white border border-rose-200/80 rounded-xl p-4 shadow-xs">
+          <div className="bg-white border border-rose-200/90 rounded-2xl p-4 shadow-xs relative overflow-hidden">
             <div className="flex items-center justify-between text-rose-600">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                Total Defected Rolls
+                All-Dept Defective Pieces
               </span>
               <ShieldAlert className="w-4 h-4" />
             </div>
             <p className="text-2xl font-bold text-rose-700 mt-1">
-              {loading ? '…' : rolls.length}
+              {loading ? '…' : `${factoryTotalPieces} PCS`}
             </p>
-            <span className="text-[10px] text-slate-500">Separated from regular issuance</span>
+            <span className="text-[10px] text-slate-500">
+              Recorded across all 6 department shelves
+            </span>
+            <div className="absolute top-0 right-0 w-16 h-16 bg-rose-50 -mr-6 -mt-6 rounded-full pointer-events-none" />
           </div>
 
-          <div className="bg-white border border-slate-200/90 rounded-xl p-4 shadow-xs">
+          <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs">
             <div className="flex items-center justify-between text-slate-500">
               <span className="text-[10px] font-bold uppercase tracking-wider">
-                Quarantined Meters
+                Store Quarantined Fabric
               </span>
-              <Archive className="w-4 h-4" />
+              <Archive className="w-4 h-4 text-slate-600" />
             </div>
             <p className="text-2xl font-bold text-slate-900 mt-1">
               {loading ? '…' : totalLength.toFixed(1)} <span className="text-sm font-normal text-slate-500">m</span>
             </p>
-            <span className="text-[10px] text-slate-500">Non-usable fabric volume</span>
+            <span className="text-[10px] text-slate-500">
+              {rolls.length} rolls on DEF-SHELF-STORE
+            </span>
           </div>
 
-          <div className="bg-white border border-amber-200/80 rounded-xl p-4 shadow-xs">
+          <div className="bg-white border border-amber-200/80 rounded-2xl p-4 shadow-xs">
             <div className="flex items-center justify-between text-amber-600">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                On QC Hold
+                Active Department Shelves
               </span>
-              <Clock className="w-4 h-4" />
+              <Building2 className="w-4 h-4" />
             </div>
             <p className="text-2xl font-bold text-amber-700 mt-1">
-              {loading ? '…' : holdCount}
+              6 Stations
             </p>
-            <span className="text-[10px] text-slate-500">Awaiting re-test or supplier review</span>
+            <span className="text-[10px] text-slate-500">
+              Store · Dyeing · QC1 · Emb · THC · QC2
+            </span>
           </div>
 
-          <div className="bg-white border border-rose-200/80 rounded-xl p-4 shadow-xs">
-            <div className="flex items-center justify-between text-rose-600">
+          <div className="bg-white border border-purple-200/80 rounded-2xl p-4 shadow-xs">
+            <div className="flex items-center justify-between text-purple-600">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                Definitively Rejected
+                Central Defective Hub
               </span>
-              <XCircle className="w-4 h-4" />
+              <Sparkles className="w-4 h-4 text-purple-600" />
             </div>
-            <p className="text-2xl font-bold text-rose-800 mt-1">
-              {loading ? '…' : rejectedCount}
+            <p className="text-2xl font-bold text-purple-900 mt-1 font-mono">
+              DEF-SHELF-CENTRAL
             </p>
-            <span className="text-[10px] text-slate-500">For return to mill or scrap write-off</span>
+            <span className="text-[10px] text-slate-500">
+              Consolidating all factory defectiveness
+            </span>
           </div>
         </section>
 
-        {/* SECTION TOGGLE: FABRIC ROLLS vs DEPARTMENT RETURNS (THREAD CUTTING) */}
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-2 shadow-xs">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {/* 2. DEPARTMENT DEFECTIVE SHELVES QUICK GLANCE CARDS */}
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs space-y-3">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+            <div className="flex items-center gap-2">
+              <Archive className="w-4 h-4 text-slate-700" />
+              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900">
+                Station-Wise Defective Shelves Infrastructure
+              </h2>
+            </div>
+            <span className="text-[11px] text-slate-500 font-medium">
+              Each department records to its local shelf + consolidates here in Central Store
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            {DEPARTMENT_SHELVES.map((shelf) => {
+              const count = deptStats[shelf.deptKey]?.totalPieces || 0;
+              const incidents = deptStats[shelf.deptKey]?.totalIncidents || 0;
+              const isSelected = selectedDeptFilter === shelf.deptKey;
+
+              return (
+                <button
+                  key={shelf.code}
+                  type="button"
+                  onClick={() => {
+                    setShelfSection('MASTER_CENTRAL');
+                    setSelectedDeptFilter(isSelected ? 'ALL' : shelf.deptKey);
+                  }}
+                  className={`p-3 rounded-xl border text-left transition relative cursor-pointer ${
+                    isSelected
+                      ? 'bg-slate-900 text-white border-slate-900 shadow-md ring-2 ring-slate-900/30'
+                      : 'bg-slate-50/70 border-slate-200/80 hover:bg-slate-100 text-slate-800'
+                  }`}
+                >
+                  <div className="text-[9px] font-mono font-bold tracking-wider opacity-75 truncate">
+                    {shelf.code}
+                  </div>
+                  <div className="text-xs font-bold mt-1 line-clamp-1">
+                    {shelf.name.replace(' Defective Shelf', '')}
+                  </div>
+                  <div className="mt-2 flex items-baseline justify-between">
+                    <span className="text-lg font-mono font-bold">
+                      {count} <span className="text-[10px] font-normal">PCS</span>
+                    </span>
+                    <span className="text-[9px] opacity-70">
+                      {incidents} logs
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 3. THREE-WAY WORKFLOW TOGGLE */}
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-1.5 shadow-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            
+            {/* TAB 1: ALL DEPARTMENTS MASTER DEFECTIVE SHELF (CENTRAL RECORD) */}
+            <button
+              type="button"
+              onClick={() => setShelfSection('MASTER_CENTRAL')}
+              className={`p-3 rounded-xl border font-bold text-xs flex items-center justify-between transition cursor-pointer ${
+                shelfSection === 'MASTER_CENTRAL'
+                  ? 'bg-gradient-to-r from-rose-900 to-indigo-950 text-white border-rose-800 shadow-sm'
+                  : 'bg-slate-50/60 border-slate-200 text-slate-700 hover:bg-slate-100'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-amber-300" />
+                <span className="uppercase tracking-wide text-left">
+                  All Departments Master Defective Shelf
+                </span>
+              </div>
+              <span className={`font-mono text-xs px-2.5 py-0.5 rounded-full font-bold ${
+                shelfSection === 'MASTER_CENTRAL'
+                  ? 'bg-amber-400 text-slate-900'
+                  : 'bg-slate-200 text-slate-800'
+              }`}>
+                {allChallans.length} Logs
+              </span>
+            </button>
+
+            {/* TAB 2: STORE QUARANTINED FABRIC ROLLS */}
             <button
               type="button"
               onClick={() => setShelfSection('ROLLS')}
-              className={`p-3 rounded-xl border font-bold text-xs flex items-center justify-between transition ${
+              className={`p-3 rounded-xl border font-bold text-xs flex items-center justify-between transition cursor-pointer ${
                 shelfSection === 'ROLLS'
                   ? 'bg-rose-50/90 border-rose-400 text-rose-950 shadow-xs'
-                  : 'bg-slate-50/60 border-slate-200 text-slate-600 hover:bg-slate-100'
+                  : 'bg-slate-50/60 border-slate-200 text-slate-700 hover:bg-slate-100'
               }`}
             >
               <div className="flex items-center gap-2">
                 <Layers className="w-4 h-4 text-rose-600" />
-                <span className="uppercase tracking-wide">Quarantined Fabric Rolls (Store QC)</span>
+                <span className="uppercase tracking-wide text-left">
+                  Store Quarantined Rolls (DEF-SHELF-STORE)
+                </span>
               </div>
               <span className="font-mono text-xs px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 font-bold">
                 {rolls.length} Rolls
               </span>
             </button>
 
+            {/* TAB 3: PHYSICAL DEPARTMENT DEFECT RETURNS */}
             <button
               type="button"
               onClick={() => setShelfSection('DEPARTMENT_RETURNS')}
-              className={`p-3 rounded-xl border font-bold text-xs flex items-center justify-between transition ${
+              className={`p-3 rounded-xl border font-bold text-xs flex items-center justify-between transition cursor-pointer ${
                 shelfSection === 'DEPARTMENT_RETURNS'
                   ? 'bg-amber-50/90 border-amber-400 text-amber-950 shadow-xs'
-                  : 'bg-slate-50/60 border-slate-200 text-slate-600 hover:bg-slate-100'
+                  : 'bg-slate-50/60 border-slate-200 text-slate-700 hover:bg-slate-100'
               }`}
             >
               <div className="flex items-center gap-2">
                 <Scissors className="w-4 h-4 text-amber-600" />
-                <span className="uppercase tracking-wide">Department Defect Returns (Thread Cutting)</span>
+                <span className="uppercase tracking-wide text-left">
+                  Physical Defect Returns from Stations
+                </span>
               </div>
               <span className="font-mono text-xs px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold">
                 {defectReturns.length} Returns
               </span>
             </button>
+
           </div>
         </div>
 
-        {/* VIEW 1: FABRIC ROLLS ON DEFECTED SHELF */}
-        {shelfSection === 'ROLLS' && (
-          <>
-            {/* TOOLBAR */}
-            <div className="bg-white border border-slate-200/90 rounded-xl p-4 shadow-xs flex flex-col md:flex-row gap-4 items-center justify-between">
-          <div className="flex items-center gap-2">
-            {[
-              { id: 'ALL', label: 'All Defected Rolls' },
-              { id: 'QC_HOLD', label: 'On QC Hold' },
-              { id: 'QC_REJECTED', label: 'Rejected' },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setFilterStatus(tab.id)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-                  filterStatus === tab.id
-                    ? 'bg-rose-700 text-white shadow-xs'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+        {/* ======================================================== */}
+        {/* VIEW 1: CENTRAL MASTER DEFECTIVE SHELF (ALL DEPARTMENTS) */}
+        {/* ======================================================== */}
+        {shelfSection === 'MASTER_CENTRAL' && (
+          <div className="space-y-4">
+            
+            {/* TOOLBAR & DEPARTMENT FILTER PILLS */}
+            <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs space-y-3">
+              <div className="flex flex-col md:flex-row gap-3 items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-rose-600" />
+                    <span>Consolidated Defective Audit Register (DEF-SHELF-CENTRAL)</span>
+                  </h3>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    Records defectiveness from each department&apos;s own defective shelf in real-time.
+                  </p>
+                </div>
 
-          <div className="relative w-full md:w-80">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-            <input
-              type="text"
-              placeholder="Search roll #, batch, fabric, defect..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
-            />
-          </div>
-        </div>
+                <div className="relative w-full md:w-80">
+                  <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                  <input
+                    type="text"
+                    placeholder="Search Challan #, dept, style, reason..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full pl-9 pr-4 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
+                  />
+                </div>
+              </div>
 
-        {/* DEFECTED ROLLS TABLE */}
-        <div className="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
-          <div className="p-4 border-b border-slate-200/80 flex items-center justify-between">
-            <div>
-              <h2 className="text-sm font-bold text-slate-900">Quarantined Defected Inventory</h2>
-              <p className="text-[11px] text-slate-500 mt-0.5">
-                Physical defected shelf assignment: Storage bay DEF-A, DEF-B, or Quarantine Cage
-              </p>
+              {/* FILTER PILLS */}
+              <div className="flex items-center gap-1.5 flex-wrap pt-1 border-t border-slate-100">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-1 flex items-center gap-1">
+                  <Filter className="w-3 h-3" />
+                  Filter Dept:
+                </span>
+                {[
+                  { key: 'ALL', label: 'All Departments' },
+                  { key: 'STORE', label: 'Store (DEF-SHELF-STORE)' },
+                  { key: 'DYEING', label: 'Dyeing (DEF-SHELF-DYEING)' },
+                  { key: 'QC1', label: 'Dyeing QC (DEF-SHELF-QC1)' },
+                  { key: 'EMBROIDERY', label: 'Embroidery (DEF-SHELF-EMBROIDERY)' },
+                  { key: 'THREAD_CUTTING', label: 'Thread Cutting (DEF-SHELF-THREAD-CUTTING)' },
+                  { key: 'QC2', label: 'Thread Cut QC (DEF-SHELF-QC2)' },
+                  { key: 'QC3', label: 'Washing QC (DEF-SHELF-QC3)' },
+                  { key: 'FINAL_CHECK', label: 'Final check (DEF-SHELF-FINAL-CHECK)' },
+                ].map((tab) => (
+                  <button
+                    key={tab.key}
+                    onClick={() => setSelectedDeptFilter(tab.key)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                      selectedDeptFilter === tab.key
+                        ? 'bg-rose-700 text-white shadow-xs'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
             </div>
-            <span className="text-xs text-slate-500">
-              Showing: <strong className="text-rose-900">{filteredRolls.length}</strong> rolls
-            </span>
-          </div>
 
-          {loading ? (
-            <div className="p-12 text-center text-xs text-slate-400">Loading defected shelf...</div>
-          ) : filteredRolls.length === 0 ? (
-            <div className="p-16 text-center space-y-3">
-              <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />
-              <p className="text-sm font-semibold text-slate-800">Defected Shelf is Clean</p>
-              <p className="text-xs text-slate-500 max-w-md mx-auto">
-                No fabric rolls are currently marked with defects or quarantined on hold. All fabric in store is cleared for production issuance.
-              </p>
+            {/* MASTER AUDIT TABLE */}
+            <div className="bg-white border border-slate-200/90 rounded-2xl shadow-xs overflow-hidden">
+              <div className="p-4 border-b border-slate-200/80 flex items-center justify-between">
+                <div>
+                  <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                    Factory Defective Record Entries ({filteredMasterChallans.length})
+                  </h4>
+                </div>
+                <span className="text-xs text-slate-500">
+                  Showing: <strong className="text-rose-900">{filteredMasterChallans.length}</strong> incidents
+                </span>
+              </div>
+
+              {loading ? (
+                <div className="p-12 text-center text-xs text-slate-400">Loading master defective shelf...</div>
+              ) : filteredMasterChallans.length === 0 ? (
+                <div className="p-16 text-center space-y-3">
+                  <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />
+                  <p className="text-sm font-semibold text-slate-800">No Defective Records Found</p>
+                  <p className="text-xs text-slate-500 max-w-md mx-auto">
+                    {selectedDeptFilter === 'ALL'
+                      ? 'No department has logged any defectiveness. All stations are operating with 100% first-pass yield.'
+                      : `No defectiveness currently logged under ${selectedDeptFilter}.`}
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-50/90 text-slate-600 font-semibold border-b border-slate-200 text-[10px] uppercase">
+                      <tr>
+                        <th className="py-3 px-3.5">Challan / Ref #</th>
+                        <th className="py-3 px-3.5">Origin Department</th>
+                        <th className="py-3 px-3.5">Program / Style</th>
+                        <th className="py-3 px-3.5 text-center">Defective Cut</th>
+                        <th className="py-3 px-3.5">Department Local Shelf</th>
+                        <th className="py-3 px-3.5">Central Store Log</th>
+                        <th className="py-3 px-3.5">Defect Reason &amp; Remarks</th>
+                        <th className="py-3 px-3.5">Date</th>
+                        <th className="py-3 px-3.5 text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 text-slate-700">
+                      {filteredMasterChallans.map((ch) => {
+                        const defectPcs = ch.defectivePieces || ch.items?.reduce((s: number, it: any) => s + (Number(it.quantity) || 0), 0) || 0;
+                        const unit = ch.fabricUnit || ch.items?.[0]?.uom || 'PCS';
+
+                        return (
+                          <tr key={ch.id} className="hover:bg-rose-50/30 transition">
+                            <td className="py-3.5 px-3.5 font-mono font-bold text-slate-900">
+                              {ch.challanNumber}
+                            </td>
+
+                            <td className="py-3.5 px-3.5">
+                              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-800 border border-slate-200">
+                                {ch.fromDepartment}
+                              </span>
+                            </td>
+
+                            <td className="py-3.5 px-3.5">
+                              <span className="font-semibold text-slate-900 block truncate max-w-[150px]">
+                                {ch.program?.mainStyle || ch.program?.clientName || 'General Style'}
+                              </span>
+                              <span className="text-[10px] text-slate-500 font-mono">
+                                Sheet: {ch.program?.programSerialNo || ch.program?.programNumber || '—'}
+                              </span>
+                            </td>
+
+                            <td className="py-3.5 px-3.5 text-center font-mono font-bold text-rose-700">
+                              {defectPcs} {unit}
+                            </td>
+
+                            <td className="py-3.5 px-3.5">
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-rose-50 text-rose-800 border border-rose-200">
+                                <Archive className="w-3 h-3 text-rose-600" />
+                                {ch.defectiveShelfLocation ? ch.defectiveShelfLocation.split(' ')[0] : 'DEF-SHELF-DEPT'}
+                              </span>
+                            </td>
+
+                            <td className="py-3.5 px-3.5">
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-purple-50 text-purple-900 border border-purple-200">
+                                <Sparkles className="w-3 h-3 text-purple-600" />
+                                DEF-SHELF-CENTRAL
+                              </span>
+                            </td>
+
+                            <td className="py-3.5 px-3.5 max-w-xs text-slate-600">
+                              <div className="font-medium text-slate-900 text-[11px]">
+                                {ch.defectReason || 'Process Defect'}
+                              </div>
+                              <p className="truncate text-[10px] text-slate-500 mt-0.5">
+                                {ch.remarks || 'Recorded during department cut'}
+                              </p>
+                            </td>
+
+                            <td className="py-3.5 px-3.5 font-mono text-[11px] text-slate-600">
+                              {new Date(ch.createdAt).toLocaleDateString('en-GB')}
+                            </td>
+
+                            <td className="py-3.5 px-3.5 text-right">
+                              <Link
+                                href={`/challans/${ch.id}`}
+                                className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-semibold transition"
+                              >
+                                <Eye className="w-3.5 h-3.5 text-slate-600" />
+                                <span>Audit</span>
+                              </Link>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50/90 text-slate-600 font-semibold border-b border-slate-200">
-                  <tr>
-                    <th className="py-3 px-4">Roll Number</th>
-                    <th className="py-3 px-4">Batch Number</th>
-                    <th className="py-3 px-4">Fabric Details</th>
-                    <th className="py-3 px-4">Length</th>
-                    <th className="py-3 px-4">Shelf / Bay Slot</th>
-                    <th className="py-3 px-4">Status</th>
-                    <th className="py-3 px-4">Defect Reason / QC Notes</th>
-                    <th className="py-3 px-4 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 text-slate-700">
-                  {filteredRolls.map((roll) => (
-                    <tr key={roll.id} className="hover:bg-rose-50/30 transition">
-                      <td className="py-3.5 px-4 font-mono font-bold text-rose-900">
-                        {roll.rollNumber}
-                      </td>
-                      <td className="py-3.5 px-4 font-mono text-[11px]">
-                        {roll.batch?.batchNumber || '—'}
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <span className="font-semibold text-slate-800 block">
-                          {roll.batch?.fabricType || 'Fabric'}
-                        </span>
-                        <span className="text-[10px] text-slate-500">
-                          {roll.batch?.fabricDescription} {roll.batch?.colorName ? `· ${roll.batch?.colorName}` : ''}
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-4 font-mono font-bold text-slate-800">
-                        {parseFloat(roll.length).toFixed(2)} m
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-rose-100/80 text-rose-800 border border-rose-200">
-                          <Archive className="w-3 h-3" />
-                          {roll.location?.locationCode || 'DEF-SHELF-01'}
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-4">
-                        {roll.status === 'QC_REJECTED' || roll.qcStatus === 'FAILED' ? (
-                          <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-rose-100 text-rose-800">
-                            REJECTED
-                          </span>
-                        ) : (
-                          <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800">
-                            QC HOLD
-                          </span>
-                        )}
-                      </td>
-                      <td className="py-3.5 px-4 max-w-xs truncate text-[11px] text-slate-600">
-                        {roll.qcRemarks || 'Flagged for quality inspection / physical defect'}
-                      </td>
-                      <td className="py-3.5 px-4 text-right space-x-1.5 whitespace-nowrap">
-                        <button
-                          onClick={() => {
-                            setSelectedRoll(roll);
-                            setActionType('RELEASE');
-                            setRemarks('');
-                          }}
-                          className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded text-[11px] font-semibold transition"
-                          title="Release back to stock"
-                        >
-                          Release
-                        </button>
-                        <button
-                          onClick={() => {
-                            setSelectedRoll(roll);
-                            setActionType('MOVE');
-                            setShelfLocation(roll.location?.locationCode || 'DEF-SHELF-02');
-                            setRemarks('');
-                          }}
-                          className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[11px] font-semibold transition"
-                          title="Assign shelf slot"
-                        >
-                          Shelf Slot
-                        </button>
-                        <button
-                          onClick={() => {
-                            setSelectedRoll(roll);
-                            setActionType('SCRAP');
-                            setRemarks('');
-                          }}
-                          className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded text-[11px] font-semibold transition"
-                          title="Scrap / Write off"
-                        >
-                          Scrap
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      </>
-    )}
 
-    {/* VIEW 2: DEPARTMENT DEFECT RETURNS (THREAD CUTTING RETURNS TO FABRIC STORE) */}
-    {shelfSection === 'DEPARTMENT_RETURNS' && (
-      <div className="bg-white border border-slate-200/90 rounded-2xl shadow-xs overflow-hidden p-6 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
-          <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 block">
-              DEPARTMENT ISOLATION GATE
-            </span>
-            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2 mt-0.5">
-              <Scissors className="w-5 h-5 text-amber-600" />
-              <span>Defective Pieces Returned from Thread Cutting</span>
-            </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Panels and pieces found defective during thread trimming and sent back to the Fabric Store defective shelf with comments and reasons.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-500">
-              Total Defect Returns: <strong className="text-slate-900">{defectReturns.length}</strong>
-            </span>
-          </div>
-        </div>
-
-        {defectReturns.length === 0 ? (
-          <div className="p-16 text-center space-y-3 border border-dashed border-slate-200 rounded-xl">
-            <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />
-            <p className="text-sm font-semibold text-slate-800">No Department Defect Returns</p>
-            <p className="text-xs text-slate-500 max-w-md mx-auto">
-              Thread Cutting has not dispatched any defective pieces to the Fabric Store defective shelf.
-            </p>
-          </div>
-        ) : (
-          <div className="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-100/80 border-b border-slate-200 text-slate-600 font-bold text-[10px] uppercase">
-                <tr>
-                  <th className="py-2.5 px-3">Return Challan #</th>
-                  <th className="py-2.5 px-3">Source Department</th>
-                  <th className="py-2.5 px-3">Program / Style</th>
-                  <th className="py-2.5 px-3 text-center">Defective Pcs</th>
-                  <th className="py-2.5 px-3">Target Defective Shelf</th>
-                  <th className="py-2.5 px-3">Defect Reason &amp; Comments</th>
-                  <th className="py-2.5 px-3">Date</th>
-                  <th className="py-2.5 px-3 text-center">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {defectReturns.map((ch: any) => {
-                  const totalPcs = (ch.items || []).reduce(
-                    (sum: number, it: any) => sum + (Number(it.quantity) || 0),
-                    0
-                  );
-
-                  return (
-                    <tr key={ch.id} className="hover:bg-amber-50/40 transition">
-                      <td className="py-3 px-3 font-mono font-bold text-slate-900">
-                        {ch.challanNumber}
-                      </td>
-                      <td className="py-3 px-3">
-                        <span className="px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-800 border border-cyan-200 text-[10px] font-bold">
-                          {ch.fromDepartment}
-                        </span>
-                      </td>
-                      <td className="py-3 px-3">
-                        <span className="font-semibold text-slate-800 block">
-                          {ch.program?.mainStyle || ch.program?.clientName || 'General Style'}
-                        </span>
-                        <span className="font-mono text-[10px] text-fuchsia-700">
-                          {ch.program?.wilcomDesignNumber || 'WILCOM-DES'}
-                        </span>
-                      </td>
-                      <td className="py-3 px-3 text-center font-mono font-bold text-rose-700 text-sm">
-                        {totalPcs} PCS
-                      </td>
-                      <td className="py-3 px-3">
-                        <span className="px-2 py-0.5 rounded bg-rose-50 border border-rose-200 text-rose-800 font-mono text-[10px] font-bold">
-                          DEF-SHELF-01 (Bay A)
-                        </span>
-                      </td>
-                      <td className="py-3 px-3 max-w-sm text-slate-700">
-                        <p className="line-clamp-2 text-[11px]">
-                          {ch.remarks || ch.items?.[0]?.remarks || 'Defective return to Fabric Store'}
-                        </p>
-                      </td>
-                      <td className="py-3 px-3 text-slate-600 text-[11px] font-mono">
-                        {new Date(ch.createdAt).toLocaleDateString('en-GB')}
-                      </td>
-                      <td className="py-3 px-3 text-center">
-                        <Link
-                          href={`/challans/${ch.id}`}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-semibold transition"
-                        >
-                          <FileText className="w-3.5 h-3.5 text-slate-600" />
-                          <span>View Challan</span>
-                        </Link>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
           </div>
         )}
-      </div>
-    )}
 
-        {/* INFORMATION NOTE */}
-        <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-2">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-rose-600" />
-            <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wide">
-              Defected Shelf Governance Protocol
-            </h3>
+        {/* ======================================================== */}
+        {/* VIEW 2: STORE QUARANTINED FABRIC ROLLS                   */}
+        {/* ======================================================== */}
+        {shelfSection === 'ROLLS' && (
+          <>
+            <div className="bg-white border border-slate-200/90 rounded-xl p-4 shadow-xs flex flex-col md:flex-row gap-4 items-center justify-between">
+              <div className="flex items-center gap-2">
+                {[
+                  { id: 'ALL', label: 'All Defected Rolls' },
+                  { id: 'QC_HOLD', label: 'On QC Hold' },
+                  { id: 'QC_REJECTED', label: 'Rejected' },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setFilterRollStatus(tab.id)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+                      filterRollStatus === tab.id
+                        ? 'bg-rose-700 text-white shadow-xs'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="relative w-full md:w-80">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                <input
+                  type="text"
+                  placeholder="Search roll #, batch, fabric, defect..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full pl-9 pr-4 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
+                />
+              </div>
+            </div>
+
+            <div className="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
+              <div className="p-4 border-b border-slate-200/80 flex items-center justify-between">
+                <div>
+                  <h2 className="text-sm font-bold text-slate-900">Quarantined Defected Inventory (Store Bay)</h2>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    Physical defective shelf: DEF-SHELF-STORE (Bay DEF-A, DEF-B, or Quarantine Cage)
+                  </p>
+                </div>
+                <span className="text-xs text-slate-500">
+                  Showing: <strong className="text-rose-900">{filteredRolls.length}</strong> rolls
+                </span>
+              </div>
+
+              {loading ? (
+                <div className="p-12 text-center text-xs text-slate-400">Loading defected shelf...</div>
+              ) : filteredRolls.length === 0 ? (
+                <div className="p-16 text-center space-y-3">
+                  <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />
+                  <p className="text-sm font-semibold text-slate-800">Defected Shelf is Clean</p>
+                  <p className="text-xs text-slate-500 max-w-md mx-auto">
+                    No fabric rolls are currently marked with defects or quarantined on hold.
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-50/90 text-slate-600 font-semibold border-b border-slate-200">
+                      <tr>
+                        <th className="py-3 px-4">Roll Number</th>
+                        <th className="py-3 px-4">Batch Number</th>
+                        <th className="py-3 px-4">Fabric Details</th>
+                        <th className="py-3 px-4">Length</th>
+                        <th className="py-3 px-4">Shelf / Bay Slot</th>
+                        <th className="py-3 px-4">Status</th>
+                        <th className="py-3 px-4">Defect Reason / QC Notes</th>
+                        <th className="py-3 px-4 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 text-slate-700">
+                      {filteredRolls.map((roll) => (
+                        <tr key={roll.id} className="hover:bg-rose-50/30 transition">
+                          <td className="py-3.5 px-4 font-mono font-bold text-rose-900">
+                            {roll.rollNumber}
+                          </td>
+                          <td className="py-3.5 px-4 font-mono text-[11px]">
+                            {roll.batch?.batchNumber || '—'}
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <span className="font-semibold text-slate-800 block">
+                              {roll.batch?.fabricType || 'Fabric'}
+                            </span>
+                            <span className="text-[10px] text-slate-500">
+                              {roll.batch?.fabricDescription} {roll.batch?.colorName ? `· ${roll.batch?.colorName}` : ''}
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-4 font-mono font-bold text-slate-800">
+                            {parseFloat(roll.length).toFixed(2)} m
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-rose-100/80 text-rose-800 border border-rose-200">
+                              <Archive className="w-3 h-3" />
+                              {roll.location?.locationCode || 'DEF-SHELF-STORE'}
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-4">
+                            {roll.status === 'QC_REJECTED' || roll.qcStatus === 'FAILED' ? (
+                              <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-rose-100 text-rose-800">
+                                REJECTED
+                              </span>
+                            ) : (
+                              <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800">
+                                QC HOLD
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-3.5 px-4 max-w-xs truncate text-[11px] text-slate-600">
+                            {roll.qcRemarks || 'Flagged for quality inspection / physical defect'}
+                          </td>
+                          <td className="py-3.5 px-4 text-right space-x-1.5 whitespace-nowrap">
+                            <button
+                              onClick={() => {
+                                setSelectedRoll(roll);
+                                setActionType('RELEASE');
+                                setRemarks('');
+                              }}
+                              className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded text-[11px] font-semibold transition"
+                              title="Release back to stock"
+                            >
+                              Release
+                            </button>
+                            <button
+                              onClick={() => {
+                                setSelectedRoll(roll);
+                                setActionType('MOVE');
+                                setShelfLocation(roll.location?.locationCode || 'DEF-SHELF-STORE-02');
+                                setRemarks('');
+                              }}
+                              className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[11px] font-semibold transition"
+                              title="Assign shelf slot"
+                            >
+                              Shelf Slot
+                            </button>
+                            <button
+                              onClick={() => {
+                                setSelectedRoll(roll);
+                                setActionType('SCRAP');
+                                setRemarks('');
+                              }}
+                              className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded text-[11px] font-semibold transition"
+                              title="Scrap / Write off"
+                            >
+                              Scrap
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* ======================================================== */}
+        {/* VIEW 3: PHYSICAL DEPARTMENT DEFECT RETURNS              */}
+        {/* ======================================================== */}
+        {shelfSection === 'DEPARTMENT_RETURNS' && (
+          <div className="bg-white border border-slate-200/90 rounded-2xl shadow-xs overflow-hidden p-6 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 block">
+                  PHYSICAL HANDOVER GATE
+                </span>
+                <h2 className="text-base font-bold text-slate-900 flex items-center gap-2 mt-0.5">
+                  <Scissors className="w-5 h-5 text-amber-600" />
+                  <span>Physical Defective Pieces Returned to Store</span>
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Panels and cut pieces physically returned from production stations (Thread Cutting, Dyeing, Embroidery).
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-500">
+                  Total Returns: <strong className="text-slate-900">{defectReturns.length}</strong>
+                </span>
+              </div>
+            </div>
+
+            {defectReturns.length === 0 ? (
+              <div className="p-16 text-center space-y-3 border border-dashed border-slate-200 rounded-xl">
+                <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />
+                <p className="text-sm font-semibold text-slate-800">No Physical Defect Returns</p>
+                <p className="text-xs text-slate-500 max-w-md mx-auto">
+                  No stations have dispatched physical defect return consignments to the Fabric Store.
+                </p>
+              </div>
+            ) : (
+              <div className="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-100/80 border-b border-slate-200 text-slate-600 font-bold text-[10px] uppercase">
+                    <tr>
+                      <th className="py-2.5 px-3">Return Challan #</th>
+                      <th className="py-2.5 px-3">Source Department</th>
+                      <th className="py-2.5 px-3">Program / Style</th>
+                      <th className="py-2.5 px-3 text-center">Defective Pcs</th>
+                      <th className="py-2.5 px-3">Target Defective Shelf</th>
+                      <th className="py-2.5 px-3">Defect Reason &amp; Comments</th>
+                      <th className="py-2.5 px-3">Date</th>
+                      <th className="py-2.5 px-3 text-center">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {defectReturns.map((ch: any) => {
+                      const totalPcs = (ch.items || []).reduce(
+                        (sum: number, it: any) => sum + (Number(it.quantity) || 0),
+                        0
+                      );
+
+                      return (
+                        <tr key={ch.id} className="hover:bg-amber-50/40 transition">
+                          <td className="py-3 px-3 font-mono font-bold text-slate-900">
+                            {ch.challanNumber}
+                          </td>
+                          <td className="py-3 px-3">
+                            <span className="px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-800 border border-cyan-200 text-[10px] font-bold">
+                              {ch.fromDepartment}
+                            </span>
+                          </td>
+                          <td className="py-3 px-3">
+                            <span className="font-semibold text-slate-800 block">
+                              {ch.program?.mainStyle || ch.program?.clientName || 'General Style'}
+                            </span>
+                            <span className="font-mono text-[10px] text-fuchsia-700">
+                              {ch.program?.wilcomDesignNumber || 'WILCOM-DES'}
+                            </span>
+                          </td>
+                          <td className="py-3 px-3 text-center font-mono font-bold text-rose-700 text-sm">
+                            {totalPcs} PCS
+                          </td>
+                          <td className="py-3 px-3">
+                            <span className="px-2 py-0.5 rounded bg-rose-50 border border-rose-200 text-rose-800 font-mono text-[10px] font-bold">
+                              {ch.defectiveShelfLocation || 'DEF-SHELF-STORE'}
+                            </span>
+                          </td>
+                          <td className="py-3 px-3 max-w-sm text-slate-700">
+                            <p className="line-clamp-2 text-[11px]">
+                              {ch.remarks || ch.items?.[0]?.remarks || 'Defective return to Fabric Store'}
+                            </p>
+                          </td>
+                          <td className="py-3 px-3 text-slate-600 text-[11px] font-mono">
+                            {new Date(ch.createdAt).toLocaleDateString('en-GB')}
+                          </td>
+                          <td className="py-3 px-3 text-center">
+                            <Link
+                              href={`/challans/${ch.id}`}
+                              className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-semibold transition"
+                            >
+                              <FileText className="w-3.5 h-3.5 text-slate-600" />
+                              <span>View Challan</span>
+                            </Link>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
-          <p className="text-xs text-slate-600 leading-relaxed font-serif">
-            Rolls stored on the Defected Shelf are physically segregated in the quarantine bay and cannot be selected for issuance in production challans. If a roll passes secondary inspection or laboratory clearance, use the <strong>Release</strong> action to return it to regular stock. Written-off or scrapped rolls are recorded in the Fabric Stock Ledger for audit accountability.
-          </p>
-        </div>
+        )}
 
-        {/* MODAL */}
+        {/* MODAL FOR ROLL ACTIONS */}
         {selectedRoll && actionType && (
           <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-2xs flex items-center justify-center p-4">
             <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
@@ -603,7 +972,7 @@ export default function DefectedShelfPage() {
                 <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4 text-rose-600" />
                   {actionType === 'RELEASE' && 'Release Roll to Production Stock'}
-                  {actionType === 'MOVE' && 'Assign Defected Shelf Slot'}
+                  {actionType === 'MOVE' && 'Assign Defective Shelf Slot'}
                   {actionType === 'SCRAP' && 'Confirm Scrap & Write-Off'}
                 </h3>
                 <span className="font-mono text-xs font-bold text-teal-800 bg-teal-50 px-2 py-0.5 rounded">
@@ -636,12 +1005,12 @@ export default function DefectedShelfPage() {
                 {actionType === 'MOVE' && (
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Defected Shelf / Slot Code <span className="text-rose-500">*</span>
+                      Defective Shelf / Slot Code <span className="text-rose-500">*</span>
                     </label>
                     <input
                       type="text"
                       required
-                      placeholder="e.g. DEF-SHELF-01, BIN-Q-3"
+                      placeholder=""
                       value={shelfLocation}
                       onChange={(e) => setShelfLocation(e.target.value)}
                       className="w-full text-xs border border-slate-300 rounded px-3 py-2 uppercase font-mono"
@@ -657,13 +1026,7 @@ export default function DefectedShelfPage() {
                   </label>
                   <textarea
                     rows={3}
-                    placeholder={
-                      actionType === 'RELEASE'
-                        ? 'e.g. Re-inspected by Incharge: defect was within tolerance after trimming 1m.'
-                        : actionType === 'SCRAP'
-                        ? 'e.g. Irreparable weft skewing; rejected by QA.'
-                        : 'e.g. Relocated to defect shelf B for mill collection.'
-                    }
+                    placeholder=""
                     value={remarks}
                     onChange={(e) => setRemarks(e.target.value)}
                     className="w-full text-xs border border-slate-300 rounded px-3 py-2"
@@ -677,14 +1040,14 @@ export default function DefectedShelfPage() {
                       setSelectedRoll(null);
                       setActionType(null);
                     }}
-                    className="px-3.5 py-1.5 border border-slate-300 rounded text-xs font-semibold text-slate-700 hover:bg-slate-100"
+                    className="px-3.5 py-1.5 border border-slate-300 rounded text-xs font-semibold text-slate-700 hover:bg-slate-100 cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={submitting}
-                    className={`px-4 py-1.5 text-white rounded text-xs font-bold shadow-xs transition ${
+                    className={`px-4 py-1.5 text-white rounded text-xs font-bold shadow-xs transition cursor-pointer ${
                       actionType === 'RELEASE'
                         ? 'bg-emerald-700 hover:bg-emerald-800'
                         : actionType === 'SCRAP'

@@ -119,27 +119,9 @@ export async function POST(request: Request) {
         );
       }
 
-      if (data.fabricColorAvailable !== 'IN_STOCK') {
-        return NextResponse.json(
-          { error: 'A production sheet can only be marked ready when the selected fabric is available in the Fabric Store.' },
-          { status: 422 },
-        );
-      }
-
-      const availability = await getFabricAvailability(
-        fabricName,
-        String(data.fabricColor || '').trim(),
-        fabricAverage * productionQuantity,
-      );
-      if (!availability.sufficient) {
-        return NextResponse.json(
-          {
-            error: `Insufficient Fabric Store stock for ${fabricName}${availability.fabricColor ? ` (${availability.fabricColor})` : ''}: ${availability.availableMeters.toFixed(2)} m available, ${availability.requiredMeters.toFixed(2)} m required.`,
-            availability,
-          },
-          { status: 422 },
-        );
-      }
+      // Note: Store inventory stock check bypass is active per user instruction.
+      // Production sheet is allowed to move to next department even when store has 0 stock.
+      // Strict stock gating will be re-enabled later once stock management is maintained.
     }
 
     // Check if updating an existing program by ID
@@ -226,7 +208,78 @@ export async function POST(request: Request) {
     const deliveryDate = parseSafeDate(data.deliveryDate, new Date(Date.now() + 14 * 86400000)) || new Date(Date.now() + 14 * 86400000);
     const prodDesignDate = parseSafeDate(data.productionDesignDate, null);
     const prodEndDate = parseSafeDate(data.productionEndDate, null);
-    const targetQty = Math.max(1, Math.round(Number(data.targetQuantity || data.colorQuantity || 1)));
+    // Multi-Item, Multi-Color & Production Grid handling
+    const rawItems: any[] = Array.isArray(data.items) ? data.items.filter((it: any) => it && (it.itemName || it.color || Number(it.measurement) > 0)) : [];
+    const rawGrid: any[] = Array.isArray(data.productionGrid) ? data.productionGrid.filter((it: any) => it && (it.color || Number(it.pcs) > 0)) : [];
+
+    const rawSubStylesWithAverages: any[] = Array.isArray(data.subStylesWithAverages) ? data.subStylesWithAverages : [];
+    const subStylesSum = rawSubStylesWithAverages.reduce((acc: number, it: any) => acc + (Number(it.average) || 0), 0);
+    const resolvedAverage = subStylesSum > 0 
+      ? Math.round(subStylesSum * 100) / 100 
+      : (data.fabricAverage ? parseFloat(data.fabricAverage) : 1.25);
+
+    const gridTotalPcs = rawGrid.reduce((acc: number, it: any) => acc + (Number(it.pcs) || 0), 0);
+    const itemsTotalQty = rawItems.reduce((acc: number, it: any) => acc + (Number(it.measurement) || 0), 0);
+    
+    const targetQty = gridTotalPcs > 0
+      ? Math.round(gridTotalPcs)
+      : itemsTotalQty > 0 
+        ? Math.round(itemsTotalQty) 
+        : Math.max(1, Math.round(Number(data.targetQuantity || data.colorQuantity || 1)));
+
+    const uniqueGridColors = Array.from(new Set(rawGrid.map((it: any) => String(it.color || '').trim()).filter(Boolean)));
+    const uniqueItemColors = Array.from(new Set(rawItems.map((it: any) => String(it.color || '').trim()).filter(Boolean)));
+    const primaryColor = uniqueGridColors.length > 0
+      ? uniqueGridColors.join(', ')
+      : uniqueItemColors.length > 0 
+        ? uniqueItemColors.join(', ') 
+        : (data.fabricColor || data.color || null);
+
+    // Prepare metadata with items & sub styles with averages
+    const metadataObj: any = {};
+    try {
+      if (typeof data.metadataJson === 'string') {
+        Object.assign(metadataObj, JSON.parse(data.metadataJson));
+      } else if (data.metadataJson && typeof data.metadataJson === 'object') {
+        Object.assign(metadataObj, data.metadataJson);
+      }
+    } catch {}
+
+    const rawSubStyles: string[] = rawSubStylesWithAverages.length > 0
+      ? rawSubStylesWithAverages.map((s: any) => String(s.name).trim()).filter(Boolean)
+      : Array.isArray(data.subStyles) 
+        ? data.subStyles.map((s: any) => String(s).trim()).filter(Boolean)
+        : (typeof data.subStyle === 'string' ? data.subStyle.split(',').map((s: string) => s.trim()).filter(Boolean) : []);
+    const subStyleFormatted = rawSubStyles.length > 0 ? rawSubStyles.join(', ') : (data.subStyle || null);
+
+    metadataObj.items = rawItems;
+    metadataObj.subStyles = rawSubStyles;
+    metadataObj.subStylesWithAverages = rawSubStylesWithAverages;
+    metadataObj.productionGrid = rawGrid;
+    metadataObj.topName = data.topName || data.mainStyle || '';
+    metadataObj.serialNoCounter = data.serialNoCounter || '000';
+    metadataObj.note = data.note || data.comments || data.remarks || '';
+    metadataObj.clientCode = data.clientCode ? String(data.clientCode).trim() : (metadataObj.clientCode || '');
+    metadataObj.clientPriority = data.clientPriority || data.priority || 'NORMAL';
+    metadataObj.swatches = Array.isArray(data.swatches) ? data.swatches : [];
+
+    // Store multi-component sheets (TOP, BOTTOM, DUPATTA), forwarded list, and Wilcom design entries
+    if (data.components && typeof data.components === 'object') {
+      metadataObj.components = data.components;
+    }
+    if (Array.isArray(data.forwardedComponents)) {
+      metadataObj.forwardedComponents = data.forwardedComponents;
+    }
+    if (Array.isArray(data.wilcomEntries)) {
+      metadataObj.wilcomEntries = data.wilcomEntries;
+    }
+
+    // Resolve primary wilcom information from wilcomEntries if provided
+    const primaryWilcom = Array.isArray(data.wilcomEntries) && data.wilcomEntries.length > 0 
+      ? data.wilcomEntries[0] 
+      : null;
+    const resolvedWilcomNumber = primaryWilcom?.wilcomDesignNumber || data.wilcomDesignNumber || null;
+    const resolvedWilcomPhoto = primaryWilcom?.photoUrl || data.wilcomDesignPhoto || null;
 
     const programData = {
       programNumber,
@@ -234,42 +287,42 @@ export async function POST(request: Request) {
       programDate: startDate,
       startDate,
       deliveryDate,
-      designNumber: data.designNumber || 'DSG-001',
-      clientName: data.clientName || data.buyerName || 'Standard Client',
-      buyerName: data.clientName || data.buyerName || 'Standard Client',
+      designNumber: data.designNumber || '',
+      clientName: data.clientName || data.buyerName || '',
+      buyerName: data.clientName || data.buyerName || '',
       clientPriority: data.clientPriority || data.priority || 'NORMAL',
       priority: data.clientPriority || data.priority || 'NORMAL',
-      orderNumber: data.orderNumber || (data.programSerialNo ? `ORD-${data.programSerialNo}` : `ORD-${programNumber}`),
-      designName: data.embroideryDesign || data.designName || 'Standard Embroidery',
-      styleCode: data.mainStyle || data.styleCode || 'STYLE-01',
+      orderNumber: data.orderNumber || (data.programSerialNo ? `ORD-${data.programSerialNo}` : (programNumber ? `ORD-${programNumber}` : '')),
+      designName: data.embroideryDesign || data.designName || '',
+      styleCode: data.mainStyle || data.styleCode || data.topName || '',
       productCategory: data.productCategory || 'GARMENT',
       targetQuantity: targetQty,
       status: targetStatus,
-      remarks: data.comments || data.remarks || null,
+      remarks: data.note || data.comments || data.remarks || null,
       createdById: actorId,
 
       // Style Info
-      mainStyle: data.mainStyle || null,
-      subStyle: data.subStyle || null,
+      mainStyle: data.mainStyle || data.topName || null,
+      subStyle: subStyleFormatted,
       pattern: data.pattern || null,
       baseDesignType: data.baseDesignType || null,
       baseDesignPhoto: data.baseDesignPhoto || null,
 
       // Wilcom Info
-      wilcomDesignNumber: data.wilcomDesignNumber || null,
-      wilcomDesignPhoto: data.wilcomDesignPhoto || null,
-      embroideryDesign: data.embroideryDesign || null,
+      wilcomDesignNumber: resolvedWilcomNumber,
+      wilcomDesignPhoto: resolvedWilcomPhoto,
+      embroideryDesign: resolvedWilcomNumber || data.embroideryDesign || null,
       embroideryDesignSize: data.embroideryDesignSize || null,
 
       // Fabric Info
-      fabricName: data.fabricName || null,
+      fabricName: data.fabricName || data.fabric || null,
       fabricType: data.fabricType || null,
       fabricWidth: data.fabricWidth || null,
       fabricWidthInches: data.fabricWidthInches ? parseFloat(data.fabricWidthInches) : null,
-      fabricColor: data.fabricColor || null,
+      fabricColor: primaryColor,
       fabricColorAvailable: data.fabricColorAvailable || null,
-      fabricAverage: data.fabricAverage ? parseFloat(data.fabricAverage) : null,
-      fabricAverageType: data.fabricAverageType || null,
+      fabricAverage: resolvedAverage,
+      fabricAverageType: data.fabricAverageType || 'Meters/Piece',
       fabricAverageMeasurement: data.fabricAverageMeasurement || null,
 
       // Dyeing Info
@@ -278,9 +331,9 @@ export async function POST(request: Request) {
       fabricSentToDyeing: data.fabricSentToDyeing ? parseFloat(data.fabricSentToDyeing) : null,
 
       // Quantity Info
-      colorQuantity: data.colorQuantity ? parseInt(data.colorQuantity, 10) : targetQty,
-      quantityMeasurement: data.quantityMeasurement || 'PCS',
-      specialMaterial: data.specialMaterial || null,
+      colorQuantity: targetQty,
+      quantityMeasurement: data.quantityMeasurement || rawItems[0]?.unit || 'PCS',
+      specialMaterial: data.specialMaterial || rawItems[0]?.specialMaterial || null,
       specialMaterialQuantity: data.specialMaterialQuantity || null,
 
       // Dates & Rejection
@@ -288,8 +341,8 @@ export async function POST(request: Request) {
       productionEndDate: prodEndDate,
       piecesRejection: data.piecesRejection ? parseInt(data.piecesRejection, 10) : 0,
       rejectionReason: data.rejectionReason || null,
-      comments: data.comments || null,
-      metadataJson: JSON.stringify(data),
+      comments: data.note || data.comments || null,
+      metadataJson: JSON.stringify(metadataObj),
     };
 
     const program = await prisma.$transaction(async (tx) => {
@@ -311,7 +364,7 @@ export async function POST(request: Request) {
       // Auto-populate ProgramFabric
       if (data.fabricName || data.fabric) {
         const fabName = data.fabricName || data.fabric;
-        const avg = parseFloat(data.fabricAverage) || 1.25;
+        const avg = resolvedAverage;
         const requiredQty = targetQty * avg;
         await tx.programFabric.create({
           data: {
@@ -321,15 +374,47 @@ export async function POST(request: Request) {
             composition: data.fabricType || 'Cotton Cambric',
             widthInInches: parseFloat(data.fabricWidthInches) || 58.0,
             gsm: 180,
-            colour: data.fabricColor || data.color || 'Standard',
+            colour: primaryColor || 'Standard',
             requiredQuantity: requiredQty,
             uom: 'MTR',
           },
         });
       }
 
-      // Auto-populate ProgramColour
-      if (data.fabricColor || data.color) {
+      // Auto-populate ProgramColour from productionGrid, rawItems, or single color
+      if (rawGrid.length > 0) {
+        const colorMap: Record<string, number> = {};
+        for (const it of rawGrid) {
+          const c = String(it.color || '').trim() || 'Standard';
+          colorMap[c] = (colorMap[c] || 0) + (Number(it.pcs) || 0);
+        }
+        for (const [cName, cQty] of Object.entries(colorMap)) {
+          await tx.programColour.create({
+            data: {
+              programId: created.id,
+              colorCode: cName.substring(0, 4).toUpperCase().replace(/\s+/g, ''),
+              colorName: cName,
+              targetQuantity: Math.max(1, Math.round(cQty)),
+            },
+          });
+        }
+      } else if (rawItems.length > 0) {
+        const colorMap: Record<string, number> = {};
+        for (const it of rawItems) {
+          const c = String(it.color || '').trim() || 'Standard';
+          colorMap[c] = (colorMap[c] || 0) + (Number(it.measurement) || 0);
+        }
+        for (const [cName, cQty] of Object.entries(colorMap)) {
+          await tx.programColour.create({
+            data: {
+              programId: created.id,
+              colorCode: cName.substring(0, 4).toUpperCase().replace(/\s+/g, ''),
+              colorName: cName,
+              targetQuantity: Math.max(1, Math.round(cQty)),
+            },
+          });
+        }
+      } else if (data.fabricColor || data.color) {
         const cName = data.fabricColor || data.color;
         await tx.programColour.create({
           data: {
@@ -341,11 +426,11 @@ export async function POST(request: Request) {
         });
       }
 
-      // Auto-populate default ProgramSize
+      // Auto-populate ProgramSize
       await tx.programSize.create({
         data: {
           programId: created.id,
-          size: 'FREE',
+          size: data.fabricWidth ? String(data.fabricWidth) : 'FREE',
           targetQuantity: targetQty,
         },
       });
@@ -363,7 +448,38 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json(fullProgram, { status: 201 });
+    const cookieHeader = request.headers.get('cookie') || '';
+    const deptHeader = request.headers.get('x-user-department') || '';
+    const roleHeader = request.headers.get('x-user-role') || '';
+
+    const isAuthorized = 
+      deptHeader.toUpperCase() === 'ADMIN' ||
+      deptHeader.toUpperCase() === 'PROGRAMMING' ||
+      roleHeader.toUpperCase() === 'ADMIN' ||
+      roleHeader.toUpperCase() === 'SUPER_ADMIN' ||
+      roleHeader.toUpperCase() === 'PROGRAMMER' ||
+      roleHeader.toUpperCase() === 'PROGRAMMING_INCHARGE' ||
+      cookieHeader.includes('subham_mes_dept=ADMIN') ||
+      cookieHeader.includes('subham_mes_dept=PROGRAMMING') ||
+      cookieHeader.includes('subham_mes_role=ADMIN') ||
+      cookieHeader.includes('subham_mes_role=SUPER_ADMIN') ||
+      cookieHeader.includes('subham_mes_role=PROGRAMMER');
+
+    let sanitizedProgram: any = { ...fullProgram };
+    if (!isAuthorized) {
+      sanitizedProgram.clientCode = null;
+      if (sanitizedProgram.metadataJson) {
+        try {
+          const parsed = JSON.parse(sanitizedProgram.metadataJson);
+          delete parsed.clientCode;
+          sanitizedProgram.metadataJson = JSON.stringify(parsed);
+        } catch {}
+      }
+    } else {
+      sanitizedProgram.clientCode = metadataObj.clientCode || null;
+    }
+
+    return NextResponse.json(sanitizedProgram, { status: 201 });
   } catch (error: any) {
     console.error('Error creating production sheet:', error);
     return NextResponse.json({ error: error.message || 'Failed to create production sheet' }, { status: 500 });

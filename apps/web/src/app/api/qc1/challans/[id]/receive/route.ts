@@ -88,7 +88,7 @@ export async function POST(
           toStatus: 'RECEIVED',
           action: 'RECEIVE',
           actorId,
-          notes: notes || `Material received at QC1 inspection station by ${actorUser?.fullName || 'QC1 Inspector'}`,
+          notes: notes || `Material received at Dyeing QC inspection station by ${actorUser?.fullName || 'Dyeing QC Inspector'}`,
           metadata: JSON.stringify({
             receivedAt: new Date(),
             itemsCount: ch.items.length,

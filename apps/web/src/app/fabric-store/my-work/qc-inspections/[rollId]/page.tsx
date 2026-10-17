@@ -327,7 +327,7 @@ export default function ConductQCPage() {
               </label>
               <textarea
                 rows={3}
-                placeholder="Specific meterage where defect starts, shade variation notes, lab test reference..."
+                placeholder=""
                 value={remarks}
                 onChange={(e) => setRemarks(e.target.value)}
                 className="w-full text-xs border border-slate-300 rounded-md p-3 focus:ring-1 focus:ring-amber-500"

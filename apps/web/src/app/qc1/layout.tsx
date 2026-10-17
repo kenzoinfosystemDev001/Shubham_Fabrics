@@ -4,8 +4,8 @@ import { ThemeProvider } from '@/components/ThemeContext';
 import '../globals.css';
 
 export const metadata = {
-  title: 'Shubham Fabrics India Pvt. Ltd. | MES - QC1 Department',
-  description: 'Enterprise Manufacturing Execution System - Quality Check 1 Inspection Workspace',
+  title: 'Shubham Fabrics India Pvt. Ltd. | MES - Dyeing QC',
+  description: 'Enterprise Manufacturing Execution System - Dyeing QC Inspection Workspace',
 };
 
 export default function QC1Layout({

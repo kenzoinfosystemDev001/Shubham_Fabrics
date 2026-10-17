@@ -27,11 +27,22 @@ import {
   Plus,
   Phone,
   Hash,
+  AlertTriangle,
+  Archive,
+  Boxes,
 } from 'lucide-react';
+import { DepartmentStockView } from '@/components/DepartmentStockView';
 import {
   downloadProductionSheetHtml,
   printProductionSheet,
 } from '@/lib/download-production-sheet';
+import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
+import {
+  ColorFabricMeasurementTable,
+  ChallanItemData,
+  createBlankChallanItem,
+  DepartmentInOutTracking,
+} from '@/components/ColorFabricMeasurementTable';
 
 interface DyeingOrder {
   id: string;
@@ -110,8 +121,8 @@ export default function DyeingMyWorkPage() {
   const initialTab = searchParams.get('tab') === 'create-challan' ? 'create-challan' : 'incoming';
   const preselectedProgramId = searchParams.get('programId');
 
-  // Navigation Tabs: 'incoming' (Incoming Challans) | 'create-challan' (Create challan to QC1)
-  const [activeTab, setActiveTab] = useState<'incoming' | 'create-challan'>(initialTab);
+  // Navigation Tabs: 'incoming' | 'create-challan' | 'stock' | 'defective-shelf'
+  const [activeTab, setActiveTab] = useState<'incoming' | 'create-challan' | 'stock' | 'defective-shelf'>(initialTab);
 
   // Data state
   const [orders, setOrders] = useState<DyeingOrder[]>([]);
@@ -136,43 +147,26 @@ export default function DyeingMyWorkPage() {
   const [deliveryDate, setDeliveryDate] = useState('');
   const [designNumber, setDesignNumber] = useState('');
   const [selectedOrderId, setSelectedOrderId] = useState<string>('');
-  const [dyedOrUndyed, setDyedOrUndyed] = useState<'DYED' | 'UNDYED'>('DYED');
-  const [colour, setColour] = useState('');
-  const [colorCode, setColorCode] = useState('');
-  const [width, setWidth] = useState('');
-  const [avgConsumption, setAvgConsumption] = useState('');
-  const [inboundQuantity, setInboundQuantity] = useState('');
-  const [uom, setUom] = useState('MTR');
-  const [shrinkageMeters, setShrinkageMeters] = useState('');
-  const [quantityToSend, setQuantityToSend] = useState('');
+  
+  // Reusable Color / Fabric / Measurement table items (Blank by default)
+  const [items, setItems] = useState<ChallanItemData[]>(() => [createBlankChallanItem('DYEING_QC1')]);
+
+  // In / Out Tracking across departments
+  const [dyeingTracking, setDyeingTracking] = useState<DepartmentInOutTracking>({
+    fabricIn: 0,
+    fabricOut: 0,
+    fabricUnit: 'MTR',
+    defectivePieces: 0,
+    defectiveShelfLocation: 'DEF-SHELF-DYEING (Dyeing Station Defective Shelf)',
+    defectReason: 'Shade Variation / Uneven Dyeing',
+    detectedFromDept: 'STORE',
+    detectedFromChallanId: null,
+    detectedFromChallanNumber: null,
+  });
+  const [dyeingDefects, setDyeingDefects] = useState<any[]>([]);
+
   const [dyeingInchargeName, setDyeingInchargeName] = useState('Dyeing Incharge');
   const [dyeingInchargeContact, setDyeingInchargeContact] = useState('');
-
-  const handleInboundQuantityChange = (val: string) => {
-    setInboundQuantity(val);
-    const inQty = parseFloat(val);
-    const shrink = parseFloat(shrinkageMeters);
-    if (!isNaN(inQty)) {
-      if (!isNaN(shrink) && shrink >= 0) {
-        setQuantityToSend(String(Math.max(0, Math.round((inQty - shrink) * 100) / 100)));
-      } else {
-        setQuantityToSend(val);
-      }
-    } else {
-      setQuantityToSend('');
-    }
-  };
-
-  const handleShrinkageChange = (val: string) => {
-    setShrinkageMeters(val);
-    const base = parseFloat(inboundQuantity) || (selectedOrder ? (selectedOrder.dyedQuantity > 0 ? selectedOrder.dyedQuantity : selectedOrder.requiredQuantity) : 0);
-    const shrink = parseFloat(val);
-    if (!isNaN(shrink) && shrink >= 0 && base > 0) {
-      setQuantityToSend(String(Math.max(0, Math.round((base - shrink) * 100) / 100)));
-    } else if (!val && base > 0) {
-      setQuantityToSend(String(base));
-    }
-  };
 
   // Submit states
   const [submittingChallan, setSubmittingChallan] = useState(false);
@@ -191,6 +185,40 @@ export default function DyeingMyWorkPage() {
   });
   const [updating, setUpdating] = useState(false);
   const [updateError, setUpdateError] = useState<string | null>(null);
+  const [receivingOrderId, setReceivingOrderId] = useState<string | null>(null);
+  const [receiveSuccessMsg, setReceiveSuccessMsg] = useState<string | null>(null);
+
+  // Receive Inbound Material at Dyeing Department
+  const handleReceiveInboundMaterial = async (order: DyeingOrder) => {
+    const challanId = order.inboundChallanId || order.inboundChallan?.id;
+    if (!challanId) {
+      alert('Inbound Challan ID not found for this dyeing order.');
+      return;
+    }
+    try {
+      setReceivingOrderId(order.id);
+      const res = await fetch(`/api/challans/${challanId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: 'RECEIVED',
+          notes: `Material accepted at Dyeing department from Fabric Store. Floor stock updated.`,
+          fabricIn: order.requiredQuantity,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.error || 'Failed to receive inbound material');
+      }
+      setReceiveSuccessMsg(`Material for ${order.orderNumber} received successfully! Dyeing floor stock updated.`);
+      setTimeout(() => setReceiveSuccessMsg(null), 4500);
+      await fetchOrders();
+    } catch (err: any) {
+      alert(err.message || 'Error receiving material');
+    } finally {
+      setReceivingOrderId(null);
+    }
+  };
 
   // Fetch Next Challan Number for Dyeing -> QC1
   const loadNextChallanNumber = async () => {
@@ -244,6 +272,13 @@ export default function DyeingMyWorkPage() {
           selectOrderForForm(target);
         }
       }
+
+      // Fetch Dyeing Defective Shelf Records
+      const defRes = await fetch('/api/defective-shelves?department=DYEING');
+      const defJson = await defRes.json();
+      if (defJson.success && defJson.data?.challans) {
+        setDyeingDefects(defJson.data.challans);
+      }
     } catch (err: any) {
       console.error('Error fetching dyeing orders:', err);
       setError(err.message || 'Error communicating with database');
@@ -257,7 +292,8 @@ export default function DyeingMyWorkPage() {
     loadNextChallanNumber();
   }, [statusFilter, priorityFilter]);
 
-  // Synchronize form fields when an order / production sheet is selected
+  // Synchronize form reference fields when an order / production sheet is selected
+  // All business entry fields remain blank as per Master Prompt rules
   const selectOrderForForm = (order: DyeingOrder) => {
     setSelectedOrderId(order.id);
     const prog = order.program;
@@ -270,17 +306,15 @@ export default function DyeingMyWorkPage() {
       setDeliveryDate('');
     }
 
-    setDyedOrUndyed(order.dyedQuantity > 0 ? 'DYED' : 'UNDYED');
-    setColour(order.dyedColor || order.targetColor || prog?.fabricColor || '');
-    setColorCode(order.colorCode || '');
-    setWidth(prog?.fabricWidth || (prog?.fabricWidthInches ? `${prog.fabricWidthInches}"` : '') || '');
-    setAvgConsumption(prog?.fabricAverage ? `${prog.fabricAverage}` : '');
-    setInboundQuantity(String(order.requiredQuantity || ''));
-    setUom(order.uom || 'MTR');
-    setShrinkageMeters('');
-
-    const availableQty = Math.max(0, (order.dyedQuantity || order.requiredQuantity) - order.sentToQc1Quantity);
-    setQuantityToSend(String(availableQty || order.requiredQuantity || ''));
+    const inQty = Number(order.dyedQuantity || order.requiredQuantity || 0);
+    setDyeingTracking((prev) => ({
+      ...prev,
+      fabricIn: inQty,
+      fabricOut: Math.max(0, inQty - prev.defectivePieces),
+      fabricUnit: order.uom === 'PCS' ? 'PCS' : 'MTR',
+      detectedFromDept: 'STORE',
+      detectedFromChallanId: order.inboundChallanId || null,
+    }));
   };
 
   const selectedOrder = orders.find((o) => o.id === selectedOrderId);
@@ -308,9 +342,13 @@ export default function DyeingMyWorkPage() {
       return;
     }
 
-    const qty = parseFloat(quantityToSend);
-    if (isNaN(qty) || qty <= 0) {
-      setFormError('Please enter a valid positive quantity (Meters) to send to QC1.');
+    // Validate ColorFabricMeasurementTable items
+    const validItems = items.filter(
+      (it) => it.fabric.trim() || it.color.trim() || parseFloat(String(it.measurement)) > 0
+    );
+
+    if (validItems.length === 0) {
+      setFormError('Please enter at least one item in the Color / Fabric / Measurement table.');
       return;
     }
 
@@ -321,43 +359,41 @@ export default function DyeingMyWorkPage() {
       const inchargeInfo = [
         dyeingInchargeName ? `Dyeing Incharge: ${dyeingInchargeName}` : null,
         dyeingInchargeContact ? `Contact: ${dyeingInchargeContact}` : null,
-        shrinkageMeters ? `Shrinkage: ${shrinkageMeters} ${uom} (Inbound: ${inboundQuantity || selectedOrder.requiredQuantity} ${uom}, Net: ${qty} ${uom})` : null,
-        `Status: ${dyedOrUndyed}`,
-        colorCode ? `Color Code: ${colorCode}` : null,
-        width ? `Width/Size: ${width}` : null,
-        avgConsumption ? `Avg: ${avgConsumption}` : null,
+        designNumber ? `Design #: ${designNumber}` : null,
       ]
         .filter(Boolean)
         .join(' · ');
 
-      const challanItems = [
-        {
-          itemDescription: `${selectedOrder.fabricName} (${dyedOrUndyed}) - ${colour || 'Standard'}`,
-          unitType: 'ROLL',
-          quantity: qty,
-          uom: uom || selectedOrder.uom || 'MTR',
-          fabricCode: selectedOrder.fabricName || 'FABRIC',
-          colour: colour || null,
-          remarks: [
-            shrinkageMeters ? `Shrinkage: ${shrinkageMeters} ${uom} (Inbound: ${inboundQuantity || selectedOrder.requiredQuantity} ${uom})` : null,
-            `Process: ${dyedOrUndyed}`,
-            colorCode ? `Code: ${colorCode}` : null,
-            width ? `Width/Size: ${width}` : null,
-            avgConsumption ? `Avg: ${avgConsumption}` : null,
-          ]
-            .filter(Boolean)
-            .join(' | '),
-        },
-      ];
+      const challanItems = validItems.map((item) => ({
+        itemDescription: `${item.fabric || selectedOrder.fabricName || 'Fabric'} — ${item.actualDyedColor || item.color || 'Dyed'}`,
+        unitType: 'ROLL',
+        quantity: parseFloat(String(item.measurement)) || 1,
+        uom: item.unit || selectedOrder.uom || 'MTR',
+        fabricCode: item.fabric || selectedOrder.fabricName || 'FABRIC',
+        colour: item.color || null,
+        shade: item.requiredDyeColor || null,
+        actualDyedColor: item.actualDyedColor || null,
+        rollNumber: item.rollNumber || null,
+        remarks: item.remarks || null,
+      }));
 
       const payload = {
         challanNumber: challanNumber.trim(),
         challanType: 'DYEING_TO_QC1',
         programId: selectedOrder.programId,
+        parentChallanId: selectedOrder.inboundChallanId || dyeingTracking.detectedFromChallanId || null,
         fromDepartment: 'DYEING',
         toDepartment: 'QC1',
         priority: priority || 'NORMAL',
         issuedDate: challanDate,
+        fabricIn: dyeingTracking.fabricIn,
+        defectivePieces: dyeingTracking.defectivePieces,
+        defectiveShelfLocation: dyeingTracking.defectiveShelfLocation,
+        defectReason: dyeingTracking.defectReason,
+        fabricOut: dyeingTracking.fabricOut,
+        fabricUnit: dyeingTracking.fabricUnit,
+        detectedFromDepartment: dyeingTracking.detectedFromDept || 'STORE',
+        detectedFromChallanId: dyeingTracking.detectedFromChallanId,
         remarks: inchargeInfo,
         items: challanItems,
       };
@@ -376,20 +412,21 @@ export default function DyeingMyWorkPage() {
       setCreatedChallanSuccess({
         ...data,
         order: selectedOrder,
-        dyedOrUndyed,
-        colour,
-        colorCode,
-        width,
-        avgConsumption,
-        qty,
         dyeingInchargeName,
         dyeingInchargeContact,
+        tableItems: validItems,
       });
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
 
       // Refresh orders list
       fetchOrders();
     } catch (err: any) {
       setFormError(err.message || 'Error dispatching challan to QC1');
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     } finally {
       setSubmittingChallan(false);
     }
@@ -508,7 +545,7 @@ export default function DyeingMyWorkPage() {
               setActiveTab('create-challan');
               loadNextChallanNumber();
             }}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition ${
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer ${
               activeTab === 'create-challan'
                 ? 'bg-purple-700 text-white shadow-xs'
                 : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
@@ -516,6 +553,32 @@ export default function DyeingMyWorkPage() {
           >
             <Send className="w-4 h-4" />
             <span>Create challan to QC1 (Quality Check 1)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('stock')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+              activeTab === 'stock'
+                ? 'bg-purple-700 text-white shadow-xs'
+                : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
+            }`}
+          >
+            <Boxes className="w-4 h-4" />
+            <span>Dyeing Stock &amp; Balance</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('defective-shelf')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+              activeTab === 'defective-shelf'
+                ? 'bg-rose-700 text-white shadow-xs'
+                : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
+            }`}
+          >
+            <AlertTriangle className="w-4 h-4 text-rose-500" />
+            <span>Defective Shelf (DEF-SHELF-DYEING) ({dyeingDefects.length})</span>
           </button>
         </div>
 
@@ -531,6 +594,13 @@ export default function DyeingMyWorkPage() {
         {/* ============================================================== */}
         {activeTab === 'incoming' && (
           <div className="space-y-4">
+            {receiveSuccessMsg && (
+              <div className="p-3.5 bg-emerald-50 border border-emerald-300 rounded-xl flex items-center gap-3 text-emerald-900 text-xs font-semibold shadow-xs animate-in fade-in">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>{receiveSuccessMsg}</span>
+              </div>
+            )}
+
             {/* SEARCH & FILTERS */}
             <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col sm:flex-row items-center gap-3">
               <div className="relative flex-1 w-full">
@@ -708,7 +778,30 @@ export default function DyeingMyWorkPage() {
 
                           {/* ACTIONS */}
                           <td className="py-3.5 px-4 text-right">
-                            <div className="flex items-center justify-end gap-1.5">
+                            <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                              {/* RECEIVE INBOUND MATERIAL (IF ISSUED OR AWAITING RECEIPT) */}
+                              {order.inboundChallan?.id && order.inboundChallan?.status !== 'RECEIVED' && (
+                                <button
+                                  type="button"
+                                  disabled={receivingOrderId === order.id}
+                                  onClick={() => handleReceiveInboundMaterial(order)}
+                                  title="Receive Material into Dyeing Floor Stock"
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-bold transition shadow-xs cursor-pointer"
+                                >
+                                  {receivingOrderId === order.id ? (
+                                    <>
+                                      <RefreshCw className="w-3 h-3 animate-spin" />
+                                      <span>Receiving...</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <CheckCircle2 className="w-3 h-3" />
+                                      <span>Receive</span>
+                                    </>
+                                  )}
+                                </button>
+                              )}
+
                               {/* VIEW PRODUCTION SHEET */}
                               <button
                                 type="button"
@@ -773,13 +866,13 @@ export default function DyeingMyWorkPage() {
                   </div>
                   <div>
                     <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-700 block">
-                      CHALLAN DISPATCHED TO QC1
+                      CHALLAN DISPATCHED TO DYEING QC
                     </span>
                     <h2 className="text-xl font-bold text-slate-900 mt-0.5">
-                      Challan {createdChallanSuccess.challanNumber} Dispatched to QC1 (Quality Check 1)
+                      Challan {createdChallanSuccess.challanNumber} Dispatched to Dyeing QC
                     </h2>
                     <p className="text-xs text-slate-600 mt-1">
-                      Material and master traveler sheet have been routed to the QC1 inspection workstation.
+                      Material and master traveler sheet have been routed to the Dyeing QC inspection workstation.
                     </p>
                   </div>
                 </div>
@@ -1019,144 +1112,18 @@ export default function DyeingMyWorkPage() {
                     </div>
                   </div>
 
-                  {/* 9. DYED OR UNDYED (Drop down) */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
-                    <label className="text-xs font-bold text-slate-700 sm:text-right sm:pr-4">
-                      Dyed or Undyed (Drop down) <span className="text-rose-500">*</span>
-                    </label>
-                    <div className="sm:col-span-2 max-w-lg">
-                      <select
-                        value={dyedOrUndyed}
-                        onChange={(e) => setDyedOrUndyed(e.target.value as 'DYED' | 'UNDYED')}
-                        className="w-full text-xs font-bold border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-purple-600 focus:border-transparent transition cursor-pointer"
-                      >
-                        <option value="DYED">DYED</option>
-                        <option value="UNDYED">UNDYED</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* 10. COLOUR (if dyed) */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
-                    <label className="text-xs font-bold text-slate-700 sm:text-right sm:pr-4">
-                      Colour (if dyed)
-                    </label>
-                    <div className="sm:col-span-2 max-w-lg">
-                      <input
-                        type="text"
-                        value={colour}
-                        onChange={(e) => setColour(e.target.value)}
-                        disabled={dyedOrUndyed === 'UNDYED'}
-                        className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 bg-white disabled:bg-slate-100 disabled:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-purple-600 focus:border-transparent transition"
-                      />
-                    </div>
-                  </div>
-
-                  {/* 11. COLOUR CODE / WIDTH / AVG. */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
-                    <label className="text-xs font-bold text-slate-700 sm:text-right sm:pr-4">
-                      Colour code / Width / Avg.
-                    </label>
-                    <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-2 max-w-lg">
-                      <div>
-                        <span className="text-[10px] text-slate-500 block uppercase font-medium">Colour Code</span>
-                        <input
-                          type="text"
-                          value={colorCode}
-                          onChange={(e) => setColorCode(e.target.value)}
-                          className="w-full text-xs font-mono border border-slate-300 rounded-lg px-2.5 py-1.5 bg-white focus:outline-hidden focus:ring-2 focus:ring-purple-600 focus:border-transparent transition"
-                        />
-                      </div>
-                      <div>
-                        <span className="text-[10px] text-slate-500 block uppercase font-medium">Width</span>
-                        <input
-                          type="text"
-                          value={width}
-                          onChange={(e) => setWidth(e.target.value)}
-                          className="w-full text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-white focus:outline-hidden focus:ring-2 focus:ring-purple-600 focus:border-transparent transition"
-                        />
-                      </div>
-                      <div>
-                        <span className="text-[10px] text-slate-500 block uppercase font-medium">Avg.</span>
-                        <input
-                          type="text"
-                          value={avgConsumption}
-                          onChange={(e) => setAvgConsumption(e.target.value)}
-                          className="w-full text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-white focus:outline-hidden focus:ring-2 focus:ring-purple-600 focus:border-transparent transition"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* ACTUAL INBOUND MEASUREMENT & UOM */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
-                    <label className="text-xs font-bold text-slate-700 sm:text-right sm:pr-4">
-                      Inbound Measurement
-                    </label>
-                    <div className="sm:col-span-2 max-w-lg grid grid-cols-3 gap-2">
-                      <div className="col-span-2">
-                        <input
-                          type="number"
-                          step="any"
-                          min="0"
-                          value={inboundQuantity}
-                          onChange={(e) => handleInboundQuantityChange(e.target.value)}
-                          placeholder=""
-                          className="w-full text-xs font-mono font-bold text-slate-900 border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-purple-600 focus:border-transparent transition"
-                        />
-                      </div>
-                      <div>
-                        <select
-                          value={uom}
-                          onChange={(e) => setUom(e.target.value)}
-                          className="w-full text-xs font-semibold border border-slate-300 rounded-lg px-2.5 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-purple-600 focus:border-transparent transition cursor-pointer"
-                        >
-                          <option value="MTR">MTR</option>
-                          <option value="KG">KG</option>
-                          <option value="YDS">YDS</option>
-                          <option value="PCS">PCS</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* SHRINKAGE LOSS */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
-                    <label className="text-xs font-bold text-slate-700 sm:text-right sm:pr-4">
-                      Shrinkage ({uom})
-                    </label>
-                    <div className="sm:col-span-2 max-w-lg">
-                      <input
-                        type="number"
-                        step="any"
-                        min="0"
-                        value={shrinkageMeters}
-                        onChange={(e) => handleShrinkageChange(e.target.value)}
-                        placeholder=""
-                        className="w-full text-xs font-mono font-bold text-amber-700 border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-purple-600 focus:border-transparent transition"
-                      />
-                      <p className="text-[10px] text-slate-400 mt-0.5">
-                        Process shrinkage after dyeing. Automatically decreases the net meters dispatched to QC1 and next department.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* NET QUANTITY TO SEND TO QC1 */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
-                    <label className="text-xs font-bold text-slate-700 sm:text-right sm:pr-4">
-                      Net Measurement to QC1 ({uom}) <span className="text-rose-500">*</span>
-                    </label>
-                    <div className="sm:col-span-2 max-w-lg">
-                      <input
-                        type="number"
-                        step="any"
-                        value={quantityToSend}
-                        onChange={(e) => setQuantityToSend(e.target.value)}
-                        required
-                        placeholder=""
-                        className="w-full text-xs font-mono font-bold text-slate-900 border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-purple-600 focus:border-transparent transition"
-                      />
-                    </div>
+                  {/* 9. COLOR / FABRIC / MEASUREMENT (Universal Item Component with In/Cut/Out Tracking) */}
+                  <div className="pt-3 border-t border-slate-200">
+                    <ColorFabricMeasurementTable
+                      items={items}
+                      onChange={setItems}
+                      context="DYEING_QC1"
+                      programId={selectedOrder?.programId}
+                      currentDepartment="DYEING"
+                      tracking={dyeingTracking}
+                      onTrackingChange={setDyeingTracking}
+                      showInOutController={true}
+                    />
                   </div>
 
                   {/* 12. DYEING INCHARGE (Name / Contact) */}
@@ -1169,14 +1136,14 @@ export default function DyeingMyWorkPage() {
                         type="text"
                         value={dyeingInchargeName}
                         onChange={(e) => setDyeingInchargeName(e.target.value)}
-                        placeholder="Name"
+                        placeholder=""
                         className="w-full text-xs font-medium border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-purple-600 focus:border-transparent transition"
                       />
                       <input
                         type="text"
                         value={dyeingInchargeContact}
                         onChange={(e) => setDyeingInchargeContact(e.target.value)}
-                        placeholder="Contact Number"
+                        placeholder=""
                         className="w-full text-xs font-mono border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-purple-600 focus:border-transparent transition"
                       />
                     </div>
@@ -1184,18 +1151,18 @@ export default function DyeingMyWorkPage() {
                 </div>
 
                 {/* SUBMIT BUTTON */}
-                <div className="pt-4 border-t border-slate-200 flex items-center justify-between">
-                  <span className="text-xs text-slate-500">
-                    Submitting will dispatch the Challan and linked Production Sheet to QC1 (Quality Check 1).
-                  </span>
-
+                <div className="pt-4 border-t border-slate-200 flex items-center justify-end">
                   <button
                     type="submit"
-                    disabled={submittingChallan || !selectedOrder}
-                    className="inline-flex items-center gap-2 px-7 py-3 bg-purple-700 hover:bg-purple-800 disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-xs transition"
+                    disabled={submittingChallan}
+                    className="inline-flex items-center gap-2 px-7 py-3 bg-purple-700 hover:bg-purple-800 disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer"
                   >
-                    <Send className="w-4 h-4" />
-                    <span>{submittingChallan ? 'Submitting...' : 'Submit'}</span>
+                    {submittingChallan ? (
+                      <RefreshCw className="w-4 h-4 animate-spin text-purple-200" />
+                    ) : (
+                      <Send className="w-4 h-4" />
+                    )}
+                    <span>{submittingChallan ? 'Dispatching to QC1...' : 'Submit Challan to QC1'}</span>
                   </button>
                 </div>
               </form>
@@ -1204,108 +1171,159 @@ export default function DyeingMyWorkPage() {
         )}
 
         {/* ============================================================== */}
-        {/* MODAL 1: VIEW PRODUCTION SHEET (VIEW, PRINT, DOWNLOADABLE)     */}
+        {/* TAB 3: DYEING DEFECTIVE SHELF (DEF-SHELF-DYEING)               */}
         {/* ============================================================== */}
-        {selectedOrderForSheet && selectedOrderForSheet.program && (
-          <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-2xs flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-5 shadow-2xl space-y-4">
-              <div className="flex items-center justify-between border-b pb-3 border-slate-200">
-                <div className="flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-purple-700" />
-                  <div>
-                    <h3 className="text-sm font-bold text-slate-900">
-                      Production Sheet Traveler &middot; {selectedOrderForSheet.program.programSerialNo || selectedOrderForSheet.program.programNumber}
-                    </h3>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => printProductionSheet(selectedOrderForSheet.program)}
-                    className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow-2xs"
-                  >
-                    <Printer className="w-3.5 h-3.5" />
-                    <span>Print</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => downloadProductionSheetHtml(selectedOrderForSheet.program)}
-                    className="flex items-center gap-1 px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-semibold shadow-2xs"
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    <span>Download</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedOrderForSheet(null)}
-                    className="p-1 text-slate-400 hover:text-slate-700 text-lg font-bold ml-2"
-                  >
-                    ✕
-                  </button>
-                </div>
+        {activeTab === 'defective-shelf' && (
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 gap-3">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-rose-600 block">
+                  DEPARTMENT ISOLATION SHELF
+                </span>
+                <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                  <Archive className="w-5 h-5 text-rose-600" />
+                  <span>Dyeing Defective Shelf (DEF-SHELF-DYEING)</span>
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Segregated rolls, cuts, and patches rejected during dyeing. Automatically recorded in the Fabric Store Master Defective Shelf (DEF-SHELF-CENTRAL).
+                </p>
               </div>
 
-              {/* MODAL SHEET CONTENT */}
-              <div className="border border-slate-200 rounded-xl p-4 bg-white space-y-3.5 text-xs">
-                <div className="flex justify-between items-start border-b-2 border-slate-800 pb-2.5">
-                  <div>
-                    <h2 className="text-base font-black text-slate-900">
-                      SHUBHAM FABRICS INDIA PVT. LTD.
-                    </h2>
-                    <span className="text-[10px] uppercase font-bold text-slate-500 block">
-                      Production Sheet Master
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <span className="font-mono text-sm font-bold text-purple-800 block">
-                      {selectedOrderForSheet.program.programSerialNo || selectedOrderForSheet.program.programNumber}
-                    </span>
-                    <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-100 text-blue-800">
-                      {selectedOrderForSheet.program.status || 'ACTIVE'}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                  <div className="p-2 bg-slate-50 rounded">
-                    <span className="text-[10px] text-slate-500 font-bold uppercase block">Buyer / Client</span>
-                    <strong className="text-slate-900">{selectedOrderForSheet.program.clientName || selectedOrderForSheet.program.buyerName || '—'}</strong>
-                  </div>
-                  <div className="p-2 bg-slate-50 rounded">
-                    <span className="text-[10px] text-slate-500 font-bold uppercase block">Main Style</span>
-                    <strong className="text-slate-900">{selectedOrderForSheet.program.mainStyle || selectedOrderForSheet.program.styleCode || '—'}</strong>
-                  </div>
-                  <div className="p-2 bg-slate-50 rounded">
-                    <span className="text-[10px] text-slate-500 font-bold uppercase block">Design #</span>
-                    <strong className="font-mono text-purple-900">{selectedOrderForSheet.program.designNumber || selectedOrderForSheet.program.wilcomDesignNumber || '—'}</strong>
-                  </div>
-                  <div className="p-2 bg-slate-50 rounded">
-                    <span className="text-[10px] text-slate-500 font-bold uppercase block">Fabric Quality</span>
-                    <strong className="text-slate-900">{selectedOrderForSheet.fabricName || '—'}</strong>
-                  </div>
-                  <div className="p-2 bg-slate-50 rounded">
-                    <span className="text-[10px] text-slate-500 font-bold uppercase block">Fabric Color</span>
-                    <strong className="text-slate-900">{selectedOrderForSheet.targetColor || '—'}</strong>
-                  </div>
-                  <div className="p-2 bg-slate-50 rounded">
-                    <span className="text-[10px] text-slate-500 font-bold uppercase block">Required Qty</span>
-                    <strong className="font-mono text-slate-900">{selectedOrderForSheet.requiredQuantity} {selectedOrderForSheet.uom}</strong>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-end pt-1">
-                <button
-                  type="button"
-                  onClick={() => setSelectedOrderForSheet(null)}
-                  className="px-4 py-2 bg-slate-800 text-white rounded-lg text-xs font-semibold hover:bg-slate-900 transition"
-                >
-                  Close
-                </button>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-500 font-mono">
+                  Shelf Code: <strong className="text-rose-700 bg-rose-50 px-2.5 py-1 rounded border border-rose-200">DEF-SHELF-DYEING</strong>
+                </span>
               </div>
             </div>
+
+            {/* STAT CARDS */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="p-4 bg-rose-50/70 border border-rose-200 rounded-xl space-y-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-rose-800">
+                  Total Dyeing Defective Cut
+                </span>
+                <div className="text-2xl font-mono font-bold text-rose-900">
+                  {dyeingDefects.reduce((acc, c) => acc + (Number(c.defectivePieces) || 0), 0)} MTR / PCS
+                </div>
+                <span className="text-[10px] text-rose-600">
+                  Quarantined from QC1 handover
+                </span>
+              </div>
+
+              <div className="p-4 bg-purple-50/70 border border-purple-200 rounded-xl space-y-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-purple-800">
+                  Fabric Store Master Sync
+                </span>
+                <div className="text-base font-bold text-purple-900 flex items-center gap-1.5 mt-1">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <span>Auto-Synced with Central Store</span>
+                </div>
+                <span className="text-[10px] text-purple-700">
+                  Visible in Fabric Store DEF-SHELF-CENTRAL
+                </span>
+              </div>
+
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+                  Logged Incidents
+                </span>
+                <div className="text-2xl font-mono font-bold text-slate-900">
+                  {dyeingDefects.length} Incidents
+                </div>
+                <span className="text-[10px] text-slate-500">
+                  Audited zero-loss accounting
+                </span>
+              </div>
+            </div>
+
+            {/* DEFECT LIST TABLE */}
+            {dyeingDefects.length === 0 ? (
+              <div className="p-16 text-center space-y-3 border border-dashed border-slate-200 rounded-xl">
+                <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />
+                <p className="text-sm font-semibold text-slate-800">Dyeing Defective Shelf is Clean</p>
+                <p className="text-xs text-slate-500 max-w-md mx-auto">
+                  No defective fabric cuts or dyeing rejections are currently logged on DEF-SHELF-DYEING.
+                </p>
+              </div>
+            ) : (
+              <div className="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200 uppercase text-[10px]">
+                    <tr>
+                      <th className="py-2.5 px-3">Challan #</th>
+                      <th className="py-2.5 px-3">Sheet / Style</th>
+                      <th className="py-2.5 px-3 text-center">Defective Volume</th>
+                      <th className="py-2.5 px-3">Station Defective Shelf</th>
+                      <th className="py-2.5 px-3">Defect Reason</th>
+                      <th className="py-2.5 px-3">Date</th>
+                      <th className="py-2.5 px-3 text-right">Audit</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {dyeingDefects.map((ch) => (
+                      <tr key={ch.id} className="hover:bg-rose-50/30 transition">
+                        <td className="py-3 px-3 font-mono font-bold text-slate-900">
+                          {ch.challanNumber}
+                        </td>
+                        <td className="py-3 px-3">
+                          <span className="font-semibold text-slate-800 block">
+                            {ch.program?.mainStyle || ch.program?.clientName || 'General Style'}
+                          </span>
+                          <span className="text-[10px] font-mono text-purple-700">
+                            Sheet: {ch.program?.programSerialNo || ch.program?.programNumber || '—'}
+                          </span>
+                        </td>
+                        <td className="py-3 px-3 text-center font-mono font-bold text-rose-700 text-sm">
+                          {ch.defectivePieces || 0} {ch.fabricUnit || 'MTR'}
+                        </td>
+                        <td className="py-3 px-3">
+                          <span className="px-2 py-0.5 rounded font-mono text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
+                            {ch.defectiveShelfLocation || 'DEF-SHELF-DYEING'}
+                          </span>
+                        </td>
+                        <td className="py-3 px-3 text-slate-700 max-w-xs">
+                          <div className="font-semibold text-[11px]">{ch.defectReason || 'Shade Variation'}</div>
+                          <p className="truncate text-[10px] text-slate-500">{ch.remarks || '—'}</p>
+                        </td>
+                        <td className="py-3 px-3 text-slate-600 font-mono text-[11px]">
+                          {new Date(ch.createdAt).toLocaleDateString('en-GB')}
+                        </td>
+                        <td className="py-3 px-3 text-right">
+                          <Link
+                            href={`/challans/${ch.id}`}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-semibold transition"
+                          >
+                            <FileText className="w-3.5 h-3.5 text-slate-600" />
+                            <span>View Challan</span>
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
+
+        {/* ============================================================== */}
+        {/* TAB 4: DYEING DEPARTMENT STOCK VIEW                            */}
+        {/* ============================================================== */}
+        {activeTab === 'stock' && (
+          <DepartmentStockView
+            department="DYEING"
+            createChallanUrl="/dyeing/my-work?tab=create-challan"
+          />
+        )}
+
+        {/* ============================================================== */}
+        {/* MODAL 1: VIEW PRODUCTION SHEET (VIEW, PRINT, DOWNLOADABLE)     */}
+        {/* ============================================================== */}
+        <ProductionSheetPrintModal
+          program={selectedOrderForSheet?.program}
+          isOpen={!!selectedOrderForSheet}
+          onClose={() => setSelectedOrderForSheet(null)}
+        />
 
         {/* ============================================================== */}
         {/* MODAL 2: UPDATE DYEING PROGRESS                                */}

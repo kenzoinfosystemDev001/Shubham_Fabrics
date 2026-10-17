@@ -16,13 +16,21 @@ import {
   Scissors, 
   AlertCircle,
   Calendar,
-  Sparkles
+  Sparkles,
+  Palette,
+  Ruler,
+  Plus
 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { getCurrentUser, canViewClientCode } from '@/lib/rbac';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { 
   downloadProductionSheetHtml, 
-  printProductionSheet 
+  printProductionSheet,
+  downloadWilcomFormHtml,
+  printWilcomForm,
+  extractSubStylesAndGrid,
+  GarmentCategory
 } from '@/lib/download-production-sheet';
 
 export default function ProgramDetailPage() {
@@ -32,6 +40,12 @@ export default function ProgramDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showPrintModal, setShowPrintModal] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [activeCategoryTab, setActiveCategoryTab] = useState<'TOP' | 'BOTTOM' | 'DUPATTA' | 'WILCOM'>('TOP');
+
+  useEffect(() => {
+    setCurrentUser(getCurrentUser());
+  }, []);
 
   const loadProgram = async () => {
     try {
@@ -89,6 +103,79 @@ export default function ProgramDetailPage() {
   const isDraft = program.status === 'DRAFT';
   const isReady = program.status === 'READY_FOR_ISSUE' || program.status === 'APPROVED';
   const isIssued = program.status === 'ISSUED' || program.status === 'IN_PRODUCTION';
+
+  let programItems: any[] = Array.isArray(program.items) ? program.items : [];
+  if (programItems.length === 0 && program.metadataJson) {
+    try {
+      const meta = typeof program.metadataJson === 'string' ? JSON.parse(program.metadataJson) : program.metadataJson;
+      if (Array.isArray(meta?.items)) {
+        programItems = meta.items;
+      }
+    } catch {}
+  }
+  if (programItems.length === 0) {
+    programItems = [
+      {
+        id: 'item-default',
+        itemName: program.mainStyle || 'Main Garment Part',
+        color: program.fabricColor || 'Standard',
+        measurement: program.colorQuantity || program.targetQuantity || 1,
+        unit: program.quantityMeasurement || 'PCS',
+        fabricAverage: program.fabricAverage || 1.25,
+        fabricWidth: program.fabricWidthInches ? `${program.fabricWidthInches} Inches` : (program.fabricWidth || '58 Inches'),
+        specialMaterial: program.specialMaterial || 'None',
+        remarks: program.comments || '',
+      },
+    ];
+  }
+
+  const grandTotalMeasurement = programItems.reduce((acc, it) => acc + (Number(it.measurement) || 0), 0);
+  const totalFabricRequired = programItems.reduce((acc, it) => {
+    const qty = Number(it.measurement) || 0;
+    const avg = Number(it.fabricAverage) || Number(program.fabricAverage) || 1.25;
+    return acc + (qty * avg);
+  }, 0);
+  const uniqueProgramColors = Array.from(new Set(programItems.map((it) => String(it.color || '').trim()).filter(Boolean)));
+
+  let programSubStyles: string[] = Array.isArray(program.subStyles) ? program.subStyles : [];
+  if (programSubStyles.length === 0 && program.subStyle) {
+    programSubStyles = program.subStyle.split(',').map((s: string) => s.trim()).filter(Boolean);
+  }
+
+  let meta: any = null;
+  if (program?.metadataJson) {
+    try {
+      meta = typeof program.metadataJson === 'string' ? JSON.parse(program.metadataJson) : program.metadataJson;
+    } catch {}
+  }
+
+  const components = meta?.components || null;
+  const forwardedComponents: string[] = Array.isArray(meta?.forwardedComponents) ? meta.forwardedComponents : ['TOP'];
+  const wilcomEntries: any[] = Array.isArray(meta?.wilcomEntries) ? meta.wilcomEntries : [];
+
+  const activeCategory: GarmentCategory = activeCategoryTab === 'WILCOM' ? 'TOP' : activeCategoryTab;
+
+  const {
+    subStylesWithAverages,
+    productionGrid,
+    topName,
+    serialNoCounter,
+    noteText,
+    totalMtrAverage,
+    fabricName: componentFabricName,
+    fabricWidth: componentFabricWidth,
+  } = program ? extractSubStylesAndGrid(program, activeCategory) : {
+    subStylesWithAverages: [],
+    productionGrid: [],
+    topName: '',
+    serialNoCounter: '000',
+    noteText: '',
+    totalMtrAverage: 0,
+    fabricName: '',
+    fabricWidth: '',
+  };
+
+  const isClientCodeVisible = canViewClientCode(currentUser) && Boolean(program?.clientCode);
 
   const handleBack = () => {
     if (typeof window !== 'undefined') {
@@ -215,6 +302,12 @@ export default function ProgramDetailPage() {
           <div>
             <span className="text-slate-400 block text-[10px] font-semibold uppercase tracking-wider">Client</span>
             <span className="font-bold text-slate-900 text-sm">{program.clientName || program.buyerName || 'Standard Client'}</span>
+            {isClientCodeVisible && (
+              <span className="inline-flex items-center gap-1 mt-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-50 text-amber-900 border border-amber-200 block w-fit">
+                <span>🔒 Code:</span>
+                <span>{program.clientCode}</span>
+              </span>
+            )}
           </div>
           <div>
             <span className="text-slate-400 block text-[10px] font-semibold uppercase tracking-wider">Main Style</span>
@@ -259,6 +352,21 @@ export default function ProgramDetailPage() {
                 <span className="text-slate-400 block text-[11px]">Delivery Date</span>
                 <span className="font-semibold text-rose-700">{program.deliveryDate ? new Date(program.deliveryDate).toLocaleDateString() : '—'}</span>
               </div>
+              {isClientCodeVisible && (
+                <div className="col-span-2 mt-2 p-2.5 bg-amber-50/80 rounded-lg border border-amber-200 flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] font-bold text-amber-900 uppercase tracking-wider block">
+                      Client Code (Confidential)
+                    </span>
+                    <span className="font-mono font-black text-amber-950 text-sm">
+                      {program.clientCode}
+                    </span>
+                  </div>
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-200/90 text-amber-950 border border-amber-300">
+                    🔒 Admin &amp; Programming Only
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -270,39 +378,30 @@ export default function ProgramDetailPage() {
             <div className="pt-1">
               {(() => {
                 const priority = (program.clientPriority || program.priority || 'NORMAL').toUpperCase();
-                const config: Record<string, { badge: string; border: string; desc: string }> = {
+                const config: Record<string, { badge: string; border: string }> = {
                   LOW: {
                     badge: 'bg-slate-100 text-slate-800 border-slate-300',
                     border: 'border-slate-200 bg-slate-50/50',
-                    desc: 'Routine manufacturing queue, flexible lead time',
                   },
                   NORMAL: {
                     badge: 'bg-blue-100 text-blue-900 border-blue-300',
                     border: 'border-blue-200 bg-blue-50/40',
-                    desc: 'Standard production pipeline and dispatch schedule',
                   },
                   HIGH: {
                     badge: 'bg-amber-100 text-amber-900 border-amber-300',
                     border: 'border-amber-200 bg-amber-50/40',
-                    desc: 'Priority queue for expedited delivery commitments',
                   },
                   URGENT: {
                     badge: 'bg-rose-100 text-rose-900 border-rose-300',
                     border: 'border-rose-200 bg-rose-50/40',
-                    desc: 'Immediate dispatch & top floor priority across departments',
                   },
                 };
                 const current = config[priority] || config.NORMAL;
                 return (
                   <div className={`p-3 rounded-lg border ${current.border} flex items-center justify-between`}>
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className={`text-xs font-black px-2.5 py-0.5 rounded border ${current.badge}`}>
-                          {priority}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-slate-600">{current.desc}</p>
-                    </div>
+                    <span className={`text-xs font-black px-2.5 py-1 rounded border ${current.badge}`}>
+                      {priority}
+                    </span>
                   </div>
                 );
               })()}
@@ -320,16 +419,32 @@ export default function ProgramDetailPage() {
                 <span className="font-semibold text-slate-900">{program.mainStyle || program.styleCode}</span>
               </div>
               <div>
-                <span className="text-slate-400 block text-[11px]">Sub Style</span>
-                <span className="text-slate-700">{program.subStyle || 'Standard'}</span>
-              </div>
-              <div>
                 <span className="text-slate-400 block text-[11px]">Pattern Ref #</span>
                 <span className="font-mono text-slate-700">{program.pattern || '—'}</span>
               </div>
               <div>
                 <span className="text-slate-400 block text-[11px]">Base Design Type</span>
                 <span className="text-slate-700">{program.baseDesignType || 'Standard'}</span>
+              </div>
+              <div className="col-span-2 pt-2 border-t border-slate-100">
+                <span className="text-slate-400 block text-[11px] mb-1 font-bold uppercase tracking-wider">
+                  Sub Styles ({programSubStyles.length})
+                </span>
+                {programSubStyles.length > 0 ? (
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {programSubStyles.map((sub: string, sIdx: number) => (
+                      <span
+                        key={sIdx}
+                        className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-amber-50 border border-amber-200 text-amber-950 font-semibold text-[11px] shadow-2xs"
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-600 shrink-0" />
+                        <span>{sub}</span>
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="text-slate-500 italic text-xs">Standard</span>
+                )}
               </div>
             </div>
           </div>
@@ -410,28 +525,281 @@ export default function ProgramDetailPage() {
                   {program.fabricDyeingRequired ? 'Dyeing Department' : 'Embroidery Department'}
                 </span>
               </div>
-            </div>
-          </div>
+            </div>          </div>
 
-          {/* PRODUCTION QUANTITY & TRIMS */}
-          <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-3">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-900 bg-indigo-50 px-2 py-0.5 rounded">
-              Quantities &amp; Special Materials
-            </span>
-            <div className="grid grid-cols-2 gap-3 text-xs pt-1">
+          {/* PRODUCTION SHEET SPECIFICATION & BREAKDOWN */}
+          <div className="bg-white border-2 border-black rounded-lg p-5 shadow-xs space-y-4 md:col-span-2 text-black">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-black/10 pb-3">
               <div>
-                <span className="text-slate-400 block text-[11px]">Total Color Qty</span>
-                <span className="font-mono font-bold text-slate-900">{program.colorQuantity || program.targetQuantity} {program.quantityMeasurement || 'PCS'}</span>
+                <span className="text-[10px] font-black uppercase tracking-wider text-black bg-slate-100 px-2 py-0.5 rounded border border-black/20">
+                  PRODUCTION SHEET &middot; TRAVELER #{program.programSerialNo || program.programNumber}
+                </span>
+                <h3 className="text-sm font-black text-black mt-1 uppercase tracking-wide flex items-center gap-2">
+                  <span>{activeCategoryTab === 'WILCOM' ? 'Wilcom Embroidery Specifications' : `${activeCategoryTab} Production Sheet Breakdown`}</span>
+                  {isClientCodeVisible && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-100 text-amber-950 text-[10px] font-mono font-black border border-amber-300 normal-case">
+                      🔒 Client Code: {program.clientCode}
+                    </span>
+                  )}
+                </h3>
               </div>
-              <div>
-                <span className="text-slate-400 block text-[11px]">Special Material</span>
-                <span className="text-slate-700">{program.specialMaterial || 'None'}</span>
-              </div>
-              <div className="col-span-2">
-                <span className="text-slate-400 block text-[11px]">Special Material Quantity</span>
-                <span className="text-slate-700">{program.specialMaterialQuantity || '—'}</span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (activeCategoryTab === 'WILCOM') {
+                      printWilcomForm(program);
+                    } else {
+                      printProductionSheet(program, activeCategoryTab);
+                    }
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  <span>{activeCategoryTab === 'WILCOM' ? 'Print Wilcom' : `Print ${activeCategoryTab}`}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (activeCategoryTab === 'WILCOM') {
+                      void downloadWilcomFormHtml(program);
+                    } else {
+                      void downloadProductionSheetHtml(program, activeCategoryTab);
+                    }
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-800 hover:bg-black text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowPrintModal(true)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-slate-300 text-slate-800 text-xs font-bold rounded hover:bg-slate-50 transition cursor-pointer"
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>Print Modal</span>
+                </button>
               </div>
             </div>
+
+            {/* COMPONENT & WILCOM TAB SELECTOR */}
+            <div className="flex items-center gap-2 pb-2 border-b border-black/10 overflow-x-auto">
+              {(['TOP', 'BOTTOM', 'DUPATTA'] as GarmentCategory[]).map((cat) => {
+                const isEnabled = components ? components[cat]?.enabled !== false : (cat === 'TOP');
+                const isForwarded = forwardedComponents.includes(cat);
+                return (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => setActiveCategoryTab(cat)}
+                    className={`px-3 py-1 rounded text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                      activeCategoryTab === cat
+                        ? 'bg-[#163767] text-white shadow-2xs'
+                        : isEnabled
+                          ? 'bg-slate-100 text-slate-800 hover:bg-slate-200 border border-slate-300'
+                          : 'bg-slate-50 text-slate-400 border border-slate-200'
+                    }`}
+                  >
+                    <span>{cat} Sheet</span>
+                    {isForwarded && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" title="Forwarded" />
+                    )}
+                  </button>
+                );
+              })}
+
+              <button
+                type="button"
+                onClick={() => setActiveCategoryTab('WILCOM')}
+                className={`px-3 py-1 rounded text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                  activeCategoryTab === 'WILCOM'
+                    ? 'bg-purple-700 text-white shadow-2xs'
+                    : 'bg-purple-50 text-purple-900 hover:bg-purple-100 border border-purple-200'
+                }`}
+              >
+                <Sparkles className="w-3 h-3 text-purple-500" />
+                <span>Wilcom Form</span>
+                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-black bg-purple-200/70 text-purple-950">
+                  {wilcomEntries.length}
+                </span>
+              </button>
+            </div>
+
+            {activeCategoryTab === 'WILCOM' ? (
+              /* WILCOM SPECIFICATIONS VIEW */
+              <div className="space-y-4 pt-1">
+                {wilcomEntries.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {wilcomEntries.map((entry: any, wIdx: number) => (
+                      <div key={entry.id || wIdx} className="p-3.5 border-[1.5px] border-black rounded bg-white space-y-2">
+                        <div className="flex items-center justify-between border-b border-black/10 pb-1.5">
+                          <span className="text-[10px] font-black px-2 py-0.5 rounded bg-purple-100 text-purple-900 border border-purple-300 uppercase">
+                            {entry.category || 'EMBROIDERY'}
+                          </span>
+                          <span className="font-mono font-black text-xs text-purple-950">
+                            WILCOM #{entry.wilcomDesignNumber}
+                          </span>
+                        </div>
+                        <div className="flex items-start gap-3">
+                          <div className="w-20 h-20 border border-slate-300 rounded bg-slate-50 flex items-center justify-center overflow-hidden shrink-0">
+                            {entry.photoUrl ? (
+                              <img src={entry.photoUrl} alt={entry.wilcomDesignNumber} className="w-full h-full object-contain" />
+                            ) : (
+                              <span className="text-[10px] text-slate-400 font-bold">No Photo</span>
+                            )}
+                          </div>
+                          <div className="space-y-1 text-xs">
+                            <div className="font-bold text-slate-900">{entry.styleName || 'Garment Style'}</div>
+                            {entry.remarks && <p className="text-slate-600 text-[11px]">{entry.remarks}</p>}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-6 text-center border border-dashed border-slate-300 rounded-md text-slate-500 text-xs">
+                    No Wilcom embroidery designs recorded for this production order.
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* COMPONENT SHEET VIEW */
+              <div className="space-y-4">
+                {/* AVERAGE TABLE (SUB-STYLES & INDIVIDUAL AVERAGES) */}
+                <div className="space-y-1">
+                  <div className="font-black text-xs uppercase tracking-wider">
+                    {activeCategoryTab} AVERAGE CONSUMPTION (METERS PER PIECE)
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse border-[1.5px] border-black text-center text-xs">
+                      <thead>
+                        <tr className="bg-slate-50">
+                          {subStylesWithAverages.map((s, idx) => (
+                            <th key={idx} className="border-[1.5px] border-black p-1.5 font-black text-[11px] uppercase tracking-wider">
+                              {s.name}
+                            </th>
+                          ))}
+                          <th className="border-[1.5px] border-black p-1.5 font-black text-[11px] uppercase tracking-wider bg-slate-100">
+                            TOTAL MTR
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="h-7 font-bold text-xs">
+                          {subStylesWithAverages.map((s, idx) => (
+                            <td key={idx} className="border-[1.5px] border-black p-1">
+                              {s.average ? Number(s.average).toFixed(2) : '—'}
+                            </td>
+                          ))}
+                          <td className="border-[1.5px] border-black p-1 font-black bg-slate-100 text-blue-950">
+                            {totalMtrAverage > 0 ? totalMtrAverage.toFixed(2) : '—'}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* MAIN PRODUCTION BREAKDOWN GRID */}
+                <div className="space-y-1 pt-1">
+                  <div className="font-black text-xs uppercase tracking-wider">
+                    {activeCategoryTab} COLOR, QTY &amp; SIZE BREAKDOWN
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse border-[1.5px] border-black text-center text-xs">
+                      <thead>
+                        <tr className="bg-slate-50">
+                          <th rowSpan={2} className="border-[1.5px] border-black p-1.5 font-black text-xs uppercase tracking-wider w-32">
+                            COLOR
+                          </th>
+                          <th colSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs uppercase tracking-wider">
+                            QTY
+                          </th>
+                          <th colSpan={subStylesWithAverages.length} className="border-[1.5px] border-black p-1 font-black text-xs uppercase tracking-wider">
+                            SIZE
+                          </th>
+                        </tr>
+                        <tr className="bg-slate-50">
+                          <th className="border-[1.5px] border-black p-1 font-black text-[11px] w-16">PCS</th>
+                          <th className="border-[1.5px] border-black p-1 font-black text-[11px] w-16">MTR</th>
+                          {subStylesWithAverages.map((sub, idx) => (
+                            <th key={idx} className="border-[1.5px] border-black p-1 font-black text-[11px] uppercase">
+                              {sub.name}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {productionGrid.length > 0 ? (
+                          productionGrid.map((row, rIdx) => (
+                            <tr key={rIdx} className="h-7">
+                              <td className="border-[1.5px] border-black px-2 py-1 text-left font-black text-xs">
+                                {row.color}
+                              </td>
+                              <td className="border-[1.5px] border-black px-1 py-1 font-bold text-xs">
+                                {row.pcs}
+                              </td>
+                              <td className="border-[1.5px] border-black px-1 py-1 font-bold text-xs bg-slate-50/50">
+                                {row.mtr}
+                              </td>
+                              {subStylesWithAverages.map((sub, sIdx) => (
+                                <td key={sIdx} className="border-[1.5px] border-black px-1 py-1 font-medium text-xs">
+                                  {row.sizes?.[sub.name] || '—'}
+                                </td>
+                              ))}
+                            </tr>
+                          ))
+                        ) : (
+                          <tr className="h-7">
+                            <td className="border-[1.5px] border-black px-2 py-1 text-left font-black text-xs">
+                              {program.fabricColor || 'Standard'}
+                            </td>
+                            <td className="border-[1.5px] border-black px-1 py-1 font-bold text-xs">
+                              {program.targetQuantity || 0}
+                            </td>
+                            <td className="border-[1.5px] border-black px-1 py-1 font-bold text-xs bg-slate-50/50">
+                              {((program.targetQuantity || 0) * totalMtrAverage).toFixed(2)}
+                            </td>
+                            {subStylesWithAverages.map((_, sIdx) => (
+                              <td key={sIdx} className="border-[1.5px] border-black px-1 py-1 font-medium text-xs">
+                                Free
+                              </td>
+                            ))}
+                          </tr>
+                        )}
+                      </tbody>
+                      <tfoot>
+                        <tr className="bg-slate-100 font-bold border-t-[1.5px] border-black text-xs">
+                          <td className="border-[1.5px] border-black p-1.5 text-right font-black uppercase text-[10px]">
+                            TOTALS:
+                          </td>
+                          <td className="border-[1.5px] border-black p-1.5 text-center font-black text-sm text-[#163767]">
+                            {productionGrid.length > 0 ? productionGrid.reduce((acc, r) => acc + (Number(r.pcs) || 0), 0) : (program.targetQuantity || 0)}
+                          </td>
+                          <td className="border-[1.5px] border-black p-1.5 text-center font-black text-sm text-emerald-800">
+                            {productionGrid.length > 0 
+                              ? (productionGrid.reduce((acc, r) => acc + (Number(r.mtr) || 0), 0)).toFixed(2)
+                              : (((program.targetQuantity || 0) * totalMtrAverage)).toFixed(2)}
+                          </td>
+                          <td colSpan={subStylesWithAverages.length} className="border-[1.5px] border-black p-1.5 text-right text-[10px] text-slate-700 font-bold">
+                            Avg: {totalMtrAverage.toFixed(2)} Mtr/Pc
+                          </td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                </div>
+
+                {/* NOTE & REMARKS */}
+                {(noteText || program.remarks) && (
+                  <div className="pt-2 text-xs border-t border-black/10">
+                    <span className="font-black text-xs uppercase tracking-wider block mb-0.5">NOTE:-</span>
+                    <p className="text-slate-800 font-sans">{noteText || program.remarks}</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* PRODUCTION DATES */}
