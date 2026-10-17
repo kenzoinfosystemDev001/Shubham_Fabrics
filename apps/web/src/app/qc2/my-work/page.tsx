@@ -28,7 +28,8 @@ import {
   Archive,
   TrendingDown,
   Kanban,
-  Waves
+  Waves,
+  Send
 } from 'lucide-react';
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
@@ -470,6 +471,14 @@ export default function QC2MyWorkPage() {
               className="flex items-center gap-1.5 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold border border-slate-700 transition"
             >
               <span>Dashboard</span>
+            </Link>
+
+            <Link
+              href="/qc2/issue-challan"
+              className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-lg text-xs font-semibold shadow-sm transition"
+            >
+              <Send className="w-4 h-4" />
+              <span>Issue Challan</span>
             </Link>
 
             <Link

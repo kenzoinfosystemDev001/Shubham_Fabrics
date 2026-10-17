@@ -124,6 +124,14 @@ export default function QC2Dashboard() {
             </button>
 
             <Link
+              href="/qc2/issue-challan"
+              className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-lg text-xs font-semibold shadow-sm transition"
+            >
+              <Send className="w-4 h-4" />
+              <span>Issue Challan</span>
+            </Link>
+
+            <Link
               href="/qc2/my-work"
               className="flex items-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-sm transition"
             >

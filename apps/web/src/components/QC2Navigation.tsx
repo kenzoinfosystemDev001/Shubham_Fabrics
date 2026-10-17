@@ -13,7 +13,8 @@ import {
   X,
   ShieldCheck,
   CheckCircle2,
-  FileText
+  FileText,
+  Send
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { isAdminUser } from '@/lib/rbac';
@@ -201,7 +202,17 @@ export function QC2Navigation() {
             <span>My Work</span>
           </Link>
 
-          {/* 3. Floor Board */}
+          {/* 3. Issue Challan */}
+          <Link
+            href="/qc2/issue-challan"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/qc2/issue-challan', false)}
+          >
+            <Send className="w-4 h-4 text-emerald-400" />
+            <span>Issue Challan</span>
+          </Link>
+
+          {/* 4. Floor Board */}
           <Link
             href="/qc2/floor-board"
             onClick={() => setMobileOpen(false)}
