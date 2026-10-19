@@ -97,6 +97,8 @@ export function canViewClientCode(user: MESUser | null): boolean {
   return isAdminUser(user) || isProgrammingUser(user);
 }
 
+export const canViewClientName = canViewClientCode;
+
 export function isFabricStoreUser(user: MESUser | null): boolean {
   if (!user) return false;
   if (isAdminUser(user)) return true; // Admins have all access
