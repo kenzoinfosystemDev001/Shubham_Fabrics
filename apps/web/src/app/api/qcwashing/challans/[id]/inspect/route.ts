@@ -263,19 +263,34 @@ export async function POST(
         }
       }
 
-      // C. Save Defect Records if failed or rework
+      // C. Save Defect Records and Inspection Defect Logs if failed or rework
       if (Array.isArray(defects) && defects.length > 0) {
         for (const d of defects) {
           const dQty = Number(d.quantity || d.defectCount || 1);
-          await tx.defectRecord.create({
+          // 1. QualityInspection DefectLog
+          await tx.defectLog.create({
             data: {
               inspectionId: inspection.id,
-              defectCode: d.defectCode || d.defectType || 'WASH_DEFECT',
+              defectType: d.defectCode || d.defectType || 'WASH_DEFECT',
               severity: d.severity || 'MAJOR',
               count: dQty,
-              locationOnGarment: d.location || 'Garment Body',
-              actionTaken: normalizedResult === 'REWORK' ? 'REWORK' : 'SCRAP',
-              notes: d.remarks || d.notes || defectRemarks || null,
+            },
+          });
+
+          // 2. Factory DefectRecord (defective shelf tracking)
+          await tx.defectRecord.create({
+            data: {
+              defectCode: d.defectCode || d.defectType || `DEF-QC3-${Date.now().toString().slice(-4)}`,
+              programId: challan.programId,
+              challanId: challan.id,
+              departmentCode: 'QC3',
+              itemDescription: `Washed garment defect (${d.location || 'Garment Body'})`,
+              severity: d.severity || 'MAJOR',
+              quantity: dQty,
+              reason: d.remarks || d.notes || defectRemarks || 'Washing Quality Defect',
+              detectedById: actorId,
+              status: normalizedResult === 'REWORK' ? 'REWORK' : 'OPEN',
+              resolutionNotes: `Logged during QC Washing inspection. Action: ${normalizedResult === 'REWORK' ? 'Re-wash Cycle' : 'Quarantine / Scrap'}`,
             },
           });
         }
@@ -307,6 +322,7 @@ export async function POST(
                   colour: primaryItem?.colour || 'Standard',
                   quantity: qFailed,
                   uom: uom,
+                  unitType: primaryItem?.unitType || 'PCS',
                   remarks: defectRemarks || 'Failed wash inspection',
                 },
               ],
@@ -341,6 +357,7 @@ export async function POST(
                   colour: primaryItem?.colour || 'Standard',
                   quantity: qRework,
                   uom: uom,
+                  unitType: primaryItem?.unitType || 'PCS',
                   remarks: reworkReason || 'Requires re-washing',
                 },
               ],
@@ -355,13 +372,15 @@ export async function POST(
           programId: challan.programId,
           challanId: challan.id,
           departmentCode: 'QC3',
+          operationName: 'QC_WASHING_INSPECTION',
           operatorId: actorId,
           inputQuantity: qInspected,
           goodQuantity: qPassed,
           reworkQuantity: qRework,
           rejectQuantity: qFailed,
-          scrapQuantity: 0,
+          wasteQuantity: 0,
           balanceQuantity: qHold,
+          unitOfMeasure: uom || 'PCS',
           recordedAt: new Date(),
           notes: `QC Washing Verification: Passed=${qPassed}, Failed=${qFailed}, Rework=${qRework}, Hold=${qHold}`,
         },

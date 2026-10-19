@@ -1287,7 +1287,7 @@ export default function QCWashingMyWorkPage() {
         <ProductionSheetPrintModal
           isOpen={true}
           onClose={() => setSelectedSheetForView(null)}
-          sheetData={selectedSheetForView}
+          program={selectedSheetForView}
         />
       )}
     </div>
