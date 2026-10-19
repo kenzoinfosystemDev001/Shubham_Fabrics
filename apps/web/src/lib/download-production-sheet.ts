@@ -17,7 +17,8 @@ export interface ProductionGridItem {
   color: string;
   pcs: number | string;
   mtr: number | string;
-  sizes: Record<string, string>;
+  size?: string;
+  sizes?: Record<string, string>;
 }
 
 export interface SwatchItem {
@@ -444,6 +445,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       color: string;
       pcs: string | number;
       mtr: string | number;
+      size?: string;
       sizes: Record<string, string>;
     }[] = [];
 
@@ -453,6 +455,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
           color: productionGrid[i].color || '',
           pcs: productionGrid[i].pcs !== undefined ? productionGrid[i].pcs : '',
           mtr: productionGrid[i].mtr !== undefined ? productionGrid[i].mtr : '',
+          size: productionGrid[i].size || productionGrid[i].sizes?.['SIZE'] || '',
           sizes: productionGrid[i].sizes || {},
         });
       } else {
@@ -460,6 +463,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
           color: '',
           pcs: '',
           mtr: '',
+          size: '',
           sizes: {},
         });
       }
@@ -548,12 +552,11 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
             <tr>
               <th rowspan="2" class="col-color-header">COLOR</th>
               <th colspan="2">QTY</th>
-              <th colspan="${subStyleColumns.length}">SIZE</th>
+              <th rowspan="2">SIZE</th>
             </tr>
             <tr>
               <th class="col-qty-pcs">PCS</th>
               <th class="col-qty-mtr">MTR</th>
-              ${subStyleColumns.map((col) => `<th>${col}</th>`).join('')}
             </tr>
           </thead>
           <tbody>
@@ -562,7 +565,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
                 <td class="cell-color">${row.color}</td>
                 <td class="cell-number">${row.pcs !== '' && row.pcs !== undefined ? row.pcs : ''}</td>
                 <td class="cell-number">${row.mtr !== '' && row.mtr !== undefined ? row.mtr : ''}</td>
-                ${subStyleColumns.map((col) => `<td>${row.sizes?.[col] || ''}</td>`).join('')}
+                <td class="cell-size">${row.size || row.sizes?.['SIZE'] || ''}</td>
               </tr>
             `).join('')}
           </tbody>

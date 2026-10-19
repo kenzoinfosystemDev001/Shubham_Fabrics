@@ -424,7 +424,7 @@ export default function CreateProductionSheetPage() {
   };
 
   // Component Grid Operations
-  const handleGridRowChange = (cat: GarmentCategory, index: number, field: 'color' | 'pcs' | 'mtr', value: any) => {
+  const handleGridRowChange = (cat: GarmentCategory, index: number, field: 'color' | 'pcs' | 'mtr' | 'size', value: any) => {
     const totalAvg = getTotalMtrAverage(cat);
     const updatedGrid = [...components[cat].productionGrid];
     const target = { ...updatedGrid[index] };
@@ -433,6 +433,9 @@ export default function CreateProductionSheetPage() {
       const numPcs = Number(value);
       target.pcs = value;
       target.mtr = value !== '' && Number.isFinite(numPcs) && numPcs > 0 ? Math.round(numPcs * totalAvg * 100) / 100 : '';
+    } else if (field === 'size') {
+      target.size = value;
+      target.sizes = { ...target.sizes, SIZE: value };
     } else {
       (target as any)[field] = value;
     }
@@ -1364,13 +1367,13 @@ export default function CreateProductionSheetPage() {
                         <table className="w-full border-collapse border-[1.5px] border-black text-center text-xs">
                           <thead>
                             <tr className="bg-white">
-                              <th rowSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase w-32">
+                              <th rowSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase w-36">
                                 COLOR
                               </th>
                               <th colSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase">
                                 QTY
                               </th>
-                              <th colSpan={comp.subStyles.length} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase">
+                              <th rowSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase">
                                 SIZE
                               </th>
                               <th rowSpan={2} className="border-[1.5px] border-black p-1 font-bold text-[10px] w-8">
@@ -1378,13 +1381,8 @@ export default function CreateProductionSheetPage() {
                               </th>
                             </tr>
                             <tr className="bg-white">
-                              <th className="border-[1.5px] border-black p-1 font-black text-[11px] w-16">PCS</th>
-                              <th className="border-[1.5px] border-black p-1 font-black text-[11px] w-16">MTR</th>
-                              {comp.subStyles.map((sub, sIdx) => (
-                                <th key={sIdx} className="border-[1.5px] border-black p-1 font-black text-[11px] uppercase">
-                                  {sub.name}
-                                </th>
-                              ))}
+                              <th className="border-[1.5px] border-black p-1 font-black text-[11px] w-20">PCS</th>
+                              <th className="border-[1.5px] border-black p-1 font-black text-[11px] w-24">MTR</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -1428,19 +1426,17 @@ export default function CreateProductionSheetPage() {
                                   />
                                 </td>
 
-                                {/* SIZE CELLS */}
-                                {comp.subStyles.map((sub, sIdx) => (
-                                  <td key={sIdx} className="border-[1.5px] border-black p-0.5">
-                                    <input
-                                      type="text"
-                                      value={row.sizes?.[sub.name] || ''}
-                                      onChange={(e) => handleGridSizeChange(cat, rIdx, sub.name, e.target.value)}
-                                      onFocus={(e) => e.target.select()}
-                                      placeholder=""
-                                      className="w-full px-1 py-1 text-center font-medium text-xs text-black border-none focus:outline-none focus:bg-blue-50"
-                                    />
-                                  </td>
-                                ))}
+                                {/* SIZE CELL */}
+                                <td className="border-[1.5px] border-black p-0.5">
+                                  <input
+                                    type="text"
+                                    value={row.size ?? (row.sizes?.['SIZE'] || '')}
+                                    onChange={(e) => handleGridRowChange(cat, rIdx, 'size', e.target.value)}
+                                    onFocus={(e) => e.target.select()}
+                                    placeholder=""
+                                    className="w-full px-2 py-1 text-center font-bold text-xs text-black border-none focus:outline-none focus:bg-blue-50"
+                                  />
+                                </td>
 
                                 {/* REMOVE ROW */}
                                 <td className="border-[1.5px] border-black p-0.5">
@@ -1470,30 +1466,12 @@ export default function CreateProductionSheetPage() {
                               <td className="border-[1.5px] border-black p-1.5 text-center font-black text-sm text-emerald-800">
                                 {catMeters > 0 ? catMeters.toFixed(2) : ''}
                               </td>
-                              <td colSpan={comp.subStyles.length + 1} className="border-[1.5px] border-black p-1.5 text-right text-[10px] text-slate-500 italic">
+                              <td colSpan={2} className="border-[1.5px] border-black p-1.5 text-right text-[10px] text-slate-500 italic">
                                 {catAvg > 0 ? `Fabric consumption @ ${catAvg.toFixed(2)} Mtr/Pc` : ''}
                               </td>
                             </tr>
                           </tfoot>
                         </table>
-                      </div>
-
-                      {/* QUICK COLOR CHIPS */}
-                      <div className="pt-2 flex flex-wrap items-center gap-1.5">
-                        <span className="text-[10px] font-black uppercase text-slate-500 mr-1 flex items-center gap-1">
-                          <Sparkles className="w-3 h-3 text-amber-600" />
-                          <span>Quick Add Color:</span>
-                        </span>
-                        {['Camel', 'Dusty Sage', 'Olive Green', 'Dark Navy', 'Maroon', 'Bottle Green', 'White', 'Black'].map((clr) => (
-                          <button
-                            key={clr}
-                            type="button"
-                            onClick={() => handleAddGridRow(cat, clr)}
-                            className="text-[10px] font-bold px-2 py-0.5 rounded border border-slate-300 bg-white hover:border-blue-500 hover:text-blue-900 transition cursor-pointer"
-                          >
-                            + {clr}
-                          </button>
-                        ))}
                       </div>
                     </div>
 
