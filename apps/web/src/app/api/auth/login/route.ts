@@ -40,6 +40,7 @@ export async function POST(request: Request) {
       washing_incharge: { role: 'WASHING_INCHARGE', dept: 'WASHING', name: 'Washing Department' },
       recutting: { role: 'RECUTTING_SUPERVISOR', dept: 'RECUTTING', name: 'Recutting Department' },
       stitching: { role: 'STITCHING_SUPERVISOR', dept: 'STITCHING', name: 'Stitching Department' },
+      finishing: { role: 'FINISHING_SUPERVISOR', dept: 'FINISHING', name: 'Finishing Department' },
     };
 
     // 2. Query user from Neon DB
@@ -288,8 +289,29 @@ export async function POST(request: Request) {
         roleCodes.includes('STITCHING_OPERATOR') ||
         roleCodes.includes('STITCHING_INCHARGE'));
 
+    const isFinishing =
+      !isAdmin &&
+      !isStore &&
+      !isProgramming &&
+      !isDyeing &&
+      !isQCWashing &&
+      !isQC1 &&
+      !isEmbroidery &&
+      !isThreadCutting &&
+      !isQC2 &&
+      !isWashing &&
+      !isRecutting &&
+      !isStitching &&
+      (user.username.toLowerCase() === 'finishing' ||
+        user.departmentCode === 'FINISHING' ||
+        roleCodes.includes('FINISHING_SUPERVISOR') ||
+        roleCodes.includes('FINISHING_OPERATOR') ||
+        roleCodes.includes('FINISHING_INCHARGE'));
+
     const normalizedRole = isAdmin
       ? 'ADMIN'
+      : isFinishing
+      ? 'FINISHING_SUPERVISOR'
       : isStitching
       ? 'STITCHING_SUPERVISOR'
       : isRecutting
@@ -316,6 +338,8 @@ export async function POST(request: Request) {
 
     const normalizedDept = isAdmin
       ? 'ADMIN'
+      : isFinishing
+      ? 'FINISHING'
       : isStitching
       ? 'STITCHING'
       : isRecutting
@@ -338,10 +362,12 @@ export async function POST(request: Request) {
       ? 'EMBROIDERY'
       : isProgramming
       ? 'PROGRAMMING'
-      : user.departmentCode || 'STITCHING';
+      : user.departmentCode || 'FINISHING';
 
     const defaultRedirect = isAdmin
       ? '/admin'
+      : isFinishing
+      ? '/finishing'
       : isStitching
       ? '/stitching'
       : isRecutting

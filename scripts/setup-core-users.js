@@ -230,6 +230,56 @@ async function setup() {
   await prisma.userRole.create({ data: { userId: stitchingUser.id, roleId: stitchingRole.id } });
   console.log('✓ Stitching user ready: stitching / 1234 (STITCHING_SUPERVISOR)');
 
+  // 8. Finishing Department & Role & User
+  let finishingRole = await prisma.role.findFirst({ where: { code: 'FINISHING_SUPERVISOR' } });
+  if (!finishingRole) {
+    finishingRole = await prisma.role.create({
+      data: { code: 'FINISHING_SUPERVISOR', name: 'Finishing Supervisor', description: 'Garment finishing, trimming, and pressing supervisor', isSystem: true },
+    });
+  }
+
+  const finishingUser = await prisma.user.upsert({
+    where: { username: 'finishing' },
+    update: { passwordHash: hash, departmentCode: 'FINISHING', fullName: 'Finishing Incharge' },
+    create: {
+      username: 'finishing',
+      email: 'finishing@subhamfabrics.com',
+      fullName: 'Finishing Incharge',
+      passwordHash: hash,
+      departmentCode: 'FINISHING',
+    },
+  });
+  await prisma.userRole.deleteMany({ where: { userId: finishingUser.id } });
+  await prisma.userRole.create({ data: { userId: finishingUser.id, roleId: finishingRole.id } });
+  console.log('✓ Finishing user ready: finishing / 1234 (FINISHING_SUPERVISOR)');
+
+  // 9. Downstream factory route departments
+  await prisma.department.upsert({
+    where: { code: 'BUTTON_ATTACHMENT' },
+    update: { name: 'Button & Trim Attachment', sequenceOrder: 13 },
+    create: { code: 'BUTTON_ATTACHMENT', name: 'Button & Trim Attachment', sequenceOrder: 13, description: 'Button stitching and trim fixing section' },
+  });
+
+  await prisma.department.upsert({
+    where: { code: 'STEAM_PRESS' },
+    update: { name: 'Steam Pressing', sequenceOrder: 14 },
+    create: { code: 'STEAM_PRESS', name: 'Steam Pressing', sequenceOrder: 14, description: 'Boiler steam pressing and crease setting' },
+  });
+
+  await prisma.department.upsert({
+    where: { code: 'FINISHED_GOODS' },
+    update: { name: 'Finished Goods Warehouse', sequenceOrder: 17 },
+    create: { code: 'FINISHED_GOODS', name: 'Finished Goods Warehouse', sequenceOrder: 17, description: 'Finished goods storage warehouse' },
+  });
+
+  await prisma.department.upsert({
+    where: { code: 'DISPATCH' },
+    update: { name: 'Dispatch Department', sequenceOrder: 18 },
+    create: { code: 'DISPATCH', name: 'Dispatch Department', sequenceOrder: 18, description: 'Shipping and logistics dispatch' },
+  });
+
+  console.log('✓ Downstream factory route departments verified');
+
   console.log('--- Core users successfully configured ---');
 }
 

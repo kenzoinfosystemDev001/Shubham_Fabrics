@@ -124,6 +124,16 @@ const DEPARTMENTS = [
     hoverClass: 'hover:bg-indigo-500/10 hover:text-indigo-300',
     activeBg: 'bg-indigo-500/15 text-indigo-300 font-bold',
   },
+  {
+    name: 'Finishing Department',
+    code: 'FINISHING',
+    href: '/finishing',
+    color: 'teal',
+    badge: 'FIN',
+    dotClass: 'bg-teal-400',
+    hoverClass: 'hover:bg-teal-500/10 hover:text-teal-300',
+    activeBg: 'bg-teal-500/15 text-teal-300 font-bold',
+  },
 ];
 
 export function DepartmentSwitcher({
