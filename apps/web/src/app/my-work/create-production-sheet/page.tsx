@@ -824,9 +824,27 @@ export default function CreateProductionSheetPage() {
         status: targetStatus,
         components: componentsPayload,
         forwardedComponents: forwardedComponents,
-        wilcomEntries: wilcomEntries,
-        wilcomDesignNumber: wilcomEntries[0]?.wilcomDesignNumber || '',
-        wilcomDesignPhoto: wilcomEntries[0]?.photoUrl || '',
+        wilcomEntries: (() => {
+          let list = [...wilcomEntries];
+          if (list.length === 0 && (wilcomDesignNumber.trim() || wilcomPhotoUrl)) {
+            list = [
+              {
+                id: `wilcom-${Date.now()}`,
+                category: wilcomCategory || 'TOP',
+                styleName: wilcomStyleName.trim() || `${primaryCat} Embroidery Design`,
+                wilcomDesignNumber: wilcomDesignNumber.trim() || 'WLC-01',
+                photoUrl: wilcomPhotoUrl,
+                remarks: wilcomRemarks.trim(),
+                createdAt: new Date().toISOString(),
+              },
+            ];
+          } else if (list.length > 0 && wilcomPhotoUrl && !list[0].photoUrl) {
+            list[0].photoUrl = wilcomPhotoUrl;
+          }
+          return list;
+        })(),
+        wilcomDesignNumber: wilcomEntries[0]?.wilcomDesignNumber || wilcomDesignNumber.trim() || '',
+        wilcomDesignPhoto: wilcomEntries[0]?.photoUrl || wilcomPhotoUrl || '',
       };
 
       const result = await api.createProductionSheet(payload);

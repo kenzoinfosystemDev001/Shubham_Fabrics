@@ -51,7 +51,27 @@ export function ProductionSheetPrintModal({
 
   const components = meta?.components || null;
   const forwardedComponents: string[] = Array.isArray(meta?.forwardedComponents) ? meta.forwardedComponents : ['TOP'];
-  const wilcomEntries: WilcomEntry[] = Array.isArray(meta?.wilcomEntries) ? meta.wilcomEntries : [];
+  
+  const rootWilcomPhoto = program.wilcomDesignPhoto || meta?.wilcomDesignPhoto || program.baseDesignPhoto || '';
+  let wilcomEntries: WilcomEntry[] = Array.isArray(meta?.wilcomEntries) ? meta.wilcomEntries : [];
+
+  if (wilcomEntries.length === 0 && (program.wilcomDesignNumber || rootWilcomPhoto || program.embroideryDesign)) {
+    wilcomEntries = [
+      {
+        id: 'wilcom-modal-auto-1',
+        category: 'TOP',
+        styleName: program.topName || program.mainStyle || 'Primary Top Style',
+        wilcomDesignNumber: program.wilcomDesignNumber || program.embroideryDesign || 'WLC-01',
+        photoUrl: rootWilcomPhoto,
+        remarks: program.remarks || program.comments || '',
+      },
+    ];
+  } else if (wilcomEntries.length > 0) {
+    wilcomEntries = wilcomEntries.map((e: any, idx: number) => ({
+      ...e,
+      photoUrl: e.photoUrl || e.photo || e.imageUrl || e.image || (idx === 0 ? rootWilcomPhoto : '') || '',
+    }));
+  }
 
   const serialNo = program.programSerialNo || program.programNumber || '';
   const designNo = program.designNumber || program.designName || '';

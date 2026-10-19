@@ -48,6 +48,7 @@ export default function ProgramDetailPage() {
   const [challans, setChallans] = useState<any[]>([]);
   const [storeAvailability, setStoreAvailability] = useState<any>(null);
   const [verifyingStore, setVerifyingStore] = useState(false);
+  const [viewingPhotoModal, setViewingPhotoModal] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showPrintModal, setShowPrintModal] = useState(false);
@@ -198,7 +199,27 @@ export default function ProgramDetailPage() {
 
   const components = meta?.components || null;
   const forwardedComponents: string[] = Array.isArray(meta?.forwardedComponents) ? meta.forwardedComponents : ['TOP'];
-  const wilcomEntries: any[] = Array.isArray(meta?.wilcomEntries) ? meta.wilcomEntries : [];
+  
+  const rootWilcomPhoto = program.wilcomDesignPhoto || meta?.wilcomDesignPhoto || program.baseDesignPhoto || '';
+  let wilcomEntries: any[] = Array.isArray(meta?.wilcomEntries) ? meta.wilcomEntries : [];
+
+  if (wilcomEntries.length === 0 && (program.wilcomDesignNumber || rootWilcomPhoto || program.embroideryDesign)) {
+    wilcomEntries = [
+      {
+        id: 'wilcom-auto-1',
+        category: 'TOP',
+        styleName: program.topName || program.mainStyle || 'Primary Top Style',
+        wilcomDesignNumber: program.wilcomDesignNumber || program.embroideryDesign || 'WLC-01',
+        photoUrl: rootWilcomPhoto,
+        remarks: program.remarks || program.comments || '',
+      },
+    ];
+  } else if (wilcomEntries.length > 0) {
+    wilcomEntries = wilcomEntries.map((e: any, idx: number) => ({
+      ...e,
+      photoUrl: e.photoUrl || e.photo || e.imageUrl || e.image || (idx === 0 ? rootWilcomPhoto : '') || '',
+    }));
+  }
 
   const activeCategory: GarmentCategory = activeCategoryTab === 'WILCOM' ? 'TOP' : activeCategoryTab;
 
@@ -619,9 +640,21 @@ export default function ProgramDetailPage() {
 
           {/* WILCOM & EMBROIDERY */}
           <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-3">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-purple-900 bg-purple-50 px-2 py-0.5 rounded">
-              Wilcom &amp; Embroidery
-            </span>
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-purple-900 bg-purple-50 px-2 py-0.5 rounded">
+                Wilcom &amp; Embroidery
+              </span>
+              <button
+                type="button"
+                onClick={() => setActiveCategoryTab('WILCOM')}
+                className="text-[11px] font-bold text-purple-700 hover:text-purple-900 flex items-center gap-1 cursor-pointer"
+              >
+                <span>Wilcom Details</span>
+                <span className="font-mono text-[10px] bg-purple-100 text-purple-900 px-1.5 py-0.2 rounded-full font-bold">
+                  {wilcomEntries.length}
+                </span>
+              </button>
+            </div>
             <div className="grid grid-cols-2 gap-3 text-xs pt-1">
               <div>
                 <span className="text-slate-400 block text-[11px]">Wilcom Design #</span>
@@ -637,8 +670,36 @@ export default function ProgramDetailPage() {
               </div>
               <div>
                 <span className="text-slate-400 block text-[11px]">Wilcom Artwork</span>
-                <span className="text-slate-500 italic">{program.wilcomDesignPhoto ? 'Attached' : 'No photo uploaded'}</span>
+                <span className="text-slate-700 font-semibold">{rootWilcomPhoto ? 'Photo Uploaded' : 'No photo uploaded'}</span>
               </div>
+
+              {/* WILCOM IMAGE THUMBNAIL IN SPECIFICATION CARD */}
+              {rootWilcomPhoto && (
+                <div className="col-span-2 pt-2.5 border-t border-purple-100 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-16 h-16 border border-purple-300 rounded-md bg-purple-50/50 flex items-center justify-center overflow-hidden shrink-0 shadow-2xs">
+                      <img
+                        src={rootWilcomPhoto}
+                        alt={program.wilcomDesignNumber || 'Wilcom Artwork'}
+                        className="w-full h-full object-contain cursor-pointer hover:scale-105 transition"
+                        onClick={() => setViewingPhotoModal(rootWilcomPhoto)}
+                        title="Click to view full photo"
+                      />
+                    </div>
+                    <div>
+                      <span className="font-bold text-slate-800 text-xs block">Wilcom Design Reference</span>
+                      <button
+                        type="button"
+                        onClick={() => setViewingPhotoModal(rootWilcomPhoto)}
+                        className="text-[11px] font-bold text-purple-700 hover:text-purple-900 hover:underline flex items-center gap-1 mt-0.5 cursor-pointer"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>Enlarge Photo</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -799,35 +860,56 @@ export default function ProgramDetailPage() {
               <div className="space-y-4 pt-1">
                 {wilcomEntries.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {wilcomEntries.map((entry: any, wIdx: number) => (
-                      <div key={entry.id || wIdx} className="p-3.5 border-[1.5px] border-black rounded bg-white space-y-2">
-                        <div className="flex items-center justify-between border-b border-black/10 pb-1.5">
-                          <span className="text-[10px] font-black px-2 py-0.5 rounded bg-purple-100 text-purple-900 border border-purple-300 uppercase">
-                            {entry.category || 'EMBROIDERY'}
-                          </span>
-                          <span className="font-mono font-black text-xs text-purple-950">
-                            WILCOM #{entry.wilcomDesignNumber}
-                          </span>
-                        </div>
-                        <div className="flex items-start gap-3">
-                          <div className="w-20 h-20 border border-slate-300 rounded bg-slate-50 flex items-center justify-center overflow-hidden shrink-0">
-                            {entry.photoUrl ? (
-                              <img src={entry.photoUrl} alt={entry.wilcomDesignNumber} className="w-full h-full object-contain" />
-                            ) : (
-                              <span className="text-[10px] text-slate-400 font-bold">No Photo</span>
-                            )}
+                    {wilcomEntries.map((entry: any, wIdx: number) => {
+                      const photo = entry.photoUrl || (wIdx === 0 ? rootWilcomPhoto : '') || '';
+                      return (
+                        <div key={entry.id || wIdx} className="p-4 border-[1.5px] border-purple-900 rounded-lg bg-white space-y-3 shadow-2xs">
+                          <div className="flex items-center justify-between border-b border-purple-100 pb-2">
+                            <span className="text-[10px] font-black px-2 py-0.5 rounded bg-purple-100 text-purple-900 border border-purple-300 uppercase">
+                              {entry.category || 'EMBROIDERY'}
+                            </span>
+                            <span className="font-mono font-black text-xs text-purple-950">
+                              WILCOM #{entry.wilcomDesignNumber || 'N/A'}
+                            </span>
                           </div>
-                          <div className="space-y-1 text-xs">
-                            <div className="font-bold text-slate-900">{entry.styleName || 'Garment Style'}</div>
-                            {entry.remarks && <p className="text-slate-600 text-[11px]">{entry.remarks}</p>}
+                          <div className="grid grid-cols-1 sm:grid-cols-[140px_1fr] gap-4 items-start">
+                            <div className="w-[140px] h-[140px] border border-purple-200 rounded-md bg-purple-50/40 flex items-center justify-center overflow-hidden shrink-0">
+                              {photo ? (
+                                <img
+                                  src={photo}
+                                  alt={entry.wilcomDesignNumber}
+                                  className="w-full h-full object-contain cursor-pointer hover:scale-105 transition"
+                                  onClick={() => setViewingPhotoModal(photo)}
+                                  title="Click to view full photo"
+                                />
+                              ) : (
+                                <span className="text-[10px] text-slate-400 font-bold text-center p-2">
+                                  No Reference Photo
+                                </span>
+                              )}
+                            </div>
+                            <div className="space-y-1.5 text-xs">
+                              <div className="font-bold text-slate-900 text-sm">{entry.styleName || 'Garment Style'}</div>
+                              {entry.remarks && <p className="text-slate-600 text-[11px] leading-relaxed">{entry.remarks}</p>}
+                              {photo && (
+                                <button
+                                  type="button"
+                                  onClick={() => setViewingPhotoModal(photo)}
+                                  className="text-[11px] font-bold text-purple-700 hover:text-purple-900 flex items-center gap-1 mt-2 cursor-pointer"
+                                >
+                                  <Eye className="w-3.5 h-3.5" />
+                                  <span>View Full Photo</span>
+                                </button>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
-                  <div className="p-6 text-center border border-dashed border-slate-300 rounded-md text-slate-500 text-xs">
-                    No Wilcom embroidery designs recorded for this production order.
+                  <div className="p-8 text-center border-2 border-dashed border-slate-300 rounded-lg text-slate-500 text-xs space-y-1">
+                    <p className="font-bold text-slate-700">No Wilcom embroidery designs recorded for this production order.</p>
                   </div>
                 )}
               </div>
@@ -1101,6 +1183,37 @@ export default function ProgramDetailPage() {
         isOpen={showPrintModal}
         onClose={() => setShowPrintModal(false)}
       />
+
+      {/* PHOTO LIGHTBOX MODAL */}
+      {viewingPhotoModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xs p-4 cursor-pointer"
+          onClick={() => setViewingPhotoModal(null)}
+        >
+          <div
+            className="relative max-w-3xl max-h-[90vh] bg-white p-4 rounded-xl shadow-2xl flex flex-col items-center cursor-default"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-full flex items-center justify-between pb-2 border-b border-slate-200">
+              <span className="text-xs font-bold text-slate-800">Wilcom Design Artwork Reference</span>
+              <button
+                type="button"
+                onClick={() => setViewingPhotoModal(null)}
+                className="text-slate-500 hover:text-slate-800 text-sm font-black p-1 hover:bg-slate-100 rounded transition cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-3 overflow-auto max-h-[75vh] flex items-center justify-center">
+              <img
+                src={viewingPhotoModal}
+                alt="Wilcom Design Artwork"
+                className="max-w-full max-h-[70vh] object-contain rounded border border-slate-200 shadow-sm"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

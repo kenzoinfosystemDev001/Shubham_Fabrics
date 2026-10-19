@@ -210,6 +210,53 @@ async function prepareProductionSheetImages(program: any) {
   if (preparedProgram.wilcomDesignPhoto) {
     preparedProgram.wilcomDesignPhoto = await embedImage(preparedProgram.wilcomDesignPhoto, 'Wilcom design photo');
   }
+
+  // Ensure all photos in wilcomEntries inside metadataJson are embedded as base64 data URLs
+  try {
+    let meta: any = null;
+    if (preparedProgram.metadataJson) {
+      meta = typeof preparedProgram.metadataJson === 'string'
+        ? JSON.parse(preparedProgram.metadataJson)
+        : { ...preparedProgram.metadataJson };
+    }
+
+    const fallbackPhoto = preparedProgram.wilcomDesignPhoto || meta?.wilcomDesignPhoto || preparedProgram.baseDesignPhoto || '';
+
+    let entries: WilcomEntry[] = Array.isArray(meta?.wilcomEntries) ? meta.wilcomEntries : [];
+    if (entries.length === 0 && (preparedProgram.wilcomDesignNumber || fallbackPhoto || preparedProgram.embroideryDesign)) {
+      entries = [
+        {
+          id: 'wilcom-auto-1',
+          category: 'TOP',
+          styleName: preparedProgram.topName || preparedProgram.mainStyle || 'Primary Top Style',
+          wilcomDesignNumber: preparedProgram.wilcomDesignNumber || preparedProgram.embroideryDesign || '',
+          photoUrl: fallbackPhoto,
+          remarks: preparedProgram.remarks || preparedProgram.comments || '',
+        },
+      ];
+    }
+
+    if (entries.length > 0) {
+      meta = meta || {};
+      meta.wilcomEntries = await Promise.all(
+        entries.map(async (entry: any, idx: number) => {
+          const rawPhoto = entry.photoUrl || entry.photo || entry.imageUrl || entry.image || (idx === 0 ? fallbackPhoto : '') || '';
+          const embedded = rawPhoto ? await embedImage(rawPhoto, 'Wilcom entry photo') : '';
+          return {
+            ...entry,
+            photoUrl: embedded,
+          };
+        })
+      );
+      preparedProgram.metadataJson = JSON.stringify(meta);
+      if (meta.wilcomEntries[0]?.photoUrl && !preparedProgram.wilcomDesignPhoto) {
+        preparedProgram.wilcomDesignPhoto = meta.wilcomEntries[0].photoUrl;
+      }
+    }
+  } catch (err) {
+    console.warn('Error embedding wilcomEntries images:', err);
+  }
+
   return preparedProgram;
 }
 
@@ -1195,27 +1242,34 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
     : new Date().toLocaleDateString('en-GB');
 
   let wilcomEntries: WilcomEntry[] = [];
+  const rootWilcomPhoto = program.wilcomDesignPhoto || program.baseDesignPhoto || '';
+
   if (program.metadataJson) {
     try {
       const meta = typeof program.metadataJson === 'string' ? JSON.parse(program.metadataJson) : program.metadataJson;
       if (Array.isArray(meta?.wilcomEntries)) {
-        wilcomEntries = meta.wilcomEntries;
+        wilcomEntries = meta.wilcomEntries.map((e: any, idx: number) => ({
+          ...e,
+          photoUrl: e.photoUrl || e.photo || e.imageUrl || e.image || (idx === 0 ? rootWilcomPhoto : '') || '',
+        }));
       }
     } catch {}
   }
 
   // Fallback for single wilcom design
-  if (wilcomEntries.length === 0 && (program.wilcomDesignNumber || program.embroideryDesign)) {
+  if (wilcomEntries.length === 0 && (program.wilcomDesignNumber || program.embroideryDesign || rootWilcomPhoto)) {
     wilcomEntries = [
       {
         id: 'legacy-1',
         category: 'TOP',
         styleName: program.topName || program.mainStyle || 'Primary Top Style',
-        wilcomDesignNumber: program.wilcomDesignNumber || program.embroideryDesign || '',
-        photoUrl: program.wilcomDesignPhoto || program.baseDesignPhoto || '',
+        wilcomDesignNumber: program.wilcomDesignNumber || program.embroideryDesign || 'WLC-01',
+        photoUrl: rootWilcomPhoto,
         remarks: program.remarks || program.comments || '',
       },
     ];
+  } else if (wilcomEntries.length > 0 && rootWilcomPhoto && !wilcomEntries[0].photoUrl) {
+    wilcomEntries[0].photoUrl = rootWilcomPhoto;
   }
 
   const filtered = filterCategory === 'ALL'
@@ -1530,8 +1584,20 @@ export function printWilcomForm(program: any, filterCategory: GarmentCategory | 
         printWindow.document.open();
         printWindow.document.write(generateWilcomFormHtml(preparedProgram, filterCategory));
         printWindow.document.close();
-        printWindow.focus();
-        printWindow.print();
+
+        const triggerPrint = () => {
+          try {
+            printWindow.focus();
+            printWindow.print();
+          } catch {}
+        };
+
+        if (printWindow.document.readyState === 'complete') {
+          setTimeout(triggerPrint, 350);
+        } else {
+          printWindow.onload = () => setTimeout(triggerPrint, 350);
+          setTimeout(triggerPrint, 800);
+        }
       } catch (error) {
         printWindow.close();
         const message = error instanceof Error ? error.message : 'Failed to print Wilcom form.';

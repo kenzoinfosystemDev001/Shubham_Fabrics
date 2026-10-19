@@ -270,16 +270,33 @@ export async function POST(request: Request) {
     if (Array.isArray(data.forwardedComponents)) {
       metadataObj.forwardedComponents = data.forwardedComponents;
     }
-    if (Array.isArray(data.wilcomEntries)) {
-      metadataObj.wilcomEntries = data.wilcomEntries;
-    }
-
-    // Resolve primary wilcom information from wilcomEntries if provided
+    // Resolve primary wilcom information from wilcomEntries or root fields
     const primaryWilcom = Array.isArray(data.wilcomEntries) && data.wilcomEntries.length > 0 
       ? data.wilcomEntries[0] 
       : null;
     const resolvedWilcomNumber = primaryWilcom?.wilcomDesignNumber || data.wilcomDesignNumber || null;
     const resolvedWilcomPhoto = primaryWilcom?.photoUrl || data.wilcomDesignPhoto || null;
+
+    metadataObj.wilcomDesignPhoto = resolvedWilcomPhoto;
+    metadataObj.wilcomDesignNumber = resolvedWilcomNumber;
+
+    if (Array.isArray(data.wilcomEntries) && data.wilcomEntries.length > 0) {
+      metadataObj.wilcomEntries = data.wilcomEntries.map((e: any, idx: number) => ({
+        ...e,
+        photoUrl: e.photoUrl || (idx === 0 ? resolvedWilcomPhoto : '') || '',
+      }));
+    } else if (resolvedWilcomNumber || resolvedWilcomPhoto) {
+      metadataObj.wilcomEntries = [
+        {
+          id: 'wilcom-auto-1',
+          category: 'TOP',
+          styleName: data.mainStyle || data.topName || 'Embroidery Design',
+          wilcomDesignNumber: resolvedWilcomNumber || '',
+          photoUrl: resolvedWilcomPhoto || '',
+          remarks: data.note || data.comments || '',
+        },
+      ];
+    }
 
     const programData = {
       programNumber,
