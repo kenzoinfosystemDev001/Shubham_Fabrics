@@ -40,8 +40,8 @@ async function cleanDatabase() {
     await prisma.fabricStockLedger.deleteMany({});
     await prisma.fabricStoreRoll.deleteMany({});
     await prisma.fabricBatch.deleteMany({});
-    if ((prisma as any).fabricInward) await (prisma as any).fabricInward.deleteMany({});
-    if ((prisma as any).fabricOutward) await (prisma as any).fabricOutward.deleteMany({});
+    if (prisma.fabricInward) await prisma.fabricInward.deleteMany({});
+    if (prisma.fabricOutward) await prisma.fabricOutward.deleteMany({});
 
     // 6. Inventory stock & ledger
     console.log('Clearing inventory stocks & ledger entries...');
