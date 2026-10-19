@@ -298,6 +298,18 @@ class ApiClient {
           defaultRedirect: '/qcwashing',
           validPins: ['Admin@12345', 'admin@12345', '1234', '1111', '0000'],
         },
+        recutting: {
+          id: 'usr-rec-001',
+          username: 'recutting',
+          fullName: 'Recutting Incharge',
+          email: 'recutting@subhamfabrics.com',
+          role: 'RECUTTING_SUPERVISOR',
+          roles: ['RECUTTING_SUPERVISOR', 'USER'],
+          permissions: ['cutting.*', 'production.*', 'challans.receive', 'challans.issue'],
+          departmentCode: 'RECUTTING',
+          defaultRedirect: '/recutting',
+          validPins: ['Admin@12345', 'admin@12345', '1234', '1111', '0000'],
+        },
       };
 
       const persona = DEMO_PERSONAS[u];

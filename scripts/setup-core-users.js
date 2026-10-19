@@ -172,6 +172,41 @@ async function setup() {
   await prisma.userRole.create({ data: { userId: qc3User.id, roleId: qcWashingRole.id } });
   console.log('✓ QC Washing alias ready: qc3 / 1234');
 
+  // 6. Recutting & Stitching Departments, Roles, and User
+  await prisma.department.upsert({
+    where: { code: 'RECUTTING' },
+    update: { name: 'Embroidery Recutting', sequenceOrder: 10 },
+    create: { code: 'RECUTTING', name: 'Embroidery Recutting', sequenceOrder: 10, description: 'Embroidery & Panel Recutting Section' },
+  });
+
+  await prisma.department.upsert({
+    where: { code: 'STITCHING' },
+    update: { name: 'Stitching Department', sequenceOrder: 11 },
+    create: { code: 'STITCHING', name: 'Stitching Department', sequenceOrder: 11, description: 'Garment Assembly & Stitching Lines' },
+  });
+
+  let recuttingRole = await prisma.role.findFirst({ where: { code: 'RECUTTING_SUPERVISOR' } });
+  if (!recuttingRole) {
+    recuttingRole = await prisma.role.create({
+      data: { code: 'RECUTTING_SUPERVISOR', name: 'Recutting Supervisor', description: 'Embroidery recutting and panel separation supervisor', isSystem: true },
+    });
+  }
+
+  const recuttingUser = await prisma.user.upsert({
+    where: { username: 'recutting' },
+    update: { passwordHash: hash, departmentCode: 'RECUTTING', fullName: 'Recutting Incharge' },
+    create: {
+      username: 'recutting',
+      email: 'recutting@subhamfabrics.com',
+      fullName: 'Recutting Incharge',
+      passwordHash: hash,
+      departmentCode: 'RECUTTING',
+    },
+  });
+  await prisma.userRole.deleteMany({ where: { userId: recuttingUser.id } });
+  await prisma.userRole.create({ data: { userId: recuttingUser.id, roleId: recuttingRole.id } });
+  console.log('✓ Recutting user ready: recutting / 1234 (RECUTTING_SUPERVISOR)');
+
   console.log('--- Core users successfully configured ---');
 }
 

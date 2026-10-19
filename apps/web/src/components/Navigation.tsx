@@ -95,7 +95,8 @@ export function Navigation() {
     pathname.startsWith('/washing') ||
     pathname.startsWith('/qcwashing') ||
     pathname.startsWith('/qc3') ||
-    pathname.startsWith('/qc-washing')
+    pathname.startsWith('/qc-washing') ||
+    pathname.startsWith('/recutting')
   ) {
     return null;
   }

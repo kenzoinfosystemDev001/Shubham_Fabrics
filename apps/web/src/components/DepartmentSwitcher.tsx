@@ -9,7 +9,7 @@ import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 
 export interface DepartmentSwitcherProps {
   currentDepartmentName: string;
-  accentColor?: 'amber' | 'teal' | 'purple' | 'emerald' | 'fuchsia' | 'indigo' | 'cyan';
+  accentColor?: 'amber' | 'teal' | 'purple' | 'emerald' | 'fuchsia' | 'indigo' | 'cyan' | 'rose';
   onNavigate?: () => void;
 }
 
@@ -104,6 +104,16 @@ const DEPARTMENTS = [
     hoverClass: 'hover:bg-emerald-500/10 hover:text-emerald-300',
     activeBg: 'bg-emerald-500/15 text-emerald-300 font-bold',
   },
+  {
+    name: 'Recutting Department',
+    code: 'RECUTTING',
+    href: '/recutting',
+    color: 'emerald',
+    badge: 'REC',
+    dotClass: 'bg-rose-400',
+    hoverClass: 'hover:bg-rose-500/10 hover:text-rose-300',
+    activeBg: 'bg-rose-500/15 text-rose-300 font-bold',
+  },
 ];
 
 export function DepartmentSwitcher({
@@ -163,6 +173,8 @@ export function DepartmentSwitcher({
         return 'text-indigo-400';
       case 'cyan':
         return 'text-cyan-400';
+      case 'rose':
+        return 'text-rose-400';
       case 'amber':
       default:
         return 'text-amber-400';
