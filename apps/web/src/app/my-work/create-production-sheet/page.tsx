@@ -21,10 +21,11 @@ import {
   Edit3,
   Check,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  X
 } from 'lucide-react';
 import { api } from '@/lib/api';
-import { getCurrentUser, canViewClientCode } from '@/lib/rbac';
+import { getCurrentUser, canViewClientCode, canViewClientName } from '@/lib/rbac';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { 
   downloadProductionSheetHtml, 
@@ -143,6 +144,7 @@ export default function CreateProductionSheetPage() {
 
   // Forwarding Selection State: select which sheets to forward to the next department
   const [forwardedComponents, setForwardedComponents] = useState<GarmentCategory[]>(['TOP']);
+  const [selectedCategory, setSelectedCategory] = useState<GarmentCategory>('TOP');
 
   // Wilcom Form Stage Management State
   const [wilcomEntries, setWilcomEntries] = useState<WilcomEntry[]>([]);
@@ -152,6 +154,7 @@ export default function CreateProductionSheetPage() {
   const [wilcomPhotoUrl, setWilcomPhotoUrl] = useState('');
   const [wilcomRemarks, setWilcomRemarks] = useState('');
   const [editingWilcomId, setEditingWilcomId] = useState<string | null>(null);
+  const [showWilcomModal, setShowWilcomModal] = useState(false);
 
   // MES Routing & Commercial Fields
   const [clientName, setClientName] = useState('');
@@ -277,6 +280,50 @@ export default function CreateProductionSheetPage() {
       }
       setForwardedComponents((prev) => [...prev, cat]);
     }
+  };
+
+  // Handle Category Change from Sheet Dropdown (where TOP / BOTTOM / DUPATTA is selected)
+  const handleCategoryDropdownChange = (newCat: GarmentCategory) => {
+    if (newCat === selectedCategory) return;
+    const oldCat = selectedCategory;
+    setSelectedCategory(newCat);
+
+    // Transfer/update component states
+    setComponents((prev) => {
+      const currentData = prev[oldCat];
+      const targetData = prev[newCat];
+
+      const hasEnteredStyle = Boolean(currentData.styleName.trim());
+      const hasEnteredFabric = Boolean(currentData.fabricName.trim() || currentData.fabricWidth.trim());
+      const hasEnteredNotes = Boolean(currentData.noteText.trim());
+      const hasCustomGrid = currentData.productionGrid.some((r) => r.color || r.pcs || r.mtr);
+
+      const defaultSubStylesForNew = getDefaultSubStylesForCategory(newCat).map((s) => ({ ...s, average: '' }));
+      const targetHasValues = targetData.subStyles.some((s) => s.average !== '');
+      const nextSubStyles = targetHasValues ? targetData.subStyles : defaultSubStylesForNew;
+
+      return {
+        ...prev,
+        [newCat]: {
+          ...targetData,
+          enabled: true,
+          styleName: hasEnteredStyle && !targetData.styleName.trim() ? currentData.styleName : targetData.styleName,
+          fabricName: hasEnteredFabric && !targetData.fabricName.trim() ? currentData.fabricName : targetData.fabricName,
+          fabricWidth: hasEnteredFabric && !targetData.fabricWidth.trim() ? currentData.fabricWidth : targetData.fabricWidth,
+          noteText: hasEnteredNotes && !targetData.noteText.trim() ? currentData.noteText : targetData.noteText,
+          productionGrid: hasCustomGrid && targetData.productionGrid.length <= 1 && !targetData.productionGrid[0]?.color
+            ? currentData.productionGrid
+            : targetData.productionGrid,
+          subStyles: nextSubStyles,
+        },
+        [oldCat]: {
+          ...currentData,
+          enabled: false,
+        },
+      };
+    });
+
+    setForwardedComponents([newCat]);
   };
 
   // Component SubStyle Changes
@@ -679,9 +726,7 @@ export default function CreateProductionSheetPage() {
         },
       };
 
-      const primaryCat: GarmentCategory = components.TOP.enabled 
-        ? 'TOP' 
-        : (components.BOTTOM.enabled ? 'BOTTOM' : 'DUPATTA');
+      const primaryCat: GarmentCategory = selectedCategory;
       const primary = components[primaryCat];
       const primaryAvg = getTotalMtrAverage(primaryCat);
       const primaryPieces = getTotalPieces(primaryCat);
@@ -691,7 +736,7 @@ export default function CreateProductionSheetPage() {
         programNumber: programSerialNo.trim() || undefined,
         programSerialNo: programSerialNo.trim(),
         designNumber: designNumber.trim(),
-        topName: components.TOP.styleName.trim() || designNumber.trim(),
+        topName: primary.styleName.trim() || designNumber.trim(),
         mainStyle: primary.styleName.trim() || designNumber.trim(),
         startDate: sheetDate,
         deliveryDate: deliveryDate,
@@ -875,175 +920,8 @@ export default function CreateProductionSheetPage() {
           </div>
         )}
 
-        {/* SHARED PRODUCTION ORDER HEADER */}
-        <section className="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-4">
-          <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
-            <div>
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 block">
-                PRODUCTION ORDER SPECIFICATION
-              </span>
-              <h2 className="text-sm font-black text-slate-900 uppercase tracking-wide">
-                Master Order Information
-              </h2>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-slate-500">Components Active:</span>
-              {(['TOP', 'BOTTOM', 'DUPATTA'] as GarmentCategory[]).map((cat) => (
-                <span
-                  key={cat}
-                  className={`text-[10px] font-black px-2 py-0.5 rounded border ${
-                    components[cat].enabled
-                      ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                      : 'bg-slate-50 text-slate-400 border-slate-200'
-                  }`}
-                >
-                  {cat} {components[cat].enabled ? '✓' : '—'}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
-            {/* DESIGN NO. */}
-            <div>
-              <label className="block text-[11px] font-black uppercase text-slate-700 mb-1">
-                DESIGN NO. *
-              </label>
-              <input
-                type="text"
-                value={designNumber}
-                onChange={(e) => setDesignNumber(e.target.value)}
-                onFocus={(e) => e.target.select()}
-                placeholder=""
-                className="w-full px-3 py-1.5 border-[1.5px] border-black rounded text-xs font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-800"
-              />
-            </div>
-
-            {/* SERIAL NO. */}
-            <div>
-              <label className="block text-[11px] font-black uppercase text-slate-700 mb-1">
-                SERIAL NO. / TRAVELER NO.
-              </label>
-              <input
-                type="text"
-                value={programSerialNo}
-                onChange={(e) => setProgramSerialNo(e.target.value)}
-                onFocus={(e) => e.target.select()}
-                placeholder=""
-                className="w-full px-3 py-1.5 border-[1.5px] border-black rounded text-xs font-black text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-800 font-mono"
-              />
-            </div>
-
-            {/* DATE */}
-            <div>
-              <label className="block text-[11px] font-black uppercase text-slate-700 mb-1">
-                DATE
-              </label>
-              <input
-                type="date"
-                value={sheetDate}
-                onChange={(e) => setSheetDate(e.target.value)}
-                className="w-full px-3 py-1.5 border-[1.5px] border-black rounded text-xs font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-800"
-              />
-            </div>
-
-            {/* CLIENT CODE (CONFIDENTIAL) */}
-            {canViewClientCode(currentUser) ? (
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block text-[11px] font-black uppercase text-amber-900">
-                    CLIENT CODE
-                  </label>
-                  <span className="text-[9px] font-bold px-1 rounded bg-amber-100 text-amber-900 border border-amber-300">
-                    🔒 Admin &amp; Prog
-                  </span>
-                </div>
-                <input
-                  type="text"
-                  value={clientCode}
-                  onChange={(e) => setClientCode(e.target.value)}
-                  onFocus={(e) => e.target.select()}
-                  placeholder=""
-                  className="w-full px-3 py-1.5 border-[1.5px] border-amber-500 bg-amber-50/70 rounded text-xs font-mono font-bold text-amber-950 focus:outline-none focus:ring-1 focus:ring-amber-800"
-                />
-              </div>
-            ) : (
-              <div>
-                <label className="block text-[11px] font-black uppercase text-slate-700 mb-1">
-                  ORDER COUNTER
-                </label>
-                <input
-                  type="text"
-                  value={serialNoCounter}
-                  onChange={(e) => setSerialNoCounter(e.target.value)}
-                  placeholder=""
-                  className="w-full px-3 py-1.5 border border-slate-200 rounded text-xs font-bold text-slate-900 focus:outline-none"
-                />
-              </div>
-            )}
-
-            {/* DEFAULT FABRIC */}
-            <div>
-              <label className="block text-[11px] font-black uppercase text-slate-700 mb-1">
-                DEFAULT FABRIC
-              </label>
-              <input
-                type="text"
-                value={fabricName}
-                onChange={(e) => setFabricName(e.target.value)}
-                onFocus={(e) => e.target.select()}
-                placeholder=""
-                className="w-full px-3 py-1.5 border border-slate-300 rounded text-xs font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-800"
-              />
-            </div>
-
-            {/* DEFAULT WIDTH */}
-            <div>
-              <label className="block text-[11px] font-black uppercase text-slate-700 mb-1">
-                FABRIC WIDTH
-              </label>
-              <input
-                type="text"
-                value={fabricWidth}
-                onChange={(e) => setFabricWidth(e.target.value)}
-                onFocus={(e) => e.target.select()}
-                placeholder=""
-                className="w-full px-3 py-1.5 border border-slate-300 rounded text-xs font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-800"
-              />
-            </div>
-
-            {/* CLIENT / BUYER NAME */}
-            <div>
-              <label className="block text-[11px] font-black uppercase text-slate-700 mb-1">
-                CLIENT / BUYER NAME *
-              </label>
-              <input
-                type="text"
-                value={clientName}
-                onChange={(e) => setClientName(e.target.value)}
-                placeholder=""
-                className="w-full px-3 py-1.5 border border-slate-300 rounded text-xs font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-800"
-              />
-            </div>
-
-            {/* DELIVERY TARGET DATE */}
-            <div>
-              <label className="block text-[11px] font-black uppercase text-slate-700 mb-1">
-                DELIVERY TARGET DATE *
-              </label>
-              <input
-                type="date"
-                value={deliveryDate}
-                onChange={(e) => setDeliveryDate(e.target.value)}
-                className="w-full px-3 py-1.5 border border-slate-300 rounded text-xs font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-800"
-              />
-            </div>
-          </div>
-        </section>
-
         {/* ========================================================================= */}
-        {/* THREE PRODUCTION SHEET CREATION OPTIONS (DISPLAYED VERTICALLY)            */}
-        {/* TOP Production Sheet, BOTTOM Production Sheet, DUPATTA Production Sheet   */}
+        {/* GARMENT COMPONENT PRODUCTION SHEETS                                       */}
         {/* ========================================================================= */}
         <section className="space-y-6">
           <div className="flex items-center justify-between border-b border-slate-200 pb-2">
@@ -1052,12 +930,21 @@ export default function CreateProductionSheetPage() {
                 STAGE 1 &middot; PRODUCTION SHEET MANAGEMENT
               </span>
               <h2 className="text-base font-black text-slate-900 uppercase">
-                Garment Component Production Sheets
+                Garment Component Production Sheet
               </h2>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-slate-500">Active Category:</span>
+              <span
+                className={`text-[10px] font-black px-2.5 py-0.5 rounded border ${CATEGORY_META[selectedCategory].badgeBg} ${CATEGORY_META[selectedCategory].badgeText} border-black/20`}
+              >
+                {selectedCategory}
+              </span>
             </div>
           </div>
 
-          {(['TOP', 'BOTTOM', 'DUPATTA'] as GarmentCategory[]).map((cat, index) => {
+          {(() => {
+            const cat = selectedCategory;
             const comp = components[cat];
             const meta = CATEGORY_META[cat];
             const catAvg = getTotalMtrAverage(cat);
@@ -1068,69 +955,39 @@ export default function CreateProductionSheetPage() {
 
             return (
               <div 
-                key={cat}
-                className={`bg-white border-2 ${comp.enabled ? 'border-black' : 'border-slate-300 bg-slate-50/50'} rounded-md shadow-xs transition-all overflow-hidden`}
+                className="bg-white border-2 border-black rounded-md shadow-xs transition-all overflow-hidden"
               >
-                {/* COMPONENT ENABLER HEADER BAR */}
+                {/* COMPONENT HEADER BAR */}
                 <div 
-                  className={`px-5 py-3 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
-                    comp.enabled 
-                      ? `${meta.badgeBg} border-black` 
-                      : 'bg-slate-100 border-slate-300 text-slate-500'
-                  }`}
+                  className={`px-5 py-3 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${meta.badgeBg} border-black`}
                 >
                   <div className="flex items-center gap-3">
-                    <label className="flex items-center gap-2.5 cursor-pointer select-none">
-                      <input
-                        type="checkbox"
-                        checked={comp.enabled}
-                        onChange={() => handleToggleComponent(cat)}
-                        className="w-4 h-4 text-blue-900 rounded border-slate-300 focus:ring-blue-700 cursor-pointer"
-                      />
-                      <span className={`text-sm font-black uppercase tracking-wider ${comp.enabled ? meta.badgeText : 'text-slate-600'}`}>
-                        {index + 1}. {meta.label}
-                      </span>
-                    </label>
+                    <span className={`text-sm font-black uppercase tracking-wider ${meta.badgeText}`}>
+                      {meta.label}
+                    </span>
 
-                    {comp.enabled && (
-                      <span className="text-[10px] font-black px-2 py-0.5 rounded bg-white border border-black/20 text-black">
-                        {catPieces} PCS &middot; {catMeters.toFixed(2)} MTR
-                      </span>
-                    )}
+                    <span className="text-[10px] font-black px-2.5 py-0.5 rounded bg-white border border-black/20 text-black">
+                      {catPieces} PCS &middot; {catMeters.toFixed(2)} MTR
+                    </span>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    {comp.enabled && (
-                      <label className="flex items-center gap-1.5 cursor-pointer text-xs font-bold select-none">
-                        <input
-                          type="checkbox"
-                          checked={isForwarded}
-                          onChange={() => handleToggleForwarding(cat)}
-                          className="w-3.5 h-3.5 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer"
-                        />
-                        <span className={isForwarded ? 'text-emerald-950 font-black' : 'text-slate-600'}>
-                          {isForwarded ? '✓ Included for Forwarding' : 'Forward Later'}
-                        </span>
-                      </label>
-                    )}
-
-                    <button
-                      type="button"
-                      onClick={() => handleToggleComponent(cat)}
-                      className={`text-xs font-bold px-2.5 py-1 rounded transition cursor-pointer ${
-                        comp.enabled
-                          ? 'bg-white hover:bg-slate-100 text-slate-800 border border-slate-300'
-                          : 'bg-blue-900 hover:bg-blue-950 text-white shadow-2xs'
-                      }`}
-                    >
-                      {comp.enabled ? 'Enabled' : '+ Enable Sheet'}
-                    </button>
+                    <label className="flex items-center gap-1.5 cursor-pointer text-xs font-bold select-none">
+                      <input
+                        type="checkbox"
+                        checked={isForwarded}
+                        onChange={() => handleToggleForwarding(cat)}
+                        className="w-3.5 h-3.5 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer"
+                      />
+                      <span className={isForwarded ? 'text-emerald-950 font-black' : 'text-slate-600'}>
+                        {isForwarded ? '✓ Included for Forwarding' : 'Forward Later'}
+                      </span>
+                    </label>
                   </div>
                 </div>
 
                 {/* EXPANDED PRODUCTION SHEET FORM (MATCHING PHYSICAL SPEC SHEET) */}
-                {comp.enabled ? (
-                  <div className="p-6 sm:p-8 space-y-5 text-black font-sans">
+                <div className="p-6 sm:p-8 space-y-5 text-black font-sans">
                     {/* SHEET BANNER TITLE */}
                     <div className="text-center font-black text-2xl sm:text-3xl tracking-[0.25em] uppercase text-black select-none border-b border-black/10 pb-2">
                       {cat} PRODUCTION SHEET
@@ -1154,10 +1011,63 @@ export default function CreateProductionSheetPage() {
                           />
                         </div>
 
+                        {/* WILCOM OPTION BELOW DESIGN NO. */}
                         <div className="flex items-center gap-2">
-                          <label className="font-black text-xs tracking-wider uppercase whitespace-nowrap min-w-[90px]">
-                            {meta.subHeader}
+                          <label className="font-black text-xs tracking-wider uppercase whitespace-nowrap min-w-[90px] text-purple-950">
+                            WILCOM
                           </label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setWilcomCategory(cat);
+                              if (!wilcomStyleName && comp.styleName) {
+                                setWilcomStyleName(comp.styleName);
+                              }
+                              setShowWilcomModal(true);
+                            }}
+                            className="border-[1.5px] border-purple-800 bg-purple-50 hover:bg-purple-100 text-purple-950 px-3 py-1 h-8 font-black text-xs uppercase tracking-wider flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
+                          >
+                            <Sparkles className="w-3.5 h-3.5 text-purple-700" />
+                            <span>WILCOM ({cat})</span>
+                            {wilcomEntries.filter((e) => e.category === cat).length > 0 ? (
+                              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold bg-purple-800 text-white">
+                                {wilcomEntries.filter((e) => e.category === cat).length}
+                              </span>
+                            ) : (
+                              <span className="text-[10px] text-purple-700 font-semibold normal-case">
+                                + Open Sheet
+                              </span>
+                            )}
+                          </button>
+                          {wilcomEntries.filter((e) => e.category === cat).length > 0 && (
+                            <span
+                              className="text-[11px] font-mono text-purple-900 font-black truncate max-w-[200px]"
+                              title={wilcomEntries.filter((e) => e.category === cat).map((e) => e.wilcomDesignNumber).join(', ')}
+                            >
+                              № {wilcomEntries.filter((e) => e.category === cat).map((e) => e.wilcomDesignNumber).join(', ')}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <div className="relative">
+                              <select
+                                value={cat}
+                                onChange={(e) => handleCategoryDropdownChange(e.target.value as GarmentCategory)}
+                                aria-label="Component Category"
+                                className="appearance-none font-black text-xs tracking-wider uppercase bg-white text-black border-[1.5px] border-black pl-2.5 pr-7 py-1 h-8 focus:outline-none focus:ring-1 focus:ring-blue-600 cursor-pointer shadow-2xs"
+                              >
+                                <option value="TOP">TOP</option>
+                                <option value="BOTTOM">BOTTOM</option>
+                                <option value="DUPATTA">DUPATTA</option>
+                              </select>
+                              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 text-black">
+                                <ChevronDown className="w-3.5 h-3.5 stroke-[2.5]" />
+                              </div>
+                            </div>
+                            <span className="font-black text-xs tracking-wider select-none">:-</span>
+                          </div>
                           <input
                             type="text"
                             value={comp.styleName}
@@ -1201,6 +1111,111 @@ export default function CreateProductionSheetPage() {
                             placeholder=""
                             className="border-[1.5px] border-black px-3 py-1 h-8 w-36 font-black text-center text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600 font-mono"
                           />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* FACTORY ROUTING & INVENTORY CLEARANCE */}
+                    <div className="pt-2">
+                      <div className="border-[1.5px] border-black p-4 bg-slate-50/50 space-y-3">
+                        <div className="flex items-center justify-between border-b border-black/15 pb-2">
+                          <h3 className="font-black text-xs uppercase tracking-wider text-black flex items-center gap-1.5 select-none">
+                            <Layers className="w-3.5 h-3.5 text-blue-800" />
+                            <span>FACTORY ROUTING &amp; INVENTORY CLEARANCE</span>
+                          </h3>
+                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                            Order Routing &middot; {cat} Sheet
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 text-xs">
+                          {/* Client / Buyer Name - Only visible to Admin and Programming */}
+                          {canViewClientName(currentUser) && (
+                            <div>
+                              <label className="block text-[10px] font-black uppercase tracking-wider text-black mb-1">
+                                CLIENT / BUYER NAME
+                              </label>
+                              <input
+                                type="text"
+                                value={clientName}
+                                onChange={(e) => setClientName(e.target.value)}
+                                onFocus={(e) => e.target.select()}
+                                placeholder="e.g. Standard Client"
+                                className="w-full px-2.5 py-1.5 border-[1.5px] border-black text-xs font-bold text-black bg-white focus:outline-none focus:ring-1 focus:ring-blue-600 shadow-2xs"
+                              />
+                            </div>
+                          )}
+
+                          {/* Delivery Target Date */}
+                          <div>
+                            <label className="block text-[10px] font-black uppercase tracking-wider text-black mb-1">
+                              DELIVERY TARGET DATE
+                            </label>
+                            <input
+                              type="date"
+                              value={deliveryDate}
+                              onChange={(e) => setDeliveryDate(e.target.value)}
+                              className="w-full px-2.5 py-1.5 border-[1.5px] border-black text-xs font-bold text-black bg-white focus:outline-none focus:ring-1 focus:ring-blue-600 shadow-2xs"
+                            />
+                          </div>
+
+                          {/* Order Priority */}
+                          <div>
+                            <label className="block text-[10px] font-black uppercase tracking-wider text-black mb-1">
+                              ORDER PRIORITY
+                            </label>
+                            <select
+                              value={clientPriority}
+                              onChange={(e) => setClientPriority(e.target.value)}
+                              className="w-full px-2.5 py-1.5 border-[1.5px] border-black text-xs font-bold text-black bg-white focus:outline-none focus:ring-1 focus:ring-blue-600 cursor-pointer shadow-2xs"
+                            >
+                              <option value="LOW">LOW</option>
+                              <option value="NORMAL">NORMAL</option>
+                              <option value="HIGH">HIGH (Expedited)</option>
+                              <option value="URGENT">URGENT (Top Floor)</option>
+                            </select>
+                          </div>
+
+                          {/* Dyeing Required */}
+                          <div>
+                            <label className="block text-[10px] font-black uppercase tracking-wider text-black mb-1">
+                              IS DYEING REQUIRED? *
+                            </label>
+                            <select
+                              value={fabricDyeingRequired ? 'YES' : 'NO'}
+                              onChange={(e) => setFabricDyeingRequired(e.target.value === 'YES')}
+                              className="w-full px-2.5 py-1.5 border-[1.5px] border-black text-xs font-bold text-black bg-white focus:outline-none focus:ring-1 focus:ring-blue-600 cursor-pointer shadow-2xs"
+                            >
+                              <option value="NO">NO (Pre-Dyed)</option>
+                              <option value="YES">YES (Kora)</option>
+                            </select>
+                          </div>
+
+                          {/* Fabric Color Availability */}
+                          <div>
+                            <label className="block text-[10px] font-black uppercase tracking-wider text-black mb-1">
+                              FABRIC COLOR AVAILABILITY
+                            </label>
+                            <select
+                              value={fabricColorAvailable}
+                              onChange={(e) => setFabricColorAvailable(e.target.value)}
+                              className="w-full px-2.5 py-1.5 border-[1.5px] border-black text-xs font-bold text-black bg-white focus:outline-none focus:ring-1 focus:ring-blue-600 cursor-pointer shadow-2xs"
+                            >
+                              <option value="IN_STOCK">IN STOCK</option>
+                              <option value="PROCUREMENT_PENDING">PROCUREMENT PENDING</option>
+                              <option value="DYEING_REQUIRED">DYEING REQUIRED</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        {/* Store Stock Availability Clearance Bar */}
+                        <div className="flex items-center justify-between p-2.5 border-[1.5px] border-black bg-white text-xs">
+                          <span className="font-black text-black uppercase tracking-wider text-[11px]">
+                            Fabric Store Stock Clearance:
+                          </span>
+                          <span className="text-[10px] font-black px-2.5 py-0.5 rounded bg-emerald-100 text-emerald-900 border border-emerald-400 uppercase tracking-wider">
+                            Movement Allowed
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -1576,411 +1591,11 @@ export default function CreateProductionSheetPage() {
                     </div>
 
                   </div>
-                ) : (
-                  <div className="p-4 text-center">
-                    <button
-                      type="button"
-                      onClick={() => handleToggleComponent(cat)}
-                      className="px-3 py-1.5 bg-blue-900 text-white rounded text-xs font-bold hover:bg-blue-950 transition cursor-pointer"
-                    >
-                      + Enable {meta.label}
-                    </button>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </section>
-
-        {/* ========================================================================= */}
-        {/* FORWARDING PRODUCTION SHEETS SELECTION                                     */}
-        {/* ========================================================================= */}
-        <section className="bg-white border-2 border-[#163767] rounded-xl p-5 sm:p-6 shadow-xs space-y-4">
-          <div className="border-b border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <span className="text-[10px] font-black uppercase tracking-wider text-[#163767] block">
-                WORKFLOW ROUTING &middot; FORWARDING ACTION
-              </span>
-              <h2 className="text-base font-black text-slate-900 uppercase">
-                Forwarding Production Sheets
-              </h2>
-            </div>
-            <div className="text-xs font-bold text-slate-600 bg-blue-50 border border-blue-200 px-3 py-1 rounded-full">
-              Selected to Forward: <strong className="text-blue-950 font-black">{forwardedComponents.join(' + ')}</strong>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-            {(['TOP', 'BOTTOM', 'DUPATTA'] as GarmentCategory[]).map((cat) => {
-              const isEnabled = components[cat].enabled;
-              const isForwarded = forwardedComponents.includes(cat);
-
-              return (
-                <div
-                  key={cat}
-                  onClick={() => {
-                    if (isEnabled) handleToggleForwarding(cat);
-                  }}
-                  className={`p-4 rounded-lg border-2 transition cursor-pointer flex flex-col justify-between gap-3 ${
-                    isForwarded
-                      ? 'border-[#163767] bg-blue-50/60 shadow-xs'
-                      : isEnabled
-                        ? 'border-slate-300 bg-white hover:border-slate-400'
-                        : 'border-slate-200 bg-slate-50 opacity-60 cursor-not-allowed'
-                  }`}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={isForwarded}
-                        disabled={!isEnabled}
-                        onChange={() => handleToggleForwarding(cat)}
-                        onClick={(e) => e.stopPropagation()}
-                        className="w-4 h-4 text-blue-900 rounded border-slate-300 focus:ring-blue-700 cursor-pointer"
-                      />
-                      <span className="text-xs font-black uppercase text-slate-900">
-                        Forward {cat} Sheet
-                      </span>
-                    </div>
-
-                    <span className={`text-[10px] font-black px-1.5 py-0.5 rounded ${
-                      isForwarded ? 'bg-[#163767] text-white' : 'bg-slate-200 text-slate-700'
-                    }`}>
-                      {isForwarded ? 'ACTIVE' : 'EXCLUDED'}
-                    </span>
-                  </div>
-
-                  <div className="text-[11px] text-slate-500">
-                    {isEnabled ? (
-                      <span>{getTotalPieces(cat)} PCS &middot; {getTotalMtrAverage(cat)} Mtr/Pc</span>
-                    ) : (
-                      <span className="italic">Sheet not yet enabled</span>
-                    )}
-                  </div>
                 </div>
               );
-            })}
-          </div>
+            })()}
         </section>
 
-        {/* ========================================================================= */}
-        {/* STAGE 2: WILCOM FORM MANAGEMENT                                            */}
-        {/* ========================================================================= */}
-        <section className="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-xs space-y-5">
-          <div className="border-b border-slate-200 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <span className="text-[10px] font-black uppercase tracking-wider text-purple-700 block">
-                STAGE 2 &middot; WILCOM FORM MANAGEMENT
-              </span>
-              <h2 className="text-base font-black text-slate-900 uppercase">
-                Wilcom Embroidery Design Specifications
-              </h2>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-slate-500">Total Wilcom Entries:</span>
-              <span className="px-2 py-0.5 rounded-full text-xs font-black bg-purple-100 text-purple-900 border border-purple-200">
-                {wilcomEntries.length}
-              </span>
-            </div>
-          </div>
-
-          {/* WILCOM ENTRY CREATION / EDITING FORM */}
-          <div className="p-4 sm:p-5 bg-purple-50/40 border border-purple-200 rounded-xl space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-black uppercase tracking-wide text-purple-950 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-purple-600" />
-                <span>{editingWilcomId ? 'Edit Wilcom Design Entry' : '+ Add Wilcom Design Entry'}</span>
-              </h3>
-              {editingWilcomId && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditingWilcomId(null);
-                    setWilcomStyleName('');
-                    setWilcomDesignNumber('');
-                    setWilcomPhotoUrl('');
-                    setWilcomRemarks('');
-                  }}
-                  className="text-xs text-rose-600 font-bold hover:underline cursor-pointer"
-                >
-                  Cancel Edit
-                </button>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-              {/* Garment Category */}
-              <div>
-                <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
-                  Garment Category *
-                </label>
-                <select
-                  value={wilcomCategory}
-                  onChange={(e) => setWilcomCategory(e.target.value as GarmentCategory)}
-                  className="w-full px-3 py-1.5 border border-purple-300 rounded font-bold text-xs bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-purple-700"
-                >
-                  <option value="TOP">TOP</option>
-                  <option value="BOTTOM">BOTTOM</option>
-                  <option value="DUPATTA">DUPATTA</option>
-                </select>
-              </div>
-
-              {/* Style Name or Style Details */}
-              <div>
-                <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
-                  Style Name or Details *
-                </label>
-                <input
-                  type="text"
-                  value={wilcomStyleName}
-                  onChange={(e) => setWilcomStyleName(e.target.value)}
-                  placeholder=""
-                  className="w-full px-3 py-1.5 border border-purple-300 rounded text-xs font-bold text-slate-900 bg-white focus:outline-none focus:ring-1 focus:ring-purple-700"
-                />
-              </div>
-
-              {/* Wilcom Design Number */}
-              <div>
-                <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
-                  Wilcom Design Number *
-                </label>
-                <input
-                  type="text"
-                  value={wilcomDesignNumber}
-                  onChange={(e) => setWilcomDesignNumber(e.target.value)}
-                  placeholder=""
-                  className="w-full px-3 py-1.5 border border-purple-300 rounded text-xs font-mono font-bold text-slate-900 bg-white focus:outline-none focus:ring-1 focus:ring-purple-700 uppercase"
-                />
-              </div>
-            </div>
-
-            {/* Photo Upload & Preview + Remarks */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs items-start">
-              {/* Photo Upload */}
-              <div className="space-y-2">
-                <label className="block text-[11px] font-bold uppercase text-slate-700">
-                  Design Photo / Reference Upload
-                </label>
-                <div className="flex items-center gap-3">
-                  <label className="px-3.5 py-2 bg-white border border-purple-300 hover:border-purple-600 rounded text-xs font-bold text-purple-900 flex items-center gap-2 cursor-pointer shadow-2xs transition">
-                    <Upload className="w-3.5 h-3.5" />
-                    <span>Choose Image File</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleWilcomPhotoChange}
-                      className="sr-only"
-                    />
-                  </label>
-
-                  {wilcomPhotoUrl && (
-                    <button
-                      type="button"
-                      onClick={() => setWilcomPhotoUrl('')}
-                      className="text-xs text-rose-600 font-bold hover:underline cursor-pointer"
-                    >
-                      Remove Photo
-                    </button>
-                  )}
-                </div>
-
-                {/* Thumbnail Preview */}
-                {wilcomPhotoUrl && (
-                  <div className="w-24 h-24 border border-purple-300 rounded-md overflow-hidden bg-white relative shadow-2xs mt-2">
-                    <img
-                      src={wilcomPhotoUrl}
-                      alt="Wilcom preview"
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
-                )}
-              </div>
-
-              {/* Remarks */}
-              <div>
-                <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
-                  Embroidery Remarks / Notes
-                </label>
-                <textarea
-                  rows={3}
-                  value={wilcomRemarks}
-                  onChange={(e) => setWilcomRemarks(e.target.value)}
-                  placeholder=""
-                  className="w-full px-3 py-2 border border-purple-300 rounded text-xs font-sans text-slate-900 bg-white focus:outline-none focus:ring-1 focus:ring-purple-700 resize-none"
-                />
-              </div>
-            </div>
-
-            <div className="flex justify-end pt-2">
-              <button
-                type="button"
-                onClick={handleSaveWilcomEntry}
-                className="px-4 py-2 bg-purple-800 hover:bg-purple-900 text-white rounded text-xs font-bold shadow-2xs transition flex items-center gap-1.5 cursor-pointer"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>{editingWilcomId ? 'Update Wilcom Entry' : '+ Add Wilcom Design'}</span>
-              </button>
-            </div>
-          </div>
-
-          {/* LIST OF CREATED WILCOM ENTRIES */}
-          <div className="space-y-3 pt-2">
-            <h3 className="text-xs font-black uppercase tracking-wider text-slate-700">
-              Attached Wilcom Design Entries ({wilcomEntries.length})
-            </h3>
-
-            {wilcomEntries.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {wilcomEntries.map((entry, idx) => (
-                  <div
-                    key={entry.id || idx}
-                    className="p-4 bg-white border border-slate-200 rounded-xl shadow-2xs hover:shadow-xs transition space-y-3"
-                  >
-                    <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                      <div className="flex items-center gap-2">
-                        <span className={`text-[10px] font-black px-2 py-0.5 rounded text-white ${
-                          entry.category === 'TOP'
-                            ? 'bg-blue-600'
-                            : entry.category === 'BOTTOM'
-                              ? 'bg-emerald-600'
-                              : 'bg-purple-600'
-                        }`}>
-                          {entry.category}
-                        </span>
-                        <span className="text-xs font-bold text-slate-900">
-                          {entry.styleName || 'Garment Style'}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-1">
-                        <button
-                          type="button"
-                          onClick={() => handleEditWilcomEntry(entry)}
-                          className="p-1 text-slate-400 hover:text-blue-700 rounded transition cursor-pointer"
-                          title="Edit Entry"
-                        >
-                          <Edit3 className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteWilcomEntry(entry.id)}
-                          className="p-1 text-slate-400 hover:text-rose-600 rounded transition cursor-pointer"
-                          title="Delete Entry"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-3">
-                      {/* Photo Thumbnail */}
-                      <div className="w-20 h-20 shrink-0 border border-slate-200 rounded-md bg-slate-50 flex items-center justify-center overflow-hidden">
-                        {entry.photoUrl ? (
-                          <img
-                            src={entry.photoUrl}
-                            alt={entry.wilcomDesignNumber}
-                            className="w-full h-full object-contain"
-                          />
-                        ) : (
-                          <ImageIcon className="w-6 h-6 text-slate-300" />
-                        )}
-                      </div>
-
-                      {/* Details */}
-                      <div className="space-y-1 text-xs">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-slate-400 text-[11px] font-bold">WILCOM NO:</span>
-                          <span className="font-mono font-black text-slate-900 text-sm">
-                            {entry.wilcomDesignNumber}
-                          </span>
-                        </div>
-                        {entry.remarks && (
-                          <div className="text-slate-600 text-[11px] line-clamp-2">
-                            {entry.remarks}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="p-8 text-center border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 text-slate-500 text-xs">
-                <span>No Wilcom designs added yet</span>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* ========================================================================= */}
-        {/* FACTORY ROUTING & INVENTORY CLEARANCE                                     */}
-        {/* ========================================================================= */}
-        <section className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-4">
-          <div className="border-b border-slate-100 pb-2.5 flex items-center justify-between">
-            <h2 className="text-xs font-black uppercase tracking-wider text-slate-800">
-              Factory Routing &amp; Inventory Clearance
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-            {/* Order Priority */}
-            <div>
-              <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
-                Order Priority
-              </label>
-              <select
-                value={clientPriority}
-                onChange={(e) => setClientPriority(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-200 rounded text-xs font-bold text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-blue-800"
-              >
-                <option value="LOW">LOW</option>
-                <option value="NORMAL">NORMAL</option>
-                <option value="HIGH">HIGH (Expedited)</option>
-                <option value="URGENT">URGENT (Top Floor)</option>
-              </select>
-            </div>
-
-            {/* Dyeing Required */}
-            <div>
-              <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
-                Is Dyeing Required? *
-              </label>
-              <select
-                value={fabricDyeingRequired ? 'YES' : 'NO'}
-                onChange={(e) => setFabricDyeingRequired(e.target.value === 'YES')}
-                className="w-full px-3 py-2 border border-slate-200 rounded text-xs font-bold text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-blue-800"
-              >
-                <option value="NO">NO (Pre-Dyed)</option>
-                <option value="YES">YES (Kora)</option>
-              </select>
-            </div>
-
-            {/* Fabric Color Availability */}
-            <div>
-              <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
-                Fabric Color Availability
-              </label>
-              <select
-                value={fabricColorAvailable}
-                onChange={(e) => setFabricColorAvailable(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-200 rounded text-xs font-bold text-slate-800 bg-white focus:outline-none focus:ring-1 focus:ring-blue-800"
-              >
-                <option value="IN_STOCK">IN STOCK</option>
-                <option value="PROCUREMENT_PENDING">PROCUREMENT PENDING</option>
-                <option value="DYEING_REQUIRED">DYEING REQUIRED</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Store Stock Availability Clearance Bar */}
-          <div className="flex items-center justify-between p-3 rounded-lg border border-slate-200 bg-slate-50 text-xs">
-            <span className="font-bold text-slate-700">Fabric Store Stock Clearance:</span>
-            <span className="text-[10px] font-bold px-2.5 py-0.5 rounded bg-emerald-100 text-emerald-900 border border-emerald-300">
-              Movement Allowed
-            </span>
-          </div>
-        </section>
 
         {/* BOTTOM ACTION BUTTONS */}
         <div className="pt-2 flex items-center justify-end gap-3">
@@ -2011,6 +1626,312 @@ export default function CreateProductionSheetPage() {
         </div>
 
       </main>
+
+      {/* WILCOM SPECIFICATIONS MODAL / SHEET */}
+      {showWilcomModal && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-in fade-in duration-200"
+          role="dialog"
+          aria-modal="true"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowWilcomModal(false);
+          }}
+        >
+          <div className="bg-white border-2 border-purple-300 rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+            {/* MODAL HEADER */}
+            <div className="px-6 py-4 bg-purple-50/90 border-b border-purple-200 flex items-center justify-between gap-3 shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-purple-700 text-white flex items-center justify-center shadow-xs">
+                  <Sparkles className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-purple-700">
+                      STAGE 2 &middot; WILCOM FORM MANAGEMENT
+                    </span>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-black bg-purple-200 text-purple-900 uppercase">
+                      {wilcomCategory} SHEET
+                    </span>
+                  </div>
+                  <h2 className="text-base sm:text-lg font-black text-slate-900 uppercase">
+                    Wilcom Embroidery Design Specifications
+                  </h2>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-purple-200 text-xs font-bold text-slate-600">
+                  <span>Total Entries:</span>
+                  <span className="font-black text-purple-700 font-mono">{wilcomEntries.length}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowWilcomModal(false)}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+                  title="Close"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* MODAL BODY (SCROLLABLE) */}
+            <div className="p-6 overflow-y-auto space-y-6">
+              {/* WILCOM ENTRY CREATION / EDITING FORM */}
+              <div className="p-4 sm:p-5 bg-purple-50/40 border border-purple-200 rounded-xl space-y-4 shadow-2xs">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-black uppercase tracking-wide text-purple-950 flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                    <span>{editingWilcomId ? 'Edit Wilcom Design Entry' : '+ Add Wilcom Design Entry'}</span>
+                  </h3>
+                  {editingWilcomId && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingWilcomId(null);
+                        setWilcomStyleName('');
+                        setWilcomDesignNumber('');
+                        setWilcomPhotoUrl('');
+                        setWilcomRemarks('');
+                      }}
+                      className="text-xs text-rose-600 font-bold hover:underline cursor-pointer"
+                    >
+                      Cancel Edit
+                    </button>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                  {/* Garment Category */}
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
+                      Garment Category *
+                    </label>
+                    <select
+                      value={wilcomCategory}
+                      onChange={(e) => setWilcomCategory(e.target.value as GarmentCategory)}
+                      className="w-full px-3 py-1.5 border border-purple-300 rounded font-bold text-xs bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-purple-700"
+                    >
+                      <option value="TOP">TOP</option>
+                      <option value="BOTTOM">BOTTOM</option>
+                      <option value="DUPATTA">DUPATTA</option>
+                    </select>
+                  </div>
+
+                  {/* Style Name or Style Details */}
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
+                      Style Name or Details *
+                    </label>
+                    <input
+                      type="text"
+                      value={wilcomStyleName}
+                      onChange={(e) => setWilcomStyleName(e.target.value)}
+                      placeholder=""
+                      className="w-full px-3 py-1.5 border border-purple-300 rounded text-xs font-bold text-slate-900 bg-white focus:outline-none focus:ring-1 focus:ring-purple-700"
+                    />
+                  </div>
+
+                  {/* Wilcom Design Number */}
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
+                      Wilcom Design Number *
+                    </label>
+                    <input
+                      type="text"
+                      value={wilcomDesignNumber}
+                      onChange={(e) => setWilcomDesignNumber(e.target.value)}
+                      placeholder=""
+                      className="w-full px-3 py-1.5 border border-purple-300 rounded text-xs font-mono font-bold text-slate-900 bg-white focus:outline-none focus:ring-1 focus:ring-purple-700 uppercase"
+                    />
+                  </div>
+                </div>
+
+                {/* Photo Upload & Preview + Remarks */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs items-start">
+                  {/* Photo Upload */}
+                  <div className="space-y-2">
+                    <label className="block text-[11px] font-bold uppercase text-slate-700">
+                      Design Photo / Reference Upload
+                    </label>
+                    <div className="flex items-center gap-3">
+                      <label className="px-3.5 py-2 bg-white border border-purple-300 hover:border-purple-600 rounded text-xs font-bold text-purple-900 flex items-center gap-2 cursor-pointer shadow-2xs transition">
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>Choose Image File</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleWilcomPhotoChange}
+                          className="sr-only"
+                        />
+                      </label>
+
+                      {wilcomPhotoUrl && (
+                        <button
+                          type="button"
+                          onClick={() => setWilcomPhotoUrl('')}
+                          className="text-xs text-rose-600 font-bold hover:underline cursor-pointer"
+                        >
+                          Remove Photo
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Thumbnail Preview */}
+                    {wilcomPhotoUrl && (
+                      <div className="w-24 h-24 border border-purple-300 rounded-md overflow-hidden bg-white relative shadow-2xs mt-2">
+                        <img
+                          src={wilcomPhotoUrl}
+                          alt="Wilcom preview"
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Remarks */}
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
+                      Embroidery Remarks / Notes
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={wilcomRemarks}
+                      onChange={(e) => setWilcomRemarks(e.target.value)}
+                      placeholder=""
+                      className="w-full px-3 py-2 border border-purple-300 rounded text-xs font-sans text-slate-900 bg-white focus:outline-none focus:ring-1 focus:ring-purple-700 resize-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end pt-2">
+                  <button
+                    type="button"
+                    onClick={handleSaveWilcomEntry}
+                    className="px-4 py-2 bg-purple-800 hover:bg-purple-900 text-white rounded text-xs font-bold shadow-2xs transition flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>{editingWilcomId ? 'Update Wilcom Entry' : '+ Add Wilcom Design'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* LIST OF CREATED WILCOM ENTRIES */}
+              <div className="space-y-3 pt-2">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-black uppercase tracking-wider text-slate-700">
+                    Attached Wilcom Design Entries ({wilcomEntries.length})
+                  </h3>
+                  {wilcomEntries.length > 0 && (
+                    <span className="text-[11px] font-medium text-slate-500">
+                      Categorized per production component
+                    </span>
+                  )}
+                </div>
+
+                {wilcomEntries.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {wilcomEntries.map((entry, idx) => (
+                      <div
+                        key={entry.id || idx}
+                        className={`p-4 bg-white border rounded-xl shadow-2xs hover:shadow-xs transition space-y-3 ${
+                          entry.category === wilcomCategory ? 'border-purple-300 ring-1 ring-purple-200' : 'border-slate-200'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`text-[10px] font-black px-2 py-0.5 rounded text-white ${
+                                entry.category === 'TOP'
+                                  ? 'bg-blue-600'
+                                  : entry.category === 'BOTTOM'
+                                    ? 'bg-emerald-600'
+                                    : 'bg-purple-600'
+                              }`}
+                            >
+                              {entry.category}
+                            </span>
+                            <span className="text-xs font-bold text-slate-900">
+                              {entry.styleName || 'Garment Style'}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => handleEditWilcomEntry(entry)}
+                              className="p-1 text-slate-400 hover:text-blue-700 rounded transition cursor-pointer"
+                              title="Edit Entry"
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteWilcomEntry(entry.id)}
+                              className="p-1 text-slate-400 hover:text-rose-600 rounded transition cursor-pointer"
+                              title="Delete Entry"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start gap-3">
+                          {/* Photo Thumbnail */}
+                          <div className="w-20 h-20 shrink-0 border border-slate-200 rounded-md bg-slate-50 flex items-center justify-center overflow-hidden">
+                            {entry.photoUrl ? (
+                              <img
+                                src={entry.photoUrl}
+                                alt={entry.wilcomDesignNumber}
+                                className="w-full h-full object-contain"
+                              />
+                            ) : (
+                              <ImageIcon className="w-6 h-6 text-slate-300" />
+                            )}
+                          </div>
+
+                          {/* Details */}
+                          <div className="space-y-1 text-xs">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-slate-400 text-[11px] font-bold">WILCOM NO:</span>
+                              <span className="font-mono font-black text-slate-900 text-sm">
+                                {entry.wilcomDesignNumber}
+                              </span>
+                            </div>
+                            {entry.remarks && (
+                              <div className="text-slate-600 text-[11px] line-clamp-2">
+                                {entry.remarks}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-8 text-center border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 text-slate-500 text-xs">
+                    <span>No Wilcom designs added yet</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* MODAL FOOTER */}
+            <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0">
+              <span className="text-xs text-slate-500 font-bold">
+                {wilcomEntries.length} {wilcomEntries.length === 1 ? 'entry' : 'entries'} currently attached
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowWilcomModal(false)}
+                className="px-5 py-2 bg-purple-700 hover:bg-purple-800 text-white rounded-lg text-xs font-bold transition cursor-pointer shadow-xs"
+              >
+                Done / Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* PRINT & DOWNLOAD MODAL */}
       <ProductionSheetPrintModal
