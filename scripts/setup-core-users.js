@@ -207,6 +207,29 @@ async function setup() {
   await prisma.userRole.create({ data: { userId: recuttingUser.id, roleId: recuttingRole.id } });
   console.log('✓ Recutting user ready: recutting / 1234 (RECUTTING_SUPERVISOR)');
 
+  // 7. Stitching Department & Role & User
+  let stitchingRole = await prisma.role.findFirst({ where: { code: 'STITCHING_SUPERVISOR' } });
+  if (!stitchingRole) {
+    stitchingRole = await prisma.role.create({
+      data: { code: 'STITCHING_SUPERVISOR', name: 'Stitching Supervisor', description: 'Garment assembly and stitching line supervisor', isSystem: true },
+    });
+  }
+
+  const stitchingUser = await prisma.user.upsert({
+    where: { username: 'stitching' },
+    update: { passwordHash: hash, departmentCode: 'STITCHING', fullName: 'Stitching Incharge' },
+    create: {
+      username: 'stitching',
+      email: 'stitching@subhamfabrics.com',
+      fullName: 'Stitching Incharge',
+      passwordHash: hash,
+      departmentCode: 'STITCHING',
+    },
+  });
+  await prisma.userRole.deleteMany({ where: { userId: stitchingUser.id } });
+  await prisma.userRole.create({ data: { userId: stitchingUser.id, roleId: stitchingRole.id } });
+  console.log('✓ Stitching user ready: stitching / 1234 (STITCHING_SUPERVISOR)');
+
   console.log('--- Core users successfully configured ---');
 }
 

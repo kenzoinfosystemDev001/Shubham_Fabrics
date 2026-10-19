@@ -96,7 +96,8 @@ export function Navigation() {
     pathname.startsWith('/qcwashing') ||
     pathname.startsWith('/qc3') ||
     pathname.startsWith('/qc-washing') ||
-    pathname.startsWith('/recutting')
+    pathname.startsWith('/recutting') ||
+    pathname.startsWith('/stitching')
   ) {
     return null;
   }

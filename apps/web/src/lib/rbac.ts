@@ -297,9 +297,31 @@ export function isRecuttingUser(user: MESUser | null): boolean {
   );
 }
 
+export function isStitchingUser(user: MESUser | null): boolean {
+  if (!user) return false;
+  if (isAdminUser(user)) return true; // Admins have all access
+
+  const username = (user.username || '').toLowerCase();
+  const dept = (user.departmentCode || '').toUpperCase();
+  const role = (user.role || '').toUpperCase();
+  const roles = (user.roles || []).map((r) => r.toUpperCase());
+
+  return (
+    username === 'stitching' ||
+    dept === 'STITCHING' ||
+    role === 'STITCHING_SUPERVISOR' ||
+    role === 'STITCHING_OPERATOR' ||
+    role === 'STITCHING_INCHARGE' ||
+    roles.includes('STITCHING_SUPERVISOR') ||
+    roles.includes('STITCHING_OPERATOR') ||
+    roles.includes('STITCHING_INCHARGE')
+  );
+}
+
 export function getUserStationHome(user: MESUser | null): string {
   if (!user) return '/login';
   if (isAdminUser(user)) return '/admin';
+  if (isStitchingUser(user)) return '/stitching';
   if (isRecuttingUser(user)) return '/recutting';
   if (isQcWashingUser(user)) return '/qcwashing';
   if (isWashingUser(user)) return '/washing';
@@ -467,6 +489,18 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
     };
   }
 
+  // Stitching Department routes protection
+  if (pathname.startsWith('/stitching')) {
+    if (isStitchingUser(user)) {
+      return { allowed: true, redirectTarget: pathname };
+    }
+    return {
+      allowed: false,
+      redirectTarget: defaultUserHome,
+      reason: 'Access Restricted: You are not authorized for the Stitching Department. Access is restricted to Stitching personnel and Admins.',
+    };
+  }
+
   // Programming department routes protection (/programming, my-work, floor-board)
   const isProgrammingRoute =
     pathname === '/programming' ||
@@ -480,6 +514,8 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
       !pathname.startsWith('/qc2/floor-board') &&
       !pathname.startsWith('/washing/floor-board') &&
       !pathname.startsWith('/embroidery/floor-board') &&
+      !pathname.startsWith('/recutting/floor-board') &&
+      !pathname.startsWith('/stitching/floor-board') &&
       !pathname.startsWith('/thread-cutting/floor-board'));
 
   if (isProgrammingRoute) {
