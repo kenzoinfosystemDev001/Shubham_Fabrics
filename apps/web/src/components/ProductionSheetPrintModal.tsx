@@ -22,16 +22,19 @@ import {
 import { getCurrentUser, canViewClientCode } from '@/lib/rbac';
 
 interface ProductionSheetPrintModalProps {
-  program: any;
+  program?: any;
+  sheetData?: any;
   isOpen: boolean;
   onClose: () => void;
 }
 
 export function ProductionSheetPrintModal({
-  program,
+  program: propProgram,
+  sheetData,
   isOpen,
   onClose,
 }: ProductionSheetPrintModalProps) {
+  const program = propProgram || sheetData;
   const [activeTab, setActiveTab] = useState<'TOP' | 'BOTTOM' | 'DUPATTA' | 'WILCOM'>('TOP');
 
   if (!isOpen || !program) return null;
