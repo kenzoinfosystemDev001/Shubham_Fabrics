@@ -6,8 +6,8 @@ async function cleanDatabase() {
   console.log('--- Cleaning DB: Removing all test/dummy data, production sheets, challans, and transactions ---');
 
   try {
-    // 1. Transactional & Quality logs
-    console.log('Clearing quality inspections and defect records...');
+    // 1. Transactional logs, defects, rework & inspections
+    console.log('Clearing quality inspections, rework, and defect records...');
     await prisma.qualityInspectionParameter.deleteMany({});
     await prisma.defectLog.deleteMany({});
     await prisma.defectRecord.deleteMany({});
@@ -16,17 +16,11 @@ async function cleanDatabase() {
     await prisma.fabricQCInspection.deleteMany({});
     await prisma.qualityInspection.deleteMany({});
 
-    // 2. Dyeing Orders
-    console.log('Clearing dyeing orders...');
-    await prisma.dyeingOrder.deleteMany({});
+    // 2. Production Transactions (these reference challans and programs)
+    console.log('Clearing production transactions...');
+    await prisma.productionTransaction.deleteMany({});
 
-    // 3. Challans & items
-    console.log('Clearing challan items, events, and challans...');
-    await prisma.challanItem.deleteMany({});
-    await prisma.challanEvent.deleteMany({});
-    await prisma.challan.deleteMany({});
-
-    // 4. Dispatch, Cartons, Bundles
+    // 3. Dispatch, Cartons, Bundles, and Rolls (these reference challans)
     console.log('Clearing dispatch orders, cartons, and bundles...');
     await prisma.dispatchCarton.deleteMany({});
     await prisma.dispatchOrder.deleteMany({});
@@ -34,6 +28,10 @@ async function cleanDatabase() {
     await prisma.carton.deleteMany({});
     await prisma.bundle.deleteMany({});
     await prisma.fabricRoll.deleteMany({});
+
+    // 4. Dyeing Orders (these reference inbound and qc1 challans)
+    console.log('Clearing dyeing orders...');
+    await prisma.dyeingOrder.deleteMany({});
 
     // 5. Fabric store batches, receipts, rolls, and ledgers
     console.log('Clearing fabric store receipts, rolls, batches, and ledger entries...');
@@ -47,9 +45,19 @@ async function cleanDatabase() {
     console.log('Clearing inventory stocks & ledger entries...');
     await prisma.stockLedgerEntry.deleteMany({});
     await prisma.inventoryStock.deleteMany({});
-    await prisma.productionTransaction.deleteMany({});
 
-    // 7. Production Sheets (Programs) and sub-tables
+    // 7. Challans, events, and items
+    console.log('Clearing challan items, events, and challans...');
+    await prisma.challanItem.deleteMany({});
+    await prisma.challanEvent.deleteMany({});
+    // Clear parentChallanId self-references first
+    await prisma.challan.updateMany({
+      where: { parentChallanId: { not: null } },
+      data: { parentChallanId: null },
+    });
+    await prisma.challan.deleteMany({});
+
+    // 8. Production Sheets (Programs) and sub-tables
     console.log('Clearing production sheets (programs) and specifications...');
     await prisma.programRouteStep.deleteMany({});
     await prisma.programRoute.deleteMany({});
@@ -61,7 +69,7 @@ async function cleanDatabase() {
     await prisma.attachment.deleteMany({});
     await prisma.program.deleteMany({});
 
-    // 8. System notifications & audit logs
+    // 9. System notifications & audit logs
     console.log('Clearing notifications, audit logs, and integrity scan results...');
     await prisma.notification.deleteMany({});
     await prisma.auditLog.deleteMany({});
