@@ -94,6 +94,16 @@ const DEPARTMENTS = [
     hoverClass: 'hover:bg-sky-500/10 hover:text-sky-300',
     activeBg: 'bg-sky-500/15 text-sky-300 font-bold',
   },
+  {
+    name: 'QC Washing',
+    code: 'QC3',
+    href: '/qcwashing',
+    color: 'emerald',
+    badge: 'QCW',
+    dotClass: 'bg-emerald-400',
+    hoverClass: 'hover:bg-emerald-500/10 hover:text-emerald-300',
+    activeBg: 'bg-emerald-500/15 text-emerald-300 font-bold',
+  },
 ];
 
 export function DepartmentSwitcher({

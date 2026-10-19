@@ -113,6 +113,65 @@ async function setup() {
     console.log('✓ Programmer alias PIN updated to 1234');
   }
 
+  // 5. QC Washing Department & Role & User
+  await prisma.department.upsert({
+    where: { code: 'QC3' },
+    update: { name: 'QC Washing', sequenceOrder: 8 },
+    create: { code: 'QC3', name: 'QC Washing', sequenceOrder: 8, description: 'QC Washing Inspection Department' },
+  });
+
+  await prisma.department.upsert({
+    where: { code: 'QCWASHING' },
+    update: { name: 'QC Washing', sequenceOrder: 8 },
+    create: { code: 'QCWASHING', name: 'QC Washing', sequenceOrder: 8, description: 'QC Washing Inspection Department' },
+  });
+
+  let qcWashingRole = await prisma.role.findFirst({ where: { code: 'QC3_INSPECTOR' } });
+  if (!qcWashingRole) {
+    qcWashingRole = await prisma.role.create({
+      data: { code: 'QC3_INSPECTOR', name: 'QC Washing Inspector', description: 'QC Washing inspection & verification', isSystem: true },
+    });
+  }
+
+  let qcInspectorRole = await prisma.role.findFirst({ where: { code: 'QC_INSPECTOR' } });
+  if (!qcInspectorRole) {
+    qcInspectorRole = await prisma.role.create({
+      data: { code: 'QC_INSPECTOR', name: 'Quality Inspector', description: 'General QC Inspector', isSystem: true },
+    });
+  }
+
+  const qcwashingUser = await prisma.user.upsert({
+    where: { username: 'qcwashing' },
+    update: { passwordHash: hash, departmentCode: 'QC3', fullName: 'QC Washing Inspector' },
+    create: {
+      username: 'qcwashing',
+      email: 'qcwashing@subhamfabrics.com',
+      fullName: 'QC Washing Inspector',
+      passwordHash: hash,
+      departmentCode: 'QC3',
+    },
+  });
+  await prisma.userRole.deleteMany({ where: { userId: qcwashingUser.id } });
+  await prisma.userRole.create({ data: { userId: qcwashingUser.id, roleId: qcWashingRole.id } });
+  await prisma.userRole.create({ data: { userId: qcwashingUser.id, roleId: qcInspectorRole.id } });
+  console.log('✓ QC Washing user ready: qcwashing / 1234 (QC3_INSPECTOR)');
+
+  // Also support alias 'qc3'
+  const qc3User = await prisma.user.upsert({
+    where: { username: 'qc3' },
+    update: { passwordHash: hash, departmentCode: 'QC3', fullName: 'QC Washing Inspector' },
+    create: {
+      username: 'qc3',
+      email: 'qc3@subhamfabrics.com',
+      fullName: 'QC Washing Inspector',
+      passwordHash: hash,
+      departmentCode: 'QC3',
+    },
+  });
+  await prisma.userRole.deleteMany({ where: { userId: qc3User.id } });
+  await prisma.userRole.create({ data: { userId: qc3User.id, roleId: qcWashingRole.id } });
+  console.log('✓ QC Washing alias ready: qc3 / 1234');
+
   console.log('--- Core users successfully configured ---');
 }
 

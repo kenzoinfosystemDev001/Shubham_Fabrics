@@ -313,7 +313,7 @@ export default function WashingWorkCenter() {
     }
   };
 
-  // Issue Handover Challan to Finishing or Store
+  // Issue Handover Challan to QC Washing
   const handleIssueToFinishing = async (challan: WashingChallan) => {
     try {
       const goodQty = challan.fabricOut || challan.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
@@ -331,9 +331,9 @@ export default function WashingWorkCenter() {
           challanType: 'REGULAR',
           programId: challan.programId,
           fromDepartment: 'WASHING',
-          toDepartment: 'FINISHING',
+          toDepartment: 'QC3',
           priority: challan.priority || 'NORMAL',
-          remarks: `Washed pieces handover to Finishing Section for pressing & packing. Barcode: ${barcode}`,
+          remarks: `Washed pieces handover to QC Washing Department for inspection & verification. Barcode: ${barcode}`,
           items: [
             {
               itemDescription: `${challan.program?.fabricName || 'Garment Pieces'} - Washed & Dried`,
@@ -342,7 +342,7 @@ export default function WashingWorkCenter() {
               quantity: goodQty,
               uom: 'PCS',
               barcode: barcode,
-              remarks: `Washing completed & inspected. Ready for Finishing & Steam Pressing.`,
+              remarks: `Washing completed. Ready for QC Washing inspection & verification.`,
             },
           ],
         }),
@@ -358,13 +358,13 @@ export default function WashingWorkCenter() {
         }).catch(() => {});
 
         setHandoverChallanModal(data.data);
-        setToastHandover(`Challan ${data.data.challanNumber} issued to Finishing Department successfully!`);
+        setToastHandover(`Challan ${data.data.challanNumber} issued to QC Washing Department successfully!`);
         loadData();
       } else {
-        throw new Error(data.error || 'Failed to issue challan to Finishing');
+        throw new Error(data.error || 'Failed to issue challan to QC Washing');
       }
     } catch (err: any) {
-      alert(`Error issuing to Finishing: ${err.message}`);
+      alert(`Error issuing to QC Washing: ${err.message}`);
     }
   };
 
@@ -499,7 +499,7 @@ export default function WashingWorkCenter() {
             }`}
           >
             <PackageCheck className="w-4 h-4" />
-            <span>Handover to Finishing</span>
+            <span>Handover to QC Washing</span>
             <span
               className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
                 activeTab === 'ISSUE_HANDOVER' ? 'bg-emerald-700 text-white' : 'bg-slate-100 text-slate-700'
@@ -683,16 +683,16 @@ export default function WashingWorkCenter() {
                                   <span>Wash Run</span>
                                 </button>
 
-                                {/* HANDOVER TO FINISHING BUTTON (if approved) */}
+                                {/* HANDOVER TO QC WASHING BUTTON (if approved) */}
                                 {isApproved && (
                                   <button
                                     type="button"
                                     onClick={() => handleIssueToFinishing(c)}
                                     className="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[11px] font-semibold flex items-center gap-1 transition shadow-2xs"
-                                    title="Issue Handover Challan to Finishing"
+                                    title="Issue Handover Challan to QC Washing"
                                   >
                                     <PackageCheck className="w-3 h-3" />
-                                    <span>Handover</span>
+                                    <span>To QC Washing</span>
                                   </button>
                                 )}
                               </div>
@@ -717,10 +717,10 @@ export default function WashingWorkCenter() {
                   <PackageCheck className="w-5 h-5 text-emerald-600" />
                   <div>
                     <h3 className="text-sm font-bold text-slate-900">
-                      Dispatched Challans to Finishing Department
+                      Dispatched Challans to QC Washing Department
                     </h3>
                     <p className="text-xs text-slate-500">
-                      Washed and barcode-tagged lots transferred to Finishing / Steam Pressing
+                      Washed and barcode-tagged lots transferred to QC Washing for verification & quality check
                     </p>
                   </div>
                 </div>

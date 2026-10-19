@@ -110,6 +110,15 @@ const STATIONS: StationOption[] = [
     borderActive: 'border-sky-500/80 shadow-[0_0_15px_rgba(14,165,233,0.25)]',
     bgActive: 'bg-sky-500/15 text-white',
   },
+  {
+    id: 'qcwashing',
+    name: 'QC Washing',
+    username: 'qcwashing',
+    icon: CheckCircle2,
+    accentColor: 'text-teal-400',
+    borderActive: 'border-teal-500/80 shadow-[0_0_15px_rgba(20,184,166,0.25)]',
+    bgActive: 'bg-teal-500/15 text-white',
+  },
 ];
 
 export default function LoginPage() {
@@ -156,7 +165,8 @@ export default function LoginPage() {
   const activeStation = STATIONS.find(
     (s) =>
       s.username.toLowerCase() === username.trim().toLowerCase() ||
-      (s.username === 'program' && username.trim().toLowerCase() === 'programmer')
+      (s.username === 'program' && username.trim().toLowerCase() === 'programmer') ||
+      (s.username === 'qcwashing' && (username.trim().toLowerCase() === 'qc3' || username.trim().toLowerCase() === 'qc_washing'))
   );
 
   return (
@@ -173,11 +183,11 @@ export default function LoginPage() {
       <div className="absolute inset-0 bg-radial-gradient from-transparent via-[#090D16]/70 to-[#090D16] pointer-events-none" />
 
       {/* CENTERED PREMIUM GLASS CARD */}
-      <div className="relative z-10 w-full max-w-[460px] bg-slate-900/80 backdrop-blur-xl border border-slate-700/60 rounded-3xl p-7 sm:p-9 shadow-2xl shadow-black/60">
+      <div className="relative z-10 w-full max-w-[500px] bg-slate-900/80 backdrop-blur-xl border border-slate-700/60 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-black/60">
         
         {/* BRANDING HEADER */}
-        <div className="flex flex-col items-center text-center mb-7">
-          <div className="w-16 h-16 rounded-2xl bg-white p-1.5 shadow-lg border border-amber-500/30 flex items-center justify-center mb-3.5 transition-transform hover:scale-105">
+        <div className="flex flex-col items-center text-center mb-6">
+          <div className="w-16 h-16 rounded-2xl bg-white p-1.5 shadow-lg border border-amber-500/30 flex items-center justify-center mb-3 transition-transform hover:scale-105">
             <img
               src="/shubham-logo.jpg"
               alt="Shubham Fabrics"
@@ -194,7 +204,7 @@ export default function LoginPage() {
 
         {/* REFINED STATION SELECTOR */}
         <div className="mb-6">
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
             {STATIONS.map((station) => {
               const Icon = station.icon;
               const isSelected = activeStation?.id === station.id;
@@ -203,7 +213,7 @@ export default function LoginPage() {
                   key={station.id}
                   type="button"
                   onClick={() => selectStation(station.username)}
-                  className={`relative p-2.5 rounded-xl border text-center transition-all duration-200 flex flex-col items-center gap-1.5 cursor-pointer ${
+                  className={`relative p-2 sm:p-2.5 rounded-xl border text-center transition-all duration-200 flex flex-col items-center justify-center gap-1 cursor-pointer min-h-[58px] ${
                     isSelected
                       ? `${station.borderActive} ${station.bgActive}`
                       : 'border-slate-800 bg-slate-800/40 hover:bg-slate-800/70 text-slate-400 hover:text-slate-200'
@@ -214,7 +224,7 @@ export default function LoginPage() {
                       isSelected ? station.accentColor : 'text-slate-500'
                     }`}
                   />
-                  <span className="text-xs font-semibold tracking-wide">
+                  <span className="text-[11px] sm:text-xs font-semibold tracking-tight text-center leading-tight">
                     {station.name}
                   </span>
                 </button>

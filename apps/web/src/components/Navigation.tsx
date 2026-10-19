@@ -92,7 +92,10 @@ export function Navigation() {
     pathname.startsWith('/embroidery') ||
     pathname.startsWith('/thread-cutting') ||
     pathname.startsWith('/qc2') ||
-    pathname.startsWith('/washing')
+    pathname.startsWith('/washing') ||
+    pathname.startsWith('/qcwashing') ||
+    pathname.startsWith('/qc3') ||
+    pathname.startsWith('/qc-washing')
   ) {
     return null;
   }

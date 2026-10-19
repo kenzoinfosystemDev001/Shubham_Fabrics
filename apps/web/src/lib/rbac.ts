@@ -149,6 +149,9 @@ export function isQc1User(user: MESUser | null): boolean {
   const role = (user.role || '').toUpperCase();
   const roles = (user.roles || []).map((r) => r.toUpperCase());
 
+  if (dept === 'QC2' || dept === 'QC3' || dept === 'QCWASHING' || dept === 'QC_WASHING') return false;
+  if (username === 'qc2' || username === 'qc2_insp' || username === 'qc3' || username === 'qcwashing' || username === 'qc_washing') return false;
+
   return (
     username === 'qc1' ||
     username === 'qc_insp' ||
@@ -168,6 +171,9 @@ export function isQc2User(user: MESUser | null): boolean {
   const dept = (user.departmentCode || '').toUpperCase();
   const role = (user.role || '').toUpperCase();
   const roles = (user.roles || []).map((r) => r.toUpperCase());
+
+  if (dept === 'QC1' || dept === 'QC3' || dept === 'QCWASHING' || dept === 'QC_WASHING') return false;
+  if (username === 'qc1' || username === 'qc_insp' || username === 'qc3' || username === 'qcwashing' || username === 'qc_washing') return false;
 
   return (
     username === 'qc2' ||
@@ -239,9 +245,39 @@ export function isWashingUser(user: MESUser | null): boolean {
   );
 }
 
+export function isQcWashingUser(user: MESUser | null): boolean {
+  if (!user) return false;
+  if (isAdminUser(user)) return true; // Admins have all access
+
+  const username = (user.username || '').toLowerCase();
+  const dept = (user.departmentCode || '').toUpperCase();
+  const role = (user.role || '').toUpperCase();
+  const roles = (user.roles || []).map((r) => r.toUpperCase());
+
+  if (dept === 'QC1' || dept === 'QC2') return false;
+  if (username === 'qc1' || username === 'qc_insp' || username === 'qc2' || username === 'qc2_insp') return false;
+
+  return (
+    username === 'qcwashing' ||
+    username === 'qc_washing' ||
+    username === 'qc3' ||
+    username === 'qc3_insp' ||
+    dept === 'QC3' ||
+    dept === 'QCWASHING' ||
+    dept === 'QC_WASHING' ||
+    dept === 'WASHING_QC' ||
+    role === 'QCWASHING_INSPECTOR' ||
+    role === 'QC3_INSPECTOR' ||
+    roles.includes('QCWASHING_INSPECTOR') ||
+    roles.includes('QC3_INSPECTOR') ||
+    (roles.includes('QC_INSPECTOR') && (dept === 'QC3' || dept === 'QCWASHING' || dept === 'QC_WASHING'))
+  );
+}
+
 export function getUserStationHome(user: MESUser | null): string {
   if (!user) return '/login';
   if (isAdminUser(user)) return '/admin';
+  if (isQcWashingUser(user)) return '/qcwashing';
   if (isWashingUser(user)) return '/washing';
   if (isQc1User(user)) return '/qc1';
   if (isQc2User(user)) return '/qc2';
@@ -356,6 +392,18 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
       allowed: false,
       redirectTarget: defaultUserHome,
       reason: 'Access Restricted: You are not authorized for the QC2 Department. Access is restricted to QC2 Quality personnel and Admins.',
+    };
+  }
+
+  // QC Washing Department routes protection
+  if (pathname.startsWith('/qcwashing') || pathname.startsWith('/qc-washing') || pathname.startsWith('/qc3')) {
+    if (isQcWashingUser(user)) {
+      return { allowed: true, redirectTarget: pathname };
+    }
+    return {
+      allowed: false,
+      redirectTarget: defaultUserHome,
+      reason: 'Access Restricted: You are not authorized for the QC Washing Department. Access is restricted to QC Washing personnel and Admins.',
     };
   }
 

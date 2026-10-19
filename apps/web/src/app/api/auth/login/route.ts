@@ -31,7 +31,10 @@ export async function POST(request: Request) {
       cutting: { role: 'THREAD_CUTTING_INCHARGE', dept: 'THREAD_CUTTING', name: 'Thread Cutting Department' },
       qc2: { role: 'QC2_INSPECTOR', dept: 'QC2', name: 'QC2 Quality Inspector' },
       qc2_insp: { role: 'QC2_INSPECTOR', dept: 'QC2', name: 'QC2 Quality Inspector' },
-      qc3: { role: 'QC_INSPECTOR', dept: 'QC3', name: 'Washing QC Inspector' },
+      qcwashing: { role: 'QC3_INSPECTOR', dept: 'QC3', name: 'QC Washing Inspector' },
+      qc_washing: { role: 'QC3_INSPECTOR', dept: 'QC3', name: 'QC Washing Inspector' },
+      qc3: { role: 'QC3_INSPECTOR', dept: 'QC3', name: 'QC Washing Inspector' },
+      qc3_insp: { role: 'QC3_INSPECTOR', dept: 'QC3', name: 'QC Washing Inspector' },
       final_check: { role: 'QC_INSPECTOR', dept: 'FINAL_CHECK', name: 'Final check Inspector' },
       washing: { role: 'WASHING_INCHARGE', dept: 'WASHING', name: 'Washing Department' },
       washing_incharge: { role: 'WASHING_INCHARGE', dept: 'WASHING', name: 'Washing Department' },
@@ -156,22 +159,42 @@ export async function POST(request: Request) {
         roleCodes.includes('DYEING_INCHARGE') ||
         roleCodes.includes('DYEING_OPERATOR'));
 
+    const isQCWashing =
+      !isAdmin &&
+      !isStore &&
+      !isProgramming &&
+      (user.username.toLowerCase() === 'qcwashing' ||
+        user.username.toLowerCase() === 'qc_washing' ||
+        user.username.toLowerCase() === 'qc3' ||
+        user.username.toLowerCase() === 'qc3_insp' ||
+        user.departmentCode === 'QC3' ||
+        user.departmentCode === 'QCWASHING' ||
+        user.departmentCode === 'QC_WASHING' ||
+        roleCodes.includes('QC3_INSPECTOR') ||
+        roleCodes.includes('QCWASHING_INSPECTOR'));
+
     const isQC1 =
       !isAdmin &&
       !isStore &&
       !isProgramming &&
       !isDyeing &&
+      !isQCWashing &&
       (user.username.toLowerCase() === 'qc1' ||
         user.username.toLowerCase() === 'qc_insp' ||
         user.departmentCode === 'QC1' ||
-        roleCodes.includes('QC_INSPECTOR') ||
-        roleCodes.includes('QC1_INSPECTOR'));
+        roleCodes.includes('QC1_INSPECTOR') ||
+        (roleCodes.includes('QC_INSPECTOR') &&
+          user.departmentCode !== 'QC2' &&
+          user.departmentCode !== 'QC3' &&
+          user.departmentCode !== 'QCWASHING' &&
+          user.departmentCode !== 'QC_WASHING'));
 
     const isEmbroidery =
       !isAdmin &&
       !isStore &&
       !isProgramming &&
       !isDyeing &&
+      !isQCWashing &&
       !isQC1 &&
       (user.username.toLowerCase() === 'embroidery' ||
         user.departmentCode === 'EMBROIDERY' ||
@@ -183,6 +206,7 @@ export async function POST(request: Request) {
       !isStore &&
       !isProgramming &&
       !isDyeing &&
+      !isQCWashing &&
       !isQC1 &&
       !isEmbroidery &&
       (user.username.toLowerCase() === 'thread-cutting' ||
@@ -197,6 +221,7 @@ export async function POST(request: Request) {
       !isStore &&
       !isProgramming &&
       !isDyeing &&
+      !isQCWashing &&
       !isQC1 &&
       !isEmbroidery &&
       !isThreadCutting &&
@@ -204,13 +229,18 @@ export async function POST(request: Request) {
         user.username.toLowerCase() === 'qc2_insp' ||
         user.departmentCode === 'QC2' ||
         roleCodes.includes('QC2_INSPECTOR') ||
-        roleCodes.includes('QC_INSPECTOR'));
+        (roleCodes.includes('QC_INSPECTOR') &&
+          user.departmentCode !== 'QC1' &&
+          user.departmentCode !== 'QC3' &&
+          user.departmentCode !== 'QCWASHING' &&
+          user.departmentCode !== 'QC_WASHING'));
 
     const isWashing =
       !isAdmin &&
       !isStore &&
       !isProgramming &&
       !isDyeing &&
+      !isQCWashing &&
       !isQC1 &&
       !isEmbroidery &&
       !isThreadCutting &&
@@ -223,6 +253,8 @@ export async function POST(request: Request) {
 
     const normalizedRole = isAdmin
       ? 'ADMIN'
+      : isQCWashing
+      ? 'QC3_INSPECTOR'
       : isWashing
       ? 'WASHING_INCHARGE'
       : isQC2
@@ -243,6 +275,8 @@ export async function POST(request: Request) {
 
     const normalizedDept = isAdmin
       ? 'ADMIN'
+      : isQCWashing
+      ? 'QC3'
       : isWashing
       ? 'WASHING'
       : isQC2
@@ -259,10 +293,12 @@ export async function POST(request: Request) {
       ? 'EMBROIDERY'
       : isProgramming
       ? 'PROGRAMMING'
-      : user.departmentCode || 'WASHING';
+      : user.departmentCode || 'QC3';
 
     const defaultRedirect = isAdmin
       ? '/admin'
+      : isQCWashing
+      ? '/qcwashing'
       : isWashing
       ? '/washing'
       : isQC2
