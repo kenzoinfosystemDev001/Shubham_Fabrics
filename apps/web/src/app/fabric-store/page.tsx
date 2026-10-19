@@ -12,6 +12,8 @@ import {
   RefreshCw,
   Eye,
   AlertTriangle,
+  ArrowDownToLine,
+  Kanban,
 } from 'lucide-react';
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 
@@ -106,25 +108,32 @@ export default function FabricStoreDashboard() {
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
           <Link
-            href="/fabric-store/my-work/incoming-challans"
-            className="flex items-center gap-2 px-3.5 py-2 bg-slate-800/90 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg shadow-xs border border-slate-700 transition"
+            href="/fabric-store/inventory/inward"
+            className="flex items-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-xs transition"
           >
-            <PackageCheck className="w-4 h-4 text-teal-400" />
-            <span>Incoming Challans</span>
+            <ArrowDownToLine className="w-4 h-4" />
+            <span>Inward Stock</span>
+          </Link>
+          <Link
+            href="/fabric-store/inventory/outward"
+            className="flex items-center gap-1.5 px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg shadow-xs transition"
+          >
+            <Send className="w-4 h-4" />
+            <span>Outward Stock</span>
           </Link>
           <Link
             href="/fabric-store/my-work/challan-to-dyeing"
-            className="flex items-center gap-2 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg shadow-xs transition"
+            className="flex items-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg shadow-xs transition"
           >
             <Send className="w-4 h-4" />
-            <span>Store to Dyeing</span>
+            <span>Store &rarr; Dyeing</span>
           </Link>
           <Link
             href="/fabric-store/my-work/challan-to-embroidery"
-            className="flex items-center gap-2 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow-xs transition"
+            className="flex items-center gap-1.5 px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold rounded-lg shadow-xs transition"
           >
             <Send className="w-4 h-4" />
-            <span>Store to Embroidery</span>
+            <span>Store &rarr; Embroidery</span>
           </Link>
         </div>
       </header>
@@ -135,6 +144,89 @@ export default function FabricStoreDashboard() {
             {error}
           </div>
         )}
+
+        {/* CORE FABRIC STORE MODULE TILES (HANDWRITTEN SPECIFICATION) */}
+        <section className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Link
+            href="/fabric-store/inventory/inward"
+            className="bg-white p-4 rounded-xl border border-emerald-200 hover:border-emerald-400 hover:shadow-md transition group"
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700">
+                1. INWARD STOCK
+              </span>
+              <ArrowDownToLine className="w-4 h-4 text-emerald-600 group-hover:scale-110 transition" />
+            </div>
+            <h3 className="text-sm font-black text-slate-900 mt-2">Any New Fabric Arriving</h3>
+            <p className="text-[11px] text-slate-500 mt-1">
+              Log mill bills, receiving date, bill quantity in MTR or PCS.
+            </p>
+            <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-700 mt-3">
+              <span>Open Inward Table</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </div>
+          </Link>
+
+          <Link
+            href="/fabric-store/inventory/outward"
+            className="bg-white p-4 rounded-xl border border-amber-200 hover:border-amber-400 hover:shadow-md transition group"
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-black uppercase tracking-wider text-amber-700">
+                2. OUTWARD STOCK
+              </span>
+              <Send className="w-4 h-4 text-amber-600 group-hover:scale-110 transition" />
+            </div>
+            <h3 className="text-sm font-black text-slate-900 mt-2">Dispatches &amp; Challans</h3>
+            <p className="text-[11px] text-slate-500 mt-1">
+              Auto-updated when Challan is created to Dyeing or Embroidery.
+            </p>
+            <div className="flex items-center gap-1 text-[11px] font-bold text-amber-700 mt-3">
+              <span>Open Outward Table</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </div>
+          </Link>
+
+          <Link
+            href="/fabric-store/inventory/total-stock"
+            className="bg-white p-4 rounded-xl border border-teal-200 hover:border-teal-400 hover:shadow-md transition group"
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-black uppercase tracking-wider text-teal-700">
+                TOTAL STOCK
+              </span>
+              <Boxes className="w-4 h-4 text-teal-600 group-hover:scale-110 transition" />
+            </div>
+            <h3 className="text-sm font-black text-slate-900 mt-2">KORA &amp; Dyed Balance</h3>
+            <p className="text-[11px] text-slate-500 mt-1">
+              Real-time In-Store Balance: Inward minus Outward dispatches.
+            </p>
+            <div className="flex items-center gap-1 text-[11px] font-bold text-teal-700 mt-3">
+              <span>View Stock Balance</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </div>
+          </Link>
+
+          <Link
+            href="/fabric-store/inventory/defected-shelf"
+            className="bg-white p-4 rounded-xl border border-rose-200 hover:border-rose-400 hover:shadow-md transition group"
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-black uppercase tracking-wider text-rose-700">
+                DEFECTIVE SHELF
+              </span>
+              <AlertTriangle className="w-4 h-4 text-rose-600 group-hover:scale-110 transition" />
+            </div>
+            <h3 className="text-sm font-black text-slate-900 mt-2">DEF-SHELF-STORE</h3>
+            <p className="text-[11px] text-slate-500 mt-1">
+              Isolated weaving slub &amp; tear defect fabric pieces quarantined.
+            </p>
+            <div className="flex items-center gap-1 text-[11px] font-bold text-rose-700 mt-3">
+              <span>Inspect Quarantined</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </div>
+          </Link>
+        </section>
 
         {/* KPI CARDS */}
         <section className="grid grid-cols-2 sm:grid-cols-4 gap-3">

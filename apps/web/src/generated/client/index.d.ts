@@ -303,6 +303,16 @@ export type FabricStockLedger = $Result.DefaultSelection<Prisma.$FabricStockLedg
  * 
  */
 export type DyeingOrder = $Result.DefaultSelection<Prisma.$DyeingOrderPayload>
+/**
+ * Model FabricInward
+ * 
+ */
+export type FabricInward = $Result.DefaultSelection<Prisma.$FabricInwardPayload>
+/**
+ * Model FabricOutward
+ * 
+ */
+export type FabricOutward = $Result.DefaultSelection<Prisma.$FabricOutwardPayload>
 
 /**
  * Enums
@@ -1127,6 +1137,26 @@ export class PrismaClient<
     * ```
     */
   get dyeingOrder(): Prisma.DyeingOrderDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.fabricInward`: Exposes CRUD operations for the **FabricInward** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more FabricInwards
+    * const fabricInwards = await prisma.fabricInward.findMany()
+    * ```
+    */
+  get fabricInward(): Prisma.FabricInwardDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.fabricOutward`: Exposes CRUD operations for the **FabricOutward** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more FabricOutwards
+    * const fabricOutwards = await prisma.fabricOutward.findMany()
+    * ```
+    */
+  get fabricOutward(): Prisma.FabricOutwardDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1625,7 +1655,9 @@ export namespace Prisma {
     MaterialReceiptItem: 'MaterialReceiptItem',
     FabricQCInspection: 'FabricQCInspection',
     FabricStockLedger: 'FabricStockLedger',
-    DyeingOrder: 'DyeingOrder'
+    DyeingOrder: 'DyeingOrder',
+    FabricInward: 'FabricInward',
+    FabricOutward: 'FabricOutward'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1644,7 +1676,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "role" | "permission" | "rolePermission" | "userRole" | "department" | "workCenter" | "machine" | "shift" | "supplier" | "customer" | "item" | "fabric" | "trim" | "design" | "colour" | "size" | "operation" | "defectCode" | "program" | "programFabric" | "programColour" | "programSize" | "programSpecification" | "programBOM" | "programRoute" | "programRouteStep" | "attachment" | "auditLog" | "challan" | "challanItem" | "productionTransaction" | "qualityInspection" | "defectLog" | "inventoryStock" | "challanEvent" | "stockLedgerEntry" | "fabricRoll" | "bundle" | "carton" | "cartonBundle" | "dispatchOrder" | "dispatchCarton" | "defectRecord" | "reworkTransaction" | "recutRequest" | "qualityInspectionParameter" | "idempotencyRecord" | "notification" | "integrityScanResult" | "inventoryLocation" | "fabricBatch" | "fabricStoreRoll" | "materialReceipt" | "materialReceiptItem" | "fabricQCInspection" | "fabricStockLedger" | "dyeingOrder"
+      modelProps: "user" | "role" | "permission" | "rolePermission" | "userRole" | "department" | "workCenter" | "machine" | "shift" | "supplier" | "customer" | "item" | "fabric" | "trim" | "design" | "colour" | "size" | "operation" | "defectCode" | "program" | "programFabric" | "programColour" | "programSize" | "programSpecification" | "programBOM" | "programRoute" | "programRouteStep" | "attachment" | "auditLog" | "challan" | "challanItem" | "productionTransaction" | "qualityInspection" | "defectLog" | "inventoryStock" | "challanEvent" | "stockLedgerEntry" | "fabricRoll" | "bundle" | "carton" | "cartonBundle" | "dispatchOrder" | "dispatchCarton" | "defectRecord" | "reworkTransaction" | "recutRequest" | "qualityInspectionParameter" | "idempotencyRecord" | "notification" | "integrityScanResult" | "inventoryLocation" | "fabricBatch" | "fabricStoreRoll" | "materialReceipt" | "materialReceiptItem" | "fabricQCInspection" | "fabricStockLedger" | "dyeingOrder" | "fabricInward" | "fabricOutward"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -5940,6 +5972,154 @@ export namespace Prisma {
           }
         }
       }
+      FabricInward: {
+        payload: Prisma.$FabricInwardPayload<ExtArgs>
+        fields: Prisma.FabricInwardFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.FabricInwardFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricInwardPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.FabricInwardFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricInwardPayload>
+          }
+          findFirst: {
+            args: Prisma.FabricInwardFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricInwardPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.FabricInwardFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricInwardPayload>
+          }
+          findMany: {
+            args: Prisma.FabricInwardFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricInwardPayload>[]
+          }
+          create: {
+            args: Prisma.FabricInwardCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricInwardPayload>
+          }
+          createMany: {
+            args: Prisma.FabricInwardCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.FabricInwardCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricInwardPayload>[]
+          }
+          delete: {
+            args: Prisma.FabricInwardDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricInwardPayload>
+          }
+          update: {
+            args: Prisma.FabricInwardUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricInwardPayload>
+          }
+          deleteMany: {
+            args: Prisma.FabricInwardDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.FabricInwardUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.FabricInwardUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricInwardPayload>[]
+          }
+          upsert: {
+            args: Prisma.FabricInwardUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricInwardPayload>
+          }
+          aggregate: {
+            args: Prisma.FabricInwardAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateFabricInward>
+          }
+          groupBy: {
+            args: Prisma.FabricInwardGroupByArgs<ExtArgs>
+            result: $Utils.Optional<FabricInwardGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.FabricInwardCountArgs<ExtArgs>
+            result: $Utils.Optional<FabricInwardCountAggregateOutputType> | number
+          }
+        }
+      }
+      FabricOutward: {
+        payload: Prisma.$FabricOutwardPayload<ExtArgs>
+        fields: Prisma.FabricOutwardFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.FabricOutwardFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricOutwardPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.FabricOutwardFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricOutwardPayload>
+          }
+          findFirst: {
+            args: Prisma.FabricOutwardFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricOutwardPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.FabricOutwardFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricOutwardPayload>
+          }
+          findMany: {
+            args: Prisma.FabricOutwardFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricOutwardPayload>[]
+          }
+          create: {
+            args: Prisma.FabricOutwardCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricOutwardPayload>
+          }
+          createMany: {
+            args: Prisma.FabricOutwardCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.FabricOutwardCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricOutwardPayload>[]
+          }
+          delete: {
+            args: Prisma.FabricOutwardDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricOutwardPayload>
+          }
+          update: {
+            args: Prisma.FabricOutwardUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricOutwardPayload>
+          }
+          deleteMany: {
+            args: Prisma.FabricOutwardDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.FabricOutwardUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.FabricOutwardUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricOutwardPayload>[]
+          }
+          upsert: {
+            args: Prisma.FabricOutwardUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricOutwardPayload>
+          }
+          aggregate: {
+            args: Prisma.FabricOutwardAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateFabricOutward>
+          }
+          groupBy: {
+            args: Prisma.FabricOutwardGroupByArgs<ExtArgs>
+            result: $Utils.Optional<FabricOutwardGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.FabricOutwardCountArgs<ExtArgs>
+            result: $Utils.Optional<FabricOutwardCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -6094,6 +6274,8 @@ export namespace Prisma {
     fabricQCInspection?: FabricQCInspectionOmit
     fabricStockLedger?: FabricStockLedgerOmit
     dyeingOrder?: DyeingOrderOmit
+    fabricInward?: FabricInwardOmit
+    fabricOutward?: FabricOutwardOmit
   }
 
   /* Types for Logging */
@@ -79659,6 +79841,2340 @@ export namespace Prisma {
 
 
   /**
+   * Model FabricInward
+   */
+
+  export type AggregateFabricInward = {
+    _count: FabricInwardCountAggregateOutputType | null
+    _avg: FabricInwardAvgAggregateOutputType | null
+    _sum: FabricInwardSumAggregateOutputType | null
+    _min: FabricInwardMinAggregateOutputType | null
+    _max: FabricInwardMaxAggregateOutputType | null
+  }
+
+  export type FabricInwardAvgAggregateOutputType = {
+    sNo: number | null
+    billQty: number | null
+  }
+
+  export type FabricInwardSumAggregateOutputType = {
+    sNo: number | null
+    billQty: number | null
+  }
+
+  export type FabricInwardMinAggregateOutputType = {
+    id: string | null
+    sNo: number | null
+    entryType: string | null
+    itemName: string | null
+    billNo: string | null
+    billDate: Date | null
+    receivingDate: Date | null
+    billQty: number | null
+    unit: string | null
+    supplierName: string | null
+    remarks: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FabricInwardMaxAggregateOutputType = {
+    id: string | null
+    sNo: number | null
+    entryType: string | null
+    itemName: string | null
+    billNo: string | null
+    billDate: Date | null
+    receivingDate: Date | null
+    billQty: number | null
+    unit: string | null
+    supplierName: string | null
+    remarks: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FabricInwardCountAggregateOutputType = {
+    id: number
+    sNo: number
+    entryType: number
+    itemName: number
+    billNo: number
+    billDate: number
+    receivingDate: number
+    billQty: number
+    unit: number
+    supplierName: number
+    remarks: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type FabricInwardAvgAggregateInputType = {
+    sNo?: true
+    billQty?: true
+  }
+
+  export type FabricInwardSumAggregateInputType = {
+    sNo?: true
+    billQty?: true
+  }
+
+  export type FabricInwardMinAggregateInputType = {
+    id?: true
+    sNo?: true
+    entryType?: true
+    itemName?: true
+    billNo?: true
+    billDate?: true
+    receivingDate?: true
+    billQty?: true
+    unit?: true
+    supplierName?: true
+    remarks?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FabricInwardMaxAggregateInputType = {
+    id?: true
+    sNo?: true
+    entryType?: true
+    itemName?: true
+    billNo?: true
+    billDate?: true
+    receivingDate?: true
+    billQty?: true
+    unit?: true
+    supplierName?: true
+    remarks?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FabricInwardCountAggregateInputType = {
+    id?: true
+    sNo?: true
+    entryType?: true
+    itemName?: true
+    billNo?: true
+    billDate?: true
+    receivingDate?: true
+    billQty?: true
+    unit?: true
+    supplierName?: true
+    remarks?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type FabricInwardAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FabricInward to aggregate.
+     */
+    where?: FabricInwardWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricInwards to fetch.
+     */
+    orderBy?: FabricInwardOrderByWithRelationInput | FabricInwardOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: FabricInwardWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricInwards from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricInwards.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned FabricInwards
+    **/
+    _count?: true | FabricInwardCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: FabricInwardAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: FabricInwardSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: FabricInwardMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: FabricInwardMaxAggregateInputType
+  }
+
+  export type GetFabricInwardAggregateType<T extends FabricInwardAggregateArgs> = {
+        [P in keyof T & keyof AggregateFabricInward]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateFabricInward[P]>
+      : GetScalarType<T[P], AggregateFabricInward[P]>
+  }
+
+
+
+
+  export type FabricInwardGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FabricInwardWhereInput
+    orderBy?: FabricInwardOrderByWithAggregationInput | FabricInwardOrderByWithAggregationInput[]
+    by: FabricInwardScalarFieldEnum[] | FabricInwardScalarFieldEnum
+    having?: FabricInwardScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: FabricInwardCountAggregateInputType | true
+    _avg?: FabricInwardAvgAggregateInputType
+    _sum?: FabricInwardSumAggregateInputType
+    _min?: FabricInwardMinAggregateInputType
+    _max?: FabricInwardMaxAggregateInputType
+  }
+
+  export type FabricInwardGroupByOutputType = {
+    id: string
+    sNo: number
+    entryType: string
+    itemName: string
+    billNo: string
+    billDate: Date
+    receivingDate: Date
+    billQty: number
+    unit: string
+    supplierName: string | null
+    remarks: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: FabricInwardCountAggregateOutputType | null
+    _avg: FabricInwardAvgAggregateOutputType | null
+    _sum: FabricInwardSumAggregateOutputType | null
+    _min: FabricInwardMinAggregateOutputType | null
+    _max: FabricInwardMaxAggregateOutputType | null
+  }
+
+  type GetFabricInwardGroupByPayload<T extends FabricInwardGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<FabricInwardGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof FabricInwardGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], FabricInwardGroupByOutputType[P]>
+            : GetScalarType<T[P], FabricInwardGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type FabricInwardSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sNo?: boolean
+    entryType?: boolean
+    itemName?: boolean
+    billNo?: boolean
+    billDate?: boolean
+    receivingDate?: boolean
+    billQty?: boolean
+    unit?: boolean
+    supplierName?: boolean
+    remarks?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["fabricInward"]>
+
+  export type FabricInwardSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sNo?: boolean
+    entryType?: boolean
+    itemName?: boolean
+    billNo?: boolean
+    billDate?: boolean
+    receivingDate?: boolean
+    billQty?: boolean
+    unit?: boolean
+    supplierName?: boolean
+    remarks?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["fabricInward"]>
+
+  export type FabricInwardSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sNo?: boolean
+    entryType?: boolean
+    itemName?: boolean
+    billNo?: boolean
+    billDate?: boolean
+    receivingDate?: boolean
+    billQty?: boolean
+    unit?: boolean
+    supplierName?: boolean
+    remarks?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["fabricInward"]>
+
+  export type FabricInwardSelectScalar = {
+    id?: boolean
+    sNo?: boolean
+    entryType?: boolean
+    itemName?: boolean
+    billNo?: boolean
+    billDate?: boolean
+    receivingDate?: boolean
+    billQty?: boolean
+    unit?: boolean
+    supplierName?: boolean
+    remarks?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type FabricInwardOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sNo" | "entryType" | "itemName" | "billNo" | "billDate" | "receivingDate" | "billQty" | "unit" | "supplierName" | "remarks" | "createdAt" | "updatedAt", ExtArgs["result"]["fabricInward"]>
+
+  export type $FabricInwardPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "FabricInward"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      sNo: number
+      entryType: string
+      itemName: string
+      billNo: string
+      billDate: Date
+      receivingDate: Date
+      billQty: number
+      unit: string
+      supplierName: string | null
+      remarks: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["fabricInward"]>
+    composites: {}
+  }
+
+  type FabricInwardGetPayload<S extends boolean | null | undefined | FabricInwardDefaultArgs> = $Result.GetResult<Prisma.$FabricInwardPayload, S>
+
+  type FabricInwardCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<FabricInwardFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: FabricInwardCountAggregateInputType | true
+    }
+
+  export interface FabricInwardDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['FabricInward'], meta: { name: 'FabricInward' } }
+    /**
+     * Find zero or one FabricInward that matches the filter.
+     * @param {FabricInwardFindUniqueArgs} args - Arguments to find a FabricInward
+     * @example
+     * // Get one FabricInward
+     * const fabricInward = await prisma.fabricInward.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends FabricInwardFindUniqueArgs>(args: SelectSubset<T, FabricInwardFindUniqueArgs<ExtArgs>>): Prisma__FabricInwardClient<$Result.GetResult<Prisma.$FabricInwardPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one FabricInward that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {FabricInwardFindUniqueOrThrowArgs} args - Arguments to find a FabricInward
+     * @example
+     * // Get one FabricInward
+     * const fabricInward = await prisma.fabricInward.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends FabricInwardFindUniqueOrThrowArgs>(args: SelectSubset<T, FabricInwardFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FabricInwardClient<$Result.GetResult<Prisma.$FabricInwardPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FabricInward that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricInwardFindFirstArgs} args - Arguments to find a FabricInward
+     * @example
+     * // Get one FabricInward
+     * const fabricInward = await prisma.fabricInward.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends FabricInwardFindFirstArgs>(args?: SelectSubset<T, FabricInwardFindFirstArgs<ExtArgs>>): Prisma__FabricInwardClient<$Result.GetResult<Prisma.$FabricInwardPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FabricInward that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricInwardFindFirstOrThrowArgs} args - Arguments to find a FabricInward
+     * @example
+     * // Get one FabricInward
+     * const fabricInward = await prisma.fabricInward.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends FabricInwardFindFirstOrThrowArgs>(args?: SelectSubset<T, FabricInwardFindFirstOrThrowArgs<ExtArgs>>): Prisma__FabricInwardClient<$Result.GetResult<Prisma.$FabricInwardPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more FabricInwards that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricInwardFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all FabricInwards
+     * const fabricInwards = await prisma.fabricInward.findMany()
+     * 
+     * // Get first 10 FabricInwards
+     * const fabricInwards = await prisma.fabricInward.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const fabricInwardWithIdOnly = await prisma.fabricInward.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends FabricInwardFindManyArgs>(args?: SelectSubset<T, FabricInwardFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricInwardPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a FabricInward.
+     * @param {FabricInwardCreateArgs} args - Arguments to create a FabricInward.
+     * @example
+     * // Create one FabricInward
+     * const FabricInward = await prisma.fabricInward.create({
+     *   data: {
+     *     // ... data to create a FabricInward
+     *   }
+     * })
+     * 
+     */
+    create<T extends FabricInwardCreateArgs>(args: SelectSubset<T, FabricInwardCreateArgs<ExtArgs>>): Prisma__FabricInwardClient<$Result.GetResult<Prisma.$FabricInwardPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many FabricInwards.
+     * @param {FabricInwardCreateManyArgs} args - Arguments to create many FabricInwards.
+     * @example
+     * // Create many FabricInwards
+     * const fabricInward = await prisma.fabricInward.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends FabricInwardCreateManyArgs>(args?: SelectSubset<T, FabricInwardCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many FabricInwards and returns the data saved in the database.
+     * @param {FabricInwardCreateManyAndReturnArgs} args - Arguments to create many FabricInwards.
+     * @example
+     * // Create many FabricInwards
+     * const fabricInward = await prisma.fabricInward.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many FabricInwards and only return the `id`
+     * const fabricInwardWithIdOnly = await prisma.fabricInward.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends FabricInwardCreateManyAndReturnArgs>(args?: SelectSubset<T, FabricInwardCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricInwardPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a FabricInward.
+     * @param {FabricInwardDeleteArgs} args - Arguments to delete one FabricInward.
+     * @example
+     * // Delete one FabricInward
+     * const FabricInward = await prisma.fabricInward.delete({
+     *   where: {
+     *     // ... filter to delete one FabricInward
+     *   }
+     * })
+     * 
+     */
+    delete<T extends FabricInwardDeleteArgs>(args: SelectSubset<T, FabricInwardDeleteArgs<ExtArgs>>): Prisma__FabricInwardClient<$Result.GetResult<Prisma.$FabricInwardPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one FabricInward.
+     * @param {FabricInwardUpdateArgs} args - Arguments to update one FabricInward.
+     * @example
+     * // Update one FabricInward
+     * const fabricInward = await prisma.fabricInward.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends FabricInwardUpdateArgs>(args: SelectSubset<T, FabricInwardUpdateArgs<ExtArgs>>): Prisma__FabricInwardClient<$Result.GetResult<Prisma.$FabricInwardPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more FabricInwards.
+     * @param {FabricInwardDeleteManyArgs} args - Arguments to filter FabricInwards to delete.
+     * @example
+     * // Delete a few FabricInwards
+     * const { count } = await prisma.fabricInward.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends FabricInwardDeleteManyArgs>(args?: SelectSubset<T, FabricInwardDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FabricInwards.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricInwardUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many FabricInwards
+     * const fabricInward = await prisma.fabricInward.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends FabricInwardUpdateManyArgs>(args: SelectSubset<T, FabricInwardUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FabricInwards and returns the data updated in the database.
+     * @param {FabricInwardUpdateManyAndReturnArgs} args - Arguments to update many FabricInwards.
+     * @example
+     * // Update many FabricInwards
+     * const fabricInward = await prisma.fabricInward.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more FabricInwards and only return the `id`
+     * const fabricInwardWithIdOnly = await prisma.fabricInward.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends FabricInwardUpdateManyAndReturnArgs>(args: SelectSubset<T, FabricInwardUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricInwardPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one FabricInward.
+     * @param {FabricInwardUpsertArgs} args - Arguments to update or create a FabricInward.
+     * @example
+     * // Update or create a FabricInward
+     * const fabricInward = await prisma.fabricInward.upsert({
+     *   create: {
+     *     // ... data to create a FabricInward
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the FabricInward we want to update
+     *   }
+     * })
+     */
+    upsert<T extends FabricInwardUpsertArgs>(args: SelectSubset<T, FabricInwardUpsertArgs<ExtArgs>>): Prisma__FabricInwardClient<$Result.GetResult<Prisma.$FabricInwardPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of FabricInwards.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricInwardCountArgs} args - Arguments to filter FabricInwards to count.
+     * @example
+     * // Count the number of FabricInwards
+     * const count = await prisma.fabricInward.count({
+     *   where: {
+     *     // ... the filter for the FabricInwards we want to count
+     *   }
+     * })
+    **/
+    count<T extends FabricInwardCountArgs>(
+      args?: Subset<T, FabricInwardCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], FabricInwardCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a FabricInward.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricInwardAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends FabricInwardAggregateArgs>(args: Subset<T, FabricInwardAggregateArgs>): Prisma.PrismaPromise<GetFabricInwardAggregateType<T>>
+
+    /**
+     * Group by FabricInward.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricInwardGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends FabricInwardGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: FabricInwardGroupByArgs['orderBy'] }
+        : { orderBy?: FabricInwardGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, FabricInwardGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFabricInwardGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the FabricInward model
+   */
+  readonly fields: FabricInwardFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for FabricInward.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__FabricInwardClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the FabricInward model
+   */
+  interface FabricInwardFieldRefs {
+    readonly id: FieldRef<"FabricInward", 'String'>
+    readonly sNo: FieldRef<"FabricInward", 'Int'>
+    readonly entryType: FieldRef<"FabricInward", 'String'>
+    readonly itemName: FieldRef<"FabricInward", 'String'>
+    readonly billNo: FieldRef<"FabricInward", 'String'>
+    readonly billDate: FieldRef<"FabricInward", 'DateTime'>
+    readonly receivingDate: FieldRef<"FabricInward", 'DateTime'>
+    readonly billQty: FieldRef<"FabricInward", 'Float'>
+    readonly unit: FieldRef<"FabricInward", 'String'>
+    readonly supplierName: FieldRef<"FabricInward", 'String'>
+    readonly remarks: FieldRef<"FabricInward", 'String'>
+    readonly createdAt: FieldRef<"FabricInward", 'DateTime'>
+    readonly updatedAt: FieldRef<"FabricInward", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * FabricInward findUnique
+   */
+  export type FabricInwardFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricInward
+     */
+    select?: FabricInwardSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricInward
+     */
+    omit?: FabricInwardOmit<ExtArgs> | null
+    /**
+     * Filter, which FabricInward to fetch.
+     */
+    where: FabricInwardWhereUniqueInput
+  }
+
+  /**
+   * FabricInward findUniqueOrThrow
+   */
+  export type FabricInwardFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricInward
+     */
+    select?: FabricInwardSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricInward
+     */
+    omit?: FabricInwardOmit<ExtArgs> | null
+    /**
+     * Filter, which FabricInward to fetch.
+     */
+    where: FabricInwardWhereUniqueInput
+  }
+
+  /**
+   * FabricInward findFirst
+   */
+  export type FabricInwardFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricInward
+     */
+    select?: FabricInwardSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricInward
+     */
+    omit?: FabricInwardOmit<ExtArgs> | null
+    /**
+     * Filter, which FabricInward to fetch.
+     */
+    where?: FabricInwardWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricInwards to fetch.
+     */
+    orderBy?: FabricInwardOrderByWithRelationInput | FabricInwardOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FabricInwards.
+     */
+    cursor?: FabricInwardWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricInwards from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricInwards.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FabricInwards.
+     */
+    distinct?: FabricInwardScalarFieldEnum | FabricInwardScalarFieldEnum[]
+  }
+
+  /**
+   * FabricInward findFirstOrThrow
+   */
+  export type FabricInwardFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricInward
+     */
+    select?: FabricInwardSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricInward
+     */
+    omit?: FabricInwardOmit<ExtArgs> | null
+    /**
+     * Filter, which FabricInward to fetch.
+     */
+    where?: FabricInwardWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricInwards to fetch.
+     */
+    orderBy?: FabricInwardOrderByWithRelationInput | FabricInwardOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FabricInwards.
+     */
+    cursor?: FabricInwardWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricInwards from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricInwards.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FabricInwards.
+     */
+    distinct?: FabricInwardScalarFieldEnum | FabricInwardScalarFieldEnum[]
+  }
+
+  /**
+   * FabricInward findMany
+   */
+  export type FabricInwardFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricInward
+     */
+    select?: FabricInwardSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricInward
+     */
+    omit?: FabricInwardOmit<ExtArgs> | null
+    /**
+     * Filter, which FabricInwards to fetch.
+     */
+    where?: FabricInwardWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricInwards to fetch.
+     */
+    orderBy?: FabricInwardOrderByWithRelationInput | FabricInwardOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing FabricInwards.
+     */
+    cursor?: FabricInwardWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricInwards from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricInwards.
+     */
+    skip?: number
+    distinct?: FabricInwardScalarFieldEnum | FabricInwardScalarFieldEnum[]
+  }
+
+  /**
+   * FabricInward create
+   */
+  export type FabricInwardCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricInward
+     */
+    select?: FabricInwardSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricInward
+     */
+    omit?: FabricInwardOmit<ExtArgs> | null
+    /**
+     * The data needed to create a FabricInward.
+     */
+    data: XOR<FabricInwardCreateInput, FabricInwardUncheckedCreateInput>
+  }
+
+  /**
+   * FabricInward createMany
+   */
+  export type FabricInwardCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many FabricInwards.
+     */
+    data: FabricInwardCreateManyInput | FabricInwardCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * FabricInward createManyAndReturn
+   */
+  export type FabricInwardCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricInward
+     */
+    select?: FabricInwardSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricInward
+     */
+    omit?: FabricInwardOmit<ExtArgs> | null
+    /**
+     * The data used to create many FabricInwards.
+     */
+    data: FabricInwardCreateManyInput | FabricInwardCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * FabricInward update
+   */
+  export type FabricInwardUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricInward
+     */
+    select?: FabricInwardSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricInward
+     */
+    omit?: FabricInwardOmit<ExtArgs> | null
+    /**
+     * The data needed to update a FabricInward.
+     */
+    data: XOR<FabricInwardUpdateInput, FabricInwardUncheckedUpdateInput>
+    /**
+     * Choose, which FabricInward to update.
+     */
+    where: FabricInwardWhereUniqueInput
+  }
+
+  /**
+   * FabricInward updateMany
+   */
+  export type FabricInwardUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update FabricInwards.
+     */
+    data: XOR<FabricInwardUpdateManyMutationInput, FabricInwardUncheckedUpdateManyInput>
+    /**
+     * Filter which FabricInwards to update
+     */
+    where?: FabricInwardWhereInput
+    /**
+     * Limit how many FabricInwards to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * FabricInward updateManyAndReturn
+   */
+  export type FabricInwardUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricInward
+     */
+    select?: FabricInwardSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricInward
+     */
+    omit?: FabricInwardOmit<ExtArgs> | null
+    /**
+     * The data used to update FabricInwards.
+     */
+    data: XOR<FabricInwardUpdateManyMutationInput, FabricInwardUncheckedUpdateManyInput>
+    /**
+     * Filter which FabricInwards to update
+     */
+    where?: FabricInwardWhereInput
+    /**
+     * Limit how many FabricInwards to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * FabricInward upsert
+   */
+  export type FabricInwardUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricInward
+     */
+    select?: FabricInwardSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricInward
+     */
+    omit?: FabricInwardOmit<ExtArgs> | null
+    /**
+     * The filter to search for the FabricInward to update in case it exists.
+     */
+    where: FabricInwardWhereUniqueInput
+    /**
+     * In case the FabricInward found by the `where` argument doesn't exist, create a new FabricInward with this data.
+     */
+    create: XOR<FabricInwardCreateInput, FabricInwardUncheckedCreateInput>
+    /**
+     * In case the FabricInward was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<FabricInwardUpdateInput, FabricInwardUncheckedUpdateInput>
+  }
+
+  /**
+   * FabricInward delete
+   */
+  export type FabricInwardDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricInward
+     */
+    select?: FabricInwardSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricInward
+     */
+    omit?: FabricInwardOmit<ExtArgs> | null
+    /**
+     * Filter which FabricInward to delete.
+     */
+    where: FabricInwardWhereUniqueInput
+  }
+
+  /**
+   * FabricInward deleteMany
+   */
+  export type FabricInwardDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FabricInwards to delete
+     */
+    where?: FabricInwardWhereInput
+    /**
+     * Limit how many FabricInwards to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * FabricInward without action
+   */
+  export type FabricInwardDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricInward
+     */
+    select?: FabricInwardSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricInward
+     */
+    omit?: FabricInwardOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model FabricOutward
+   */
+
+  export type AggregateFabricOutward = {
+    _count: FabricOutwardCountAggregateOutputType | null
+    _avg: FabricOutwardAvgAggregateOutputType | null
+    _sum: FabricOutwardSumAggregateOutputType | null
+    _min: FabricOutwardMinAggregateOutputType | null
+    _max: FabricOutwardMaxAggregateOutputType | null
+  }
+
+  export type FabricOutwardAvgAggregateOutputType = {
+    sNo: number | null
+    issueQty: number | null
+    avgPerPcs: number | null
+    issuePcsQty: number | null
+  }
+
+  export type FabricOutwardSumAggregateOutputType = {
+    sNo: number | null
+    issueQty: number | null
+    avgPerPcs: number | null
+    issuePcsQty: number | null
+  }
+
+  export type FabricOutwardMinAggregateOutputType = {
+    id: string | null
+    sNo: number | null
+    date: Date | null
+    challanNumber: string | null
+    challanId: string | null
+    designNumber: string | null
+    itemName: string | null
+    issueQty: number | null
+    unit: string | null
+    avgPerPcs: number | null
+    issuePcsQty: number | null
+    byOrderName: string | null
+    remarks: string | null
+    destination: string | null
+    fabricType: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FabricOutwardMaxAggregateOutputType = {
+    id: string | null
+    sNo: number | null
+    date: Date | null
+    challanNumber: string | null
+    challanId: string | null
+    designNumber: string | null
+    itemName: string | null
+    issueQty: number | null
+    unit: string | null
+    avgPerPcs: number | null
+    issuePcsQty: number | null
+    byOrderName: string | null
+    remarks: string | null
+    destination: string | null
+    fabricType: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FabricOutwardCountAggregateOutputType = {
+    id: number
+    sNo: number
+    date: number
+    challanNumber: number
+    challanId: number
+    designNumber: number
+    itemName: number
+    issueQty: number
+    unit: number
+    avgPerPcs: number
+    issuePcsQty: number
+    byOrderName: number
+    remarks: number
+    destination: number
+    fabricType: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type FabricOutwardAvgAggregateInputType = {
+    sNo?: true
+    issueQty?: true
+    avgPerPcs?: true
+    issuePcsQty?: true
+  }
+
+  export type FabricOutwardSumAggregateInputType = {
+    sNo?: true
+    issueQty?: true
+    avgPerPcs?: true
+    issuePcsQty?: true
+  }
+
+  export type FabricOutwardMinAggregateInputType = {
+    id?: true
+    sNo?: true
+    date?: true
+    challanNumber?: true
+    challanId?: true
+    designNumber?: true
+    itemName?: true
+    issueQty?: true
+    unit?: true
+    avgPerPcs?: true
+    issuePcsQty?: true
+    byOrderName?: true
+    remarks?: true
+    destination?: true
+    fabricType?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FabricOutwardMaxAggregateInputType = {
+    id?: true
+    sNo?: true
+    date?: true
+    challanNumber?: true
+    challanId?: true
+    designNumber?: true
+    itemName?: true
+    issueQty?: true
+    unit?: true
+    avgPerPcs?: true
+    issuePcsQty?: true
+    byOrderName?: true
+    remarks?: true
+    destination?: true
+    fabricType?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FabricOutwardCountAggregateInputType = {
+    id?: true
+    sNo?: true
+    date?: true
+    challanNumber?: true
+    challanId?: true
+    designNumber?: true
+    itemName?: true
+    issueQty?: true
+    unit?: true
+    avgPerPcs?: true
+    issuePcsQty?: true
+    byOrderName?: true
+    remarks?: true
+    destination?: true
+    fabricType?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type FabricOutwardAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FabricOutward to aggregate.
+     */
+    where?: FabricOutwardWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricOutwards to fetch.
+     */
+    orderBy?: FabricOutwardOrderByWithRelationInput | FabricOutwardOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: FabricOutwardWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricOutwards from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricOutwards.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned FabricOutwards
+    **/
+    _count?: true | FabricOutwardCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: FabricOutwardAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: FabricOutwardSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: FabricOutwardMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: FabricOutwardMaxAggregateInputType
+  }
+
+  export type GetFabricOutwardAggregateType<T extends FabricOutwardAggregateArgs> = {
+        [P in keyof T & keyof AggregateFabricOutward]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateFabricOutward[P]>
+      : GetScalarType<T[P], AggregateFabricOutward[P]>
+  }
+
+
+
+
+  export type FabricOutwardGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FabricOutwardWhereInput
+    orderBy?: FabricOutwardOrderByWithAggregationInput | FabricOutwardOrderByWithAggregationInput[]
+    by: FabricOutwardScalarFieldEnum[] | FabricOutwardScalarFieldEnum
+    having?: FabricOutwardScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: FabricOutwardCountAggregateInputType | true
+    _avg?: FabricOutwardAvgAggregateInputType
+    _sum?: FabricOutwardSumAggregateInputType
+    _min?: FabricOutwardMinAggregateInputType
+    _max?: FabricOutwardMaxAggregateInputType
+  }
+
+  export type FabricOutwardGroupByOutputType = {
+    id: string
+    sNo: number
+    date: Date
+    challanNumber: string | null
+    challanId: string | null
+    designNumber: string | null
+    itemName: string
+    issueQty: number
+    unit: string
+    avgPerPcs: number | null
+    issuePcsQty: number | null
+    byOrderName: string | null
+    remarks: string | null
+    destination: string | null
+    fabricType: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: FabricOutwardCountAggregateOutputType | null
+    _avg: FabricOutwardAvgAggregateOutputType | null
+    _sum: FabricOutwardSumAggregateOutputType | null
+    _min: FabricOutwardMinAggregateOutputType | null
+    _max: FabricOutwardMaxAggregateOutputType | null
+  }
+
+  type GetFabricOutwardGroupByPayload<T extends FabricOutwardGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<FabricOutwardGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof FabricOutwardGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], FabricOutwardGroupByOutputType[P]>
+            : GetScalarType<T[P], FabricOutwardGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type FabricOutwardSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sNo?: boolean
+    date?: boolean
+    challanNumber?: boolean
+    challanId?: boolean
+    designNumber?: boolean
+    itemName?: boolean
+    issueQty?: boolean
+    unit?: boolean
+    avgPerPcs?: boolean
+    issuePcsQty?: boolean
+    byOrderName?: boolean
+    remarks?: boolean
+    destination?: boolean
+    fabricType?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["fabricOutward"]>
+
+  export type FabricOutwardSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sNo?: boolean
+    date?: boolean
+    challanNumber?: boolean
+    challanId?: boolean
+    designNumber?: boolean
+    itemName?: boolean
+    issueQty?: boolean
+    unit?: boolean
+    avgPerPcs?: boolean
+    issuePcsQty?: boolean
+    byOrderName?: boolean
+    remarks?: boolean
+    destination?: boolean
+    fabricType?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["fabricOutward"]>
+
+  export type FabricOutwardSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    sNo?: boolean
+    date?: boolean
+    challanNumber?: boolean
+    challanId?: boolean
+    designNumber?: boolean
+    itemName?: boolean
+    issueQty?: boolean
+    unit?: boolean
+    avgPerPcs?: boolean
+    issuePcsQty?: boolean
+    byOrderName?: boolean
+    remarks?: boolean
+    destination?: boolean
+    fabricType?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["fabricOutward"]>
+
+  export type FabricOutwardSelectScalar = {
+    id?: boolean
+    sNo?: boolean
+    date?: boolean
+    challanNumber?: boolean
+    challanId?: boolean
+    designNumber?: boolean
+    itemName?: boolean
+    issueQty?: boolean
+    unit?: boolean
+    avgPerPcs?: boolean
+    issuePcsQty?: boolean
+    byOrderName?: boolean
+    remarks?: boolean
+    destination?: boolean
+    fabricType?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type FabricOutwardOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sNo" | "date" | "challanNumber" | "challanId" | "designNumber" | "itemName" | "issueQty" | "unit" | "avgPerPcs" | "issuePcsQty" | "byOrderName" | "remarks" | "destination" | "fabricType" | "createdAt" | "updatedAt", ExtArgs["result"]["fabricOutward"]>
+
+  export type $FabricOutwardPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "FabricOutward"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      sNo: number
+      date: Date
+      challanNumber: string | null
+      challanId: string | null
+      designNumber: string | null
+      itemName: string
+      issueQty: number
+      unit: string
+      avgPerPcs: number | null
+      issuePcsQty: number | null
+      byOrderName: string | null
+      remarks: string | null
+      destination: string | null
+      fabricType: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["fabricOutward"]>
+    composites: {}
+  }
+
+  type FabricOutwardGetPayload<S extends boolean | null | undefined | FabricOutwardDefaultArgs> = $Result.GetResult<Prisma.$FabricOutwardPayload, S>
+
+  type FabricOutwardCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<FabricOutwardFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: FabricOutwardCountAggregateInputType | true
+    }
+
+  export interface FabricOutwardDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['FabricOutward'], meta: { name: 'FabricOutward' } }
+    /**
+     * Find zero or one FabricOutward that matches the filter.
+     * @param {FabricOutwardFindUniqueArgs} args - Arguments to find a FabricOutward
+     * @example
+     * // Get one FabricOutward
+     * const fabricOutward = await prisma.fabricOutward.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends FabricOutwardFindUniqueArgs>(args: SelectSubset<T, FabricOutwardFindUniqueArgs<ExtArgs>>): Prisma__FabricOutwardClient<$Result.GetResult<Prisma.$FabricOutwardPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one FabricOutward that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {FabricOutwardFindUniqueOrThrowArgs} args - Arguments to find a FabricOutward
+     * @example
+     * // Get one FabricOutward
+     * const fabricOutward = await prisma.fabricOutward.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends FabricOutwardFindUniqueOrThrowArgs>(args: SelectSubset<T, FabricOutwardFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FabricOutwardClient<$Result.GetResult<Prisma.$FabricOutwardPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FabricOutward that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricOutwardFindFirstArgs} args - Arguments to find a FabricOutward
+     * @example
+     * // Get one FabricOutward
+     * const fabricOutward = await prisma.fabricOutward.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends FabricOutwardFindFirstArgs>(args?: SelectSubset<T, FabricOutwardFindFirstArgs<ExtArgs>>): Prisma__FabricOutwardClient<$Result.GetResult<Prisma.$FabricOutwardPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FabricOutward that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricOutwardFindFirstOrThrowArgs} args - Arguments to find a FabricOutward
+     * @example
+     * // Get one FabricOutward
+     * const fabricOutward = await prisma.fabricOutward.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends FabricOutwardFindFirstOrThrowArgs>(args?: SelectSubset<T, FabricOutwardFindFirstOrThrowArgs<ExtArgs>>): Prisma__FabricOutwardClient<$Result.GetResult<Prisma.$FabricOutwardPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more FabricOutwards that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricOutwardFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all FabricOutwards
+     * const fabricOutwards = await prisma.fabricOutward.findMany()
+     * 
+     * // Get first 10 FabricOutwards
+     * const fabricOutwards = await prisma.fabricOutward.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const fabricOutwardWithIdOnly = await prisma.fabricOutward.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends FabricOutwardFindManyArgs>(args?: SelectSubset<T, FabricOutwardFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricOutwardPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a FabricOutward.
+     * @param {FabricOutwardCreateArgs} args - Arguments to create a FabricOutward.
+     * @example
+     * // Create one FabricOutward
+     * const FabricOutward = await prisma.fabricOutward.create({
+     *   data: {
+     *     // ... data to create a FabricOutward
+     *   }
+     * })
+     * 
+     */
+    create<T extends FabricOutwardCreateArgs>(args: SelectSubset<T, FabricOutwardCreateArgs<ExtArgs>>): Prisma__FabricOutwardClient<$Result.GetResult<Prisma.$FabricOutwardPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many FabricOutwards.
+     * @param {FabricOutwardCreateManyArgs} args - Arguments to create many FabricOutwards.
+     * @example
+     * // Create many FabricOutwards
+     * const fabricOutward = await prisma.fabricOutward.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends FabricOutwardCreateManyArgs>(args?: SelectSubset<T, FabricOutwardCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many FabricOutwards and returns the data saved in the database.
+     * @param {FabricOutwardCreateManyAndReturnArgs} args - Arguments to create many FabricOutwards.
+     * @example
+     * // Create many FabricOutwards
+     * const fabricOutward = await prisma.fabricOutward.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many FabricOutwards and only return the `id`
+     * const fabricOutwardWithIdOnly = await prisma.fabricOutward.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends FabricOutwardCreateManyAndReturnArgs>(args?: SelectSubset<T, FabricOutwardCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricOutwardPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a FabricOutward.
+     * @param {FabricOutwardDeleteArgs} args - Arguments to delete one FabricOutward.
+     * @example
+     * // Delete one FabricOutward
+     * const FabricOutward = await prisma.fabricOutward.delete({
+     *   where: {
+     *     // ... filter to delete one FabricOutward
+     *   }
+     * })
+     * 
+     */
+    delete<T extends FabricOutwardDeleteArgs>(args: SelectSubset<T, FabricOutwardDeleteArgs<ExtArgs>>): Prisma__FabricOutwardClient<$Result.GetResult<Prisma.$FabricOutwardPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one FabricOutward.
+     * @param {FabricOutwardUpdateArgs} args - Arguments to update one FabricOutward.
+     * @example
+     * // Update one FabricOutward
+     * const fabricOutward = await prisma.fabricOutward.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends FabricOutwardUpdateArgs>(args: SelectSubset<T, FabricOutwardUpdateArgs<ExtArgs>>): Prisma__FabricOutwardClient<$Result.GetResult<Prisma.$FabricOutwardPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more FabricOutwards.
+     * @param {FabricOutwardDeleteManyArgs} args - Arguments to filter FabricOutwards to delete.
+     * @example
+     * // Delete a few FabricOutwards
+     * const { count } = await prisma.fabricOutward.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends FabricOutwardDeleteManyArgs>(args?: SelectSubset<T, FabricOutwardDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FabricOutwards.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricOutwardUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many FabricOutwards
+     * const fabricOutward = await prisma.fabricOutward.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends FabricOutwardUpdateManyArgs>(args: SelectSubset<T, FabricOutwardUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FabricOutwards and returns the data updated in the database.
+     * @param {FabricOutwardUpdateManyAndReturnArgs} args - Arguments to update many FabricOutwards.
+     * @example
+     * // Update many FabricOutwards
+     * const fabricOutward = await prisma.fabricOutward.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more FabricOutwards and only return the `id`
+     * const fabricOutwardWithIdOnly = await prisma.fabricOutward.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends FabricOutwardUpdateManyAndReturnArgs>(args: SelectSubset<T, FabricOutwardUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricOutwardPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one FabricOutward.
+     * @param {FabricOutwardUpsertArgs} args - Arguments to update or create a FabricOutward.
+     * @example
+     * // Update or create a FabricOutward
+     * const fabricOutward = await prisma.fabricOutward.upsert({
+     *   create: {
+     *     // ... data to create a FabricOutward
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the FabricOutward we want to update
+     *   }
+     * })
+     */
+    upsert<T extends FabricOutwardUpsertArgs>(args: SelectSubset<T, FabricOutwardUpsertArgs<ExtArgs>>): Prisma__FabricOutwardClient<$Result.GetResult<Prisma.$FabricOutwardPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of FabricOutwards.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricOutwardCountArgs} args - Arguments to filter FabricOutwards to count.
+     * @example
+     * // Count the number of FabricOutwards
+     * const count = await prisma.fabricOutward.count({
+     *   where: {
+     *     // ... the filter for the FabricOutwards we want to count
+     *   }
+     * })
+    **/
+    count<T extends FabricOutwardCountArgs>(
+      args?: Subset<T, FabricOutwardCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], FabricOutwardCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a FabricOutward.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricOutwardAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends FabricOutwardAggregateArgs>(args: Subset<T, FabricOutwardAggregateArgs>): Prisma.PrismaPromise<GetFabricOutwardAggregateType<T>>
+
+    /**
+     * Group by FabricOutward.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricOutwardGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends FabricOutwardGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: FabricOutwardGroupByArgs['orderBy'] }
+        : { orderBy?: FabricOutwardGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, FabricOutwardGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFabricOutwardGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the FabricOutward model
+   */
+  readonly fields: FabricOutwardFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for FabricOutward.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__FabricOutwardClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the FabricOutward model
+   */
+  interface FabricOutwardFieldRefs {
+    readonly id: FieldRef<"FabricOutward", 'String'>
+    readonly sNo: FieldRef<"FabricOutward", 'Int'>
+    readonly date: FieldRef<"FabricOutward", 'DateTime'>
+    readonly challanNumber: FieldRef<"FabricOutward", 'String'>
+    readonly challanId: FieldRef<"FabricOutward", 'String'>
+    readonly designNumber: FieldRef<"FabricOutward", 'String'>
+    readonly itemName: FieldRef<"FabricOutward", 'String'>
+    readonly issueQty: FieldRef<"FabricOutward", 'Float'>
+    readonly unit: FieldRef<"FabricOutward", 'String'>
+    readonly avgPerPcs: FieldRef<"FabricOutward", 'Float'>
+    readonly issuePcsQty: FieldRef<"FabricOutward", 'Float'>
+    readonly byOrderName: FieldRef<"FabricOutward", 'String'>
+    readonly remarks: FieldRef<"FabricOutward", 'String'>
+    readonly destination: FieldRef<"FabricOutward", 'String'>
+    readonly fabricType: FieldRef<"FabricOutward", 'String'>
+    readonly createdAt: FieldRef<"FabricOutward", 'DateTime'>
+    readonly updatedAt: FieldRef<"FabricOutward", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * FabricOutward findUnique
+   */
+  export type FabricOutwardFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricOutward
+     */
+    select?: FabricOutwardSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricOutward
+     */
+    omit?: FabricOutwardOmit<ExtArgs> | null
+    /**
+     * Filter, which FabricOutward to fetch.
+     */
+    where: FabricOutwardWhereUniqueInput
+  }
+
+  /**
+   * FabricOutward findUniqueOrThrow
+   */
+  export type FabricOutwardFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricOutward
+     */
+    select?: FabricOutwardSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricOutward
+     */
+    omit?: FabricOutwardOmit<ExtArgs> | null
+    /**
+     * Filter, which FabricOutward to fetch.
+     */
+    where: FabricOutwardWhereUniqueInput
+  }
+
+  /**
+   * FabricOutward findFirst
+   */
+  export type FabricOutwardFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricOutward
+     */
+    select?: FabricOutwardSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricOutward
+     */
+    omit?: FabricOutwardOmit<ExtArgs> | null
+    /**
+     * Filter, which FabricOutward to fetch.
+     */
+    where?: FabricOutwardWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricOutwards to fetch.
+     */
+    orderBy?: FabricOutwardOrderByWithRelationInput | FabricOutwardOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FabricOutwards.
+     */
+    cursor?: FabricOutwardWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricOutwards from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricOutwards.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FabricOutwards.
+     */
+    distinct?: FabricOutwardScalarFieldEnum | FabricOutwardScalarFieldEnum[]
+  }
+
+  /**
+   * FabricOutward findFirstOrThrow
+   */
+  export type FabricOutwardFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricOutward
+     */
+    select?: FabricOutwardSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricOutward
+     */
+    omit?: FabricOutwardOmit<ExtArgs> | null
+    /**
+     * Filter, which FabricOutward to fetch.
+     */
+    where?: FabricOutwardWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricOutwards to fetch.
+     */
+    orderBy?: FabricOutwardOrderByWithRelationInput | FabricOutwardOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FabricOutwards.
+     */
+    cursor?: FabricOutwardWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricOutwards from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricOutwards.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FabricOutwards.
+     */
+    distinct?: FabricOutwardScalarFieldEnum | FabricOutwardScalarFieldEnum[]
+  }
+
+  /**
+   * FabricOutward findMany
+   */
+  export type FabricOutwardFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricOutward
+     */
+    select?: FabricOutwardSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricOutward
+     */
+    omit?: FabricOutwardOmit<ExtArgs> | null
+    /**
+     * Filter, which FabricOutwards to fetch.
+     */
+    where?: FabricOutwardWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricOutwards to fetch.
+     */
+    orderBy?: FabricOutwardOrderByWithRelationInput | FabricOutwardOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing FabricOutwards.
+     */
+    cursor?: FabricOutwardWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricOutwards from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricOutwards.
+     */
+    skip?: number
+    distinct?: FabricOutwardScalarFieldEnum | FabricOutwardScalarFieldEnum[]
+  }
+
+  /**
+   * FabricOutward create
+   */
+  export type FabricOutwardCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricOutward
+     */
+    select?: FabricOutwardSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricOutward
+     */
+    omit?: FabricOutwardOmit<ExtArgs> | null
+    /**
+     * The data needed to create a FabricOutward.
+     */
+    data: XOR<FabricOutwardCreateInput, FabricOutwardUncheckedCreateInput>
+  }
+
+  /**
+   * FabricOutward createMany
+   */
+  export type FabricOutwardCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many FabricOutwards.
+     */
+    data: FabricOutwardCreateManyInput | FabricOutwardCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * FabricOutward createManyAndReturn
+   */
+  export type FabricOutwardCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricOutward
+     */
+    select?: FabricOutwardSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricOutward
+     */
+    omit?: FabricOutwardOmit<ExtArgs> | null
+    /**
+     * The data used to create many FabricOutwards.
+     */
+    data: FabricOutwardCreateManyInput | FabricOutwardCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * FabricOutward update
+   */
+  export type FabricOutwardUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricOutward
+     */
+    select?: FabricOutwardSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricOutward
+     */
+    omit?: FabricOutwardOmit<ExtArgs> | null
+    /**
+     * The data needed to update a FabricOutward.
+     */
+    data: XOR<FabricOutwardUpdateInput, FabricOutwardUncheckedUpdateInput>
+    /**
+     * Choose, which FabricOutward to update.
+     */
+    where: FabricOutwardWhereUniqueInput
+  }
+
+  /**
+   * FabricOutward updateMany
+   */
+  export type FabricOutwardUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update FabricOutwards.
+     */
+    data: XOR<FabricOutwardUpdateManyMutationInput, FabricOutwardUncheckedUpdateManyInput>
+    /**
+     * Filter which FabricOutwards to update
+     */
+    where?: FabricOutwardWhereInput
+    /**
+     * Limit how many FabricOutwards to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * FabricOutward updateManyAndReturn
+   */
+  export type FabricOutwardUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricOutward
+     */
+    select?: FabricOutwardSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricOutward
+     */
+    omit?: FabricOutwardOmit<ExtArgs> | null
+    /**
+     * The data used to update FabricOutwards.
+     */
+    data: XOR<FabricOutwardUpdateManyMutationInput, FabricOutwardUncheckedUpdateManyInput>
+    /**
+     * Filter which FabricOutwards to update
+     */
+    where?: FabricOutwardWhereInput
+    /**
+     * Limit how many FabricOutwards to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * FabricOutward upsert
+   */
+  export type FabricOutwardUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricOutward
+     */
+    select?: FabricOutwardSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricOutward
+     */
+    omit?: FabricOutwardOmit<ExtArgs> | null
+    /**
+     * The filter to search for the FabricOutward to update in case it exists.
+     */
+    where: FabricOutwardWhereUniqueInput
+    /**
+     * In case the FabricOutward found by the `where` argument doesn't exist, create a new FabricOutward with this data.
+     */
+    create: XOR<FabricOutwardCreateInput, FabricOutwardUncheckedCreateInput>
+    /**
+     * In case the FabricOutward was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<FabricOutwardUpdateInput, FabricOutwardUncheckedUpdateInput>
+  }
+
+  /**
+   * FabricOutward delete
+   */
+  export type FabricOutwardDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricOutward
+     */
+    select?: FabricOutwardSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricOutward
+     */
+    omit?: FabricOutwardOmit<ExtArgs> | null
+    /**
+     * Filter which FabricOutward to delete.
+     */
+    where: FabricOutwardWhereUniqueInput
+  }
+
+  /**
+   * FabricOutward deleteMany
+   */
+  export type FabricOutwardDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FabricOutwards to delete
+     */
+    where?: FabricOutwardWhereInput
+    /**
+     * Limit how many FabricOutwards to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * FabricOutward without action
+   */
+  export type FabricOutwardDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricOutward
+     */
+    select?: FabricOutwardSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricOutward
+     */
+    omit?: FabricOutwardOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -80736,6 +83252,48 @@ export namespace Prisma {
   };
 
   export type DyeingOrderScalarFieldEnum = (typeof DyeingOrderScalarFieldEnum)[keyof typeof DyeingOrderScalarFieldEnum]
+
+
+  export const FabricInwardScalarFieldEnum: {
+    id: 'id',
+    sNo: 'sNo',
+    entryType: 'entryType',
+    itemName: 'itemName',
+    billNo: 'billNo',
+    billDate: 'billDate',
+    receivingDate: 'receivingDate',
+    billQty: 'billQty',
+    unit: 'unit',
+    supplierName: 'supplierName',
+    remarks: 'remarks',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type FabricInwardScalarFieldEnum = (typeof FabricInwardScalarFieldEnum)[keyof typeof FabricInwardScalarFieldEnum]
+
+
+  export const FabricOutwardScalarFieldEnum: {
+    id: 'id',
+    sNo: 'sNo',
+    date: 'date',
+    challanNumber: 'challanNumber',
+    challanId: 'challanId',
+    designNumber: 'designNumber',
+    itemName: 'itemName',
+    issueQty: 'issueQty',
+    unit: 'unit',
+    avgPerPcs: 'avgPerPcs',
+    issuePcsQty: 'issuePcsQty',
+    byOrderName: 'byOrderName',
+    remarks: 'remarks',
+    destination: 'destination',
+    fabricType: 'fabricType',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type FabricOutwardScalarFieldEnum = (typeof FabricOutwardScalarFieldEnum)[keyof typeof FabricOutwardScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -86823,6 +89381,214 @@ export namespace Prisma {
     sentToQc1At?: DateTimeNullableWithAggregatesFilter<"DyeingOrder"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"DyeingOrder"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"DyeingOrder"> | Date | string
+  }
+
+  export type FabricInwardWhereInput = {
+    AND?: FabricInwardWhereInput | FabricInwardWhereInput[]
+    OR?: FabricInwardWhereInput[]
+    NOT?: FabricInwardWhereInput | FabricInwardWhereInput[]
+    id?: StringFilter<"FabricInward"> | string
+    sNo?: IntFilter<"FabricInward"> | number
+    entryType?: StringFilter<"FabricInward"> | string
+    itemName?: StringFilter<"FabricInward"> | string
+    billNo?: StringFilter<"FabricInward"> | string
+    billDate?: DateTimeFilter<"FabricInward"> | Date | string
+    receivingDate?: DateTimeFilter<"FabricInward"> | Date | string
+    billQty?: FloatFilter<"FabricInward"> | number
+    unit?: StringFilter<"FabricInward"> | string
+    supplierName?: StringNullableFilter<"FabricInward"> | string | null
+    remarks?: StringNullableFilter<"FabricInward"> | string | null
+    createdAt?: DateTimeFilter<"FabricInward"> | Date | string
+    updatedAt?: DateTimeFilter<"FabricInward"> | Date | string
+  }
+
+  export type FabricInwardOrderByWithRelationInput = {
+    id?: SortOrder
+    sNo?: SortOrder
+    entryType?: SortOrder
+    itemName?: SortOrder
+    billNo?: SortOrder
+    billDate?: SortOrder
+    receivingDate?: SortOrder
+    billQty?: SortOrder
+    unit?: SortOrder
+    supplierName?: SortOrderInput | SortOrder
+    remarks?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FabricInwardWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: FabricInwardWhereInput | FabricInwardWhereInput[]
+    OR?: FabricInwardWhereInput[]
+    NOT?: FabricInwardWhereInput | FabricInwardWhereInput[]
+    sNo?: IntFilter<"FabricInward"> | number
+    entryType?: StringFilter<"FabricInward"> | string
+    itemName?: StringFilter<"FabricInward"> | string
+    billNo?: StringFilter<"FabricInward"> | string
+    billDate?: DateTimeFilter<"FabricInward"> | Date | string
+    receivingDate?: DateTimeFilter<"FabricInward"> | Date | string
+    billQty?: FloatFilter<"FabricInward"> | number
+    unit?: StringFilter<"FabricInward"> | string
+    supplierName?: StringNullableFilter<"FabricInward"> | string | null
+    remarks?: StringNullableFilter<"FabricInward"> | string | null
+    createdAt?: DateTimeFilter<"FabricInward"> | Date | string
+    updatedAt?: DateTimeFilter<"FabricInward"> | Date | string
+  }, "id">
+
+  export type FabricInwardOrderByWithAggregationInput = {
+    id?: SortOrder
+    sNo?: SortOrder
+    entryType?: SortOrder
+    itemName?: SortOrder
+    billNo?: SortOrder
+    billDate?: SortOrder
+    receivingDate?: SortOrder
+    billQty?: SortOrder
+    unit?: SortOrder
+    supplierName?: SortOrderInput | SortOrder
+    remarks?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: FabricInwardCountOrderByAggregateInput
+    _avg?: FabricInwardAvgOrderByAggregateInput
+    _max?: FabricInwardMaxOrderByAggregateInput
+    _min?: FabricInwardMinOrderByAggregateInput
+    _sum?: FabricInwardSumOrderByAggregateInput
+  }
+
+  export type FabricInwardScalarWhereWithAggregatesInput = {
+    AND?: FabricInwardScalarWhereWithAggregatesInput | FabricInwardScalarWhereWithAggregatesInput[]
+    OR?: FabricInwardScalarWhereWithAggregatesInput[]
+    NOT?: FabricInwardScalarWhereWithAggregatesInput | FabricInwardScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"FabricInward"> | string
+    sNo?: IntWithAggregatesFilter<"FabricInward"> | number
+    entryType?: StringWithAggregatesFilter<"FabricInward"> | string
+    itemName?: StringWithAggregatesFilter<"FabricInward"> | string
+    billNo?: StringWithAggregatesFilter<"FabricInward"> | string
+    billDate?: DateTimeWithAggregatesFilter<"FabricInward"> | Date | string
+    receivingDate?: DateTimeWithAggregatesFilter<"FabricInward"> | Date | string
+    billQty?: FloatWithAggregatesFilter<"FabricInward"> | number
+    unit?: StringWithAggregatesFilter<"FabricInward"> | string
+    supplierName?: StringNullableWithAggregatesFilter<"FabricInward"> | string | null
+    remarks?: StringNullableWithAggregatesFilter<"FabricInward"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"FabricInward"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"FabricInward"> | Date | string
+  }
+
+  export type FabricOutwardWhereInput = {
+    AND?: FabricOutwardWhereInput | FabricOutwardWhereInput[]
+    OR?: FabricOutwardWhereInput[]
+    NOT?: FabricOutwardWhereInput | FabricOutwardWhereInput[]
+    id?: StringFilter<"FabricOutward"> | string
+    sNo?: IntFilter<"FabricOutward"> | number
+    date?: DateTimeFilter<"FabricOutward"> | Date | string
+    challanNumber?: StringNullableFilter<"FabricOutward"> | string | null
+    challanId?: StringNullableFilter<"FabricOutward"> | string | null
+    designNumber?: StringNullableFilter<"FabricOutward"> | string | null
+    itemName?: StringFilter<"FabricOutward"> | string
+    issueQty?: FloatFilter<"FabricOutward"> | number
+    unit?: StringFilter<"FabricOutward"> | string
+    avgPerPcs?: FloatNullableFilter<"FabricOutward"> | number | null
+    issuePcsQty?: FloatNullableFilter<"FabricOutward"> | number | null
+    byOrderName?: StringNullableFilter<"FabricOutward"> | string | null
+    remarks?: StringNullableFilter<"FabricOutward"> | string | null
+    destination?: StringNullableFilter<"FabricOutward"> | string | null
+    fabricType?: StringNullableFilter<"FabricOutward"> | string | null
+    createdAt?: DateTimeFilter<"FabricOutward"> | Date | string
+    updatedAt?: DateTimeFilter<"FabricOutward"> | Date | string
+  }
+
+  export type FabricOutwardOrderByWithRelationInput = {
+    id?: SortOrder
+    sNo?: SortOrder
+    date?: SortOrder
+    challanNumber?: SortOrderInput | SortOrder
+    challanId?: SortOrderInput | SortOrder
+    designNumber?: SortOrderInput | SortOrder
+    itemName?: SortOrder
+    issueQty?: SortOrder
+    unit?: SortOrder
+    avgPerPcs?: SortOrderInput | SortOrder
+    issuePcsQty?: SortOrderInput | SortOrder
+    byOrderName?: SortOrderInput | SortOrder
+    remarks?: SortOrderInput | SortOrder
+    destination?: SortOrderInput | SortOrder
+    fabricType?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FabricOutwardWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: FabricOutwardWhereInput | FabricOutwardWhereInput[]
+    OR?: FabricOutwardWhereInput[]
+    NOT?: FabricOutwardWhereInput | FabricOutwardWhereInput[]
+    sNo?: IntFilter<"FabricOutward"> | number
+    date?: DateTimeFilter<"FabricOutward"> | Date | string
+    challanNumber?: StringNullableFilter<"FabricOutward"> | string | null
+    challanId?: StringNullableFilter<"FabricOutward"> | string | null
+    designNumber?: StringNullableFilter<"FabricOutward"> | string | null
+    itemName?: StringFilter<"FabricOutward"> | string
+    issueQty?: FloatFilter<"FabricOutward"> | number
+    unit?: StringFilter<"FabricOutward"> | string
+    avgPerPcs?: FloatNullableFilter<"FabricOutward"> | number | null
+    issuePcsQty?: FloatNullableFilter<"FabricOutward"> | number | null
+    byOrderName?: StringNullableFilter<"FabricOutward"> | string | null
+    remarks?: StringNullableFilter<"FabricOutward"> | string | null
+    destination?: StringNullableFilter<"FabricOutward"> | string | null
+    fabricType?: StringNullableFilter<"FabricOutward"> | string | null
+    createdAt?: DateTimeFilter<"FabricOutward"> | Date | string
+    updatedAt?: DateTimeFilter<"FabricOutward"> | Date | string
+  }, "id">
+
+  export type FabricOutwardOrderByWithAggregationInput = {
+    id?: SortOrder
+    sNo?: SortOrder
+    date?: SortOrder
+    challanNumber?: SortOrderInput | SortOrder
+    challanId?: SortOrderInput | SortOrder
+    designNumber?: SortOrderInput | SortOrder
+    itemName?: SortOrder
+    issueQty?: SortOrder
+    unit?: SortOrder
+    avgPerPcs?: SortOrderInput | SortOrder
+    issuePcsQty?: SortOrderInput | SortOrder
+    byOrderName?: SortOrderInput | SortOrder
+    remarks?: SortOrderInput | SortOrder
+    destination?: SortOrderInput | SortOrder
+    fabricType?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: FabricOutwardCountOrderByAggregateInput
+    _avg?: FabricOutwardAvgOrderByAggregateInput
+    _max?: FabricOutwardMaxOrderByAggregateInput
+    _min?: FabricOutwardMinOrderByAggregateInput
+    _sum?: FabricOutwardSumOrderByAggregateInput
+  }
+
+  export type FabricOutwardScalarWhereWithAggregatesInput = {
+    AND?: FabricOutwardScalarWhereWithAggregatesInput | FabricOutwardScalarWhereWithAggregatesInput[]
+    OR?: FabricOutwardScalarWhereWithAggregatesInput[]
+    NOT?: FabricOutwardScalarWhereWithAggregatesInput | FabricOutwardScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"FabricOutward"> | string
+    sNo?: IntWithAggregatesFilter<"FabricOutward"> | number
+    date?: DateTimeWithAggregatesFilter<"FabricOutward"> | Date | string
+    challanNumber?: StringNullableWithAggregatesFilter<"FabricOutward"> | string | null
+    challanId?: StringNullableWithAggregatesFilter<"FabricOutward"> | string | null
+    designNumber?: StringNullableWithAggregatesFilter<"FabricOutward"> | string | null
+    itemName?: StringWithAggregatesFilter<"FabricOutward"> | string
+    issueQty?: FloatWithAggregatesFilter<"FabricOutward"> | number
+    unit?: StringWithAggregatesFilter<"FabricOutward"> | string
+    avgPerPcs?: FloatNullableWithAggregatesFilter<"FabricOutward"> | number | null
+    issuePcsQty?: FloatNullableWithAggregatesFilter<"FabricOutward"> | number | null
+    byOrderName?: StringNullableWithAggregatesFilter<"FabricOutward"> | string | null
+    remarks?: StringNullableWithAggregatesFilter<"FabricOutward"> | string | null
+    destination?: StringNullableWithAggregatesFilter<"FabricOutward"> | string | null
+    fabricType?: StringNullableWithAggregatesFilter<"FabricOutward"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"FabricOutward"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"FabricOutward"> | Date | string
   }
 
   export type UserCreateInput = {
@@ -93366,6 +96132,258 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type FabricInwardCreateInput = {
+    id?: string
+    sNo?: number
+    entryType: string
+    itemName: string
+    billNo: string
+    billDate: Date | string
+    receivingDate: Date | string
+    billQty: number
+    unit?: string
+    supplierName?: string | null
+    remarks?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FabricInwardUncheckedCreateInput = {
+    id?: string
+    sNo?: number
+    entryType: string
+    itemName: string
+    billNo: string
+    billDate: Date | string
+    receivingDate: Date | string
+    billQty: number
+    unit?: string
+    supplierName?: string | null
+    remarks?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FabricInwardUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sNo?: IntFieldUpdateOperationsInput | number
+    entryType?: StringFieldUpdateOperationsInput | string
+    itemName?: StringFieldUpdateOperationsInput | string
+    billNo?: StringFieldUpdateOperationsInput | string
+    billDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    receivingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    billQty?: FloatFieldUpdateOperationsInput | number
+    unit?: StringFieldUpdateOperationsInput | string
+    supplierName?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricInwardUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sNo?: IntFieldUpdateOperationsInput | number
+    entryType?: StringFieldUpdateOperationsInput | string
+    itemName?: StringFieldUpdateOperationsInput | string
+    billNo?: StringFieldUpdateOperationsInput | string
+    billDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    receivingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    billQty?: FloatFieldUpdateOperationsInput | number
+    unit?: StringFieldUpdateOperationsInput | string
+    supplierName?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricInwardCreateManyInput = {
+    id?: string
+    sNo?: number
+    entryType: string
+    itemName: string
+    billNo: string
+    billDate: Date | string
+    receivingDate: Date | string
+    billQty: number
+    unit?: string
+    supplierName?: string | null
+    remarks?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FabricInwardUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sNo?: IntFieldUpdateOperationsInput | number
+    entryType?: StringFieldUpdateOperationsInput | string
+    itemName?: StringFieldUpdateOperationsInput | string
+    billNo?: StringFieldUpdateOperationsInput | string
+    billDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    receivingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    billQty?: FloatFieldUpdateOperationsInput | number
+    unit?: StringFieldUpdateOperationsInput | string
+    supplierName?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricInwardUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sNo?: IntFieldUpdateOperationsInput | number
+    entryType?: StringFieldUpdateOperationsInput | string
+    itemName?: StringFieldUpdateOperationsInput | string
+    billNo?: StringFieldUpdateOperationsInput | string
+    billDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    receivingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    billQty?: FloatFieldUpdateOperationsInput | number
+    unit?: StringFieldUpdateOperationsInput | string
+    supplierName?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricOutwardCreateInput = {
+    id?: string
+    sNo?: number
+    date?: Date | string
+    challanNumber?: string | null
+    challanId?: string | null
+    designNumber?: string | null
+    itemName: string
+    issueQty: number
+    unit?: string
+    avgPerPcs?: number | null
+    issuePcsQty?: number | null
+    byOrderName?: string | null
+    remarks?: string | null
+    destination?: string | null
+    fabricType?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FabricOutwardUncheckedCreateInput = {
+    id?: string
+    sNo?: number
+    date?: Date | string
+    challanNumber?: string | null
+    challanId?: string | null
+    designNumber?: string | null
+    itemName: string
+    issueQty: number
+    unit?: string
+    avgPerPcs?: number | null
+    issuePcsQty?: number | null
+    byOrderName?: string | null
+    remarks?: string | null
+    destination?: string | null
+    fabricType?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FabricOutwardUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sNo?: IntFieldUpdateOperationsInput | number
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    challanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    challanId?: NullableStringFieldUpdateOperationsInput | string | null
+    designNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    itemName?: StringFieldUpdateOperationsInput | string
+    issueQty?: FloatFieldUpdateOperationsInput | number
+    unit?: StringFieldUpdateOperationsInput | string
+    avgPerPcs?: NullableFloatFieldUpdateOperationsInput | number | null
+    issuePcsQty?: NullableFloatFieldUpdateOperationsInput | number | null
+    byOrderName?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    destination?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricOutwardUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sNo?: IntFieldUpdateOperationsInput | number
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    challanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    challanId?: NullableStringFieldUpdateOperationsInput | string | null
+    designNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    itemName?: StringFieldUpdateOperationsInput | string
+    issueQty?: FloatFieldUpdateOperationsInput | number
+    unit?: StringFieldUpdateOperationsInput | string
+    avgPerPcs?: NullableFloatFieldUpdateOperationsInput | number | null
+    issuePcsQty?: NullableFloatFieldUpdateOperationsInput | number | null
+    byOrderName?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    destination?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricOutwardCreateManyInput = {
+    id?: string
+    sNo?: number
+    date?: Date | string
+    challanNumber?: string | null
+    challanId?: string | null
+    designNumber?: string | null
+    itemName: string
+    issueQty: number
+    unit?: string
+    avgPerPcs?: number | null
+    issuePcsQty?: number | null
+    byOrderName?: string | null
+    remarks?: string | null
+    destination?: string | null
+    fabricType?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FabricOutwardUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sNo?: IntFieldUpdateOperationsInput | number
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    challanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    challanId?: NullableStringFieldUpdateOperationsInput | string | null
+    designNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    itemName?: StringFieldUpdateOperationsInput | string
+    issueQty?: FloatFieldUpdateOperationsInput | number
+    unit?: StringFieldUpdateOperationsInput | string
+    avgPerPcs?: NullableFloatFieldUpdateOperationsInput | number | null
+    issuePcsQty?: NullableFloatFieldUpdateOperationsInput | number | null
+    byOrderName?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    destination?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricOutwardUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sNo?: IntFieldUpdateOperationsInput | number
+    date?: DateTimeFieldUpdateOperationsInput | Date | string
+    challanNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    challanId?: NullableStringFieldUpdateOperationsInput | string | null
+    designNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    itemName?: StringFieldUpdateOperationsInput | string
+    issueQty?: FloatFieldUpdateOperationsInput | number
+    unit?: StringFieldUpdateOperationsInput | string
+    avgPerPcs?: NullableFloatFieldUpdateOperationsInput | number | null
+    issuePcsQty?: NullableFloatFieldUpdateOperationsInput | number | null
+    byOrderName?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    destination?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -97560,6 +100578,138 @@ export namespace Prisma {
     undyedQuantity?: SortOrder
     readyForQc1Quantity?: SortOrder
     sentToQc1Quantity?: SortOrder
+  }
+
+  export type FabricInwardCountOrderByAggregateInput = {
+    id?: SortOrder
+    sNo?: SortOrder
+    entryType?: SortOrder
+    itemName?: SortOrder
+    billNo?: SortOrder
+    billDate?: SortOrder
+    receivingDate?: SortOrder
+    billQty?: SortOrder
+    unit?: SortOrder
+    supplierName?: SortOrder
+    remarks?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FabricInwardAvgOrderByAggregateInput = {
+    sNo?: SortOrder
+    billQty?: SortOrder
+  }
+
+  export type FabricInwardMaxOrderByAggregateInput = {
+    id?: SortOrder
+    sNo?: SortOrder
+    entryType?: SortOrder
+    itemName?: SortOrder
+    billNo?: SortOrder
+    billDate?: SortOrder
+    receivingDate?: SortOrder
+    billQty?: SortOrder
+    unit?: SortOrder
+    supplierName?: SortOrder
+    remarks?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FabricInwardMinOrderByAggregateInput = {
+    id?: SortOrder
+    sNo?: SortOrder
+    entryType?: SortOrder
+    itemName?: SortOrder
+    billNo?: SortOrder
+    billDate?: SortOrder
+    receivingDate?: SortOrder
+    billQty?: SortOrder
+    unit?: SortOrder
+    supplierName?: SortOrder
+    remarks?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FabricInwardSumOrderByAggregateInput = {
+    sNo?: SortOrder
+    billQty?: SortOrder
+  }
+
+  export type FabricOutwardCountOrderByAggregateInput = {
+    id?: SortOrder
+    sNo?: SortOrder
+    date?: SortOrder
+    challanNumber?: SortOrder
+    challanId?: SortOrder
+    designNumber?: SortOrder
+    itemName?: SortOrder
+    issueQty?: SortOrder
+    unit?: SortOrder
+    avgPerPcs?: SortOrder
+    issuePcsQty?: SortOrder
+    byOrderName?: SortOrder
+    remarks?: SortOrder
+    destination?: SortOrder
+    fabricType?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FabricOutwardAvgOrderByAggregateInput = {
+    sNo?: SortOrder
+    issueQty?: SortOrder
+    avgPerPcs?: SortOrder
+    issuePcsQty?: SortOrder
+  }
+
+  export type FabricOutwardMaxOrderByAggregateInput = {
+    id?: SortOrder
+    sNo?: SortOrder
+    date?: SortOrder
+    challanNumber?: SortOrder
+    challanId?: SortOrder
+    designNumber?: SortOrder
+    itemName?: SortOrder
+    issueQty?: SortOrder
+    unit?: SortOrder
+    avgPerPcs?: SortOrder
+    issuePcsQty?: SortOrder
+    byOrderName?: SortOrder
+    remarks?: SortOrder
+    destination?: SortOrder
+    fabricType?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FabricOutwardMinOrderByAggregateInput = {
+    id?: SortOrder
+    sNo?: SortOrder
+    date?: SortOrder
+    challanNumber?: SortOrder
+    challanId?: SortOrder
+    designNumber?: SortOrder
+    itemName?: SortOrder
+    issueQty?: SortOrder
+    unit?: SortOrder
+    avgPerPcs?: SortOrder
+    issuePcsQty?: SortOrder
+    byOrderName?: SortOrder
+    remarks?: SortOrder
+    destination?: SortOrder
+    fabricType?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FabricOutwardSumOrderByAggregateInput = {
+    sNo?: SortOrder
+    issueQty?: SortOrder
+    avgPerPcs?: SortOrder
+    issuePcsQty?: SortOrder
   }
 
   export type UserRoleCreateNestedManyWithoutUserInput = {

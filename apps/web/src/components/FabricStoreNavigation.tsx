@@ -14,6 +14,7 @@ import {
   LogOut,
   UserCircle,
   Boxes,
+  Layers,
   BookOpen,
   ListChecks,
   Kanban,
@@ -34,7 +35,8 @@ export function FabricStoreNavigation() {
   const [mounted, setMounted] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [myWorkOpen, setMyWorkOpen] = useState(true);
-  const [inventoryOpen, setInventoryOpen] = useState(false);
+  const [inventoryOpen, setInventoryOpen] = useState(true);
+  const [totalStockOpen, setTotalStockOpen] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>({
     fullName: 'Fabric Store Incharge',
     username: 'store',
@@ -67,7 +69,8 @@ export function FabricStoreNavigation() {
 
     // Auto-expand sections based on current path
     if (pathname.includes('/fabric-store/my-work')) setMyWorkOpen(true);
-    if (pathname.includes('/fabric-store/inventory')) setInventoryOpen(true);
+    if (pathname.includes('/fabric-store/inventory/inward') || pathname.includes('/fabric-store/inventory/outward')) setInventoryOpen(true);
+    if (pathname.includes('/fabric-store/inventory/total-stock')) setTotalStockOpen(true);
     // Close mobile drawer on navigation
     setMobileOpen(false);
   }, [pathname]);
@@ -95,8 +98,8 @@ export function FabricStoreNavigation() {
     }`;
   };
 
-  const subLinkClass = (href: string) => {
-    const active = pathname === href || pathname.startsWith(href + '/');
+  const subLinkClass = (href: string, exact = false) => {
+    const active = exact ? pathname === href : pathname === href || pathname.startsWith(href + '/');
     return `flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[11px] font-medium transition ${
       active
         ? 'bg-[#1E293B] text-white border-l-2 border-teal-400 pl-2 shadow-xs'
@@ -117,7 +120,8 @@ export function FabricStoreNavigation() {
   );
 
   const myWorkActive = pathname.includes('/fabric-store/my-work');
-  const inventoryActive = pathname.includes('/fabric-store/inventory');
+  const inventoryActive = pathname.includes('/fabric-store/inventory/inward') || pathname.includes('/fabric-store/inventory/outward');
+  const totalStockActive = pathname.includes('/fabric-store/inventory/total-stock');
 
   return (
     <>
@@ -214,7 +218,7 @@ export function FabricStoreNavigation() {
         {/* NAV */}
         <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto pt-1">
 
-          {/* Dashboard */}
+          {/* 1. Dashboard */}
           <Link
             href="/fabric-store"
             onClick={() => setMobileOpen(false)}
@@ -224,7 +228,7 @@ export function FabricStoreNavigation() {
             <span>Dashboard</span>
           </Link>
 
-          {/* My Work */}
+          {/* 2. My Work */}
           <div>
             <div className="flex items-center gap-3 px-3 py-2">
               <Briefcase className="w-4 h-4 text-slate-400" />
@@ -248,7 +252,7 @@ export function FabricStoreNavigation() {
                   className={subLinkClass('/fabric-store/my-work/challan-to-dyeing')}
                 >
                   <Send className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>Store to Dyeing</span>
+                  <span>Store to Dyeing (Challan)</span>
                 </Link>
                 <Link
                   href="/fabric-store/my-work/challan-to-embroidery"
@@ -256,13 +260,23 @@ export function FabricStoreNavigation() {
                   className={subLinkClass('/fabric-store/my-work/challan-to-embroidery')}
                 >
                   <Send className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Store to Embroidery</span>
+                  <span>Store to Embroidery (Challan)</span>
                 </Link>
               </div>
             )}
           </div>
 
-          {/* Inventory */}
+          {/* 3. Floor Board */}
+          <Link
+            href="/fabric-store/floor-board"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/fabric-store/floor-board', true)}
+          >
+            <Kanban className="w-4 h-4 text-slate-400" />
+            <span>Floor Board</span>
+          </Link>
+
+          {/* 4. Inventory (Inward Stock & Outward Stock) */}
           <div>
             <div className="flex items-center gap-3 px-3 py-2">
               <Boxes className="w-4 h-4 text-slate-400" />
@@ -273,34 +287,72 @@ export function FabricStoreNavigation() {
             {inventoryOpen && (
               <div className="ml-7 pl-3 border-l border-slate-700/80 space-y-0.5 my-0.5">
                 <Link
-                  href="/fabric-store/inventory/stock"
+                  href="/fabric-store/inventory/inward"
                   onClick={() => setMobileOpen(false)}
-                  className={subLinkClass('/fabric-store/inventory/stock')}
+                  className={subLinkClass('/fabric-store/inventory/inward')}
                 >
-                  <Boxes className="w-3.5 h-3.5 text-teal-400" />
-                  <span>Stock Overview</span>
+                  <ArrowDownToLine className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Inward Stock</span>
                 </Link>
                 <Link
-                  href="/fabric-store/inventory/defected-shelf"
+                  href="/fabric-store/inventory/outward"
                   onClick={() => setMobileOpen(false)}
-                  className={subLinkClass('/fabric-store/inventory/defected-shelf')}
+                  className={subLinkClass('/fabric-store/inventory/outward')}
                 >
-                  <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
-                  <span>Defected Shelf</span>
+                  <Send className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Outward Stock</span>
                 </Link>
               </div>
             )}
           </div>
 
-          {/* Floor Board */}
+          {/* 5. Defective Shelf */}
           <Link
-            href="/fabric-store/floor-board"
+            href="/fabric-store/inventory/defected-shelf"
             onClick={() => setMobileOpen(false)}
-            className={linkClass('/fabric-store/floor-board', true)}
+            className={linkClass('/fabric-store/inventory/defected-shelf')}
           >
-            <Kanban className="w-4 h-4 text-slate-400" />
-            <span>Floor Board</span>
+            <AlertTriangle className="w-4 h-4 text-rose-400" />
+            <span>Defective Shelf</span>
           </Link>
+
+          {/* 6. Total Stock (Kora Undyed & Dyed) */}
+          <div>
+            <div className="flex items-center gap-3 px-3 py-2">
+              <Layers className="w-4 h-4 text-teal-400" />
+              <div className="flex-1">
+                {sectionHeader('Total Stock', totalStockOpen, () => setTotalStockOpen(!totalStockOpen), totalStockActive)}
+              </div>
+            </div>
+            {totalStockOpen && (
+              <div className="ml-7 pl-3 border-l border-slate-700/80 space-y-0.5 my-0.5">
+                <Link
+                  href="/fabric-store/inventory/total-stock"
+                  onClick={() => setMobileOpen(false)}
+                  className={subLinkClass('/fabric-store/inventory/total-stock', true)}
+                >
+                  <Boxes className="w-3.5 h-3.5 text-teal-300" />
+                  <span>All Stock Balance</span>
+                </Link>
+                <Link
+                  href="/fabric-store/inventory/total-stock?type=KORA"
+                  onClick={() => setMobileOpen(false)}
+                  className={subLinkClass('/fabric-store/inventory/total-stock?type=KORA')}
+                >
+                  <span className="w-2 h-2 rounded-full bg-amber-400 inline-block mr-1" />
+                  <span>KORA (Undyed)</span>
+                </Link>
+                <Link
+                  href="/fabric-store/inventory/total-stock?type=DYED"
+                  onClick={() => setMobileOpen(false)}
+                  className={subLinkClass('/fabric-store/inventory/total-stock?type=DYED')}
+                >
+                  <span className="w-2 h-2 rounded-full bg-purple-400 inline-block mr-1" />
+                  <span>Dyed</span>
+                </Link>
+              </div>
+            )}
+          </div>
 
         </nav>
 

@@ -1403,3 +1403,51 @@ model DyeingOrder {
   @@index([status])
   @@index([orderNumber])
 }
+
+// ==========================================
+// 18. FABRIC STORE INWARD & OUTWARD STOCK
+// ==========================================
+
+model FabricInward {
+  id            String   @id @default(uuid())
+  sNo           Int      @default(autoincrement())
+  entryType     String // "KORA" or "DYED"
+  itemName      String // e.g. "Cotton 60x60 Cambric"
+  billNo        String // Supplier bill / invoice number
+  billDate      DateTime // Bill Date
+  receivingDate DateTime // Date received in store
+  billQty       Float // Quantity
+  unit          String   @default("MTR") // "MTR" or "PCS"
+  supplierName  String?
+  remarks       String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([entryType])
+  @@index([billNo])
+  @@index([receivingDate])
+}
+
+model FabricOutward {
+  id            String   @id @default(uuid())
+  sNo           Int      @default(autoincrement())
+  date          DateTime @default(now())
+  challanNumber String?
+  challanId     String?
+  designNumber  String?
+  itemName      String
+  issueQty      Float // meters or units issued
+  unit          String   @default("MTR")
+  avgPerPcs     Float? // avg fabric per pcs
+  issuePcsQty   Float? // pcs quantity
+  byOrderName   String? // by order name / client name
+  remarks       String?
+  destination   String? // "DYEING", "EMBROIDERY", "OTHER"
+  fabricType    String? // "KORA", "DYED"
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([challanNumber])
+  @@index([designNumber])
+  @@index([date])
+}
