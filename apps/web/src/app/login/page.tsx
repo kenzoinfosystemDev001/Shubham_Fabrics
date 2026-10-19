@@ -17,6 +17,7 @@ import {
   Scissors,
   Waves,
   Shirt,
+  Sparkles,
 } from 'lucide-react';
 
 interface StationOption {
@@ -137,6 +138,15 @@ const STATIONS: StationOption[] = [
     accentColor: 'text-indigo-400',
     borderActive: 'border-indigo-500/80 shadow-[0_0_15px_rgba(99,102,241,0.25)]',
     bgActive: 'bg-indigo-500/15 text-white',
+  },
+  {
+    id: 'finishing',
+    name: 'Finishing',
+    username: 'finishing',
+    icon: Sparkles,
+    accentColor: 'text-teal-400',
+    borderActive: 'border-teal-500/80 shadow-[0_0_15px_rgba(20,184,166,0.25)]',
+    bgActive: 'bg-teal-500/15 text-white',
   },
 ];
 
