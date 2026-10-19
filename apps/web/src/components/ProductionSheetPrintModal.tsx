@@ -35,7 +35,7 @@ export function ProductionSheetPrintModal({
   onClose,
 }: ProductionSheetPrintModalProps) {
   const program = propProgram || sheetData;
-  const [activeTab, setActiveTab] = useState<'TOP' | 'BOTTOM' | 'DUPATTA' | 'WILCOM'>('TOP');
+  const [activeTab, setActiveTab] = useState<'TOP' | 'BOTTOM' | 'DUPATTA' | 'OTHER' | 'WILCOM'>('TOP');
 
   if (!isOpen || !program) return null;
 
@@ -66,7 +66,9 @@ export function ProductionSheetPrintModal({
     productionGrid,
     swatches,
     topName,
+    pattern,
     noteText,
+    remarksText,
     totalMtrAverage,
     fabricName,
     fabricWidth,
@@ -80,6 +82,7 @@ export function ProductionSheetPrintModal({
     color: string;
     pcs: string | number;
     mtr: string | number;
+    subStyle?: string;
     size?: string;
     sizes: Record<string, string>;
   }[] = [];
@@ -90,6 +93,7 @@ export function ProductionSheetPrintModal({
         color: productionGrid[i].color || '',
         pcs: productionGrid[i].pcs !== undefined ? productionGrid[i].pcs : '',
         mtr: productionGrid[i].mtr !== undefined ? productionGrid[i].mtr : '',
+        subStyle: productionGrid[i].subStyle || '',
         size: productionGrid[i].size || productionGrid[i].sizes?.['SIZE'] || '',
         sizes: productionGrid[i].sizes || {},
       });
@@ -98,6 +102,7 @@ export function ProductionSheetPrintModal({
         color: '',
         pcs: '',
         mtr: '',
+        subStyle: '',
         size: '',
         sizes: {},
       });
@@ -164,7 +169,7 @@ export function ProductionSheetPrintModal({
         {/* COMPONENT & WILCOM TAB SELECTOR */}
         <div className="px-5 py-2 bg-slate-100 border-b border-slate-200 flex items-center justify-between gap-2 overflow-x-auto">
           <div className="flex items-center gap-1.5">
-            {(['TOP', 'BOTTOM', 'DUPATTA'] as GarmentCategory[]).map((cat) => {
+            {(['TOP', 'BOTTOM', 'DUPATTA', 'OTHER'] as GarmentCategory[]).map((cat) => {
               const isEnabled = components ? components[cat]?.enabled !== false : (cat === 'TOP');
               const isForwarded = forwardedComponents.includes(cat);
               return (
@@ -331,46 +336,87 @@ export function ProductionSheetPrintModal({
 
               {/* TOP META ROW */}
               <div className="flex justify-between items-start gap-4">
-                {/* Left Column: DESIGN NO. & COMPONENT LABEL */}
+                {/* Left Column: DESIGN NUMBER, WILCOM, STYLE & PATTERN */}
                 <div className="w-1/2 space-y-2">
                   <div className="flex items-center gap-2">
-                    <span className="font-black text-xs tracking-wider whitespace-nowrap">DESIGN NO.</span>
-                    <div className="border-[1.5px] border-black px-3 py-1 h-7 min-w-[130px] flex items-center font-bold text-xs bg-white">
+                    <span className="font-black text-xs tracking-wider whitespace-nowrap min-w-[95px]">DESIGN NO.</span>
+                    <div className="border-[1.5px] border-black px-3 py-1 h-8 flex-1 flex items-center font-bold text-xs bg-white">
                       {designNo}
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 pt-1">
-                    <span className="font-black text-xs tracking-wider whitespace-nowrap">{activeTab}:-</span>
-                    <div className="border-b-[1.5px] border-black px-2 pb-0.5 min-w-[180px] flex-1 font-bold text-xs">
-                      {topName}
+                  <div className="flex items-center gap-2">
+                    <span className="font-black text-xs tracking-wider whitespace-nowrap min-w-[95px] text-purple-900">WILCOM:</span>
+                    <div className="border-[1.5px] border-purple-800 bg-purple-50 text-purple-950 px-3 py-1 h-8 flex-1 flex items-center font-bold text-xs">
+                      {program.wilcomDesignNumber ? `№ ${program.wilcomDesignNumber}` : 'None'}
                     </div>
                   </div>
 
-                  {canSeeClientCode && (
-                    <div className="flex items-center gap-2 pt-1">
-                      <span className="font-black text-xs tracking-wider whitespace-nowrap text-amber-900">CLIENT CODE:</span>
-                      <div className="border-[1.5px] border-black px-2.5 py-0.5 h-6.5 min-w-[110px] flex items-center font-mono font-black text-xs bg-amber-50 text-amber-950">
-                        {program.clientCode}
+                  <div className="grid grid-cols-2 gap-2 pt-0.5">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-black text-xs tracking-wider whitespace-nowrap">STYLE:</span>
+                      <div className="border-[1.5px] border-black px-2 py-1 h-8 flex-1 flex items-center font-bold text-xs bg-white uppercase">
+                        {activeTab}
                       </div>
                     </div>
-                  )}
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-black text-xs tracking-wider whitespace-nowrap">PATTERN:</span>
+                      <div className="border-[1.5px] border-black px-2 py-1 h-8 flex-1 flex items-center font-bold text-xs bg-white">
+                        {pattern || '-'}
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Right Column: DATE: & SERIAL NO. */}
+                {/* Right Column: SERIAL NO., DATE, DELIVERY DATE */}
                 <div className="w-1/2 space-y-2 flex flex-col items-end">
-                  <div className="flex items-center justify-end gap-2">
-                    <span className="font-black text-xs tracking-wider whitespace-nowrap">DATE:</span>
-                    <div className="border-[1.5px] border-black px-3 py-1 h-7 min-w-[130px] flex items-center justify-center font-bold text-xs bg-white">
+                  <div className="flex items-center justify-end gap-2 w-full">
+                    <span className="font-black text-xs tracking-wider whitespace-nowrap min-w-[100px] text-right">SERIAL NO.</span>
+                    <div className="border-[1.5px] border-black px-3 py-1 h-8 w-44 flex items-center justify-center font-black text-sm bg-white font-mono">
+                      {serialNo}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2 w-full">
+                    <span className="font-black text-xs tracking-wider whitespace-nowrap min-w-[100px] text-right">DATE:</span>
+                    <div className="border-[1.5px] border-black px-3 py-1 h-8 w-44 flex items-center justify-center font-bold text-xs bg-white">
                       {dateVal}
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-end gap-2 pt-1">
-                    <span className="font-black text-xs tracking-wider whitespace-nowrap">SERIAL NO.</span>
-                    <div className="border-[1.5px] border-black px-3 py-1 h-7 min-w-[100px] flex items-center justify-center font-black text-base bg-white">
-                      {serialNo}
+                  <div className="flex items-center justify-end gap-2 w-full">
+                    <span className="font-black text-xs tracking-wider whitespace-nowrap min-w-[100px] text-right">DELIVERY DATE:</span>
+                    <div className="border-[1.5px] border-black px-3 py-1 h-8 w-44 flex items-center justify-center font-bold text-xs bg-white">
+                      {program.deliveryDate ? new Date(program.deliveryDate).toLocaleDateString('en-GB') : '-'}
                     </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* THREE UNIFORM SUMMARY BOXES */}
+              <div className="grid grid-cols-3 gap-3 pt-1">
+                <div className="border-[1.5px] border-black p-2 bg-white">
+                  <div className="text-[9px] font-black uppercase tracking-wider text-slate-500 mb-0.5">
+                    CLIENT NAME
+                  </div>
+                  <div className="font-bold text-xs text-black truncate">
+                    {canSeeClientCode ? (program.clientName || 'Standard Client') : 'Confidential'}
+                  </div>
+                </div>
+                <div className="border-[1.5px] border-black p-2 bg-white">
+                  <div className="text-[9px] font-black uppercase tracking-wider text-slate-500 mb-0.5">
+                    PRIORITY
+                  </div>
+                  <div className="font-bold text-xs text-black">
+                    {program.clientPriority || program.priority || 'NORMAL'}
+                  </div>
+                </div>
+                <div className="border-[1.5px] border-black p-2 bg-white">
+                  <div className="text-[9px] font-black uppercase tracking-wider text-slate-500 mb-0.5">
+                    IS DYEING REQUIRED?
+                  </div>
+                  <div className="font-bold text-xs text-black">
+                    {program.fabricDyeingRequired ? 'YES (Kora)' : 'NO (Pre-Dyed)'}
                   </div>
                 </div>
               </div>
@@ -438,56 +484,76 @@ export function ProductionSheetPrintModal({
                 </table>
               </div>
 
-              {/* MAIN COLOR & SIZE BREAKDOWN GRID */}
-              <table className="w-full border-collapse border-[1.5px] border-black text-center text-xs">
-                <thead>
-                  <tr className="bg-white">
-                    <th rowSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase w-28">
-                      COLOR
-                    </th>
-                    <th colSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase">
-                      QTY
-                    </th>
-                    <th rowSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase">
-                      SIZE
-                    </th>
-                  </tr>
-                  <tr className="bg-white">
-                    <th className="border-[1.5px] border-black p-1 font-black text-[11px] w-14">PCS</th>
-                    <th className="border-[1.5px] border-black p-1 font-black text-[11px] w-16">MTR</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {gridRows.map((row, rIdx) => (
-                    <tr key={rIdx} className="h-6">
-                      <td className="border-[1.5px] border-black px-2 py-0.5 text-left font-black text-xs">
-                        {row.color}
-                      </td>
-                      <td className="border-[1.5px] border-black px-1 py-0.5 font-bold text-xs">
-                        {row.pcs !== '' && row.pcs !== undefined ? row.pcs : ''}
-                      </td>
-                      <td className="border-[1.5px] border-black px-1 py-0.5 font-bold text-xs">
-                        {row.mtr !== '' && row.mtr !== undefined ? row.mtr : ''}
-                      </td>
-                      <td className="border-[1.5px] border-black px-2 py-0.5 font-bold text-xs">
-                        {row.size || row.sizes?.['SIZE'] || ''}
-                      </td>
+              {/* PRODUCTION BREAKDOWN GRID */}
+              <div>
+                <div className="font-black text-xs uppercase tracking-wider mb-1">
+                  PRODUCTION BREAKDOWN
+                </div>
+                <table className="w-full border-collapse border-[1.5px] border-black text-center text-xs">
+                  <thead>
+                    <tr className="bg-white">
+                      <th rowSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase w-28">
+                        COLOR
+                      </th>
+                      <th colSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase">
+                        QTY
+                      </th>
+                      <th rowSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase">
+                        SUB STYLE
+                      </th>
+                      <th rowSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase w-24">
+                        SIZE
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                    <tr className="bg-white">
+                      <th className="border-[1.5px] border-black p-1 font-black text-[11px] w-16">MTR</th>
+                      <th className="border-[1.5px] border-black p-1 font-black text-[11px] w-14">PCS</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {gridRows.map((row, rIdx) => (
+                      <tr key={rIdx} className="h-6">
+                        <td className="border-[1.5px] border-black px-2 py-0.5 text-left font-black text-xs">
+                          {row.color}
+                        </td>
+                        <td className="border-[1.5px] border-black px-1 py-0.5 font-bold text-xs">
+                          {row.mtr !== '' && row.mtr !== undefined ? row.mtr : ''}
+                        </td>
+                        <td className="border-[1.5px] border-black px-1 py-0.5 font-bold text-xs">
+                          {row.pcs !== '' && row.pcs !== undefined ? row.pcs : ''}
+                        </td>
+                        <td className="border-[1.5px] border-black px-2 py-0.5 font-bold text-xs">
+                          {row.subStyle || ''}
+                        </td>
+                        <td className="border-[1.5px] border-black px-2 py-0.5 font-bold text-xs">
+                          {row.size || row.sizes?.['SIZE'] || ''}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
-              {/* FOOTER: NOTE, SWATCHES, SIGNATURE */}
-              <div className="flex justify-between items-end pt-2">
-                <div className="w-3/5 space-y-2">
-                  <div className="font-black text-xs tracking-wider uppercase">NOTE:-</div>
-                  {noteText && (
+              {/* FOOTER: NOTE, REMARKS, SWATCHES, SIGNATURE */}
+              <div className="space-y-3 pt-2">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="border-[1.5px] border-black p-2 min-h-[48px]">
+                    <div className="font-black text-xs tracking-wider uppercase mb-1">NOTE:-</div>
                     <div className="text-xs text-slate-800 leading-snug">
-                      {noteText}
+                      {noteText || '—'}
                     </div>
-                  )}
+                  </div>
+                  <div className="border-[1.5px] border-black p-2 min-h-[48px]">
+                    <div className="font-black text-xs tracking-wider uppercase mb-1">REMARKS:-</div>
+                    <div className="text-xs text-slate-800 leading-snug">
+                      {remarksText || '—'}
+                    </div>
+                  </div>
+                </div>
 
-                  {/* COLOR SWATCH SAMPLES */}
+                <div className="flex justify-between items-end pt-1">
+                  <div className="w-3/5 space-y-2">
+                    {/* COLOR SWATCH SAMPLES */}
                   <div className="pt-2">
                     <div className="font-black text-[11px] tracking-wider uppercase text-[#163767] mb-1.5">
                       COLOR SWATCHES:
@@ -534,9 +600,10 @@ export function ProductionSheetPrintModal({
                   <div className="border-b-[1.5px] border-black w-full mx-auto" />
                 </div>
               </div>
-
             </div>
-          )}
+
+          </div>
+        )}
         </div>
 
       </div>

@@ -41,7 +41,7 @@ export default function ProgramDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
-  const [activeCategoryTab, setActiveCategoryTab] = useState<'TOP' | 'BOTTOM' | 'DUPATTA' | 'WILCOM'>('TOP');
+  const [activeCategoryTab, setActiveCategoryTab] = useState<'TOP' | 'BOTTOM' | 'DUPATTA' | 'OTHER' | 'WILCOM'>('TOP');
 
   useEffect(() => {
     setCurrentUser(getCurrentUser());
@@ -159,8 +159,10 @@ export default function ProgramDetailPage() {
     subStylesWithAverages,
     productionGrid,
     topName,
+    pattern,
     serialNoCounter,
     noteText,
+    remarksText,
     totalMtrAverage,
     fabricName: componentFabricName,
     fabricWidth: componentFabricWidth,
@@ -168,8 +170,10 @@ export default function ProgramDetailPage() {
     subStylesWithAverages: [],
     productionGrid: [],
     topName: '',
+    pattern: '',
     serialNoCounter: '000',
     noteText: '',
+    remarksText: '',
     totalMtrAverage: 0,
     fabricName: '',
     fabricWidth: '',

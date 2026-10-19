@@ -49,12 +49,14 @@ import {
 interface ComponentState {
   enabled: boolean;
   styleName: string;
+  pattern: string;
   fabricName: string;
   fabricWidth: string;
   subStyles: SubStyleAverage[];
   productionGrid: ProductionGridItem[];
   swatchColorOverrides: Record<string, string>;
   noteText: string;
+  remarksText: string;
   signatureName: string;
 }
 
@@ -86,6 +88,13 @@ const CATEGORY_META: Record<GarmentCategory, {
     accentBorder: 'border-purple-800',
     subHeader: 'DUPATTA:-',
   },
+  OTHER: {
+    label: 'OTHER Production Sheet',
+    badgeBg: 'bg-amber-100',
+    badgeText: 'text-amber-900',
+    accentBorder: 'border-amber-700',
+    subHeader: 'OTHER:-',
+  },
 };
 
 export default function CreateProductionSheetPage() {
@@ -104,40 +113,59 @@ export default function CreateProductionSheetPage() {
   const [fabricName, setFabricName] = useState('');
   const [fabricWidth, setFabricWidth] = useState('');
 
-  // Three Garment Components: TOP, BOTTOM, DUPATTA
+  // Four Garment Components: TOP, BOTTOM, DUPATTA, OTHER
   // Starts clean with NO dummy data
   const [components, setComponents] = useState<Record<GarmentCategory, ComponentState>>({
     TOP: {
       enabled: true,
       styleName: '',
+      pattern: '',
       fabricName: '',
       fabricWidth: '',
       subStyles: DEFAULT_SUB_STYLES.map((s) => ({ ...s, average: '' })),
-      productionGrid: [{ id: 'top-row-1', color: '', pcs: '', mtr: '', sizes: {} }],
+      productionGrid: [{ id: 'top-row-1', color: '', pcs: '', mtr: '', subStyle: '', size: '', sizes: {} }],
       swatchColorOverrides: {},
       noteText: '',
+      remarksText: '',
       signatureName: '',
     },
     BOTTOM: {
       enabled: false,
       styleName: '',
+      pattern: '',
       fabricName: '',
       fabricWidth: '',
       subStyles: DEFAULT_BOTTOM_SUB_STYLES.map((s) => ({ ...s, average: '' })),
-      productionGrid: [{ id: 'bottom-row-1', color: '', pcs: '', mtr: '', sizes: {} }],
+      productionGrid: [{ id: 'bottom-row-1', color: '', pcs: '', mtr: '', subStyle: '', size: '', sizes: {} }],
       swatchColorOverrides: {},
       noteText: '',
+      remarksText: '',
       signatureName: '',
     },
     DUPATTA: {
       enabled: false,
       styleName: '',
+      pattern: '',
       fabricName: '',
       fabricWidth: '',
       subStyles: DEFAULT_DUPATTA_SUB_STYLES.map((s) => ({ ...s, average: '' })),
-      productionGrid: [{ id: 'dupatta-row-1', color: '', pcs: '', mtr: '', sizes: {} }],
+      productionGrid: [{ id: 'dupatta-row-1', color: '', pcs: '', mtr: '', subStyle: '', size: '', sizes: {} }],
       swatchColorOverrides: {},
       noteText: '',
+      remarksText: '',
+      signatureName: '',
+    },
+    OTHER: {
+      enabled: false,
+      styleName: '',
+      pattern: '',
+      fabricName: '',
+      fabricWidth: '',
+      subStyles: DEFAULT_SUB_STYLES.map((s) => ({ ...s, average: '' })),
+      productionGrid: [{ id: 'other-row-1', color: '', pcs: '', mtr: '', subStyle: '', size: '', sizes: {} }],
+      swatchColorOverrides: {},
+      noteText: '',
+      remarksText: '',
       signatureName: '',
     },
   });
@@ -424,7 +452,7 @@ export default function CreateProductionSheetPage() {
   };
 
   // Component Grid Operations
-  const handleGridRowChange = (cat: GarmentCategory, index: number, field: 'color' | 'pcs' | 'mtr' | 'size', value: any) => {
+  const handleGridRowChange = (cat: GarmentCategory, index: number, field: 'color' | 'pcs' | 'mtr' | 'subStyle' | 'size', value: any) => {
     const totalAvg = getTotalMtrAverage(cat);
     const updatedGrid = [...components[cat].productionGrid];
     const target = { ...updatedGrid[index] };
@@ -432,7 +460,11 @@ export default function CreateProductionSheetPage() {
     if (field === 'pcs') {
       const numPcs = Number(value);
       target.pcs = value;
-      target.mtr = value !== '' && Number.isFinite(numPcs) && numPcs > 0 ? Math.round(numPcs * totalAvg * 100) / 100 : '';
+      target.mtr = value !== '' && Number.isFinite(numPcs) && numPcs > 0 && totalAvg > 0 ? Math.round(numPcs * totalAvg * 100) / 100 : target.mtr;
+    } else if (field === 'mtr') {
+      target.mtr = value;
+    } else if (field === 'subStyle') {
+      target.subStyle = value;
     } else if (field === 'size') {
       target.size = value;
       target.sizes = { ...target.sizes, SIZE: value };
@@ -476,6 +508,8 @@ export default function CreateProductionSheetPage() {
       color: presetColor || '',
       pcs: '',
       mtr: '',
+      subStyle: '',
+      size: '',
       sizes: initialSizes,
     };
 
@@ -687,12 +721,14 @@ export default function CreateProductionSheetPage() {
           forwarded: forwardedComponents.includes('TOP'),
           category: 'TOP',
           styleName: components.TOP.styleName.trim(),
+          pattern: (components.TOP.pattern || '').trim(),
           fabricName: components.TOP.fabricName.trim() || fabricName.trim(),
           fabricWidth: components.TOP.fabricWidth.trim() || fabricWidth.trim(),
           subStyles: components.TOP.subStyles,
           productionGrid: components.TOP.productionGrid,
           swatches: getDisplaySwatches('TOP'),
           note: components.TOP.noteText.trim(),
+          remarks: components.TOP.remarksText.trim(),
           totalMtrAverage: getTotalMtrAverage('TOP'),
           totalPieces: getTotalPieces('TOP'),
           totalFabricMeters: getTotalFabricMeters('TOP'),
@@ -702,12 +738,14 @@ export default function CreateProductionSheetPage() {
           forwarded: forwardedComponents.includes('BOTTOM'),
           category: 'BOTTOM',
           styleName: components.BOTTOM.styleName.trim(),
+          pattern: (components.BOTTOM.pattern || '').trim(),
           fabricName: components.BOTTOM.fabricName.trim() || fabricName.trim(),
           fabricWidth: components.BOTTOM.fabricWidth.trim() || fabricWidth.trim(),
           subStyles: components.BOTTOM.subStyles,
           productionGrid: components.BOTTOM.productionGrid,
           swatches: getDisplaySwatches('BOTTOM'),
           note: components.BOTTOM.noteText.trim(),
+          remarks: components.BOTTOM.remarksText.trim(),
           totalMtrAverage: getTotalMtrAverage('BOTTOM'),
           totalPieces: getTotalPieces('BOTTOM'),
           totalFabricMeters: getTotalFabricMeters('BOTTOM'),
@@ -717,15 +755,34 @@ export default function CreateProductionSheetPage() {
           forwarded: forwardedComponents.includes('DUPATTA'),
           category: 'DUPATTA',
           styleName: components.DUPATTA.styleName.trim(),
+          pattern: (components.DUPATTA.pattern || '').trim(),
           fabricName: components.DUPATTA.fabricName.trim() || fabricName.trim(),
           fabricWidth: components.DUPATTA.fabricWidth.trim() || fabricWidth.trim(),
           subStyles: components.DUPATTA.subStyles,
           productionGrid: components.DUPATTA.productionGrid,
           swatches: getDisplaySwatches('DUPATTA'),
           note: components.DUPATTA.noteText.trim(),
+          remarks: components.DUPATTA.remarksText.trim(),
           totalMtrAverage: getTotalMtrAverage('DUPATTA'),
           totalPieces: getTotalPieces('DUPATTA'),
           totalFabricMeters: getTotalFabricMeters('DUPATTA'),
+        },
+        OTHER: {
+          enabled: components.OTHER.enabled,
+          forwarded: forwardedComponents.includes('OTHER'),
+          category: 'OTHER',
+          styleName: components.OTHER.styleName.trim(),
+          pattern: (components.OTHER.pattern || '').trim(),
+          fabricName: components.OTHER.fabricName.trim() || fabricName.trim(),
+          fabricWidth: components.OTHER.fabricWidth.trim() || fabricWidth.trim(),
+          subStyles: components.OTHER.subStyles,
+          productionGrid: components.OTHER.productionGrid,
+          swatches: getDisplaySwatches('OTHER'),
+          note: components.OTHER.noteText.trim(),
+          remarks: components.OTHER.remarksText.trim(),
+          totalMtrAverage: getTotalMtrAverage('OTHER'),
+          totalPieces: getTotalPieces('OTHER'),
+          totalFabricMeters: getTotalFabricMeters('OTHER'),
         },
       };
 
@@ -741,6 +798,7 @@ export default function CreateProductionSheetPage() {
         designNumber: designNumber.trim(),
         topName: primary.styleName.trim() || designNumber.trim(),
         mainStyle: primary.styleName.trim() || designNumber.trim(),
+        pattern: (primary.pattern || '').trim(),
         startDate: sheetDate,
         deliveryDate: deliveryDate,
         clientName: clientName.trim(),
@@ -759,7 +817,8 @@ export default function CreateProductionSheetPage() {
         targetQuantity: overallTotalPieces > 0 ? overallTotalPieces : primaryPieces,
         swatches: getDisplaySwatches(primaryCat).map((s) => ({ name: s.name, color: s.color })),
         note: primary.noteText.trim(),
-        comments: primary.noteText.trim(),
+        remarks: (primary.remarksText || primary.noteText).trim(),
+        comments: (primary.remarksText || primary.noteText).trim(),
         fabricDyeingRequired: Boolean(fabricDyeingRequired),
         fabricColorAvailable: fabricColorAvailable,
         status: targetStatus,
@@ -996,28 +1055,28 @@ export default function CreateProductionSheetPage() {
                       {cat} PRODUCTION SHEET
                     </div>
 
-                    {/* TOP META ROW: DESIGN NO., [CAT]:-, DATE, SERIAL NO. */}
-                    <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-                      {/* Left: DESIGN NO. & [COMPONENT]:- */}
-                      <div className="w-full sm:w-1/2 space-y-3">
-                        <div className="flex items-center gap-2">
-                          <label className="font-black text-xs tracking-wider uppercase whitespace-nowrap min-w-[90px]">
-                            DESIGN NO.
+                    {/* TOP META ROW: DESIGN NUMBER, WILCOM, STYLE, PATTERN, SERIAL NO, DATE, DELIVERY DATE */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Left: DESIGN NUMBER, WILCOM, STYLE & PATTERN */}
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-[11px] font-black uppercase tracking-wider text-black mb-1">
+                            DESIGN NUMBER:
                           </label>
                           <input
                             type="text"
                             value={designNumber}
                             onChange={(e) => setDesignNumber(e.target.value)}
                             onFocus={(e) => e.target.select()}
-                            placeholder=""
-                            className="border-[1.5px] border-black px-3 py-1 h-8 w-44 font-bold text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600"
+                            placeholder="Enter Design Number..."
+                            className="w-full border-[1.5px] border-black px-3 py-1.5 h-10 font-bold text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600 shadow-2xs"
                           />
                         </div>
 
                         {/* WILCOM OPTION BELOW DESIGN NO. */}
-                        <div className="flex items-center gap-2">
-                          <label className="font-black text-xs tracking-wider uppercase whitespace-nowrap min-w-[90px] text-purple-950">
-                            WILCOM
+                        <div>
+                          <label className="block text-[11px] font-black uppercase tracking-wider text-purple-950 mb-1">
+                            WILCOM - (CLICK AND OPEN SHEET):
                           </label>
                           <button
                             type="button"
@@ -1028,82 +1087,74 @@ export default function CreateProductionSheetPage() {
                               }
                               setShowWilcomModal(true);
                             }}
-                            className="border-[1.5px] border-purple-800 bg-purple-50 hover:bg-purple-100 text-purple-950 px-3 py-1 h-8 font-black text-xs uppercase tracking-wider flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
+                            className="w-full border-[1.5px] border-purple-800 bg-purple-50 hover:bg-purple-100 text-purple-950 px-3 py-1.5 h-10 font-black text-xs uppercase tracking-wider flex items-center justify-between transition cursor-pointer shadow-2xs"
                           >
-                            <Sparkles className="w-3.5 h-3.5 text-purple-700" />
-                            <span>WILCOM ({cat})</span>
+                            <span className="flex items-center gap-1.5">
+                              <Sparkles className="w-3.5 h-3.5 text-purple-700" />
+                              <span>WILCOM ({cat})</span>
+                            </span>
                             {wilcomEntries.filter((e) => e.category === cat).length > 0 ? (
-                              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold bg-purple-800 text-white">
-                                {wilcomEntries.filter((e) => e.category === cat).length}
+                              <span className="px-2 py-0.5 rounded bg-purple-800 text-white font-mono text-[11px]">
+                                № {wilcomEntries.filter((e) => e.category === cat).map((e) => e.wilcomDesignNumber).join(', ')}
                               </span>
                             ) : (
-                              <span className="text-[10px] text-purple-700 font-semibold normal-case">
-                                + Open Sheet
+                              <span className="text-[11px] text-purple-700 font-semibold normal-case">
+                                + Click &amp; Open Sheet
                               </span>
                             )}
                           </button>
-                          {wilcomEntries.filter((e) => e.category === cat).length > 0 && (
-                            <span
-                              className="text-[11px] font-mono text-purple-900 font-black truncate max-w-[200px]"
-                              title={wilcomEntries.filter((e) => e.category === cat).map((e) => e.wilcomDesignNumber).join(', ')}
-                            >
-                              № {wilcomEntries.filter((e) => e.category === cat).map((e) => e.wilcomDesignNumber).join(', ')}
-                            </span>
-                          )}
                         </div>
 
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center gap-1.5 shrink-0">
+                        {/* STYLE & PATTERN (SIDE-BY-SIDE EQUAL BOXES) */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-[11px] font-black uppercase tracking-wider text-black mb-1">
+                              STYLE:
+                            </label>
                             <div className="relative">
                               <select
                                 value={cat}
                                 onChange={(e) => handleCategoryDropdownChange(e.target.value as GarmentCategory)}
                                 aria-label="Component Category"
-                                className="appearance-none font-black text-xs tracking-wider uppercase bg-white text-black border-[1.5px] border-black pl-2.5 pr-7 py-1 h-8 focus:outline-none focus:ring-1 focus:ring-blue-600 cursor-pointer shadow-2xs"
+                                className="w-full appearance-none font-black text-xs tracking-wider uppercase bg-white text-black border-[1.5px] border-black pl-3 pr-8 py-1.5 h-10 focus:outline-none focus:ring-1 focus:ring-blue-600 cursor-pointer shadow-2xs"
                               >
                                 <option value="TOP">TOP</option>
                                 <option value="BOTTOM">BOTTOM</option>
                                 <option value="DUPATTA">DUPATTA</option>
+                                <option value="OTHER">OTHER</option>
                               </select>
-                              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 text-black">
-                                <ChevronDown className="w-3.5 h-3.5 stroke-[2.5]" />
+                              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-black">
+                                <ChevronDown className="w-4 h-4 stroke-[2.5]" />
                               </div>
                             </div>
-                            <span className="font-black text-xs tracking-wider select-none">:-</span>
                           </div>
-                          <input
-                            type="text"
-                            value={comp.styleName}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              setComponents((prev) => ({
-                                ...prev,
-                                [cat]: { ...prev[cat], styleName: val },
-                              }));
-                            }}
-                            onFocus={(e) => e.target.select()}
-                            placeholder=""
-                            className="border-b-[1.5px] border-black border-t-0 border-l-0 border-r-0 px-2 py-1 h-8 flex-1 font-bold text-xs bg-transparent text-black focus:outline-none focus:border-blue-600 rounded-none"
-                          />
+
+                          <div>
+                            <label className="block text-[11px] font-black uppercase tracking-wider text-black mb-1">
+                              PATTERN:
+                            </label>
+                            <input
+                              type="text"
+                              value={comp.pattern || ''}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setComponents((prev) => ({
+                                  ...prev,
+                                  [cat]: { ...prev[cat], pattern: val },
+                                }));
+                              }}
+                              onFocus={(e) => e.target.select()}
+                              placeholder="Fill pattern manually..."
+                              className="w-full border-[1.5px] border-black px-3 py-1.5 h-10 font-bold text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600 shadow-2xs"
+                            />
+                          </div>
                         </div>
                       </div>
 
-                      {/* Right: DATE & SERIAL NO */}
-                      <div className="w-full sm:w-1/2 space-y-3 flex flex-col items-start sm:items-end">
-                        <div className="flex items-center gap-2">
-                          <label className="font-black text-xs tracking-wider uppercase whitespace-nowrap min-w-[75px] text-left sm:text-right">
-                            DATE:
-                          </label>
-                          <input
-                            type="date"
-                            value={sheetDate}
-                            onChange={(e) => setSheetDate(e.target.value)}
-                            className="border-[1.5px] border-black px-3 py-1 h-8 w-44 font-bold text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600"
-                          />
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <label className="font-black text-xs tracking-wider uppercase whitespace-nowrap min-w-[75px] text-left sm:text-right">
+                      {/* Right: SERIAL NO, DATE, DELIVERY DATE */}
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-[11px] font-black uppercase tracking-wider text-black mb-1">
                             SERIAL NO.
                           </label>
                           <input
@@ -1111,166 +1162,145 @@ export default function CreateProductionSheetPage() {
                             value={programSerialNo ? `${programSerialNo}${cat === 'TOP' ? '' : `-${cat}`}` : ''}
                             onChange={(e) => setProgramSerialNo(e.target.value.replace(new RegExp(`-${cat}$`, 'i'), ''))}
                             onFocus={(e) => e.target.select()}
-                            placeholder=""
-                            className="border-[1.5px] border-black px-3 py-1 h-8 w-36 font-black text-center text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600 font-mono"
+                            placeholder="e.g. 101"
+                            className="w-full border-[1.5px] border-black px-3 py-1.5 h-10 font-black text-center text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600 font-mono shadow-2xs"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-black uppercase tracking-wider text-black mb-1">
+                            DATE:
+                          </label>
+                          <input
+                            type="date"
+                            value={sheetDate}
+                            onChange={(e) => setSheetDate(e.target.value)}
+                            className="w-full border-[1.5px] border-black px-3 py-1.5 h-10 font-bold text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600 shadow-2xs"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-black uppercase tracking-wider text-black mb-1">
+                            DELIVERY DATE:
+                          </label>
+                          <input
+                            type="date"
+                            value={deliveryDate}
+                            onChange={(e) => setDeliveryDate(e.target.value)}
+                            className="w-full border-[1.5px] border-black px-3 py-1.5 h-10 font-bold text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600 shadow-2xs"
                           />
                         </div>
                       </div>
                     </div>
 
-                    {/* FACTORY ROUTING & INVENTORY CLEARANCE */}
-                    <div className="pt-2">
-                      <div className="border-[1.5px] border-black p-4 bg-slate-50/50 space-y-3">
-                        <div className="flex items-center justify-between border-b border-black/15 pb-2">
-                          <h3 className="font-black text-xs uppercase tracking-wider text-black flex items-center gap-1.5 select-none">
-                            <Layers className="w-3.5 h-3.5 text-blue-800" />
-                            <span>FACTORY ROUTING &amp; INVENTORY CLEARANCE</span>
-                          </h3>
-                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                            Order Routing &middot; {cat} Sheet
-                          </span>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 text-xs">
-                          {/* Client / Buyer Name - Only visible to Admin and Programming */}
-                          {canViewClientName(currentUser) && (
-                            <div>
-                              <label className="block text-[10px] font-black uppercase tracking-wider text-black mb-1">
-                                CLIENT / BUYER NAME
-                              </label>
-                              <input
-                                type="text"
-                                value={clientName}
-                                onChange={(e) => setClientName(e.target.value)}
-                                onFocus={(e) => e.target.select()}
-                                placeholder="e.g. Standard Client"
-                                className="w-full px-2.5 py-1.5 border-[1.5px] border-black text-xs font-bold text-black bg-white focus:outline-none focus:ring-1 focus:ring-blue-600 shadow-2xs"
-                              />
-                            </div>
-                          )}
-
-                          {/* Delivery Target Date */}
-                          <div>
-                            <label className="block text-[10px] font-black uppercase tracking-wider text-black mb-1">
-                              DELIVERY TARGET DATE
-                            </label>
-                            <input
-                              type="date"
-                              value={deliveryDate}
-                              onChange={(e) => setDeliveryDate(e.target.value)}
-                              className="w-full px-2.5 py-1.5 border-[1.5px] border-black text-xs font-bold text-black bg-white focus:outline-none focus:ring-1 focus:ring-blue-600 shadow-2xs"
-                            />
+                    {/* THREE EQUAL SIZED BOXES: CLIENT NAME, PRIORITY, IS DYEING REQUIRED */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+                      {/* CLIENT NAME */}
+                      <div>
+                        <label className="block text-[11px] font-black uppercase tracking-wider text-black mb-1">
+                          CLIENT NAME
+                        </label>
+                        {canViewClientName(currentUser) ? (
+                          <input
+                            type="text"
+                            value={clientName}
+                            onChange={(e) => setClientName(e.target.value)}
+                            onFocus={(e) => e.target.select()}
+                            placeholder="Client Name..."
+                            className="w-full border-[1.5px] border-black px-3 py-1.5 h-10 font-bold text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600 shadow-2xs"
+                          />
+                        ) : (
+                          <div className="w-full border-[1.5px] border-black px-3 py-1.5 h-10 font-bold text-xs bg-slate-100 text-slate-400 flex items-center justify-between shadow-2xs">
+                            <span>••••••••</span>
+                            <span className="text-[10px] text-slate-400 font-normal">Restricted</span>
                           </div>
+                        )}
+                      </div>
 
-                          {/* Order Priority */}
-                          <div>
-                            <label className="block text-[10px] font-black uppercase tracking-wider text-black mb-1">
-                              ORDER PRIORITY
-                            </label>
-                            <select
-                              value={clientPriority}
-                              onChange={(e) => setClientPriority(e.target.value)}
-                              className="w-full px-2.5 py-1.5 border-[1.5px] border-black text-xs font-bold text-black bg-white focus:outline-none focus:ring-1 focus:ring-blue-600 cursor-pointer shadow-2xs"
-                            >
-                              <option value="LOW">LOW</option>
-                              <option value="NORMAL">NORMAL</option>
-                              <option value="HIGH">HIGH (Expedited)</option>
-                              <option value="URGENT">URGENT (Top Floor)</option>
-                            </select>
-                          </div>
-
-                          {/* Dyeing Required */}
-                          <div>
-                            <label className="block text-[10px] font-black uppercase tracking-wider text-black mb-1">
-                              IS DYEING REQUIRED? *
-                            </label>
-                            <select
-                              value={fabricDyeingRequired ? 'YES' : 'NO'}
-                              onChange={(e) => setFabricDyeingRequired(e.target.value === 'YES')}
-                              className="w-full px-2.5 py-1.5 border-[1.5px] border-black text-xs font-bold text-black bg-white focus:outline-none focus:ring-1 focus:ring-blue-600 cursor-pointer shadow-2xs"
-                            >
-                              <option value="NO">NO (Pre-Dyed)</option>
-                              <option value="YES">YES (Kora)</option>
-                            </select>
-                          </div>
-
-                          {/* Fabric Color Availability */}
-                          <div>
-                            <label className="block text-[10px] font-black uppercase tracking-wider text-black mb-1">
-                              FABRIC COLOR AVAILABILITY
-                            </label>
-                            <select
-                              value={fabricColorAvailable}
-                              onChange={(e) => setFabricColorAvailable(e.target.value)}
-                              className="w-full px-2.5 py-1.5 border-[1.5px] border-black text-xs font-bold text-black bg-white focus:outline-none focus:ring-1 focus:ring-blue-600 cursor-pointer shadow-2xs"
-                            >
-                              <option value="IN_STOCK">IN STOCK</option>
-                              <option value="PROCUREMENT_PENDING">PROCUREMENT PENDING</option>
-                              <option value="DYEING_REQUIRED">DYEING REQUIRED</option>
-                            </select>
+                      {/* PRIORITY */}
+                      <div>
+                        <label className="block text-[11px] font-black uppercase tracking-wider text-black mb-1">
+                          PRIORITY
+                        </label>
+                        <div className="relative">
+                          <select
+                            value={clientPriority}
+                            onChange={(e) => setClientPriority(e.target.value)}
+                            className="w-full appearance-none border-[1.5px] border-black pl-3 pr-8 py-1.5 h-10 font-bold text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600 cursor-pointer shadow-2xs"
+                          >
+                            <option value="LOW">LOW</option>
+                            <option value="NORMAL">NORMAL</option>
+                            <option value="HIGH">HIGH (Expedited)</option>
+                            <option value="URGENT">URGENT (Top Floor)</option>
+                          </select>
+                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-black">
+                            <ChevronDown className="w-4 h-4 stroke-[2.5]" />
                           </div>
                         </div>
+                      </div>
 
-                        {/* Store Stock Availability Clearance Bar */}
-                        <div className="flex items-center justify-between p-2.5 border-[1.5px] border-black bg-white text-xs">
-                          <span className="font-black text-black uppercase tracking-wider text-[11px]">
-                            Fabric Store Stock Clearance:
-                          </span>
-                          <span className="text-[10px] font-black px-2.5 py-0.5 rounded bg-emerald-100 text-emerald-900 border border-emerald-400 uppercase tracking-wider">
-                            Movement Allowed
-                          </span>
+                      {/* IS DYEING REQUIRED */}
+                      <div>
+                        <label className="block text-[11px] font-black uppercase tracking-wider text-black mb-1">
+                          IS DYEING REQUIRED?
+                        </label>
+                        <div className="relative">
+                          <select
+                            value={fabricDyeingRequired ? 'YES' : 'NO'}
+                            onChange={(e) => setFabricDyeingRequired(e.target.value === 'YES')}
+                            className="w-full appearance-none border-[1.5px] border-black pl-3 pr-8 py-1.5 h-10 font-bold text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600 cursor-pointer shadow-2xs"
+                          >
+                            <option value="NO">NO (Pre-Dyed)</option>
+                            <option value="YES">YES (Kora)</option>
+                          </select>
+                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-black">
+                            <ChevronDown className="w-4 h-4 stroke-[2.5]" />
+                          </div>
                         </div>
                       </div>
                     </div>
 
-                    {/* FABRIC & WIDTH TABLE */}
-                    <div className="pt-1">
-                      <table className="w-full border-collapse border-[1.5px] border-black text-xs">
-                        <tbody>
-                          <tr>
-                            <td className="border-[1.5px] border-black px-3 py-1.5 font-black uppercase w-28 bg-white select-none">
-                              FABRIC
-                            </td>
-                            <td className="border-[1.5px] border-black p-1">
-                              <input
-                                type="text"
-                                value={comp.fabricName || fabricName}
-                                onChange={(e) => {
-                                  const val = e.target.value;
-                                  setComponents((prev) => ({
-                                    ...prev,
-                                    [cat]: { ...prev[cat], fabricName: val },
-                                  }));
-                                }}
-                                onFocus={(e) => e.target.select()}
-                                placeholder=""
-                                className="w-full px-2 py-1 font-bold text-xs text-black border-none focus:outline-none focus:bg-blue-50/50"
-                              />
-                            </td>
-                          </tr>
-                          <tr>
-                            <td className="border-[1.5px] border-black px-3 py-1.5 font-black uppercase w-28 bg-white select-none">
-                              WIDTH
-                            </td>
-                            <td className="border-[1.5px] border-black p-1">
-                              <input
-                                type="text"
-                                value={comp.fabricWidth || fabricWidth}
-                                onChange={(e) => {
-                                  const val = e.target.value;
-                                  setComponents((prev) => ({
-                                    ...prev,
-                                    [cat]: { ...prev[cat], fabricWidth: val },
-                                  }));
-                                }}
-                                onFocus={(e) => e.target.select()}
-                                placeholder=""
-                                className="w-full px-2 py-1 font-bold text-xs text-black border-none focus:outline-none focus:bg-blue-50/50"
-                              />
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
+                    {/* FABRIC & WIDTH (UNIFORM BOX SIZE) */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                      <div>
+                        <label className="block text-[11px] font-black uppercase tracking-wider text-black mb-1">
+                          FABRIC:
+                        </label>
+                        <input
+                          type="text"
+                          value={comp.fabricName || fabricName}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setComponents((prev) => ({
+                              ...prev,
+                              [cat]: { ...prev[cat], fabricName: val },
+                            }));
+                          }}
+                          onFocus={(e) => e.target.select()}
+                          placeholder="e.g. Cotton Viscose..."
+                          className="w-full border-[1.5px] border-black px-3 py-1.5 h-10 font-bold text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600 shadow-2xs"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-black uppercase tracking-wider text-black mb-1">
+                          WIDTH:
+                        </label>
+                        <input
+                          type="text"
+                          value={comp.fabricWidth || fabricWidth}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setComponents((prev) => ({
+                              ...prev,
+                              [cat]: { ...prev[cat], fabricWidth: val },
+                            }));
+                          }}
+                          onFocus={(e) => e.target.select()}
+                          placeholder="e.g. 58 inches..."
+                          className="w-full border-[1.5px] border-black px-3 py-1.5 h-10 font-bold text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600 shadow-2xs"
+                        />
+                      </div>
                     </div>
 
                     {/* AVERAGE SECTION (SUB STYLES & CONSUMPTION) */}
@@ -1358,7 +1388,7 @@ export default function CreateProductionSheetPage() {
                             className="text-[10px] font-bold text-blue-700 hover:text-blue-900 flex items-center gap-1 cursor-pointer"
                           >
                             <Plus className="w-3 h-3" />
-                            <span>Add Color Row</span>
+                            <span>Add Item / Color Row</span>
                           </button>
                         </div>
                       </div>
@@ -1373,7 +1403,11 @@ export default function CreateProductionSheetPage() {
                               <th colSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase">
                                 QTY
                               </th>
-                              <th rowSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase">
+                              <th rowSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase w-36">
+                                <div>SUB STYLE</div>
+                                <div className="text-[9px] font-normal text-slate-500 normal-case">(manual fill)</div>
+                              </th>
+                              <th rowSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase w-28">
                                 SIZE
                               </th>
                               <th rowSpan={2} className="border-[1.5px] border-black p-1 font-bold text-[10px] w-8">
@@ -1381,8 +1415,8 @@ export default function CreateProductionSheetPage() {
                               </th>
                             </tr>
                             <tr className="bg-white">
-                              <th className="border-[1.5px] border-black p-1 font-black text-[11px] w-20">PCS</th>
                               <th className="border-[1.5px] border-black p-1 font-black text-[11px] w-24">MTR</th>
+                              <th className="border-[1.5px] border-black p-1 font-black text-[11px] w-20">PCS</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -1400,6 +1434,19 @@ export default function CreateProductionSheetPage() {
                                   />
                                 </td>
 
+                                {/* MTR */}
+                                <td className="border-[1.5px] border-black p-0.5 font-bold text-center text-xs bg-slate-50/50">
+                                  <input
+                                    type="number"
+                                    step="0.01"
+                                    value={row.mtr}
+                                    onChange={(e) => handleGridRowChange(cat, rIdx, 'mtr', e.target.value)}
+                                    onFocus={(e) => e.target.select()}
+                                    placeholder=""
+                                    className="w-full px-1 py-1 font-bold text-center text-xs text-black border-none focus:outline-none focus:bg-blue-50 bg-transparent"
+                                  />
+                                </td>
+
                                 {/* PCS */}
                                 <td className="border-[1.5px] border-black p-0.5">
                                   <input
@@ -1413,16 +1460,15 @@ export default function CreateProductionSheetPage() {
                                   />
                                 </td>
 
-                                {/* MTR */}
-                                <td className="border-[1.5px] border-black p-0.5 font-bold text-center text-xs bg-slate-50/50">
+                                {/* SUB STYLE (manual fill) */}
+                                <td className="border-[1.5px] border-black p-0.5">
                                   <input
-                                    type="number"
-                                    step="0.01"
-                                    value={row.mtr}
-                                    onChange={(e) => handleGridRowChange(cat, rIdx, 'mtr', e.target.value)}
+                                    type="text"
+                                    value={row.subStyle || ''}
+                                    onChange={(e) => handleGridRowChange(cat, rIdx, 'subStyle', e.target.value)}
                                     onFocus={(e) => e.target.select()}
                                     placeholder=""
-                                    className="w-full px-1 py-1 font-bold text-center text-xs text-black border-none focus:outline-none focus:bg-blue-50 bg-transparent"
+                                    className="w-full px-2 py-1 text-center font-bold text-xs text-black border-none focus:outline-none focus:bg-blue-50"
                                   />
                                 </td>
 
@@ -1460,13 +1506,13 @@ export default function CreateProductionSheetPage() {
                               <td className="border-[1.5px] border-black p-1.5 text-right font-black uppercase text-[10px]">
                                 {cat} TOTALS:
                               </td>
-                              <td className="border-[1.5px] border-black p-1.5 text-center font-black text-sm text-[#163767]">
-                                {catPieces > 0 ? catPieces : ''}
-                              </td>
                               <td className="border-[1.5px] border-black p-1.5 text-center font-black text-sm text-emerald-800">
                                 {catMeters > 0 ? catMeters.toFixed(2) : ''}
                               </td>
-                              <td colSpan={2} className="border-[1.5px] border-black p-1.5 text-right text-[10px] text-slate-500 italic">
+                              <td className="border-[1.5px] border-black p-1.5 text-center font-black text-sm text-[#163767]">
+                                {catPieces > 0 ? catPieces : ''}
+                              </td>
+                              <td colSpan={3} className="border-[1.5px] border-black p-1.5 text-right text-[10px] text-slate-500 italic">
                                 {catAvg > 0 ? `Fabric consumption @ ${catAvg.toFixed(2)} Mtr/Pc` : ''}
                               </td>
                             </tr>
@@ -1475,10 +1521,10 @@ export default function CreateProductionSheetPage() {
                       </div>
                     </div>
 
-                    {/* FOOTER: NOTE, SWATCHES, SIGNATURE */}
-                    <div className="flex flex-col sm:flex-row justify-between items-end gap-6 pt-3 border-t border-black/10">
-                      {/* Left: NOTE & SWATCH SAMPLES */}
-                      <div className="w-full sm:w-3/5 space-y-3">
+                    {/* FOOTER: NOTE, REMARKS, SWATCHES, SIGNATURE */}
+                    <div className="space-y-4 pt-3 border-t border-black/10">
+                      {/* NOTE & REMARKS side-by-side */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label className="font-black text-xs tracking-wider uppercase block mb-1">
                             NOTE:-
@@ -1494,12 +1540,33 @@ export default function CreateProductionSheetPage() {
                               }));
                             }}
                             placeholder=""
-                            className="w-full px-2.5 py-1.5 border-[1.5px] border-black text-xs font-sans text-black focus:outline-none focus:ring-1 focus:ring-blue-600 resize-none"
+                            className="w-full px-2.5 py-1.5 border-[1.5px] border-black text-xs font-sans text-black focus:outline-none focus:ring-1 focus:ring-blue-600 resize-none bg-white"
                           />
                         </div>
 
-                        {/* SWATCH SAMPLES */}
-                        <div className="pt-2">
+                        <div>
+                          <label className="font-black text-xs tracking-wider uppercase block mb-1">
+                            REMARKS:-
+                          </label>
+                          <textarea
+                            rows={2}
+                            value={comp.remarksText}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setComponents((prev) => ({
+                                ...prev,
+                                [cat]: { ...prev[cat], remarksText: val },
+                              }));
+                            }}
+                            placeholder=""
+                            className="w-full px-2.5 py-1.5 border-[1.5px] border-black text-xs font-sans text-black focus:outline-none focus:ring-1 focus:ring-blue-600 resize-none bg-white"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row justify-between items-end gap-6 pt-2">
+                        {/* Left: SWATCH SAMPLES */}
+                        <div className="w-full sm:w-3/5 space-y-2">
                           <label className="font-black text-xs tracking-wider uppercase text-[#163767] block mb-2">
                             COLOR SWATCHES:
                           </label>
@@ -1543,28 +1610,27 @@ export default function CreateProductionSheetPage() {
                             )}
                           </div>
                         </div>
-                      </div>
 
-                      {/* Right: SIGNATURE */}
-                      <div className="w-full sm:w-1/3 text-center space-y-3">
-                        <div className="font-black text-xs tracking-wider uppercase">
-                          SIGNATURE
+                        {/* Right: SIGNATURE */}
+                        <div className="w-full sm:w-1/3 text-center space-y-2">
+                          <div className="font-black text-xs tracking-wider uppercase">
+                            SIGNATURE
+                          </div>
+                          <input
+                            type="text"
+                            value={comp.signatureName}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setComponents((prev) => ({
+                                ...prev,
+                                [cat]: { ...prev[cat], signatureName: val },
+                              }));
+                            }}
+                            onFocus={(e) => e.target.select()}
+                            placeholder=""
+                            className="w-full h-10 text-center font-bold text-xs border-[1.5px] border-black bg-white focus:outline-none focus:ring-1 focus:ring-blue-600 px-3"
+                          />
                         </div>
-                        <input
-                          type="text"
-                          value={comp.signatureName}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setComponents((prev) => ({
-                              ...prev,
-                              [cat]: { ...prev[cat], signatureName: val },
-                            }));
-                          }}
-                          onFocus={(e) => e.target.select()}
-                          placeholder=""
-                          className="w-full text-center font-bold text-xs border-none focus:outline-none focus:bg-blue-50/50 py-1"
-                        />
-                        <div className="border-b-[1.5px] border-black w-full mx-auto" />
                       </div>
                     </div>
 

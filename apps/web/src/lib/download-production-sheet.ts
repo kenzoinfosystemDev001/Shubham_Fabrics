@@ -17,6 +17,7 @@ export interface ProductionGridItem {
   color: string;
   pcs: number | string;
   mtr: number | string;
+  subStyle?: string;
   size?: string;
   sizes?: Record<string, string>;
 }
@@ -114,19 +115,21 @@ export function getSwatchColorHex(name?: string, fallback?: string): string {
   return `hsl(${hue}, 40%, 55%)`;
 }
 
-export type GarmentCategory = 'TOP' | 'BOTTOM' | 'DUPATTA';
+export type GarmentCategory = 'TOP' | 'BOTTOM' | 'DUPATTA' | 'OTHER';
 
 export interface ComponentSheetData {
   enabled: boolean;
   forwarded: boolean;
   category: GarmentCategory;
   styleName: string;
+  pattern?: string;
   fabricName: string;
   fabricWidth: string;
   subStyles: SubStyleAverage[];
   productionGrid: ProductionGridItem[];
   swatches?: SwatchItem[];
   note?: string;
+  remarks?: string;
   totalMtrAverage?: number;
   totalPieces?: number;
   totalFabricMeters?: number;
@@ -215,8 +218,10 @@ export function extractSubStylesAndGrid(program: any, category: GarmentCategory 
   productionGrid: ProductionGridItem[];
   swatches: SwatchItem[];
   topName: string;
+  pattern: string;
   serialNoCounter: string;
   noteText: string;
+  remarksText: string;
   totalMtrAverage: number;
   clientCode?: string;
   fabricName: string;
@@ -232,8 +237,10 @@ export function extractSubStylesAndGrid(program: any, category: GarmentCategory 
   let productionGrid: ProductionGridItem[] = [];
   let swatches: SwatchItem[] = [];
   let topName = program.topName || program.mainStyle || program.styleCode || '';
+  let pattern = program.pattern || '';
   let serialNoCounter = program.serialNoCounter || '';
-  let noteText = program.note || program.comments || program.remarks || '';
+  let noteText = program.note || program.comments || '';
+  let remarksText = program.remarks || '';
   let clientCode = program.clientCode || '';
   let fabricName = program.fabricName || program.fabric || (program.fabrics?.[0]?.fabricName) || '';
   let fabricWidth = program.fabricWidth || (program.fabricWidthInches ? `${program.fabricWidthInches}"` : '') || '';
@@ -263,6 +270,7 @@ export function extractSubStylesAndGrid(program: any, category: GarmentCategory 
         isEnabled = comp.enabled !== false;
         isForwarded = comp.forwarded !== false || forwardedComponents.includes(category);
         if (comp.styleName) topName = comp.styleName;
+        if (comp.pattern) pattern = comp.pattern;
         if (comp.fabricName) fabricName = comp.fabricName;
         if (comp.fabricWidth) fabricWidth = comp.fabricWidth;
         if (Array.isArray(comp.subStyles) && comp.subStyles.length > 0) {
@@ -275,6 +283,7 @@ export function extractSubStylesAndGrid(program: any, category: GarmentCategory 
           swatches = comp.swatches;
         }
         if (comp.note) noteText = comp.note;
+        if (comp.remarks) remarksText = comp.remarks;
       } else {
         // Fallback for single sheet legacy metadata
         if (Array.isArray(meta?.subStylesWithAverages) && meta.subStylesWithAverages.length > 0) {
@@ -377,8 +386,10 @@ export function extractSubStylesAndGrid(program: any, category: GarmentCategory 
     productionGrid,
     swatches,
     topName,
+    pattern,
     serialNoCounter,
     noteText,
+    remarksText,
     totalMtrAverage,
     clientCode,
     fabricName,
@@ -431,13 +442,13 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       productionGrid,
       swatches,
       topName,
+      pattern,
       noteText,
+      remarksText,
       totalMtrAverage,
       fabricName,
       fabricWidth,
     } = extractSubStylesAndGrid(program, activeCategory);
-
-    const subStyleColumns = subStylesWithAverages.map((s) => s.name);
 
     // Generate 14 rows total (matching the paper sheet grid)
     const TOTAL_GRID_ROWS = 14;
@@ -445,6 +456,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       color: string;
       pcs: string | number;
       mtr: string | number;
+      subStyle?: string;
       size?: string;
       sizes: Record<string, string>;
     }[] = [];
@@ -455,6 +467,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
           color: productionGrid[i].color || '',
           pcs: productionGrid[i].pcs !== undefined ? productionGrid[i].pcs : '',
           mtr: productionGrid[i].mtr !== undefined ? productionGrid[i].mtr : '',
+          subStyle: productionGrid[i].subStyle || '',
           size: productionGrid[i].size || productionGrid[i].sizes?.['SIZE'] || '',
           sizes: productionGrid[i].sizes || {},
         });
@@ -463,51 +476,74 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
           color: '',
           pcs: '',
           mtr: '',
+          subStyle: '',
           size: '',
           sizes: {},
         });
       }
     }
 
+    const deliveryDateVal = program.deliveryDate
+      ? new Date(program.deliveryDate).toLocaleDateString('en-GB')
+      : '';
+    const priorityVal = program.clientPriority || program.priority || 'NORMAL';
+    const dyeingVal = program.fabricDyeingRequired ? 'YES (Kora)' : 'NO (Pre-Dyed)';
+    const wilcomVal = program.wilcomDesignNumber ? `№ ${program.wilcomDesignNumber}` : 'None';
+
     return `
     <div class="sheet-wrapper">
       <div>
-        <!-- TITLE (IN PLACE OF JBBJ) -->
+        <!-- TITLE -->
         <div class="header-title">PRODUCTION SHEET &mdash; ${activeCategory}</div>
 
-        <!-- HEADER META: DESIGN NO, COMPONENT STYLE, DATE, SERIAL NO -->
+        <!-- HEADER META: DESIGN NO, WILCOM, STYLE, PATTERN, DATE, SERIAL NO, DELIVERY DATE -->
         <div class="top-meta-row">
           <div class="meta-col-left">
             <div class="field-row">
-              <span class="label-bold">DESIGN NO.</span>
+              <span class="label-bold">DESIGN NUMBER:</span>
               <div class="box-input">${designNo}</div>
             </div>
-            <div class="field-row" style="margin-top: 10px;">
-              <span class="label-bold">${activeCategory}:-</span>
-              <div class="line-underline">${topName}</div>
+            <div class="field-row" style="margin-top: 6px;">
+              <span class="label-bold">WILCOM:</span>
+              <div class="box-input">${wilcomVal}</div>
             </div>
-            ${canSeeClientCode ? `
-            <div class="field-row" style="margin-top: 8px;">
-              <span class="label-bold" style="color: #92400e;">CLIENT CODE:</span>
-              <div class="box-input" style="width: 120px; font-weight: 900; background: #fef3c7; border: 1.5px solid #000000; color: #78350f;">
-                ${program.clientCode}
-              </div>
-              <span style="font-size: 8px; font-weight: 800; margin-left: 6px; color: #92400e; background: #fef3c7; padding: 2px 5px; border: 1px solid #f59e0b; border-radius: 3px;">
-                CONFIDENTIAL: ADMIN &amp; PROG ONLY
-              </span>
+            <div class="field-row" style="margin-top: 6px;">
+              <span class="label-bold">STYLE:</span>
+              <div class="box-input" style="width: 90px; text-transform: uppercase;">${activeCategory}</div>
+              <span class="label-bold" style="margin-left: 10px;">PATTERN:</span>
+              <div class="box-input" style="flex: 1;">${pattern || '-'}</div>
             </div>
-            ` : ''}
           </div>
 
           <div class="meta-col-right">
             <div class="field-row-right">
-              <span class="label-bold">DATE:</span>
-              <div class="box-input">${dateVal}</div>
-            </div>
-            <div class="field-row-right" style="margin-top: 10px;">
               <span class="label-bold">SERIAL NO.</span>
               <div class="box-serial">${serialNo}</div>
             </div>
+            <div class="field-row-right" style="margin-top: 6px;">
+              <span class="label-bold">DATE:</span>
+              <div class="box-input">${dateVal}</div>
+            </div>
+            <div class="field-row-right" style="margin-top: 6px;">
+              <span class="label-bold">DELIVERY DATE:</span>
+              <div class="box-input">${deliveryDateVal || '-'}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- THREE UNIFORM SUMMARY BOXES: CLIENT NAME, PRIORITY, IS DYEING REQUIRED -->
+        <div class="summary-boxes-row">
+          <div class="summary-box">
+            <div class="summary-box-label">CLIENT NAME</div>
+            <div class="summary-box-value">${canSeeClientCode ? (program.clientName || 'Standard Client') : 'Confidential'}</div>
+          </div>
+          <div class="summary-box">
+            <div class="summary-box-label">PRIORITY</div>
+            <div class="summary-box-value">${priorityVal}</div>
+          </div>
+          <div class="summary-box">
+            <div class="summary-box-label">IS DYEING REQUIRED?</div>
+            <div class="summary-box-value">${dyeingVal}</div>
           </div>
         </div>
 
@@ -546,25 +582,28 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
           </tbody>
         </table>
 
-        <!-- MAIN COLOR & SIZE BREAKDOWN GRID -->
+        <!-- PRODUCTION BREAKDOWN GRID -->
+        <div class="average-heading" style="margin-top: 10px;">PRODUCTION BREAKDOWN</div>
         <table class="production-grid">
           <thead>
             <tr>
               <th rowspan="2" class="col-color-header">COLOR</th>
               <th colspan="2">QTY</th>
-              <th rowspan="2">SIZE</th>
+              <th rowspan="2" style="width: 25%;">SUB STYLE<br><span style="font-size: 8px; font-weight: normal; text-transform: none;">(manual fill)</span></th>
+              <th rowspan="2" style="width: 15%;">SIZE</th>
             </tr>
             <tr>
-              <th class="col-qty-pcs">PCS</th>
               <th class="col-qty-mtr">MTR</th>
+              <th class="col-qty-pcs">PCS</th>
             </tr>
           </thead>
           <tbody>
             ${gridRows.map((row) => `
               <tr class="grid-data-row">
                 <td class="cell-color">${row.color}</td>
-                <td class="cell-number">${row.pcs !== '' && row.pcs !== undefined ? row.pcs : ''}</td>
                 <td class="cell-number">${row.mtr !== '' && row.mtr !== undefined ? row.mtr : ''}</td>
+                <td class="cell-number">${row.pcs !== '' && row.pcs !== undefined ? row.pcs : ''}</td>
+                <td class="cell-substyle">${row.subStyle || ''}</td>
                 <td class="cell-size">${row.size || row.sizes?.['SIZE'] || ''}</td>
               </tr>
             `).join('')}
@@ -572,11 +611,19 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
         </table>
       </div>
 
-      <!-- FOOTER: NOTE, SWATCHES, SIGNATURE -->
+      <!-- FOOTER: NOTE, REMARKS, SWATCHES, SIGNATURE -->
       <div class="footer-block">
         <div class="footer-left">
-          <div class="note-heading">NOTE:-</div>
-          ${noteText ? `<div class="note-content">${noteText}</div>` : ''}
+          <div style="display: flex; gap: 10px; margin-bottom: 8px;">
+            <div style="flex: 1; border: 1.5px solid #000; padding: 4px 6px; min-height: 40px; box-sizing: border-box;">
+              <div class="note-heading">NOTE:-</div>
+              <div class="note-content">${noteText || ''}</div>
+            </div>
+            <div style="flex: 1; border: 1.5px solid #000; padding: 4px 6px; min-height: 40px; box-sizing: border-box;">
+              <div class="note-heading">REMARKS:-</div>
+              <div class="note-content">${remarksText || ''}</div>
+            </div>
+          </div>
 
           <!-- COLOR SWATCHES -->
           <div class="swatches-section">
@@ -788,6 +835,34 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       align-items: flex-end;
     }
 
+    /* SUMMARY BOXES (3 UNIFORM BOXES) */
+    .summary-boxes-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .summary-box {
+      flex: 1;
+      border: 1.5px solid #000000;
+      padding: 6px 10px;
+      background: #ffffff;
+      min-height: 48px;
+      box-sizing: border-box;
+    }
+    .summary-box-label {
+      font-size: 9px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 3px;
+      color: #000000;
+    }
+    .summary-box-value {
+      font-size: 11px;
+      font-weight: 800;
+      color: #000000;
+    }
+
     /* FABRIC & WIDTH BOX */
     .fabric-section {
       margin-bottom: 14px;
@@ -896,6 +971,15 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
     }
     .cell-number {
       font-family: inherit;
+    }
+    .cell-substyle {
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 10px;
+    }
+    .cell-size {
+      font-weight: 800;
+      font-size: 11px;
     }
 
     /* FOOTER SECTION: NOTE, SWATCHES, SIGNATURE */
