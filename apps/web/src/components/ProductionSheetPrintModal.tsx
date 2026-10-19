@@ -77,6 +77,7 @@ export function ProductionSheetPrintModal({
     color: string;
     pcs: string | number;
     mtr: string | number;
+    size?: string;
     sizes: Record<string, string>;
   }[] = [];
 
@@ -86,6 +87,7 @@ export function ProductionSheetPrintModal({
         color: productionGrid[i].color || '',
         pcs: productionGrid[i].pcs !== undefined ? productionGrid[i].pcs : '',
         mtr: productionGrid[i].mtr !== undefined ? productionGrid[i].mtr : '',
+        size: productionGrid[i].size || productionGrid[i].sizes?.['SIZE'] || '',
         sizes: productionGrid[i].sizes || {},
       });
     } else {
@@ -93,6 +95,7 @@ export function ProductionSheetPrintModal({
         color: '',
         pcs: '',
         mtr: '',
+        size: '',
         sizes: {},
       });
     }
@@ -442,18 +445,13 @@ export function ProductionSheetPrintModal({
                     <th colSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase">
                       QTY
                     </th>
-                    <th colSpan={subStyleColumns.length} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase">
+                    <th rowSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase">
                       SIZE
                     </th>
                   </tr>
                   <tr className="bg-white">
                     <th className="border-[1.5px] border-black p-1 font-black text-[11px] w-14">PCS</th>
                     <th className="border-[1.5px] border-black p-1 font-black text-[11px] w-16">MTR</th>
-                    {subStyleColumns.map((col, idx) => (
-                      <th key={idx} className="border-[1.5px] border-black p-1 font-black text-[11px] uppercase">
-                        {col}
-                      </th>
-                    ))}
                   </tr>
                 </thead>
                 <tbody>
@@ -468,11 +466,9 @@ export function ProductionSheetPrintModal({
                       <td className="border-[1.5px] border-black px-1 py-0.5 font-bold text-xs">
                         {row.mtr !== '' && row.mtr !== undefined ? row.mtr : ''}
                       </td>
-                      {subStyleColumns.map((col, cIdx) => (
-                        <td key={cIdx} className="border-[1.5px] border-black px-1 py-0.5 font-medium text-xs">
-                          {row.sizes?.[col] || ''}
-                        </td>
-                      ))}
+                      <td className="border-[1.5px] border-black px-2 py-0.5 font-bold text-xs">
+                        {row.size || row.sizes?.['SIZE'] || ''}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
