@@ -27,15 +27,22 @@ import {
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { getCurrentUser, canViewClientCode } from '@/lib/rbac';
-import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
+import { ProductionSheetPrintModal } from '@/components/production-sheet/ProductionSheetPrintModal';
+import { ProductionSheetView } from '@/components/production-sheet/ProductionSheetView';
 import { 
   downloadProductionSheetHtml, 
   printProductionSheet,
-  downloadWilcomFormHtml,
-  printWilcomForm,
   extractSubStylesAndGrid,
-  GarmentCategory
+  GarmentCategory 
 } from '@/lib/download-production-sheet';
+import { WilcomPrintModal } from '@/components/wilcom/WilcomPrintModal';
+import { WilcomSheetView } from '@/components/wilcom/WilcomSheetView';
+import { 
+  WilcomEntry, 
+  printWilcomForm, 
+  downloadWilcomFormHtml 
+} from '@/lib/download-wilcom';
+import { ChallanListTable } from '@/components/challan/ChallanListTable';
 import { 
   downloadChallanHtml, 
   printChallan 
@@ -52,6 +59,7 @@ export default function ProgramDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showPrintModal, setShowPrintModal] = useState(false);
+  const [showWilcomPrintModal, setShowWilcomPrintModal] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [activeCategoryTab, setActiveCategoryTab] = useState<'TOP' | 'BOTTOM' | 'DUPATTA' | 'OTHER' | 'WILCOM'>('TOP');
 
@@ -758,60 +766,6 @@ export default function ProgramDetailPage() {
 
           {/* PRODUCTION SHEET SPECIFICATION & BREAKDOWN */}
           <div className="bg-white border-2 border-black rounded-lg p-5 shadow-xs space-y-4 md:col-span-2 text-black">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-black/10 pb-3">
-              <div>
-                <span className="text-[10px] font-black uppercase tracking-wider text-black bg-slate-100 px-2 py-0.5 rounded border border-black/20">
-                  PRODUCTION SHEET &middot; TRAVELER #{program.programSerialNo || program.programNumber}
-                </span>
-                <h3 className="text-sm font-black text-black mt-1 uppercase tracking-wide flex items-center gap-2">
-                  <span>{activeCategoryTab === 'WILCOM' ? 'Wilcom Embroidery Specifications' : `${activeCategoryTab} Production Sheet Breakdown`}</span>
-                  {isClientCodeVisible && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-100 text-amber-950 text-[10px] font-mono font-black border border-amber-300 normal-case">
-                      🔒 Client Code: {program.clientCode}
-                    </span>
-                  )}
-                </h3>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (activeCategoryTab === 'WILCOM') {
-                      printWilcomForm(program);
-                    } else {
-                      printProductionSheet(program, activeCategoryTab);
-                    }
-                  }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
-                >
-                  <Printer className="w-3.5 h-3.5" />
-                  <span>{activeCategoryTab === 'WILCOM' ? 'Print Wilcom' : `Print ${activeCategoryTab}`}</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (activeCategoryTab === 'WILCOM') {
-                      void downloadWilcomFormHtml(program);
-                    } else {
-                      void downloadProductionSheetHtml(program, activeCategoryTab);
-                    }
-                  }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-800 hover:bg-black text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Download</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowPrintModal(true)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-slate-300 text-slate-800 text-xs font-bold rounded hover:bg-slate-50 transition cursor-pointer"
-                >
-                  <Eye className="w-3.5 h-3.5" />
-                  <span>Print Modal</span>
-                </button>
-              </div>
-            </div>
-
             {/* COMPONENT & WILCOM TAB SELECTOR */}
             <div className="flex items-center gap-2 pb-2 border-b border-black/10 overflow-x-auto">
               {(['TOP', 'BOTTOM', 'DUPATTA'] as GarmentCategory[]).map((cat) => {
@@ -832,7 +786,7 @@ export default function ProgramDetailPage() {
                   >
                     <span>{cat} Sheet</span>
                     {isForwarded && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" title="Forwarded" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" title="Forwarded Component" />
                     )}
                   </button>
                 );
@@ -856,199 +810,20 @@ export default function ProgramDetailPage() {
             </div>
 
             {activeCategoryTab === 'WILCOM' ? (
-              /* WILCOM SPECIFICATIONS VIEW */
-              <div className="space-y-4 pt-1">
-                {wilcomEntries.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {wilcomEntries.map((entry: any, wIdx: number) => {
-                      const photo = entry.photoUrl || (wIdx === 0 ? rootWilcomPhoto : '') || '';
-                      return (
-                        <div key={entry.id || wIdx} className="p-4 border-[1.5px] border-purple-900 rounded-lg bg-white space-y-3 shadow-2xs">
-                          <div className="flex items-center justify-between border-b border-purple-100 pb-2">
-                            <span className="text-[10px] font-black px-2 py-0.5 rounded bg-purple-100 text-purple-900 border border-purple-300 uppercase">
-                              {entry.category || 'EMBROIDERY'}
-                            </span>
-                            <span className="font-mono font-black text-xs text-purple-950">
-                              WILCOM #{entry.wilcomDesignNumber || 'N/A'}
-                            </span>
-                          </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-[140px_1fr] gap-4 items-start">
-                            <div className="w-[140px] h-[140px] border border-purple-200 rounded-md bg-purple-50/40 flex items-center justify-center overflow-hidden shrink-0">
-                              {photo ? (
-                                <img
-                                  src={photo}
-                                  alt={entry.wilcomDesignNumber}
-                                  className="w-full h-full object-contain cursor-pointer hover:scale-105 transition"
-                                  onClick={() => setViewingPhotoModal(photo)}
-                                  title="Click to view full photo"
-                                />
-                              ) : (
-                                <span className="text-[10px] text-slate-400 font-bold text-center p-2">
-                                  No Reference Photo
-                                </span>
-                              )}
-                            </div>
-                            <div className="space-y-1.5 text-xs">
-                              <div className="font-bold text-slate-900 text-sm">{entry.styleName || 'Garment Style'}</div>
-                              {entry.remarks && <p className="text-slate-600 text-[11px] leading-relaxed">{entry.remarks}</p>}
-                              {photo && (
-                                <button
-                                  type="button"
-                                  onClick={() => setViewingPhotoModal(photo)}
-                                  className="text-[11px] font-bold text-purple-700 hover:text-purple-900 flex items-center gap-1 mt-2 cursor-pointer"
-                                >
-                                  <Eye className="w-3.5 h-3.5" />
-                                  <span>View Full Photo</span>
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="p-8 text-center border-2 border-dashed border-slate-300 rounded-lg text-slate-500 text-xs space-y-1">
-                    <p className="font-bold text-slate-700">No Wilcom embroidery designs recorded for this production order.</p>
-                  </div>
-                )}
-              </div>
+              <WilcomSheetView
+                program={program}
+                wilcomEntries={wilcomEntries}
+                rootWilcomPhoto={rootWilcomPhoto}
+                onOpenPrintModal={() => setShowWilcomPrintModal(true)}
+              />
             ) : (
-              /* COMPONENT SHEET VIEW */
-              <div className="space-y-4">
-                {/* AVERAGE TABLE (SUB-STYLES & INDIVIDUAL AVERAGES) */}
-                <div className="space-y-1">
-                  <div className="font-black text-xs uppercase tracking-wider">
-                    {activeCategoryTab} AVERAGE CONSUMPTION (METERS PER PIECE)
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full border-collapse border-[1.5px] border-black text-center text-xs">
-                      <thead>
-                        <tr className="bg-slate-50">
-                          {subStylesWithAverages.map((s, idx) => (
-                            <th key={idx} className="border-[1.5px] border-black p-1.5 font-black text-[11px] uppercase tracking-wider">
-                              {s.name}
-                            </th>
-                          ))}
-                          <th className="border-[1.5px] border-black p-1.5 font-black text-[11px] uppercase tracking-wider bg-slate-100">
-                            TOTAL MTR
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr className="h-7 font-bold text-xs">
-                          {subStylesWithAverages.map((s, idx) => (
-                            <td key={idx} className="border-[1.5px] border-black p-1">
-                              {s.average ? Number(s.average).toFixed(2) : '—'}
-                            </td>
-                          ))}
-                          <td className="border-[1.5px] border-black p-1 font-black bg-slate-100 text-blue-950">
-                            {totalMtrAverage > 0 ? totalMtrAverage.toFixed(2) : '—'}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                {/* MAIN PRODUCTION BREAKDOWN GRID */}
-                <div className="space-y-1 pt-1">
-                  <div className="font-black text-xs uppercase tracking-wider">
-                    {activeCategoryTab} COLOR, QTY &amp; SIZE BREAKDOWN
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full border-collapse border-[1.5px] border-black text-center text-xs">
-                      <thead>
-                        <tr className="bg-slate-50">
-                          <th rowSpan={2} className="border-[1.5px] border-black p-1.5 font-black text-xs uppercase tracking-wider w-32">
-                            COLOR
-                          </th>
-                          <th colSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs uppercase tracking-wider">
-                            QTY
-                          </th>
-                          <th colSpan={subStylesWithAverages.length} className="border-[1.5px] border-black p-1 font-black text-xs uppercase tracking-wider">
-                            SIZE
-                          </th>
-                        </tr>
-                        <tr className="bg-slate-50">
-                          <th className="border-[1.5px] border-black p-1 font-black text-[11px] w-16">PCS</th>
-                          <th className="border-[1.5px] border-black p-1 font-black text-[11px] w-16">MTR</th>
-                          {subStylesWithAverages.map((sub, idx) => (
-                            <th key={idx} className="border-[1.5px] border-black p-1 font-black text-[11px] uppercase">
-                              {sub.name}
-                            </th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {productionGrid.length > 0 ? (
-                          productionGrid.map((row, rIdx) => (
-                            <tr key={rIdx} className="h-7">
-                              <td className="border-[1.5px] border-black px-2 py-1 text-left font-black text-xs">
-                                {row.color}
-                              </td>
-                              <td className="border-[1.5px] border-black px-1 py-1 font-bold text-xs">
-                                {row.pcs}
-                              </td>
-                              <td className="border-[1.5px] border-black px-1 py-1 font-bold text-xs bg-slate-50/50">
-                                {row.mtr}
-                              </td>
-                              {subStylesWithAverages.map((sub, sIdx) => (
-                                <td key={sIdx} className="border-[1.5px] border-black px-1 py-1 font-medium text-xs">
-                                  {row.sizes?.[sub.name] || '—'}
-                                </td>
-                              ))}
-                            </tr>
-                          ))
-                        ) : (
-                          <tr className="h-7">
-                            <td className="border-[1.5px] border-black px-2 py-1 text-left font-black text-xs">
-                              {program.fabricColor || 'Standard'}
-                            </td>
-                            <td className="border-[1.5px] border-black px-1 py-1 font-bold text-xs">
-                              {program.targetQuantity || 0}
-                            </td>
-                            <td className="border-[1.5px] border-black px-1 py-1 font-bold text-xs bg-slate-50/50">
-                              {((program.targetQuantity || 0) * totalMtrAverage).toFixed(2)}
-                            </td>
-                            {subStylesWithAverages.map((_, sIdx) => (
-                              <td key={sIdx} className="border-[1.5px] border-black px-1 py-1 font-medium text-xs">
-                                Free
-                              </td>
-                            ))}
-                          </tr>
-                        )}
-                      </tbody>
-                      <tfoot>
-                        <tr className="bg-slate-100 font-bold border-t-[1.5px] border-black text-xs">
-                          <td className="border-[1.5px] border-black p-1.5 text-right font-black uppercase text-[10px]">
-                            TOTALS:
-                          </td>
-                          <td className="border-[1.5px] border-black p-1.5 text-center font-black text-sm text-[#163767]">
-                            {productionGrid.length > 0 ? productionGrid.reduce((acc, r) => acc + (Number(r.pcs) || 0), 0) : (program.targetQuantity || 0)}
-                          </td>
-                          <td className="border-[1.5px] border-black p-1.5 text-center font-black text-sm text-emerald-800">
-                            {productionGrid.length > 0 
-                              ? (productionGrid.reduce((acc, r) => acc + (Number(r.mtr) || 0), 0)).toFixed(2)
-                              : (((program.targetQuantity || 0) * totalMtrAverage)).toFixed(2)}
-                          </td>
-                          <td colSpan={subStylesWithAverages.length} className="border-[1.5px] border-black p-1.5 text-right text-[10px] text-slate-700 font-bold">
-                            Avg: {totalMtrAverage.toFixed(2)} Mtr/Pc
-                          </td>
-                        </tr>
-                      </tfoot>
-                    </table>
-                  </div>
-                </div>
-
-                {/* NOTE & REMARKS */}
-                {(noteText || program.remarks) && (
-                  <div className="pt-2 text-xs border-t border-black/10">
-                    <span className="font-black text-xs uppercase tracking-wider block mb-0.5">NOTE:-</span>
-                    <p className="text-slate-800 font-sans">{noteText || program.remarks}</p>
-                  </div>
-                )}
-              </div>
+              <ProductionSheetView
+                program={program}
+                activeCategory={activeCategoryTab as GarmentCategory}
+                onCategoryChange={(cat) => setActiveCategoryTab(cat)}
+                onOpenPrintModal={() => setShowPrintModal(true)}
+                isClientCodeVisible={isClientCodeVisible}
+              />
             )}
           </div>
 
@@ -1088,100 +863,25 @@ export default function ProgramDetailPage() {
                 <span>+ Issue New Challan</span>
               </Link>
             </div>
-
-            {challans.length === 0 ? (
-              <div className="p-8 text-center bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-400 space-y-2">
-                <p>No dispatch challans issued for this production sheet yet.</p>
-                <Link
-                  href={`/my-work/issue-challan?programId=${program.id}`}
-                  className="inline-block font-semibold text-blue-700 hover:underline"
-                >
-                  Issue first Challan from Programming to Fabric Store →
-                </Link>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
-                    <tr>
-                      <th className="py-2.5 px-3">Challan No.</th>
-                      <th className="py-2.5 px-3">Handoff Route</th>
-                      <th className="py-2.5 px-3">Dispatched Quantity</th>
-                      <th className="py-2.5 px-3">Status</th>
-                      <th className="py-2.5 px-3">Date</th>
-                      <th className="py-2.5 px-3 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 text-slate-700">
-                    {challans.map((ch) => (
-                      <tr key={ch.id} className="hover:bg-slate-50/70 transition">
-                        <td className="py-3 px-3 font-mono font-bold text-[#163767]">
-                          <Link href={`/challans/${ch.id}`} className="hover:underline">
-                            {ch.challanNumber}
-                          </Link>
-                        </td>
-                        <td className="py-3 px-3 font-medium">
-                          <span className="text-slate-900 font-semibold">{ch.fromDepartment}</span>
-                          <span className="text-slate-400 mx-1">→</span>
-                          <span className="text-blue-900 font-bold">{ch.toDepartment}</span>
-                        </td>
-                        <td className="py-3 px-3 font-mono">
-                          {ch.items?.[0]?.quantity || ch.totalQuantity || '—'} {ch.items?.[0]?.uom || 'PCS'}
-                        </td>
-                        <td className="py-3 px-3">
-                          <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-800 border border-blue-200">
-                            {ch.status}
-                          </span>
-                        </td>
-                        <td className="py-3 px-3 text-[11px] text-slate-500">
-                          {ch.createdAt ? new Date(ch.createdAt).toLocaleDateString() : '—'}
-                        </td>
-                        <td className="py-3 px-3 text-right">
-                          <div className="flex items-center justify-end gap-1.5 flex-wrap">
-                            <button
-                              type="button"
-                              onClick={() => downloadChallanHtml(ch)}
-                              className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-700 hover:text-emerald-900 bg-slate-100 hover:bg-emerald-50 px-2 py-1 rounded border border-slate-200 transition cursor-pointer"
-                              title="Download Challan as standalone HTML/PDF"
-                            >
-                              <Download className="w-3 h-3 text-emerald-600" />
-                              <span>Download</span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => printChallan(ch)}
-                              className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-700 hover:text-blue-900 bg-slate-100 hover:bg-blue-50 px-2 py-1 rounded border border-slate-200 transition cursor-pointer"
-                              title="Print Challan Slip"
-                            >
-                              <Printer className="w-3 h-3 text-slate-500" />
-                              <span>Print</span>
-                            </button>
-                            <Link
-                              href={`/challans/${ch.id}`}
-                              className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded transition"
-                            >
-                              <Eye className="w-3 h-3" />
-                              <span>View</span>
-                            </Link>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+            <ChallanListTable challans={challans} emptyMessage="No dispatch challans issued for this production sheet yet." />
           </div>
 
         </div>
 
       </main>
 
-      {/* PRINT & DOWNLOAD MODAL */}
+      {/* PRINT & DOWNLOAD MODALS */}
       <ProductionSheetPrintModal
         program={program}
         isOpen={showPrintModal}
         onClose={() => setShowPrintModal(false)}
+        initialTab={activeCategoryTab === 'WILCOM' ? 'TOP' : activeCategoryTab}
+      />
+
+      <WilcomPrintModal
+        program={program}
+        isOpen={showWilcomPrintModal}
+        onClose={() => setShowWilcomPrintModal(false)}
       />
 
       {/* PHOTO LIGHTBOX MODAL */}
