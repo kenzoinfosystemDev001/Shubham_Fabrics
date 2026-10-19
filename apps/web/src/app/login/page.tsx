@@ -16,6 +16,7 @@ import {
   CheckCircle2,
   Scissors,
   Waves,
+  Shirt,
 } from 'lucide-react';
 
 interface StationOption {
@@ -127,6 +128,15 @@ const STATIONS: StationOption[] = [
     accentColor: 'text-rose-400',
     borderActive: 'border-rose-500/80 shadow-[0_0_15px_rgba(244,63,94,0.25)]',
     bgActive: 'bg-rose-500/15 text-white',
+  },
+  {
+    id: 'stitching',
+    name: 'Stitching',
+    username: 'stitching',
+    icon: Shirt,
+    accentColor: 'text-indigo-400',
+    borderActive: 'border-indigo-500/80 shadow-[0_0_15px_rgba(99,102,241,0.25)]',
+    bgActive: 'bg-indigo-500/15 text-white',
   },
 ];
 

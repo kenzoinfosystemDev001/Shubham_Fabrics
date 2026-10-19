@@ -114,6 +114,16 @@ const DEPARTMENTS = [
     hoverClass: 'hover:bg-rose-500/10 hover:text-rose-300',
     activeBg: 'bg-rose-500/15 text-rose-300 font-bold',
   },
+  {
+    name: 'Stitching & Assembly',
+    code: 'STITCHING',
+    href: '/stitching',
+    color: 'indigo',
+    badge: 'STC',
+    dotClass: 'bg-indigo-400',
+    hoverClass: 'hover:bg-indigo-500/10 hover:text-indigo-300',
+    activeBg: 'bg-indigo-500/15 text-indigo-300 font-bold',
+  },
 ];
 
 export function DepartmentSwitcher({

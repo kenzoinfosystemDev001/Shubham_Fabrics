@@ -19,6 +19,7 @@ export type DepartmentScope =
   | 'WASHING'
   | 'QC3'
   | 'RECUTTING'
+  | 'STITCHING'
   | 'PROGRAMMING'
   | 'ADMIN'
   | 'AUTH'
@@ -35,6 +36,7 @@ export function getDepartmentScope(path: string): DepartmentScope {
   if (path.startsWith('/washing')) return 'WASHING';
   if (path.startsWith('/qcwashing') || path.startsWith('/qc3') || path.startsWith('/qc-washing')) return 'QC3';
   if (path.startsWith('/recutting')) return 'RECUTTING';
+  if (path.startsWith('/stitching')) return 'STITCHING';
   if (path.startsWith('/programming')) return 'PROGRAMMING';
   if (path.startsWith('/admin')) return 'ADMIN';
   if (path.startsWith('/challans') || path.startsWith('/programs')) return 'SHARED';
@@ -52,6 +54,7 @@ export function getDepartmentRoot(scope: DepartmentScope): string {
     case 'WASHING': return '/washing';
     case 'QC3': return '/qcwashing';
     case 'RECUTTING': return '/recutting';
+    case 'STITCHING': return '/stitching';
     case 'PROGRAMMING': return '/programming';
     case 'ADMIN': return '/admin';
     default: return '/login';
