@@ -28,18 +28,19 @@ export default function QCWashingIssueChallanPage() {
   const [selectedSheetForView, setSelectedSheetForView] = useState<any | null>(null);
   const [generatedChallan, setGeneratedChallan] = useState<any | null>(null);
   const [challanNumber, setChallanNumber] = useState('');
-  const [toDepartment, setToDepartment] = useState('FINISHING');
+  const [toDepartment, setToDepartment] = useState('RECUTTING');
   const [priority, setPriority] = useState('NORMAL');
-  const [remarks, setRemarks] = useState('QC Washing Verified & Approved pieces handover to Finishing for pressing and packing.');
+  const [remarks, setRemarks] = useState('QC Washing Verified & Approved pieces handover to Recutting Section for embroidery precision cutting.');
   
   const [items, setItems] = useState([
     {
-      itemDescription: 'Verified Washed Pieces - Approved for Finishing',
+      itemDescription: 'Verified Washed Pieces - Approved for Recutting',
       fabricCode: 'PIECE',
       colour: 'Standard',
       quantity: '',
       uom: 'PCS',
-      remarks: 'QC Washing approved. No wash stains or shrinkage deviations.',
+      unitType: 'PCS',
+      remarks: 'QC Washing approved. Ready for embroidery precision cutting.',
     },
   ]);
 
@@ -76,6 +77,7 @@ export default function QCWashingIssueChallanPage() {
         colour: 'Standard',
         quantity: '',
         uom: 'PCS',
+        unitType: 'PCS',
         remarks: 'QC Washing approved.',
       },
     ]);
@@ -198,6 +200,7 @@ export default function QCWashingIssueChallanPage() {
                 onChange={(e) => setToDepartment(e.target.value)}
                 className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
               >
+                <option value="RECUTTING">RECUTTING (Embroidery Recutting & Panel Separation)</option>
                 <option value="FINISHING">FINISHING (Finishing & Steam Pressing)</option>
                 <option value="STORE">STORE (Raw Material & Fabric Store)</option>
                 <option value="WASHING">WASHING (Re-wash handoff)</option>

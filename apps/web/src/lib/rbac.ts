@@ -276,9 +276,31 @@ export function isQcWashingUser(user: MESUser | null): boolean {
   );
 }
 
+export function isRecuttingUser(user: MESUser | null): boolean {
+  if (!user) return false;
+  if (isAdminUser(user)) return true; // Admins have all access
+
+  const username = (user.username || '').toLowerCase();
+  const dept = (user.departmentCode || '').toUpperCase();
+  const role = (user.role || '').toUpperCase();
+  const roles = (user.roles || []).map((r) => r.toUpperCase());
+
+  return (
+    username === 'recutting' ||
+    dept === 'RECUTTING' ||
+    role === 'RECUTTING_SUPERVISOR' ||
+    role === 'RECUTTING_OPERATOR' ||
+    role === 'RECUTTING_INCHARGE' ||
+    roles.includes('RECUTTING_SUPERVISOR') ||
+    roles.includes('RECUTTING_OPERATOR') ||
+    roles.includes('RECUTTING_INCHARGE')
+  );
+}
+
 export function getUserStationHome(user: MESUser | null): string {
   if (!user) return '/login';
   if (isAdminUser(user)) return '/admin';
+  if (isRecuttingUser(user)) return '/recutting';
   if (isQcWashingUser(user)) return '/qcwashing';
   if (isWashingUser(user)) return '/washing';
   if (isQc1User(user)) return '/qc1';
@@ -406,6 +428,18 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
       allowed: false,
       redirectTarget: defaultUserHome,
       reason: 'Access Restricted: You are not authorized for the QC Washing Department. Access is restricted to QC Washing personnel and Admins.',
+    };
+  }
+
+  // Recutting Department routes protection
+  if (pathname.startsWith('/recutting')) {
+    if (isRecuttingUser(user)) {
+      return { allowed: true, redirectTarget: pathname };
+    }
+    return {
+      allowed: false,
+      redirectTarget: defaultUserHome,
+      reason: 'Access Restricted: You are not authorized for the Recutting Department. Access is restricted to Recutting personnel and Admins.',
     };
   }
 

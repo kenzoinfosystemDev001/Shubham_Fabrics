@@ -43,7 +43,7 @@ export const DEPARTMENT_LABELS: Record<DepartmentCode, string> = {
   [DepartmentCode.THREAD_CUTTING]: 'Thread Cutting & Clean-up',
   [DepartmentCode.WASHING]: 'Garment Wash & Laundry',
   [DepartmentCode.QC2]: 'Thread Cut QC',
-  [DepartmentCode.RECUTTING]: 'Panel Re-Cutting Section',
+  [DepartmentCode.RECUTTING]: 'Embroidery Recutting Department',
   [DepartmentCode.STITCHING]: 'Stitching & Assembly Lines',
   [DepartmentCode.QC3]: 'QC Washing',
   [DepartmentCode.QCWASHING]: 'QC Washing',
