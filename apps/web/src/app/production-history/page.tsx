@@ -31,6 +31,10 @@ import {
   downloadProductionSheetHtml,
   printProductionSheet,
 } from '@/lib/download-production-sheet';
+import {
+  downloadChallanHtml,
+  printChallan,
+} from '@/lib/download-challan';
 
 export default function ProductionHistoryPage() {
   const router = useRouter();
@@ -546,12 +550,32 @@ export default function ProductionHistoryPage() {
                                   <span>Date:</span>
                                   <span>{c.challanDate ? new Date(c.challanDate).toLocaleDateString() : '—'}</span>
                                 </div>
-                                <div className="pt-1.5 border-t border-slate-100 flex items-center justify-end">
+                                <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-1 flex-wrap">
+                                  <div className="flex items-center gap-1">
+                                    <button
+                                      type="button"
+                                      onClick={() => downloadChallanHtml(c)}
+                                      className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-slate-700 hover:text-emerald-900 bg-slate-100 hover:bg-emerald-50 px-2 py-1 rounded transition cursor-pointer"
+                                      title="Download Challan as standalone HTML/PDF"
+                                    >
+                                      <Download className="w-3 h-3 text-emerald-600" />
+                                      <span>Download</span>
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => printChallan(c)}
+                                      className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-slate-700 hover:text-blue-900 bg-slate-100 hover:bg-blue-50 px-2 py-1 rounded transition cursor-pointer"
+                                      title="Print Challan Slip"
+                                    >
+                                      <Printer className="w-3 h-3 text-slate-500" />
+                                      <span>Print</span>
+                                    </button>
+                                  </div>
                                   <Link
                                     href={`/challans/${c.id}`}
                                     className="text-[11px] font-bold text-blue-700 hover:text-blue-900 transition flex items-center gap-1"
                                   >
-                                    <span>View Challan Details</span>
+                                    <span>View Slip</span>
                                     <ArrowRight className="w-3 h-3" />
                                   </Link>
                                 </div>

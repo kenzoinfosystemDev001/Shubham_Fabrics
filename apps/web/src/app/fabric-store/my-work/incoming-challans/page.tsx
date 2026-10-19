@@ -11,9 +11,19 @@ import {
   FileText, 
   Send, 
   ArrowUpFromLine, 
-  Eye 
+  Eye,
+  Printer,
+  Download 
 } from 'lucide-react';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
+import { 
+  downloadProductionSheetHtml, 
+  printProductionSheet 
+} from '@/lib/download-production-sheet';
+import { 
+  downloadChallanHtml, 
+  printChallan 
+} from '@/lib/download-challan';
 
 export default function IncomingChallansPage() {
   const [loading, setLoading] = useState(true);
@@ -245,16 +255,55 @@ export default function IncomingChallansPage() {
                               </>
                             )}
 
+                            {/* CHALLAN ACTIONS */}
+                            <button
+                              type="button"
+                              onClick={() => downloadChallanHtml(ch)}
+                              className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-700 hover:text-emerald-900 bg-slate-100 hover:bg-emerald-50 px-2 py-1 rounded border border-slate-200 transition cursor-pointer"
+                              title="Download Challan as standalone HTML/PDF"
+                            >
+                              <Download className="w-3 h-3 text-emerald-600" />
+                              <span>Challan</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => printChallan(ch)}
+                              className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-700 hover:text-blue-900 bg-slate-100 hover:bg-blue-50 px-2 py-1 rounded border border-slate-200 transition cursor-pointer"
+                              title="Print Challan Slip"
+                            >
+                              <Printer className="w-3 h-3 text-slate-500" />
+                              <span>Print</span>
+                            </button>
+
+                            {/* PRODUCTION SHEET ACCOMPANYING ACTIONS */}
                             {ch.program && (
-                              <button
-                                type="button"
-                                onClick={() => setSelectedSheetModal(ch.program)}
-                                className="inline-flex items-center gap-1 text-[11px] font-bold text-teal-800 hover:text-teal-900 bg-teal-50 hover:bg-teal-100 border border-teal-200 px-2 py-1 rounded transition cursor-pointer"
-                                title="View accompanying Production Sheet from Programming"
-                              >
-                                <FileText className="w-3.5 h-3.5 text-teal-700" />
-                                <span>View Sheet</span>
-                              </button>
+                              <div className="flex items-center gap-1 bg-teal-50 border border-teal-200 px-1.5 py-0.5 rounded">
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedSheetModal(ch.program)}
+                                  className="inline-flex items-center gap-1 text-[11px] font-bold text-teal-800 hover:text-teal-900 transition cursor-pointer"
+                                  title="View accompanying Production Sheet from Programming"
+                                >
+                                  <FileText className="w-3 h-3 text-teal-700" />
+                                  <span>Sheet</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => downloadProductionSheetHtml(ch.program)}
+                                  className="p-0.5 text-teal-700 hover:text-teal-900 hover:bg-teal-100 rounded transition cursor-pointer"
+                                  title="Download Production Sheet HTML"
+                                >
+                                  <Download className="w-3 h-3" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => printProductionSheet(ch.program)}
+                                  className="p-0.5 text-teal-700 hover:text-teal-900 hover:bg-teal-100 rounded transition cursor-pointer"
+                                  title="Print Production Sheet on A4"
+                                >
+                                  <Printer className="w-3 h-3" />
+                                </button>
+                              </div>
                             )}
 
                             <Link

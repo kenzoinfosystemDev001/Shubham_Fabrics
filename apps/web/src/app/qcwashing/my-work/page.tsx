@@ -37,6 +37,14 @@ import {
 } from 'lucide-react';
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
+import { 
+  downloadProductionSheetHtml, 
+  printProductionSheet 
+} from '@/lib/download-production-sheet';
+import { 
+  downloadChallanHtml, 
+  printChallan 
+} from '@/lib/download-challan';
 import BarcodeStickerCard from '@/components/BarcodeStickerCard';
 
 interface QCWashingChallan {
@@ -804,53 +812,109 @@ export default function QCWashingMyWorkPage() {
                               </span>
                             </td>
                             <td className="py-3 px-4 text-right">
-                              <div className="flex items-center justify-end gap-1.5">
-                                {/* RECEIVE BUTTON */}
-                                {isPending && (
-                                  <button
-                                    onClick={() => handleReceiveChallan(c)}
-                                    disabled={submittingAction}
-                                    className="px-2.5 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded text-[11px] font-bold flex items-center gap-1 transition shadow-2xs"
-                                  >
-                                    <Check className="w-3 h-3" />
-                                    <span>Receive</span>
-                                  </button>
-                                )}
+                              <div className="flex flex-col items-end gap-1.5">
+                                {/* WORKFLOW BUTTONS */}
+                                <div className="flex items-center gap-1.5">
+                                  {/* RECEIVE BUTTON */}
+                                  {isPending && (
+                                    <button
+                                      onClick={() => handleReceiveChallan(c)}
+                                      disabled={submittingAction}
+                                      className="px-2.5 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded text-[11px] font-bold flex items-center gap-1 transition shadow-2xs"
+                                    >
+                                      <Check className="w-3 h-3" />
+                                      <span>Receive</span>
+                                    </button>
+                                  )}
 
-                                {/* INSPECT / VERIFY BUTTON */}
-                                {(isReceived || isUnderInspection) && (
-                                  <button
-                                    onClick={() => handleOpenInspectModal(c)}
-                                    className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[11px] font-bold flex items-center gap-1 transition shadow-2xs"
-                                  >
-                                    <ShieldCheck className="w-3 h-3" />
-                                    <span>Verify Work</span>
-                                  </button>
-                                )}
+                                  {/* INSPECT / VERIFY BUTTON */}
+                                  {(isReceived || isUnderInspection) && (
+                                    <button
+                                      onClick={() => handleOpenInspectModal(c)}
+                                      className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[11px] font-bold flex items-center gap-1 transition shadow-2xs"
+                                    >
+                                      <ShieldCheck className="w-3 h-3" />
+                                      <span>Verify Work</span>
+                                    </button>
+                                  )}
 
-                                {/* HANDOVER TO FINISHING BUTTON */}
-                                {isApproved && (
-                                  <button
-                                    onClick={() => handleIssueToFinishing(c)}
-                                    disabled={submittingAction}
-                                    className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-[11px] font-bold flex items-center gap-1 transition shadow-2xs"
-                                    title="Issue Handover Challan to Finishing"
-                                  >
-                                    <PackageCheck className="w-3 h-3" />
-                                    <span>To Finishing</span>
-                                  </button>
-                                )}
+                                  {/* HANDOVER TO FINISHING BUTTON */}
+                                  {isApproved && (
+                                    <button
+                                      onClick={() => handleIssueToFinishing(c)}
+                                      disabled={submittingAction}
+                                      className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-[11px] font-bold flex items-center gap-1 transition shadow-2xs"
+                                      title="Issue Handover Challan to Finishing"
+                                    >
+                                      <PackageCheck className="w-3 h-3" />
+                                      <span>To Finishing</span>
+                                    </button>
+                                  )}
+                                </div>
 
-                                {/* VIEW SHEET BUTTON */}
-                                {c.program && (
-                                  <button
-                                    onClick={() => setSelectedSheetForView(c.program)}
-                                    className="p-1 hover:bg-slate-100 text-slate-500 rounded transition"
-                                    title="View Production Sheet"
+                                {/* CHALLAN & SHEET ACTIONS */}
+                                <div className="flex items-center gap-1 flex-wrap justify-end">
+                                  {/* CHALLAN CLUSTER */}
+                                  <Link
+                                    href={`/challans/${c.id}`}
+                                    className="px-1.5 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] font-semibold flex items-center gap-0.5"
+                                    title="View Challan Slip"
                                   >
-                                    <FileText className="w-3.5 h-3.5" />
+                                    <Eye className="w-2.5 h-2.5" />
+                                    <span>Slip</span>
+                                  </Link>
+                                  <button
+                                    type="button"
+                                    onClick={() => downloadChallanHtml(c)}
+                                    className="px-1.5 py-0.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded text-[10px] font-semibold flex items-center gap-0.5"
+                                    title="Download Challan HTML"
+                                  >
+                                    <Download className="w-2.5 h-2.5" />
+                                    <span>Challan</span>
                                   </button>
-                                )}
+                                  <button
+                                    type="button"
+                                    onClick={() => printChallan(c)}
+                                    className="px-1.5 py-0.5 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded text-[10px] font-semibold flex items-center gap-0.5"
+                                    title="Print Challan Slip"
+                                  >
+                                    <Printer className="w-2.5 h-2.5" />
+                                    <span>Print</span>
+                                  </button>
+
+                                  {/* PRODUCTION SHEET CLUSTER */}
+                                  {c.program && (
+                                    <>
+                                      <button
+                                        type="button"
+                                        onClick={() => setSelectedSheetForView(c.program)}
+                                        className="px-1.5 py-0.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded text-[10px] font-semibold flex items-center gap-0.5 ml-1"
+                                        title="View Production Sheet Traveler"
+                                      >
+                                        <FileText className="w-2.5 h-2.5" />
+                                        <span>Sheet</span>
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => downloadProductionSheetHtml(c.program)}
+                                        className="px-1.5 py-0.5 bg-sky-50 hover:bg-sky-100 text-sky-700 rounded text-[10px] font-semibold flex items-center gap-0.5"
+                                        title="Download Production Sheet HTML"
+                                      >
+                                        <Download className="w-2.5 h-2.5" />
+                                        <span>Sheet</span>
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => printProductionSheet(c.program)}
+                                        className="px-1.5 py-0.5 bg-blue-100/70 hover:bg-blue-200/70 text-blue-800 rounded text-[10px] font-semibold flex items-center gap-0.5"
+                                        title="Print Production Sheet Traveler"
+                                      >
+                                        <Printer className="w-2.5 h-2.5" />
+                                        <span>Sheet</span>
+                                      </button>
+                                    </>
+                                  )}
+                                </div>
                               </div>
                             </td>
                           </tr>
@@ -905,7 +969,27 @@ export default function QCWashingMyWorkPage() {
                           </div>
                           <p className="text-slate-600 text-[11px]">{c.remarks}</p>
                         </div>
-                        <span className="font-mono font-bold text-rose-700 text-sm">{qty} PCS</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono font-bold text-rose-700 text-sm">{qty} PCS</span>
+                          <button
+                            type="button"
+                            onClick={() => downloadChallanHtml(c)}
+                            className="px-2 py-0.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded text-[10px] font-semibold flex items-center gap-1"
+                            title="Download Challan HTML"
+                          >
+                            <Download className="w-2.5 h-2.5" />
+                            <span>Challan</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => printChallan(c)}
+                            className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] font-semibold flex items-center gap-1"
+                            title="Print Challan Slip"
+                          >
+                            <Printer className="w-2.5 h-2.5" />
+                            <span>Print</span>
+                          </button>
+                        </div>
                       </div>
                     );
                   })}
@@ -956,7 +1040,27 @@ export default function QCWashingMyWorkPage() {
                           </div>
                           <p className="text-slate-600 text-[11px]">{c.remarks}</p>
                         </div>
-                        <span className="font-mono font-bold text-orange-700 text-sm">{qty} PCS</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono font-bold text-orange-700 text-sm">{qty} PCS</span>
+                          <button
+                            type="button"
+                            onClick={() => downloadChallanHtml(c)}
+                            className="px-2 py-0.5 bg-orange-50 hover:bg-orange-100 text-orange-700 rounded text-[10px] font-semibold flex items-center gap-1"
+                            title="Download Challan HTML"
+                          >
+                            <Download className="w-2.5 h-2.5" />
+                            <span>Challan</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => printChallan(c)}
+                            className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] font-semibold flex items-center gap-1"
+                            title="Print Challan Slip"
+                          >
+                            <Printer className="w-2.5 h-2.5" />
+                            <span>Print</span>
+                          </button>
+                        </div>
                       </div>
                     );
                   })}
@@ -988,13 +1092,31 @@ export default function QCWashingMyWorkPage() {
                     <p className="font-medium text-slate-800">{prog.clientName}</p>
                     <p className="text-[11px] text-slate-500">{prog.fabricName} ({prog.fabricColor})</p>
                   </div>
-                  <button
-                    onClick={() => setSelectedSheetForView(prog)}
-                    className="w-full mt-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition"
-                  >
-                    <FileText className="w-3.5 h-3.5" />
-                    <span>View Full Tech Sheet</span>
-                  </button>
+                  <div className="flex items-center gap-1.5 mt-3">
+                    <button
+                      onClick={() => setSelectedSheetForView(prog)}
+                      className="flex-1 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition"
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      <span>View</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => downloadProductionSheetHtml(prog)}
+                      className="p-1.5 bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 rounded-lg text-xs font-semibold transition"
+                      title="Download Production Sheet HTML"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => printProductionSheet(prog)}
+                      className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition"
+                      title="Print Production Sheet Traveler"
+                    >
+                      <Printer className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -1020,12 +1142,45 @@ export default function QCWashingMyWorkPage() {
                   </p>
                 </div>
               </div>
-              <button
-                onClick={() => setSelectedChallanForInspect(null)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2">
+                {selectedChallanForInspect.program && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedSheetForView(selectedChallanForInspect.program)}
+                      className="px-2.5 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded text-xs font-semibold flex items-center gap-1 transition"
+                      title="View Official Production Sheet"
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      <span>Sheet</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => downloadProductionSheetHtml(selectedChallanForInspect.program)}
+                      className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded text-xs font-semibold flex items-center gap-1 transition"
+                      title="Download Production Sheet HTML"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>Download</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => printProductionSheet(selectedChallanForInspect.program)}
+                      className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded text-xs font-semibold flex items-center gap-1 transition"
+                      title="Print Production Sheet Traveler"
+                    >
+                      <Printer className="w-3.5 h-3.5" />
+                      <span>Print</span>
+                    </button>
+                  </>
+                )}
+                <button
+                  onClick={() => setSelectedChallanForInspect(null)}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             {/* Modal Form */}
@@ -1271,6 +1426,25 @@ export default function QCWashingMyWorkPage() {
                   {finishingChallanModal.items?.[0]?.quantity || 0} PCS
                 </span>
               </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => downloadChallanHtml(finishingChallanModal)}
+                className="flex-1 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5"
+              >
+                <Download className="w-4 h-4" />
+                <span>Download Challan</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => printChallan(finishingChallanModal)}
+                className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5"
+              >
+                <Printer className="w-4 h-4" />
+                <span>Print Challan</span>
+              </button>
             </div>
 
             <button

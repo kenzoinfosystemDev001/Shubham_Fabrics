@@ -36,6 +36,10 @@ import {
   downloadProductionSheetHtml,
   printProductionSheet,
 } from '@/lib/download-production-sheet';
+import {
+  downloadChallanHtml,
+  printChallan,
+} from '@/lib/download-challan';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import {
   ColorFabricMeasurementTable,
@@ -802,22 +806,74 @@ export default function DyeingMyWorkPage() {
                                 </button>
                               )}
 
-                              {/* VIEW PRODUCTION SHEET */}
-                              <button
-                                type="button"
-                                onClick={() => setSelectedOrderForSheet(order)}
-                                title="Show Production Sheet (View, Print & Download)"
-                                className="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md transition"
-                              >
-                                <Eye className="w-4 h-4" />
-                              </button>
+                              {/* INBOUND CHALLAN ACTIONS */}
+                              {order.inboundChallan && (
+                                <div className="flex items-center gap-1 bg-purple-50 border border-purple-200 px-1.5 py-0.5 rounded">
+                                  <Link
+                                    href={`/challans/${order.inboundChallan.id}`}
+                                    className="text-[10px] font-bold text-purple-800 hover:text-purple-950"
+                                    title="View Inbound Challan Slip"
+                                  >
+                                    Challan
+                                  </Link>
+                                  <button
+                                    type="button"
+                                    onClick={() => downloadChallanHtml(order.inboundChallan)}
+                                    className="p-0.5 text-purple-700 hover:text-purple-900 rounded cursor-pointer"
+                                    title="Download Inbound Challan HTML"
+                                  >
+                                    <Download className="w-3 h-3 text-purple-700" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => printChallan(order.inboundChallan)}
+                                    className="p-0.5 text-purple-700 hover:text-purple-900 rounded cursor-pointer"
+                                    title="Print Inbound Challan Slip"
+                                  >
+                                    <Printer className="w-3 h-3 text-purple-700" />
+                                  </button>
+                                </div>
+                              )}
+
+                              {/* PRODUCTION SHEET ACTIONS */}
+                              <div className="flex items-center gap-1 bg-blue-50 border border-blue-200 px-1.5 py-0.5 rounded">
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedOrderForSheet(order)}
+                                  title="Show Production Sheet (View, Print & Download)"
+                                  className="inline-flex items-center gap-0.5 text-[10px] font-bold text-blue-800 hover:text-blue-950 cursor-pointer"
+                                >
+                                  <FileText className="w-3 h-3 text-blue-700" />
+                                  <span>Sheet</span>
+                                </button>
+                                {order.program && (
+                                  <>
+                                    <button
+                                      type="button"
+                                      onClick={() => downloadProductionSheetHtml(order.program)}
+                                      title="Download Production Sheet HTML"
+                                      className="p-0.5 text-blue-700 hover:text-blue-900 rounded cursor-pointer"
+                                    >
+                                      <Download className="w-3 h-3 text-emerald-600" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => printProductionSheet(order.program)}
+                                      title="Print Production Sheet on A4"
+                                      className="p-0.5 text-blue-700 hover:text-blue-900 rounded cursor-pointer"
+                                    >
+                                      <Printer className="w-3 h-3 text-slate-600" />
+                                    </button>
+                                  </>
+                                )}
+                              </div>
 
                               {/* RECORD DYEING PROGRESS */}
                               <button
                                 type="button"
                                 onClick={() => openUpdateModal(order)}
                                 title="Record Dyeing Progress & Quantities"
-                                className="p-1.5 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-md transition"
+                                className="p-1.5 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-md transition cursor-pointer"
                               >
                                 <Edit3 className="w-4 h-4" />
                               </button>
@@ -827,7 +883,7 @@ export default function DyeingMyWorkPage() {
                                 type="button"
                                 onClick={() => handleStartCreateChallan(order)}
                                 title="Create Challan to QC1 (Quality Check 1)"
-                                className="inline-flex items-center gap-1 px-2.5 py-1 bg-purple-700 hover:bg-purple-800 text-white rounded text-xs font-bold transition shadow-2xs"
+                                className="inline-flex items-center gap-1 px-2.5 py-1 bg-purple-700 hover:bg-purple-800 text-white rounded text-xs font-bold transition shadow-2xs cursor-pointer"
                               >
                                 <Send className="w-3 h-3" />
                                 <span>To QC1</span>

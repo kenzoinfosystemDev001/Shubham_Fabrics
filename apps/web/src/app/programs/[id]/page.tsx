@@ -32,11 +32,16 @@ import {
   extractSubStylesAndGrid,
   GarmentCategory
 } from '@/lib/download-production-sheet';
+import { 
+  downloadChallanHtml, 
+  printChallan 
+} from '@/lib/download-challan';
 
 export default function ProgramDetailPage() {
   const { id } = useParams() as { id: string };
   const router = useRouter();
   const [program, setProgram] = useState<any>(null);
+  const [challans, setChallans] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showPrintModal, setShowPrintModal] = useState(false);
@@ -50,8 +55,12 @@ export default function ProgramDetailPage() {
   const loadProgram = async () => {
     try {
       setLoading(true);
-      const data = await api.getProgram(id);
+      const [data, challansData] = await Promise.all([
+        api.getProgram(id),
+        api.getChallans({ programId: id }).catch(() => [])
+      ]);
       setProgram(data);
+      setChallans(challansData || []);
     } catch (err: any) {
       setError(err.message || 'Failed to load Production Sheet');
     } finally {
@@ -821,6 +830,110 @@ export default function ProgramDetailPage() {
                 <span className="text-slate-800">{program.productionEndDate ? new Date(program.productionEndDate).toLocaleDateString() : '—'}</span>
               </div>
             </div>
+          </div>
+
+          {/* DISPATCHED CHALLANS ACCOMPANYING THIS PRODUCTION SHEET */}
+          <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-4 md:col-span-2">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900">
+                  Accompanying Departmental Challans ({challans.length})
+                </h3>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  Physical and digital challans traveling department-to-department with this Production Sheet
+                </p>
+              </div>
+              <Link
+                href={`/my-work/issue-challan?programId=${program.id}`}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#163767] hover:bg-[#0F264A] text-white text-xs font-semibold rounded-md shadow-xs transition"
+              >
+                <Send className="w-3.5 h-3.5" />
+                <span>+ Issue New Challan</span>
+              </Link>
+            </div>
+
+            {challans.length === 0 ? (
+              <div className="p-8 text-center bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-400 space-y-2">
+                <p>No dispatch challans issued for this production sheet yet.</p>
+                <Link
+                  href={`/my-work/issue-challan?programId=${program.id}`}
+                  className="inline-block font-semibold text-blue-700 hover:underline"
+                >
+                  Issue first Challan from Programming to Fabric Store →
+                </Link>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                    <tr>
+                      <th className="py-2.5 px-3">Challan No.</th>
+                      <th className="py-2.5 px-3">Handoff Route</th>
+                      <th className="py-2.5 px-3">Dispatched Quantity</th>
+                      <th className="py-2.5 px-3">Status</th>
+                      <th className="py-2.5 px-3">Date</th>
+                      <th className="py-2.5 px-3 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 text-slate-700">
+                    {challans.map((ch) => (
+                      <tr key={ch.id} className="hover:bg-slate-50/70 transition">
+                        <td className="py-3 px-3 font-mono font-bold text-[#163767]">
+                          <Link href={`/challans/${ch.id}`} className="hover:underline">
+                            {ch.challanNumber}
+                          </Link>
+                        </td>
+                        <td className="py-3 px-3 font-medium">
+                          <span className="text-slate-900 font-semibold">{ch.fromDepartment}</span>
+                          <span className="text-slate-400 mx-1">→</span>
+                          <span className="text-blue-900 font-bold">{ch.toDepartment}</span>
+                        </td>
+                        <td className="py-3 px-3 font-mono">
+                          {ch.items?.[0]?.quantity || ch.totalQuantity || '—'} {ch.items?.[0]?.uom || 'PCS'}
+                        </td>
+                        <td className="py-3 px-3">
+                          <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-800 border border-blue-200">
+                            {ch.status}
+                          </span>
+                        </td>
+                        <td className="py-3 px-3 text-[11px] text-slate-500">
+                          {ch.createdAt ? new Date(ch.createdAt).toLocaleDateString() : '—'}
+                        </td>
+                        <td className="py-3 px-3 text-right">
+                          <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                            <button
+                              type="button"
+                              onClick={() => downloadChallanHtml(ch)}
+                              className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-700 hover:text-emerald-900 bg-slate-100 hover:bg-emerald-50 px-2 py-1 rounded border border-slate-200 transition cursor-pointer"
+                              title="Download Challan as standalone HTML/PDF"
+                            >
+                              <Download className="w-3 h-3 text-emerald-600" />
+                              <span>Download</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => printChallan(ch)}
+                              className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-700 hover:text-blue-900 bg-slate-100 hover:bg-blue-50 px-2 py-1 rounded border border-slate-200 transition cursor-pointer"
+                              title="Print Challan Slip"
+                            >
+                              <Printer className="w-3 h-3 text-slate-500" />
+                              <span>Print</span>
+                            </button>
+                            <Link
+                              href={`/challans/${ch.id}`}
+                              className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded transition"
+                            >
+                              <Eye className="w-3 h-3" />
+                              <span>View</span>
+                            </Link>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
 
         </div>

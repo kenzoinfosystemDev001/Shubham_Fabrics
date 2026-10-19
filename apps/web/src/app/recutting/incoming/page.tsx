@@ -18,8 +18,20 @@ import {
   X,
   Clock,
   ShieldCheck,
+  Eye,
+  Download,
+  Printer,
 } from 'lucide-react';
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
+import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
+import { 
+  downloadProductionSheetHtml, 
+  printProductionSheet 
+} from '@/lib/download-production-sheet';
+import { 
+  downloadChallanHtml, 
+  printChallan 
+} from '@/lib/download-challan';
 
 export default function RecuttingIncomingPage() {
   const router = useRouter();
@@ -28,6 +40,7 @@ export default function RecuttingIncomingPage() {
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'ALL' | 'ISSUED' | 'RECEIVED'>('ALL');
+  const [viewSheetProgram, setViewSheetProgram] = useState<any | null>(null);
 
   // Receive modal state
   const [selectedChallan, setSelectedChallan] = useState<any>(null);
@@ -348,25 +361,90 @@ export default function RecuttingIncomingPage() {
                     </div>
                   </div>
 
-                  {/* Actions footer */}
-                  <div className="p-3 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between gap-2">
-                    {isIssued ? (
-                      <button
-                        onClick={() => openReceiveModal(ch)}
-                        className="w-full py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-bold transition shadow-xs flex items-center justify-center gap-1.5"
-                      >
-                        <ArrowDownLeft className="w-3.5 h-3.5" />
-                        <span>Perform Physical Check & Receive</span>
-                      </button>
-                    ) : (
-                      <Link
-                        href={`/recutting/my-work?jobId=${ch.id}`}
-                        className="w-full py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-bold transition shadow-xs flex items-center justify-center gap-1.5"
-                      >
-                        <Scissors className="w-3.5 h-3.5" />
-                        <span>Open Cutting Workstation</span>
-                      </Link>
-                    )}
+                  {/* Actions toolbar */}
+                  <div className="p-3 bg-slate-50/80 border-t border-slate-100 space-y-2">
+                    <div className="flex items-center justify-between gap-1 flex-wrap">
+                      <div className="flex items-center gap-1">
+                        <Link
+                          href={`/challans/${ch.id}`}
+                          className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[11px] font-semibold flex items-center gap-1"
+                          title="View Challan Slip"
+                        >
+                          <Eye className="w-3 h-3 text-slate-500" />
+                          <span>Slip</span>
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => downloadChallanHtml(ch)}
+                          className="px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded text-[11px] font-semibold flex items-center gap-1"
+                          title="Download Challan HTML"
+                        >
+                          <Download className="w-3 h-3" />
+                          <span>Challan</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => printChallan(ch)}
+                          className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[11px] font-semibold flex items-center gap-1"
+                          title="Print Challan Slip"
+                        >
+                          <Printer className="w-3 h-3 text-slate-500" />
+                          <span>Print</span>
+                        </button>
+                      </div>
+
+                      {ch.program && (
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => setViewSheetProgram(ch.program)}
+                            className="px-2 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded text-[11px] font-semibold flex items-center gap-1"
+                            title="View Production Sheet"
+                          >
+                            <FileText className="w-3 h-3 text-blue-600" />
+                            <span>Sheet</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => downloadProductionSheetHtml(ch.program)}
+                            className="px-2 py-1 bg-sky-50 hover:bg-sky-100 text-sky-700 rounded text-[11px] font-semibold flex items-center gap-1"
+                            title="Download Production Sheet HTML"
+                          >
+                            <Download className="w-3 h-3 text-sky-600" />
+                            <span>Sheet</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => printProductionSheet(ch.program)}
+                            className="px-2 py-1 bg-blue-100/70 hover:bg-blue-200/70 text-blue-800 rounded text-[11px] font-semibold flex items-center gap-1"
+                            title="Print Production Sheet Traveler"
+                          >
+                            <Printer className="w-3 h-3 text-blue-600" />
+                            <span>Sheet</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="pt-1 border-t border-slate-200/60">
+                      {isIssued ? (
+                        <button
+                          onClick={() => openReceiveModal(ch)}
+                          className="w-full py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-bold transition shadow-xs flex items-center justify-center gap-1.5"
+                        >
+                          <ArrowDownLeft className="w-3.5 h-3.5" />
+                          <span>Perform Physical Check & Receive</span>
+                        </button>
+                      ) : (
+                        <Link
+                          href={`/recutting/my-work?jobId=${ch.id}`}
+                          className="w-full py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-bold transition shadow-xs flex items-center justify-center gap-1.5"
+                        >
+                          <Scissors className="w-3.5 h-3.5" />
+                          <span>Open Cutting Workstation</span>
+                        </Link>
+                      )}
+                    </div>
                   </div>
                 </div>
               );
@@ -500,6 +578,14 @@ export default function RecuttingIncomingPage() {
             </form>
           </div>
         </div>
+      )}
+      {/* PRODUCTION SHEET PRINT MODAL */}
+      {viewSheetProgram && (
+        <ProductionSheetPrintModal
+          isOpen={true}
+          onClose={() => setViewSheetProgram(null)}
+          program={viewSheetProgram}
+        />
       )}
     </div>
   );

@@ -33,6 +33,14 @@ import {
 } from 'lucide-react';
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
+import { 
+  downloadProductionSheetHtml, 
+  printProductionSheet 
+} from '@/lib/download-production-sheet';
+import { 
+  downloadChallanHtml, 
+  printChallan 
+} from '@/lib/download-challan';
 import BarcodeStickerCard from '@/components/BarcodeStickerCard';
 
 interface QC2Challan {
@@ -711,13 +719,55 @@ export default function QC2MyWorkPage() {
                                 </button>
                               )}
 
+                              {/* CHALLAN ACTIONS */}
                               <button
-                                onClick={() => setSelectedSheetForView(c.program)}
-                                className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded"
-                                title="View Production Sheet"
+                                type="button"
+                                onClick={() => downloadChallanHtml(c)}
+                                className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-slate-700 hover:text-emerald-900 bg-slate-100 hover:bg-emerald-50 px-2 py-1 rounded transition cursor-pointer"
+                                title="Download Challan as standalone HTML/PDF"
                               >
-                                <FileText className="w-4 h-4" />
+                                <Download className="w-3 h-3 text-emerald-600" />
+                                <span>Challan</span>
                               </button>
+                              <button
+                                type="button"
+                                onClick={() => printChallan(c)}
+                                className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-slate-700 hover:text-blue-900 bg-slate-100 hover:bg-blue-50 px-2 py-1 rounded transition cursor-pointer"
+                                title="Print Challan Slip"
+                              >
+                                <Printer className="w-3 h-3 text-slate-500" />
+                                <span>Print</span>
+                              </button>
+
+                              {/* PRODUCTION SHEET ACTIONS */}
+                              {c.program && (
+                                <div className="flex items-center gap-0.5 bg-blue-50 border border-blue-200 px-1 py-0.5 rounded">
+                                  <button
+                                    type="button"
+                                    onClick={() => setSelectedSheetForView(c.program)}
+                                    className="text-[10px] font-bold text-blue-800 hover:text-blue-950 px-0.5"
+                                    title="View Accompanying Production Sheet"
+                                  >
+                                    Sheet
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => downloadProductionSheetHtml(c.program)}
+                                    className="p-0.5 text-blue-700 hover:text-blue-900 rounded cursor-pointer"
+                                    title="Download Production Sheet HTML"
+                                  >
+                                    <Download className="w-3 h-3 text-emerald-600" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => printProductionSheet(c.program)}
+                                    className="p-0.5 text-blue-700 hover:text-blue-900 rounded cursor-pointer"
+                                    title="Print Production Sheet on A4"
+                                  >
+                                    <Printer className="w-3 h-3 text-slate-600" />
+                                  </button>
+                                </div>
+                              )}
 
                               <button
                                 onClick={() => setSelectedChallanForView(c)}

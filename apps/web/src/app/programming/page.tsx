@@ -26,6 +26,11 @@ import {
   downloadProductionSheetHtml, 
   printProductionSheet 
 } from '@/lib/download-production-sheet';
+import { 
+  downloadChallanHtml, 
+  printChallan 
+} from '@/lib/download-challan';
+import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 
 import { isAdminUser, isProgrammingUser } from '@/lib/rbac';
@@ -37,6 +42,7 @@ export default function ProgrammingDashboardPage() {
   const [challans, setChallans] = useState<any[]>([]);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedSheetModal, setSelectedSheetModal] = useState<any | null>(null);
 
   const loadData = async () => {
     try {
@@ -508,41 +514,102 @@ export default function ProgrammingDashboardPage() {
                     <thead className="bg-slate-50/80 text-slate-600 font-semibold border-b border-slate-200">
                       <tr>
                         <th className="py-2.5 px-4">Challan Number</th>
-                        <th className="py-2.5 px-4">Program</th>
-                        <th className="py-2.5 px-4">From</th>
-                        <th className="py-2.5 px-4">To Department</th>
+                        <th className="py-2.5 px-4">Program Sheet</th>
+                        <th className="py-2.5 px-4">Route</th>
                         <th className="py-2.5 px-4">Quantity</th>
                         <th className="py-2.5 px-4">Status</th>
                         <th className="py-2.5 px-4">Issued At</th>
+                        <th className="py-2.5 px-4 text-right">Actions (Challan &amp; Sheet)</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 text-slate-700">
-                      {challans.slice(0, 5).map((ch) => (
-                        <tr key={ch.id} className="hover:bg-slate-50/60">
+                      {challans.slice(0, 10).map((ch) => (
+                        <tr key={ch.id} className="hover:bg-slate-50/60 transition">
                           <td className="py-3 px-4 font-mono font-bold text-[#163767]">
-                            <Link href={`/challans/${ch.id}`} className="hover:underline">
-                              {ch.challanNumber}
+                            <Link href={`/challans/${ch.id}`} className="hover:underline flex items-center gap-1">
+                              <span>{ch.challanNumber}</span>
                             </Link>
                           </td>
-                          <td className="py-3 px-4 font-mono text-slate-600">
-                            {ch.program?.programNumber || '—'}
+                          <td className="py-3 px-4">
+                            <span className="font-mono font-semibold text-slate-900 block">
+                              {ch.program?.programSerialNo || ch.program?.programNumber || '—'}
+                            </span>
+                            {ch.program?.designNumber && (
+                              <span className="text-[10px] text-slate-500 block truncate max-w-[140px]">
+                                Design: {ch.program.designNumber}
+                              </span>
+                            )}
                           </td>
-                          <td className="py-3 px-4 font-semibold text-slate-800">
-                            {ch.fromDepartment}
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-1 text-[11px] font-semibold">
+                              <span className="text-slate-800">{ch.fromDepartment}</span>
+                              <span className="text-slate-400">→</span>
+                              <span className="text-blue-900">{ch.toDepartment}</span>
+                            </div>
                           </td>
-                          <td className="py-3 px-4 font-semibold text-blue-900">
-                            {ch.toDepartment}
-                          </td>
-                          <td className="py-3 px-4 font-mono">
+                          <td className="py-3 px-4 font-mono text-slate-900 font-medium">
                             {ch.items?.[0]?.quantity || '—'} {ch.items?.[0]?.uom || ''}
                           </td>
                           <td className="py-3 px-4">
-                            <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-800">
+                            <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-800 border border-blue-200">
                               {ch.status}
                             </span>
                           </td>
                           <td className="py-3 px-4 text-[11px] text-slate-500">
                             {ch.createdAt ? new Date(ch.createdAt).toLocaleDateString() : '—'}
+                          </td>
+                          <td className="py-3 px-4 text-right">
+                            <div className="flex items-center justify-end gap-1 flex-wrap">
+                              {/* CHALLAN ACTIONS */}
+                              <button
+                                type="button"
+                                onClick={() => downloadChallanHtml(ch)}
+                                title="Download Challan (.html / print)"
+                                className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-700 hover:text-emerald-900 bg-slate-100 hover:bg-emerald-50 px-2 py-1 rounded transition cursor-pointer"
+                              >
+                                <Download className="w-3 h-3 text-emerald-600" />
+                                <span>Challan</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => printChallan(ch)}
+                                title="Print Challan Slip"
+                                className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-700 hover:text-blue-900 bg-slate-100 hover:bg-blue-50 px-2 py-1 rounded transition cursor-pointer"
+                              >
+                                <Printer className="w-3 h-3 text-slate-500" />
+                                <span>Print</span>
+                              </button>
+
+                              {/* PRODUCTION SHEET ACCOMPANYING ACTIONS */}
+                              {ch.program && (
+                                <>
+                                  <button
+                                    type="button"
+                                    onClick={() => setSelectedSheetModal(ch.program)}
+                                    title="View Accompanying Production Sheet"
+                                    className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-700 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-2 py-1 rounded transition cursor-pointer"
+                                  >
+                                    <FileText className="w-3 h-3" />
+                                    <span>Sheet</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => downloadProductionSheetHtml(ch.program)}
+                                    title="Download Production Sheet HTML"
+                                    className="p-1 text-slate-500 hover:text-emerald-700 hover:bg-slate-100 rounded transition cursor-pointer"
+                                  >
+                                    <Download className="w-3 h-3" />
+                                  </button>
+                                </>
+                              )}
+
+                              <Link
+                                href={`/challans/${ch.id}`}
+                                className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded transition"
+                              >
+                                <span>View</span>
+                              </Link>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -602,13 +669,18 @@ export default function ProgrammingDashboardPage() {
               </div>
             </div>
 
-
-
           </div>
 
         </div>
 
       </main>
+
+      {/* Production Sheet Print & Download Modal */}
+      <ProductionSheetPrintModal
+        program={selectedSheetModal}
+        isOpen={!!selectedSheetModal}
+        onClose={() => setSelectedSheetModal(null)}
+      />
     </div>
   );
 }

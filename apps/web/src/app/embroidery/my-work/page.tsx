@@ -36,6 +36,14 @@ import {
 } from '@/components/ColorFabricMeasurementTable';
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
+import { 
+  downloadProductionSheetHtml, 
+  printProductionSheet 
+} from '@/lib/download-production-sheet';
+import { 
+  downloadChallanHtml, 
+  printChallan 
+} from '@/lib/download-challan';
 
 export default function EmbroideryMyWorkPage() {
   const [activeWorkflow, setActiveWorkflow] = useState<
@@ -684,21 +692,40 @@ export default function EmbroideryMyWorkPage() {
                       </div>
                     </div>
 
-                    <div className="pt-2 flex items-center justify-between gap-2 border-t border-slate-100">
-                      <button
-                        type="button"
-                        onClick={() => setShowSheetDetailModal(prog)}
-                        className="flex-1 py-1.5 px-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition text-center"
-                      >
-                        Inspect Sheet
-                      </button>
+                    <div className="pt-2 flex flex-col gap-1.5 border-t border-slate-100">
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => setShowSheetDetailModal(prog)}
+                          className="flex-1 py-1.5 px-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-bold transition text-center flex items-center justify-center gap-1"
+                        >
+                          <FileText className="w-3.5 h-3.5" />
+                          <span>View Sheet</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => downloadProductionSheetHtml(prog)}
+                          className="py-1.5 px-2 bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1"
+                          title="Download Production Sheet HTML"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => printProductionSheet(prog)}
+                          className="py-1.5 px-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1"
+                          title="Print Production Sheet Traveler"
+                        >
+                          <Printer className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                       <button
                         type="button"
                         onClick={() => {
                           applyProgramToForm(prog);
                           setActiveWorkflow('CREATE_CHALLAN');
                         }}
-                        className="flex-1 py-1.5 px-2 bg-fuchsia-600 hover:bg-fuchsia-700 text-white rounded-lg text-xs font-bold shadow-2xs transition text-center"
+                        className="w-full py-1.5 px-2 bg-fuchsia-600 hover:bg-fuchsia-700 text-white rounded-lg text-xs font-bold shadow-2xs transition text-center"
                       >
                         Use in Challan
                       </button>
@@ -873,49 +900,106 @@ export default function EmbroideryMyWorkPage() {
                               )}
                             </td>
                             <td className="py-3 px-3 text-right">
-                              <div className="flex items-center justify-end gap-1.5 flex-wrap">
-                                {!isReceived ? (
-                                  <button
-                                    type="button"
-                                    disabled={receivingId === ch.id}
-                                    onClick={() => handleReceiveIncoming(ch)}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-xs transition cursor-pointer"
-                                    title="Receive material and book onto Embroidery floor stock"
-                                  >
-                                    {receivingId === ch.id ? (
-                                      <>
-                                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                                        <span>Receiving...</span>
-                                      </>
-                                    ) : (
-                                      <>
-                                        <CheckCircle2 className="w-3.5 h-3.5" />
-                                        <span>Receive &amp; Accept</span>
-                                      </>
-                                    )}
-                                  </button>
-                                ) : (
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      if (ch.program) applyProgramToForm(ch.program);
-                                      setActiveWorkflow('CREATE_CHALLAN');
-                                    }}
-                                    className="inline-flex items-center gap-1 px-2.5 py-1 bg-fuchsia-600 hover:bg-fuchsia-700 text-white rounded-lg text-xs font-bold transition shadow-2xs cursor-pointer"
-                                    title="Use this received lot in a new Challan to Thread Cutting"
-                                  >
-                                    <Send className="w-3 h-3" />
-                                    <span>To Thread Cutting</span>
-                                  </button>
-                                )}
+                              <div className="flex flex-col items-end gap-1.5">
+                                {/* WORKFLOW ACTION */}
+                                <div className="flex items-center gap-1.5">
+                                  {!isReceived ? (
+                                    <button
+                                      type="button"
+                                      disabled={receivingId === ch.id}
+                                      onClick={() => handleReceiveIncoming(ch)}
+                                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-xs transition cursor-pointer"
+                                      title="Receive material and book onto Embroidery floor stock"
+                                    >
+                                      {receivingId === ch.id ? (
+                                        <>
+                                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                                          <span>Receiving...</span>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <CheckCircle2 className="w-3.5 h-3.5" />
+                                          <span>Receive &amp; Accept</span>
+                                        </>
+                                      )}
+                                    </button>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        if (ch.program) applyProgramToForm(ch.program);
+                                        setActiveWorkflow('CREATE_CHALLAN');
+                                      }}
+                                      className="inline-flex items-center gap-1 px-2.5 py-1 bg-fuchsia-600 hover:bg-fuchsia-700 text-white rounded-lg text-xs font-bold transition shadow-2xs cursor-pointer"
+                                      title="Use this received lot in a new Challan to Thread Cutting"
+                                    >
+                                      <Send className="w-3 h-3" />
+                                      <span>To Thread Cutting</span>
+                                    </button>
+                                  )}
+                                </div>
 
-                                <Link
-                                  href={`/challans/${ch.id}`}
-                                  className="inline-flex items-center gap-1 p-1 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded transition"
-                                  title="View Challan Details"
-                                >
-                                  <ExternalLink className="w-3.5 h-3.5" />
-                                </Link>
+                                {/* CHALLAN & SHEET ACTIONS */}
+                                <div className="flex items-center gap-1 flex-wrap justify-end">
+                                  <Link
+                                    href={`/challans/${ch.id}`}
+                                    className="px-1.5 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] font-semibold flex items-center gap-0.5"
+                                    title="View Challan Slip"
+                                  >
+                                    <Eye className="w-2.5 h-2.5" />
+                                    <span>Slip</span>
+                                  </Link>
+                                  <button
+                                    type="button"
+                                    onClick={() => downloadChallanHtml(ch)}
+                                    className="px-1.5 py-0.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded text-[10px] font-semibold flex items-center gap-0.5"
+                                    title="Download Challan HTML"
+                                  >
+                                    <Download className="w-2.5 h-2.5" />
+                                    <span>Challan</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => printChallan(ch)}
+                                    className="px-1.5 py-0.5 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded text-[10px] font-semibold flex items-center gap-0.5"
+                                    title="Print Challan Slip"
+                                  >
+                                    <Printer className="w-2.5 h-2.5" />
+                                    <span>Print</span>
+                                  </button>
+
+                                  {ch.program && (
+                                    <>
+                                      <button
+                                        type="button"
+                                        onClick={() => setShowSheetDetailModal(ch.program)}
+                                        className="px-1.5 py-0.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded text-[10px] font-semibold flex items-center gap-0.5 ml-1"
+                                        title="View Production Sheet"
+                                      >
+                                        <FileText className="w-2.5 h-2.5" />
+                                        <span>Sheet</span>
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => downloadProductionSheetHtml(ch.program)}
+                                        className="px-1.5 py-0.5 bg-sky-50 hover:bg-sky-100 text-sky-700 rounded text-[10px] font-semibold flex items-center gap-0.5"
+                                        title="Download Production Sheet HTML"
+                                      >
+                                        <Download className="w-2.5 h-2.5" />
+                                        <span>Sheet</span>
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => printProductionSheet(ch.program)}
+                                        className="px-1.5 py-0.5 bg-blue-100/70 hover:bg-blue-200/70 text-blue-800 rounded text-[10px] font-semibold flex items-center gap-0.5"
+                                        title="Print Production Sheet Traveler"
+                                      >
+                                        <Printer className="w-2.5 h-2.5" />
+                                        <span>Sheet</span>
+                                      </button>
+                                    </>
+                                  )}
+                                </div>
                               </div>
                             </td>
                           </tr>
@@ -1212,26 +1296,61 @@ export default function EmbroideryMyWorkPage() {
               >
                 Create Another Challan
               </button>
+              <button
+                type="button"
+                onClick={() => downloadChallanHtml(createdChallanModal)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 rounded-lg text-xs font-bold transition"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Download Challan</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => printChallan(createdChallanModal)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition"
+              >
+                <Printer className="w-3.5 h-3.5" />
+                <span>Print Challan</span>
+              </button>
               {selectedProgram && (
-                <button
-                  type="button"
-                  onClick={() => setShowSheetDetailModal(selectedProgram)}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-300 rounded-lg text-xs font-bold transition"
-                >
-                  <FileText className="w-3.5 h-3.5 text-teal-700" />
-                  <span>View Production Sheet</span>
-                </button>
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setShowSheetDetailModal(selectedProgram)}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-300 rounded-lg text-xs font-bold transition"
+                  >
+                    <FileText className="w-3.5 h-3.5 text-teal-700" />
+                    <span>View Production Sheet</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => downloadProductionSheetHtml(selectedProgram)}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-300 rounded-lg text-xs font-bold transition"
+                  >
+                    <Download className="w-3.5 h-3.5 text-sky-700" />
+                    <span>Download Sheet</span>
+                  </button>
+                </>
               )}
               <Link
                 href={`/challans/${createdChallanModal.id}`}
                 className="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-bold shadow-xs transition"
               >
-                <Printer className="w-3.5 h-3.5" />
-                <span>View &amp; Print Full Challan</span>
+                <Eye className="w-3.5 h-3.5" />
+                <span>View Full Challan Slip</span>
               </Link>
             </div>
           </div>
         </div>
+      )}
+
+      {/* PRODUCTION SHEET PRINT / TRAVELER MODAL */}
+      {showSheetDetailModal && (
+        <ProductionSheetPrintModal
+          isOpen={true}
+          onClose={() => setShowSheetDetailModal(null)}
+          program={showSheetDetailModal}
+        />
       )}
     </div>
   );

@@ -30,6 +30,10 @@ import {
   downloadProductionSheetHtml, 
   printProductionSheet 
 } from '@/lib/download-production-sheet';
+import { 
+  downloadChallanHtml, 
+  printChallan 
+} from '@/lib/download-challan';
 
 export default function EmbroideryIncomingChallansPage() {
   const [loading, setLoading] = useState(true);
@@ -469,18 +473,37 @@ export default function EmbroideryIncomingChallansPage() {
                       </button>
 
                       {ch.program && (
-                        <button
-                          type="button"
-                          onClick={() => setSelectedSheetModal(ch.program)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition"
-                        >
-                          <Eye className="w-3.5 h-3.5 text-slate-500" />
-                          <span>Show Production Sheet</span>
-                        </button>
+                        <div className="flex items-center gap-1 bg-fuchsia-50 border border-fuchsia-200 px-2 py-1 rounded-lg">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedSheetModal(ch.program)}
+                            className="inline-flex items-center gap-1 text-xs font-bold text-fuchsia-800 hover:text-fuchsia-950 cursor-pointer"
+                            title="Preview Full Production Sheet"
+                          >
+                            <FileText className="w-3.5 h-3.5 text-fuchsia-700" />
+                            <span>Sheet</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => downloadProductionSheetHtml(ch.program)}
+                            className="p-1 text-fuchsia-700 hover:text-fuchsia-950 rounded cursor-pointer"
+                            title="Download Production Sheet HTML"
+                          >
+                            <Download className="w-3.5 h-3.5 text-emerald-600" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => printProductionSheet(ch.program)}
+                            className="p-1 text-fuchsia-700 hover:text-fuchsia-950 rounded cursor-pointer"
+                            title="Print Production Sheet on A4"
+                          >
+                            <Printer className="w-3.5 h-3.5 text-slate-600" />
+                          </button>
+                        </div>
                       )}
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <button
                         type="button"
                         onClick={() => {
@@ -506,12 +529,32 @@ export default function EmbroideryIncomingChallansPage() {
                         <span>Barcode PNG</span>
                       </button>
 
+                      {/* CHALLAN DOWNLOAD & PRINT */}
+                      <button
+                        type="button"
+                        onClick={() => downloadChallanHtml(ch)}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-900 border border-slate-300 rounded-lg text-xs font-semibold transition cursor-pointer"
+                        title="Download Challan as standalone HTML/PDF"
+                      >
+                        <Download className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Download Challan</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => printChallan(ch)}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-900 border border-slate-300 rounded-lg text-xs font-semibold transition cursor-pointer"
+                        title="Print Challan Slip"
+                      >
+                        <Printer className="w-3.5 h-3.5 text-slate-500" />
+                        <span>Print Slip</span>
+                      </button>
+
                       <Link
                         href={`/challans/${ch.id}`}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-semibold transition"
                       >
-                        <FileText className="w-3.5 h-3.5" />
-                        <span>View &amp; Print Challan</span>
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>View Details</span>
                       </Link>
                     </div>
                   </div>

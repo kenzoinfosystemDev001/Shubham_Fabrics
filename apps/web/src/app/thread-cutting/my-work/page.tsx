@@ -40,6 +40,10 @@ import {
   downloadProductionSheetHtml, 
   printProductionSheet 
 } from '@/lib/download-production-sheet';
+import { 
+  downloadChallanHtml, 
+  printChallan 
+} from '@/lib/download-challan';
 
 interface ItemRow {
   fabricMeasurementPcs: string; // Color / Fabric / Measurement (PCS)
@@ -694,6 +698,70 @@ export default function ThreadCuttingMyWorkPage() {
                           <span>Sheet: {ch.program?.programSerialNo || ch.program?.programNumber || '—'}</span>
                           <span>{new Date(ch.createdAt).toLocaleDateString('en-GB')}</span>
                         </div>
+
+                        {/* 1-CLICK ACTION BUTTONS */}
+                        <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between gap-1 flex-wrap" onClick={(e) => e.stopPropagation()}>
+                          <div className="flex items-center gap-1">
+                            <Link
+                              href={`/challans/${ch.id}`}
+                              className="px-1.5 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] font-semibold flex items-center gap-0.5"
+                              title="View Challan Slip"
+                            >
+                              <Eye className="w-2.5 h-2.5" />
+                              <span>Slip</span>
+                            </Link>
+                            <button
+                              type="button"
+                              onClick={() => downloadChallanHtml(ch)}
+                              className="px-1.5 py-0.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded text-[10px] font-semibold flex items-center gap-0.5"
+                              title="Download Challan HTML"
+                            >
+                              <Download className="w-2.5 h-2.5" />
+                              <span>Challan</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => printChallan(ch)}
+                              className="px-1.5 py-0.5 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded text-[10px] font-semibold flex items-center gap-0.5"
+                              title="Print Challan Slip"
+                            >
+                              <Printer className="w-2.5 h-2.5" />
+                              <span>Print</span>
+                            </button>
+                          </div>
+
+                          {ch.program && (
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                onClick={() => setShowSheetDetailModal(ch.program)}
+                                className="px-1.5 py-0.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded text-[10px] font-semibold flex items-center gap-0.5"
+                                title="View Production Sheet"
+                              >
+                                <FileText className="w-2.5 h-2.5" />
+                                <span>Sheet</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => downloadProductionSheetHtml(ch.program)}
+                                className="px-1.5 py-0.5 bg-sky-50 hover:bg-sky-100 text-sky-700 rounded text-[10px] font-semibold flex items-center gap-0.5"
+                                title="Download Production Sheet HTML"
+                              >
+                                <Download className="w-2.5 h-2.5" />
+                                <span>Sheet</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => printProductionSheet(ch.program)}
+                                className="px-1.5 py-0.5 bg-blue-100/70 hover:bg-blue-200/70 text-blue-800 rounded text-[10px] font-semibold flex items-center gap-0.5"
+                                title="Print Production Sheet Traveler"
+                              >
+                                <Printer className="w-2.5 h-2.5" />
+                                <span>Sheet</span>
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     );
                   })}
@@ -716,25 +784,65 @@ export default function ThreadCuttingMyWorkPage() {
                       </h2>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      {selectedIncoming.program && (
-                        <button
-                          type="button"
-                          onClick={() => setShowSheetDetailModal(selectedIncoming.program)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 text-indigo-900 rounded-lg text-xs font-bold transition cursor-pointer"
-                        >
-                          <Eye className="w-3.5 h-3.5 text-indigo-600" />
-                          <span>View Production Sheet</span>
-                        </button>
-                      )}
-
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {/* CHALLAN SUITE */}
                       <Link
                         href={`/challans/${selectedIncoming.id}`}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition"
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition"
                       >
-                        <FileText className="w-3.5 h-3.5 text-slate-500" />
-                        <span>Print Embroidery Challan</span>
+                        <Eye className="w-3.5 h-3.5 text-slate-500" />
+                        <span>Slip</span>
                       </Link>
+                      <button
+                        type="button"
+                        onClick={() => downloadChallanHtml(selectedIncoming)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-bold transition cursor-pointer"
+                        title="Download Challan HTML"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        <span>Download Challan</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => printChallan(selectedIncoming)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition"
+                        title="Print Challan Slip"
+                      >
+                        <Printer className="w-3.5 h-3.5 text-slate-500" />
+                        <span>Print Challan</span>
+                      </button>
+
+                      {/* PRODUCTION SHEET SUITE */}
+                      {selectedIncoming.program && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => setShowSheetDetailModal(selectedIncoming.program)}
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-blue-50 border border-blue-200 hover:bg-blue-100 text-blue-900 rounded-lg text-xs font-bold transition cursor-pointer"
+                          >
+                            <FileText className="w-3.5 h-3.5 text-blue-600" />
+                            <span>View Sheet</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => downloadProductionSheetHtml(selectedIncoming.program)}
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-sky-50 border border-sky-200 hover:bg-sky-100 text-sky-700 rounded-lg text-xs font-bold transition cursor-pointer"
+                            title="Download Production Sheet HTML"
+                          >
+                            <Download className="w-3.5 h-3.5 text-sky-600" />
+                            <span>Download Sheet</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => printProductionSheet(selectedIncoming.program)}
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition"
+                            title="Print Production Sheet Traveler"
+                          >
+                            <Printer className="w-3.5 h-3.5 text-slate-600" />
+                            <span>Print Sheet</span>
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
 
@@ -1857,12 +1965,28 @@ export default function ThreadCuttingMyWorkPage() {
               >
                 Issue Another Challan
               </button>
+              <button
+                type="button"
+                onClick={() => downloadChallanHtml(createdChallanModal)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 rounded-lg text-xs font-bold transition"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Download Challan</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => printChallan(createdChallanModal)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition"
+              >
+                <Printer className="w-3.5 h-3.5" />
+                <span>Print Challan</span>
+              </button>
               <Link
                 href={`/challans/${createdChallanModal.id}`}
                 className="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-bold shadow-xs transition"
               >
-                <Printer className="w-3.5 h-3.5" />
-                <span>View &amp; Print Full Challan</span>
+                <Eye className="w-3.5 h-3.5" />
+                <span>View Full Challan Slip</span>
               </Link>
             </div>
           </div>
@@ -1970,12 +2094,28 @@ export default function ThreadCuttingMyWorkPage() {
                 <Archive className="w-3.5 h-3.5 text-rose-600" />
                 <span>Go to Fabric Store Defective Shelf</span>
               </Link>
+              <button
+                type="button"
+                onClick={() => downloadChallanHtml(createdDefectModal)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 rounded-lg text-xs font-bold transition"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Download Return Challan</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => printChallan(createdDefectModal)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition"
+              >
+                <Printer className="w-3.5 h-3.5" />
+                <span>Print Return Challan</span>
+              </button>
               <Link
                 href={`/challans/${createdDefectModal.id}`}
                 className="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-bold shadow-xs transition"
               >
-                <Printer className="w-3.5 h-3.5" />
-                <span>View &amp; Print Return Challan</span>
+                <Eye className="w-3.5 h-3.5" />
+                <span>View Challan Slip</span>
               </Link>
             </div>
           </div>
