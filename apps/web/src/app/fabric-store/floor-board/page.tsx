@@ -9,7 +9,9 @@ import {
   Send,
   AlertTriangle,
   ArrowRight,
-  ArrowDownToLine
+  ArrowDownToLine,
+  Lock,
+  Check,
 } from 'lucide-react';
 
 export default function FabricStoreFloorBoardPage() {
@@ -18,14 +20,28 @@ export default function FabricStoreFloorBoardPage() {
   const [incomingChallans, setIncomingChallans] = useState<any[]>([]);
   const [rolls, setRolls] = useState<any[]>([]);
   const [issueChallans, setIssueChallans] = useState<any[]>([]);
+  const [availabilityMap, setAvailabilityMap] = useState<Record<string, any>>({});
 
   const loadData = async () => {
     try {
       setLoading(true);
-      const [challansRes, rollsRes] = await Promise.all([
+      const [challansRes, rollsRes, availRes] = await Promise.all([
         fetch('/api/challans').catch(() => null),
         fetch('/api/fabric-store/rolls?limit=100').catch(() => null),
+        fetch('/api/fabric-store/check-availability').catch(() => null),
       ]);
+
+      if (availRes && availRes.ok) {
+        const availJson = await availRes.json();
+        const map: Record<string, any> = {};
+        if (Array.isArray(availJson.data)) {
+          for (const item of availJson.data) {
+            if (item.programId) map[item.programId] = item;
+            if (item.programNumber) map[item.programNumber] = item;
+          }
+        }
+        setAvailabilityMap(map);
+      }
 
       if (challansRes && challansRes.ok) {
         const challanData = await challansRes.json();
@@ -155,39 +171,71 @@ export default function FabricStoreFloorBoardPage() {
                   No incoming challans pending receipt.
                 </div>
               ) : (
-                incomingLane.map((c) => (
-                  <div key={c.id} className="p-3 bg-white border border-slate-200/80 rounded-lg shadow-2xs hover:border-blue-400 transition">
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-xs font-mono font-bold text-blue-700">{c.challanNumber}</span>
-                      <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded">
-                        {c.status}
-                      </span>
-                    </div>
-                    <div className="text-xs font-semibold text-slate-800 mb-1">
-                      From: {c.fromDepartment || 'Programming'}
-                    </div>
-                    {c.program && (
-                      <div className="text-[11px] text-slate-500 font-mono">
-                        Prog: {c.program.programNumber || c.programNumber}
+                incomingLane.map((c) => {
+                  const progId = c.programId || c.program?.id;
+                  const progNum = c.programNumber || c.program?.programNumber;
+                  const avail = (progId && availabilityMap[progId]) || (progNum && availabilityMap[progNum]);
+                  const isAvailable = avail ? Boolean(avail.isAvailable) : false;
+
+                  return (
+                    <div key={c.id} className="p-3 bg-white border border-slate-200/80 rounded-lg shadow-2xs hover:border-blue-400 transition">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-xs font-mono font-bold text-blue-700">{c.challanNumber}</span>
+                        <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded">
+                          {c.status}
+                        </span>
                       </div>
-                    )}
-                    <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between gap-1">
-                      <Link
-                        href={`/fabric-store/my-work/issue-challan?programId=${c.programId || c.program?.id}&dest=DYEING`}
-                        className="text-[10px] font-bold text-purple-700 hover:text-purple-900 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200"
-                        title="Dispatch directly to Dyeing"
-                      >
-                        To Dyeing →
-                      </Link>
-                      <Link
-                        href="/fabric-store/my-work/incoming-challans"
-                        className="text-[11px] font-bold text-teal-700 hover:text-teal-900 flex items-center gap-1"
-                      >
-                        Process <ArrowRight className="w-3 h-3" />
-                      </Link>
+                      <div className="text-xs font-semibold text-slate-800 mb-1">
+                        From: {c.fromDepartment || 'Programming'}
+                      </div>
+                      {c.program && (
+                        <div className="text-[11px] text-slate-500 font-mono mb-1.5">
+                          Prog: {c.program.programNumber || c.programNumber}
+                        </div>
+                      )}
+
+                      {/* Fabric Store Availability Status Badge */}
+                      <div className="mb-2">
+                        {isAvailable ? (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                            <Check className="w-2.5 h-2.5 text-emerald-600" />
+                            Fabric in Store ({avail?.totalStoreStockMeters || 0}m)
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                            <Lock className="w-2.5 h-2.5 text-amber-600" />
+                            Fabric Not in Store (Movement Blocked)
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-1">
+                        {isAvailable ? (
+                          <Link
+                            href={`/fabric-store/my-work/issue-challan?programId=${progId}&dest=DYEING`}
+                            className="text-[10px] font-bold text-purple-700 hover:text-purple-900 bg-purple-50 px-2 py-1 rounded border border-purple-200 inline-flex items-center gap-1"
+                            title="Fabric is in store — authorized to dispatch to Dyeing"
+                          >
+                            To Dyeing →
+                          </Link>
+                        ) : (
+                          <span
+                            className="text-[10px] font-semibold text-slate-400 bg-slate-100 px-2 py-1 rounded border border-slate-200 inline-flex items-center gap-1 cursor-not-allowed"
+                            title="Cannot move to next department until fabric is available in store"
+                          >
+                            <Lock className="w-2.5 h-2.5" /> Blocked
+                          </span>
+                        )}
+                        <Link
+                          href="/fabric-store/my-work/incoming-challans"
+                          className="text-[11px] font-bold text-teal-700 hover:text-teal-900 flex items-center gap-1"
+                        >
+                          Process <ArrowRight className="w-3 h-3" />
+                        </Link>
+                      </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>

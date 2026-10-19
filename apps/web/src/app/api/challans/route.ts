@@ -256,6 +256,35 @@ export async function POST(request: Request) {
       },
     });
 
+    // =========================================================================
+    // FABRIC STORE MANDATORY AVAILABILITY GATE
+    // "If the fabric is available in the store then only the production sheet will move to the next department"
+    // Block movement from STORE to downstream departments (or bypassing STORE directly to DYEING/EMBROIDERY)
+    // if the fabric is not verified/in stock in the Fabric Store.
+    // =========================================================================
+    const isMovingOutFromStore =
+      (fromDept === 'STORE' || fromDept.includes('STR') || fromDept.includes('FABRIC')) &&
+      toDept !== 'STORE';
+
+    const isBypassingToProcessing =
+      fromDept === 'PROGRAMMING' &&
+      toDept !== 'STORE' &&
+      (toDept === 'DYEING' || toDept === 'EMBROIDERY');
+
+    if (isMovingOutFromStore || isBypassingToProcessing) {
+      const { checkFabricStoreAvailability } = await import('@/lib/fabric-availability');
+      const availability = await checkFabricStoreAvailability(resolvedProgramId);
+      if (!availability.isAvailable) {
+        return NextResponse.json(
+          {
+            error: `Fabric is not available in Fabric Store for Program ${availability.programSerialNo || resolvedProgramId}. ${availability.message}`,
+            fabricAvailability: availability,
+          },
+          { status: 400 }
+        );
+      }
+    }
+
     // 4. Resolve unique challan number
     const year = new Date().getFullYear();
 

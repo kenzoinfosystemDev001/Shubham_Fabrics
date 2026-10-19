@@ -17,10 +17,14 @@ import {
   Trash2,
   Calendar,
   Building2,
-  Phone,
-  User,
   Hash,
   Sparkles,
+  Lock,
+  ShieldCheck,
+  ShieldAlert,
+  AlertTriangle,
+  PackagePlus,
+  Check,
 } from 'lucide-react';
 import {
   downloadProductionSheetHtml,
@@ -91,6 +95,54 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
   const [error, setError] = useState('');
   const [showSheetModal, setShowSheetModal] = useState(false);
   const [issuedChallan, setIssuedChallan] = useState<any>(null);
+
+  // Fabric Store Stock Availability Gate State
+  const [fabricAvailability, setFabricAvailability] = useState<any | null>(null);
+  const [checkingAvailability, setCheckingAvailability] = useState(false);
+  const [updatingAvailability, setUpdatingAvailability] = useState(false);
+
+  const loadAvailability = async (progId: string) => {
+    if (!progId) return;
+    try {
+      setCheckingAvailability(true);
+      const res = await fetch(`/api/fabric-store/check-availability?programId=${progId}`);
+      const json = await res.json();
+      if (res.ok && json.data) {
+        setFabricAvailability(json.data);
+      }
+    } catch (err) {
+      console.error('Failed to load fabric availability:', err);
+    } finally {
+      setCheckingAvailability(false);
+    }
+  };
+
+  const handleToggleAvailability = async (isAvailable: boolean) => {
+    if (!selectedProgramId) return;
+    try {
+      setUpdatingAvailability(true);
+      const res = await fetch('/api/fabric-store/check-availability', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          programId: selectedProgramId,
+          isAvailable,
+          actorName: storeInchargeName || 'Fabric Store Incharge',
+        }),
+      });
+      const json = await res.json();
+      if (res.ok && json.data) {
+        setFabricAvailability(json.data);
+        if (isAvailable) setError('');
+      } else {
+        setError(json.error || 'Failed to update fabric availability');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Error updating availability');
+    } finally {
+      setUpdatingAvailability(false);
+    }
+  };
 
   // Load Programs & Next Challan Number
   const loadData = async () => {
@@ -173,6 +225,9 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
       fabricUnit: prog.quantityMeasurement === 'PCS' ? 'PCS' : 'MTR',
       detectedFromDept: 'PROGRAMMING',
     }));
+
+    // Trigger Fabric Store stock verification
+    loadAvailability(prog.id);
   };
 
   const selectedProgram = programs.find((p) => p.id === selectedProgramId);
@@ -183,6 +238,17 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
 
     if (!selectedProgram) {
       setError('Please select a Serial Number / Production Sheet.');
+      return;
+    }
+
+    // MANDATORY GATE: Check if fabric is available in store
+    if (fabricAvailability && !fabricAvailability.isAvailable) {
+      setError(
+        `Fabric (${fabricAvailability.fabricName || 'fabric'}) is unavailable in the Fabric Store. Production sheet cannot move to ${destDept} until fabric arrives and is in stock.`
+      );
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
       return;
     }
 
@@ -486,6 +552,121 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
               )}
             </div>
 
+            {/* ============================================================== */}
+            {/* MANDATORY GATE: FABRIC STORE STOCK AVAILABILITY               */}
+            {/* "If fabric is available in store then only sheet moves"       */}
+            {/* ============================================================== */}
+            {selectedProgram && (
+              <div
+                className={`p-4 rounded-xl border transition-all ${
+                  checkingAvailability
+                    ? 'bg-slate-50 border-slate-200 text-slate-600'
+                    : fabricAvailability?.isAvailable
+                    ? 'bg-emerald-50/90 border-emerald-300 text-emerald-950 shadow-2xs'
+                    : 'bg-rose-50/90 border-rose-300 text-rose-950 shadow-2xs'
+                }`}
+              >
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                  <div className="flex items-start gap-3">
+                    <div
+                      className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                        checkingAvailability
+                          ? 'bg-slate-200 text-slate-700'
+                          : fabricAvailability?.isAvailable
+                          ? 'bg-emerald-600 text-white'
+                          : 'bg-rose-600 text-white'
+                      }`}
+                    >
+                      {checkingAvailability ? (
+                        <RefreshCw className="w-5 h-5 animate-spin" />
+                      ) : fabricAvailability?.isAvailable ? (
+                        <ShieldCheck className="w-5 h-5" />
+                      ) : (
+                        <ShieldAlert className="w-5 h-5" />
+                      )}
+                    </div>
+
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-white/80 border border-current/20">
+                          FABRIC STORE GATEWAY
+                        </span>
+                        {fabricAvailability?.isAvailable ? (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
+                            <Check className="w-3 h-3 text-emerald-600" />
+                            Fabric Available in Store — Cleared for {destDept} Handoff
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-800 bg-rose-100 px-2 py-0.5 rounded-full">
+                            <Lock className="w-3 h-3 text-rose-600" />
+                            Fabric Unavailable — Movement Blocked
+                          </span>
+                        )}
+                      </div>
+
+                      <p className="text-xs font-semibold mt-1">
+                        {fabricAvailability?.message ||
+                          (checkingAvailability
+                            ? 'Checking real-time Fabric Store inventory…'
+                            : 'Fabric status check complete.')}
+                      </p>
+
+                      <div className="flex items-center gap-3 text-[11px] text-slate-600 mt-1 flex-wrap font-mono">
+                        <span>Fabric: <strong>{fabricAvailability?.fabricName || selectedProgram.fabricName || '—'}</strong></span>
+                        <span>·</span>
+                        <span>Color: <strong>{fabricAvailability?.fabricColor || selectedProgram.fabricColor || 'Natural'}</strong></span>
+                        <span>·</span>
+                        <span>Store Stock: <strong className={fabricAvailability?.totalStoreStockMeters > 0 ? 'text-emerald-700' : 'text-rose-700'}>
+                          {fabricAvailability?.totalStoreStockMeters ?? 0} MTR
+                        </strong></span>
+                        <span>·</span>
+                        <span>Rolls: <strong>{fabricAvailability?.rollCount ?? 0}</strong></span>
+                        <span>·</span>
+                        <span>Inward Records: <strong>{fabricAvailability?.inwardEntriesCount ?? 0}</strong></span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* GATE ACTION CONTROLS */}
+                  <div className="flex items-center gap-2 shrink-0 self-start md:self-center">
+                    <Link
+                      href="/fabric-store/inventory/inward"
+                      target="_blank"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 rounded-lg text-xs font-bold transition shadow-2xs"
+                      title="Open Fabric Store Inward form to add incoming fabric stock"
+                    >
+                      <PackagePlus className="w-3.5 h-3.5 text-teal-700" />
+                      <span>Inward Stock</span>
+                    </Link>
+
+                    {fabricAvailability?.isAvailable ? (
+                      <button
+                        type="button"
+                        disabled={updatingAvailability}
+                        onClick={() => handleToggleAvailability(false)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-lg text-xs font-bold transition shadow-2xs cursor-pointer"
+                        title="Mark fabric out of stock and put production sheet on hold"
+                      >
+                        <Lock className="w-3.5 h-3.5 text-rose-600" />
+                        <span>{updatingAvailability ? 'Saving…' : 'Mark Out of Stock (Hold)'}</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled={updatingAvailability}
+                        onClick={() => handleToggleAvailability(true)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition shadow-2xs cursor-pointer"
+                        title="Fabric Store Incharge confirms fabric physical presence in store"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                        <span>{updatingAvailability ? 'Verifying…' : 'Confirm Fabric in Store'}</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* LINE BY LINE FORM FIELDS */}
             <div className="space-y-4">
               {/* 1. CHALLAN NUMBER */}
@@ -665,18 +846,46 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
             </div>
 
             {/* 11. SUBMIT BUTTON */}
-            <div className="pt-4 border-t border-slate-200 flex items-center justify-end">
+            <div className="pt-4 border-t border-slate-200 flex items-center justify-between gap-4 flex-wrap">
+              <div className="text-xs">
+                {fabricAvailability && !fabricAvailability.isAvailable ? (
+                  <span className="text-rose-700 font-bold flex items-center gap-1.5 bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-lg">
+                    <Lock className="w-4 h-4 text-rose-600 shrink-0" />
+                    <span>Handoff locked: Fabric must be in store before moving to {destDept}.</span>
+                  </span>
+                ) : fabricAvailability?.isAvailable ? (
+                  <span className="text-emerald-700 font-semibold flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Fabric verified in store. Cleared for dispatch to {destDept}.</span>
+                  </span>
+                ) : (
+                  <span className="text-slate-500 italic">Select program to verify store stock</span>
+                )}
+              </div>
+
               <button
                 type="submit"
-                disabled={submitting}
-                className="inline-flex items-center gap-2 px-7 py-3 bg-teal-700 hover:bg-teal-800 disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer"
+                disabled={submitting || (fabricAvailability && !fabricAvailability.isAvailable)}
+                className={`inline-flex items-center gap-2 px-7 py-3 text-white text-xs font-bold rounded-xl shadow-xs transition ${
+                  fabricAvailability && !fabricAvailability.isAvailable
+                    ? 'bg-slate-400 cursor-not-allowed opacity-60'
+                    : 'bg-teal-700 hover:bg-teal-800 cursor-pointer'
+                }`}
               >
                 {submitting ? (
                   <RefreshCw className="w-4 h-4 animate-spin text-teal-200" />
+                ) : fabricAvailability && !fabricAvailability.isAvailable ? (
+                  <Lock className="w-4 h-4" />
                 ) : (
                   <Send className="w-4 h-4" />
                 )}
-                <span>{submitting ? 'Submitting Challan...' : 'Submit Challan to Dyeing'}</span>
+                <span>
+                  {submitting
+                    ? 'Submitting Challan...'
+                    : fabricAvailability && !fabricAvailability.isAvailable
+                    ? `Movement Blocked — Fabric Not in Store`
+                    : `Submit Challan to ${destDept}`}
+                </span>
               </button>
             </div>
           </form>

@@ -13,7 +13,13 @@ import {
   ArrowUpFromLine, 
   Eye,
   Printer,
-  Download 
+  Download,
+  Lock,
+  Check,
+  ShieldCheck,
+  ShieldAlert,
+  AlertTriangle,
+  PackagePlus,
 } from 'lucide-react';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { 
@@ -28,16 +34,34 @@ import {
 export default function IncomingChallansPage() {
   const [loading, setLoading] = useState(true);
   const [challans, setChallans] = useState<any[]>([]);
+  const [availabilityMap, setAvailabilityMap] = useState<Record<string, any>>({});
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
   const [selectedSheetModal, setSelectedSheetModal] = useState<any | null>(null);
 
   const loadChallans = async () => {
     try {
       setLoading(true);
-      // Load challans where toDepartment = STORE
-      const res = await fetch('/api/challans?toDepartment=STORE');
+      // Load challans where toDepartment = STORE and live Fabric Store availability
+      const [res, availRes] = await Promise.all([
+        fetch('/api/challans?toDepartment=STORE'),
+        fetch('/api/fabric-store/check-availability').catch(() => null),
+      ]);
+
       const json = await res.json();
       const data = Array.isArray(json) ? json : json.data || [];
+
+      if (availRes && availRes.ok) {
+        const availJson = await availRes.json();
+        const map: Record<string, any> = {};
+        if (Array.isArray(availJson.data)) {
+          for (const item of availJson.data) {
+            if (item.programId) map[item.programId] = item;
+            if (item.programNumber) map[item.programNumber] = item;
+          }
+        }
+        setAvailabilityMap(map);
+      }
+
       // Filter: addressed to store and active
       setChallans(data.filter((c: any) => 
         (c.toDepartment === 'STORE' || c.toDepartmentCode === 'STORE') && 
@@ -47,6 +71,24 @@ export default function IncomingChallansPage() {
       setChallans([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleQuickVerify = async (programId: string, isAvailable: boolean) => {
+    try {
+      setActionInProgress(programId);
+      const res = await fetch('/api/fabric-store/check-availability', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ programId, isAvailable }),
+      });
+      if (res.ok) {
+        await loadChallans();
+      }
+    } catch (err) {
+      console.error('Failed to update fabric availability:', err);
+    } finally {
+      setActionInProgress(null);
     }
   };
 
@@ -142,6 +184,7 @@ export default function IncomingChallansPage() {
                     <th className="py-2.5 px-4">Program / Client</th>
                     <th className="py-2.5 px-4">Date</th>
                     <th className="py-2.5 px-4">Description</th>
+                    <th className="py-2.5 px-4">Fabric in Store</th>
                     <th className="py-2.5 px-4">Status</th>
                     <th className="py-2.5 px-4 text-right">Actions</th>
                   </tr>
@@ -153,6 +196,8 @@ export default function IncomingChallansPage() {
                     const progNum = ch.program?.programSerialNo || ch.program?.programNumber || '—';
                     const client = ch.program?.clientName || ch.program?.buyerName || '';
                     const style = ch.program?.mainStyle || ch.program?.styleCode || '';
+                    const avail = progId ? availabilityMap[progId] : null;
+                    const isFabricInStore = avail ? avail.isAvailable : false;
 
                     return (
                       <tr key={ch.id} className="hover:bg-slate-50/70 transition">
@@ -197,6 +242,48 @@ export default function IncomingChallansPage() {
                           )}
                         </td>
 
+                        {/* FABRIC IN STORE STATUS */}
+                        <td className="py-3 px-4">
+                          {avail ? (
+                            isFabricInStore ? (
+                              <div className="space-y-1">
+                                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                                  <Check className="w-3 h-3 text-emerald-600" />
+                                  <span>In Store ({avail.totalStoreStockMeters} M)</span>
+                                </span>
+                                <button
+                                  type="button"
+                                  disabled={actionInProgress === progId}
+                                  onClick={() => handleQuickVerify(progId, false)}
+                                  className="block text-[9px] text-rose-600 hover:underline font-medium cursor-pointer"
+                                  title="Mark Out of Stock / Hold"
+                                >
+                                  Hold Sheet
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="space-y-1">
+                                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-800 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-full">
+                                  <Lock className="w-3 h-3 text-rose-600" />
+                                  <span>Not in Store</span>
+                                </span>
+                                <button
+                                  type="button"
+                                  disabled={actionInProgress === progId}
+                                  onClick={() => handleQuickVerify(progId, true)}
+                                  className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 hover:text-emerald-950 bg-emerald-100/90 hover:bg-emerald-200 border border-emerald-300 px-1.5 py-0.5 rounded transition cursor-pointer"
+                                  title="Store incharge confirms fabric received in store"
+                                >
+                                  <Check className="w-3 h-3 text-emerald-600" />
+                                  <span>{actionInProgress === progId ? '…' : 'Confirm Stock'}</span>
+                                </button>
+                              </div>
+                            )
+                          ) : (
+                            <span className="text-[10px] text-slate-400 italic">Checking…</span>
+                          )}
+                        </td>
+
                         <td className="py-3 px-4">{statusBadge(ch.status)}</td>
 
                         <td className="py-3 px-4 text-right">
@@ -207,7 +294,7 @@ export default function IncomingChallansPage() {
                                 type="button"
                                 disabled={actionInProgress === ch.id}
                                 onClick={() => handleMarkReceived(ch.id)}
-                                className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2 py-1 rounded transition"
+                                className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2 py-1 rounded transition cursor-pointer"
                                 title="Mark as received in Fabric Store"
                               >
                                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
@@ -215,44 +302,55 @@ export default function IncomingChallansPage() {
                               </button>
                             )}
 
-                            {ch.program?.fabricDyeingRequired ? (
-                              <>
-                                <Link
-                                  href={`/fabric-store/my-work/challan-to-dyeing?programId=${progId || ''}`}
-                                  className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-800 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2 py-1 rounded transition"
-                                  title="Issue next challan to Dyeing Department"
-                                >
-                                  <Send className="w-3.5 h-3.5 text-indigo-600" />
-                                  <span>Store to Dyeing</span>
-                                </Link>
-                                <Link
-                                  href={`/fabric-store/my-work/challan-to-embroidery?programId=${progId || ''}`}
-                                  className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2 py-1 rounded transition"
-                                  title="Issue next challan to Embroidery Department"
-                                >
-                                  <Send className="w-3.5 h-3.5 text-emerald-600" />
-                                  <span>Store to Embroidery</span>
-                                </Link>
-                              </>
+                            {/* NEXT DEPARTMENT MOVEMENT BUTTONS (GATED BY FABRIC AVAILABILITY) */}
+                            {isFabricInStore ? (
+                              ch.program?.fabricDyeingRequired ? (
+                                <>
+                                  <Link
+                                    href={`/fabric-store/my-work/challan-to-dyeing?programId=${progId || ''}`}
+                                    className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-800 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2 py-1 rounded transition"
+                                    title="Issue next challan to Dyeing Department"
+                                  >
+                                    <Send className="w-3.5 h-3.5 text-indigo-600" />
+                                    <span>Store to Dyeing</span>
+                                  </Link>
+                                  <Link
+                                    href={`/fabric-store/my-work/challan-to-embroidery?programId=${progId || ''}`}
+                                    className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2 py-1 rounded transition"
+                                    title="Issue next challan to Embroidery Department"
+                                  >
+                                    <Send className="w-3.5 h-3.5 text-emerald-600" />
+                                    <span>Store to Embroidery</span>
+                                  </Link>
+                                </>
+                              ) : (
+                                <>
+                                  <Link
+                                    href={`/fabric-store/my-work/challan-to-embroidery?programId=${progId || ''}`}
+                                    className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2 py-1 rounded transition"
+                                    title="Issue next challan to Embroidery Department"
+                                  >
+                                    <Send className="w-3.5 h-3.5 text-emerald-600" />
+                                    <span>Store to Embroidery</span>
+                                  </Link>
+                                  <Link
+                                    href={`/fabric-store/my-work/challan-to-dyeing?programId=${progId || ''}`}
+                                    className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-800 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2 py-1 rounded transition"
+                                    title="Issue next challan to Dyeing Department"
+                                  >
+                                    <Send className="w-3.5 h-3.5 text-indigo-600" />
+                                    <span>Store to Dyeing</span>
+                                  </Link>
+                                </>
+                              )
                             ) : (
-                              <>
-                                <Link
-                                  href={`/fabric-store/my-work/challan-to-embroidery?programId=${progId || ''}`}
-                                  className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2 py-1 rounded transition"
-                                  title="Issue next challan to Embroidery Department"
-                                >
-                                  <Send className="w-3.5 h-3.5 text-emerald-600" />
-                                  <span>Store to Embroidery</span>
-                                </Link>
-                                <Link
-                                  href={`/fabric-store/my-work/challan-to-dyeing?programId=${progId || ''}`}
-                                  className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-800 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2 py-1 rounded transition"
-                                  title="Issue next challan to Dyeing Department"
-                                >
-                                  <Send className="w-3.5 h-3.5 text-indigo-600" />
-                                  <span>Store to Dyeing</span>
-                                </Link>
-                              </>
+                              <span
+                                className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-400 bg-slate-100 border border-slate-200 px-2 py-1 rounded cursor-not-allowed opacity-80"
+                                title="Fabric is not available in Fabric Store. Production sheet cannot move to next department until fabric arrives."
+                              >
+                                <Lock className="w-3 h-3 text-slate-400" />
+                                <span>Held (Need Fabric)</span>
+                              </span>
                             )}
 
                             {/* CHALLAN ACTIONS */}

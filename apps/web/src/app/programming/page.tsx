@@ -19,7 +19,9 @@ import {
   Download,
   Search,
   History,
-  X
+  X,
+  Lock,
+  Check
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { 
@@ -40,6 +42,7 @@ export default function ProgrammingDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [programs, setPrograms] = useState<any[]>([]);
   const [challans, setChallans] = useState<any[]>([]);
+  const [availabilityMap, setAvailabilityMap] = useState<Record<string, any>>({});
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSheetModal, setSelectedSheetModal] = useState<any | null>(null);
@@ -47,12 +50,21 @@ export default function ProgrammingDashboardPage() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [programsData, challansData] = await Promise.all([
+      const [programsData, challansData, availRes] = await Promise.all([
         api.getPrograms().catch(() => []),
         api.getChallans().catch(() => []),
+        fetch('/api/fabric-store/check-availability').then(r => r.json()).catch(() => null),
       ]);
       setPrograms(programsData || []);
       setChallans(challansData || []);
+      if (availRes && Array.isArray(availRes.data)) {
+        const map: Record<string, any> = {};
+        for (const item of availRes.data) {
+          if (item.programId) map[item.programId] = item;
+          if (item.programNumber) map[item.programNumber] = item;
+        }
+        setAvailabilityMap(map);
+      }
     } catch (err) {
       console.error('Failed to load dashboard data:', err);
     } finally {
@@ -428,19 +440,44 @@ export default function ProgrammingDashboardPage() {
                               {prog.deliveryDate ? new Date(prog.deliveryDate).toLocaleDateString() : '—'}
                             </td>
                             <td className="py-3 px-4">
-                              <span
-                                className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-                                  isDraft
-                                    ? 'bg-amber-100 text-amber-800'
-                                    : isReady
-                                    ? 'bg-indigo-100 text-indigo-800'
-                                    : isIssued
-                                    ? 'bg-emerald-100 text-emerald-800'
-                                    : 'bg-blue-100 text-blue-800'
-                                }`}
-                              >
-                                {prog.status}
-                              </span>
+                              <div className="space-y-1">
+                                <span
+                                  className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                                    isDraft
+                                      ? 'bg-amber-100 text-amber-800'
+                                      : isReady
+                                      ? 'bg-indigo-100 text-indigo-800'
+                                      : isIssued
+                                      ? 'bg-emerald-100 text-emerald-800'
+                                      : 'bg-blue-100 text-blue-800'
+                                  }`}
+                                >
+                                  {prog.status}
+                                </span>
+                                <div>
+                                  {(() => {
+                                    const avail = availabilityMap[prog.id] || availabilityMap[prog.programNumber];
+                                    const isAvailable = avail ? Boolean(avail.isAvailable) : false;
+                                    return isAvailable ? (
+                                      <span
+                                        className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200"
+                                        title={`Fabric available in store (${avail?.totalStoreStockMeters || 0}m). Cleared to move to next department.`}
+                                      >
+                                        <Check className="w-2.5 h-2.5 text-emerald-600" />
+                                        In Store ({avail?.totalStoreStockMeters || 0}m)
+                                      </span>
+                                    ) : (
+                                      <span
+                                        className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200"
+                                        title="Fabric not available in store. Production sheet cannot move to next department."
+                                      >
+                                        <Lock className="w-2.5 h-2.5 text-amber-600" />
+                                        Awaiting Fabric
+                                      </span>
+                                    );
+                                  })()}
+                                </div>
+                              </div>
                             </td>
                             <td className="py-3 px-4 text-right space-x-1.5">
                               <button
