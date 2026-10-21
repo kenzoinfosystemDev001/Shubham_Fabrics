@@ -34,8 +34,12 @@ interface OutwardItem {
   byOrderName: string;
   remarks: string;
   destination: string;
-  fabricType: 'KORA' | 'DYED' | string;
+  fabricType: 'UNDYED' | 'DYED' | 'KORA' | string;
   status: string;
+  verifiedInwardDetails?: string;
+  inwardVerified?: boolean;
+  inwardBillNo?: string | null;
+  inwardSupplier?: string | null;
 }
 
 export default function OutwardStockPage() {
@@ -45,11 +49,12 @@ export default function OutwardStockPage() {
     totalEntries: 0,
     totalMeters: 0,
     totalPcs: 0,
+    undyedMeters: 0,
     koraMeters: 0,
     dyedMeters: 0,
   });
 
-  const [typeFilter, setTypeFilter] = useState<'ALL' | 'KORA' | 'DYED'>('ALL');
+  const [typeFilter, setTypeFilter] = useState<'ALL' | 'UNDYED' | 'DYED'>('ALL');
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -160,6 +165,8 @@ export default function OutwardStockPage() {
     }
   };
 
+  const undyedMetersTotal = summary.undyedMeters || summary.koraMeters || 0;
+
   return (
     <div className="min-h-screen bg-[#F0FAF9] pb-16">
       {/* HEADER */}
@@ -177,10 +184,10 @@ export default function OutwardStockPage() {
             </div>
             <h1 className="text-lg font-bold text-slate-900 flex items-center gap-2">
               <Send className="w-5 h-5 text-amber-600" />
-              <span>Outward Stock</span>
+              <span>Outward Fabric Dispatches</span>
             </h1>
             <p className="text-[11px] text-slate-500 mt-0.5">
-              The outward will update on challan created &middot; Dispatches to Dyeing, Embroidery &amp; other units
+              Live outward tracking with verified Inward details &middot; Dispatches to Dyeing, Embroidery &amp; other units
             </p>
           </div>
 
@@ -246,28 +253,38 @@ export default function OutwardStockPage() {
           </div>
 
           <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 block">
-              KORA OUTWARD TO DYEING
-            </span>
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 block">
+                1. UNDYED OUTWARD (TO DYEING)
+              </span>
+              <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-100 text-amber-900">
+                UNDYED
+              </span>
+            </div>
             <div className="text-2xl font-black text-amber-900 mt-1">
-              {summary.koraMeters.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+              {undyedMetersTotal.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
               <span className="text-xs font-semibold text-amber-700 ml-1">MTR</span>
             </div>
             <span className="text-[10px] text-amber-700/80 mt-0.5 block">
-              Grey fabric sent to Dyeing House
+              Undyed fabric sent to Dyeing House
             </span>
           </div>
 
           <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-purple-700 block">
-              DYED OUTWARD TO EMBROIDERY
-            </span>
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-purple-700 block">
+                2. DYED OUTWARD (TO EMBROIDERY)
+              </span>
+              <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-purple-100 text-purple-900">
+                DYED
+              </span>
+            </div>
             <div className="text-2xl font-black text-purple-900 mt-1">
               {summary.dyedMeters.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
               <span className="text-xs font-semibold text-purple-700 ml-1">MTR</span>
             </div>
             <span className="text-[10px] text-purple-700/80 mt-0.5 block">
-              Processed fabric issued for embroidery
+              Dyed fabric issued for embroidery
             </span>
           </div>
 
@@ -305,14 +322,14 @@ export default function OutwardStockPage() {
             </button>
             <button
               type="button"
-              onClick={() => setTypeFilter('KORA')}
+              onClick={() => setTypeFilter('UNDYED')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                typeFilter === 'KORA'
+                typeFilter === 'UNDYED'
                   ? 'bg-amber-700 text-white'
                   : 'bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200'
               }`}
             >
-              Kora (Store &rarr; Dyeing)
+              1. UNDYED (Store &rarr; Dyeing)
             </button>
             <button
               type="button"
@@ -323,7 +340,7 @@ export default function OutwardStockPage() {
                   : 'bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-200'
               }`}
             >
-              Dyed (Store &rarr; Embroidery)
+              2. DYED (Store &rarr; Embroidery)
             </button>
           </div>
 
@@ -334,7 +351,7 @@ export default function OutwardStockPage() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search Challan, Design, Order..."
+                placeholder="Search Challan, Design, Inward Bill..."
                 className="pl-8 pr-3 py-1.5 border border-slate-300 rounded-lg text-xs w-48 sm:w-64 focus:outline-none focus:ring-1 focus:ring-teal-600 bg-white"
               />
             </div>
@@ -347,14 +364,14 @@ export default function OutwardStockPage() {
           </form>
         </div>
 
-        {/* OUTWARD STOCK TABLE (Matches user's handwritten fields exactly) */}
+        {/* OUTWARD STOCK TABLE */}
         <div className="bg-white rounded-xl border-[1.5px] border-black shadow-xs overflow-hidden">
           <div className="px-5 py-3 border-b-[1.5px] border-black bg-slate-50 flex items-center justify-between">
             <span className="font-black text-xs uppercase tracking-wider text-slate-900">
               OUTWARD STOCK TABLE ({items.length} DISPATCHES)
             </span>
             <span className="text-[11px] font-semibold text-slate-500">
-              Auto-synced with issued Challans
+              Auto-synced with issued Challans &middot; Displays verified inward stock sources
             </span>
           </div>
 
@@ -377,6 +394,9 @@ export default function OutwardStockPage() {
                   <th className="border-r-[1.5px] border-black px-3 py-2 font-black">
                     ITEM NAME
                   </th>
+                  <th className="border-r-[1.5px] border-black px-2.5 py-2 font-black text-center w-24">
+                    CATEGORY
+                  </th>
                   <th className="border-r-[1.5px] border-black px-3 py-2 font-black text-right w-24">
                     ISSUE QTY
                   </th>
@@ -389,6 +409,9 @@ export default function OutwardStockPage() {
                   <th className="border-r-[1.5px] border-black px-3 py-2 font-black w-36">
                     BY ORDER NAME
                   </th>
+                  <th className="border-r-[1.5px] border-black px-3 py-2 font-black w-56 bg-emerald-50/50">
+                    VERIFIED INWARD DETAILS
+                  </th>
                   <th className="px-3 py-2 font-black">
                     REMARKS
                   </th>
@@ -397,59 +420,87 @@ export default function OutwardStockPage() {
               <tbody className="divide-y divide-slate-200">
                 {items.length === 0 ? (
                   <tr>
-                    <td colSpan={10} className="px-4 py-12 text-center text-slate-500 space-y-2">
+                    <td colSpan={12} className="px-4 py-12 text-center text-slate-500 space-y-2">
                       <Send className="w-8 h-8 mx-auto text-slate-300" />
                       <div className="text-sm font-bold text-slate-700">No outward records found</div>
                       <p className="text-xs text-slate-400">
-                        When you issue a Challan to Dyeing or Embroidery, it will automatically populate this table.
+                        When you issue a Challan to Dyeing or Embroidery, it will automatically populate this table with verified Inward stock origin.
                       </p>
                     </td>
                   </tr>
                 ) : (
-                  items.map((item, index) => (
-                    <tr key={item.id} className="hover:bg-amber-50/40 transition h-10">
-                      <td className="border-r-[1.5px] border-black px-2.5 py-2 text-center font-bold font-mono text-slate-700">
-                        {item.sNo ?? index + 1}
-                      </td>
-                      <td className="border-r-[1.5px] border-black px-3 py-2 text-center font-medium text-slate-700 whitespace-nowrap">
-                        {formatDate(item.date)}
-                      </td>
-                      <td className="border-r-[1.5px] border-black px-3 py-2 font-mono font-black text-indigo-900">
-                        {item.challanNumber}
-                      </td>
-                      <td className="border-r-[1.5px] border-black px-3 py-2 font-mono font-bold text-slate-900">
-                        {item.designNumber}
-                      </td>
-                      <td className="border-r-[1.5px] border-black px-3 py-2 font-bold text-slate-900">
-                        <div className="truncate max-w-[200px]" title={item.itemName}>
-                          {item.itemName}
-                        </div>
-                      </td>
-                      <td className="border-r-[1.5px] border-black px-3 py-2 text-right font-black text-sm text-slate-900">
-                        {Number(item.issueQty).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                        <span className="text-[10px] font-bold text-slate-500 ml-1">
-                          {item.unit || 'MTR'}
-                        </span>
-                      </td>
-                      <td className="border-r-[1.5px] border-black px-3 py-2 text-right font-bold text-slate-700">
-                        {item.avgPerPcs ? `${Number(item.avgPerPcs).toFixed(2)} m/pc` : '—'}
-                      </td>
-                      <td className="border-r-[1.5px] border-black px-3 py-2 text-right font-black text-sm text-teal-900">
-                        {item.issuePcsQty ? Number(item.issuePcsQty).toLocaleString('en-IN') : '—'}
-                        {item.issuePcsQty ? <span className="text-[10px] font-bold text-slate-500 ml-0.5">PCS</span> : null}
-                      </td>
-                      <td className="border-r-[1.5px] border-black px-3 py-2 font-semibold text-slate-800">
-                        <div className="truncate max-w-[140px]" title={item.byOrderName}>
-                          {item.byOrderName}
-                        </div>
-                      </td>
-                      <td className="px-3 py-2 text-slate-600 text-xs">
-                        <div className="truncate max-w-xs font-medium text-slate-700" title={item.remarks}>
-                          {item.remarks}
-                        </div>
-                      </td>
-                    </tr>
-                  ))
+                  items.map((item, index) => {
+                    const isUndyed = item.fabricType === 'UNDYED' || (item.fabricType as string) === 'KORA';
+                    return (
+                      <tr key={item.id} className="hover:bg-amber-50/40 transition h-10">
+                        <td className="border-r-[1.5px] border-black px-2.5 py-2 text-center font-bold font-mono text-slate-700">
+                          {item.sNo ?? index + 1}
+                        </td>
+                        <td className="border-r-[1.5px] border-black px-3 py-2 text-center font-medium text-slate-700 whitespace-nowrap">
+                          {formatDate(item.date)}
+                        </td>
+                        <td className="border-r-[1.5px] border-black px-3 py-2 font-mono font-black text-indigo-900">
+                          {item.challanId ? (
+                            <Link href={`/challans/${item.challanId}`} className="hover:underline text-indigo-700">
+                              {item.challanNumber}
+                            </Link>
+                          ) : (
+                            item.challanNumber
+                          )}
+                        </td>
+                        <td className="border-r-[1.5px] border-black px-3 py-2 font-mono font-bold text-slate-900">
+                          {item.designNumber}
+                        </td>
+                        <td className="border-r-[1.5px] border-black px-3 py-2 font-bold text-slate-900">
+                          <div className="truncate max-w-[200px]" title={item.itemName}>
+                            {item.itemName}
+                          </div>
+                        </td>
+                        <td className="border-r-[1.5px] border-black px-2.5 py-2 text-center">
+                          <span
+                            className={`inline-block px-2 py-0.5 rounded text-[10px] font-black tracking-wider uppercase ${
+                              isUndyed
+                                ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                                : 'bg-purple-100 text-purple-900 border border-purple-300'
+                            }`}
+                          >
+                            {isUndyed ? 'UNDYED' : 'DYED'}
+                          </span>
+                        </td>
+                        <td className="border-r-[1.5px] border-black px-3 py-2 text-right font-black text-sm text-slate-900">
+                          {Number(item.issueQty).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                          <span className="text-[10px] font-bold text-slate-500 ml-1">
+                            {item.unit || 'MTR'}
+                          </span>
+                        </td>
+                        <td className="border-r-[1.5px] border-black px-3 py-2 text-right font-bold text-slate-700">
+                          {item.avgPerPcs ? `${Number(item.avgPerPcs).toFixed(2)} m/pc` : '—'}
+                        </td>
+                        <td className="border-r-[1.5px] border-black px-3 py-2 text-right font-black text-sm text-teal-900">
+                          {item.issuePcsQty ? Number(item.issuePcsQty).toLocaleString('en-IN') : '—'}
+                          {item.issuePcsQty ? <span className="text-[10px] font-bold text-slate-500 ml-0.5">PCS</span> : null}
+                        </td>
+                        <td className="border-r-[1.5px] border-black px-3 py-2 font-semibold text-slate-800">
+                          <div className="truncate max-w-[140px]" title={item.byOrderName}>
+                            {item.byOrderName}
+                          </div>
+                        </td>
+                        <td className="border-r-[1.5px] border-black px-3 py-2 text-slate-800 text-xs bg-emerald-50/30">
+                          <div className="flex items-center gap-1.5 font-semibold text-emerald-950">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                            <span className="truncate max-w-[220px]" title={item.verifiedInwardDetails || 'Verified In-Store Stock'}>
+                              {item.verifiedInwardDetails || 'Verified In-Store Stock'}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-3 py-2 text-slate-600 text-xs">
+                          <div className="truncate max-w-xs font-medium text-slate-700" title={item.remarks}>
+                            {item.remarks}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>
@@ -638,8 +689,8 @@ export default function OutwardStockPage() {
                     onChange={(e) => setFormData((prev) => ({ ...prev, fabricType: e.target.value }))}
                     className="w-full h-10 px-3 border border-slate-300 rounded-lg text-xs font-bold text-slate-800 bg-white focus:outline-none"
                   >
-                    <option value="DYED">Dyed Fabric</option>
-                    <option value="KORA">KORA (Undyed)</option>
+                    <option value="DYED">2. DYED</option>
+                    <option value="UNDYED">1. UNDYED</option>
                   </select>
                 </div>
               </div>

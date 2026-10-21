@@ -16,7 +16,6 @@ import {
   Trash2,
   Layers,
   Sparkles,
-  Upload,
   Image as ImageIcon,
   Edit3,
   Check,
@@ -47,7 +46,8 @@ import { WilcomPrintModal } from '@/components/wilcom/WilcomPrintModal';
 import { 
   WilcomEntry, 
   printWilcomForm, 
-  downloadWilcomFormHtml 
+  downloadWilcomFormHtml,
+  extractRootWilcomPhoto
 } from '@/lib/download-wilcom';
 
 interface ComponentState {
@@ -101,6 +101,384 @@ const CATEGORY_META: Record<GarmentCategory, {
   },
 };
 
+const COMMON_GARMENT_SUB_STYLES = [
+  'FRONT',
+  'BACK',
+  'SLEEVE',
+  'COLLAR',
+  'CUFF',
+  'YOKE',
+  'POCKET',
+  'BORDER',
+  'LACE',
+  'BELT',
+  'DAMAN',
+  'GALA / NECK',
+  'DUPATTA BODY',
+  'PALLU',
+  'BOTTOM WAIST',
+  'PANTS LEG',
+  'INNER LINING',
+  'PATTI',
+  'HOOD',
+  'FLAP',
+];
+
+interface SubStyleMultiSelectCellProps {
+  cat: GarmentCategory;
+  rIdx: number;
+  row: ProductionGridItem;
+  compSubStyles: SubStyleAverage[];
+  isPickerOpen: boolean;
+  onOpenPicker: () => void;
+  onClosePicker: () => void;
+  onToggleSubStyle: (subStyleName: string) => void;
+  onSetSubStyles: (subStyles: string[]) => void;
+  onApplyAll: () => void;
+  onSubStyleTextChange: (text: string) => void;
+  customSubStyleInput: string;
+  setCustomSubStyleInput: (val: string) => void;
+  canApplyAll: boolean;
+}
+
+function SubStyleMultiSelectCell({
+  cat,
+  rIdx,
+  row,
+  compSubStyles,
+  isPickerOpen,
+  onOpenPicker,
+  onClosePicker,
+  onToggleSubStyle,
+  onSetSubStyles,
+  onApplyAll,
+  onSubStyleTextChange,
+  customSubStyleInput,
+  setCustomSubStyleInput,
+  canApplyAll,
+}: SubStyleMultiSelectCellProps) {
+  let rowSubStyles = Array.isArray(row.subStyles) ? row.subStyles : [];
+  if (rowSubStyles.length === 0 && row.subStyle) {
+    rowSubStyles = String(row.subStyle)
+      .split(',')
+      .map((s) => s.trim().toUpperCase())
+      .filter(Boolean);
+  }
+
+  return (
+    <div className="relative w-full flex items-center justify-center p-0.5 min-h-[30px]">
+      <div className="flex flex-wrap items-center justify-center gap-1 w-full">
+        {rowSubStyles.map((sub, sIdx) => (
+          <span
+            key={sIdx}
+            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-black uppercase bg-blue-100 border border-blue-300 text-blue-950 shadow-2xs select-none"
+          >
+            <span>{sub}</span>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleSubStyle(sub);
+              }}
+              className="text-blue-800 hover:text-rose-600 transition p-0.5 rounded cursor-pointer"
+              title="Remove this sub style"
+            >
+              <X className="w-2.5 h-2.5" />
+            </button>
+          </span>
+        ))}
+
+        <button
+          type="button"
+          onClick={onOpenPicker}
+          className="inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold text-blue-700 hover:text-blue-950 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded transition cursor-pointer shadow-2xs"
+          title="Select or add sub styles"
+        >
+          <Plus className="w-2.5 h-2.5" />
+        </button>
+      </div>
+
+      {isPickerOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-black/10 backdrop-blur-[0.5px]"
+            onClick={onClosePicker}
+          />
+          <div
+            className="absolute left-1/2 -translate-x-1/2 top-full mt-1 z-50 w-72 bg-white rounded-lg shadow-2xl border-2 border-black p-3 text-left"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-slate-200 pb-2 mb-2">
+              <div>
+                <span className="text-[11px] font-black uppercase text-slate-900 block">
+                  Sub Styles &middot; Row #{rIdx + 1}
+                </span>
+                <span className="text-[10px] text-blue-800 font-bold">
+                  {rowSubStyles.length} selected
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={onClosePicker}
+                className="text-slate-400 hover:text-slate-700 p-0.5 cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between gap-1 mb-2">
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const allNames = compSubStyles.map((s) => s.name);
+                    onSetSubStyles(allNames);
+                  }}
+                  className="text-[9px] font-bold text-blue-700 hover:bg-blue-50 border border-blue-300 px-1.5 py-0.5 rounded cursor-pointer transition"
+                >
+                  Select All
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onSetSubStyles([])}
+                  className="text-[9px] font-bold text-slate-600 hover:bg-slate-100 border border-slate-300 px-1.5 py-0.5 rounded cursor-pointer transition"
+                >
+                  Clear
+                </button>
+              </div>
+              {canApplyAll && (
+                <button
+                  type="button"
+                  onClick={onApplyAll}
+                  className="text-[9px] font-bold text-purple-700 hover:bg-purple-50 border border-purple-300 px-1.5 py-0.5 rounded cursor-pointer transition"
+                  title="Copy selected sub styles to all color rows in this grid"
+                >
+                  Apply to All Rows
+                </button>
+              )}
+            </div>
+
+            <div className="max-h-40 overflow-y-auto space-y-1 mb-2 pr-1 border border-slate-100 rounded p-1 bg-slate-50/50">
+              {compSubStyles.map((sub, sIdx) => {
+                const isChecked = rowSubStyles.includes(sub.name.toUpperCase());
+                return (
+                  <label
+                    key={sIdx}
+                    className={`flex items-center justify-between px-2 py-1 rounded text-xs cursor-pointer select-none transition ${
+                      isChecked
+                        ? 'bg-blue-100 text-blue-950 font-bold border border-blue-300'
+                        : 'hover:bg-slate-100 text-slate-700 font-medium'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => onToggleSubStyle(sub.name)}
+                        className="w-3.5 h-3.5 rounded border-slate-300 text-blue-600 focus:ring-0 cursor-pointer"
+                      />
+                      <span>{sub.name}</span>
+                    </div>
+                    {sub.average && Number(sub.average) > 0 && (
+                      <span className="text-[10px] text-slate-500 font-mono">
+                        {Number(sub.average).toFixed(2)}m
+                      </span>
+                    )}
+                  </label>
+                );
+              })}
+            </div>
+
+            <div className="pt-2 border-t border-slate-200">
+              <div className="text-[10px] font-bold text-slate-600 mb-1 uppercase">
+                Custom Part
+              </div>
+              <div className="flex items-center gap-1">
+                <input
+                  type="text"
+                  value={customSubStyleInput}
+                  onChange={(e) => setCustomSubStyleInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      if (customSubStyleInput.trim()) {
+                        onToggleSubStyle(customSubStyleInput);
+                        setCustomSubStyleInput('');
+                      }
+                    }
+                  }}
+                  placeholder="e.g. POCKET"
+                  className="flex-1 px-2 py-1 text-xs uppercase font-bold border border-slate-300 rounded focus:outline-none focus:border-blue-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (customSubStyleInput.trim()) {
+                      onToggleSubStyle(customSubStyleInput);
+                      setCustomSubStyleInput('');
+                    }
+                  }}
+                  className="px-2 py-1 bg-[#163767] hover:bg-[#0F264A] text-white text-xs font-bold rounded cursor-pointer transition"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+
+            <div className="pt-2 mt-2 border-t border-slate-200">
+              <div className="text-[10px] font-bold text-slate-600 mb-1 uppercase">
+                Manual Text Edit
+              </div>
+              <input
+                type="text"
+                value={row.subStyle || ''}
+                onChange={(e) => onSubStyleTextChange(e.target.value)}
+                placeholder="Comma-separated: FRONT, SLEEVE"
+                className="w-full px-2 py-1 text-xs uppercase font-bold border border-slate-300 rounded focus:outline-none focus:border-blue-500"
+              />
+            </div>
+
+            <div className="mt-2.5 pt-2 border-t border-slate-200 flex items-center justify-end">
+              <button
+                type="button"
+                onClick={onClosePicker}
+                className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold rounded cursor-pointer transition shadow-2xs"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+interface BatchSubStylesModalProps {
+  cat: GarmentCategory;
+  existingSubStyles: SubStyleAverage[];
+  selectedPresets: string[];
+  onTogglePreset: (part: string) => void;
+  customInput: string;
+  onCustomInputChange: (val: string) => void;
+  onClose: () => void;
+  onAdd: (subStyles: string[]) => void;
+}
+
+function BatchSubStylesModal({
+  cat,
+  existingSubStyles,
+  selectedPresets,
+  onTogglePreset,
+  customInput,
+  onCustomInputChange,
+  onClose,
+  onAdd,
+}: BatchSubStylesModalProps) {
+  const existingSet = new Set(existingSubStyles.map((s) => s.name.toUpperCase()));
+
+  const handleConfirm = () => {
+    const customParts = customInput
+      .split(',')
+      .map((s) => s.trim().toUpperCase())
+      .filter(Boolean);
+    const combined = Array.from(new Set([...selectedPresets, ...customParts]));
+    if (combined.length > 0) {
+      onAdd(combined);
+    }
+    onClose();
+  };
+
+  const totalCount = selectedPresets.length + customInput.split(',').filter((s) => s.trim()).length;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
+      <div className="bg-white rounded-xl shadow-2xl border-2 border-black max-w-md w-full p-5 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+        <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+          <div>
+            <h3 className="font-black text-sm uppercase text-slate-900">
+              Add Multiple Sub Styles &middot; {cat}
+            </h3>
+            <p className="text-xs text-slate-500">
+              Select common garment components or enter custom names
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-slate-400 hover:text-slate-700 p-1 cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="space-y-1.5">
+          <span className="text-xs font-bold text-slate-700 uppercase">
+            Quick Preset Parts
+          </span>
+          <div className="flex flex-wrap gap-1.5 max-h-44 overflow-y-auto p-1.5 border border-slate-200 rounded-lg bg-slate-50">
+            {COMMON_GARMENT_SUB_STYLES.map((part) => {
+              const isSelected = selectedPresets.includes(part);
+              const isAlreadyAdded = existingSet.has(part);
+
+              return (
+                <button
+                  key={part}
+                  type="button"
+                  disabled={isAlreadyAdded}
+                  onClick={() => onTogglePreset(part)}
+                  className={`px-2 py-1 rounded text-xs font-bold uppercase transition flex items-center gap-1 cursor-pointer ${
+                    isAlreadyAdded
+                      ? 'bg-slate-200 text-slate-400 cursor-not-allowed opacity-60'
+                      : isSelected
+                      ? 'bg-blue-600 text-white shadow-2xs'
+                      : 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  {isSelected && <Check className="w-3 h-3" />}
+                  <span>{part}</span>
+                  {isAlreadyAdded && <span className="text-[9px]">(added)</span>}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="space-y-1">
+          <label className="text-xs font-bold text-slate-700 uppercase block">
+            Or Enter Custom Sub Styles (Comma-Separated)
+          </label>
+          <textarea
+            rows={2}
+            value={customInput}
+            onChange={(e) => onCustomInputChange(e.target.value)}
+            placeholder="e.g. FRONT YOKE, BACK YOKE, INNER POCKET"
+            className="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs uppercase font-bold focus:outline-none focus:border-blue-500 resize-none"
+          />
+        </div>
+
+        <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-3 py-1.5 border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-bold rounded cursor-pointer transition"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={handleConfirm}
+            disabled={totalCount === 0}
+            className="px-4 py-1.5 bg-[#163767] hover:bg-[#0F264A] disabled:opacity-50 text-white text-xs font-bold rounded cursor-pointer transition shadow-xs"
+          >
+            Add to Average Table ({totalCount})
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function CreateProductionSheetPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -108,6 +486,18 @@ export default function CreateProductionSheetPage() {
   const [success, setSuccess] = useState<any | null>(null);
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [createdProgramId, setCreatedProgramId] = useState<string | null>(null);
+  // Sub-style Multi-select Picker State
+  const [activeSubStylePicker, setActiveSubStylePicker] = useState<{
+    cat: GarmentCategory;
+    rowIndex: number;
+  } | null>(null);
+  const [customSubStyleInput, setCustomSubStyleInput] = useState('');
+
+  // Batch Sub-styles Modal State (for AVERAGE section)
+  const [showBatchSubStylesModal, setShowBatchSubStylesModal] = useState<GarmentCategory | null>(null);
+  const [batchSubStylesInput, setBatchSubStylesInput] = useState('');
+  const [selectedBatchPresets, setSelectedBatchPresets] = useState<string[]>([]);
+
 
   // Common / Shared Order Header Fields
   const [designNumber, setDesignNumber] = useState('');
@@ -127,7 +517,7 @@ export default function CreateProductionSheetPage() {
       fabricName: '',
       fabricWidth: '',
       subStyles: DEFAULT_SUB_STYLES.map((s) => ({ ...s, average: '' })),
-      productionGrid: [{ id: 'top-row-1', color: '', pcs: '', mtr: '', subStyle: '', size: '', sizes: {} }],
+      productionGrid: [{ id: 'top-row-1', color: '', pcs: '', mtr: '', subStyle: '', subStyles: [], size: '', sizes: {} }],
       swatchColorOverrides: {},
       noteText: '',
       remarksText: '',
@@ -140,7 +530,7 @@ export default function CreateProductionSheetPage() {
       fabricName: '',
       fabricWidth: '',
       subStyles: DEFAULT_BOTTOM_SUB_STYLES.map((s) => ({ ...s, average: '' })),
-      productionGrid: [{ id: 'bottom-row-1', color: '', pcs: '', mtr: '', subStyle: '', size: '', sizes: {} }],
+      productionGrid: [{ id: 'bottom-row-1', color: '', pcs: '', mtr: '', subStyle: '', subStyles: [], size: '', sizes: {} }],
       swatchColorOverrides: {},
       noteText: '',
       remarksText: '',
@@ -153,7 +543,7 @@ export default function CreateProductionSheetPage() {
       fabricName: '',
       fabricWidth: '',
       subStyles: DEFAULT_DUPATTA_SUB_STYLES.map((s) => ({ ...s, average: '' })),
-      productionGrid: [{ id: 'dupatta-row-1', color: '', pcs: '', mtr: '', subStyle: '', size: '', sizes: {} }],
+      productionGrid: [{ id: 'dupatta-row-1', color: '', pcs: '', mtr: '', subStyle: '', subStyles: [], size: '', sizes: {} }],
       swatchColorOverrides: {},
       noteText: '',
       remarksText: '',
@@ -166,7 +556,7 @@ export default function CreateProductionSheetPage() {
       fabricName: '',
       fabricWidth: '',
       subStyles: DEFAULT_SUB_STYLES.map((s) => ({ ...s, average: '' })),
-      productionGrid: [{ id: 'other-row-1', color: '', pcs: '', mtr: '', subStyle: '', size: '', sizes: {} }],
+      productionGrid: [{ id: 'other-row-1', color: '', pcs: '', mtr: '', subStyle: '', subStyles: [], size: '', sizes: {} }],
       swatchColorOverrides: {},
       noteText: '',
       remarksText: '',
@@ -223,9 +613,8 @@ export default function CreateProductionSheetPage() {
   };
 
   const getTotalFabricMeters = (cat: GarmentCategory): number => {
-    const pieces = getTotalPieces(cat);
-    const avg = getTotalMtrAverage(cat);
-    return Math.round(pieces * avg * 100) / 100;
+    const sum = components[cat].productionGrid.reduce((acc, row) => acc + (Number(row.mtr) || 0), 0);
+    return Math.round(sum * 100) / 100;
   };
 
   const getDisplaySwatches = (cat: GarmentCategory): SwatchItem[] => {
@@ -359,21 +748,11 @@ export default function CreateProductionSheetPage() {
     const updatedSubStyles = [...components[cat].subStyles];
     updatedSubStyles[index] = { ...updatedSubStyles[index], average: newAverage };
 
-    const newTotal = Math.round(
-      updatedSubStyles.reduce((acc, it) => acc + (Number(it.average) || 0), 0) * 100
-    ) / 100;
-
-    const updatedGrid = components[cat].productionGrid.map((row) => ({
-      ...row,
-      mtr: row.pcs !== '' && Number(row.pcs) > 0 ? Math.round(Number(row.pcs) * newTotal * 100) / 100 : '',
-    }));
-
     setComponents((prev) => ({
       ...prev,
       [cat]: {
         ...prev[cat],
         subStyles: updatedSubStyles,
-        productionGrid: updatedGrid,
       },
     }));
   };
@@ -427,16 +806,11 @@ export default function CreateProductionSheetPage() {
     const removedName = components[cat].subStyles[indexToRemove].name;
     const updatedSubStyles = components[cat].subStyles.filter((_, idx) => idx !== indexToRemove);
 
-    const newTotal = Math.round(
-      updatedSubStyles.reduce((acc, it) => acc + (Number(it.average) || 0), 0) * 100
-    ) / 100;
-
     const updatedGrid = components[cat].productionGrid.map((row) => {
       const nextSizes = { ...row.sizes };
       delete nextSizes[removedName];
       return {
         ...row,
-        mtr: row.pcs !== '' && Number(row.pcs) > 0 ? Math.round(Number(row.pcs) * newTotal * 100) / 100 : '',
         sizes: nextSizes,
       };
     });
@@ -458,9 +832,7 @@ export default function CreateProductionSheetPage() {
     const target = { ...updatedGrid[index] };
 
     if (field === 'pcs') {
-      const numPcs = Number(value);
       target.pcs = value;
-      target.mtr = value !== '' && Number.isFinite(numPcs) && numPcs > 0 && totalAvg > 0 ? Math.round(numPcs * totalAvg * 100) / 100 : target.mtr;
     } else if (field === 'mtr') {
       target.mtr = value;
     } else if (field === 'subStyle') {
@@ -483,10 +855,25 @@ export default function CreateProductionSheetPage() {
     }));
   };
 
-  const handleGridSizeChange = (cat: GarmentCategory, rowIndex: number, subStyleName: string, sizeVal: string) => {
+    const handleGridSizeChange = (cat: GarmentCategory, rowIndex: number, subStyleName: string, sizeVal: string) => {
     const updatedGrid = [...components[cat].productionGrid];
     const target = { ...updatedGrid[rowIndex] };
-    target.sizes = { ...target.sizes, [subStyleName]: sizeVal };
+    const nextSizes = { ...target.sizes, [subStyleName]: sizeVal };
+    target.sizes = nextSizes;
+
+    const rowSubs = Array.isArray(target.subStyles) && target.subStyles.length > 0
+      ? target.subStyles
+      : target.subStyle ? target.subStyle.split(',').map((s) => s.trim().toUpperCase()).filter(Boolean) : [];
+
+    if (rowSubs.length > 1) {
+      target.size = rowSubs
+        .map((s) => (nextSizes[s] ? `${s}: ${nextSizes[s]}` : ''))
+        .filter(Boolean)
+        .join(', ');
+    } else {
+      target.size = sizeVal;
+    }
+
     updatedGrid[rowIndex] = target;
 
     setComponents((prev) => ({
@@ -494,6 +881,129 @@ export default function CreateProductionSheetPage() {
       [cat]: {
         ...prev[cat],
         productionGrid: updatedGrid,
+      },
+    }));
+  };
+
+  const handleGridRowSubStylesToggle = (cat: GarmentCategory, index: number, subStyleName: string) => {
+    const updatedGrid = [...components[cat].productionGrid];
+    const target = { ...updatedGrid[index] };
+    const cleanName = subStyleName.trim().toUpperCase();
+    if (!cleanName) return;
+
+    let current = Array.isArray(target.subStyles) ? [...target.subStyles] : [];
+    if (current.length === 0 && target.subStyle) {
+      current = String(target.subStyle).split(',').map((s) => s.trim().toUpperCase()).filter(Boolean);
+    }
+
+    if (current.includes(cleanName)) {
+      current = current.filter((s) => s !== cleanName);
+    } else {
+      current.push(cleanName);
+    }
+
+    target.subStyles = current;
+    target.subStyle = current.join(', ');
+
+    // Synchronize sizes
+    const nextSizes = { ...target.sizes };
+    if (!nextSizes[cleanName]) {
+      nextSizes[cleanName] = current.length === 1 && target.size ? target.size : '';
+    }
+    target.sizes = nextSizes;
+    if (current.length > 1) {
+      target.size = current.map((s) => (nextSizes[s] ? `${s}: ${nextSizes[s]}` : '')).filter(Boolean).join(', ');
+    } else if (current.length === 1) {
+      target.size = nextSizes[current[0]] || target.size || '';
+    }
+
+    updatedGrid[index] = target;
+
+    setComponents((prev) => ({
+      ...prev,
+      [cat]: {
+        ...prev[cat],
+        productionGrid: updatedGrid,
+      },
+    }));
+  };
+
+  const handleGridRowSubStylesSet = (cat: GarmentCategory, index: number, newSubStyles: string[]) => {
+    const updatedGrid = [...components[cat].productionGrid];
+    const target = { ...updatedGrid[index] };
+    const cleanList = Array.from(new Set(newSubStyles.map((s) => s.trim().toUpperCase()).filter(Boolean)));
+    target.subStyles = cleanList;
+    target.subStyle = cleanList.join(', ');
+
+    const nextSizes = { ...target.sizes };
+    cleanList.forEach((s) => {
+      if (nextSizes[s] === undefined) nextSizes[s] = '';
+    });
+    target.sizes = nextSizes;
+    if (cleanList.length > 1) {
+      target.size = cleanList.map((s) => (nextSizes[s] ? `${s}: ${nextSizes[s]}` : '')).filter(Boolean).join(', ');
+    } else if (cleanList.length === 1) {
+      target.size = nextSizes[cleanList[0]] || target.size || '';
+    }
+
+    updatedGrid[index] = target;
+
+    setComponents((prev) => ({
+      ...prev,
+      [cat]: {
+        ...prev[cat],
+        productionGrid: updatedGrid,
+      },
+    }));
+  };
+
+  const handleApplySubStylesToAllRows = (cat: GarmentCategory, sourceIndex: number) => {
+    const sourceRow = components[cat].productionGrid[sourceIndex];
+    if (!sourceRow) return;
+    let currentSubStyles = Array.isArray(sourceRow.subStyles) ? [...sourceRow.subStyles] : [];
+    if (currentSubStyles.length === 0 && sourceRow.subStyle) {
+      currentSubStyles = String(sourceRow.subStyle).split(',').map((s) => s.trim().toUpperCase()).filter(Boolean);
+    }
+    const currentSubStyle = currentSubStyles.join(', ');
+    const sourceSizes = sourceRow.sizes ? { ...sourceRow.sizes } : {};
+
+    const updatedGrid = components[cat].productionGrid.map((row) => ({
+      ...row,
+      subStyles: [...currentSubStyles],
+      subStyle: currentSubStyle,
+      sizes: { ...sourceSizes },
+      size: sourceRow.size || '',
+    }));
+
+    setComponents((prev) => ({
+      ...prev,
+      [cat]: {
+        ...prev[cat],
+        productionGrid: updatedGrid,
+      },
+    }));
+  };
+
+  const handleAddMultipleSubStyles = (cat: GarmentCategory, names: string[]) => {
+    const cleanNames = names.map((n) => n.trim().toUpperCase()).filter(Boolean);
+    if (cleanNames.length === 0) return;
+
+    const existingNames = new Set(components[cat].subStyles.map((s) => s.name.toUpperCase()));
+    const newItems: SubStyleAverage[] = [];
+    for (const name of cleanNames) {
+      if (!existingNames.has(name)) {
+        newItems.push({ name, average: '' });
+        existingNames.add(name);
+      }
+    }
+
+    if (newItems.length === 0) return;
+
+    setComponents((prev) => ({
+      ...prev,
+      [cat]: {
+        ...prev[cat],
+        subStyles: [...prev[cat].subStyles, ...newItems],
       },
     }));
   };
@@ -509,6 +1019,7 @@ export default function CreateProductionSheetPage() {
       pcs: '',
       mtr: '',
       subStyle: '',
+      subStyles: [],
       size: '',
       sizes: initialSizes,
     };
@@ -711,6 +1222,10 @@ export default function CreateProductionSheetPage() {
       const primaryAvg = getTotalMtrAverage(primaryCat);
       const primaryPieces = getTotalPieces(primaryCat);
 
+      const wilcomEntriesToSubmit = wilcomEntries.map((entry) => ({
+        ...entry,
+        photoUrl: entry.photoUrl || '',
+      }));
       const payload: any = {
         id: createdProgramId || undefined,
         programNumber: programSerialNo.trim() || undefined,
@@ -744,21 +1259,38 @@ export default function CreateProductionSheetPage() {
         status: targetStatus,
         components: componentsPayload,
         forwardedComponents: forwardedComponents,
-        wilcomEntries: wilcomEntries,
-        wilcomDesignNumber: wilcomEntries[0]?.wilcomDesignNumber || '',
-        wilcomDesignPhoto: wilcomEntries[0]?.photoUrl || '',
+        wilcomEntries: wilcomEntriesToSubmit,
+        wilcomDesignNumber: wilcomEntriesToSubmit.find((e) => e.wilcomDesignNumber)?.wilcomDesignNumber || wilcomEntriesToSubmit[0]?.wilcomDesignNumber || '',
+        wilcomDesignPhoto: wilcomEntriesToSubmit.find((e) => e.photoUrl)?.photoUrl || '',
       };
 
       const result = await api.createProductionSheet(payload);
+      const resultWilcomEntries = Array.isArray(result?.wilcomEntries) ? result.wilcomEntries : [];
+      const persistedWilcomPhoto =
+        resultWilcomEntries.find((entry: any) => entry?.photoUrl)?.photoUrl ||
+        result?.wilcomDesignPhoto;
       if (result?.id) {
         setCreatedProgramId(result.id);
       }
-      setSuccess(result);
+      if (payload.wilcomDesignPhoto && !persistedWilcomPhoto) {
+        throw new Error('The production sheet was saved, but the Wilcom photo was not confirmed by the server. Please retry saving before leaving this page.');
+      }
+      const activePhoto = persistedWilcomPhoto || payload.wilcomDesignPhoto;
+      const enrichedResult = {
+        ...result,
+        wilcomEntries: resultWilcomEntries.length > 0 ? resultWilcomEntries : wilcomEntriesToSubmit,
+        wilcomDesignPhoto: activePhoto,
+      };
+      setSuccess(enrichedResult);
       if (typeof window !== 'undefined') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to save Production Sheets.');
+      const rawMsg = err.message || '';
+      const displayMsg = rawMsg.toLowerCase().includes('abort') || rawMsg.toLowerCase().includes('timeout')
+        ? 'Request timed out while saving. Please check your connection and try again.'
+        : rawMsg || 'Failed to save Production Sheets.';
+      setError(displayMsg);
       if (typeof window !== 'undefined') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
@@ -828,76 +1360,86 @@ export default function CreateProductionSheetPage() {
 
         {/* Success Modal / Banner */}
         {success && (
-          <div className="p-5 bg-emerald-50 border border-emerald-300 rounded-xl text-emerald-950 space-y-3 shadow-xs">
+          <div className="p-5 bg-emerald-50 border border-emerald-300 rounded-xl text-emerald-950 space-y-3.5 shadow-xs">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-emerald-600" />
               <h3 className="text-sm font-bold">
-                Production Sheets Saved Successfully &middot; Serial #{success.programSerialNo || success.programNumber}
+                Production Sheet Submitted Successfully
               </h3>
             </div>
-            <p className="text-xs text-emerald-800 leading-relaxed font-sans">
-              Status is marked as <strong className="font-bold">{success.status}</strong>. Forwarded sheets: <strong className="font-bold">{forwardedComponents.join(', ')}</strong>. Wilcom designs attached: <strong className="font-bold">{wilcomEntries.length}</strong>.
-            </p>
-            <div className="pt-1 flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                onClick={() => printProductionSheet(success, 'ALL')}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
-              >
-                <Printer className="w-3.5 h-3.5" />
-                <span>Print All Forwarded Sheets (A4)</span>
-              </button>
 
+            <div className="flex flex-wrap items-center gap-2.5">
+              {/* 1. Production Sheet Actions */}
               <button
                 type="button"
-                onClick={() => printWilcomForm(success)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
+                onClick={() => setShowPrintModal(true)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
               >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Print Wilcom Form (A4)</span>
+                <Eye className="w-3.5 h-3.5" />
+                <span>View Production Sheet</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => downloadProductionSheetHtml(success, 'ALL')}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>Download Sheets (.html)</span>
+                <span>Download Production Sheet</span>
               </button>
 
               <button
                 type="button"
-                onClick={() => downloadWilcomFormHtml(success)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-black text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
+                onClick={() => printProductionSheet(success, 'ALL')}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-800 hover:bg-black text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
               >
-                <Download className="w-3.5 h-3.5" />
-                <span>Download Wilcom (.html)</span>
+                <Printer className="w-3.5 h-3.5" />
+                <span>Print Production Sheet</span>
               </button>
 
+              {/* 2. Wilcom Sheet Actions */}
               <button
                 type="button"
-                onClick={() => setShowPrintModal(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-emerald-300 text-emerald-900 text-xs font-bold rounded hover:bg-emerald-100/50 transition cursor-pointer"
+                onClick={() => setShowWilcomPrintModal(true)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
               >
                 <Eye className="w-3.5 h-3.5" />
-                <span>Preview Documents</span>
+                <span>View Wilcom Sheet</span>
               </button>
 
-              <Link
-                href={`/programs/${success.id}`}
-                className="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-slate-300 text-slate-700 text-xs font-semibold rounded hover:bg-slate-50 transition"
+              <button
+                type="button"
+                onClick={() => {
+                  const activePhoto = wilcomEntries.find((e) => e.photoUrl)?.photoUrl || wilcomEntries[0]?.photoUrl || success?.wilcomDesignPhoto;
+                  const progToDownload = {
+                    ...success,
+                    wilcomEntries: wilcomEntries.length > 0 ? wilcomEntries : success?.wilcomEntries,
+                    wilcomDesignPhoto: activePhoto || success?.wilcomDesignPhoto,
+                  };
+                  void downloadWilcomFormHtml(progToDownload, 'ALL');
+                }}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-indigo-700 hover:bg-indigo-800 text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
               >
-                <span>View Details</span>
-                <ExternalLink className="w-3 h-3" />
-              </Link>
+                <Download className="w-3.5 h-3.5" />
+                <span>Download Wilcom Sheet</span>
+              </button>
 
-              <Link
-                href={`/my-work/issue-challan?programId=${success.id}`}
-                className="px-3.5 py-1.5 bg-[#163767] hover:bg-[#0F264A] text-white text-xs font-bold rounded shadow-2xs transition"
+              <button
+                type="button"
+                onClick={() => {
+                  const activePhoto = wilcomEntries.find((e) => e.photoUrl)?.photoUrl || wilcomEntries[0]?.photoUrl || success?.wilcomDesignPhoto;
+                  const progToPrint = {
+                    ...success,
+                    wilcomEntries: wilcomEntries.length > 0 ? wilcomEntries : success?.wilcomEntries,
+                    wilcomDesignPhoto: activePhoto || success?.wilcomDesignPhoto,
+                  };
+                  printWilcomForm(progToPrint, 'ALL');
+                }}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-purple-900 hover:bg-purple-950 text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
               >
-                Issue Challan →
-              </Link>
+                <Printer className="w-3.5 h-3.5" />
+                <span>Print Wilcom Sheet</span>
+              </button>
             </div>
           </div>
         )}
@@ -948,9 +1490,7 @@ export default function CreateProductionSheetPage() {
                       {meta.label}
                     </span>
 
-                    <span className="text-[10px] font-black px-2.5 py-0.5 rounded bg-white border border-black/20 text-black">
-                      {catPieces} PCS &middot; {catMeters.toFixed(2)} MTR
-                    </span>
+
                   </div>
 
                   <div className="flex items-center gap-3">
@@ -995,31 +1535,68 @@ export default function CreateProductionSheetPage() {
 
                         {/* WILCOM OPTION BELOW DESIGN NO. */}
                         <div>
-                          <label className="block text-[11px] font-black uppercase tracking-wider text-purple-950 mb-1">
-                            WILCOM - (CLICK AND OPEN SHEET):
+                          <label className="block text-[11px] font-black uppercase tracking-wider text-slate-800 mb-1">
+                            WILCOM:
                           </label>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setWilcomCategory(cat);
-                              setShowWilcomModal(true);
-                            }}
-                            className="w-full border-[1.5px] border-purple-800 bg-purple-50 hover:bg-purple-100 text-purple-950 px-3 py-1.5 h-10 font-black text-xs uppercase tracking-wider flex items-center justify-between transition cursor-pointer shadow-2xs"
-                          >
-                            <span className="flex items-center gap-1.5">
-                              <Sparkles className="w-3.5 h-3.5 text-purple-700" />
-                              <span>WILCOM ({cat})</span>
-                            </span>
-                            {wilcomEntries.filter((e) => e.category === cat).length > 0 ? (
-                              <span className="px-2 py-0.5 rounded bg-purple-800 text-white font-mono text-[11px]">
-                                № {wilcomEntries.filter((e) => e.category === cat).map((e) => e.wilcomDesignNumber).join(', ')}
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setWilcomCategory(cat);
+                                setShowWilcomModal(true);
+                              }}
+                              className="flex-1 border-[1.5px] border-black bg-slate-50 hover:bg-slate-100 text-slate-900 px-3 py-1.5 h-10 font-bold text-xs uppercase tracking-wider flex items-center justify-between transition cursor-pointer shadow-2xs"
+                            >
+                              <span className="flex items-center gap-1.5">
+                                <Sparkles className="w-3.5 h-3.5 text-[#163767]" />
+                                <span>WILCOM ({cat})</span>
                               </span>
-                            ) : (
-                              <span className="text-[11px] text-purple-700 font-semibold normal-case">
-                                + Click &amp; Open Sheet
-                              </span>
-                            )}
-                          </button>
+                              {(() => {
+                                const matching = wilcomEntries.filter((e) =>
+                                  cat === 'OTHER'
+                                    ? e.category === 'OTHER' || !['TOP', 'BOTTOM', 'DUPATTA'].includes(e.category)
+                                    : e.category === cat
+                                );
+                                return matching.length > 0 ? (
+                                  <span className="px-2 py-0.5 rounded bg-[#163767] text-white font-mono text-[11px]">
+                                    № {matching.map((e) => `${e.wilcomDesignNumber}${cat === 'OTHER' && e.category !== 'OTHER' ? ` (${e.category})` : ''}`).join(', ')}
+                                  </span>
+                                ) : null;
+                              })()}
+                            </button>
+
+                            {/* Photo uploads are managed from the Wilcom sheet. */}
+                            {(() => {
+                              const matching = wilcomEntries.filter((e) =>
+                                cat === 'OTHER'
+                                  ? e.category === 'OTHER' || !['TOP', 'BOTTOM', 'DUPATTA'].includes(e.category)
+                                  : e.category === cat
+                              );
+                              const photo = matching.find((m) => m.photoUrl)?.photoUrl || wilcomEntries[0]?.photoUrl;
+
+                              if (!photo) return null;
+
+                              return (
+                                <div className="h-10 border-[1.5px] border-black bg-white flex items-center px-2.5 shrink-0 gap-1.5 shadow-2xs">
+                                  <div className="flex items-center gap-1.5">
+                                    <img
+                                      src={photo}
+                                      alt="Wilcom Photo"
+                                      className="w-7 h-7 object-contain rounded border border-slate-300 cursor-pointer hover:scale-105 transition"
+                                      onClick={() => {
+                                        setWilcomCategory(cat);
+                                        setShowWilcomModal(true);
+                                      }}
+                                      title="Click to view/manage Wilcom photo"
+                                    />
+                                    <span className="text-[10px] font-bold text-emerald-700 hidden sm:inline">
+                                      ✓ Photo
+                                    </span>
+                                  </div>
+                                </div>
+                              );
+                            })()}
+                          </div>
                         </div>
 
                         {/* STYLE & PATTERN (SIDE-BY-SIDE EQUAL BOXES) */}
@@ -1320,11 +1897,10 @@ export default function CreateProductionSheetPage() {
                               <th colSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase">
                                 QTY
                               </th>
-                              <th rowSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase w-36">
-                                <div>SUB STYLE</div>
-                                <div className="text-[9px] font-normal text-slate-500 normal-case">(manual fill)</div>
+                              <th rowSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase w-48">
+                                SUB STYLE
                               </th>
-                              <th rowSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase w-28">
+                              <th rowSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase w-36">
                                 SIZE
                               </th>
                               <th rowSpan={2} className="border-[1.5px] border-black p-1 font-bold text-[10px] w-8">
@@ -1337,7 +1913,14 @@ export default function CreateProductionSheetPage() {
                             </tr>
                           </thead>
                           <tbody>
-                            {comp.productionGrid.map((row, rIdx) => (
+                            {comp.productionGrid.map((row, rIdx) => {
+                              const rowSubStyles = Array.isArray(row.subStyles) && row.subStyles.length > 0
+                                ? row.subStyles
+                                : row.subStyle
+                                  ? row.subStyle.split(',').map((s) => s.trim().toUpperCase()).filter(Boolean)
+                                  : [];
+
+                              return (
                               <tr key={row.id || rIdx} className="h-8">
                                 {/* COLOR */}
                                 <td className="border-[1.5px] border-black p-0.5">
@@ -1377,28 +1960,67 @@ export default function CreateProductionSheetPage() {
                                   />
                                 </td>
 
-                                {/* SUB STYLE (manual fill) */}
-                                <td className="border-[1.5px] border-black p-0.5">
-                                  <input
-                                    type="text"
-                                    value={row.subStyle || ''}
-                                    onChange={(e) => handleGridRowChange(cat, rIdx, 'subStyle', e.target.value)}
-                                    onFocus={(e) => e.target.select()}
-                                    placeholder=""
-                                    className="w-full px-2 py-1 text-center font-bold text-xs text-black border-none focus:outline-none focus:bg-blue-50"
+                                {/* SUB STYLE (multi-select / chips) */}
+                                <td className="border-[1.5px] border-black p-0.5 relative">
+                                  <SubStyleMultiSelectCell
+                                    cat={cat}
+                                    rIdx={rIdx}
+                                    row={row}
+                                    compSubStyles={comp.subStyles}
+                                    isPickerOpen={activeSubStylePicker?.cat === cat && activeSubStylePicker?.rowIndex === rIdx}
+                                    onOpenPicker={() => {
+                                      setActiveSubStylePicker({ cat, rowIndex: rIdx });
+                                      setCustomSubStyleInput('');
+                                    }}
+                                    onClosePicker={() => setActiveSubStylePicker(null)}
+                                    onToggleSubStyle={(sub) => handleGridRowSubStylesToggle(cat, rIdx, sub)}
+                                    onSetSubStyles={(subs) => handleGridRowSubStylesSet(cat, rIdx, subs)}
+                                    onApplyAll={() => handleApplySubStylesToAllRows(cat, rIdx)}
+                                    onSubStyleTextChange={(txt) => handleGridRowChange(cat, rIdx, 'subStyle', txt)}
+                                    customSubStyleInput={customSubStyleInput}
+                                    setCustomSubStyleInput={setCustomSubStyleInput}
+                                    canApplyAll={comp.productionGrid.length > 1}
                                   />
                                 </td>
 
-                                {/* SIZE CELL */}
-                                <td className="border-[1.5px] border-black p-0.5">
-                                  <input
-                                    type="text"
-                                    value={row.size ?? (row.sizes?.['SIZE'] || '')}
-                                    onChange={(e) => handleGridRowChange(cat, rIdx, 'size', e.target.value)}
-                                    onFocus={(e) => e.target.select()}
-                                    placeholder=""
-                                    className="w-full px-2 py-1 text-center font-bold text-xs text-black border-none focus:outline-none focus:bg-blue-50"
-                                  />
+                                {/* SIZE CELL (Per-SubStyle Inputs) */}
+                                <td className="border-[1.5px] border-black p-0.5 align-middle">
+                                  {rowSubStyles.length > 1 ? (
+                                    <div className="flex flex-col gap-1 p-1">
+                                      {rowSubStyles.map((sub) => (
+                                        <div
+                                          key={sub}
+                                          className="flex items-center gap-1 bg-white border border-slate-300 rounded px-1.5 py-0.5 shadow-2xs"
+                                        >
+                                          <span className="text-[10px] font-black uppercase text-blue-900 bg-blue-50 border border-blue-200 px-1 py-0.5 rounded shrink-0">
+                                            {sub}
+                                          </span>
+                                          <input
+                                            type="text"
+                                            value={row.sizes?.[sub] || ''}
+                                            onChange={(e) => handleGridSizeChange(cat, rIdx, sub, e.target.value)}
+                                            onFocus={(e) => e.target.select()}
+                                            placeholder="Size"
+                                            className="w-full text-center font-bold text-xs text-black border-none focus:outline-none uppercase bg-transparent"
+                                          />
+                                        </div>
+                                      ))}
+                                    </div>
+                                  ) : (
+                                    <input
+                                      type="text"
+                                      value={row.size ?? (rowSubStyles[0] ? row.sizes?.[rowSubStyles[0]] : '') ?? (row.sizes?.['SIZE'] || '')}
+                                      onChange={(e) => {
+                                        handleGridRowChange(cat, rIdx, 'size', e.target.value);
+                                        if (rowSubStyles[0]) {
+                                          handleGridSizeChange(cat, rIdx, rowSubStyles[0], e.target.value);
+                                        }
+                                      }}
+                                      onFocus={(e) => e.target.select()}
+                                      placeholder=""
+                                      className="w-full px-2 py-1 text-center font-bold text-xs text-black border-none focus:outline-none focus:bg-blue-50 uppercase"
+                                    />
+                                  )}
                                 </td>
 
                                 {/* REMOVE ROW */}
@@ -1415,7 +2037,8 @@ export default function CreateProductionSheetPage() {
                                   )}
                                 </td>
                               </tr>
-                            ))}
+                            );
+                            })}
                           </tbody>
 
                           <tfoot>
@@ -1595,7 +2218,7 @@ export default function CreateProductionSheetPage() {
         wilcomEntries={wilcomEntries}
         onSaveEntries={setWilcomEntries}
         activeCategory={wilcomCategory}
-        defaultStyleName={components[wilcomCategory]?.styleName || ''}
+        defaultStyleName={components[wilcomCategory]?.styleName}
       />
 
       {/* PRINT & DOWNLOAD MODALS */}
@@ -1603,12 +2226,29 @@ export default function CreateProductionSheetPage() {
         program={success}
         isOpen={showPrintModal}
         onClose={() => setShowPrintModal(false)}
+        initialTab={selectedCategory}
+        onViewWilcom={(cat) => {
+          if (cat) setWilcomCategory(cat);
+          setShowPrintModal(false);
+          setShowWilcomPrintModal(true);
+        }}
       />
 
       <WilcomPrintModal
         program={success}
         isOpen={showWilcomPrintModal}
         onClose={() => setShowWilcomPrintModal(false)}
+        initialCategory={wilcomCategory}
+        onViewSheet={() => {
+          setShowWilcomPrintModal(false);
+          setShowPrintModal(true);
+        }}
+        onProgramUpdate={(updated) => {
+          setSuccess((prev: any) => ({ ...prev, ...updated }));
+          if (Array.isArray(updated?.wilcomEntries) && updated.wilcomEntries.length > 0) {
+            setWilcomEntries(updated.wilcomEntries);
+          }
+        }}
       />
     </div>
   );

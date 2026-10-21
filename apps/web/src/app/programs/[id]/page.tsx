@@ -23,11 +23,14 @@ import {
   Lock,
   ShieldCheck,
   Check,
-  Building
+  Building,
+  RefreshCw,
+  Upload
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { getCurrentUser, canViewClientCode } from '@/lib/rbac';
 import { ProductionSheetPrintModal } from '@/components/production-sheet/ProductionSheetPrintModal';
+import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
 import { ProductionSheetView } from '@/components/production-sheet/ProductionSheetView';
 import { 
   downloadProductionSheetHtml, 
@@ -40,7 +43,8 @@ import { WilcomSheetView } from '@/components/wilcom/WilcomSheetView';
 import { 
   WilcomEntry, 
   printWilcomForm, 
-  downloadWilcomFormHtml 
+  downloadWilcomFormHtml,
+  extractRootWilcomPhoto
 } from '@/lib/download-wilcom';
 import { ChallanListTable } from '@/components/challan/ChallanListTable';
 import { 
@@ -60,6 +64,7 @@ export default function ProgramDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [showWilcomPrintModal, setShowWilcomPrintModal] = useState(false);
+  const [wilcomCategoryTab, setWilcomCategoryTab] = useState<GarmentCategory | 'ALL'>('TOP');
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [activeCategoryTab, setActiveCategoryTab] = useState<'TOP' | 'BOTTOM' | 'DUPATTA' | 'OTHER' | 'WILCOM'>('TOP');
 
@@ -70,18 +75,28 @@ export default function ProgramDetailPage() {
   const loadProgram = async () => {
     try {
       setLoading(true);
-      const [data, challansData, availRes] = await Promise.all([
-        api.getProgram(id),
-        api.getChallans({ programId: id }).catch(() => []),
-        fetch(`/api/fabric-store/check-availability?programId=${id}`).then(r => r.json()).catch(() => null)
-      ]);
-      setProgram(data);
-      setChallans(challansData || []);
-      if (availRes && availRes.data) {
-        setStoreAvailability(availRes.data);
+      setError(null);
+      const data = await api.getProgram(id);
+      if (!data) {
+        throw new Error('Production Sheet not found');
       }
+      setProgram(data);
+      setChallans(data.challans || []);
+
+      // Non-blocking fetch of fabric store availability
+      fetch(`/api/fabric-store/check-availability?programId=${encodeURIComponent(id)}`)
+        .then((r) => r.json())
+        .then((availRes) => {
+          if (availRes?.data) setStoreAvailability(availRes.data);
+        })
+        .catch(() => {});
     } catch (err: any) {
-      setError(err.message || 'Failed to load Production Sheet');
+      console.error('Failed to load production sheet:', err);
+      const rawMsg = err.message || '';
+      const displayMsg = rawMsg.toLowerCase().includes('abort') || rawMsg.toLowerCase().includes('timeout')
+        ? 'Network request timed out while loading the sheet. Please click Retry below.'
+        : rawMsg || 'Failed to load Production Sheet';
+      setError(displayMsg);
     } finally {
       setLoading(false);
     }
@@ -140,17 +155,27 @@ export default function ProgramDetailPage() {
 
   if (error || !program) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] pl-0 md:pl-64 p-4 sm:p-8">
-        <div className="max-w-xl mx-auto p-6 bg-rose-50 border border-rose-200 rounded-xl text-center space-y-3">
-          <AlertCircle className="w-8 h-8 text-rose-600 mx-auto" />
-          <h2 className="text-sm font-bold text-rose-900">Error Loading Sheet</h2>
-          <p className="text-xs text-rose-700">{error || 'Production Sheet not found'}</p>
-          <Link
-            href="/programming"
-            className="inline-flex items-center gap-2 px-3.5 py-2 bg-rose-900 text-white rounded text-xs font-semibold"
-          >
-            ← Return to Dashboard
-          </Link>
+      <div className="min-h-screen bg-[#F8FAFC] pl-0 md:pl-64 p-4 sm:p-8 flex items-center justify-center">
+        <div className="max-w-md w-full p-6 bg-rose-50 border border-rose-200 rounded-2xl text-center space-y-4 shadow-xs">
+          <AlertCircle className="w-10 h-10 text-rose-600 mx-auto" />
+          <h2 className="text-base font-bold text-rose-900">Error Loading Sheet</h2>
+          <p className="text-xs text-rose-700 leading-relaxed">{error || 'Production Sheet not found'}</p>
+          <div className="flex items-center justify-center gap-2 pt-2">
+            <button
+              type="button"
+              onClick={loadProgram}
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>Retry</span>
+            </button>
+            <Link
+              href="/programming"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-rose-800 hover:bg-rose-900 text-white rounded-lg text-xs font-semibold shadow-xs transition"
+            >
+              ← Return to Dashboard
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -208,21 +233,30 @@ export default function ProgramDetailPage() {
   const components = meta?.components || null;
   const forwardedComponents: string[] = Array.isArray(meta?.forwardedComponents) ? meta.forwardedComponents : ['TOP'];
   
-  const rootWilcomPhoto = program.wilcomDesignPhoto || meta?.wilcomDesignPhoto || program.baseDesignPhoto || '';
-  let wilcomEntries: any[] = Array.isArray(meta?.wilcomEntries) ? meta.wilcomEntries : [];
+  const rootWilcomPhoto = extractRootWilcomPhoto(program, meta);
+  let wilcomEntries: any[] = [];
+  if (Array.isArray(program.wilcomEntries) && program.wilcomEntries.length > 0) {
+    wilcomEntries = program.wilcomEntries;
+  } else if (Array.isArray(meta?.wilcomEntries) && meta.wilcomEntries.length > 0) {
+    wilcomEntries = meta.wilcomEntries;
+  }
 
-  if (wilcomEntries.length === 0 && (program.wilcomDesignNumber || rootWilcomPhoto || program.embroideryDesign)) {
+  const progDesignNo = program.designNumber || program.designName || '—';
+  const progMainStyle = program.mainStyle || program.topName || meta?.mainStyle || meta?.topName || '—';
+  const progSubStyle = program.subStyle || program.styleCode || meta?.subStyle || meta?.style || '—';
+
+  if (wilcomEntries.length === 0) {
     wilcomEntries = [
       {
         id: 'wilcom-auto-1',
         category: 'TOP',
-        styleName: program.topName || program.mainStyle || 'Primary Top Style',
-        wilcomDesignNumber: program.wilcomDesignNumber || program.embroideryDesign || 'WLC-01',
+        styleName: progSubStyle !== '—' ? progSubStyle : (progMainStyle !== '—' ? progMainStyle : 'Primary Top Style'),
+        wilcomDesignNumber: program.wilcomDesignNumber || program.embroideryDesign || (progDesignNo !== '—' ? progDesignNo : 'WLC-01'),
         photoUrl: rootWilcomPhoto,
         remarks: program.remarks || program.comments || '',
       },
     ];
-  } else if (wilcomEntries.length > 0) {
+  } else {
     wilcomEntries = wilcomEntries.map((e: any, idx: number) => ({
       ...e,
       photoUrl: e.photoUrl || e.photo || e.imageUrl || e.image || (idx === 0 ? rootWilcomPhoto : '') || '',
@@ -327,33 +361,12 @@ export default function ProgramDetailPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowPrintModal(true)}
-            className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-md border border-slate-300 transition cursor-pointer"
-            title="Preview Full A4 Traveler"
-          >
-            <Eye className="w-3.5 h-3.5" />
-            <span>Preview</span>
-          </button>
-
-          <button
-            onClick={() => printProductionSheet(program)}
-            className="flex items-center gap-1.5 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-900 text-xs font-semibold rounded-md border border-blue-200 transition cursor-pointer"
-            title="Print Production Sheet on A4 Paper"
-          >
-            <Printer className="w-3.5 h-3.5" />
-            <span>Print Sheet</span>
-          </button>
-
-          <button
-            onClick={() => downloadProductionSheetHtml(program)}
-            className="flex items-center gap-1.5 px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 text-xs font-semibold rounded-md border border-emerald-200 transition cursor-pointer"
-            title="Download Standalone HTML/PDF File"
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span>Download</span>
-          </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <DocumentActionButtons
+            program={program}
+            challan={challans?.[0]}
+            size="sm"
+          />
 
           {isDraft && (
             <button
@@ -681,9 +694,9 @@ export default function ProgramDetailPage() {
                 <span className="text-slate-700 font-semibold">{rootWilcomPhoto ? 'Photo Uploaded' : 'No photo uploaded'}</span>
               </div>
 
-              {/* WILCOM IMAGE THUMBNAIL IN SPECIFICATION CARD */}
-              {rootWilcomPhoto && (
-                <div className="col-span-2 pt-2.5 border-t border-purple-100 flex items-center justify-between gap-3">
+              {/* WILCOM IMAGE THUMBNAIL / UPLOAD IN SPECIFICATION CARD */}
+              <div className="col-span-2 pt-2.5 border-t border-purple-100 flex items-center justify-between gap-3">
+                {rootWilcomPhoto ? (
                   <div className="flex items-center gap-3">
                     <div className="w-16 h-16 border border-purple-300 rounded-md bg-purple-50/50 flex items-center justify-center overflow-hidden shrink-0 shadow-2xs">
                       <img
@@ -706,8 +719,45 @@ export default function ProgramDetailPage() {
                       </button>
                     </div>
                   </div>
-                </div>
-              )}
+                ) : (
+                  <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-200 rounded-lg text-xs font-bold transition cursor-pointer shadow-2xs">
+                    <Upload className="w-3.5 h-3.5 text-purple-700" />
+                    <span>Upload Wilcom Artwork Photo</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onload = async () => {
+                          if (typeof reader.result === 'string') {
+                            const newPhoto = reader.result;
+                            setProgram((prev: any) => ({
+                              ...prev,
+                              wilcomDesignPhoto: newPhoto,
+                            }));
+                            try {
+                              await fetch(`/api/programs/${program.id}`, {
+                                method: 'PATCH',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                  wilcomDesignPhoto: newPhoto,
+                                }),
+                              });
+                            } catch (err) {
+                              console.warn('Failed to save photo:', err);
+                            }
+                          }
+                        };
+                        reader.readAsDataURL(file);
+                        e.target.value = '';
+                      }}
+                    />
+                  </label>
+                )}
+              </div>
             </div>
           </div>
 
@@ -815,6 +865,7 @@ export default function ProgramDetailPage() {
                 wilcomEntries={wilcomEntries}
                 rootWilcomPhoto={rootWilcomPhoto}
                 onOpenPrintModal={() => setShowWilcomPrintModal(true)}
+                onProgramUpdate={(updated) => setProgram((prev: any) => ({ ...prev, ...updated }))}
               />
             ) : (
               <ProductionSheetView
@@ -876,12 +927,23 @@ export default function ProgramDetailPage() {
         isOpen={showPrintModal}
         onClose={() => setShowPrintModal(false)}
         initialTab={activeCategoryTab === 'WILCOM' ? 'TOP' : activeCategoryTab}
+        onViewWilcom={(cat) => {
+          setWilcomCategoryTab(cat || 'TOP');
+          setShowPrintModal(false);
+          setShowWilcomPrintModal(true);
+        }}
       />
 
       <WilcomPrintModal
         program={program}
         isOpen={showWilcomPrintModal}
         onClose={() => setShowWilcomPrintModal(false)}
+        initialCategory={wilcomCategoryTab}
+        onViewSheet={() => {
+          setShowWilcomPrintModal(false);
+          setShowPrintModal(true);
+        }}
+        onProgramUpdate={(updated) => setProgram((prev: any) => ({ ...prev, ...updated }))}
       />
 
       {/* PHOTO LIGHTBOX MODAL */}

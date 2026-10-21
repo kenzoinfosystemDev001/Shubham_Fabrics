@@ -1,4 +1,5 @@
 import { prisma } from '@subham/database';
+import { isFabricStoreDepartment } from '@/lib/fabric-stock';
 
 export interface FabricAvailabilityStatus {
   programId: string;
@@ -140,26 +141,49 @@ export async function checkFabricStoreAvailability(
         : undefined,
     });
 
-    inwardEntriesCount = inwardEntries.length;
-    const totalInward = inwardEntries.reduce(
+    const meterInwardEntries = inwardEntries.filter((it: any) => (it.unit || 'MTR').toUpperCase() === 'MTR');
+    inwardEntriesCount = meterInwardEntries.length;
+    const totalInward = meterInwardEntries.reduce(
       (sum: number, it: any) => sum + (Number(it.billQty) || 0),
       0
     );
 
     // Subtract any manual outward or dispatched challans for this fabric
     const outwardEntries = await (prisma as any).fabricOutward.findMany({
-      where: fabricName
-        ? {
-            itemName: { contains: fabricName, mode: 'insensitive' },
-          }
-        : undefined,
+      where: {
+        ...(fabricName ? { itemName: { contains: fabricName, mode: 'insensitive' } } : {}),
+        unit: 'MTR',
+      },
     });
-    const totalOutward = outwardEntries.reduce(
+    const totalManualOutward = outwardEntries.reduce(
       (sum: number, it: any) => sum + (Number(it.issueQty) || 0),
       0
     );
 
-    inwardStockMeters = Math.max(0, totalInward - totalOutward);
+    const issuedChallans = (await prisma.challan.findMany({
+      where: {
+        programId: program.id,
+        NOT: { toDepartment: { equals: 'STORE', mode: 'insensitive' } },
+        OR: [
+          { fromDepartment: { contains: 'STORE', mode: 'insensitive' } },
+          { fromDepartment: { equals: 'FABRIC', mode: 'insensitive' } },
+        ],
+      },
+      include: { items: true },
+    })).filter((challan) => isFabricStoreDepartment(challan.fromDepartment));
+
+    const totalChallanOutward = issuedChallans.reduce((sum, challan) => {
+      if (challan.items.length > 0) {
+        return sum + challan.items.reduce((itemSum, item) => {
+          const unit = item.uom || challan.fabricUnit || 'MTR';
+          return itemSum + (unit.toUpperCase() === 'MTR' ? Number(item.quantity) || 0 : 0);
+        }, 0);
+      }
+      const unit = challan.fabricUnit || 'MTR';
+      return sum + (unit.toUpperCase() === 'MTR' ? Number(challan.fabricOut ?? challan.fabricIn) || 0 : 0);
+    }, 0);
+
+    inwardStockMeters = Math.max(0, totalInward - totalManualOutward - totalChallanOutward);
   } catch (err) {
     console.warn('Error reading FabricInward balance:', err);
   }

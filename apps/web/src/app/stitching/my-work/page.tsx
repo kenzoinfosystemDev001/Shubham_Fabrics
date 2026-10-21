@@ -31,6 +31,7 @@ import {
   Play,
 } from 'lucide-react';
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
+import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 
 function StitchingWorkstationContent() {
@@ -482,6 +483,14 @@ function StitchingWorkstationContent() {
                         <span className="text-slate-500">Pending</span>
                       )}
                     </div>
+
+                    <div className="pt-2 border-t border-slate-800/80" onClick={(e) => e.stopPropagation()}>
+                      <DocumentActionButtons
+                        challan={j}
+                        program={j.program}
+                        size="xs"
+                      />
+                    </div>
                   </div>
                 );
               })
@@ -508,17 +517,12 @@ function StitchingWorkstationContent() {
                     </h2>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => {
-                        setTechSheetProgram(selectedJob.program);
-                        setShowTechSheet(true);
-                      }}
-                      className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5"
-                    >
-                      <FileText className="w-3.5 h-3.5 text-indigo-400" />
-                      <span>Production Sheet</span>
-                    </button>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <DocumentActionButtons
+                      challan={selectedJob}
+                      program={selectedJob.program}
+                      size="sm"
+                    />
 
                     <Link
                       href={`/stitching/workspace/${selectedJob.id}`}

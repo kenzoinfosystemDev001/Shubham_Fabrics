@@ -23,6 +23,7 @@ import {
   Printer,
 } from 'lucide-react';
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
+import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { 
   downloadProductionSheetHtml, 
@@ -364,66 +365,11 @@ export default function RecuttingIncomingPage() {
                   {/* Actions toolbar */}
                   <div className="p-3 bg-slate-50/80 border-t border-slate-100 space-y-2">
                     <div className="flex items-center justify-between gap-1 flex-wrap">
-                      <div className="flex items-center gap-1">
-                        <Link
-                          href={`/challans/${ch.id}`}
-                          className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[11px] font-semibold flex items-center gap-1"
-                          title="View Challan Slip"
-                        >
-                          <Eye className="w-3 h-3 text-slate-500" />
-                          <span>Slip</span>
-                        </Link>
-                        <button
-                          type="button"
-                          onClick={() => downloadChallanHtml(ch)}
-                          className="px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded text-[11px] font-semibold flex items-center gap-1"
-                          title="Download Challan HTML"
-                        >
-                          <Download className="w-3 h-3" />
-                          <span>Challan</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => printChallan(ch)}
-                          className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[11px] font-semibold flex items-center gap-1"
-                          title="Print Challan Slip"
-                        >
-                          <Printer className="w-3 h-3 text-slate-500" />
-                          <span>Print</span>
-                        </button>
-                      </div>
-
-                      {ch.program && (
-                        <div className="flex items-center gap-1">
-                          <button
-                            type="button"
-                            onClick={() => setViewSheetProgram(ch.program)}
-                            className="px-2 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded text-[11px] font-semibold flex items-center gap-1"
-                            title="View Production Sheet"
-                          >
-                            <FileText className="w-3 h-3 text-blue-600" />
-                            <span>Sheet</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => downloadProductionSheetHtml(ch.program)}
-                            className="px-2 py-1 bg-sky-50 hover:bg-sky-100 text-sky-700 rounded text-[11px] font-semibold flex items-center gap-1"
-                            title="Download Production Sheet HTML"
-                          >
-                            <Download className="w-3 h-3 text-sky-600" />
-                            <span>Sheet</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => printProductionSheet(ch.program)}
-                            className="px-2 py-1 bg-blue-100/70 hover:bg-blue-200/70 text-blue-800 rounded text-[11px] font-semibold flex items-center gap-1"
-                            title="Print Production Sheet Traveler"
-                          >
-                            <Printer className="w-3 h-3 text-blue-600" />
-                            <span>Sheet</span>
-                          </button>
-                        </div>
-                      )}
+                      <DocumentActionButtons
+                        challan={ch}
+                        program={ch.program}
+                        size="xs"
+                      />
                     </div>
 
                     <div className="pt-1 border-t border-slate-200/60">

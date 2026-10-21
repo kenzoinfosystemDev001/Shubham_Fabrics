@@ -24,14 +24,7 @@ import {
   Check
 } from 'lucide-react';
 import { api } from '@/lib/api';
-import { 
-  downloadProductionSheetHtml, 
-  printProductionSheet 
-} from '@/lib/download-production-sheet';
-import { 
-  downloadChallanHtml, 
-  printChallan 
-} from '@/lib/download-challan';
+import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 
@@ -440,78 +433,41 @@ export default function ProgrammingDashboardPage() {
                               {prog.deliveryDate ? new Date(prog.deliveryDate).toLocaleDateString() : '—'}
                             </td>
                             <td className="py-3 px-4">
-                              <div className="space-y-1">
-                                <span
-                                  className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-                                    isDraft
-                                      ? 'bg-amber-100 text-amber-800'
-                                      : isReady
-                                      ? 'bg-indigo-100 text-indigo-800'
-                                      : isIssued
-                                      ? 'bg-emerald-100 text-emerald-800'
-                                      : 'bg-blue-100 text-blue-800'
-                                  }`}
-                                >
-                                  {prog.status}
-                                </span>
-                                <div>
-                                  {(() => {
-                                    const avail = availabilityMap[prog.id] || availabilityMap[prog.programNumber];
-                                    const isAvailable = avail ? Boolean(avail.isAvailable) : false;
-                                    return isAvailable ? (
-                                      <span
-                                        className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200"
-                                        title={`Fabric available in store (${avail?.totalStoreStockMeters || 0}m). Cleared to move to next department.`}
-                                      >
-                                        <Check className="w-2.5 h-2.5 text-emerald-600" />
-                                        In Store ({avail?.totalStoreStockMeters || 0}m)
-                                      </span>
-                                    ) : (
-                                      <span
-                                        className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200"
-                                        title="Fabric not available in store. Production sheet cannot move to next department."
-                                      >
-                                        <Lock className="w-2.5 h-2.5 text-amber-600" />
-                                        Awaiting Fabric
-                                      </span>
-                                    );
-                                  })()}
-                                </div>
-                              </div>
+                              <span
+                                className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                                  isDraft
+                                    ? 'bg-amber-100 text-amber-800'
+                                    : isReady
+                                    ? 'bg-indigo-100 text-indigo-800'
+                                    : isIssued
+                                    ? 'bg-emerald-100 text-emerald-800'
+                                    : 'bg-blue-100 text-blue-800'
+                                }`}
+                              >
+                                {prog.status}
+                              </span>
                             </td>
-                            <td className="py-3 px-4 text-right space-x-1.5">
-                              <button
-                                type="button"
-                                onClick={() => printProductionSheet(prog)}
-                                title="Print Production Sheet (A4)"
-                                className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 hover:text-blue-900 bg-slate-100 hover:bg-blue-50 px-2 py-1 rounded transition cursor-pointer"
-                              >
-                                <Printer className="w-3 h-3 text-slate-500" />
-                                <span>Print</span>
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => downloadProductionSheetHtml(prog)}
-                                title="Download File (.html / PDF)"
-                                className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 hover:text-emerald-900 bg-slate-100 hover:bg-emerald-50 px-2 py-1 rounded transition cursor-pointer"
-                              >
-                                <Download className="w-3 h-3 text-slate-500" />
-                                <span>Download</span>
-                              </button>
-                              {isReady && (
+                            <td className="py-3 px-4 text-right">
+                              <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                                <DocumentActionButtons
+                                  program={prog}
+                                  size="xs"
+                                />
+                                {isReady && (
+                                  <Link
+                                    href={`/my-work/issue-challan?programId=${prog.id}`}
+                                    className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded transition"
+                                  >
+                                    <span>Issue Challan</span>
+                                  </Link>
+                                )}
                                 <Link
-                                  href={`/my-work/issue-challan?programId=${prog.id}`}
-                                  className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded transition"
+                                  href={`/programs/${prog.id}`}
+                                  className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded transition"
                                 >
-                                  <span>Issue Challan</span>
+                                  <span>Details</span>
                                 </Link>
-                              )}
-                              <Link
-                                href={`/programs/${prog.id}`}
-                                className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded transition"
-                              >
-                                <span>View</span>
-                              </Link>
+                              </div>
                             </td>
                           </tr>
                         );
@@ -597,55 +553,11 @@ export default function ProgrammingDashboardPage() {
                           </td>
                           <td className="py-3 px-4 text-right">
                             <div className="flex items-center justify-end gap-1 flex-wrap">
-                              {/* CHALLAN ACTIONS */}
-                              <button
-                                type="button"
-                                onClick={() => downloadChallanHtml(ch)}
-                                title="Download Challan (.html / print)"
-                                className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-700 hover:text-emerald-900 bg-slate-100 hover:bg-emerald-50 px-2 py-1 rounded transition cursor-pointer"
-                              >
-                                <Download className="w-3 h-3 text-emerald-600" />
-                                <span>Challan</span>
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => printChallan(ch)}
-                                title="Print Challan Slip"
-                                className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-700 hover:text-blue-900 bg-slate-100 hover:bg-blue-50 px-2 py-1 rounded transition cursor-pointer"
-                              >
-                                <Printer className="w-3 h-3 text-slate-500" />
-                                <span>Print</span>
-                              </button>
-
-                              {/* PRODUCTION SHEET ACCOMPANYING ACTIONS */}
-                              {ch.program && (
-                                <>
-                                  <button
-                                    type="button"
-                                    onClick={() => setSelectedSheetModal(ch.program)}
-                                    title="View Accompanying Production Sheet"
-                                    className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-700 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-2 py-1 rounded transition cursor-pointer"
-                                  >
-                                    <FileText className="w-3 h-3" />
-                                    <span>Sheet</span>
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => downloadProductionSheetHtml(ch.program)}
-                                    title="Download Production Sheet HTML"
-                                    className="p-1 text-slate-500 hover:text-emerald-700 hover:bg-slate-100 rounded transition cursor-pointer"
-                                  >
-                                    <Download className="w-3 h-3" />
-                                  </button>
-                                </>
-                              )}
-
-                              <Link
-                                href={`/challans/${ch.id}`}
-                                className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded transition"
-                              >
-                                <span>View</span>
-                              </Link>
+                              <DocumentActionButtons
+                                challan={ch}
+                                program={ch.program}
+                                size="xs"
+                              />
                             </div>
                           </td>
                         </tr>

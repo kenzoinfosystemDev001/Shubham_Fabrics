@@ -5,14 +5,10 @@ import {
   Plus, 
   Trash2, 
   AlertCircle, 
-  Scissors, 
-  ArrowRight, 
   RefreshCw, 
   CheckCircle2, 
-  Archive, 
   ShieldAlert,
-  Layers,
-  Sparkles
+  Layers
 } from 'lucide-react';
 
 export interface ChallanItemData {
@@ -312,27 +308,19 @@ export function ColorFabricMeasurementTable({
 
   return (
     <div className="space-y-4">
-      {/* 1. DEPARTMENT FABRIC / PIECE IN & OUT TRACKING CONTROLLER */}
+      {/* 1. DEPARTMENT FABRIC / PIECE TRACKING CONTROLLER */}
       {showInOutController && (
-        <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 text-white rounded-xl p-4 sm:p-5 shadow-sm border border-slate-700/60">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-700/80">
+        <div className="bg-slate-900 text-white rounded-xl p-4 border border-slate-700/60 space-y-3">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-700/60">
             <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-amber-400/20 text-amber-300 rounded-lg border border-amber-400/30">
-                <Sparkles className="w-4 h-4" />
-              </div>
-              <div>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
-                  <span>Department Fabric &amp; Piece Tracking (In / Cut / Out)</span>
-                  {detectedFromDept && (
-                    <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30 font-mono">
-                      ⚡ Auto-detected from {detectedFromDept}
-                    </span>
-                  )}
-                </h3>
-                <p className="text-[11px] text-slate-300">
-                  Pieces/meters in are automatically detected. Any defective pieces cut are routed to the Defective Shelf, and remaining pieces flow to the next department.
-                </p>
-              </div>
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-200">
+                Fabric Tracking
+              </span>
+              {detectedFromDept && (
+                <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                  {detectedFromDept}
+                </span>
+              )}
             </div>
 
             {programId && !readOnly && (
@@ -340,38 +328,28 @@ export function ColorFabricMeasurementTable({
                 type="button"
                 onClick={() => runAutoDetection()}
                 disabled={autoDetecting}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg border border-slate-600 transition shrink-0 cursor-pointer self-start sm:self-auto"
-                title="Re-query previous department challan or program sheet"
+                className="inline-flex items-center gap-1.5 px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded border border-slate-700 transition cursor-pointer"
+                title="Sync from previous department"
               >
-                <RefreshCw className={`w-3.5 h-3.5 ${autoDetecting ? 'animate-spin text-amber-400' : ''}`} />
-                <span>{autoDetecting ? 'Detecting…' : 'Detect from Prev Dept'}</span>
+                <RefreshCw className={`w-3 h-3 ${autoDetecting ? 'animate-spin text-amber-400' : ''}`} />
+                <span>{autoDetecting ? 'Syncing...' : 'Sync'}</span>
               </button>
             )}
           </div>
 
-          {/* AUTO-DETECT NOTIFICATION BANNER */}
           {autoDetectMessage && (
-            <div className="mt-2.5 px-3 py-1.5 bg-emerald-950/60 border border-emerald-500/40 rounded-lg flex items-center gap-2 text-xs text-emerald-300 font-medium">
+            <div className="px-2.5 py-1 bg-emerald-950/60 border border-emerald-500/30 rounded text-xs text-emerald-300 flex items-center gap-1.5">
               <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-emerald-400" />
               <span>{autoDetectMessage}</span>
             </div>
           )}
 
-          {/* THREE-COLUMN PIPELINE: FABRIC IN ➔ DEFECTIVE CUT (SHELF) ➔ FABRIC OUT */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 mt-4">
-            
-            {/* STAGE 1: FABRIC / PIECES IN */}
-            <div className="bg-slate-800/90 border border-slate-700/80 rounded-xl p-3.5 space-y-2 relative overflow-hidden">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1">
-                  <span>1. Fabric / Pieces IN</span>
-                  <span className="text-rose-400">*</span>
-                </span>
-                <span className="text-[10px] font-mono font-bold bg-blue-500/20 text-blue-300 px-1.5 py-0.5 rounded">
-                  {detectedFromDept ? `From ${detectedFromDept}` : 'Current Station'}
-                </span>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {/* IN */}
+            <div className="bg-slate-800/90 border border-slate-700/70 rounded-lg p-3 space-y-1.5">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                In
               </div>
-
               <div className="flex items-center gap-2">
                 {readOnly ? (
                   <div className="text-xl font-mono font-bold text-white py-1">
@@ -385,13 +363,13 @@ export function ColorFabricMeasurementTable({
                       min="0"
                       value={fabricIn}
                       onChange={(e) => setFabricIn(Math.max(0, parseFloat(e.target.value) || 0))}
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-sm font-mono font-bold text-white focus:outline-none focus:ring-1 focus:ring-amber-400"
-                      placeholder="0.00"
+                      className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-600 rounded text-sm font-mono font-bold text-white focus:outline-none focus:border-slate-400"
+                      placeholder="0"
                     />
                     <select
                       value={fabricUnit}
                       onChange={(e) => setFabricUnit(e.target.value as 'MTR' | 'PCS')}
-                      className="px-2.5 py-2 bg-slate-900 border border-slate-600 rounded-lg text-xs font-bold text-amber-300 focus:outline-none cursor-pointer"
+                      className="px-2 py-1.5 bg-slate-900 border border-slate-600 rounded text-xs font-bold text-slate-200 focus:outline-none cursor-pointer"
                     >
                       <option value="MTR">MTR</option>
                       <option value="PCS">PCS</option>
@@ -399,24 +377,13 @@ export function ColorFabricMeasurementTable({
                   </>
                 )}
               </div>
-
-              <span className="text-[10px] text-slate-400 block">
-                {detectedFromChallanNumber ? `Linked to: ${detectedFromChallanNumber}` : 'Total quantity arriving at this station'}
-              </span>
             </div>
 
-            {/* STAGE 2: DEFECTIVENESS FOUND? (CUT & QUARANTINED TO DEFECTIVE SHELF) */}
-            <div className="bg-rose-950/40 border border-rose-800/60 rounded-xl p-3.5 space-y-2 relative">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-rose-300 flex items-center gap-1.5">
-                  <Scissors className="w-3.5 h-3.5 text-rose-400" />
-                  <span>2. Defective Cut Pieces</span>
-                </span>
-                <span className="text-[10px] font-mono font-bold bg-rose-500/20 text-rose-300 px-1.5 py-0.5 rounded border border-rose-500/30">
-                  ➔ Defective Shelf
-                </span>
+            {/* DEFECTIVE */}
+            <div className="bg-slate-800/90 border border-slate-700/70 rounded-lg p-3 space-y-1.5">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-rose-400">
+                Defective
               </div>
-
               <div className="flex items-center gap-2">
                 {readOnly ? (
                   <div className="text-xl font-mono font-bold text-rose-300 py-1">
@@ -430,7 +397,7 @@ export function ColorFabricMeasurementTable({
                     max={fabricIn}
                     value={defectivePieces}
                     onChange={(e) => setDefectivePieces(Math.max(0, Math.min(fabricIn, parseFloat(e.target.value) || 0)))}
-                    className="w-full px-3 py-2 bg-slate-900 border border-rose-700/70 rounded-lg text-sm font-mono font-bold text-rose-300 focus:outline-none focus:ring-1 focus:ring-rose-400"
+                    className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-600 rounded text-sm font-mono font-bold text-rose-300 focus:outline-none focus:border-rose-400"
                     placeholder="0"
                   />
                 )}
@@ -438,99 +405,69 @@ export function ColorFabricMeasurementTable({
 
               {defectivePieces > 0 && !readOnly && (
                 <div className="space-y-1.5 pt-1">
-                  <div>
-                    <label className="text-[9px] uppercase tracking-wider text-rose-300 font-bold block mb-0.5">
-                      Defect Reason:
-                    </label>
-                    <select
-                      value={defectReason}
-                      onChange={(e) => setDefectReason(e.target.value)}
-                      className="w-full px-2 py-1 bg-slate-900 border border-rose-800/60 rounded text-[11px] text-rose-200 focus:outline-none cursor-pointer"
-                    >
-                      <option value="Broken Stitch / Needle Holes">Broken Stitch / Needle Holes</option>
-                      <option value="Fabric Stain / Oil Marks">Fabric Stain / Oil Marks</option>
-                      <option value="Shade Variation / Uneven Dyeing">Shade Variation / Uneven Dyeing</option>
-                      <option value="Selvage / Border Chew / Knife Cut">Selvage / Border Chew / Knife Cut</option>
-                      <option value="Weaving Slub / Fabric Tear">Weaving Slub / Fabric Tear</option>
-                      <option value="Thread Drop / Tension Knot">Thread Drop / Tension Knot</option>
-                      <option value="Other Defectiveness">Other Process Defect</option>
-                    </select>
-                  </div>
+                  <select
+                    value={defectReason}
+                    onChange={(e) => setDefectReason(e.target.value)}
+                    className="w-full px-2 py-1 bg-slate-900 border border-slate-700 rounded text-xs text-rose-200 focus:outline-none cursor-pointer"
+                  >
+                    <option value="Broken Stitch / Needle Holes">Broken Stitch / Needle Holes</option>
+                    <option value="Fabric Stain / Oil Marks">Fabric Stain / Oil Marks</option>
+                    <option value="Shade Variation / Uneven Dyeing">Shade Variation / Uneven Dyeing</option>
+                    <option value="Selvage / Border Chew / Knife Cut">Selvage / Border Chew / Knife Cut</option>
+                    <option value="Weaving Slub / Fabric Tear">Weaving Slub / Fabric Tear</option>
+                    <option value="Thread Drop / Tension Knot">Thread Drop / Tension Knot</option>
+                    <option value="Other Defectiveness">Other Process Defect</option>
+                  </select>
 
-                  <div>
-                    <label className="text-[9px] uppercase tracking-wider text-amber-300 font-bold block mb-0.5">
-                      Assigned Defective Shelf:
-                    </label>
-                    <select
-                      value={defectiveShelfLocation}
-                      onChange={(e) => setDefectiveShelfLocation(e.target.value)}
-                      className="w-full px-2 py-1 bg-slate-900 border border-amber-500/60 rounded text-[10px] font-mono text-amber-300 focus:outline-none cursor-pointer"
-                    >
-                      {currentDepartment && (
-                        <option value={getDeptDefaultShelf(currentDepartment)}>
-                          {getDeptDefaultShelf(currentDepartment)} (This Dept Shelf)
-                        </option>
-                      )}
-                      <option value="DEF-SHELF-CENTRAL (Fabric Store Master Defective Shelf)">
-                        DEF-SHELF-CENTRAL (Fabric Store Master Defective Shelf)
+                  <select
+                    value={defectiveShelfLocation}
+                    onChange={(e) => setDefectiveShelfLocation(e.target.value)}
+                    className="w-full px-2 py-1 bg-slate-900 border border-slate-700 rounded text-xs font-mono text-amber-300 focus:outline-none cursor-pointer"
+                  >
+                    {currentDepartment && (
+                      <option value={getDeptDefaultShelf(currentDepartment)}>
+                        {getDeptDefaultShelf(currentDepartment)} (Dept Shelf)
                       </option>
-                      <option value="DEF-SHELF-STORE (Fabric Store Quarantined Shelf)">
-                        DEF-SHELF-STORE (Fabric Store Quarantined Shelf)
-                      </option>
-                      <option value="DEF-SHELF-DYEING (Dyeing Station Defective Shelf)">
-                        DEF-SHELF-DYEING (Dyeing Station Defective Shelf)
-                      </option>
-                      <option value="DEF-SHELF-QC1 (Dyeing QC Defective Shelf)">
-                        DEF-SHELF-QC1 (Dyeing QC Defective Shelf)
-                      </option>
-                      <option value="DEF-SHELF-EMBROIDERY (Embroidery Station Defective Shelf)">
-                        DEF-SHELF-EMBROIDERY (Embroidery Station Defective Shelf)
-                      </option>
-                      <option value="DEF-SHELF-THREAD-CUTTING (Thread Cutting Trimming Shelf)">
-                        DEF-SHELF-THREAD-CUTTING (Thread Cutting Trimming Shelf)
-                      </option>
-                      <option value="DEF-SHELF-QC2 (Thread Cut QC Defective Shelf)">
-                        DEF-SHELF-QC2 (Thread Cut QC Defective Shelf)
-                      </option>
-                      <option value="DEF-SHELF-QC3 (Washing QC Defective Shelf)">
-                        DEF-SHELF-QC3 (Washing QC Defective Shelf)
-                      </option>
-                      <option value="DEF-SHELF-FINAL-CHECK (Final check Defective Shelf)">
-                        DEF-SHELF-FINAL-CHECK (Final check Defective Shelf)
-                      </option>
-                    </select>
-                  </div>
-
-                  <div className="p-1.5 bg-rose-950/70 border border-rose-800/40 rounded text-[9px] text-amber-200 leading-tight flex items-start gap-1">
-                    <Archive className="w-3 h-3 text-amber-400 shrink-0 mt-0.5" />
-                    <span>
-                      Recorded in <strong>{defectiveShelfLocation.split(' ')[0]}</strong> &amp; automatically logged in the <strong>Fabric Store Central Defective Shelf</strong>.
-                    </span>
-                  </div>
+                    )}
+                    <option value="DEF-SHELF-CENTRAL (Fabric Store Master Defective Shelf)">
+                      DEF-SHELF-CENTRAL (Store Master)
+                    </option>
+                    <option value="DEF-SHELF-STORE (Fabric Store Quarantined Shelf)">
+                      DEF-SHELF-STORE (Quarantine)
+                    </option>
+                    <option value="DEF-SHELF-DYEING (Dyeing Station Defective Shelf)">
+                      DEF-SHELF-DYEING (Dyeing)
+                    </option>
+                    <option value="DEF-SHELF-QC1 (Dyeing QC Defective Shelf)">
+                      DEF-SHELF-QC1 (QC1)
+                    </option>
+                    <option value="DEF-SHELF-EMBROIDERY (Embroidery Station Defective Shelf)">
+                      DEF-SHELF-EMBROIDERY (Embroidery)
+                    </option>
+                    <option value="DEF-SHELF-THREAD-CUTTING (Thread Cutting Trimming Shelf)">
+                      DEF-SHELF-THREAD-CUTTING (Thread Cut)
+                    </option>
+                    <option value="DEF-SHELF-QC2 (Thread Cut QC Defective Shelf)">
+                      DEF-SHELF-QC2 (QC2)
+                    </option>
+                    <option value="DEF-SHELF-QC3 (Washing QC Defective Shelf)">
+                      DEF-SHELF-QC3 (QC3)
+                    </option>
+                    <option value="DEF-SHELF-FINAL-CHECK (Final check Defective Shelf)">
+                      DEF-SHELF-FINAL-CHECK (Final Check)
+                    </option>
+                  </select>
                 </div>
-              )}
-
-              {defectivePieces === 0 && (
-                <span className="text-[10px] text-slate-400 block italic">
-                  No defective pieces cut. All {fabricIn} {fabricUnit} pass.
-                </span>
               )}
             </div>
 
-            {/* STAGE 3: FABRIC / PIECES OUT (DISPATCH TO NEXT DEPARTMENT) */}
-            <div className="bg-emerald-950/40 border border-emerald-800/60 rounded-xl p-3.5 space-y-2 relative">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-300 flex items-center gap-1.5">
-                  <ArrowRight className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>3. Pieces Left (OUT)</span>
-                </span>
-                <span className="text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-500/30">
-                  ➔ Next Department
-                </span>
+            {/* OUT */}
+            <div className="bg-slate-800/90 border border-slate-700/70 rounded-lg p-3 space-y-1.5">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-emerald-400">
+                Out
               </div>
-
               <div className="flex items-center justify-between gap-2">
-                <div className="text-xl font-mono font-black text-emerald-300 py-1">
+                <div className="text-xl font-mono font-bold text-emerald-300 py-1">
                   {fabricOut} <span className="text-xs text-emerald-400 font-normal">{fabricUnit}</span>
                 </div>
 
@@ -538,34 +475,13 @@ export function ColorFabricMeasurementTable({
                   <button
                     type="button"
                     onClick={handleSyncToItems}
-                    className="px-2.5 py-1 bg-emerald-800 hover:bg-emerald-700 text-white text-[10px] font-bold rounded shadow-xs transition cursor-pointer"
-                    title="Populate table item measurement with this leftover piece count"
+                    className="px-2 py-1 bg-emerald-700 hover:bg-emerald-600 text-white text-[10px] font-bold rounded transition cursor-pointer"
+                    title="Populate table items"
                   >
                     Sync to Items
                   </button>
                 )}
               </div>
-
-              <div className="text-[10px] text-emerald-200/80 leading-tight">
-                Automatically visible as <strong>IN</strong> for the receiving department.
-              </div>
-            </div>
-
-          </div>
-
-          {/* MATHEMATICAL BALANCE VERIFICATION BAR */}
-          <div className="mt-3 pt-2.5 border-t border-slate-700/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] font-mono text-slate-300">
-            <div className="flex items-center gap-2">
-              <span className="text-slate-400">Balance:</span>
-              <span className="text-white font-bold">{fabricIn} {fabricUnit} (In)</span>
-              <span>=</span>
-              <span className="text-rose-300 font-bold">{defectivePieces} {fabricUnit} (Cut to Shelf)</span>
-              <span>+</span>
-              <span className="text-emerald-300 font-bold">{fabricOut} {fabricUnit} (Out to Next Dept)</span>
-            </div>
-            <div className="flex items-center gap-1.5 text-emerald-400 font-semibold">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>Zero-loss accounting verified</span>
             </div>
           </div>
         </div>

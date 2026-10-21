@@ -40,11 +40,12 @@ export default function InwardStockPage() {
     totalEntries: 0,
     totalMeters: 0,
     totalPcs: 0,
+    undyedMeters: 0,
     koraMeters: 0,
     dyedMeters: 0,
   });
 
-  const [typeFilter, setTypeFilter] = useState<'ALL' | 'KORA' | 'DYED'>('ALL');
+  const [typeFilter, setTypeFilter] = useState<'ALL' | 'UNDYED' | 'DYED' | 'KORA'>('ALL');
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -53,7 +54,7 @@ export default function InwardStockPage() {
 
   // Form State
   const [formData, setFormData] = useState({
-    entryType: 'KORA',
+    entryType: 'UNDYED',
     itemName: '',
     billNo: '',
     billDate: new Date().toISOString().split('T')[0],
@@ -117,7 +118,7 @@ export default function InwardStockPage() {
       setSuccessMsg(`Inward record for "${formData.itemName}" saved successfully!`);
       setModalOpen(false);
       setFormData({
-        entryType: 'KORA',
+        entryType: 'UNDYED',
         itemName: '',
         billNo: '',
         billDate: new Date().toISOString().split('T')[0],
@@ -221,22 +222,32 @@ export default function InwardStockPage() {
           </div>
 
           <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 block">
-              KORA (UNDYED) RECEIVED
-            </span>
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 block">
+                1. UNDYED RECEIVED
+              </span>
+              <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-100 text-amber-900">
+                UNDYED
+              </span>
+            </div>
             <div className="text-2xl font-black text-amber-900 mt-1">
-              {summary.koraMeters.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+              {(summary.undyedMeters || summary.koraMeters || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
               <span className="text-xs font-semibold text-amber-700 ml-1">MTR</span>
             </div>
             <span className="text-[10px] text-amber-700/80 mt-0.5 block">
-              Raw grey fabric for dyeing
+              Raw undyed fabric for dyeing
             </span>
           </div>
 
           <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-purple-700 block">
-              DYED FABRIC RECEIVED
-            </span>
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-purple-700 block">
+                2. DYED RECEIVED
+              </span>
+              <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-purple-100 text-purple-900">
+                DYED
+              </span>
+            </div>
             <div className="text-2xl font-black text-purple-900 mt-1">
               {summary.dyedMeters.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
               <span className="text-xs font-semibold text-purple-700 ml-1">MTR</span>
@@ -280,14 +291,14 @@ export default function InwardStockPage() {
             </button>
             <button
               type="button"
-              onClick={() => setTypeFilter('KORA')}
+              onClick={() => setTypeFilter('UNDYED')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                typeFilter === 'KORA'
+                typeFilter === 'UNDYED'
                   ? 'bg-amber-700 text-white'
                   : 'bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200'
               }`}
             >
-              Kora (Undyed)
+              1. UNDYED
             </button>
             <button
               type="button"
@@ -298,7 +309,7 @@ export default function InwardStockPage() {
                   : 'bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-200'
               }`}
             >
-              Dyed Fabric
+              2. DYED
             </button>
           </div>
 
@@ -383,12 +394,12 @@ export default function InwardStockPage() {
                       <td className="border-r-[1.5px] border-black px-3 py-2 text-center">
                         <span
                           className={`inline-block px-2 py-0.5 rounded text-[10px] font-black tracking-wider uppercase ${
-                            item.entryType === 'KORA'
+                            item.entryType === 'UNDYED' || item.entryType === 'KORA'
                               ? 'bg-amber-100 text-amber-900 border border-amber-300'
                               : 'bg-purple-100 text-purple-900 border border-purple-300'
                           }`}
                         >
-                          {item.entryType === 'KORA' ? 'KORA' : 'DYED'}
+                          {item.entryType === 'UNDYED' || item.entryType === 'KORA' ? 'UNDYED' : 'DYED'}
                         </span>
                       </td>
                       <td className="border-r-[1.5px] border-black px-4 py-2 font-bold text-slate-900">
@@ -458,14 +469,14 @@ export default function InwardStockPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     type="button"
-                    onClick={() => setFormData((prev) => ({ ...prev, entryType: 'KORA' }))}
+                    onClick={() => setFormData((prev) => ({ ...prev, entryType: 'UNDYED' }))}
                     className={`py-2 px-3 text-xs font-bold rounded-lg border text-center transition cursor-pointer ${
-                      formData.entryType === 'KORA'
+                      formData.entryType === 'UNDYED' || formData.entryType === 'KORA'
                         ? 'bg-amber-50 border-amber-600 text-amber-950 font-black ring-1 ring-amber-500'
                         : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
                     }`}
                   >
-                    KORA (Undyed Fabric)
+                    1. UNDYED FABRIC
                   </button>
                   <button
                     type="button"
@@ -476,7 +487,7 @@ export default function InwardStockPage() {
                         : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
                     }`}
                   >
-                    DYED FABRIC
+                    2. DYED FABRIC
                   </button>
                 </div>
               </div>

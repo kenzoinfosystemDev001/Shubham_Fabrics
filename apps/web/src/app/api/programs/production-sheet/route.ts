@@ -270,20 +270,32 @@ export async function POST(request: Request) {
     if (Array.isArray(data.forwardedComponents)) {
       metadataObj.forwardedComponents = data.forwardedComponents;
     }
-    // Resolve primary wilcom information from wilcomEntries or root fields
-    const primaryWilcom = Array.isArray(data.wilcomEntries) && data.wilcomEntries.length > 0 
-      ? data.wilcomEntries[0] 
-      : null;
-    const resolvedWilcomNumber = primaryWilcom?.wilcomDesignNumber || data.wilcomDesignNumber || null;
-    const resolvedWilcomPhoto = primaryWilcom?.photoUrl || data.wilcomDesignPhoto || null;
+    // Resolve wilcom photo and design number across all entries and root fields
+    const submittedWilcomEntries = Array.isArray(data.wilcomEntries)
+      ? data.wilcomEntries
+          .filter((entry: any) => entry && typeof entry === 'object')
+          .map((entry: any) => ({
+            ...entry,
+            photoUrl: entry.photoUrl || entry.photo || entry.imageUrl || entry.image || '',
+          }))
+      : [];
+    const resolvedWilcomPhoto =
+      submittedWilcomEntries.find((entry: any) => entry.photoUrl)?.photoUrl ||
+      data.wilcomDesignPhoto ||
+      null;
+
+    const resolvedWilcomNumber =
+      submittedWilcomEntries.find((entry: any) => entry.wilcomDesignNumber)?.wilcomDesignNumber ||
+      data.wilcomDesignNumber ||
+      null;
 
     metadataObj.wilcomDesignPhoto = resolvedWilcomPhoto;
     metadataObj.wilcomDesignNumber = resolvedWilcomNumber;
 
-    if (Array.isArray(data.wilcomEntries) && data.wilcomEntries.length > 0) {
-      metadataObj.wilcomEntries = data.wilcomEntries.map((e: any, idx: number) => ({
-        ...e,
-        photoUrl: e.photoUrl || (idx === 0 ? resolvedWilcomPhoto : '') || '',
+    if (submittedWilcomEntries.length > 0) {
+      metadataObj.wilcomEntries = submittedWilcomEntries.map((entry: any) => ({
+        ...entry,
+        photoUrl: entry.photoUrl || resolvedWilcomPhoto || '',
       }));
     } else if (resolvedWilcomNumber || resolvedWilcomPhoto) {
       metadataObj.wilcomEntries = [
@@ -453,6 +465,9 @@ export async function POST(request: Request) {
       });
 
       return created;
+    }, {
+      maxWait: 15000,
+      timeout: 30000,
     });
 
     const fullProgram = await prisma.program.findUnique({
@@ -482,7 +497,11 @@ export async function POST(request: Request) {
       cookieHeader.includes('subham_mes_role=SUPER_ADMIN') ||
       cookieHeader.includes('subham_mes_role=PROGRAMMER');
 
-    let sanitizedProgram: any = { ...fullProgram };
+    let sanitizedProgram: any = {
+      ...fullProgram,
+      wilcomEntries: metadataObj.wilcomEntries || [],
+      wilcomDesignPhoto: resolvedWilcomPhoto || fullProgram?.wilcomDesignPhoto,
+    };
     if (!isAuthorized) {
       sanitizedProgram.clientCode = null;
       if (sanitizedProgram.metadataJson) {
