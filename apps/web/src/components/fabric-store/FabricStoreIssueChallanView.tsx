@@ -815,7 +815,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                   currentDepartment="STORE"
                   tracking={storeTracking}
                   onTrackingChange={setStoreTracking}
-                  showInOutController={true}
+                  showInOutController={false}
                 />
               </div>
 

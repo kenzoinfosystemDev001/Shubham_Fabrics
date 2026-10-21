@@ -19,6 +19,7 @@ import {
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import BarcodeStickerCard from '@/components/BarcodeStickerCard';
+import { ColorFabricMeasurementTable, createDepartmentInOutTracking } from '@/components/ColorFabricMeasurementTable';
 
 export default function QCWashingIssueChallanPage() {
   const router = useRouter();
@@ -43,6 +44,7 @@ export default function QCWashingIssueChallanPage() {
       remarks: 'QC Washing approved. Ready for embroidery precision cutting.',
     },
   ]);
+  const [tracking, setTracking] = useState(() => createDepartmentInOutTracking('QC3'));
 
   useEffect(() => {
     const init = async () => {
@@ -59,7 +61,13 @@ export default function QCWashingIssueChallanPage() {
           const progJson = await progRes.json();
           const list = Array.isArray(progJson) ? progJson : progJson.data || [];
           setPrograms(list);
-          if (list.length > 0) setSelectedProgram(list[0]);
+          if (list.length > 0) {
+            setSelectedProgram(list[0]);
+            setTracking(createDepartmentInOutTracking('QC3', {
+              fabricIn: Number(list[0].targetQuantity) || 0,
+              fabricUnit: 'PCS',
+            }));
+          }
         }
       } catch (err) {
         console.error(err);
@@ -112,6 +120,8 @@ export default function QCWashingIssueChallanPage() {
         programId: selectedProgram.id,
         fromDepartment: 'QC3',
         toDepartment,
+        ...tracking,
+        detectedFromDepartment: tracking.detectedFromDept,
         priority,
         remarks,
         items: items.map((it) => ({
@@ -231,6 +241,10 @@ export default function QCWashingIssueChallanPage() {
               onChange={(e) => {
                 const p = programs.find((x) => x.id === e.target.value);
                 setSelectedProgram(p || null);
+                setTracking(createDepartmentInOutTracking('QC3', {
+                  fabricIn: Number(p?.targetQuantity) || 0,
+                  fabricUnit: 'PCS',
+                }));
               }}
               className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
             >
@@ -241,6 +255,20 @@ export default function QCWashingIssueChallanPage() {
               ))}
             </select>
           </div>
+
+          <ColorFabricMeasurementTable
+            items={[]}
+            onChange={() => {}}
+            currentDepartment="QC3"
+            programId={selectedProgram?.id}
+            tracking={tracking}
+            onTrackingChange={setTracking}
+            trackingOnly
+            showInOutController
+            onSyncToItems={(fabricOut, fabricUnit) => {
+              setItems((prev) => prev.map((item, index) => index === 0 ? { ...item, quantity: String(fabricOut), uom: fabricUnit, unitType: fabricUnit } : item));
+            }}
+          />
 
           {/* 3. Items Table */}
           <div className="space-y-3">

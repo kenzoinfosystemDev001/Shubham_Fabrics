@@ -19,6 +19,7 @@ import {
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import BarcodeStickerCard from '@/components/BarcodeStickerCard';
+import { ColorFabricMeasurementTable, createDepartmentInOutTracking } from '@/components/ColorFabricMeasurementTable';
 
 export default function QC2IssueChallanPage() {
   const router = useRouter();
@@ -42,6 +43,7 @@ export default function QC2IssueChallanPage() {
       remarks: 'QC2 Approved. Ready for drum washer & hydro-extractor.',
     },
   ]);
+  const [tracking, setTracking] = useState(() => createDepartmentInOutTracking('QC2'));
 
   useEffect(() => {
     const init = async () => {
@@ -71,6 +73,10 @@ export default function QC2IssueChallanPage() {
 
   const handleSelectProgram = (prog: any) => {
     setSelectedProgram(prog);
+    setTracking(createDepartmentInOutTracking('QC2', {
+      fabricIn: Number(prog.targetQuantity) || 0,
+      fabricUnit: 'PCS',
+    }));
     setItems((prev) => [
       {
         ...prev[0],
@@ -104,6 +110,8 @@ export default function QC2IssueChallanPage() {
           programId: selectedProgram.id,
           fromDepartment: 'QC2',
           toDepartment: toDepartment,
+          ...tracking,
+          detectedFromDepartment: tracking.detectedFromDept,
           priority,
           remarks: `${remarks} | Production Sheet #${selectedProgram.programSerialNo || selectedProgram.programNumber}`,
           items: validItems.map((it) => ({
@@ -224,6 +232,7 @@ export default function QC2IssueChallanPage() {
               onChange={(e) => {
                 const prog = programs.find((p) => p.id === e.target.value);
                 if (prog) handleSelectProgram(prog);
+                else setSelectedProgram(null);
               }}
               className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium focus:ring-2 focus:ring-blue-500"
             >
@@ -233,6 +242,20 @@ export default function QC2IssueChallanPage() {
                 </option>
               ))}
             </select>
+
+            <ColorFabricMeasurementTable
+              items={[]}
+              onChange={() => {}}
+              currentDepartment="QC2"
+              programId={selectedProgram?.id}
+              tracking={tracking}
+              onTrackingChange={setTracking}
+              trackingOnly
+              showInOutController
+              onSyncToItems={(fabricOut, fabricUnit) => {
+                setItems((prev) => prev.map((item, index) => index === 0 ? { ...item, quantity: String(fabricOut), uom: fabricUnit } : item));
+              }}
+            />
 
             {selectedProgram && (
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-slate-600 pt-2 border-t border-sky-200/60">

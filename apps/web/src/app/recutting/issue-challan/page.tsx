@@ -22,6 +22,7 @@ import {
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import BarcodeStickerCard from '@/components/BarcodeStickerCard';
+import { ColorFabricMeasurementTable, createDepartmentInOutTracking } from '@/components/ColorFabricMeasurementTable';
 
 function RecuttingIssueChallanContent() {
   const router = useRouter();
@@ -51,6 +52,7 @@ function RecuttingIssueChallanContent() {
       remarks: 'Passed pre-stitching verification (seam allowance and motif symmetry checked).',
     },
   ]);
+  const [tracking, setTracking] = useState(() => createDepartmentInOutTracking('RECUTTING'));
 
   useEffect(() => {
     const loadEligibleJobs = async () => {
@@ -86,6 +88,13 @@ function RecuttingIssueChallanContent() {
   const selectJob = (job: any) => {
     setSelectedJob(job);
     const goodQty = job.fabricOut ?? job.fabricIn ?? 0;
+    setTracking(createDepartmentInOutTracking('RECUTTING', {
+      fabricIn: Number(goodQty) || 0,
+      fabricUnit: job.fabricUnit === 'MTR' ? 'MTR' : 'PCS',
+      detectedFromDept: job.fromDepartment || null,
+      detectedFromChallanId: job.id,
+      detectedFromChallanNumber: job.challanNumber || null,
+    }));
     // auto-fill first item quantity
     setItems([
       {
@@ -149,6 +158,8 @@ function RecuttingIssueChallanContent() {
       const payload = {
         parentChallanId: selectedJob.id,
         programId: selectedJob.programId,
+        ...tracking,
+        detectedFromDepartment: tracking.detectedFromDept,
         priority,
         remarks,
         items: items.map((it) => ({
@@ -223,6 +234,19 @@ function RecuttingIssueChallanContent() {
       {/* MAIN CONTAINER */}
       <main className="max-w-5xl mx-auto px-4 sm:px-8 py-6 space-y-6">
         <form onSubmit={handleSubmit} className="space-y-6">
+          <ColorFabricMeasurementTable
+            items={[]}
+            onChange={() => {}}
+            currentDepartment="RECUTTING"
+            programId={selectedJob?.programId}
+            tracking={tracking}
+            onTrackingChange={setTracking}
+            trackingOnly
+            showInOutController
+            onSyncToItems={(fabricOut, fabricUnit) => {
+              setItems((prev) => prev.map((item, index) => index === 0 ? { ...item, quantity: String(fabricOut), uom: fabricUnit, unitType: fabricUnit } : item));
+            }}
+          />
           {/* STEP 1: SELECT SOURCE RECUTTING JOB */}
           <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">

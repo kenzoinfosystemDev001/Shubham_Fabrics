@@ -21,6 +21,7 @@ import {
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import BarcodeStickerCard from '@/components/BarcodeStickerCard';
+import { ColorFabricMeasurementTable, createDepartmentInOutTracking } from '@/components/ColorFabricMeasurementTable';
 
 function FinishingIssueChallanContent() {
   const router = useRouter();
@@ -51,6 +52,7 @@ function FinishingIssueChallanContent() {
       remarks: 'Passed finishing QC checks (threads trimmed <2mm, no spots, pressed).',
     },
   ]);
+  const [tracking, setTracking] = useState(() => createDepartmentInOutTracking('FINISHING'));
 
   useEffect(() => {
     const loadEligibleJobs = async () => {
@@ -86,6 +88,13 @@ function FinishingIssueChallanContent() {
   const selectJob = (job: any) => {
     setSelectedJob(job);
     const availableGood = job.fabricOut ?? job.fabricIn ?? 0;
+    setTracking(createDepartmentInOutTracking('FINISHING', {
+      fabricIn: Number(availableGood) || 0,
+      fabricUnit: job.fabricUnit === 'MTR' ? 'MTR' : 'PCS',
+      detectedFromDept: job.fromDepartment || null,
+      detectedFromChallanId: job.id,
+      detectedFromChallanNumber: job.challanNumber || null,
+    }));
     setItems([
       {
         itemDescription: `${job.program?.styleCode || 'Finished'} Garments - Ready for Handover`,
@@ -156,6 +165,8 @@ function FinishingIssueChallanContent() {
         parentChallanId: selectedJob.id,
         programId: selectedJob.programId,
         toDepartment: targetDepartment,
+        ...tracking,
+        detectedFromDepartment: tracking.detectedFromDept,
         priority,
         remarks,
         items: items.map((it) => ({
@@ -223,6 +234,19 @@ function FinishingIssueChallanContent() {
       {/* FORM BODY */}
       <main className="max-w-5xl mx-auto w-full p-4 md:p-6 space-y-6 flex-1">
         <form onSubmit={handleSubmit} className="space-y-6">
+          <ColorFabricMeasurementTable
+            items={[]}
+            onChange={() => {}}
+            currentDepartment="FINISHING"
+            programId={selectedJob?.programId}
+            tracking={tracking}
+            onTrackingChange={setTracking}
+            trackingOnly
+            showInOutController
+            onSyncToItems={(fabricOut, fabricUnit) => {
+              setItems((prev) => prev.map((item, index) => index === 0 ? { ...item, quantity: String(fabricOut), uom: fabricUnit, unitType: fabricUnit } : item));
+            }}
+          />
           {/* SOURCE JOB SELECTOR */}
           <div className="p-5 rounded-2xl bg-slate-900/70 border border-slate-800 space-y-4">
             <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">

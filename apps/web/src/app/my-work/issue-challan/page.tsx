@@ -619,7 +619,7 @@ function IssueChallanContent() {
                 currentDepartment="PROGRAMMING"
                 tracking={tracking}
                 onTrackingChange={setTracking}
-                showInOutController={true}
+                showInOutController={false}
               />
             </div>
 
