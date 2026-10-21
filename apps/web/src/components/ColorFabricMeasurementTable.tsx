@@ -338,6 +338,22 @@ export function ColorFabricMeasurementTable({
     onChange([...items, createBlankChallanItem(context)]);
   };
 
+  const handleAddColorMeasurement = (index: number) => {
+    if (readOnly) return;
+    const sourceItem = items[index];
+    const colorItem = {
+      ...createBlankChallanItem(context),
+      fabric: sourceItem.fabric,
+      width: sourceItem.width,
+      colorCode: sourceItem.colorCode,
+    };
+    onChange([
+      ...items.slice(0, index + 1),
+      colorItem,
+      ...items.slice(index + 1),
+    ]);
+  };
+
   const handleRemoveItem = (index: number) => {
     if (readOnly) return;
     if (items.length <= 1) {
@@ -651,15 +667,26 @@ export function ColorFabricMeasurementTable({
                       {readOnly ? (
                         <span className="text-slate-800">{item.color || '—'}</span>
                       ) : (
-                        <input
-                          type="text"
-                          required
-                          value={item.color}
-                          onChange={(e) => handleFieldChange(idx, 'color', e.target.value)}
-                          onFocus={(e) => e.target.select()}
-                          placeholder=""
-                          className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 transition"
-                        />
+                        <div className="space-y-1.5">
+                          <input
+                            type="text"
+                            required
+                            value={item.color}
+                            onChange={(e) => handleFieldChange(idx, 'color', e.target.value)}
+                            onFocus={(e) => e.target.select()}
+                            placeholder=""
+                            className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 transition"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleAddColorMeasurement(idx)}
+                            className="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-600 hover:text-slate-900 transition cursor-pointer whitespace-nowrap"
+                            title="Add another color with its own measurement"
+                          >
+                            <Plus className="w-3 h-3" />
+                            <span>Add Color &amp; Measurement</span>
+                          </button>
+                        </div>
                       )}
                     </td>
 
