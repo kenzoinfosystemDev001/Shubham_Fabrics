@@ -134,6 +134,16 @@ const DEPARTMENTS = [
     hoverClass: 'hover:bg-teal-500/10 hover:text-teal-300',
     activeBg: 'bg-teal-500/15 text-teal-300 font-bold',
   },
+  {
+    name: 'Steam Press Department',
+    code: 'STEAM_PRESS',
+    href: '/steam-press',
+    color: 'cyan',
+    badge: 'STP',
+    dotClass: 'bg-cyan-400',
+    hoverClass: 'hover:bg-cyan-500/10 hover:text-cyan-300',
+    activeBg: 'bg-cyan-500/15 text-cyan-300 font-bold',
+  },
 ];
 
 export function DepartmentSwitcher({

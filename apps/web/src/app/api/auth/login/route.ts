@@ -41,6 +41,9 @@ export async function POST(request: Request) {
       recutting: { role: 'RECUTTING_SUPERVISOR', dept: 'RECUTTING', name: 'Recutting Department' },
       stitching: { role: 'STITCHING_SUPERVISOR', dept: 'STITCHING', name: 'Stitching Department' },
       finishing: { role: 'FINISHING_SUPERVISOR', dept: 'FINISHING', name: 'Finishing Department' },
+      steampress: { role: 'STEAM_PRESS_SUPERVISOR', dept: 'STEAM_PRESS', name: 'Steam Press Department' },
+      steam_press: { role: 'STEAM_PRESS_SUPERVISOR', dept: 'STEAM_PRESS', name: 'Steam Press Department' },
+      finalcheck: { role: 'FINAL_CHECK_INSPECTOR', dept: 'FINAL_CHECK', name: 'Final Quality Check' },
     };
 
     // 2. Query user from Neon DB
@@ -307,6 +310,26 @@ export async function POST(request: Request) {
         roleCodes.includes('FINISHING_SUPERVISOR') ||
         roleCodes.includes('FINISHING_OPERATOR') ||
         roleCodes.includes('FINISHING_INCHARGE'));
+
+    const isSteamPress =
+      !isAdmin &&
+      !isStore &&
+      !isProgramming &&
+      !isEmbroidery &&
+      !isDyeing &&
+      !isQC1 &&
+      !isThreadCutting &&
+      !isQC2 &&
+      !isWashing &&
+      !isRecutting &&
+      !isStitching &&
+      !isFinishing &&
+      (user.username.toLowerCase() === 'steampress' ||
+        user.username.toLowerCase() === 'steam_press' ||
+        user.departmentCode === 'STEAM_PRESS' ||
+        roleCodes.includes('STEAM_PRESS_SUPERVISOR') ||
+        roleCodes.includes('STEAM_PRESS_OPERATOR') ||
+        roleCodes.includes('STEAM_PRESS_INCHARGE'));
 
     const normalizedRole = isAdmin
       ? 'ADMIN'

@@ -18,6 +18,7 @@ import {
   Waves,
   Shirt,
   Sparkles,
+  Wind,
 } from 'lucide-react';
 
 interface StationOption {
@@ -147,6 +148,15 @@ const STATIONS: StationOption[] = [
     accentColor: 'text-teal-400',
     borderActive: 'border-teal-500/80 shadow-[0_0_15px_rgba(20,184,166,0.25)]',
     bgActive: 'bg-teal-500/15 text-white',
+  },
+  {
+    id: 'steampress',
+    name: 'Steam Press',
+    username: 'steampress',
+    icon: Wind,
+    accentColor: 'text-cyan-400',
+    borderActive: 'border-cyan-500/80 shadow-[0_0_15px_rgba(6,182,212,0.25)]',
+    bgActive: 'bg-cyan-500/15 text-white',
   },
 ];
 

@@ -278,6 +278,52 @@ async function setup() {
     create: { code: 'DISPATCH', name: 'Dispatch Department', sequenceOrder: 18, description: 'Shipping and logistics dispatch' },
   });
 
+  // 10. Steam Press Department & User
+  let steamPressRole = await prisma.role.findFirst({ where: { code: 'STEAM_PRESS_SUPERVISOR' } });
+  if (!steamPressRole) {
+    steamPressRole = await prisma.role.create({
+      data: { code: 'STEAM_PRESS_SUPERVISOR', name: 'Steam Press Supervisor', description: 'Steam pressing, ironing, and crease setting supervisor', isSystem: true },
+    });
+  }
+
+  const steamPressUser = await prisma.user.upsert({
+    where: { username: 'steampress' },
+    update: { passwordHash: hash, departmentCode: 'STEAM_PRESS', fullName: 'Steam Press Incharge' },
+    create: {
+      username: 'steampress',
+      email: 'steampress@subhamfabrics.com',
+      fullName: 'Steam Press Incharge',
+      passwordHash: hash,
+      departmentCode: 'STEAM_PRESS',
+    },
+  });
+  await prisma.userRole.deleteMany({ where: { userId: steamPressUser.id } });
+  await prisma.userRole.create({ data: { userId: steamPressUser.id, roleId: steamPressRole.id } });
+  console.log('✓ Steam Press user ready: steampress / 1234 (STEAM_PRESS_SUPERVISOR)');
+
+  // 11. Final QC Department & User
+  let finalCheckRole = await prisma.role.findFirst({ where: { code: 'FINAL_CHECK_INSPECTOR' } });
+  if (!finalCheckRole) {
+    finalCheckRole = await prisma.role.create({
+      data: { code: 'FINAL_CHECK_INSPECTOR', name: 'Final QC Inspector', description: 'Final garment inspection and quality verification', isSystem: true },
+    });
+  }
+
+  const finalCheckUser = await prisma.user.upsert({
+    where: { username: 'finalcheck' },
+    update: { passwordHash: hash, departmentCode: 'FINAL_CHECK', fullName: 'Final QC Inspector' },
+    create: {
+      username: 'finalcheck',
+      email: 'finalcheck@subhamfabrics.com',
+      fullName: 'Final QC Inspector',
+      passwordHash: hash,
+      departmentCode: 'FINAL_CHECK',
+    },
+  });
+  await prisma.userRole.deleteMany({ where: { userId: finalCheckUser.id } });
+  await prisma.userRole.create({ data: { userId: finalCheckUser.id, roleId: finalCheckRole.id } });
+  console.log('✓ Final QC user ready: finalcheck / 1234 (FINAL_CHECK_INSPECTOR)');
+
   console.log('✓ Downstream factory route departments verified');
 
   console.log('--- Core users successfully configured ---');

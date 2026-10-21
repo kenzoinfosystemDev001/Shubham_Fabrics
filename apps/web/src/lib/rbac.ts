@@ -318,6 +318,28 @@ export function isStitchingUser(user: MESUser | null): boolean {
   );
 }
 
+export function isSteamPressUser(user: MESUser | null): boolean {
+  if (!user) return false;
+  if (isAdminUser(user)) return true; // Admins have all access
+
+  const username = (user.username || '').toLowerCase();
+  const dept = (user.departmentCode || '').toUpperCase();
+  const role = (user.role || '').toUpperCase();
+  const roles = (user.roles || []).map((r) => r.toUpperCase());
+
+  return (
+    username === 'steampress' ||
+    username === 'steam_press' ||
+    dept === 'STEAM_PRESS' ||
+    role === 'STEAM_PRESS_SUPERVISOR' ||
+    role === 'STEAM_PRESS_OPERATOR' ||
+    role === 'STEAM_PRESS_INCHARGE' ||
+    roles.includes('STEAM_PRESS_SUPERVISOR') ||
+    roles.includes('STEAM_PRESS_OPERATOR') ||
+    roles.includes('STEAM_PRESS_INCHARGE')
+  );
+}
+
 export function isFinishingUser(user: MESUser | null): boolean {
   if (!user) return false;
   if (isAdminUser(user)) return true; // Admins have all access
@@ -342,6 +364,7 @@ export function isFinishingUser(user: MESUser | null): boolean {
 export function getUserStationHome(user: MESUser | null): string {
   if (!user) return '/login';
   if (isAdminUser(user)) return '/admin';
+  if (isSteamPressUser(user)) return '/steam-press';
   if (isFinishingUser(user)) return '/finishing';
   if (isStitchingUser(user)) return '/stitching';
   if (isRecuttingUser(user)) return '/recutting';
@@ -551,6 +574,7 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
       !pathname.startsWith('/recutting/floor-board') &&
       !pathname.startsWith('/stitching/floor-board') &&
       !pathname.startsWith('/finishing/floor-board') &&
+      !pathname.startsWith('/steam-press/floor-board') &&
       !pathname.startsWith('/thread-cutting/floor-board'));
 
   if (isProgrammingRoute) {
