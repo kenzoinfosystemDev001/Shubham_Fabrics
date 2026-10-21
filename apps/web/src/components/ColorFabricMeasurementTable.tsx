@@ -37,6 +37,26 @@ export type ChallanContext =
   | 'EMBROIDERY_THREAD_CUTTING'
   | 'GENERIC';
 
+const FABRIC_TRACKING_DEPARTMENTS = new Set([
+  'DYEING',
+  'QC1',
+  'DYEING_QC',
+  'EMBROIDERY',
+  'THREAD_CUTTING',
+  'QC2',
+  'WASHING',
+  'QC3',
+  'QCWASHING',
+  'QC_WASHING',
+  'RECUTTING',
+  'STITCHING',
+  'ASSEMBLY',
+  'FINISHING',
+  'STEAM_PRESS',
+  'FINAL_CHECK',
+  'PACKING',
+]);
+
 export interface DepartmentInOutTracking {
   fabricIn: number;
   fabricOut: number;
@@ -181,11 +201,13 @@ export function ColorFabricMeasurementTable({
 
   const [autoDetecting, setAutoDetecting] = useState(false);
   const [autoDetectMessage, setAutoDetectMessage] = useState<string | null>(null);
+  const normalizedDepartment = (currentDepartment || '')
+    .trim()
+    .toUpperCase()
+    .replace(/[\s-]+/g, '_');
   const trackingControllerVisible =
     showInOutController &&
-    !['PROGRAMMING', 'PRG', 'STORE', 'FABRIC_STORE'].includes(
-      (currentDepartment || '').trim().toUpperCase()
-    );
+    FABRIC_TRACKING_DEPARTMENTS.has(normalizedDepartment);
 
   // Derived Fabric Out = In - Defective
   const fabricOut = Math.max(0, Number((fabricIn - defectivePieces).toFixed(2)));
