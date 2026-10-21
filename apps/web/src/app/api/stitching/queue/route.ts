@@ -41,19 +41,11 @@ export async function GET(request: Request) {
       where: whereClause,
       include: {
         program: {
-          select: {
-            id: true,
-            programNumber: true,
-            programSerialNo: true,
-            clientName: true,
-            buyerName: true,
-            styleCode: true,
-            designNumber: true,
-            wilcomDesignNumber: true,
-            fabricName: true,
-            fabricColor: true,
-            targetQuantity: true,
-            quantityMeasurement: true,
+          include: {
+            fabrics: true,
+            colours: true,
+            sizes: true,
+            specifications: true,
           },
         },
         items: true,

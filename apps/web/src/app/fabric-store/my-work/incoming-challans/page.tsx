@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { 
   RefreshCw, 
   ArrowDownToLine, 
-  Package, 
   CheckCircle2, 
   Layers, 
   FileText, 
@@ -21,15 +20,8 @@ import {
   AlertTriangle,
   PackagePlus,
 } from 'lucide-react';
+import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
-import { 
-  downloadProductionSheetHtml, 
-  printProductionSheet 
-} from '@/lib/download-production-sheet';
-import { 
-  downloadChallanHtml, 
-  printChallan 
-} from '@/lib/download-challan';
 
 export default function IncomingChallansPage() {
   const [loading, setLoading] = useState(true);
@@ -144,13 +136,6 @@ export default function IncomingChallansPage() {
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
-          <Link
-            href="/fabric-store/my-work/material-receipt/create"
-            className="flex items-center gap-2 px-3.5 py-2 bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold rounded-md shadow-xs transition"
-          >
-            <Package className="w-4 h-4" />
-            <span>Create GRN</span>
-          </Link>
         </div>
       </header>
 
@@ -353,64 +338,11 @@ export default function IncomingChallansPage() {
                               </span>
                             )}
 
-                            {/* CHALLAN ACTIONS */}
-                            <button
-                              type="button"
-                              onClick={() => downloadChallanHtml(ch)}
-                              className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-700 hover:text-emerald-900 bg-slate-100 hover:bg-emerald-50 px-2 py-1 rounded border border-slate-200 transition cursor-pointer"
-                              title="Download Challan as standalone HTML/PDF"
-                            >
-                              <Download className="w-3 h-3 text-emerald-600" />
-                              <span>Challan</span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => printChallan(ch)}
-                              className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-700 hover:text-blue-900 bg-slate-100 hover:bg-blue-50 px-2 py-1 rounded border border-slate-200 transition cursor-pointer"
-                              title="Print Challan Slip"
-                            >
-                              <Printer className="w-3 h-3 text-slate-500" />
-                              <span>Print</span>
-                            </button>
-
-                            {/* PRODUCTION SHEET ACCOMPANYING ACTIONS */}
-                            {ch.program && (
-                              <div className="flex items-center gap-1 bg-teal-50 border border-teal-200 px-1.5 py-0.5 rounded">
-                                <button
-                                  type="button"
-                                  onClick={() => setSelectedSheetModal(ch.program)}
-                                  className="inline-flex items-center gap-1 text-[11px] font-bold text-teal-800 hover:text-teal-900 transition cursor-pointer"
-                                  title="View accompanying Production Sheet from Programming"
-                                >
-                                  <FileText className="w-3 h-3 text-teal-700" />
-                                  <span>Sheet</span>
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => downloadProductionSheetHtml(ch.program)}
-                                  className="p-0.5 text-teal-700 hover:text-teal-900 hover:bg-teal-100 rounded transition cursor-pointer"
-                                  title="Download Production Sheet HTML"
-                                >
-                                  <Download className="w-3 h-3" />
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => printProductionSheet(ch.program)}
-                                  className="p-0.5 text-teal-700 hover:text-teal-900 hover:bg-teal-100 rounded transition cursor-pointer"
-                                  title="Print Production Sheet on A4"
-                                >
-                                  <Printer className="w-3 h-3" />
-                                </button>
-                              </div>
-                            )}
-
-                            <Link
-                              href={`/challans/${ch.id}`}
-                              className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded transition"
-                              title="View full challan voucher"
-                            >
-                              <Eye className="w-3.5 h-3.5" />
-                            </Link>
+                            <DocumentActionButtons
+                              challan={ch}
+                              program={ch.program}
+                              size="xs"
+                            />
                           </div>
                         </td>
                       </tr>

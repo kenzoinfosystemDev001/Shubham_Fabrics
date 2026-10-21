@@ -9,26 +9,42 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const program = await prisma.program.findUnique({
-      where: { id },
-      include: {
-        customer: true,
-        design: true,
-        createdBy: { select: { id: true, username: true, fullName: true } },
-        approvedBy: { select: { id: true, username: true, fullName: true } },
-        fabrics: true,
-        sizes: true,
-        colours: true,
-        challans: {
-          include: {
-            items: true,
-            fromDeptRel: true,
-            toDeptRel: true,
-          },
-          orderBy: { createdAt: 'desc' },
+    const programInclude = {
+      customer: true,
+      design: true,
+      createdBy: { select: { id: true, username: true, fullName: true } },
+      approvedBy: { select: { id: true, username: true, fullName: true } },
+      fabrics: true,
+      sizes: true,
+      colours: true,
+      challans: {
+        include: {
+          items: true,
+          fromDeptRel: true,
+          toDeptRel: true,
         },
+        orderBy: { createdAt: 'desc' as const },
       },
-    });
+    };
+
+    let program = await prisma.program.findUnique({
+      where: { id },
+      include: programInclude,
+    }).catch(() => null);
+
+    if (!program) {
+      program = await prisma.program.findUnique({
+        where: { programNumber: id },
+        include: programInclude,
+      }).catch(() => null);
+    }
+
+    if (!program) {
+      program = await prisma.program.findFirst({
+        where: { programSerialNo: id },
+        include: programInclude,
+      }).catch(() => null);
+    }
 
     if (!program) {
       return NextResponse.json({ error: 'Program not found' }, { status: 404 });
@@ -42,6 +58,8 @@ export async function GET(
     let serialNoCounter = '000';
     let note = '';
     let clientCode = '';
+    let wilcomEntries: any[] = [];
+    let wilcomDesignPhoto = program.wilcomDesignPhoto;
 
     try {
       if (program.metadataJson) {
@@ -54,6 +72,10 @@ export async function GET(
         if (parsed.serialNoCounter) serialNoCounter = parsed.serialNoCounter;
         if (parsed.note) note = parsed.note;
         if (parsed.clientCode) clientCode = parsed.clientCode;
+        if (Array.isArray(parsed.wilcomEntries)) wilcomEntries = parsed.wilcomEntries;
+        if (!wilcomDesignPhoto) {
+          wilcomDesignPhoto = parsed.wilcomDesignPhoto || wilcomEntries.find((e: any) => e?.photoUrl)?.photoUrl || null;
+        }
       }
     } catch {}
 
@@ -81,6 +103,8 @@ export async function GET(
 
     return NextResponse.json({ 
       ...program, 
+      wilcomDesignPhoto: wilcomDesignPhoto || program.wilcomDesignPhoto,
+      wilcomEntries,
       items, 
       subStyles,
       subStylesWithAverages,
@@ -312,5 +336,109 @@ export async function DELETE(
       { error: error.message || 'Failed to permanently remove program' },
       { status: 500 }
     );
+  }
+}
+
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const body = await request.json();
+
+    let prog = await prisma.program.findUnique({
+      where: { id },
+      select: { id: true, metadataJson: true },
+    }).catch(() => null);
+
+    if (!prog) {
+      prog = await prisma.program.findFirst({
+        where: { OR: [{ programNumber: id }, { programSerialNo: id }] },
+        select: { id: true, metadataJson: true },
+      }).catch(() => null);
+    }
+
+    if (!prog) {
+      return NextResponse.json({ error: 'Program not found' }, { status: 404 });
+    }
+
+    let meta: any = {};
+    if (prog.metadataJson) {
+      try {
+        meta = typeof prog.metadataJson === 'string' ? JSON.parse(prog.metadataJson) : prog.metadataJson;
+      } catch {}
+    }
+
+    const updateData: any = {};
+    let resolvedPhoto: string | null = null;
+
+    if (body.wilcomDesignPhoto) {
+      resolvedPhoto = body.wilcomDesignPhoto;
+    }
+
+    if (Array.isArray(body.wilcomEntries)) {
+      if (!resolvedPhoto) {
+        resolvedPhoto = body.wilcomEntries.find((e: any) => e?.photoUrl)?.photoUrl || null;
+      }
+      meta.wilcomEntries = body.wilcomEntries.map((e: any) => ({
+        ...e,
+        photoUrl: e.photoUrl || resolvedPhoto || undefined,
+      }));
+    } else if (body.wilcomDesignPhoto) {
+      if (Array.isArray(meta.wilcomEntries) && meta.wilcomEntries.length > 0) {
+        meta.wilcomEntries = meta.wilcomEntries.map((e: any) => ({
+          ...e,
+          photoUrl: e.photoUrl || body.wilcomDesignPhoto,
+        }));
+      } else {
+        meta.wilcomEntries = [
+          {
+            id: 'wilcom-auto-1',
+            category: 'TOP',
+            styleName: body.styleName || 'Primary Top Style',
+            wilcomDesignNumber: body.wilcomDesignNumber || 'WLC-01',
+            photoUrl: body.wilcomDesignPhoto,
+          },
+        ];
+      }
+    }
+
+    if (!resolvedPhoto && meta.wilcomDesignPhoto) {
+      resolvedPhoto = meta.wilcomDesignPhoto;
+    }
+
+    if (resolvedPhoto) {
+      updateData.wilcomDesignPhoto = resolvedPhoto;
+      meta.wilcomDesignPhoto = resolvedPhoto;
+    } else if (body.wilcomDesignPhoto === null) {
+      updateData.wilcomDesignPhoto = null;
+      meta.wilcomDesignPhoto = null;
+    }
+
+    if (body.baseDesignPhoto !== undefined) {
+      updateData.baseDesignPhoto = body.baseDesignPhoto;
+      meta.baseDesignPhoto = body.baseDesignPhoto;
+    }
+    if (body.wilcomDesignNumber !== undefined) {
+      updateData.wilcomDesignNumber = body.wilcomDesignNumber;
+      meta.wilcomDesignNumber = body.wilcomDesignNumber;
+    }
+
+    updateData.metadataJson = JSON.stringify(meta);
+
+    const updated = await prisma.program.update({
+      where: { id: prog.id },
+      data: updateData,
+    });
+
+    return NextResponse.json({
+      ...updated,
+      wilcomEntries: meta.wilcomEntries || [],
+      wilcomDesignPhoto: resolvedPhoto || updated.wilcomDesignPhoto,
+    });
+  } catch (error: any) {
+    console.error('Error updating program:', error);
+    return NextResponse.json({ error: error.message || 'Failed to update program' }, { status: 500 });
   }
 }

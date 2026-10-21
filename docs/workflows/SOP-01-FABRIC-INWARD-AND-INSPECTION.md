@@ -26,3 +26,5 @@ Applies to the Raw Material Store, Dyeing Unit, and Fabric Quality Gate (QC1) wi
 5. **Challan Status Transition**:
    - If Pass: QC Inspector signs off on MES (`QC_APPROVED`).
    - If Fail: Flagged as `REJECTED` or `ON_HOLD`, supplier notified, and debit note generated.
+6. **Fabric Store Inward Stock**:
+   - Record each accepted receipt with its fabric name, DYED/UNDYED type, quantity, and MTR/PCS unit. The receipt is included in Total Stock under the matching type and unit.

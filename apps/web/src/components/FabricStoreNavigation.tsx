@@ -316,7 +316,7 @@ export function FabricStoreNavigation() {
             <span>Defective Shelf</span>
           </Link>
 
-          {/* 6. Total Stock (Kora Undyed & Dyed) */}
+          {/* 6. Total Stock (UNDYED & DYED) */}
           <div>
             <div className="flex items-center gap-3 px-3 py-2">
               <Layers className="w-4 h-4 text-teal-400" />
@@ -335,12 +335,12 @@ export function FabricStoreNavigation() {
                   <span>All Stock Balance</span>
                 </Link>
                 <Link
-                  href="/fabric-store/inventory/total-stock?type=KORA"
+                  href="/fabric-store/inventory/total-stock?type=UNDYED"
                   onClick={() => setMobileOpen(false)}
-                  className={subLinkClass('/fabric-store/inventory/total-stock?type=KORA')}
+                  className={subLinkClass('/fabric-store/inventory/total-stock?type=UNDYED')}
                 >
                   <span className="w-2 h-2 rounded-full bg-amber-400 inline-block mr-1" />
-                  <span>KORA (Undyed)</span>
+                  <span>1. UNDYED</span>
                 </Link>
                 <Link
                   href="/fabric-store/inventory/total-stock?type=DYED"
@@ -348,7 +348,7 @@ export function FabricStoreNavigation() {
                   className={subLinkClass('/fabric-store/inventory/total-stock?type=DYED')}
                 >
                   <span className="w-2 h-2 rounded-full bg-purple-400 inline-block mr-1" />
-                  <span>Dyed</span>
+                  <span>2. DYED</span>
                 </Link>
               </div>
             )}

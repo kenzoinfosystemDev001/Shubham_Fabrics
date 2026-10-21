@@ -44,6 +44,7 @@ import {
   downloadChallanHtml, 
   printChallan 
 } from '@/lib/download-challan';
+import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
 
 interface ItemRow {
   fabricMeasurementPcs: string; // Color / Fabric / Measurement (PCS)
@@ -699,68 +700,9 @@ export default function ThreadCuttingMyWorkPage() {
                           <span>{new Date(ch.createdAt).toLocaleDateString('en-GB')}</span>
                         </div>
 
-                        {/* 1-CLICK ACTION BUTTONS */}
+                        {/* COMPLETE DOCUMENT ACTIONS: PRODUCTION SHEET, CHALLAN & WILCOM */}
                         <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between gap-1 flex-wrap" onClick={(e) => e.stopPropagation()}>
-                          <div className="flex items-center gap-1">
-                            <Link
-                              href={`/challans/${ch.id}`}
-                              className="px-1.5 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] font-semibold flex items-center gap-0.5"
-                              title="View Challan Slip"
-                            >
-                              <Eye className="w-2.5 h-2.5" />
-                              <span>Slip</span>
-                            </Link>
-                            <button
-                              type="button"
-                              onClick={() => downloadChallanHtml(ch)}
-                              className="px-1.5 py-0.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded text-[10px] font-semibold flex items-center gap-0.5"
-                              title="Download Challan HTML"
-                            >
-                              <Download className="w-2.5 h-2.5" />
-                              <span>Challan</span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => printChallan(ch)}
-                              className="px-1.5 py-0.5 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded text-[10px] font-semibold flex items-center gap-0.5"
-                              title="Print Challan Slip"
-                            >
-                              <Printer className="w-2.5 h-2.5" />
-                              <span>Print</span>
-                            </button>
-                          </div>
-
-                          {ch.program && (
-                            <div className="flex items-center gap-1">
-                              <button
-                                type="button"
-                                onClick={() => setShowSheetDetailModal(ch.program)}
-                                className="px-1.5 py-0.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded text-[10px] font-semibold flex items-center gap-0.5"
-                                title="View Production Sheet"
-                              >
-                                <FileText className="w-2.5 h-2.5" />
-                                <span>Sheet</span>
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => downloadProductionSheetHtml(ch.program)}
-                                className="px-1.5 py-0.5 bg-sky-50 hover:bg-sky-100 text-sky-700 rounded text-[10px] font-semibold flex items-center gap-0.5"
-                                title="Download Production Sheet HTML"
-                              >
-                                <Download className="w-2.5 h-2.5" />
-                                <span>Sheet</span>
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => printProductionSheet(ch.program)}
-                                className="px-1.5 py-0.5 bg-blue-100/70 hover:bg-blue-200/70 text-blue-800 rounded text-[10px] font-semibold flex items-center gap-0.5"
-                                title="Print Production Sheet Traveler"
-                              >
-                                <Printer className="w-2.5 h-2.5" />
-                                <span>Sheet</span>
-                              </button>
-                            </div>
-                          )}
+                          <DocumentActionButtons program={ch.program} challan={ch} size="xs" />
                         </div>
                       </div>
                     );

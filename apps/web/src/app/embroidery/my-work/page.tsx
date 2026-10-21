@@ -44,6 +44,7 @@ import {
   downloadChallanHtml, 
   printChallan 
 } from '@/lib/download-challan';
+import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
 
 export default function EmbroideryMyWorkPage() {
   const [activeWorkflow, setActiveWorkflow] = useState<
@@ -693,32 +694,7 @@ export default function EmbroideryMyWorkPage() {
                     </div>
 
                     <div className="pt-2 flex flex-col gap-1.5 border-t border-slate-100">
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => setShowSheetDetailModal(prog)}
-                          className="flex-1 py-1.5 px-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-bold transition text-center flex items-center justify-center gap-1"
-                        >
-                          <FileText className="w-3.5 h-3.5" />
-                          <span>View Sheet</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => downloadProductionSheetHtml(prog)}
-                          className="py-1.5 px-2 bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1"
-                          title="Download Production Sheet HTML"
-                        >
-                          <Download className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => printProductionSheet(prog)}
-                          className="py-1.5 px-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1"
-                          title="Print Production Sheet Traveler"
-                        >
-                          <Printer className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
+                      <DocumentActionButtons program={prog} size="xs" className="w-full justify-between" />
                       <button
                         type="button"
                         onClick={() => {
@@ -939,67 +915,8 @@ export default function EmbroideryMyWorkPage() {
                                   )}
                                 </div>
 
-                                {/* CHALLAN & SHEET ACTIONS */}
-                                <div className="flex items-center gap-1 flex-wrap justify-end">
-                                  <Link
-                                    href={`/challans/${ch.id}`}
-                                    className="px-1.5 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] font-semibold flex items-center gap-0.5"
-                                    title="View Challan Slip"
-                                  >
-                                    <Eye className="w-2.5 h-2.5" />
-                                    <span>Slip</span>
-                                  </Link>
-                                  <button
-                                    type="button"
-                                    onClick={() => downloadChallanHtml(ch)}
-                                    className="px-1.5 py-0.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded text-[10px] font-semibold flex items-center gap-0.5"
-                                    title="Download Challan HTML"
-                                  >
-                                    <Download className="w-2.5 h-2.5" />
-                                    <span>Challan</span>
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => printChallan(ch)}
-                                    className="px-1.5 py-0.5 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded text-[10px] font-semibold flex items-center gap-0.5"
-                                    title="Print Challan Slip"
-                                  >
-                                    <Printer className="w-2.5 h-2.5" />
-                                    <span>Print</span>
-                                  </button>
-
-                                  {ch.program && (
-                                    <>
-                                      <button
-                                        type="button"
-                                        onClick={() => setShowSheetDetailModal(ch.program)}
-                                        className="px-1.5 py-0.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded text-[10px] font-semibold flex items-center gap-0.5 ml-1"
-                                        title="View Production Sheet"
-                                      >
-                                        <FileText className="w-2.5 h-2.5" />
-                                        <span>Sheet</span>
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => downloadProductionSheetHtml(ch.program)}
-                                        className="px-1.5 py-0.5 bg-sky-50 hover:bg-sky-100 text-sky-700 rounded text-[10px] font-semibold flex items-center gap-0.5"
-                                        title="Download Production Sheet HTML"
-                                      >
-                                        <Download className="w-2.5 h-2.5" />
-                                        <span>Sheet</span>
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => printProductionSheet(ch.program)}
-                                        className="px-1.5 py-0.5 bg-blue-100/70 hover:bg-blue-200/70 text-blue-800 rounded text-[10px] font-semibold flex items-center gap-0.5"
-                                        title="Print Production Sheet Traveler"
-                                      >
-                                        <Printer className="w-2.5 h-2.5" />
-                                        <span>Sheet</span>
-                                      </button>
-                                    </>
-                                  )}
-                                </div>
+                                {/* COMPLETE DOCUMENT ACTIONS: PRODUCTION SHEET, CHALLAN & WILCOM */}
+                                <DocumentActionButtons program={ch.program} challan={ch} size="xs" />
                               </div>
                             </td>
                           </tr>

@@ -1,14 +1,24 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Sparkles, 
   Eye, 
   Printer, 
   Download, 
-  X 
+  X,
+  Upload,
+  Image as ImageIcon
 } from 'lucide-react';
-import { WilcomEntry, GarmentCategory, printWilcomForm, downloadWilcomFormHtml } from '@/lib/download-wilcom';
+import {
+  WilcomEntry,
+  GarmentCategory,
+  printWilcomForm,
+  downloadWilcomFormHtml,
+  compressImageForUpload,
+  extractRootWilcomPhoto
+} from '@/lib/download-wilcom';
+import { useProgramDocument } from '@/hooks/useProgramDocument';
 
 interface WilcomSheetViewProps {
   program: any;
@@ -16,45 +26,183 @@ interface WilcomSheetViewProps {
   rootWilcomPhoto?: string;
   onOpenPrintModal?: () => void;
   showActions?: boolean;
+  onProgramUpdate?: (updated: any) => void;
 }
 
 export function WilcomSheetView({
-  program,
-  wilcomEntries,
-  rootWilcomPhoto = '',
+  program: sourceProgram,
+  wilcomEntries: propWilcomEntries,
+  rootWilcomPhoto: propRootWilcomPhoto = '',
   onOpenPrintModal,
   showActions = true,
+  onProgramUpdate,
 }: WilcomSheetViewProps) {
+  const { program, loading, error } = useProgramDocument(sourceProgram);
   const [viewingPhoto, setViewingPhoto] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
-  const displayEntries: WilcomEntry[] = wilcomEntries.length > 0
-    ? wilcomEntries.map((e, idx) => ({
-        ...e,
-        photoUrl: e.photoUrl || (idx === 0 ? rootWilcomPhoto : '') || '',
-      }))
-    : rootWilcomPhoto || program?.wilcomDesignNumber
-      ? [
+  let meta: any = null;
+  if (program?.metadataJson) {
+    try {
+      meta = typeof program.metadataJson === 'string' ? JSON.parse(program.metadataJson) : program.metadataJson;
+    } catch {}
+  }
+
+  const rootWilcomPhoto =
+    propRootWilcomPhoto ||
+    extractRootWilcomPhoto(program, meta);
+
+  const serialNo = program?.programSerialNo || program?.programNumber || '—';
+  const designNo = program?.designNumber || program?.designName || '—';
+  const mainStyleVal = program?.mainStyle || program?.topName || meta?.mainStyle || meta?.topName || '—';
+  const styleVal = program?.subStyle || program?.styleCode || meta?.subStyle || meta?.style || '—';
+
+  const buildInitialEntries = (): WilcomEntry[] => {
+    let entries: WilcomEntry[] = [];
+    if (Array.isArray(propWilcomEntries) && propWilcomEntries.length > 0) {
+      entries = propWilcomEntries;
+    } else if (Array.isArray(program?.wilcomEntries) && program.wilcomEntries.length > 0) {
+      entries = program.wilcomEntries;
+    } else if (Array.isArray(meta?.wilcomEntries) && meta.wilcomEntries.length > 0) {
+      entries = meta.wilcomEntries;
+    }
+
+    if (entries.length === 0) {
+      return [
+        {
+          id: 'wilcom-auto-1',
+          category: 'TOP',
+          styleName: styleVal !== '—' ? styleVal : (mainStyleVal !== '—' ? mainStyleVal : 'Style'),
+          wilcomDesignNumber: program?.wilcomDesignNumber || program?.embroideryDesign || (designNo !== '—' ? designNo : 'WLC-01'),
+          photoUrl: rootWilcomPhoto,
+          remarks: program?.remarks || program?.comments || '',
+        },
+      ];
+    }
+
+    return entries.map((e, idx) => ({
+      ...e,
+      photoUrl: e.photoUrl || (idx === 0 ? rootWilcomPhoto : '') || rootWilcomPhoto || '',
+    }));
+  };
+
+  const [entries, setEntries] = useState<WilcomEntry[]>(buildInitialEntries);
+
+  useEffect(() => {
+    setEntries(buildInitialEntries());
+  }, [program, propWilcomEntries, rootWilcomPhoto]);
+
+  const handleUploadPhoto = async (e: React.ChangeEvent<HTMLInputElement>, targetEntryId?: string) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 15 * 1024 * 1024) {
+      alert('Photo must be less than 15MB');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const newPhotoUrl = await compressImageForUpload(file);
+      if (!newPhotoUrl) {
+        throw new Error('Could not process image');
+      }
+
+      let updatedEntries: WilcomEntry[] = [];
+      if (entries.length === 0) {
+        updatedEntries = [
           {
             id: 'wilcom-auto-1',
             category: 'TOP',
-            styleName: program?.topName || program?.mainStyle || 'Primary Top Style',
-            wilcomDesignNumber: program?.wilcomDesignNumber || program?.embroideryDesign || 'WLC-01',
-            photoUrl: rootWilcomPhoto,
-            remarks: program?.remarks || '',
+            styleName: styleVal !== '—' ? styleVal : (mainStyleVal !== '—' ? mainStyleVal : 'Style'),
+            wilcomDesignNumber: program?.wilcomDesignNumber || program?.embroideryDesign || (designNo !== '—' ? designNo : 'WLC-01'),
+            photoUrl: newPhotoUrl,
+            remarks: program?.remarks || program?.comments || '',
           },
-        ]
-      : [];
+        ];
+      } else {
+        updatedEntries = entries.map((item, idx) => {
+          if (targetEntryId ? item.id === targetEntryId : idx === 0) {
+            return { ...item, photoUrl: newPhotoUrl };
+          }
+          return item;
+        });
+      }
+      setEntries(updatedEntries);
+
+      // Mutate in-memory program references immediately
+      if (program) {
+        program.wilcomDesignPhoto = newPhotoUrl;
+        program.wilcomEntries = updatedEntries;
+      }
+      if (onProgramUpdate) {
+        onProgramUpdate({
+          wilcomDesignPhoto: newPhotoUrl,
+          wilcomEntries: updatedEntries,
+        });
+      }
+
+      // Auto-save to database if program ID is present
+      const progId = program?.id || program?.programNumber || program?.programSerialNo;
+      if (progId) {
+        try {
+          await fetch(`/api/programs/${progId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              wilcomDesignPhoto: newPhotoUrl,
+              wilcomEntries: updatedEntries,
+            }),
+          });
+        } catch (err) {
+          console.warn('Auto-save of uploaded wilcom photo failed:', err);
+        }
+      }
+    } catch (err: any) {
+      alert(err.message || 'Failed to read image file');
+    } finally {
+      setUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  const handlePrint = () => {
+    const activePhoto = entries.find((e) => e.photoUrl)?.photoUrl || entries[0]?.photoUrl || rootWilcomPhoto;
+    const prepared = {
+      ...program,
+      wilcomEntries: entries,
+      wilcomDesignPhoto: activePhoto,
+    };
+    printWilcomForm(prepared, 'ALL');
+  };
+
+  const handleDownload = () => {
+    const activePhoto = entries.find((e) => e.photoUrl)?.photoUrl || entries[0]?.photoUrl || rootWilcomPhoto;
+    const prepared = {
+      ...program,
+      wilcomEntries: entries,
+      wilcomDesignPhoto: activePhoto,
+    };
+    void downloadWilcomFormHtml(prepared, 'ALL');
+  };
+
+  const displayEntries = entries;
 
   return (
     <div className="space-y-4">
+      {(loading || error) && (
+        <div className={`rounded-md px-3 py-2 text-xs ${error ? 'bg-rose-50 text-rose-800' : 'bg-blue-50 text-blue-800'}`}>
+          {error || 'Loading Wilcom artwork and production details…'}
+        </div>
+      )}
       {/* HEADER & ACTION BAR */}
       {showActions && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-purple-200/80 pb-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
           <div>
-            <span className="text-[10px] font-black uppercase tracking-wider text-purple-900 bg-purple-100 px-2 py-0.5 rounded border border-purple-300">
-              WILCOM SPECIFICATIONS &middot; {displayEntries.length} {displayEntries.length === 1 ? 'DESIGN' : 'DESIGNS'}
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+              Wilcom Specifications &middot; {displayEntries.length} {displayEntries.length === 1 ? 'Design' : 'Designs'}
             </span>
-            <h4 className="text-sm font-black text-slate-900 mt-1 uppercase tracking-wide">
+            <h4 className="text-sm font-bold text-slate-900 mt-1 tracking-tight">
               Embroidery Artwork &amp; Design Numbers
             </h4>
           </div>
@@ -62,28 +210,28 @@ export function WilcomSheetView({
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => printWilcomForm(program)}
-              className="inline-flex items-center gap-1.5 px-3 py-1 bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
+              onClick={handlePrint}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#163767] hover:bg-[#0F264A] text-white text-xs font-semibold rounded-lg shadow-2xs transition cursor-pointer"
             >
               <Printer className="w-3.5 h-3.5" />
-              <span>Print Wilcom Form</span>
+              <span>Print Wilcom Sheet</span>
             </button>
             <button
               type="button"
-              onClick={() => void downloadWilcomFormHtml(program)}
-              className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-800 hover:bg-black text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
+              onClick={handleDownload}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-black text-white text-xs font-semibold rounded-lg shadow-2xs transition cursor-pointer"
             >
               <Download className="w-3.5 h-3.5" />
-              <span>Download Form</span>
+              <span>Download Wilcom Sheet</span>
             </button>
             {onOpenPrintModal && (
               <button
                 type="button"
                 onClick={onOpenPrintModal}
-                className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-purple-300 text-purple-900 text-xs font-bold rounded hover:bg-purple-50 transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-300 text-slate-800 text-xs font-semibold rounded-lg hover:bg-slate-50 transition cursor-pointer"
               >
                 <Eye className="w-3.5 h-3.5" />
-                <span>Preview Modal</span>
+                <span>Preview</span>
               </button>
             )}
           </div>
@@ -98,58 +246,115 @@ export function WilcomSheetView({
             return (
               <div 
                 key={entry.id || idx} 
-                className="p-4 border-[1.5px] border-purple-900 rounded-lg bg-white space-y-3 shadow-2xs"
+                className="p-4 border border-slate-200 rounded-xl bg-white space-y-3 shadow-2xs hover:border-slate-300 transition"
               >
-                <div className="flex items-center justify-between border-b border-purple-100 pb-2">
-                  <span className={`text-[10px] font-black px-2 py-0.5 rounded uppercase ${
+                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${
                     entry.category === 'TOP'
-                      ? 'bg-blue-100 text-blue-900 border border-blue-300'
+                      ? 'bg-blue-50 text-blue-900 border border-blue-200'
                       : entry.category === 'BOTTOM'
-                        ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
-                        : 'bg-purple-100 text-purple-900 border border-purple-300'
+                        ? 'bg-emerald-50 text-emerald-900 border border-emerald-200'
+                        : entry.category === 'DUPATTA'
+                          ? 'bg-amber-50 text-amber-900 border border-amber-200'
+                          : 'bg-slate-100 text-slate-800 border border-slate-200'
                   }`}>
-                    {entry.category || 'EMBROIDERY'}
+                    WILCOM {entry.category}
                   </span>
-                  <span className="font-mono font-black text-xs text-purple-950">
-                    WILCOM #{entry.wilcomDesignNumber || 'N/A'}
+                  <span className="font-mono font-bold text-xs text-slate-900">
+                    {entry.wilcomDesignNumber || '—'}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-[140px_1fr] gap-4 items-start">
-                  <div className="w-[140px] h-[140px] border border-purple-200 rounded-md bg-purple-50/40 flex items-center justify-center overflow-hidden shrink-0">
+                  <div className="w-[140px] h-[140px] border border-slate-200 rounded-lg bg-slate-50 flex flex-col items-center justify-center overflow-hidden shrink-0 relative group">
                     {photo ? (
-                      <img
-                        src={photo}
-                        alt={entry.wilcomDesignNumber || 'Wilcom Artwork'}
-                        className="w-full h-full object-contain cursor-pointer hover:scale-105 transition"
-                        onClick={() => setViewingPhoto(photo)}
-                        title="Click to view full photo"
-                      />
+                      <>
+                        <img
+                          src={photo}
+                          alt={entry.wilcomDesignNumber || 'Wilcom Artwork'}
+                          className="w-full h-full object-contain cursor-pointer hover:scale-105 transition"
+                          onClick={() => setViewingPhoto(photo)}
+                          title="Click to view full photo"
+                        />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setViewingPhoto(photo)}
+                            className="p-1.5 bg-white/90 hover:bg-white text-slate-800 rounded-full shadow-xs cursor-pointer"
+                            title="View full size"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                          </button>
+                          <label className="p-1.5 bg-white/90 hover:bg-white text-slate-800 rounded-full shadow-xs cursor-pointer" title="Change photo">
+                            <Upload className="w-3.5 h-3.5" />
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => handleUploadPhoto(e, entry.id)}
+                            />
+                          </label>
+                        </div>
+                      </>
                     ) : (
-                      <span className="text-[10px] text-slate-400 font-bold text-center p-2">
-                        No Reference Photo
-                      </span>
+                      <div className="text-center p-2.5 flex flex-col items-center justify-center gap-1.5">
+                        <ImageIcon className="w-6 h-6 text-slate-300" />
+                        <span className="text-[10px] text-slate-400 font-semibold">
+                          No Artwork Photo
+                        </span>
+                        <label className="inline-flex items-center gap-1 px-2 py-0.5 bg-white hover:bg-slate-100 text-[#163767] border border-slate-300 rounded text-[10px] font-bold shadow-2xs cursor-pointer transition">
+                          <Upload className="w-3 h-3" />
+                          <span>{uploading ? '...' : 'Upload'}</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => handleUploadPhoto(e, entry.id)}
+                            disabled={uploading}
+                          />
+                        </label>
+                      </div>
                     )}
                   </div>
 
                   <div className="space-y-1.5 text-xs">
-                    <div className="font-bold text-slate-900 text-sm">
-                      {entry.styleName || 'Garment Style'}
+                    <div>
+                      <span className="text-slate-400 block text-[10px]">Design Number:</span>
+                      <span className="font-mono font-bold text-slate-900 text-xs">{designNo}</span>
                     </div>
-                    {entry.remarks && (
-                      <p className="text-slate-600 text-[11px] leading-relaxed">
-                        {entry.remarks}
-                      </p>
-                    )}
+                    <div>
+                      <span className="text-slate-400 block text-[10px]">Serial Number:</span>
+                      <span className="font-mono font-bold text-slate-900 text-xs">{serialNo}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[10px]">Main Style:</span>
+                      <span className="font-bold text-slate-800 text-xs">{mainStyleVal}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[10px]">Style:</span>
+                      <span className="font-semibold text-slate-800 text-xs">{entry.styleName || styleVal}</span>
+                    </div>
                     {photo && (
-                      <button
-                        type="button"
-                        onClick={() => setViewingPhoto(photo)}
-                        className="text-[11px] font-bold text-purple-700 hover:text-purple-900 flex items-center gap-1 mt-2 cursor-pointer hover:underline"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                        <span>View Full Photo</span>
-                      </button>
+                      <div className="flex items-center gap-3 pt-1">
+                        <button
+                          type="button"
+                          onClick={() => setViewingPhoto(photo)}
+                          className="text-[11px] font-semibold text-[#163767] hover:underline flex items-center gap-1 cursor-pointer"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>View Full Photo</span>
+                        </button>
+                        <label className="text-[11px] font-semibold text-slate-600 hover:text-slate-900 hover:underline flex items-center gap-1 cursor-pointer">
+                          <Upload className="w-3.5 h-3.5" />
+                          <span>Change Photo</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => handleUploadPhoto(e, entry.id)}
+                          />
+                        </label>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -158,9 +363,8 @@ export function WilcomSheetView({
           })}
         </div>
       ) : (
-        <div className="p-8 text-center border-2 border-dashed border-slate-300 rounded-lg text-slate-500 text-xs space-y-1">
-          <Sparkles className="w-6 h-6 text-purple-400 mx-auto mb-1" />
-          <p className="font-bold text-slate-700">No Wilcom embroidery designs recorded for this production order.</p>
+        <div className="p-8 text-center border border-dashed border-slate-200 rounded-xl bg-white text-slate-400 text-xs">
+          No Wilcom designs recorded.
         </div>
       )}
 
@@ -186,9 +390,6 @@ export function WilcomSheetView({
               alt="Enlarged Wilcom Reference"
               className="max-h-[82vh] max-w-full object-contain rounded-lg"
             />
-            <div className="mt-2 text-xs font-bold text-slate-700">
-              Wilcom Artwork Reference Photo
-            </div>
           </div>
         </div>
       )}

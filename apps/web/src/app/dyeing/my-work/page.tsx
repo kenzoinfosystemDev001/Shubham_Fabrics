@@ -41,6 +41,7 @@ import {
   printChallan,
 } from '@/lib/download-challan';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
+import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
 import {
   ColorFabricMeasurementTable,
   ChallanItemData,
@@ -806,67 +807,12 @@ export default function DyeingMyWorkPage() {
                                 </button>
                               )}
 
-                              {/* INBOUND CHALLAN ACTIONS */}
-                              {order.inboundChallan && (
-                                <div className="flex items-center gap-1 bg-purple-50 border border-purple-200 px-1.5 py-0.5 rounded">
-                                  <Link
-                                    href={`/challans/${order.inboundChallan.id}`}
-                                    className="text-[10px] font-bold text-purple-800 hover:text-purple-950"
-                                    title="View Inbound Challan Slip"
-                                  >
-                                    Challan
-                                  </Link>
-                                  <button
-                                    type="button"
-                                    onClick={() => downloadChallanHtml(order.inboundChallan)}
-                                    className="p-0.5 text-purple-700 hover:text-purple-900 rounded cursor-pointer"
-                                    title="Download Inbound Challan HTML"
-                                  >
-                                    <Download className="w-3 h-3 text-purple-700" />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => printChallan(order.inboundChallan)}
-                                    className="p-0.5 text-purple-700 hover:text-purple-900 rounded cursor-pointer"
-                                    title="Print Inbound Challan Slip"
-                                  >
-                                    <Printer className="w-3 h-3 text-purple-700" />
-                                  </button>
-                                </div>
-                              )}
-
-                              {/* PRODUCTION SHEET ACTIONS */}
-                              <div className="flex items-center gap-1 bg-blue-50 border border-blue-200 px-1.5 py-0.5 rounded">
-                                <button
-                                  type="button"
-                                  onClick={() => setSelectedOrderForSheet(order)}
-                                  title="Show Production Sheet (View, Print & Download)"
-                                  className="inline-flex items-center gap-0.5 text-[10px] font-bold text-blue-800 hover:text-blue-950 cursor-pointer"
-                                >
-                                  <FileText className="w-3 h-3 text-blue-700" />
-                                  <span>Sheet</span>
-                                </button>
-                                {order.program && (
-                                  <>
-                                    <button
-                                      type="button"
-                                      onClick={() => downloadProductionSheetHtml(order.program)}
-                                      title="Download Production Sheet HTML"
-                                      className="p-0.5 text-blue-700 hover:text-blue-900 rounded cursor-pointer"
-                                    >
-                                      <Download className="w-3 h-3 text-emerald-600" />
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => printProductionSheet(order.program)}
-                                      title="Print Production Sheet on A4"
-                                      className="p-0.5 text-blue-700 hover:text-blue-900 rounded cursor-pointer"
-                                    >
-                                      <Printer className="w-3 h-3 text-slate-600" />
-                                    </button>
-                                  </>
-                                )}
-                              </div>
+                              {/* COMPLETE DOCUMENT ACTIONS: PRODUCTION SHEET, CHALLAN & WILCOM */}
+                              <DocumentActionButtons
+                                program={order.program}
+                                challan={order.inboundChallan || (order.qc1Challan ? { ...order.qc1Challan, program: order.program } : null)}
+                                size="xs"
+                              />
 
                               {/* RECORD DYEING PROGRESS */}
                               <button
@@ -1345,13 +1291,7 @@ export default function DyeingMyWorkPage() {
                           {new Date(ch.createdAt).toLocaleDateString('en-GB')}
                         </td>
                         <td className="py-3 px-3 text-right">
-                          <Link
-                            href={`/challans/${ch.id}`}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-semibold transition"
-                          >
-                            <FileText className="w-3.5 h-3.5 text-slate-600" />
-                            <span>View Challan</span>
-                          </Link>
+                          <DocumentActionButtons program={ch.program} challan={ch} size="xs" />
                         </td>
                       </tr>
                     ))}
@@ -1494,6 +1434,14 @@ export default function DyeingMyWorkPage() {
               </form>
             </div>
           </div>
+        )}
+
+        {selectedOrderForSheet?.program && (
+          <ProductionSheetPrintModal
+            program={selectedOrderForSheet.program}
+            isOpen={Boolean(selectedOrderForSheet)}
+            onClose={() => setSelectedOrderForSheet(null)}
+          />
         )}
       </main>
     </div>

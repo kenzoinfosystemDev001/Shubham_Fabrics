@@ -10,6 +10,8 @@
 
 import { generateCode128SvgBars } from '@/lib/barcode';
 import { getCurrentUser, canViewClientCode } from '@/lib/rbac';
+import { loadProgramDocument } from '@/lib/program-document';
+import { extractRootWilcomPhoto, prepareWilcomImages } from '@/lib/download-wilcom';
 
 export interface ChallanItem {
   id?: string;
@@ -33,7 +35,6 @@ export function generateChallanHtml(challan: any): string {
   const toDept = challan.toDepartment || 'DYEING';
   const status = challan.status || 'ISSUED';
   const priority = challan.priority || 'NORMAL';
-  const remarks = challan.remarks || '';
   const dateStr = challan.createdAt || challan.issuedDate 
     ? new Date(challan.createdAt || challan.issuedDate).toLocaleDateString('en-IN', {
         day: '2-digit',
@@ -54,6 +55,7 @@ export function generateChallanHtml(challan: any): string {
   const styleCode = prog.mainStyle || prog.styleCode || '—';
   const pattern = prog.pattern || '—';
   const fabricName = prog.fabricName || '—';
+  const artworkPhoto = extractRootWilcomPhoto(prog);
 
   // Department labels
   const deptLabels: Record<string, string> = {
@@ -186,10 +188,8 @@ export function generateChallanHtml(challan: any): string {
       max-width: 820px;
       margin: 0 auto;
       background: #ffffff;
-      border: 2px solid #0f172a;
-      border-radius: 8px;
-      padding: 24px;
-      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+      border: 2px solid #000000;
+      padding: 20px;
     }
 
     /* HEADER */
@@ -197,37 +197,38 @@ export function generateChallanHtml(challan: any): string {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      border-bottom: 2px solid #0f172a;
-      padding-bottom: 14px;
-      margin-bottom: 14px;
+      border-bottom: 2px solid #000000;
+      padding-bottom: 12px;
+      margin-bottom: 12px;
       gap: 16px;
     }
     .company-title {
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 2px;
-      color: #a66e22;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      color: #000000;
       text-transform: uppercase;
       margin-bottom: 2px;
     }
     .main-title {
-      font-size: 19px;
+      font-size: 18px;
       font-weight: 900;
-      font-family: Georgia, serif;
-      color: #0f172a;
+      color: #000000;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
       line-height: 1.2;
     }
     .sub-route-badge {
       display: inline-block;
-      margin-top: 6px;
-      padding: 3px 8px;
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      color: #1e40af;
-      font-size: 11px;
-      font-weight: 700;
+      margin-top: 4px;
+      padding: 2px 6px;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #000000;
+      font-size: 10px;
+      font-weight: 800;
       font-family: monospace;
-      border-radius: 4px;
+      border-radius: 3px;
     }
 
     /* BARCODE SECTION */
@@ -263,12 +264,11 @@ export function generateChallanHtml(challan: any): string {
     .meta-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
+      gap: 8px;
       background: #f8fafc;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 6px;
-      padding: 10px 14px;
-      margin-bottom: 14px;
+      border: 1.5px solid #000000;
+      padding: 8px 12px;
+      margin-bottom: 8px;
     }
     .meta-cell {
       display: flex;
@@ -276,21 +276,16 @@ export function generateChallanHtml(challan: any): string {
     }
     .meta-label {
       font-size: 9px;
-      font-weight: 800;
+      font-weight: 900;
       text-transform: uppercase;
-      color: #64748b;
+      color: #475569;
       letter-spacing: 0.5px;
-      margin-bottom: 2px;
+      margin-bottom: 1px;
     }
     .meta-val {
-      font-size: 12px;
-      font-weight: 700;
-      color: #0f172a;
-    }
-    .meta-val-sub {
-      font-size: 10px;
-      color: #64748b;
-      margin-top: 1px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #000000;
     }
 
     /* FLOW AUDIT LEDGER */
@@ -427,22 +422,6 @@ export function generateChallanHtml(challan: any): string {
       margin-top: 2px;
     }
 
-    /* REMARKS BOX */
-    .remarks-box {
-      background: #f8fafc;
-      border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      padding: 8px 12px;
-      margin-bottom: 18px;
-      font-size: 11px;
-    }
-    .remarks-title {
-      font-weight: 800;
-      font-size: 10px;
-      text-transform: uppercase;
-      color: #475569;
-      margin-bottom: 2px;
-    }
 
     /* SIGNATURE BLOCK */
     .sign-grid {
@@ -525,10 +504,10 @@ export function generateChallanHtml(challan: any): string {
     <!-- TOP HEADER -->
     <div class="company-header">
       <div>
-        <div class="company-title">Shubham Fabrics India Pvt. Ltd.</div>
-        <h1 class="main-title">${voucherTitle}</h1>
+        <div class="company-title">SHUBHAM FABRICS INDIA PVT. LTD.</div>
+        <h1 class="main-title">DEPARTMENT TRANSFER CHALLAN</h1>
         <div class="sub-route-badge">
-          ${fromDept} → ${toDept} &middot; STATUS: ${status}
+          ${fromLabel} &rarr; ${toLabel}
         </div>
       </div>
 
@@ -543,164 +522,138 @@ export function generateChallanHtml(challan: any): string {
       </div>
     </div>
 
-    <!-- SUMMARY METADATA GRID -->
+    <!-- METADATA FORM GRID -->
     <div class="meta-grid">
       <div class="meta-cell">
-        <span class="meta-label">Origin (From)</span>
-        <span class="meta-val">${fromLabel}</span>
-        <span class="meta-val-sub">Source Department</span>
+        <span class="meta-label">CHALLAN NO</span>
+        <span class="meta-val font-mono">${challanNo}</span>
       </div>
       <div class="meta-cell">
-        <span class="meta-label">Destination (To)</span>
-        <span class="meta-val" style="color: #1e40af;">${toLabel}</span>
-        <span class="meta-val-sub">Next Inward Gate</span>
-      </div>
-      <div class="meta-cell">
-        <span class="meta-label">Dispatch Date</span>
+        <span class="meta-label">DISPATCH DATE</span>
         <span class="meta-val">${dateStr}</span>
-        <span class="meta-val-sub">Priority: ${priority}</span>
       </div>
       <div class="meta-cell">
-        <span class="meta-label">Authorized Issuer</span>
-        <span class="meta-val">${issuerName}</span>
-        <span class="meta-val-sub" style="color: #059669;">✓ Digitally Signed</span>
+        <span class="meta-label">FROM STATION</span>
+        <span class="meta-val">${fromLabel}</span>
+      </div>
+      <div class="meta-cell">
+        <span class="meta-label">TO STATION</span>
+        <span class="meta-val">${toLabel}</span>
       </div>
     </div>
 
-    <!-- PROGRAM / CLIENT CONTEXT -->
-    <div class="meta-grid" style="margin-top: -6px; background: #ffffff;">
+    <!-- PROGRAM / ORDER DETAILS (ONLY ACTUAL FILLED DETAILS) -->
+    <div class="meta-grid" style="margin-top: -4px;">
       <div class="meta-cell">
-        <span class="meta-label">Production Sheet #</span>
-        <span class="meta-val" style="font-family: monospace;">${programSerial}</span>
+        <span class="meta-label">PRODUCTION SHEET #</span>
+        <span class="meta-val font-mono">${programSerial}</span>
       </div>
       <div class="meta-cell">
-        <span class="meta-label">Buyer / Customer</span>
-        <span class="meta-val">${clientName}</span>
-        ${canSeeClientCode && clientCode ? `<span class="meta-val-sub" style="color: #b45309; font-weight: 700;">🔒 Code: ${clientCode}</span>` : ''}
+        <span class="meta-label">DESIGN NO</span>
+        <span class="meta-val font-mono">${designNo}</span>
       </div>
       <div class="meta-cell">
-        <span class="meta-label">Style / Pattern</span>
-        <span class="meta-val">${styleCode} ${pattern !== '—' ? `(${pattern})` : ''}</span>
+        <span class="meta-label">STYLE / PATTERN</span>
+        <span class="meta-val">${styleCode}${pattern && pattern !== '—' ? ` (${pattern})` : ''}</span>
       </div>
       <div class="meta-cell">
-        <span class="meta-label">Fabric Specification</span>
+        <span class="meta-label">FABRIC</span>
         <span class="meta-val">${fabricName}</span>
       </div>
     </div>
 
-    <!-- FLOW AUDIT & DEFECTIVE SEGREGATION LEDGER -->
-    <div class="flow-ledger">
-      <div class="flow-header">
-        <span>Department Flow Audit &amp; Handover Ledger</span>
-        <span>Route Gate: ${fromDept} $\rightarrow$ ${toDept}</span>
-      </div>
-      <div class="flow-grid">
-        <div class="flow-card">
-          <div class="flow-card-label">1. Fabric / Pieces IN</div>
-          <div class="flow-card-val">${fabricIn} <span style="font-size: 11px; font-weight: normal;">${fabricUnit}</span></div>
-          <div class="flow-card-sub">Inward into ${fromDept}</div>
-        </div>
-        <div class="flow-card defect">
-          <div class="flow-card-label">2. Defective Cut (To Shelf)</div>
-          <div class="flow-card-val">${defectivePieces} <span style="font-size: 11px; font-weight: normal;">${fabricUnit}</span></div>
-          <div class="flow-card-sub" title="${defectiveShelf}">${defectivePieces > 0 ? defectiveShelf : 'Zero Defects Cut'}</div>
-        </div>
-        <div class="flow-card out">
-          <div class="flow-card-label">3. Pieces Dispatched (OUT)</div>
-          <div class="flow-card-val">${fabricOut} <span style="font-size: 11px; font-weight: normal;">${fabricUnit}</span></div>
-          <div class="flow-card-sub">To ${toDept} Inward</div>
-        </div>
-      </div>
-      ${defectReason ? `
-        <div style="font-size: 10px; color: #fde68a; margin-top: 6px; padding-top: 4px; border-top: 1px dashed #475569;">
-          ⚠️ Defect Segregation Note: ${defectReason}
-        </div>
-      ` : ''}
+    ${artworkPhoto ? `
+    <div style="display:flex;align-items:center;gap:12px;border:1px solid #111;padding:6px;margin-top:6px;">
+      <strong style="font-size:9px;text-transform:uppercase;">Wilcom Artwork Reference</strong>
+      <img src="${artworkPhoto}" alt="Wilcom artwork for design ${designNo}" style="max-height:72px;max-width:180px;object-fit:contain;">
     </div>
+    ` : ''}
+
+    ${clientName && clientName !== 'Standard Client' ? `
+    <div class="meta-grid" style="margin-top: -4px;">
+      <div class="meta-cell" style="grid-column: span 2;">
+        <span class="meta-label">BUYER / CLIENT</span>
+        <span class="meta-val">${clientName}${canSeeClientCode && clientCode ? ` (Code: ${clientCode})` : ''}</span>
+      </div>
+      <div class="meta-cell">
+        <span class="meta-label">PRIORITY</span>
+        <span class="meta-val">${priority}</span>
+      </div>
+      <div class="meta-cell">
+        <span class="meta-label">STATUS</span>
+        <span class="meta-val">${status}</span>
+      </div>
+    </div>
+    ` : ''}
+
+    ${defectivePieces > 0 ? `
+    <div style="border: 1.5px solid #991b1b; background: #fef2f2; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; font-size: 11px; font-weight: bold; color: #991b1b;">
+      DEFECTIVE CUT (TO SHELF): ${defectivePieces} ${fabricUnit} [Location: ${defectiveShelf}]${defectReason ? ` &middot; Reason: ${defectReason}` : ''}
+    </div>
+    ` : ''}
 
     <!-- TRANSFERRED ITEMS TABLE -->
     <div class="table-container">
       <div class="table-title">
-        <span>Transferred Work Items &amp; Materials (${items.length} Records)</span>
-        <span style="font-family: monospace; font-size: 11px;">Total Dispatched: ${totalQuantity} ${uom}</span>
+        <span>ITEMS / MATERIALS</span>
+        <span style="font-family: monospace; font-size: 11px;">Total: ${totalQuantity || challan.fabricOut || challan.fabricIn || 0} ${uom}</span>
       </div>
       <table>
         <thead>
           <tr>
-            <th style="width: 35px;">#</th>
-            <th>Item Description</th>
-            <th style="width: 140px;">Color / Shade</th>
-            <th style="width: 120px;">Roll / Lot #</th>
-            <th style="width: 90px; text-align: right;">Quantity</th>
-            <th style="width: 60px;">UOM</th>
+            <th style="width: 35px; text-align: center;">#</th>
+            <th>ITEM DESCRIPTION</th>
+            <th style="width: 140px;">COLOR / SHADE</th>
+            <th style="width: 120px;">ROLL / LOT #</th>
+            <th style="width: 90px; text-align: right;">QUANTITY</th>
+            <th style="width: 60px; text-align: center;">UOM</th>
           </tr>
         </thead>
         <tbody>
           ${items.length > 0 ? items.map((it, idx) => `
             <tr>
-              <td style="font-family: monospace; color: #64748b;">${idx + 1}</td>
-              <td style="font-weight: 600;">${it.itemDescription || 'Factory Material'}</td>
-              <td>${it.colour || 'Standard'}</td>
+              <td style="text-align: center; font-family: monospace;">${idx + 1}</td>
+              <td style="font-weight: 700;">${it.itemDescription || fabricName || styleCode || 'Fabric Lot'}</td>
+              <td>${it.colour || prog.fabricColor || 'Standard'}</td>
               <td style="font-family: monospace;">${it.rollNumber || it.lotNumber || '—'}</td>
               <td class="num">${it.quantity || 0}</td>
-              <td>${it.uom || uom}</td>
+              <td style="text-align: center;">${it.uom || uom}</td>
             </tr>
           `).join('') : `
             <tr>
-              <td colspan="6" style="text-align: center; color: #94a3b8; padding: 12px;">
-                Standard batch lot matching Production Sheet ${programSerial}.
-              </td>
+              <td style="text-align: center; font-family: monospace;">1</td>
+              <td style="font-weight: 700;">${fabricName || styleCode || 'Production Material'}</td>
+              <td>${prog.fabricColor || 'Standard'}</td>
+              <td style="font-family: monospace;">—</td>
+              <td class="num">${totalQuantity || challan.fabricOut || challan.fabricIn || 0}</td>
+              <td style="text-align: center;">${uom}</td>
             </tr>
           `}
           <tr class="totals-row">
-            <td colspan="4" style="text-align: right; text-transform: uppercase; font-size: 10px;">
-              Total Dispatched Handover Quantity:
+            <td colspan="4" style="text-align: right; text-transform: uppercase; font-size: 10px; font-weight: 900;">
+              TOTAL QUANTITY:
             </td>
-            <td class="num" style="font-size: 13px; color: #1e3a8a;">
-              ${totalQuantity}
+            <td class="num" style="font-size: 13px; font-weight: 900;">
+              ${totalQuantity || challan.fabricOut || challan.fabricIn || 0}
             </td>
-            <td>${uom}</td>
+            <td style="text-align: center; font-weight: 900;">${uom}</td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- ACCOMPANYING PRODUCTION SHEET NOTICE -->
-    <div class="sheet-ref-card">
-      <div>
-        <div class="sheet-ref-title">
-          📋 ACCOMPANYING MASTER PRODUCTION SHEET: ${programSerial}
-        </div>
-        <div class="sheet-ref-sub">
-          Design: <strong>${designNo}</strong> &middot; Style: <strong>${styleCode}</strong> &middot; Fabric: <strong>${fabricName}</strong>
-          <br>
-          Mandatory rule: This physical challan slip must be physically attached to the Master Production Sheet as it moves from department to department.
-        </div>
-      </div>
-      <div style="font-family: monospace; font-size: 11px; font-weight: 800; color: #7e22ce;">
-        TRAVELER DOC
-      </div>
-    </div>
-
-    <!-- REMARKS -->
-    ${remarks ? `
-      <div class="remarks-box">
-        <div class="remarks-title">Special Instructions / Remarks:</div>
-        <p style="color: #334155; font-style: italic;">${remarks}</p>
-      </div>
-    ` : ''}
 
     <!-- DUAL PHYSICAL HANDOVER AUTHORIZATION SIGNATURES -->
     <div class="sign-grid">
       <div class="sign-box">
-        <div class="sign-title">${fromLabel}</div>
-        <div class="sign-sub">Authorized Dispatcher Signature (${issuerName})</div>
-        <div class="sign-sub" style="margin-top: 14px;">Date: ${dateStr} &middot; Dispatched: ${totalQuantity} ${uom}</div>
+        <div class="sign-title">DISPATCHED BY</div>
+        <div class="sign-sub">${issuerName} (${fromLabel})</div>
+        <div class="sign-sub" style="margin-top: 24px; font-weight: 700;">Signature: _______________________</div>
       </div>
       <div class="sign-box">
-        <div class="sign-title">${toLabel}</div>
-        <div class="sign-sub">Receiver Gate Inward Stamp &amp; Signature</div>
-        <div class="sign-sub" style="margin-top: 14px;">Date: ____________ &middot; Verified Count: ____________</div>
+        <div class="sign-title">RECEIVED BY</div>
+        <div class="sign-sub">Station Incharge (${toLabel})</div>
+        <div class="sign-sub" style="margin-top: 24px; font-weight: 700;">Signature: _______________________</div>
       </div>
     </div>
 
@@ -735,10 +688,14 @@ export function generateChallanHtml(challan: any): string {
 export async function downloadChallanHtml(challan: any): Promise<void> {
   if (!challan) return;
   try {
-    const html = generateChallanHtml(challan);
-    const challanNo = (challan.challanNumber || 'CHALLAN').replace(/[^a-zA-Z0-9_-]/g, '_');
-    const fromDept = (challan.fromDepartment || 'FROM').replace(/[^a-zA-Z0-9_-]/g, '_');
-    const toDept = (challan.toDepartment || 'TO').replace(/[^a-zA-Z0-9_-]/g, '_');
+    const completeChallan = {
+      ...challan,
+      program: await prepareWilcomImages(await loadProgramDocument(challan.program || { id: challan.programId })),
+    };
+    const html = generateChallanHtml(completeChallan);
+    const challanNo = (completeChallan.challanNumber || 'CHALLAN').replace(/[^a-zA-Z0-9_-]/g, '_');
+    const fromDept = (completeChallan.fromDepartment || 'FROM').replace(/[^a-zA-Z0-9_-]/g, '_');
+    const toDept = (completeChallan.toDepartment || 'TO').replace(/[^a-zA-Z0-9_-]/g, '_');
 
     const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -762,17 +719,23 @@ export function printChallan(challan: any): void {
   if (!challan) return;
   const printWindow = window.open('', '_blank');
   if (printWindow) {
-    try {
-      const html = generateChallanHtml(challan);
-      printWindow.document.open();
-      printWindow.document.write(html);
-      printWindow.document.close();
-      printWindow.focus();
-      printWindow.print();
-    } catch (err) {
-      printWindow.close();
-      void downloadChallanHtml(challan);
-    }
+    void (async () => {
+      try {
+        const completeChallan = {
+          ...challan,
+          program: await prepareWilcomImages(await loadProgramDocument(challan.program || { id: challan.programId })),
+        };
+        printWindow.document.open();
+        printWindow.document.write(generateChallanHtml(completeChallan));
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+      } catch (error) {
+        printWindow.close();
+        const message = error instanceof Error ? error.message : 'Failed to print challan.';
+        window.alert(`Challan print failed: ${message}`);
+      }
+    })();
   } else {
     void downloadChallanHtml(challan);
   }

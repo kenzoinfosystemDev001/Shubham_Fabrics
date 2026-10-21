@@ -63,6 +63,8 @@ export async function GET(request: Request) {
           include: {
             fabrics: true,
             colours: true,
+            sizes: true,
+            specifications: true,
             createdBy: { select: { fullName: true, username: true } },
           },
         },

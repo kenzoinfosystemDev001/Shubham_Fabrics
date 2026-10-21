@@ -41,6 +41,7 @@ import {
   downloadChallanHtml, 
   printChallan 
 } from '@/lib/download-challan';
+import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
 
 interface QC1Challan {
   id: string;
@@ -745,64 +746,8 @@ export default function QC1MyWorkPage() {
                         {/* Actions */}
                         <td className="py-3 px-4 text-right">
                           <div className="flex items-center justify-end gap-1 flex-wrap">
-                            {/* CHALLAN ACTIONS */}
-                            <button
-                              type="button"
-                              onClick={() => downloadChallanHtml(challan)}
-                              className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-slate-700 hover:text-emerald-900 bg-slate-100 hover:bg-emerald-50 px-2 py-1 rounded transition cursor-pointer"
-                              title="Download Challan as standalone HTML/PDF"
-                            >
-                              <Download className="w-3 h-3 text-emerald-600" />
-                              <span>Challan</span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => printChallan(challan)}
-                              className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-slate-700 hover:text-blue-900 bg-slate-100 hover:bg-blue-50 px-2 py-1 rounded transition cursor-pointer"
-                              title="Print Challan Slip"
-                            >
-                              <Printer className="w-3 h-3 text-slate-500" />
-                              <span>Print</span>
-                            </button>
-
-                            {/* PRODUCTION SHEET ACTIONS */}
-                            {challan.program && (
-                              <div className="flex items-center gap-0.5 bg-indigo-50 border border-indigo-200 px-1 py-0.5 rounded">
-                                <button
-                                  type="button"
-                                  onClick={() => setSelectedSheetForModal(challan.program)}
-                                  className="text-[10px] font-bold text-indigo-700 hover:text-indigo-900 px-1"
-                                  title="View Accompanying Production Sheet"
-                                >
-                                  Sheet
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => downloadProductionSheetHtml(challan.program)}
-                                  className="p-0.5 text-indigo-700 hover:text-indigo-950 rounded cursor-pointer"
-                                  title="Download Production Sheet HTML"
-                                >
-                                  <Download className="w-3 h-3 text-emerald-600" />
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => printProductionSheet(challan.program)}
-                                  className="p-0.5 text-indigo-700 hover:text-indigo-950 rounded cursor-pointer"
-                                  title="Print Production Sheet on A4"
-                                >
-                                  <Printer className="w-3 h-3 text-slate-600" />
-                                </button>
-                              </div>
-                            )}
-
-                            {/* View Challan Document Modal */}
-                            <button
-                              onClick={() => setSelectedChallanForView(challan)}
-                              className="p-1 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded transition cursor-pointer"
-                              title="View full challan details"
-                            >
-                              <Eye className="w-3.5 h-3.5" />
-                            </button>
+                            {/* COMPLETE DOCUMENT ACTIONS: PRODUCTION SHEET, CHALLAN & WILCOM */}
+                            <DocumentActionButtons program={challan.program} challan={challan} size="xs" />
 
                             {/* RECEIVE MATERIAL BUTTON (If status === 'ISSUED') */}
                             {isIssued && (
@@ -1396,13 +1341,6 @@ export default function QC1MyWorkPage() {
                   </div>
                 </div>
 
-                {/* Remarks */}
-                {selectedChallanForView.remarks && (
-                  <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs">
-                    <span className="font-bold text-slate-700 block mb-0.5">Remarks / Instructions:</span>
-                    <p className="text-slate-600 italic font-serif">{selectedChallanForView.remarks}</p>
-                  </div>
-                )}
 
                 {/* Physical Signature Blocks */}
                 <div className="pt-8 border-t border-slate-200 grid grid-cols-2 gap-8 text-xs">
