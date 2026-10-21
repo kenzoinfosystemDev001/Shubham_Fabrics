@@ -62,6 +62,10 @@ export function ProductionSheetPrintModal({
   }
 
   const components = meta?.components || null;
+  const componentCategories: GarmentCategory[] = components
+    ? Object.keys(components)
+    : ['TOP', 'BOTTOM', 'DUPATTA', 'OTHER'];
+  const activeTabName = components?.[activeTab]?.styleName || (activeTab === 'OTHER' ? 'INPUT' : activeTab);
   const artworkPhoto = extractRootWilcomPhoto(program, meta);
   const forwardedComponents: string[] = Array.isArray(meta?.forwardedComponents) ? meta.forwardedComponents : ['TOP'];
 
@@ -215,9 +219,10 @@ export function ProductionSheetPrintModal({
         {/* COMPONENT TAB SELECTOR */}
         <div className="px-5 py-2 bg-slate-100 border-b border-slate-200 flex items-center justify-between gap-2 overflow-x-auto">
           <div className="flex items-center gap-1.5">
-            {(['TOP', 'BOTTOM', 'DUPATTA', 'OTHER'] as GarmentCategory[]).map((cat) => {
+            {componentCategories.map((cat) => {
               const isEnabled = components ? components[cat]?.enabled !== false : (cat === 'TOP');
               const isForwarded = forwardedComponents.includes(cat);
+              const categoryName = components?.[cat]?.styleName || (cat === 'OTHER' ? 'INPUT' : cat);
               return (
                 <button
                   key={cat}
@@ -231,7 +236,7 @@ export function ProductionSheetPrintModal({
                         : 'bg-slate-100 text-slate-400 border border-slate-200'
                   }`}
                 >
-                  <span>{cat} Sheet</span>
+                  <span>{categoryName} Sheet</span>
                   {isForwarded && (
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" title="Selected for forwarding" />
                   )}
@@ -261,7 +266,7 @@ export function ProductionSheetPrintModal({
                 SHUBHAM FABRICS INDIA PVT. LTD.
               </div>
               <div className="text-xl font-black tracking-widest uppercase text-blue-950 mt-1">
-                PRODUCTION SHEET &middot; {activeTab}
+                PRODUCTION SHEET &middot; {activeTabName}
               </div>
             </div>
 

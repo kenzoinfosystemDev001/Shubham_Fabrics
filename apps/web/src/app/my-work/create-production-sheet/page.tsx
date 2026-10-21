@@ -64,7 +64,7 @@ interface ComponentState {
   signatureName: string;
 }
 
-const CATEGORY_META: Record<GarmentCategory, {
+const CATEGORY_META: Record<string, {
   label: string;
   badgeBg: string;
   badgeText: string;
@@ -123,6 +123,45 @@ const COMMON_GARMENT_SUB_STYLES = [
   'HOOD',
   'FLAP',
 ];
+
+const BUILT_IN_CATEGORIES: GarmentCategory[] = ['TOP', 'BOTTOM', 'DUPATTA', 'OTHER'];
+
+function isCustomCategory(category: GarmentCategory): boolean {
+  return !BUILT_IN_CATEGORIES.includes(category);
+}
+
+function getCategoryMeta(category: GarmentCategory) {
+  return CATEGORY_META[category] || CATEGORY_META.OTHER;
+}
+
+function createComponentState(category: GarmentCategory, rowId: string): ComponentState {
+  return {
+    enabled: true,
+    styleName: '',
+    pattern: '',
+    fabricName: '',
+    fabricWidth: '',
+    subStyles: getDefaultSubStylesForCategory(category).map((style) => ({ ...style, average: '' })),
+    productionGrid: [{ id: rowId, color: '', pcs: '', mtr: '', subStyle: '', subStyles: [], size: '', sizes: {} }],
+    swatchColorOverrides: {},
+    noteText: '',
+    remarksText: '',
+    signatureName: '',
+  };
+}
+
+function hasComponentInput(component: ComponentState): boolean {
+  return Boolean(
+    component.styleName.trim() ||
+    component.pattern.trim() ||
+    component.fabricName.trim() ||
+    component.fabricWidth.trim() ||
+    component.noteText.trim() ||
+    component.remarksText.trim() ||
+    component.subStyles.some((style) => style.average !== '') ||
+    component.productionGrid.some((row) => row.color.trim() || Number(row.pcs) > 0 || Number(row.mtr) > 0)
+  );
+}
 
 interface SubStyleMultiSelectCellProps {
   cat: GarmentCategory;
@@ -563,6 +602,7 @@ export default function CreateProductionSheetPage() {
       signatureName: '',
     },
   });
+  const componentCategories = Object.keys(components) as GarmentCategory[];
 
   // Forwarding Selection State: select which sheets to forward to the next department
   const [forwardedComponents, setForwardedComponents] = useState<GarmentCategory[]>(['TOP']);
@@ -641,23 +681,38 @@ export default function CreateProductionSheetPage() {
   // Overall totals across enabled components
   const overallTotalPieces = useMemo(() => {
     let sum = 0;
-    (['TOP', 'BOTTOM', 'DUPATTA', 'OTHER'] as GarmentCategory[]).forEach((cat) => {
+    componentCategories.forEach((cat) => {
       if (components[cat].enabled) {
         sum += getTotalPieces(cat);
       }
     });
     return sum;
-  }, [components]);
+  }, [components, componentCategories]);
 
   const overallFabricMeters = useMemo(() => {
     let sum = 0;
-    (['TOP', 'BOTTOM', 'DUPATTA', 'OTHER'] as GarmentCategory[]).forEach((cat) => {
+    componentCategories.forEach((cat) => {
       if (components[cat].enabled) {
         sum += getTotalFabricMeters(cat);
       }
     });
     return Math.round(sum * 100) / 100;
-  }, [components]);
+  }, [components, componentCategories]);
+
+  const handleAddCustomStyle = () => {
+    const newCategory = `CUSTOM_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    const topIsBlank = !hasComponentInput(components.TOP);
+    setComponents((prev) => ({
+      ...prev,
+      ...(topIsBlank ? { TOP: { ...prev.TOP, enabled: false } } : {}),
+      [newCategory]: createComponentState(newCategory, `${newCategory.toLowerCase()}-row-1`),
+    }));
+    setSelectedCategory(newCategory);
+    setForwardedComponents((prev) => [
+      ...(topIsBlank ? prev.filter((category) => category !== 'TOP') : prev),
+      newCategory,
+    ]);
+  };
 
   // Handle Component Enable/Disable
   const handleToggleComponent = (cat: GarmentCategory) => {
@@ -699,48 +754,24 @@ export default function CreateProductionSheetPage() {
     }
   };
 
-  // Handle Category Change from Sheet Dropdown (where TOP / BOTTOM / DUPATTA is selected)
+  // Selecting a sheet should not disable or overwrite the other component sheets.
   const handleCategoryDropdownChange = (newCat: GarmentCategory) => {
     if (newCat === selectedCategory) return;
-    const oldCat = selectedCategory;
+    const oldCategoryIsBlank =
+      !isCustomCategory(selectedCategory) &&
+      !hasComponentInput(components[selectedCategory]);
     setSelectedCategory(newCat);
-
-    // Transfer/update component states
-    setComponents((prev) => {
-      const currentData = prev[oldCat];
-      const targetData = prev[newCat];
-
-      const hasEnteredStyle = Boolean(currentData.styleName.trim());
-      const hasEnteredFabric = Boolean(currentData.fabricName.trim() || currentData.fabricWidth.trim());
-      const hasEnteredNotes = Boolean(currentData.noteText.trim());
-      const hasCustomGrid = currentData.productionGrid.some((r) => r.color || r.pcs || r.mtr);
-
-      const defaultSubStylesForNew = getDefaultSubStylesForCategory(newCat).map((s) => ({ ...s, average: '' }));
-      const targetHasValues = targetData.subStyles.some((s) => s.average !== '');
-      const nextSubStyles = targetHasValues ? targetData.subStyles : defaultSubStylesForNew;
-
-      return {
-        ...prev,
-        [newCat]: {
-          ...targetData,
-          enabled: true,
-          styleName: hasEnteredStyle && !targetData.styleName.trim() ? currentData.styleName : targetData.styleName,
-          fabricName: hasEnteredFabric && !targetData.fabricName.trim() ? currentData.fabricName : targetData.fabricName,
-          fabricWidth: hasEnteredFabric && !targetData.fabricWidth.trim() ? currentData.fabricWidth : targetData.fabricWidth,
-          noteText: hasEnteredNotes && !targetData.noteText.trim() ? currentData.noteText : targetData.noteText,
-          productionGrid: hasCustomGrid && targetData.productionGrid.length <= 1 && !targetData.productionGrid[0]?.color
-            ? currentData.productionGrid
-            : targetData.productionGrid,
-          subStyles: nextSubStyles,
-        },
-        [oldCat]: {
-          ...currentData,
-          enabled: false,
-        },
-      };
-    });
-
-    setForwardedComponents([newCat]);
+    setComponents((prev) => ({
+      ...prev,
+      ...(oldCategoryIsBlank
+        ? { [selectedCategory]: { ...prev[selectedCategory], enabled: false } }
+        : {}),
+      [newCat]: { ...prev[newCat], enabled: true },
+    }));
+    setForwardedComponents((prev) => [
+      ...(oldCategoryIsBlank ? prev.filter((category) => category !== selectedCategory) : prev),
+      ...(prev.includes(newCat) ? [] : [newCat]),
+    ]);
   };
 
   // Component SubStyle Changes
@@ -1112,7 +1143,7 @@ export default function CreateProductionSheetPage() {
       return;
     }
 
-    const enabledCats = (['TOP', 'BOTTOM', 'DUPATTA', 'OTHER'] as GarmentCategory[]).filter((c) => components[c].enabled);
+    const enabledCats = componentCategories.filter((c) => components[c].enabled);
     if (enabledCats.length === 0) {
       setError('Please enable at least one Production Sheet.');
       if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1121,15 +1152,15 @@ export default function CreateProductionSheetPage() {
 
     // Verify pieces in enabled components
     for (const cat of enabledCats) {
-      if (cat === 'OTHER' && !components.OTHER.styleName.trim()) {
-        setError('Enter a name for the INPUT Production Sheet.');
+      if ((cat === 'OTHER' || isCustomCategory(cat)) && !components[cat].styleName.trim()) {
+        setError(`Enter a name for the ${cat === 'OTHER' ? 'custom' : 'style'} Production Sheet.`);
         if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
 
       const pcs = getTotalPieces(cat);
       if (pcs <= 0) {
-        const categoryName = cat === 'OTHER' ? components.OTHER.styleName.trim() : cat;
+        const categoryName = cat === 'OTHER' || isCustomCategory(cat) ? components[cat].styleName.trim() : cat;
         setError(`Please enter at least one color row with positive PCS quantity for ${categoryName} Production Sheet.`);
         if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
@@ -1153,76 +1184,27 @@ export default function CreateProductionSheetPage() {
 
     setLoading(true);
     try {
-      const componentsPayload: Record<GarmentCategory, ComponentSheetData> = {
-        TOP: {
-          enabled: components.TOP.enabled,
-          forwarded: forwardedComponents.includes('TOP'),
-          category: 'TOP',
-          styleName: components.TOP.styleName.trim(),
-          pattern: (components.TOP.pattern || '').trim(),
-          fabricName: components.TOP.fabricName.trim() || fabricName.trim(),
-          fabricWidth: components.TOP.fabricWidth.trim() || fabricWidth.trim(),
-          subStyles: components.TOP.subStyles,
-          productionGrid: components.TOP.productionGrid,
-          swatches: getDisplaySwatches('TOP'),
-          note: components.TOP.noteText.trim(),
-          remarks: components.TOP.remarksText.trim(),
-          totalMtrAverage: getTotalMtrAverage('TOP'),
-          totalPieces: getTotalPieces('TOP'),
-          totalFabricMeters: getTotalFabricMeters('TOP'),
-        },
-        BOTTOM: {
-          enabled: components.BOTTOM.enabled,
-          forwarded: forwardedComponents.includes('BOTTOM'),
-          category: 'BOTTOM',
-          styleName: components.BOTTOM.styleName.trim(),
-          pattern: (components.BOTTOM.pattern || '').trim(),
-          fabricName: components.BOTTOM.fabricName.trim() || fabricName.trim(),
-          fabricWidth: components.BOTTOM.fabricWidth.trim() || fabricWidth.trim(),
-          subStyles: components.BOTTOM.subStyles,
-          productionGrid: components.BOTTOM.productionGrid,
-          swatches: getDisplaySwatches('BOTTOM'),
-          note: components.BOTTOM.noteText.trim(),
-          remarks: components.BOTTOM.remarksText.trim(),
-          totalMtrAverage: getTotalMtrAverage('BOTTOM'),
-          totalPieces: getTotalPieces('BOTTOM'),
-          totalFabricMeters: getTotalFabricMeters('BOTTOM'),
-        },
-        DUPATTA: {
-          enabled: components.DUPATTA.enabled,
-          forwarded: forwardedComponents.includes('DUPATTA'),
-          category: 'DUPATTA',
-          styleName: components.DUPATTA.styleName.trim(),
-          pattern: (components.DUPATTA.pattern || '').trim(),
-          fabricName: components.DUPATTA.fabricName.trim() || fabricName.trim(),
-          fabricWidth: components.DUPATTA.fabricWidth.trim() || fabricWidth.trim(),
-          subStyles: components.DUPATTA.subStyles,
-          productionGrid: components.DUPATTA.productionGrid,
-          swatches: getDisplaySwatches('DUPATTA'),
-          note: components.DUPATTA.noteText.trim(),
-          remarks: components.DUPATTA.remarksText.trim(),
-          totalMtrAverage: getTotalMtrAverage('DUPATTA'),
-          totalPieces: getTotalPieces('DUPATTA'),
-          totalFabricMeters: getTotalFabricMeters('DUPATTA'),
-        },
-        OTHER: {
-          enabled: components.OTHER.enabled,
-          forwarded: forwardedComponents.includes('OTHER'),
-          category: 'OTHER',
-          styleName: components.OTHER.styleName.trim(),
-          pattern: (components.OTHER.pattern || '').trim(),
-          fabricName: components.OTHER.fabricName.trim() || fabricName.trim(),
-          fabricWidth: components.OTHER.fabricWidth.trim() || fabricWidth.trim(),
-          subStyles: components.OTHER.subStyles,
-          productionGrid: components.OTHER.productionGrid,
-          swatches: getDisplaySwatches('OTHER'),
-          note: components.OTHER.noteText.trim(),
-          remarks: components.OTHER.remarksText.trim(),
-          totalMtrAverage: getTotalMtrAverage('OTHER'),
-          totalPieces: getTotalPieces('OTHER'),
-          totalFabricMeters: getTotalFabricMeters('OTHER'),
-        },
-      };
+        const componentsPayload = componentCategories.reduce<Record<string, ComponentSheetData>>((payload, cat) => {
+          const component = components[cat];
+          payload[cat] = {
+            enabled: component.enabled,
+            forwarded: forwardedComponents.includes(cat),
+            category: cat,
+            styleName: component.styleName.trim(),
+            pattern: (component.pattern || '').trim(),
+            fabricName: component.fabricName.trim() || fabricName.trim(),
+            fabricWidth: component.fabricWidth.trim() || fabricWidth.trim(),
+            subStyles: component.subStyles,
+            productionGrid: component.productionGrid,
+            swatches: getDisplaySwatches(cat),
+            note: component.noteText.trim(),
+            remarks: component.remarksText.trim(),
+            totalMtrAverage: getTotalMtrAverage(cat),
+            totalPieces: getTotalPieces(cat),
+            totalFabricMeters: getTotalFabricMeters(cat),
+          };
+          return payload;
+        }, {});
 
       const primaryCat: GarmentCategory = selectedCategory;
       const primary = components[primaryCat];
@@ -1467,21 +1449,29 @@ export default function CreateProductionSheetPage() {
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold text-slate-500">Active Category:</span>
               <span
-                className={`text-[10px] font-black px-2.5 py-0.5 rounded border ${CATEGORY_META[selectedCategory].badgeBg} ${CATEGORY_META[selectedCategory].badgeText} border-black/20`}
+                className={`text-[10px] font-black px-2.5 py-0.5 rounded border ${getCategoryMeta(selectedCategory).badgeBg} ${getCategoryMeta(selectedCategory).badgeText} border-black/20`}
               >
-                {selectedCategory === 'OTHER'
-                  ? components.OTHER.styleName.trim() || 'INPUT'
+                {selectedCategory === 'OTHER' || isCustomCategory(selectedCategory)
+                  ? components[selectedCategory].styleName.trim() || 'New Style'
                   : selectedCategory}
               </span>
+              <button
+                type="button"
+                onClick={handleAddCustomStyle}
+                className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#163767] hover:bg-[#0F264A] text-white text-[10px] font-bold rounded transition cursor-pointer"
+              >
+                <Plus className="w-3 h-3" />
+                Add Style
+              </button>
             </div>
           </div>
 
           {(() => {
             const cat = selectedCategory;
             const comp = components[cat];
-            const meta = CATEGORY_META[cat];
+            const meta = getCategoryMeta(cat);
             const categoryDisplayName =
-              cat === 'OTHER' ? comp.styleName.trim() || 'INPUT' : cat;
+              cat === 'OTHER' || isCustomCategory(cat) ? comp.styleName.trim() || 'New Style' : cat;
             const catAvg = getTotalMtrAverage(cat);
             const catPieces = getTotalPieces(cat);
             const catMeters = getTotalFabricMeters(cat);
@@ -1498,7 +1488,7 @@ export default function CreateProductionSheetPage() {
                 >
                   <div className="flex items-center gap-3">
                     <span className={`text-sm font-black uppercase tracking-wider ${meta.badgeText}`}>
-                      {cat === 'OTHER'
+                      {cat === 'OTHER' || isCustomCategory(cat)
                         ? `${categoryDisplayName} Production Sheet`
                         : meta.label}
                     </span>
@@ -1507,6 +1497,25 @@ export default function CreateProductionSheetPage() {
                   </div>
 
                   <div className="flex items-center gap-3">
+                    {isCustomCategory(cat) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setComponents((prev) => {
+                            const next = { ...prev };
+                            delete next[cat];
+                            return next;
+                          });
+                          setForwardedComponents((prev) => prev.filter((category) => category !== cat));
+                          setSelectedCategory('TOP');
+                          setWilcomEntries((prev) => prev.filter((entry) => entry.category !== cat));
+                        }}
+                        className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-bold text-rose-700 border border-rose-200 hover:bg-rose-50 rounded cursor-pointer"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        Remove Style
+                      </button>
+                    )}
                     <label className="flex items-center gap-1.5 cursor-pointer text-xs font-bold select-none">
                       <input
                         type="checkbox"
@@ -1562,7 +1571,7 @@ export default function CreateProductionSheetPage() {
                             >
                               <span className="flex items-center gap-1.5">
                                 <Sparkles className="w-3.5 h-3.5 text-[#163767]" />
-                                <span>WILCOM ({cat})</span>
+                                <span>WILCOM ({categoryDisplayName})</span>
                               </span>
                               {(() => {
                                 const matching = wilcomEntries.filter((e) =>
@@ -1628,7 +1637,13 @@ export default function CreateProductionSheetPage() {
                                 <option value="TOP">TOP</option>
                                 <option value="BOTTOM">BOTTOM</option>
                                 <option value="DUPATTA">DUPATTA</option>
-                                <option value="OTHER">INPUT</option>
+                                {componentCategories
+                                  .filter((category) => category === 'OTHER' || isCustomCategory(category))
+                                  .map((category) => (
+                                    <option key={category} value={category}>
+                                      {components[category].styleName.trim() || 'New Style'}
+                                    </option>
+                                  ))}
                               </select>
                               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-black">
                                 <ChevronDown className="w-4 h-4 stroke-[2.5]" />
@@ -1656,7 +1671,7 @@ export default function CreateProductionSheetPage() {
                             />
                           </div>
                         </div>
-                        {cat === 'OTHER' && (
+                        {(cat === 'OTHER' || isCustomCategory(cat)) && (
                           <div>
                             <label className="block text-[11px] font-black uppercase tracking-wider text-black mb-1">
                               PRODUCTION SHEET NAME:
@@ -1669,7 +1684,7 @@ export default function CreateProductionSheetPage() {
                                 const value = e.target.value;
                                 setComponents((prev) => ({
                                   ...prev,
-                                  OTHER: { ...prev.OTHER, styleName: value },
+                                  [cat]: { ...prev[cat], styleName: value },
                                 }));
                               }}
                               placeholder="Enter a production sheet name"
