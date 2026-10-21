@@ -22,6 +22,7 @@ import {
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import BarcodeStickerCard from '@/components/BarcodeStickerCard';
+import { ColorFabricMeasurementTable, createDepartmentInOutTracking } from '@/components/ColorFabricMeasurementTable';
 
 function SteamPressIssueChallanContent() {
   const router = useRouter();
@@ -52,6 +53,7 @@ function SteamPressIssueChallanContent() {
       remarks: 'Passed Steam Press quality audit (creases sharp, zero shine glaze, dry).',
     },
   ]);
+  const [tracking, setTracking] = useState(() => createDepartmentInOutTracking('STEAM_PRESS'));
 
   useEffect(() => {
     const loadEligibleJobs = async () => {
@@ -87,6 +89,13 @@ function SteamPressIssueChallanContent() {
   const selectJob = (job: any) => {
     setSelectedJob(job);
     const availableGood = job.fabricOut ?? job.fabricIn ?? 0;
+    setTracking(createDepartmentInOutTracking('STEAM_PRESS', {
+      fabricIn: Number(availableGood) || 0,
+      fabricUnit: job.fabricUnit === 'MTR' ? 'MTR' : 'PCS',
+      detectedFromDept: job.fromDepartment || null,
+      detectedFromChallanId: job.id,
+      detectedFromChallanNumber: job.challanNumber || null,
+    }));
     setItems([
       {
         itemDescription: `${job.program?.styleCode || 'Steam Pressed'} Garments - Ready for Final QC`,
@@ -156,6 +165,8 @@ function SteamPressIssueChallanContent() {
         parentChallanId: selectedJob.id,
         programId: selectedJob.programId,
         toDepartment: targetDepartment,
+        ...tracking,
+        detectedFromDepartment: tracking.detectedFromDept,
         priority,
         remarks,
         items: items.map((it) => ({
@@ -298,6 +309,19 @@ function SteamPressIssueChallanContent() {
         ) : (
           /* CHALLAN CREATION FORM */
           <form onSubmit={handleSubmit} className="space-y-6">
+            <ColorFabricMeasurementTable
+              items={[]}
+              onChange={() => {}}
+              currentDepartment="STEAM_PRESS"
+              programId={selectedJob?.programId}
+              tracking={tracking}
+              onTrackingChange={setTracking}
+              trackingOnly
+              showInOutController
+              onSyncToItems={(fabricOut, fabricUnit) => {
+                setItems((prev) => prev.map((item, index) => index === 0 ? { ...item, quantity: String(fabricOut), uom: fabricUnit, unitType: fabricUnit } : item));
+              }}
+            />
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* SOURCE JOB SELECTION */}
               <div className="lg:col-span-1 bg-slate-900/80 border border-slate-800 rounded-2xl p-5 backdrop-blur-md space-y-4">

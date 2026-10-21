@@ -93,7 +93,7 @@ const CATEGORY_META: Record<GarmentCategory, {
     subHeader: 'DUPATTA:-',
   },
   OTHER: {
-    label: 'OTHER Production Sheet',
+    label: 'INPUT Production Sheet',
     badgeBg: 'bg-amber-100',
     badgeText: 'text-amber-900',
     accentBorder: 'border-amber-700',
@@ -507,7 +507,7 @@ export default function CreateProductionSheetPage() {
   const [fabricName, setFabricName] = useState('');
   const [fabricWidth, setFabricWidth] = useState('');
 
-  // Four Garment Components: TOP, BOTTOM, DUPATTA, OTHER
+  // OTHER is the internal category for user-named production sheets.
   // Starts clean with NO dummy data
   const [components, setComponents] = useState<Record<GarmentCategory, ComponentState>>({
     TOP: {
@@ -641,7 +641,7 @@ export default function CreateProductionSheetPage() {
   // Overall totals across enabled components
   const overallTotalPieces = useMemo(() => {
     let sum = 0;
-    (['TOP', 'BOTTOM', 'DUPATTA'] as GarmentCategory[]).forEach((cat) => {
+    (['TOP', 'BOTTOM', 'DUPATTA', 'OTHER'] as GarmentCategory[]).forEach((cat) => {
       if (components[cat].enabled) {
         sum += getTotalPieces(cat);
       }
@@ -651,7 +651,7 @@ export default function CreateProductionSheetPage() {
 
   const overallFabricMeters = useMemo(() => {
     let sum = 0;
-    (['TOP', 'BOTTOM', 'DUPATTA'] as GarmentCategory[]).forEach((cat) => {
+    (['TOP', 'BOTTOM', 'DUPATTA', 'OTHER'] as GarmentCategory[]).forEach((cat) => {
       if (components[cat].enabled) {
         sum += getTotalFabricMeters(cat);
       }
@@ -1112,18 +1112,25 @@ export default function CreateProductionSheetPage() {
       return;
     }
 
-    const enabledCats = (['TOP', 'BOTTOM', 'DUPATTA'] as GarmentCategory[]).filter((c) => components[c].enabled);
+    const enabledCats = (['TOP', 'BOTTOM', 'DUPATTA', 'OTHER'] as GarmentCategory[]).filter((c) => components[c].enabled);
     if (enabledCats.length === 0) {
-      setError('Please enable at least one Production Sheet (TOP, BOTTOM, or DUPATTA).');
+      setError('Please enable at least one Production Sheet.');
       if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
     // Verify pieces in enabled components
     for (const cat of enabledCats) {
+      if (cat === 'OTHER' && !components.OTHER.styleName.trim()) {
+        setError('Enter a name for the INPUT Production Sheet.');
+        if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
       const pcs = getTotalPieces(cat);
       if (pcs <= 0) {
-        setError(`Please enter at least one color row with positive PCS quantity for ${cat} Production Sheet.`);
+        const categoryName = cat === 'OTHER' ? components.OTHER.styleName.trim() : cat;
+        setError(`Please enter at least one color row with positive PCS quantity for ${categoryName} Production Sheet.`);
         if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
@@ -1462,7 +1469,9 @@ export default function CreateProductionSheetPage() {
               <span
                 className={`text-[10px] font-black px-2.5 py-0.5 rounded border ${CATEGORY_META[selectedCategory].badgeBg} ${CATEGORY_META[selectedCategory].badgeText} border-black/20`}
               >
-                {selectedCategory}
+                {selectedCategory === 'OTHER'
+                  ? components.OTHER.styleName.trim() || 'INPUT'
+                  : selectedCategory}
               </span>
             </div>
           </div>
@@ -1471,6 +1480,8 @@ export default function CreateProductionSheetPage() {
             const cat = selectedCategory;
             const comp = components[cat];
             const meta = CATEGORY_META[cat];
+            const categoryDisplayName =
+              cat === 'OTHER' ? comp.styleName.trim() || 'INPUT' : cat;
             const catAvg = getTotalMtrAverage(cat);
             const catPieces = getTotalPieces(cat);
             const catMeters = getTotalFabricMeters(cat);
@@ -1487,7 +1498,9 @@ export default function CreateProductionSheetPage() {
                 >
                   <div className="flex items-center gap-3">
                     <span className={`text-sm font-black uppercase tracking-wider ${meta.badgeText}`}>
-                      {meta.label}
+                      {cat === 'OTHER'
+                        ? `${categoryDisplayName} Production Sheet`
+                        : meta.label}
                     </span>
 
 
@@ -1512,7 +1525,7 @@ export default function CreateProductionSheetPage() {
                 <div className="p-6 sm:p-8 space-y-5 text-black font-sans">
                     {/* SHEET BANNER TITLE */}
                     <div className="text-center font-black text-2xl sm:text-3xl tracking-[0.25em] uppercase text-black select-none border-b border-black/10 pb-2">
-                      {cat} PRODUCTION SHEET
+                      {categoryDisplayName} PRODUCTION SHEET
                     </div>
 
                     {/* TOP META ROW: DESIGN NUMBER, WILCOM, STYLE, PATTERN, SERIAL NO, DATE, DELIVERY DATE */}
@@ -1615,7 +1628,7 @@ export default function CreateProductionSheetPage() {
                                 <option value="TOP">TOP</option>
                                 <option value="BOTTOM">BOTTOM</option>
                                 <option value="DUPATTA">DUPATTA</option>
-                                <option value="OTHER">OTHER</option>
+                                <option value="OTHER">INPUT</option>
                               </select>
                               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-black">
                                 <ChevronDown className="w-4 h-4 stroke-[2.5]" />
@@ -1643,6 +1656,27 @@ export default function CreateProductionSheetPage() {
                             />
                           </div>
                         </div>
+                        {cat === 'OTHER' && (
+                          <div>
+                            <label className="block text-[11px] font-black uppercase tracking-wider text-black mb-1">
+                              PRODUCTION SHEET NAME:
+                            </label>
+                            <input
+                              type="text"
+                              required
+                              value={comp.styleName}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                setComponents((prev) => ({
+                                  ...prev,
+                                  OTHER: { ...prev.OTHER, styleName: value },
+                                }));
+                              }}
+                              placeholder="Enter a production sheet name"
+                              className="w-full border-[1.5px] border-black px-3 py-1.5 h-10 font-bold text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600 shadow-2xs"
+                            />
+                          </div>
+                        )}
                       </div>
 
                       {/* Right: SERIAL NO, DATE, DELIVERY DATE */}

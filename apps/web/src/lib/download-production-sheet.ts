@@ -119,6 +119,18 @@ export function getSwatchColorHex(name?: string, fallback?: string): string {
 
 export type GarmentCategory = 'TOP' | 'BOTTOM' | 'DUPATTA' | 'OTHER';
 
+function escapeHtmlText(value: string): string {
+  return value.replace(/[&<>"']/g, (character) => {
+    switch (character) {
+      case '&': return '&amp;';
+      case '<': return '&lt;';
+      case '>': return '&gt;';
+      case '"': return '&quot;';
+      default: return '&#39;';
+    }
+  });
+}
+
 export interface ComponentSheetData {
   enabled: boolean;
   forwarded: boolean;
@@ -466,7 +478,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
     if (Array.isArray(meta?.forwardedComponents) && meta.forwardedComponents.length > 0) {
       targetCategories = meta.forwardedComponents;
     } else if (meta?.components) {
-      targetCategories = (['TOP', 'BOTTOM', 'DUPATTA'] as GarmentCategory[]).filter(
+      targetCategories = (['TOP', 'BOTTOM', 'DUPATTA', 'OTHER'] as GarmentCategory[]).filter(
         (c) => meta.components[c]?.enabled !== false
       );
     }
@@ -476,6 +488,13 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
   } else {
     targetCategories = [category];
   }
+
+  const categoryName = category === 'OTHER'
+    ? extractSubStylesAndGrid(program, 'OTHER').topName.trim() || 'INPUT'
+    : category;
+  const categoryLabel = category === 'ALL' ? 'All Forwarded Components' : categoryName;
+  const safeCategoryLabel = escapeHtmlText(categoryLabel);
+  const safeFilenameCategory = categoryLabel.replace(/[^a-z0-9_-]+/gi, '_');
 
   const renderSingleSheet = (activeCategory: GarmentCategory) => {
     const {
@@ -490,6 +509,10 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       fabricName,
       fabricWidth,
     } = extractSubStylesAndGrid(program, activeCategory);
+    const activeCategoryName = activeCategory === 'OTHER'
+      ? topName.trim() || 'INPUT'
+      : activeCategory;
+    const safeActiveCategoryName = escapeHtmlText(activeCategoryName);
 
     // Generate 14 rows total (matching the paper sheet grid)
     const TOTAL_GRID_ROWS = 14;
@@ -546,7 +569,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
     <div class="sheet-wrapper">
       <div>
         <!-- TITLE -->
-        <div class="header-title">PRODUCTION SHEET &mdash; ${activeCategory}</div>
+        <div class="header-title">PRODUCTION SHEET &mdash; ${safeActiveCategoryName}</div>
 
         <!-- HEADER META: DESIGN NO, WILCOM, STYLE, PATTERN, DATE, SERIAL NO, DELIVERY DATE -->
         <div class="top-meta-row">
@@ -561,7 +584,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
             </div>
             <div class="field-row" style="margin-top: 6px;">
               <span class="label-bold">STYLE:</span>
-              <div class="box-input" style="width: 90px; text-transform: uppercase;">${activeCategory}</div>
+              <div class="box-input" style="width: 90px; text-transform: uppercase;">${safeActiveCategoryName}</div>
               <span class="label-bold" style="margin-left: 10px;">PATTERN:</span>
               <div class="box-input" style="flex: 1;">${pattern || '-'}</div>
             </div>
@@ -737,7 +760,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Production Sheet (${category === 'ALL' ? 'All' : category}) - ${serialNo}</title>
+  <title>Production Sheet (${safeCategoryLabel}) - ${serialNo}</title>
   <style>
     @page {
       size: A4 portrait;
@@ -1176,14 +1199,14 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
   <!-- Top Action Bar for interactive browser preview -->
   <div class="no-print-bar">
     <div>
-      <strong>Production Sheet &middot; ${category === 'ALL' ? 'All Forwarded Components' : category}</strong> &middot; Serial No. ${serialNo}
+      <strong>Production Sheet &middot; ${safeCategoryLabel}</strong> &middot; Serial No. ${serialNo}
     </div>
     <div style="display: flex; gap: 8px;">
       <button class="btn btn-primary" onclick="window.print()">
-        🖨️ Print ${category === 'ALL' ? 'All' : category} Sheet (A4)
+        🖨️ Print ${safeCategoryLabel} Sheet (A4)
       </button>
       <button class="btn btn-primary" style="background: #059669;" onclick="window.downloadSelf()">
-        💾 Download ${category === 'ALL' ? 'All' : category} Sheet
+        💾 Download ${safeCategoryLabel} Sheet
       </button>
       <button class="btn btn-outline" onclick="window.close()">
         ✕ Close
@@ -1199,7 +1222,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
       a.href = url;
-      a.download = 'Production_Sheet_${category}_${serialNo}.html';
+      a.download = 'Production_Sheet_${safeFilenameCategory}_${serialNo}.html';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

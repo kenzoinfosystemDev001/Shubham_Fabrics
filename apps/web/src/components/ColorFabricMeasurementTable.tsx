@@ -37,6 +37,26 @@ export type ChallanContext =
   | 'EMBROIDERY_THREAD_CUTTING'
   | 'GENERIC';
 
+const FABRIC_TRACKING_DEPARTMENTS = new Set([
+  'DYEING',
+  'QC1',
+  'DYEING_QC',
+  'EMBROIDERY',
+  'THREAD_CUTTING',
+  'QC2',
+  'WASHING',
+  'QC3',
+  'QCWASHING',
+  'QC_WASHING',
+  'RECUTTING',
+  'STITCHING',
+  'ASSEMBLY',
+  'FINISHING',
+  'STEAM_PRESS',
+  'FINAL_CHECK',
+  'PACKING',
+]);
+
 export interface DepartmentInOutTracking {
   fabricIn: number;
   fabricOut: number;
@@ -61,6 +81,8 @@ export interface ColorFabricMeasurementTableProps {
   tracking?: Partial<DepartmentInOutTracking>;
   onTrackingChange?: (tracking: DepartmentInOutTracking) => void;
   showInOutController?: boolean;
+  trackingOnly?: boolean;
+  onSyncToItems?: (fabricOut: number, fabricUnit: 'MTR' | 'PCS') => void;
 }
 
 export function createBlankChallanItem(context?: ChallanContext): ChallanItemData {
@@ -102,6 +124,27 @@ export function getDeptDefaultShelf(dept?: string): string {
   return 'DEF-SHELF-STORE (Fabric Store Quarantined Shelf)';
 }
 
+export function createDepartmentInOutTracking(
+  currentDepartment?: string,
+  values: Partial<DepartmentInOutTracking> = {}
+): DepartmentInOutTracking {
+  const fabricIn = Math.max(0, Number(values.fabricIn) || 0);
+  const defectivePieces = Math.max(0, Math.min(fabricIn, Number(values.defectivePieces) || 0));
+  const fabricUnit = values.fabricUnit || 'PCS';
+
+  return {
+    fabricIn,
+    fabricOut: values.fabricOut ?? Math.max(0, fabricIn - defectivePieces),
+    fabricUnit,
+    defectivePieces,
+    defectiveShelfLocation: values.defectiveShelfLocation || getDeptDefaultShelf(currentDepartment),
+    defectReason: values.defectReason || 'Broken Stitch / Needle Holes',
+    detectedFromDept: values.detectedFromDept ?? null,
+    detectedFromChallanId: values.detectedFromChallanId ?? null,
+    detectedFromChallanNumber: values.detectedFromChallanNumber ?? null,
+  };
+}
+
 export function ColorFabricMeasurementTable({
   items,
   onChange,
@@ -113,6 +156,8 @@ export function ColorFabricMeasurementTable({
   tracking: externalTracking,
   onTrackingChange,
   showInOutController = true,
+  trackingOnly = false,
+  onSyncToItems,
 }: ColorFabricMeasurementTableProps) {
   // Local In/Out Tracking State
   const sumOfItems = items.reduce(
@@ -156,13 +201,20 @@ export function ColorFabricMeasurementTable({
 
   const [autoDetecting, setAutoDetecting] = useState(false);
   const [autoDetectMessage, setAutoDetectMessage] = useState<string | null>(null);
+  const normalizedDepartment = (currentDepartment || '')
+    .trim()
+    .toUpperCase()
+    .replace(/[\s-]+/g, '_');
+  const trackingControllerVisible =
+    showInOutController &&
+    FABRIC_TRACKING_DEPARTMENTS.has(normalizedDepartment);
 
   // Derived Fabric Out = In - Defective
   const fabricOut = Math.max(0, Number((fabricIn - defectivePieces).toFixed(2)));
 
   // Emit tracking changes upward
   useEffect(() => {
-    if (onTrackingChange) {
+    if (trackingControllerVisible && onTrackingChange) {
       onTrackingChange({
         fabricIn,
         fabricOut,
@@ -185,6 +237,7 @@ export function ColorFabricMeasurementTable({
     detectedFromDept,
     detectedFromChallanId,
     detectedFromChallanNumber,
+    trackingControllerVisible,
   ]);
 
   // Sync external tracking changes if passed
@@ -263,14 +316,16 @@ export function ColorFabricMeasurementTable({
   };
 
   useEffect(() => {
-    if (programId && !externalTracking?.fabricIn) {
+    if (trackingControllerVisible && programId && !externalTracking?.fabricIn) {
       runAutoDetection(programId, currentDepartment);
     }
-  }, [programId, currentDepartment]);
+  }, [trackingControllerVisible, programId, currentDepartment]);
 
   // Sync fabricOut to first item measurement or distribute
   const handleSyncToItems = () => {
-    if (readOnly || items.length === 0) return;
+    if (readOnly) return;
+    onSyncToItems?.(fabricOut, fabricUnit);
+    if (items.length === 0) return;
     const updated = [...items];
     if (updated.length === 1) {
       updated[0] = { ...updated[0], measurement: fabricOut, unit: fabricUnit };
@@ -309,7 +364,7 @@ export function ColorFabricMeasurementTable({
   return (
     <div className="space-y-4">
       {/* 1. DEPARTMENT FABRIC / PIECE TRACKING CONTROLLER */}
-      {showInOutController && (
+      {trackingControllerVisible && (
         <div className="bg-slate-900 text-white rounded-xl p-4 border border-slate-700/60 space-y-3">
           <div className="flex items-center justify-between pb-2 border-b border-slate-700/60">
             <div className="flex items-center gap-2">
@@ -487,6 +542,7 @@ export function ColorFabricMeasurementTable({
         </div>
       )}
 
+      <div className={`space-y-4 ${trackingOnly ? 'hidden' : ''}`}>
       {/* 2. HEADER SECTION WITH TITLE AND ADD ITEM BUTTON */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1">
         <div>
@@ -763,6 +819,7 @@ export function ColorFabricMeasurementTable({
               })}
             </tbody>
           </table>
+        </div>
         </div>
       </div>
     </div>

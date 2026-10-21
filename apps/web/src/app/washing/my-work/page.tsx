@@ -318,7 +318,7 @@ export default function WashingWorkCenter() {
   // Issue Handover Challan to QC Washing
   const handleIssueToFinishing = async (challan: WashingChallan) => {
     try {
-      const goodQty = challan.fabricOut || challan.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
+      const goodQty = challan.fabricOut ?? challan.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
       const barcode = challan.items?.[0]?.barcode || `WB-${new Date().getFullYear()}-0001`;
 
       const numRes = await fetch('/api/challans/next-number?department=WASHING');
@@ -334,6 +334,14 @@ export default function WashingWorkCenter() {
           programId: challan.programId,
           fromDepartment: 'WASHING',
           toDepartment: 'QC3',
+          fabricIn: challan.fabricIn ?? goodQty + (challan.defectivePieces || 0),
+          fabricOut: goodQty,
+          fabricUnit: challan.fabricUnit || 'PCS',
+          defectivePieces: challan.defectivePieces || 0,
+          defectiveShelfLocation: challan.defectiveShelfLocation,
+          defectReason: challan.defectReason,
+          detectedFromDepartment: challan.fromDepartment,
+          detectedFromChallanId: challan.id,
           priority: challan.priority || 'NORMAL',
           remarks: `Washed pieces handover to QC Washing Department for inspection & verification. Barcode: ${barcode}`,
           items: [
