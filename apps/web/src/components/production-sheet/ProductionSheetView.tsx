@@ -43,6 +43,10 @@ export function ProductionSheetView({
   }
 
   const components = meta?.components || null;
+  const componentCategories: GarmentCategory[] = components
+    ? Object.keys(components)
+    : ['TOP', 'BOTTOM', 'DUPATTA', 'OTHER'];
+  const activeCategoryName = components?.[activeCategory]?.styleName || (activeCategory === 'OTHER' ? 'INPUT' : activeCategory);
   const artworkPhoto = extractRootWilcomPhoto(program, meta);
   const forwardedComponents: string[] = Array.isArray(meta?.forwardedComponents) ? meta.forwardedComponents : ['TOP'];
 
@@ -127,7 +131,7 @@ export function ProductionSheetView({
             PRODUCTION SHEET &middot; TRAVELER #{program.programSerialNo || program.programNumber}
           </span>
           <h3 className="text-sm font-black text-black mt-1 uppercase tracking-wide flex items-center gap-2">
-            <span>{activeCategory} Production Sheet Breakdown</span>
+            <span>{activeCategoryName} Production Sheet Breakdown</span>
             {isClientCodeVisible && program.clientCode && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-100 text-amber-950 text-[10px] font-mono font-black border border-amber-300 normal-case">
                 🔒 Client Code: {program.clientCode}
@@ -168,9 +172,10 @@ export function ProductionSheetView({
 
       {/* COMPONENT TAB SELECTOR */}
       <div className="flex items-center gap-2 pb-2 border-b border-black/10 overflow-x-auto">
-        {(['TOP', 'BOTTOM', 'DUPATTA'] as GarmentCategory[]).map((cat) => {
+        {componentCategories.map((cat) => {
           const isEnabled = components ? components[cat]?.enabled !== false : (cat === 'TOP');
           const isForwarded = forwardedComponents.includes(cat);
+          const categoryName = components?.[cat]?.styleName || (cat === 'OTHER' ? 'INPUT' : cat);
           return (
             <button
               key={cat}
@@ -184,7 +189,7 @@ export function ProductionSheetView({
                     : 'bg-slate-50 text-slate-400 border border-slate-200'
               }`}
             >
-              <span>{cat} Sheet</span>
+              <span>{categoryName} Sheet</span>
               {isForwarded && (
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" title="Forwarded Component" />
               )}
@@ -196,7 +201,7 @@ export function ProductionSheetView({
       {/* SUB-STYLES & INDIVIDUAL CONSUMPTION AVERAGE TABLE */}
       <div className="space-y-1">
         <div className="font-black text-xs uppercase tracking-wider text-slate-800">
-          {activeCategory} AVERAGE CONSUMPTION (METERS PER PIECE)
+          {activeCategoryName} AVERAGE CONSUMPTION (METERS PER PIECE)
         </div>
         <div className="overflow-x-auto">
           <table className="w-full border-collapse border-[1.5px] border-black text-center text-xs">
@@ -232,7 +237,7 @@ export function ProductionSheetView({
       <div className="space-y-1">
         <div className="flex items-center justify-between">
           <span className="font-black text-xs uppercase tracking-wider text-slate-800">
-            {activeCategory} PRODUCTION BREAKDOWN GRID
+            {activeCategoryName} PRODUCTION BREAKDOWN GRID
           </span>
           <span className="text-[11px] font-bold text-slate-500">
             {productionGrid.length} Active Colors Recorded
@@ -315,7 +320,7 @@ export function ProductionSheetView({
             <tfoot>
               <tr className="h-7 bg-slate-100 font-black border-t-2 border-black">
                 <td className="border-[1.5px] border-black p-1 text-left uppercase">
-                  {activeCategory} TOTALS:
+                  {activeCategoryName} TOTALS:
                 </td>
                 <td className="border-[1.5px] border-black p-1 font-black text-emerald-800 text-center">
                   {totalMtr > 0 ? totalMtr.toFixed(2) : '—'}

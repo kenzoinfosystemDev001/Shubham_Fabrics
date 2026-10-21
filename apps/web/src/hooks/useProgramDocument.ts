@@ -20,7 +20,7 @@ export function useProgramDocument(sourceProgram: any, enabled = true) {
       };
     }
 
-    if (sourceProgram.metadataJson !== undefined) {
+    if (sourceProgram.metadataJson !== undefined && sourceProgram.metadataJson !== null) {
       setLoading(false);
       return () => {
         active = false;

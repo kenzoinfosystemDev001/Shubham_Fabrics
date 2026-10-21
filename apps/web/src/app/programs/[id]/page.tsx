@@ -66,7 +66,7 @@ export default function ProgramDetailPage() {
   const [showWilcomPrintModal, setShowWilcomPrintModal] = useState(false);
   const [wilcomCategoryTab, setWilcomCategoryTab] = useState<GarmentCategory | 'ALL'>('TOP');
   const [currentUser, setCurrentUser] = useState<any>(null);
-  const [activeCategoryTab, setActiveCategoryTab] = useState<'TOP' | 'BOTTOM' | 'DUPATTA' | 'OTHER' | 'WILCOM'>('TOP');
+  const [activeCategoryTab, setActiveCategoryTab] = useState<GarmentCategory | 'WILCOM'>('TOP');
 
   useEffect(() => {
     setCurrentUser(getCurrentUser());
@@ -231,6 +231,9 @@ export default function ProgramDetailPage() {
   }
 
   const components = meta?.components || null;
+  const componentCategories: GarmentCategory[] = components
+    ? Object.keys(components)
+    : ['TOP', 'BOTTOM', 'DUPATTA', 'OTHER'];
   const forwardedComponents: string[] = Array.isArray(meta?.forwardedComponents) ? meta.forwardedComponents : ['TOP'];
   
   const rootWilcomPhoto = extractRootWilcomPhoto(program, meta);
@@ -818,9 +821,10 @@ export default function ProgramDetailPage() {
           <div className="bg-white border-2 border-black rounded-lg p-5 shadow-xs space-y-4 md:col-span-2 text-black">
             {/* COMPONENT & WILCOM TAB SELECTOR */}
             <div className="flex items-center gap-2 pb-2 border-b border-black/10 overflow-x-auto">
-              {(['TOP', 'BOTTOM', 'DUPATTA'] as GarmentCategory[]).map((cat) => {
+              {componentCategories.map((cat) => {
                 const isEnabled = components ? components[cat]?.enabled !== false : (cat === 'TOP');
                 const isForwarded = forwardedComponents.includes(cat);
+                const categoryName = components?.[cat]?.styleName || (cat === 'OTHER' ? 'INPUT' : cat);
                 return (
                   <button
                     key={cat}
@@ -834,7 +838,7 @@ export default function ProgramDetailPage() {
                           : 'bg-slate-50 text-slate-400 border border-slate-200'
                     }`}
                   >
-                    <span>{cat} Sheet</span>
+                    <span>{categoryName} Sheet</span>
                     {isForwarded && (
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" title="Forwarded Component" />
                     )}

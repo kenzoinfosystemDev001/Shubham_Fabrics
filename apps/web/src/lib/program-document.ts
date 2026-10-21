@@ -1,5 +1,5 @@
 export async function loadProgramDocument(program: any): Promise<any> {
-  if (!program || program.metadataJson !== undefined) {
+  if (!program || (program.metadataJson !== undefined && program.metadataJson !== null)) {
     return program;
   }
 

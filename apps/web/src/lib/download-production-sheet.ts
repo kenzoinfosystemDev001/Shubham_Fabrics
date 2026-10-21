@@ -117,7 +117,7 @@ export function getSwatchColorHex(name?: string, fallback?: string): string {
   return `hsl(${hue}, 40%, 55%)`;
 }
 
-export type GarmentCategory = 'TOP' | 'BOTTOM' | 'DUPATTA' | 'OTHER';
+export type GarmentCategory = 'TOP' | 'BOTTOM' | 'DUPATTA' | 'OTHER' | (string & {});
 
 function escapeHtmlText(value: string): string {
   return value.replace(/[&<>"']/g, (character) => {
@@ -298,7 +298,7 @@ export function extractSubStylesAndGrid(program: any, category: GarmentCategory 
   let clientCode = program.clientCode || '';
   let fabricName = program.fabricName || program.fabric || (program.fabrics?.[0]?.fabricName) || '';
   let fabricWidth = program.fabricWidth || (program.fabricWidthInches ? `${program.fabricWidthInches}"` : '') || '';
-  let allComponents: Record<GarmentCategory, ComponentSheetData> | undefined;
+  let allComponents: Record<string, ComponentSheetData> | undefined;
   let forwardedComponents: string[] = ['TOP'];
   let wilcomEntries: WilcomEntry[] = [];
   let isEnabled = true;
@@ -478,7 +478,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
     if (Array.isArray(meta?.forwardedComponents) && meta.forwardedComponents.length > 0) {
       targetCategories = meta.forwardedComponents;
     } else if (meta?.components) {
-      targetCategories = (['TOP', 'BOTTOM', 'DUPATTA', 'OTHER'] as GarmentCategory[]).filter(
+      targetCategories = Object.keys(meta.components).filter(
         (c) => meta.components[c]?.enabled !== false
       );
     }
@@ -489,9 +489,9 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
     targetCategories = [category];
   }
 
-  const categoryName = category === 'OTHER'
-    ? extractSubStylesAndGrid(program, 'OTHER').topName.trim() || 'INPUT'
-    : category;
+  const categoryName = category === 'TOP' || category === 'BOTTOM' || category === 'DUPATTA'
+    ? category
+    : extractSubStylesAndGrid(program, category).topName.trim() || 'INPUT';
   const categoryLabel = category === 'ALL' ? 'All Forwarded Components' : categoryName;
   const safeCategoryLabel = escapeHtmlText(categoryLabel);
   const safeFilenameCategory = categoryLabel.replace(/[^a-z0-9_-]+/gi, '_');
@@ -509,9 +509,9 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       fabricName,
       fabricWidth,
     } = extractSubStylesAndGrid(program, activeCategory);
-    const activeCategoryName = activeCategory === 'OTHER'
-      ? topName.trim() || 'INPUT'
-      : activeCategory;
+    const activeCategoryName = activeCategory === 'TOP' || activeCategory === 'BOTTOM' || activeCategory === 'DUPATTA'
+      ? activeCategory
+      : topName.trim() || 'INPUT';
     const safeActiveCategoryName = escapeHtmlText(activeCategoryName);
 
     // Generate 14 rows total (matching the paper sheet grid)
