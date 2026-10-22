@@ -102,8 +102,8 @@ function SteamPressIssueChallanContent() {
         fabricCode: 'GARMENT',
         colour: job.program?.fabricColor || 'Standard',
         quantity: availableGood > 0 ? String(availableGood) : '1',
-        uom: job.items[0]?.uom || 'PCS',
-        unitType: 'PCS',
+        uom: job.fabricUnit || job.items?.[0]?.uom || 'PCS',
+        unitType: job.items?.[0]?.uom || job.fabricUnit || 'PCS',
         remarks: 'Passed steam press quality audit.',
       },
     ]);
@@ -116,15 +116,15 @@ function SteamPressIssueChallanContent() {
   };
 
   const addItemRow = () => {
-    setItems([
-      ...items,
+    setItems((prev) => [
+      ...prev,
       {
         itemDescription: 'Steam Pressed Garment Secondary Bundle',
         fabricCode: 'GARMENT',
         colour: 'Standard',
         quantity: '1',
-        uom: 'PCS',
-        unitType: 'PCS',
+        uom: prev[0]?.uom || selectedJob?.fabricUnit || selectedJob?.items?.[0]?.uom || 'PCS',
+        unitType: prev[0]?.uom || selectedJob?.fabricUnit || selectedJob?.items?.[0]?.uom || 'PCS',
         remarks: 'Batch portion',
       },
     ]);
@@ -136,14 +136,29 @@ function SteamPressIssueChallanContent() {
   };
 
   const totalTransferPieces = items.reduce(
-    (sum, item) => sum + (parseInt(item.quantity) || 0),
+    (sum, item) => sum + (parseFloat(item.quantity) || 0),
     0
   );
+  const sourceQuantityUnit = selectedJob?.fabricUnit || selectedJob?.items?.[0]?.uom || 'PCS';
+  const totalTransferLabel = Object.entries(items.reduce<Record<string, number>>((totals, item) => {
+    const unit = item.uom || 'PCS';
+    totals[unit] = (totals[unit] || 0) + (Number(item.quantity) || 0);
+    return totals;
+  }, {})).map(([unit, quantity]) => `${quantity.toLocaleString()} ${unit}`).join(' + ');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedJob) {
       alert('Please select a source job.');
+      return;
+    }
+
+    if (new Set(items.map((item) => item.uom)).size > 1) {
+      alert('Use the same unit for every quantity in one challan.');
+      return;
+    }
+    if (items[0]?.uom !== sourceQuantityUnit) {
+      alert(`Quantity unit must match the source job (${sourceQuantityUnit}).`);
       return;
     }
 
@@ -166,6 +181,7 @@ function SteamPressIssueChallanContent() {
         programId: selectedJob.programId,
         toDepartment: targetDepartment,
         ...tracking,
+        fabricUnit: items[0]?.uom || tracking.fabricUnit,
         detectedFromDepartment: tracking.detectedFromDept,
         priority,
         remarks,
@@ -173,7 +189,7 @@ function SteamPressIssueChallanContent() {
           itemDescription: it.itemDescription,
           fabricCode: it.fabricCode,
           colour: it.colour,
-          quantity: parseInt(it.quantity) || 0,
+          quantity: parseFloat(it.quantity) || 0,
           uom: it.uom || 'PCS',
           unitType: it.unitType || 'PCS',
           remarks: it.remarks,
@@ -264,7 +280,7 @@ function SteamPressIssueChallanContent() {
               <div className="flex justify-between">
                 <span className="text-slate-400">Handover Quantity:</span>
                 <span className="font-mono font-bold text-white">
-                  {generatedChallan.items?.reduce((s: number, it: any) => s + (Number(it.quantity) || 0), 0) || totalTransferPieces} PCS
+                  {totalTransferLabel}
                 </span>
               </div>
             </div>
@@ -279,7 +295,7 @@ function SteamPressIssueChallanContent() {
                   fromDepartment: 'STEAM_PRESS',
                   toDepartment: generatedChallan.toDepartment || 'FINAL_CHECK',
                   totalQuantity: totalTransferPieces,
-                  uom: 'PCS',
+                  uom: items[0]?.uom || 'PCS',
                   date: new Date().toLocaleDateString('en-GB'),
                   mainStyle: selectedJob?.program?.styleCode || 'Standard',
                   programSerialNo: selectedJob?.program?.programNumber || 'N/A',
@@ -364,7 +380,7 @@ function SteamPressIssueChallanContent() {
                           </div>
                           <div className="flex justify-between text-[11px] pt-1 border-t border-slate-800/50 text-slate-400">
                             <span>Available:</span>
-                            <span className="font-mono font-bold text-emerald-400">{availableGood} PCS</span>
+                            <span className="font-mono font-bold text-emerald-400">{availableGood} {sourceQuantityUnit}</span>
                           </div>
                         </div>
                       );
@@ -453,15 +469,28 @@ function SteamPressIssueChallanContent() {
                         <div className="col-span-3">
                           <input
                             type="number"
-                            min="1"
+                            min="0.01"
+                            step="any"
                             value={it.quantity}
                             onChange={(e) => handleItemChange(idx, 'quantity', e.target.value)}
-                            placeholder="Qty (PCS)"
+                            placeholder={`Qty (${it.uom})`}
                             className="w-full px-2 py-1 bg-slate-900 border border-slate-700 rounded text-xs text-white font-mono font-bold"
                           />
                         </div>
                         <div className="col-span-2">
-                          <span className="text-slate-400 text-xs font-mono">{it.uom}</span>
+                          <label className="mb-1 block text-[10px] font-semibold text-slate-400">Unit *</label>
+                          <select
+                            value={it.uom}
+                            onChange={(e) => {
+                              handleItemChange(idx, 'uom', e.target.value);
+                              handleItemChange(idx, 'unitType', e.target.value);
+                            }}
+                            className="w-full px-2 py-1 bg-slate-900 border border-slate-700 rounded text-xs text-white"
+                            aria-label="Quantity unit"
+                          >
+                            <option value="MTR">MTR</option>
+                            <option value="PCS">PCS</option>
+                          </select>
                         </div>
                         <div className="col-span-1 flex justify-end">
                           {items.length > 1 && (
@@ -479,8 +508,8 @@ function SteamPressIssueChallanContent() {
                   </div>
 
                   <div className="flex items-center justify-between p-3 bg-cyan-950/20 border border-cyan-500/30 rounded-xl">
-                    <span className="text-xs text-slate-300">Total Handover Transfer Pieces:</span>
-                    <span className="font-mono text-base font-bold text-cyan-300">{totalTransferPieces} PCS</span>
+                    <span className="text-xs text-slate-300">Total Handover Quantity:</span>
+                    <span className="font-mono text-base font-bold text-cyan-300">{totalTransferLabel}</span>
                   </div>
                 </div>
 

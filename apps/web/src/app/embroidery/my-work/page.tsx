@@ -189,6 +189,10 @@ export default function EmbroideryMyWorkPage() {
       setFormError('Please add at least one item to the Challan.');
       return;
     }
+    if (new Set(items.map((item) => item.unit)).size > 1) {
+      setFormError('Use the same unit for every quantity in one challan.');
+      return;
+    }
 
     try {
       setSubmitting(true);
@@ -219,7 +223,7 @@ export default function EmbroideryMyWorkPage() {
         defectiveShelfLocation: tracking.defectiveShelfLocation,
         defectReason: tracking.defectReason,
         fabricOut: tracking.fabricOut,
-        fabricUnit: tracking.fabricUnit,
+        fabricUnit: items[0]?.unit || tracking.fabricUnit,
         detectedFromDepartment: tracking.detectedFromDept || 'QC1',
         detectedFromChallanId: tracking.detectedFromChallanId,
         remarks: `Embroidery Handover to Thread Cutting | Design: ${designNumber} | Sheet: ${serialNumber} | Incharge: ${inchargeName} | Accounting: In: ${tracking.fabricIn} ${tracking.fabricUnit}, Defective Cut: ${tracking.defectivePieces} ${tracking.fabricUnit} (To ${tracking.defectiveShelfLocation}), Leftover Out: ${tracking.fabricOut} ${tracking.fabricUnit} (To Thread Cutting)`,

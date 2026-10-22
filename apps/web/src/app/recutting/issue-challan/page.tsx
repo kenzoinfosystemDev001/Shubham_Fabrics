@@ -102,8 +102,8 @@ function RecuttingIssueChallanContent() {
         fabricCode: 'PANEL',
         colour: job.program?.fabricColor || 'Standard',
         quantity: String(goodQty),
-        uom: 'PCS',
-        unitType: 'PCS',
+        uom: job.fabricUnit || job.items?.[0]?.uom || 'PCS',
+        unitType: job.fabricUnit || job.items?.[0]?.uom || 'PCS',
         remarks: 'Passed pre-stitching verification. Ready for stitching assembly.',
       },
     ]);
@@ -117,8 +117,8 @@ function RecuttingIssueChallanContent() {
         fabricCode: 'PANEL',
         colour: selectedJob?.program?.fabricColor || 'Standard',
         quantity: '',
-        uom: 'PCS',
-        unitType: 'PCS',
+        uom: prev[0]?.uom || selectedJob?.fabricUnit || selectedJob?.items?.[0]?.uom || 'PCS',
+        unitType: prev[0]?.uom || selectedJob?.fabricUnit || selectedJob?.items?.[0]?.uom || 'PCS',
         remarks: 'Passed pre-stitching check.',
       },
     ]);
@@ -138,12 +138,27 @@ function RecuttingIssueChallanContent() {
   };
 
   const totalQuantityToIssue = items.reduce((sum, it) => sum + (Number(it.quantity) || 0), 0);
+  const sourceQuantityUnit = selectedJob?.fabricUnit || selectedJob?.items?.[0]?.uom || 'PCS';
+  const totalQuantityLabel = Object.entries(items.reduce<Record<string, number>>((totals, item) => {
+    const unit = item.uom || 'PCS';
+    totals[unit] = (totals[unit] || 0) + (Number(item.quantity) || 0);
+    return totals;
+  }, {})).map(([unit, quantity]) => `${quantity.toLocaleString()} ${unit}`).join(' + ');
   const maxGoodAvailable = selectedJob ? (selectedJob.fabricOut ?? selectedJob.fabricIn ?? 0) : 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedJob) {
       alert('Please select a source Recutting Challan / Job.');
+      return;
+    }
+
+    if (new Set(items.map((item) => item.uom)).size > 1) {
+      alert('Use the same unit for every quantity in one challan.');
+      return;
+    }
+    if (items[0]?.uom !== sourceQuantityUnit) {
+      alert(`Quantity unit must match the source job (${sourceQuantityUnit}).`);
       return;
     }
 
@@ -159,6 +174,7 @@ function RecuttingIssueChallanContent() {
         parentChallanId: selectedJob.id,
         programId: selectedJob.programId,
         ...tracking,
+        fabricUnit: items[0]?.uom || tracking.fabricUnit,
         detectedFromDepartment: tracking.detectedFromDept,
         priority,
         remarks,
@@ -298,7 +314,7 @@ function RecuttingIssueChallanContent() {
                     const good = j.fabricOut ?? j.fabricIn ?? 0;
                     return (
                       <option key={j.id} value={j.id}>
-                        {j.challanNumber} — {j.program?.programNumber || 'No Program'} ({good} PCS verified) [{j.status}]
+                        {j.challanNumber} — {j.program?.programNumber || 'No Program'} ({good} {j.fabricUnit || j.items?.[0]?.uom || 'PCS'} verified) [{j.status}]
                       </option>
                     );
                   })}
@@ -323,7 +339,7 @@ function RecuttingIssueChallanContent() {
                 </div>
                 <div>
                   <span className="text-slate-400 block text-[10px]">Verified Good Available</span>
-                  <strong className="text-emerald-700 font-black">{maxGoodAvailable} PCS</strong>
+                  <strong className="text-emerald-700 font-black">{maxGoodAvailable} {sourceQuantityUnit}</strong>
                 </div>
               </div>
             )}
@@ -444,7 +460,8 @@ function RecuttingIssueChallanContent() {
                       </label>
                       <input
                         type="number"
-                        min="1"
+                        min="0.01"
+                        step="any"
                         value={item.quantity}
                         onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
                         required
@@ -454,14 +471,19 @@ function RecuttingIssueChallanContent() {
 
                     <div className="sm:col-span-2">
                       <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                        UOM
+                        Unit *
                       </label>
-                      <input
-                        type="text"
+                      <select
                         value={item.uom}
-                        onChange={(e) => handleItemChange(index, 'uom', e.target.value)}
+                        onChange={(e) => {
+                          handleItemChange(index, 'uom', e.target.value);
+                          handleItemChange(index, 'unitType', e.target.value);
+                        }}
                         className="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg bg-white"
-                      />
+                      >
+                        <option value="MTR">MTR</option>
+                        <option value="PCS">PCS</option>
+                      </select>
                     </div>
 
                     <div className="sm:col-span-2">
@@ -485,13 +507,13 @@ function RecuttingIssueChallanContent() {
               <div>
                 <span className="text-slate-500 font-medium">Total Quantity to Dispatch: </span>
                 <span className="font-mono font-black text-slate-900 text-sm">
-                  {totalQuantityToIssue.toLocaleString()} PCS
+                  {totalQuantityLabel}
                 </span>
               </div>
               <div>
                 <span className="text-slate-500 font-medium">Available Good: </span>
                 <span className="font-mono font-bold text-emerald-700 text-sm">
-                  {maxGoodAvailable.toLocaleString()} PCS
+                  {maxGoodAvailable.toLocaleString()} {sourceQuantityUnit}
                 </span>
               </div>
             </div>
@@ -558,7 +580,7 @@ function RecuttingIssueChallanContent() {
               <div className="flex justify-between">
                 <span className="text-slate-500">Handover Quantity:</span>
                 <span className="font-black text-emerald-700">
-                  {generatedChallan.totalQuantity || totalQuantityToIssue} PCS
+                  {generatedChallan.totalQuantity || totalQuantityToIssue} {items[0]?.uom || 'PCS'}
                 </span>
               </div>
             </div>
@@ -573,7 +595,7 @@ function RecuttingIssueChallanContent() {
                   fromDepartment: 'RECUTTING',
                   toDepartment: 'STITCHING',
                   totalQuantity: generatedChallan.totalQuantity || totalQuantityToIssue,
-                  uom: 'PCS',
+                  uom: items[0]?.uom || 'PCS',
                   date: new Date().toLocaleDateString(),
                   clientName: selectedJob?.program?.clientName || 'N/A',
                 }}

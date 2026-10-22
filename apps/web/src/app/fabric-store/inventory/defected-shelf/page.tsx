@@ -132,15 +132,14 @@ export default function DefectedShelfPage() {
       const challanRes = await fetch('/api/challans?toDepartment=STORE');
       const challans = await challanRes.json();
       if (Array.isArray(challans)) {
-        const returns = challans.filter(
-          (c) =>
-            c.challanType === 'DEFECT_RETURN' ||
-            c.challanType === 'DEFECTIVE_RETURN' ||
-            c.fromDepartment === 'THREAD_CUTTING' ||
-            c.fromDepartment === 'QC2' ||
-            c.fromDepartment === 'QC1' ||
-            (c.remarks && c.remarks.toLowerCase().includes('defective'))
-        );
+        const returns = challans.filter((c) => {
+          const shelf = (c.defectiveShelfLocation || '').toUpperCase();
+          return (
+            ['DEFECT_RETURN', 'DEFECTIVE_RETURN'].includes(c.challanType) ||
+            (Number(c.defectivePieces) > 0 &&
+              (shelf.includes('DEF-SHELF-STORE') || c.toDepartment?.toUpperCase() === 'STORE'))
+          );
+        });
         setDefectReturns(returns);
       }
     } catch (err: any) {
@@ -178,6 +177,27 @@ export default function DefectedShelfPage() {
       return matchDept && matchSearch;
     });
   }, [allChallans, selectedDeptFilter, search]);
+
+  const filteredDefectReturns = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return defectReturns;
+    return defectReturns.filter((challan) => [
+      challan.challanNumber,
+      challan.fromDepartment,
+      challan.program?.mainStyle,
+      challan.program?.clientName,
+      challan.program?.programSerialNo,
+      challan.program?.programNumber,
+      challan.defectReason,
+      challan.remarks,
+      challan.defectiveShelfLocation,
+      challan.createdBy?.fullName,
+      challan.createdBy?.username,
+      challan.program?.fabricName,
+      challan.program?.fabricColor,
+      ...(challan.items || []).flatMap((item: any) => [item.itemDescription, item.fabricCode, item.colour, item.shade]),
+    ].some((value) => String(value || '').toLowerCase().includes(query)));
+  }, [defectReturns, search]);
 
   // Filter Rolls
   const filteredRolls = useMemo(() => {
@@ -402,8 +422,12 @@ export default function DefectedShelfPage() {
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             {DEPARTMENT_SHELVES.map((shelf) => {
-              const count = deptStats[shelf.deptKey]?.totalPieces || 0;
-              const incidents = deptStats[shelf.deptKey]?.totalIncidents || 0;
+              const shelfStats = deptStats[shelf.deptKey];
+              const quantitiesByUnit = shelfStats?.quantitiesByUnit || {};
+              const quantityLabel = Object.entries(quantitiesByUnit)
+                .map(([unit, quantity]) => `${quantity} ${unit}`)
+                .join(' · ') || '0 PCS';
+              const incidents = shelfStats?.totalIncidents || 0;
               const isSelected = selectedDeptFilter === shelf.deptKey;
 
               return (
@@ -427,9 +451,7 @@ export default function DefectedShelfPage() {
                     {shelf.name.replace(' Defective Shelf', '')}
                   </div>
                   <div className="mt-2 flex items-baseline justify-between">
-                    <span className="text-lg font-mono font-bold">
-                      {count} <span className="text-[10px] font-normal">PCS</span>
-                    </span>
+                    <span className="text-sm font-mono font-bold">{quantityLabel}</span>
                     <span className="text-[9px] opacity-70">
                       {incidents} logs
                     </span>
@@ -744,6 +766,8 @@ export default function DefectedShelfPage() {
                 </div>
                 <span className="text-xs text-slate-500">
                   Showing: <strong className="text-rose-900">{filteredRolls.length}</strong> rolls
+                  {' · '}
+                  <strong className="text-amber-800">{defectReturns.length}</strong> returned challans
                 </span>
               </div>
 
@@ -854,6 +878,76 @@ export default function DefectedShelfPage() {
                   </table>
                 </div>
               )}
+
+              <div className="border-t border-slate-200">
+                <div className="p-4 border-b border-slate-200/80">
+                  <h3 className="text-sm font-bold text-slate-900">Rejected Material Assigned to Store Defective Shelf</h3>
+                </div>
+                {filteredDefectReturns.length === 0 ? (
+                  <div className="p-8 text-center text-xs text-slate-500">
+                    {search ? 'No matching rejections.' : 'No rejected material assigned to the Store shelf.'}
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-amber-50/70 text-slate-600 font-semibold border-b border-slate-200">
+                        <tr>
+                          <th className="py-2.5 px-4">Return Challan</th>
+                          <th className="py-2.5 px-4">Source Department</th>
+                          <th className="py-2.5 px-4">Fabric / Style</th>
+                          <th className="py-2.5 px-4 text-right">Rejected Quantity</th>
+                          <th className="py-2.5 px-4">Reason</th>
+                          <th className="py-2.5 px-4">Reported By</th>
+                          <th className="py-2.5 px-4">Date</th>
+                          <th className="py-2.5 px-4">Target Shelf</th>
+                          <th className="py-2.5 px-4">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {filteredDefectReturns.map((challan: any) => {
+                          const quantity = Number(challan.defectivePieces) ||
+                            (challan.items || []).reduce(
+                              (sum: number, item: any) => sum + (Number(item.quantity) || 0),
+                              0
+                            );
+                          const unit = challan.fabricUnit || challan.items?.[0]?.uom || 'PCS';
+
+                          return (
+                            <tr key={challan.id} className="hover:bg-amber-50/40">
+                              <td className="py-3 px-4 font-mono font-bold text-slate-900">
+                                {challan.challanNumber}
+                              </td>
+                              <td className="py-3 px-4">{challan.fromDepartment}</td>
+                              <td className="py-3 px-4">
+                                {challan.items?.[0]?.itemDescription || challan.program?.fabricName || challan.program?.mainStyle || challan.program?.clientName || 'General Style'}
+                                <span className="block text-[10px] text-slate-500">
+                                  {[challan.program?.fabricColor || challan.items?.[0]?.colour, challan.program?.programSerialNo || challan.program?.programNumber].filter(Boolean).join(' · ') || '-'}
+                                </span>
+                              </td>
+                              <td className="py-3 px-4 text-right font-mono font-bold text-rose-700">
+                                {quantity} {unit}
+                              </td>
+                              <td className="py-3 px-4 max-w-56">{challan.defectReason || challan.remarks || '-'}</td>
+                              <td className="py-3 px-4">{challan.createdBy?.fullName || '-'}</td>
+                              <td className="py-3 px-4 whitespace-nowrap">
+                                {challan.createdAt ? new Date(challan.createdAt).toLocaleDateString() : '-'}
+                              </td>
+                              <td className="py-3 px-4 font-mono text-[10px]">
+                                {challan.defectiveShelfLocation || 'DEF-SHELF-STORE'}
+                              </td>
+                              <td className="py-3 px-4">
+                                <span className="inline-flex px-2 py-0.5 rounded border border-amber-200 bg-amber-50 text-amber-800 text-[10px] font-bold">
+                                  {challan.status}
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
             </div>
           </>
         )}

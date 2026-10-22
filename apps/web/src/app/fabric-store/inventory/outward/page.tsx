@@ -34,6 +34,8 @@ interface OutwardItem {
   byOrderName: string;
   remarks: string;
   destination: string;
+  sourceDepartment?: string;
+  issuedBy?: string | null;
   fabricType: 'UNDYED' | 'DYED' | 'KORA' | string;
   status: string;
   verifiedInwardDetails?: string;
@@ -388,6 +390,9 @@ export default function OutwardStockPage() {
                   <th className="border-r-[1.5px] border-black px-3 py-2 font-black w-32">
                     CHALLAN NO.
                   </th>
+                  <th className="border-r-[1.5px] border-black px-3 py-2 font-black w-36">
+                    ROUTE
+                  </th>
                   <th className="border-r-[1.5px] border-black px-3 py-2 font-black w-28">
                     DESIGN NO
                   </th>
@@ -407,7 +412,7 @@ export default function OutwardStockPage() {
                     ISSUE PCS QTY
                   </th>
                   <th className="border-r-[1.5px] border-black px-3 py-2 font-black w-36">
-                    BY ORDER NAME
+                    ORDER / ISSUED BY
                   </th>
                   <th className="border-r-[1.5px] border-black px-3 py-2 font-black w-56 bg-emerald-50/50">
                     VERIFIED INWARD DETAILS
@@ -420,7 +425,7 @@ export default function OutwardStockPage() {
               <tbody className="divide-y divide-slate-200">
                 {items.length === 0 ? (
                   <tr>
-                    <td colSpan={12} className="px-4 py-12 text-center text-slate-500 space-y-2">
+                    <td colSpan={13} className="px-4 py-12 text-center text-slate-500 space-y-2">
                       <Send className="w-8 h-8 mx-auto text-slate-300" />
                       <div className="text-sm font-bold text-slate-700">No outward records found</div>
                       <p className="text-xs text-slate-400">
@@ -447,6 +452,11 @@ export default function OutwardStockPage() {
                           ) : (
                             item.challanNumber
                           )}
+                        </td>
+                        <td className="border-r-[1.5px] border-black px-3 py-2 text-slate-700">
+                          <span className="font-semibold">{item.sourceDepartment || 'STORE'}</span>
+                          <span className="text-slate-400"> {'→'} </span>
+                          <span>{item.destination}</span>
                         </td>
                         <td className="border-r-[1.5px] border-black px-3 py-2 font-mono font-bold text-slate-900">
                           {item.designNumber}
@@ -484,6 +494,7 @@ export default function OutwardStockPage() {
                           <div className="truncate max-w-[140px]" title={item.byOrderName}>
                             {item.byOrderName}
                           </div>
+                          {item.issuedBy && <span className="block text-[10px] font-normal text-slate-500">Issued by {item.issuedBy}</span>}
                         </td>
                         <td className="border-r-[1.5px] border-black px-3 py-2 text-slate-800 text-xs bg-emerald-50/30">
                           <div className="flex items-center gap-1.5 font-semibold text-emerald-950">

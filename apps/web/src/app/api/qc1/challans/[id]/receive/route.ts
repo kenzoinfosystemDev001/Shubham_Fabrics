@@ -114,7 +114,7 @@ export async function POST(
       });
 
       return ch;
-    });
+    }, { maxWait: 15000, timeout: 30000 });
 
     return NextResponse.json({
       message: `Challan ${updatedChallan.challanNumber} received successfully at QC1.`,

@@ -45,6 +45,11 @@ export default function QCWashingIssueChallanPage() {
     },
   ]);
   const [tracking, setTracking] = useState(() => createDepartmentInOutTracking('QC3'));
+  const totalQuantityLabel = Object.entries(items.reduce<Record<string, number>>((totals, item) => {
+    const unit = item.uom || 'PCS';
+    totals[unit] = (totals[unit] || 0) + (Number(item.quantity) || 0);
+    return totals;
+  }, {})).map(([unit, quantity]) => `${quantity.toLocaleString()} ${unit}`).join(' + ');
 
   useEffect(() => {
     const init = async () => {
@@ -84,8 +89,8 @@ export default function QCWashingIssueChallanPage() {
         fabricCode: 'PIECE',
         colour: 'Standard',
         quantity: '',
-        uom: 'PCS',
-        unitType: 'PCS',
+        uom: prev[0]?.uom || 'PCS',
+        unitType: prev[0]?.uom || 'PCS',
         remarks: 'QC Washing approved.',
       },
     ]);
@@ -110,6 +115,10 @@ export default function QCWashingIssueChallanPage() {
       alert('Please select a Production Program.');
       return;
     }
+    if (new Set(items.map((item) => item.uom)).size > 1) {
+      alert('Use the same unit for every quantity in one challan.');
+      return;
+    }
 
     try {
       setLoading(true);
@@ -121,6 +130,7 @@ export default function QCWashingIssueChallanPage() {
         fromDepartment: 'QC3',
         toDepartment,
         ...tracking,
+        fabricUnit: items[0]?.uom || tracking.fabricUnit,
         detectedFromDepartment: tracking.detectedFromDept,
         priority,
         remarks,
@@ -313,10 +323,11 @@ export default function QCWashingIssueChallanPage() {
                       />
                     </div>
                     <div>
-                      <label className="text-[11px] font-bold text-slate-600 block mb-1">Quantity (PCS) *</label>
+                      <label className="text-[11px] font-bold text-slate-600 block mb-1">Quantity *</label>
                       <input
                         type="number"
-                        min="1"
+                        min="0.01"
+                        step="any"
                         required
                         placeholder="e.g. 500"
                         value={item.quantity}
@@ -325,13 +336,19 @@ export default function QCWashingIssueChallanPage() {
                       />
                     </div>
                     <div>
-                      <label className="text-[11px] font-bold text-slate-600 block mb-1">UOM</label>
-                      <input
-                        type="text"
-                        readOnly
+                      <label className="text-[11px] font-bold text-slate-600 block mb-1">Unit *</label>
+                      <select
                         value={item.uom}
-                        className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs bg-slate-100 font-mono"
-                      />
+                        onChange={(e) => {
+                          handleItemChange(idx, 'uom', e.target.value);
+                          handleItemChange(idx, 'unitType', e.target.value);
+                          setTracking((prev) => ({ ...prev, fabricUnit: e.target.value as 'MTR' | 'PCS' }));
+                        }}
+                        className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs bg-white font-mono"
+                      >
+                        <option value="MTR">MTR</option>
+                        <option value="PCS">PCS</option>
+                      </select>
                     </div>
                   </div>
                 </div>
@@ -399,7 +416,7 @@ export default function QCWashingIssueChallanPage() {
                 <div className="flex justify-between">
                   <span className="text-slate-500">Total Quantity:</span>
                   <span className="font-bold font-mono text-slate-900">
-                    {generatedChallan.items?.reduce((s: number, it: any) => s + (Number(it.quantity) || 0), 0) || 0} PCS
+                    {totalQuantityLabel}
                   </span>
                 </div>
               </div>

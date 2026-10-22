@@ -57,6 +57,7 @@ interface StockSummary {
     itemCount: number;
   };
   defectiveStockPcs: number;
+  defectiveStockByUnit: Record<string, number>;
 }
 
 interface StockItem {
@@ -73,18 +74,32 @@ interface StockItem {
   status: 'IN_STOCK' | 'OUT_OF_STOCK';
 }
 
+interface OutwardHistoryItem {
+  id: string;
+  date: string;
+  challanNumber?: string;
+  sourceDepartment?: string;
+  destination?: string;
+  itemName: string;
+  quantity: number;
+  unit: string;
+  fabricType: string;
+}
+
 function TotalStockContent() {
   const searchParams = useSearchParams();
   const initialType = searchParams?.get('type')?.toUpperCase();
 
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<StockItem[]>([]);
+  const [outwardHistory, setOutwardHistory] = useState<OutwardHistoryItem[]>([]);
   const [summary, setSummary] = useState<StockSummary>({
     overall: { totalInwardMeters: 0, totalOutwardMeters: 0, availableBalanceMeters: 0, totalInwardPcs: 0, totalOutwardPcs: 0, availableBalancePcs: 0, itemCount: 0 },
     undyed: { totalInwardMeters: 0, totalOutwardMeters: 0, availableBalanceMeters: 0, totalInwardPcs: 0, totalOutwardPcs: 0, availableBalancePcs: 0, itemCount: 0 },
     kora: { totalInwardMeters: 0, totalOutwardMeters: 0, availableBalanceMeters: 0, totalInwardPcs: 0, totalOutwardPcs: 0, availableBalancePcs: 0, itemCount: 0 },
     dyed: { totalInwardMeters: 0, totalOutwardMeters: 0, availableBalanceMeters: 0, totalInwardPcs: 0, totalOutwardPcs: 0, availableBalancePcs: 0, itemCount: 0 },
     defectiveStockPcs: 0,
+    defectiveStockByUnit: {},
   });
 
   const [typeFilter, setTypeFilter] = useState<'ALL' | 'UNDYED' | 'DYED'>(
@@ -107,6 +122,7 @@ function TotalStockContent() {
       const json = await res.json();
       if (res.ok) {
         setItems(json.data || []);
+        setOutwardHistory(json.outwardHistory || []);
         if (json.summary) setSummary(json.summary);
       }
     } catch (err) {
@@ -155,6 +171,9 @@ function TotalStockContent() {
     availableBalancePcs: 0,
     itemCount: 0,
   };
+  const defectiveStockByUnit = Object.keys(summary.defectiveStockByUnit || {}).length > 0
+    ? summary.defectiveStockByUnit
+    : { PCS: summary.defectiveStockPcs };
 
   return (
     <div className="min-h-screen bg-[#F0FAF9] pb-16">
@@ -289,8 +308,13 @@ function TotalStockContent() {
               <ExternalLink className="w-3.5 h-3.5 text-rose-400 group-hover:text-rose-700 transition" />
             </div>
             <div className="text-2xl font-black text-rose-900 mt-1">
-              {summary.defectiveStockPcs.toLocaleString('en-IN')}
-              <span className="text-xs font-semibold text-rose-700 ml-1">PCS</span>
+              {Object.entries(defectiveStockByUnit)
+                .map(([unit, quantity]) => (
+                  <span key={unit} className="mr-2">
+                    {quantity.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                    <span className="text-xs font-semibold text-rose-700 ml-1">{unit}</span>
+                  </span>
+                ))}
             </div>
             <span className="text-[10px] text-rose-700/80 mt-0.5 block">
               DEF-SHELF-STORE Quarantined
@@ -490,6 +514,41 @@ function TotalStockContent() {
             </table>
           </div>
         </div>
+
+        <section className="bg-white rounded-xl border-[1.5px] border-black shadow-xs overflow-hidden">
+          <div className="px-5 py-3 border-b-[1.5px] border-black bg-slate-50 flex items-center justify-between">
+            <h2 className="font-black text-xs uppercase tracking-wider text-slate-900">Fabric Outward History</h2>
+            <span className="text-[11px] font-semibold text-slate-500">{outwardHistory.length} issued entries</span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-left text-xs">
+              <thead>
+                <tr className="bg-slate-100 border-b border-slate-300 text-slate-700">
+                  <th className="px-4 py-2 font-bold">DATE</th>
+                  <th className="px-4 py-2 font-bold">CHALLAN</th>
+                  <th className="px-4 py-2 font-bold">FABRIC</th>
+                  <th className="px-4 py-2 font-bold">FROM</th>
+                  <th className="px-4 py-2 font-bold">TO</th>
+                  <th className="px-4 py-2 font-bold text-right">QUANTITY</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200">
+                {outwardHistory.length === 0 ? (
+                  <tr><td colSpan={6} className="px-4 py-8 text-center text-slate-500">No outward challans found</td></tr>
+                ) : outwardHistory.map((entry) => (
+                  <tr key={entry.id} className="hover:bg-slate-50">
+                    <td className="px-4 py-2 whitespace-nowrap">{formatDate(entry.date)}</td>
+                    <td className="px-4 py-2 font-semibold">{entry.challanNumber || '—'}</td>
+                    <td className="px-4 py-2">{entry.itemName}</td>
+                    <td className="px-4 py-2">{entry.sourceDepartment || '—'}</td>
+                    <td className="px-4 py-2">{entry.destination || '—'}</td>
+                    <td className="px-4 py-2 text-right font-bold">{Number(entry.quantity).toLocaleString('en-IN', { maximumFractionDigits: 2 })} {entry.unit}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
       </main>
     </div>
   );
