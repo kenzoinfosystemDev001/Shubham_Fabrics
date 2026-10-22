@@ -144,6 +144,16 @@ const DEPARTMENTS = [
     hoverClass: 'hover:bg-cyan-500/10 hover:text-cyan-300',
     activeBg: 'bg-cyan-500/15 text-cyan-300 font-bold',
   },
+  {
+    name: 'Final QC Department',
+    code: 'FINAL_CHECK',
+    href: '/final-check',
+    color: 'emerald',
+    badge: 'FQC',
+    dotClass: 'bg-emerald-400',
+    hoverClass: 'hover:bg-emerald-500/10 hover:text-emerald-300',
+    activeBg: 'bg-emerald-500/15 text-emerald-300 font-bold',
+  },
 ];
 
 export function DepartmentSwitcher({
