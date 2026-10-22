@@ -19,6 +19,7 @@ import {
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import BarcodeStickerCard from '@/components/BarcodeStickerCard';
+import { ColorFabricMeasurementTable, createDepartmentInOutTracking } from '@/components/ColorFabricMeasurementTable';
 
 export default function QCWashingIssueChallanPage() {
   const router = useRouter();
@@ -43,6 +44,12 @@ export default function QCWashingIssueChallanPage() {
       remarks: 'QC Washing approved. Ready for embroidery precision cutting.',
     },
   ]);
+  const [tracking, setTracking] = useState(() => createDepartmentInOutTracking('QC3'));
+  const totalQuantityLabel = Object.entries(items.reduce<Record<string, number>>((totals, item) => {
+    const unit = item.uom || 'PCS';
+    totals[unit] = (totals[unit] || 0) + (Number(item.quantity) || 0);
+    return totals;
+  }, {})).map(([unit, quantity]) => `${quantity.toLocaleString()} ${unit}`).join(' + ');
 
   useEffect(() => {
     const init = async () => {
@@ -59,7 +66,13 @@ export default function QCWashingIssueChallanPage() {
           const progJson = await progRes.json();
           const list = Array.isArray(progJson) ? progJson : progJson.data || [];
           setPrograms(list);
-          if (list.length > 0) setSelectedProgram(list[0]);
+          if (list.length > 0) {
+            setSelectedProgram(list[0]);
+            setTracking(createDepartmentInOutTracking('QC3', {
+              fabricIn: Number(list[0].targetQuantity) || 0,
+              fabricUnit: 'PCS',
+            }));
+          }
         }
       } catch (err) {
         console.error(err);
@@ -76,8 +89,8 @@ export default function QCWashingIssueChallanPage() {
         fabricCode: 'PIECE',
         colour: 'Standard',
         quantity: '',
-        uom: 'PCS',
-        unitType: 'PCS',
+        uom: prev[0]?.uom || 'PCS',
+        unitType: prev[0]?.uom || 'PCS',
         remarks: 'QC Washing approved.',
       },
     ]);
@@ -102,6 +115,10 @@ export default function QCWashingIssueChallanPage() {
       alert('Please select a Production Program.');
       return;
     }
+    if (new Set(items.map((item) => item.uom)).size > 1) {
+      alert('Use the same unit for every quantity in one challan.');
+      return;
+    }
 
     try {
       setLoading(true);
@@ -112,6 +129,9 @@ export default function QCWashingIssueChallanPage() {
         programId: selectedProgram.id,
         fromDepartment: 'QC3',
         toDepartment,
+        ...tracking,
+        fabricUnit: items[0]?.uom || tracking.fabricUnit,
+        detectedFromDepartment: tracking.detectedFromDept,
         priority,
         remarks,
         items: items.map((it) => ({
@@ -231,6 +251,10 @@ export default function QCWashingIssueChallanPage() {
               onChange={(e) => {
                 const p = programs.find((x) => x.id === e.target.value);
                 setSelectedProgram(p || null);
+                setTracking(createDepartmentInOutTracking('QC3', {
+                  fabricIn: Number(p?.targetQuantity) || 0,
+                  fabricUnit: 'PCS',
+                }));
               }}
               className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
             >
@@ -241,6 +265,20 @@ export default function QCWashingIssueChallanPage() {
               ))}
             </select>
           </div>
+
+          <ColorFabricMeasurementTable
+            items={[]}
+            onChange={() => {}}
+            currentDepartment="QC3"
+            programId={selectedProgram?.id}
+            tracking={tracking}
+            onTrackingChange={setTracking}
+            trackingOnly
+            showInOutController
+            onSyncToItems={(fabricOut, fabricUnit) => {
+              setItems((prev) => prev.map((item, index) => index === 0 ? { ...item, quantity: String(fabricOut), uom: fabricUnit, unitType: fabricUnit } : item));
+            }}
+          />
 
           {/* 3. Items Table */}
           <div className="space-y-3">
@@ -285,10 +323,11 @@ export default function QCWashingIssueChallanPage() {
                       />
                     </div>
                     <div>
-                      <label className="text-[11px] font-bold text-slate-600 block mb-1">Quantity (PCS) *</label>
+                      <label className="text-[11px] font-bold text-slate-600 block mb-1">Quantity *</label>
                       <input
                         type="number"
-                        min="1"
+                        min="0.01"
+                        step="any"
                         required
                         placeholder="e.g. 500"
                         value={item.quantity}
@@ -297,13 +336,19 @@ export default function QCWashingIssueChallanPage() {
                       />
                     </div>
                     <div>
-                      <label className="text-[11px] font-bold text-slate-600 block mb-1">UOM</label>
-                      <input
-                        type="text"
-                        readOnly
+                      <label className="text-[11px] font-bold text-slate-600 block mb-1">Unit *</label>
+                      <select
                         value={item.uom}
-                        className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs bg-slate-100 font-mono"
-                      />
+                        onChange={(e) => {
+                          handleItemChange(idx, 'uom', e.target.value);
+                          handleItemChange(idx, 'unitType', e.target.value);
+                          setTracking((prev) => ({ ...prev, fabricUnit: e.target.value as 'MTR' | 'PCS' }));
+                        }}
+                        className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs bg-white font-mono"
+                      >
+                        <option value="MTR">MTR</option>
+                        <option value="PCS">PCS</option>
+                      </select>
                     </div>
                   </div>
                 </div>
@@ -371,7 +416,7 @@ export default function QCWashingIssueChallanPage() {
                 <div className="flex justify-between">
                   <span className="text-slate-500">Total Quantity:</span>
                   <span className="font-bold font-mono text-slate-900">
-                    {generatedChallan.items?.reduce((s: number, it: any) => s + (Number(it.quantity) || 0), 0) || 0} PCS
+                    {totalQuantityLabel}
                   </span>
                 </div>
               </div>

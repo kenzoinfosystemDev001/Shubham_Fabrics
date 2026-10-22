@@ -27,14 +27,7 @@ import {
   X
 } from 'lucide-react';
 import { api } from '@/lib/api';
-import {
-  downloadProductionSheetHtml,
-  printProductionSheet,
-} from '@/lib/download-production-sheet';
-import {
-  downloadChallanHtml,
-  printChallan,
-} from '@/lib/download-challan';
+import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
 
 export default function ProductionHistoryPage() {
   const router = useRouter();
@@ -448,28 +441,10 @@ export default function ProductionHistoryPage() {
                           />
                         </button>
 
-                        {/* PRINT */}
-                        <button
-                          type="button"
-                          onClick={() => printProductionSheet(prog)}
-                          title="Print Production Sheet (A4)"
-                          className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded-md border border-slate-200 bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-900 transition"
-                        >
-                          <Printer className="w-3.5 h-3.5 text-slate-500" />
-                          <span>Print</span>
-                        </button>
-
-                        {/* DOWNLOAD */}
-                        <button
-                          type="button"
-                          onClick={() => downloadProductionSheetHtml(prog)}
-                          title="Download Sheet (.html / PDF)"
-                          className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded-md border border-slate-200 bg-white hover:bg-emerald-50 text-slate-700 hover:text-emerald-900 transition"
-                        >
-                          <Download className="w-3.5 h-3.5 text-slate-500" />
-                          <span>Download</span>
-                        </button>
-
+                        <DocumentActionButtons
+                          program={prog}
+                          size="xs"
+                        />
                         {/* ISSUE CHALLAN (IF READY) */}
                         {isReady && (
                           <Link
@@ -480,14 +455,12 @@ export default function ProductionHistoryPage() {
                             <span>Issue Challan</span>
                           </Link>
                         )}
-
-                        {/* VIEW FULL DETAILS */}
                         <Link
                           href={`/programs/${prog.id}`}
                           className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-md bg-slate-800 hover:bg-slate-900 text-white shadow-xs transition"
                         >
                           <Eye className="w-3.5 h-3.5" />
-                          <span>View Sheet</span>
+                          <span>Details</span>
                         </Link>
                       </div>
                     </div>
@@ -550,34 +523,12 @@ export default function ProductionHistoryPage() {
                                   <span>Date:</span>
                                   <span>{c.challanDate ? new Date(c.challanDate).toLocaleDateString() : '—'}</span>
                                 </div>
-                                <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-1 flex-wrap">
-                                  <div className="flex items-center gap-1">
-                                    <button
-                                      type="button"
-                                      onClick={() => downloadChallanHtml(c)}
-                                      className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-slate-700 hover:text-emerald-900 bg-slate-100 hover:bg-emerald-50 px-2 py-1 rounded transition cursor-pointer"
-                                      title="Download Challan as standalone HTML/PDF"
-                                    >
-                                      <Download className="w-3 h-3 text-emerald-600" />
-                                      <span>Download</span>
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => printChallan(c)}
-                                      className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-slate-700 hover:text-blue-900 bg-slate-100 hover:bg-blue-50 px-2 py-1 rounded transition cursor-pointer"
-                                      title="Print Challan Slip"
-                                    >
-                                      <Printer className="w-3 h-3 text-slate-500" />
-                                      <span>Print</span>
-                                    </button>
-                                  </div>
-                                  <Link
-                                    href={`/challans/${c.id}`}
-                                    className="text-[11px] font-bold text-blue-700 hover:text-blue-900 transition flex items-center gap-1"
-                                  >
-                                    <span>View Slip</span>
-                                    <ArrowRight className="w-3 h-3" />
-                                  </Link>
+                                <div className="pt-2 border-t border-slate-100 flex items-center justify-end">
+                                  <DocumentActionButtons
+                                    challan={c}
+                                    program={prog}
+                                    size="xs"
+                                  />
                                 </div>
                               </div>
                             ))}

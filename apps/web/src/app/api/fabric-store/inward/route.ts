@@ -7,12 +7,16 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const entryType = searchParams.get('entryType'); // "KORA" | "DYED" | "ALL"
+    const rawType = searchParams.get('entryType')?.toUpperCase();
     const search = searchParams.get('search');
 
     const where: any = {};
-    if (entryType && entryType !== 'ALL') {
-      where.entryType = entryType;
+    if (rawType && rawType !== 'ALL') {
+      if (rawType === 'UNDYED' || rawType === 'KORA') {
+        where.entryType = { in: ['UNDYED', 'KORA'] };
+      } else {
+        where.entryType = rawType;
+      }
     }
     if (search) {
       where.OR = [
@@ -35,8 +39,11 @@ export async function GET(request: Request) {
       totalPcs: inwardList
         .filter((item: any) => item.unit === 'PCS')
         .reduce((sum: number, item: any) => sum + (Number(item.billQty) || 0), 0),
+      undyedMeters: inwardList
+        .filter((item: any) => (item.entryType === 'UNDYED' || item.entryType === 'KORA') && item.unit === 'MTR')
+        .reduce((sum: number, item: any) => sum + (Number(item.billQty) || 0), 0),
       koraMeters: inwardList
-        .filter((item: any) => item.entryType === 'KORA' && item.unit === 'MTR')
+        .filter((item: any) => (item.entryType === 'UNDYED' || item.entryType === 'KORA') && item.unit === 'MTR')
         .reduce((sum: number, item: any) => sum + (Number(item.billQty) || 0), 0),
       dyedMeters: inwardList
         .filter((item: any) => item.entryType === 'DYED' && item.unit === 'MTR')
@@ -81,9 +88,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'billQty must be a positive number' }, { status: 400 });
     }
 
+    const normalizedType =
+      String(entryType).toUpperCase() === 'KORA' || String(entryType).toUpperCase() === 'UNDYED'
+        ? 'UNDYED'
+        : 'DYED';
+
     const inward = await (prisma as any).fabricInward.create({
       data: {
-        entryType: String(entryType).toUpperCase(),
+        entryType: normalizedType,
         itemName: String(itemName).trim(),
         billNo: String(billNo).trim(),
         billDate: new Date(billDate),

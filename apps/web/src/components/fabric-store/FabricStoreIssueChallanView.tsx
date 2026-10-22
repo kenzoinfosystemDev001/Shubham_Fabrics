@@ -266,6 +266,10 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
       setError('Please enter at least one item in the Color / Fabric / Measurement table.');
       return;
     }
+    if (new Set(validItems.map((item) => item.unit)).size > 1) {
+      setError('Use the same unit for every quantity in one challan.');
+      return;
+    }
 
     try {
       setSubmitting(true);
@@ -308,7 +312,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
         defectiveShelfLocation: storeTracking.defectiveShelfLocation,
         defectReason: storeTracking.defectReason,
         fabricOut: storeTracking.fabricOut,
-        fabricUnit: storeTracking.fabricUnit,
+        fabricUnit: validItems[0]?.unit || storeTracking.fabricUnit,
         detectedFromDepartment: storeTracking.detectedFromDept || 'PROGRAMMING',
         remarks: inchargeInfo,
         items: challanItems,
@@ -815,7 +819,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                   currentDepartment="STORE"
                   tracking={storeTracking}
                   onTrackingChange={setStoreTracking}
-                  showInOutController={true}
+                  showInOutController={false}
                 />
               </div>
 

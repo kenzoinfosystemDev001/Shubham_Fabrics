@@ -197,7 +197,7 @@ export default function FabricStoreDashboard() {
               </span>
               <Boxes className="w-4 h-4 text-teal-600 group-hover:scale-110 transition" />
             </div>
-            <h3 className="text-sm font-black text-slate-900 mt-2">KORA &amp; Dyed Balance</h3>
+            <h3 className="text-sm font-black text-slate-900 mt-2">DYED &amp; UNDYED Balance</h3>
             <p className="text-[11px] text-slate-500 mt-1">
               Real-time In-Store Balance: Inward minus Outward dispatches.
             </p>

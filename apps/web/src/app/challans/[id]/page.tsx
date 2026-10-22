@@ -18,6 +18,7 @@ import {
   Tag,
   Eye
 } from 'lucide-react';
+import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { 
   downloadProductionSheetHtml, 
@@ -287,61 +288,12 @@ export default function ChallanDetailPage() {
             </>
           )}
 
-          {/* 2. ACCOMPANYING PRODUCTION SHEET ACTIONS (RULE: ALWAYS VISIBLE & TRAVELS WITH CHALLAN) */}
-          {challan.program && (
-            <div className="flex items-center gap-1.5 bg-indigo-50 border border-indigo-200 p-1 rounded-md">
-              <span className="text-[10px] font-bold text-indigo-900 px-1 uppercase tracking-wider hidden md:inline">
-                Sheet:
-              </span>
-              <button
-                type="button"
-                onClick={() => setShowSheetModal(true)}
-                className="flex items-center gap-1 px-2.5 py-1.5 bg-indigo-700 hover:bg-indigo-800 text-white text-xs font-bold rounded shadow-xs transition cursor-pointer"
-                title="View the accompanying Production Sheet (TOP, BOTTOM, DUPATTA, WILCOM)"
-              >
-                <FileText className="w-3.5 h-3.5" />
-                <span>View Sheet</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => downloadProductionSheetHtml(challan.program)}
-                className="flex items-center gap-1 px-2.5 py-1.5 bg-white hover:bg-indigo-100 text-indigo-900 text-xs font-semibold rounded border border-indigo-300 transition cursor-pointer"
-                title="Download Production Sheet as HTML/PDF"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Download Sheet</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => printProductionSheet(challan.program)}
-                className="flex items-center gap-1 px-2.5 py-1.5 bg-white hover:bg-indigo-100 text-indigo-900 text-xs font-semibold rounded border border-indigo-300 transition cursor-pointer"
-                title="Print Production Sheet on A4"
-              >
-                <Printer className="w-3.5 h-3.5" />
-                <span>Print Sheet</span>
-              </button>
-            </div>
-          )}
-
-          {/* 3. CHALLAN SLIP ACTIONS (DOWNLOADABLE & PRINTABLE) */}
-          <button
-            type="button"
-            onClick={() => downloadChallanHtml(challan)}
-            className="flex items-center gap-1.5 px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-md shadow-xs transition cursor-pointer"
-            title="Download Challan as offline HTML document"
-          >
-            <Download className="w-4 h-4 text-emerald-400" />
-            <span>Download Challan</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => printChallan(challan)}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-[#163767] hover:bg-[#0F264A] text-white text-xs font-semibold rounded-md shadow-xs transition cursor-pointer"
-            title="Print Challan Slip directly"
-          >
-            <Printer className="w-4 h-4" />
-            <span>Print Challan Slip</span>
-          </button>
+          {/* DOCUMENT SUITE: PRODUCTION SHEET, CHALLAN & WILCOM (VIEW, DOWNLOAD, PRINT) */}
+          <DocumentActionButtons
+            challan={challan}
+            program={challan.program}
+            size="sm"
+          />
         </div>
       </header>
 
@@ -813,13 +765,6 @@ export default function ChallanDetailPage() {
                   </div>
                 </div>
 
-                {/* REMARKS */}
-                {challan.remarks && (
-                  <div className="p-3.5 bg-slate-50 rounded-lg border border-slate-200 text-xs">
-                    <span className="font-bold text-slate-700 block mb-0.5">Remarks / Instructions:</span>
-                    <p className="text-slate-600 italic font-serif">{challan.remarks}</p>
-                  </div>
-                )}
 
                 {/* PHYSICAL SIGNATURE BLOCKS FOR FACTORY HANDOFF */}
                 <div className="pt-8 border-t border-slate-200 grid grid-cols-2 gap-8 text-xs">

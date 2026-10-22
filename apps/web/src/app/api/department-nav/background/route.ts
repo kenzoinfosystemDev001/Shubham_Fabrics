@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { DEPARTMENT_NAV_BG_RECORD } from '@/lib/nav-bg';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,9 +16,27 @@ export async function GET(request: Request) {
     });
 
     if (!attachment) {
+      if (raw) {
+        const base64Data = DEPARTMENT_NAV_BG_RECORD.dataUri.split(';base64,').pop() || '';
+        const imageBuffer = Buffer.from(base64Data, 'base64');
+        return new Response(imageBuffer, {
+          status: 200,
+          headers: {
+            'Content-Type': DEPARTMENT_NAV_BG_RECORD.fileType,
+            'Content-Length': imageBuffer.length.toString(),
+            'Cache-Control': 'public, max-age=86400, stale-while-revalidate=43200',
+          },
+        });
+      }
+
       return NextResponse.json(
-        { success: false, error: 'Department navigation background image not found in database.' },
-        { status: 404 }
+        {
+          success: true,
+          data: {
+            fileUrl: DEPARTMENT_NAV_BG_RECORD.dataUri,
+            isFallback: true,
+          },
+        }
       );
     }
 

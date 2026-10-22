@@ -30,7 +30,8 @@ import {
   Download,
 } from 'lucide-react';
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
-import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
+import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
+import { ProductionSheetPrintModal } from '@/components/production-sheet/ProductionSheetPrintModal';
 import { 
   downloadProductionSheetHtml, 
   printProductionSheet 
@@ -577,65 +578,12 @@ function RecuttingWorkstationContent() {
                             </div>
 
                             {/* 1-CLICK ACTIONS */}
-                            <div className="mt-2 flex items-center gap-1 flex-wrap" onClick={(e) => e.stopPropagation()}>
-                              <Link
-                                href={`/challans/${job.id}`}
-                                className="px-1.5 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] font-semibold flex items-center gap-0.5"
-                                title="View Challan Slip"
-                              >
-                                <Eye className="w-2.5 h-2.5" />
-                                <span>Slip</span>
-                              </Link>
-                              <button
-                                type="button"
-                                onClick={() => downloadChallanHtml(job)}
-                                className="px-1.5 py-0.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded text-[10px] font-semibold flex items-center gap-0.5"
-                                title="Download Challan HTML"
-                              >
-                                <Download className="w-2.5 h-2.5" />
-                                <span>Challan</span>
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => printChallan(job)}
-                                className="px-1.5 py-0.5 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded text-[10px] font-semibold flex items-center gap-0.5"
-                                title="Print Challan Slip"
-                              >
-                                <Printer className="w-2.5 h-2.5" />
-                                <span>Print</span>
-                              </button>
-
-                              {job.program && (
-                                <>
-                                  <button
-                                    type="button"
-                                    onClick={() => openTechSheet(job.program)}
-                                    className="px-1.5 py-0.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded text-[10px] font-semibold flex items-center gap-0.5"
-                                    title="View Production Sheet"
-                                  >
-                                    <FileText className="w-2.5 h-2.5" />
-                                    <span>Sheet</span>
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => downloadProductionSheetHtml(job.program)}
-                                    className="px-1.5 py-0.5 bg-sky-50 hover:bg-sky-100 text-sky-700 rounded text-[10px] font-semibold flex items-center gap-0.5"
-                                    title="Download Production Sheet HTML"
-                                  >
-                                    <Download className="w-2.5 h-2.5" />
-                                    <span>Sheet</span>
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => printProductionSheet(job.program)}
-                                    className="px-1.5 py-0.5 bg-blue-100/70 hover:bg-blue-200/70 text-blue-800 rounded text-[10px] font-semibold flex items-center gap-0.5"
-                                    title="Print Production Sheet Traveler"
-                                  >
-                                    <Printer className="w-2.5 h-2.5" />
-                                    <span>Sheet</span>
-                                  </button>
-                                </>
-                              )}
+                            <div className="mt-2" onClick={(e) => e.stopPropagation()}>
+                              <DocumentActionButtons
+                                challan={job}
+                                program={job.program}
+                                size="xs"
+                              />
                             </div>
                           </div>
 
@@ -706,66 +654,12 @@ function RecuttingWorkstationContent() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      {/* CHALLAN SUITE */}
-                      <Link
-                        href={`/challans/${selectedJob.id}`}
-                        className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-bold transition flex items-center gap-1 border border-slate-200"
-                        title="View Full Challan Slip"
-                      >
-                        <Eye className="w-3.5 h-3.5 text-slate-600" />
-                        <span>Slip</span>
-                      </Link>
-                      <button
-                        type="button"
-                        onClick={() => downloadChallanHtml(selectedJob)}
-                        className="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-bold transition flex items-center gap-1 border border-indigo-200 cursor-pointer"
-                        title="Download Challan HTML"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                        <span>Challan</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => printChallan(selectedJob)}
-                        className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1 border border-slate-200 cursor-pointer"
-                        title="Print Challan Slip"
-                      >
-                        <Printer className="w-3.5 h-3.5" />
-                        <span>Print</span>
-                      </button>
-
-                      {/* PRODUCTION SHEET SUITE */}
-                      {selectedJob.program && (
-                        <>
-                          <button
-                            type="button"
-                            onClick={() => openTechSheet(selectedJob.program)}
-                            className="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg text-xs font-bold transition flex items-center gap-1 border border-blue-200 cursor-pointer"
-                          >
-                            <FileText className="w-3.5 h-3.5 text-blue-600" />
-                            <span>View Sheet</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => downloadProductionSheetHtml(selectedJob.program)}
-                            className="px-2.5 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-700 rounded-lg text-xs font-bold transition flex items-center gap-1 border border-sky-200 cursor-pointer"
-                            title="Download Production Sheet HTML"
-                          >
-                            <Download className="w-3.5 h-3.5 text-sky-600" />
-                            <span>Download Sheet</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => printProductionSheet(selectedJob.program)}
-                            className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-1 border border-slate-200 cursor-pointer"
-                            title="Print Production Sheet Traveler"
-                          >
-                            <Printer className="w-3.5 h-3.5 text-slate-600" />
-                            <span>Print Sheet</span>
-                          </button>
-                        </>
-                      )}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <DocumentActionButtons
+                        challan={selectedJob}
+                        program={selectedJob.program}
+                        size="sm"
+                      />
                       <Link
                         href={`/recutting/workspace/${selectedJob.id}`}
                         className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 border border-rose-200"

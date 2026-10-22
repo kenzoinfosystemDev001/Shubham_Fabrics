@@ -1,0 +1,210 @@
+'use client';
+
+import React, { useState } from 'react';
+import { 
+  FileText, 
+  Download, 
+  Printer, 
+  Sparkles,
+  Eye,
+  Layers
+} from 'lucide-react';
+import { 
+  downloadProductionSheetHtml, 
+  printProductionSheet 
+} from '@/lib/download-production-sheet';
+import { 
+  downloadChallanHtml, 
+  printChallan 
+} from '@/lib/download-challan';
+import { 
+  downloadWilcomFormHtml, 
+  printWilcomForm 
+} from '@/lib/download-wilcom';
+import { ProductionSheetPrintModal } from '@/components/production-sheet/ProductionSheetPrintModal';
+import { ChallanPrintModal } from '@/components/challan/ChallanPrintModal';
+import { WilcomPrintModal } from '@/components/wilcom/WilcomPrintModal';
+
+interface DocumentActionButtonsProps {
+  program?: any;
+  challan?: any;
+  size?: 'xs' | 'sm' | 'md';
+  showLabels?: boolean;
+  className?: string;
+}
+
+export function DocumentActionButtons({
+  program,
+  challan,
+  size = 'sm',
+  showLabels = true,
+  className = '',
+}: DocumentActionButtonsProps) {
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isChallanOpen, setIsChallanOpen] = useState(false);
+  const [isWilcomOpen, setIsWilcomOpen] = useState(false);
+  const [wilcomCategory, setWilcomCategory] = useState<any>('TOP');
+
+  const activeProgram = program || challan?.program;
+  const activeChallan = challan;
+
+  if (!activeProgram && !activeChallan) {
+    return null;
+  }
+
+  const iconSize = size === 'xs' ? 'w-3 h-3' : size === 'sm' ? 'w-3.5 h-3.5' : 'w-4 h-4';
+  const textClass = size === 'xs' ? 'text-[10px]' : size === 'sm' ? 'text-[11px]' : 'text-xs';
+  const padClass = size === 'xs' ? 'px-1.5 py-0.5' : size === 'sm' ? 'px-2 py-1' : 'px-2.5 py-1.5';
+
+  return (
+    <>
+      <div className={`inline-flex items-center gap-1.5 flex-wrap ${className}`}>
+        
+        {/* 1. PRODUCTION SHEET ACTIONS */}
+        {activeProgram && (
+          <div className="inline-flex items-center bg-blue-50/80 border border-blue-200/90 rounded-md overflow-hidden shadow-2xs">
+            <button
+              type="button"
+              onClick={() => setIsSheetOpen(true)}
+              className={`inline-flex items-center gap-1 ${padClass} ${textClass} font-bold text-blue-900 hover:bg-blue-100 transition cursor-pointer`}
+              title="View Master Production Sheet Form"
+            >
+              <FileText className={`${iconSize} text-blue-700`} />
+              {showLabels && <span>Sheet</span>}
+            </button>
+            <button
+              type="button"
+              onClick={() => void downloadProductionSheetHtml(activeProgram)}
+              className={`p-1 text-blue-700 hover:text-blue-950 hover:bg-blue-100 border-l border-blue-200/80 transition cursor-pointer`}
+              title="Download Master Production Sheet (HTML/PDF)"
+            >
+              <Download className={iconSize} />
+            </button>
+            <button
+              type="button"
+              onClick={() => printProductionSheet(activeProgram)}
+              className={`p-1 text-blue-700 hover:text-blue-950 hover:bg-blue-100 border-l border-blue-200/80 transition cursor-pointer`}
+              title="Print Master Production Sheet (A4 Traveler)"
+            >
+              <Printer className={iconSize} />
+            </button>
+          </div>
+        )}
+
+        {/* 2. CHALLAN ACTIONS */}
+        {activeChallan && (
+          <div className="inline-flex items-center bg-emerald-50/80 border border-emerald-200/90 rounded-md overflow-hidden shadow-2xs">
+            <button
+              type="button"
+              onClick={() => setIsChallanOpen(true)}
+              className={`inline-flex items-center gap-1 ${padClass} ${textClass} font-bold text-emerald-900 hover:bg-emerald-100 transition cursor-pointer`}
+              title="View Department Transfer Challan Slip"
+            >
+              <FileText className={`${iconSize} text-emerald-700`} />
+              {showLabels && <span>Challan</span>}
+            </button>
+            <button
+              type="button"
+              onClick={() => void downloadChallanHtml(activeChallan)}
+              className={`p-1 text-emerald-700 hover:text-emerald-950 hover:bg-emerald-100 border-l border-emerald-200/80 transition cursor-pointer`}
+              title="Download Department Transfer Challan Form with Barcode"
+            >
+              <Download className={iconSize} />
+            </button>
+            <button
+              type="button"
+              onClick={() => printChallan(activeChallan)}
+              className={`p-1 text-emerald-700 hover:text-emerald-950 hover:bg-emerald-100 border-l border-emerald-200/80 transition cursor-pointer`}
+              title="Print Department Transfer Challan Slip"
+            >
+              <Printer className={iconSize} />
+            </button>
+          </div>
+        )}
+
+        {/* 3. WILCOM SPECIFICATION ACTIONS */}
+        {activeProgram && (
+          <div className="inline-flex items-center bg-purple-50/80 border border-purple-200/90 rounded-md overflow-hidden shadow-2xs">
+            <button
+              type="button"
+              onClick={() => setIsWilcomOpen(true)}
+              className={`inline-flex items-center gap-1 ${padClass} ${textClass} font-bold text-purple-900 hover:bg-purple-100 transition cursor-pointer`}
+              title="View Wilcom Embroidery Specification Form"
+            >
+              <Sparkles className={`${iconSize} text-purple-700`} />
+              {showLabels && <span>Wilcom</span>}
+            </button>
+            <button
+              type="button"
+              onClick={() => void downloadWilcomFormHtml(activeProgram)}
+              className={`p-1 text-purple-700 hover:text-purple-950 hover:bg-purple-100 border-l border-purple-200/80 transition cursor-pointer`}
+              title="Download Wilcom Form with Design Artwork & Offline Images"
+            >
+              <Download className={iconSize} />
+            </button>
+            <button
+              type="button"
+              onClick={() => printWilcomForm(activeProgram)}
+              className={`p-1 text-purple-700 hover:text-purple-950 hover:bg-purple-100 border-l border-purple-200/80 transition cursor-pointer`}
+              title="Print Wilcom Form (A4)"
+            >
+              <Printer className={iconSize} />
+            </button>
+          </div>
+        )}
+
+      </div>
+
+      {/* DOCUMENT PREVIEW MODALS WITH FULL CROSS-NAVIGATION */}
+      {activeProgram && (
+        <ProductionSheetPrintModal
+          program={activeProgram}
+          isOpen={isSheetOpen}
+          onClose={() => setIsSheetOpen(false)}
+          onViewWilcom={(cat) => {
+            if (cat) setWilcomCategory(cat);
+            setIsSheetOpen(false);
+            setIsWilcomOpen(true);
+          }}
+          onViewChallan={activeChallan ? () => {
+            setIsSheetOpen(false);
+            setIsChallanOpen(true);
+          } : undefined}
+        />
+      )}
+
+      {activeChallan && (
+        <ChallanPrintModal
+          challan={activeChallan}
+          isOpen={isChallanOpen}
+          onClose={() => setIsChallanOpen(false)}
+          onViewSheet={activeProgram ? () => {
+            setIsChallanOpen(false);
+            setIsSheetOpen(true);
+          } : undefined}
+          onViewWilcom={activeProgram ? () => {
+            setIsChallanOpen(false);
+            setIsWilcomOpen(true);
+          } : undefined}
+        />
+      )}
+
+      {activeProgram && (
+        <WilcomPrintModal
+          program={activeProgram}
+          isOpen={isWilcomOpen}
+          onClose={() => setIsWilcomOpen(false)}
+          initialCategory={wilcomCategory}
+          onViewSheet={() => {
+            setIsWilcomOpen(false);
+            setIsSheetOpen(true);
+          }}
+          onViewChallan={activeChallan ? () => {
+            setIsWilcomOpen(false);
+            setIsChallanOpen(true);
+          } : undefined}
+        />
+      )}
+    </>
+  );
+}

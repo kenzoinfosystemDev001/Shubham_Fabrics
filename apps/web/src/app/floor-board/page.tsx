@@ -20,11 +20,9 @@ import {
   FileText
 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
-import { 
-  downloadProductionSheetHtml, 
-  printProductionSheet 
-} from '@/lib/download-production-sheet';
+import { downloadProductionSheetHtml, printProductionSheet } from '@/lib/download-production-sheet';
 
 export default function ProgrammingFloorBoardPage() {
   const router = useRouter();
@@ -249,42 +247,15 @@ export default function ProgrammingFloorBoardPage() {
                     </p>
                   </div>
 
-                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] flex-wrap gap-1">
                     <span className="font-mono font-semibold text-slate-600">
                       {prog.colorQuantity || prog.targetQuantity} PCS
                     </span>
-                    <div className="flex items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() => setSelectedSheetForView(prog)}
-                        className="p-1 hover:bg-blue-50 text-blue-700 rounded transition"
-                        title="View Production Sheet"
-                      >
-                        <FileText className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => downloadProductionSheetHtml(prog)}
-                        className="p-1 hover:bg-sky-50 text-sky-700 rounded transition"
-                        title="Download Production Sheet HTML"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => printProductionSheet(prog)}
-                        className="p-1 hover:bg-slate-100 text-slate-700 rounded transition"
-                        title="Print Production Sheet"
-                      >
-                        <Printer className="w-3.5 h-3.5" />
-                      </button>
-                      <Link
-                        href={`/programs/${prog.id}`}
-                        className="text-blue-700 hover:underline font-semibold ml-1"
-                      >
-                        View →
-                      </Link>
-                    </div>
+                    <DocumentActionButtons
+                      program={prog}
+                      challan={challans.find((c) => c.programId === prog.id)}
+                      size="xs"
+                    />
                   </div>
                 </div>
               ))}
@@ -338,38 +309,19 @@ export default function ProgrammingFloorBoardPage() {
                     </div>
                   )}
 
-                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between flex-wrap gap-1">
                     <span className="font-mono font-bold text-xs text-slate-800">
                       {prog.colorQuantity || prog.targetQuantity} PCS
                     </span>
-                    <div className="flex items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() => setSelectedSheetForView(prog)}
-                        className="p-1 hover:bg-blue-50 text-blue-700 rounded transition"
-                        title="View Production Sheet"
-                      >
-                        <FileText className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => downloadProductionSheetHtml(prog)}
-                        className="p-1 hover:bg-sky-50 text-sky-700 rounded transition"
-                        title="Download Production Sheet HTML"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => printProductionSheet(prog)}
-                        className="p-1 hover:bg-slate-100 text-slate-700 rounded transition"
-                        title="Print Production Sheet"
-                      >
-                        <Printer className="w-3.5 h-3.5" />
-                      </button>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <DocumentActionButtons
+                        program={prog}
+                        challan={challans.find((c) => c.programId === prog.id)}
+                        size="xs"
+                      />
                       <Link
                         href={`/my-work/issue-challan?programId=${prog.id}`}
-                        className="px-2 py-0.5 bg-indigo-700 hover:bg-indigo-800 text-white text-[11px] font-semibold rounded shadow-xs transition flex items-center gap-1 ml-1"
+                        className="px-2 py-0.5 bg-indigo-700 hover:bg-indigo-800 text-white text-[11px] font-semibold rounded shadow-xs transition flex items-center gap-1"
                       >
                         <Send className="w-3 h-3" />
                         <span>Issue</span>
@@ -422,33 +374,12 @@ export default function ProgrammingFloorBoardPage() {
                     </p>
                   </div>
 
-                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                    <div className="flex items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() => setSelectedSheetForView(prog)}
-                        className="p-1 hover:bg-blue-50 text-blue-700 rounded transition"
-                        title="View Production Sheet"
-                      >
-                        <FileText className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => downloadProductionSheetHtml(prog)}
-                        className="p-1 hover:bg-sky-50 text-sky-700 rounded transition"
-                        title="Download Production Sheet HTML"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => printProductionSheet(prog)}
-                        className="p-1 hover:bg-slate-100 text-slate-700 rounded transition"
-                        title="Print Production Sheet"
-                      >
-                        <Printer className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
+                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] flex-wrap gap-1">
+                    <DocumentActionButtons
+                      program={prog}
+                      challan={challans.find((c) => c.programId === prog.id)}
+                      size="xs"
+                    />
                     <Link
                       href={`/programs/${prog.id}`}
                       className="text-slate-600 hover:text-slate-900 font-semibold"

@@ -178,6 +178,10 @@ function IssueChallanContent() {
       setError('Please add at least one fabric item in COLOR / FABRIC / MEASUREMENT.');
       return;
     }
+    if (new Set(items.map((item) => item.unit)).size > 1) {
+      setError('Use the same unit for every quantity in one challan.');
+      return;
+    }
 
     // Validate item rows
     for (let i = 0; i < items.length; i++) {
@@ -213,7 +217,7 @@ function IssueChallanContent() {
         defectiveShelfLocation: tracking.defectiveShelfLocation,
         defectReason: tracking.defectReason,
         fabricOut: tracking.fabricOut,
-        fabricUnit: tracking.fabricUnit,
+        fabricUnit: items[0]?.unit || tracking.fabricUnit,
         detectedFromDepartment: 'PROGRAMMING',
         remarks: [
           remarks,
@@ -619,7 +623,7 @@ function IssueChallanContent() {
                 currentDepartment="PROGRAMMING"
                 tracking={tracking}
                 onTrackingChange={setTracking}
-                showInOutController={true}
+                showInOutController={false}
               />
             </div>
 

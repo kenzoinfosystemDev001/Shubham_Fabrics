@@ -6,6 +6,7 @@
  * layout (Production Sheet format) with sub-style averages and multi-color breakdown grid.
  */
 import { getCurrentUser, canViewClientCode } from '@/lib/rbac';
+import { loadProgramDocument } from '@/lib/program-document';
 
 export interface SubStyleAverage {
   name: string;
@@ -18,6 +19,7 @@ export interface ProductionGridItem {
   pcs: number | string;
   mtr: number | string;
   subStyle?: string;
+  subStyles?: string[];
   size?: string;
   sizes?: Record<string, string>;
 }
@@ -115,7 +117,19 @@ export function getSwatchColorHex(name?: string, fallback?: string): string {
   return `hsl(${hue}, 40%, 55%)`;
 }
 
-export type GarmentCategory = 'TOP' | 'BOTTOM' | 'DUPATTA' | 'OTHER';
+export type GarmentCategory = 'TOP' | 'BOTTOM' | 'DUPATTA' | 'OTHER' | (string & {});
+
+function escapeHtmlText(value: string): string {
+  return value.replace(/[&<>"']/g, (character) => {
+    switch (character) {
+      case '&': return '&amp;';
+      case '<': return '&lt;';
+      case '>': return '&gt;';
+      case '"': return '&quot;';
+      default: return '&#39;';
+    }
+  });
+}
 
 export interface ComponentSheetData {
   enabled: boolean;
@@ -135,7 +149,7 @@ export interface ComponentSheetData {
   totalFabricMeters?: number;
 }
 
-import type { WilcomEntry } from './download-wilcom';
+import { extractRootWilcomPhoto, type WilcomEntry } from './download-wilcom';
 export type { WilcomEntry };
 
 export const DEFAULT_SUB_STYLES: SubStyleAverage[] = [
@@ -284,7 +298,7 @@ export function extractSubStylesAndGrid(program: any, category: GarmentCategory 
   let clientCode = program.clientCode || '';
   let fabricName = program.fabricName || program.fabric || (program.fabrics?.[0]?.fabricName) || '';
   let fabricWidth = program.fabricWidth || (program.fabricWidthInches ? `${program.fabricWidthInches}"` : '') || '';
-  let allComponents: Record<GarmentCategory, ComponentSheetData> | undefined;
+  let allComponents: Record<string, ComponentSheetData> | undefined;
   let forwardedComponents: string[] = ['TOP'];
   let wilcomEntries: WilcomEntry[] = [];
   let isEnabled = true;
@@ -376,8 +390,7 @@ export function extractSubStylesAndGrid(program: any, category: GarmentCategory 
     if (programItems.length > 0) {
       productionGrid = programItems.map((it, idx) => {
         const pcs = Number(it.measurement) || 0;
-        const avg = Number(it.fabricAverage) || totalMtrAverage || 1.25;
-        const mtr = Math.round(pcs * avg * 100) / 100;
+        const mtr = it.mtr !== undefined && it.mtr !== '' ? it.mtr : '';
         const sizes: Record<string, string> = {};
         for (const sub of subStylesWithAverages) {
           sizes[sub.name] = it.fabricWidth || 'Free';
@@ -393,7 +406,7 @@ export function extractSubStylesAndGrid(program: any, category: GarmentCategory 
     } else if (Array.isArray(program.colours) && program.colours.length > 0) {
       productionGrid = program.colours.map((c: any, idx: number) => {
         const pcs = Number(c.targetQuantity) || 0;
-        const mtr = Math.round(pcs * totalMtrAverage * 100) / 100;
+        const mtr = c.mtr !== undefined && c.mtr !== '' ? c.mtr : '';
         const sizes: Record<string, string> = {};
         return {
           id: `row-${idx}`,
@@ -465,7 +478,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
     if (Array.isArray(meta?.forwardedComponents) && meta.forwardedComponents.length > 0) {
       targetCategories = meta.forwardedComponents;
     } else if (meta?.components) {
-      targetCategories = (['TOP', 'BOTTOM', 'DUPATTA'] as GarmentCategory[]).filter(
+      targetCategories = Object.keys(meta.components).filter(
         (c) => meta.components[c]?.enabled !== false
       );
     }
@@ -475,6 +488,13 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
   } else {
     targetCategories = [category];
   }
+
+  const categoryName = category === 'TOP' || category === 'BOTTOM' || category === 'DUPATTA'
+    ? category
+    : extractSubStylesAndGrid(program, category).topName.trim() || 'INPUT';
+  const categoryLabel = category === 'ALL' ? 'All Forwarded Components' : categoryName;
+  const safeCategoryLabel = escapeHtmlText(categoryLabel);
+  const safeFilenameCategory = categoryLabel.replace(/[^a-z0-9_-]+/gi, '_');
 
   const renderSingleSheet = (activeCategory: GarmentCategory) => {
     const {
@@ -489,6 +509,10 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       fabricName,
       fabricWidth,
     } = extractSubStylesAndGrid(program, activeCategory);
+    const activeCategoryName = activeCategory === 'TOP' || activeCategory === 'BOTTOM' || activeCategory === 'DUPATTA'
+      ? activeCategory
+      : topName.trim() || 'INPUT';
+    const safeActiveCategoryName = escapeHtmlText(activeCategoryName);
 
     // Generate 14 rows total (matching the paper sheet grid)
     const TOTAL_GRID_ROWS = 14;
@@ -497,19 +521,28 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       pcs: string | number;
       mtr: string | number;
       subStyle?: string;
+      subStyles?: string[];
       size?: string;
       sizes: Record<string, string>;
     }[] = [];
 
     for (let i = 0; i < TOTAL_GRID_ROWS; i++) {
       if (i < productionGrid.length) {
+        const item = productionGrid[i];
+        let itemSubStyles = Array.isArray(item.subStyles) ? item.subStyles : [];
+        if (itemSubStyles.length === 0 && item.subStyle) {
+          itemSubStyles = String(item.subStyle).split(',').map((s) => s.trim()).filter(Boolean);
+        }
+        const itemSubStyleStr = itemSubStyles.length > 0 ? itemSubStyles.join(', ') : (item.subStyle || '');
+
         gridRows.push({
-          color: productionGrid[i].color || '',
-          pcs: productionGrid[i].pcs !== undefined ? productionGrid[i].pcs : '',
-          mtr: productionGrid[i].mtr !== undefined ? productionGrid[i].mtr : '',
-          subStyle: productionGrid[i].subStyle || '',
-          size: productionGrid[i].size || productionGrid[i].sizes?.['SIZE'] || '',
-          sizes: productionGrid[i].sizes || {},
+          color: item.color || '',
+          pcs: item.pcs !== undefined ? item.pcs : '',
+          mtr: item.mtr !== undefined ? item.mtr : '',
+          subStyle: itemSubStyleStr,
+          subStyles: itemSubStyles,
+          size: item.size || item.sizes?.['SIZE'] || '',
+          sizes: item.sizes || {},
         });
       } else {
         gridRows.push({
@@ -517,6 +550,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
           pcs: '',
           mtr: '',
           subStyle: '',
+          subStyles: [],
           size: '',
           sizes: {},
         });
@@ -529,12 +563,13 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
     const priorityVal = program.clientPriority || program.priority || 'NORMAL';
     const dyeingVal = program.fabricDyeingRequired ? 'YES (Kora)' : 'NO (Pre-Dyed)';
     const wilcomVal = program.wilcomDesignNumber ? `№ ${program.wilcomDesignNumber}` : 'None';
+    const artworkPhoto = extractRootWilcomPhoto(program, meta);
 
     return `
     <div class="sheet-wrapper">
       <div>
         <!-- TITLE -->
-        <div class="header-title">PRODUCTION SHEET &mdash; ${activeCategory}</div>
+        <div class="header-title">PRODUCTION SHEET &mdash; ${safeActiveCategoryName}</div>
 
         <!-- HEADER META: DESIGN NO, WILCOM, STYLE, PATTERN, DATE, SERIAL NO, DELIVERY DATE -->
         <div class="top-meta-row">
@@ -549,7 +584,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
             </div>
             <div class="field-row" style="margin-top: 6px;">
               <span class="label-bold">STYLE:</span>
-              <div class="box-input" style="width: 90px; text-transform: uppercase;">${activeCategory}</div>
+              <div class="box-input" style="width: 90px; text-transform: uppercase;">${safeActiveCategoryName}</div>
               <span class="label-bold" style="margin-left: 10px;">PATTERN:</span>
               <div class="box-input" style="flex: 1;">${pattern || '-'}</div>
             </div>
@@ -586,6 +621,13 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
             <div class="summary-box-value">${dyeingVal}</div>
           </div>
         </div>
+
+        ${artworkPhoto ? `
+        <div style="display:flex;align-items:center;gap:12px;border:1px solid #111;padding:6px;margin-top:6px;">
+          <strong style="font-size:9px;text-transform:uppercase;">Wilcom Artwork</strong>
+          <img src="${artworkPhoto}" alt="Wilcom artwork for design ${designNo}" style="max-height:72px;max-width:180px;object-fit:contain;">
+        </div>
+        ` : ''}
 
         <!-- FABRIC & WIDTH BOX -->
         <div class="fabric-section">
@@ -629,7 +671,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
             <tr>
               <th rowspan="2" class="col-color-header">COLOR</th>
               <th colspan="2">QTY</th>
-              <th rowspan="2" style="width: 25%;">SUB STYLE<br><span style="font-size: 8px; font-weight: normal; text-transform: none;">(manual fill)</span></th>
+              <th rowspan="2" style="width: 25%;">SUB STYLE</th>
               <th rowspan="2" style="width: 15%;">SIZE</th>
             </tr>
             <tr>
@@ -644,7 +686,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
                 <td class="cell-number">${row.mtr !== '' && row.mtr !== undefined ? row.mtr : ''}</td>
                 <td class="cell-number">${row.pcs !== '' && row.pcs !== undefined ? row.pcs : ''}</td>
                 <td class="cell-substyle">${row.subStyle || ''}</td>
-                <td class="cell-size">${row.size || row.sizes?.['SIZE'] || ''}</td>
+                <td class="cell-size">${row.subStyles && row.subStyles.length > 1 && row.sizes ? row.subStyles.map(s => row.sizes[s] ? `${s}: ${row.sizes[s]}` : '').filter(Boolean).join('<br>') || row.size || '' : row.size || (row.subStyles?.[0] ? row.sizes?.[row.subStyles[0]] : '') || row.sizes?.['SIZE'] || ''}</td>
               </tr>
             `).join('')}
           </tbody>
@@ -718,7 +760,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Production Sheet - ${serialNo} (${targetCategories.join(', ')})</title>
+  <title>Production Sheet (${safeCategoryLabel}) - ${serialNo}</title>
   <style>
     @page {
       size: A4 portrait;
@@ -1157,11 +1199,14 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
   <!-- Top Action Bar for interactive browser preview -->
   <div class="no-print-bar">
     <div>
-      <strong>Production Sheet</strong> &middot; Serial No. ${serialNo} (${targetCategories.join(', ')})
+      <strong>Production Sheet &middot; ${safeCategoryLabel}</strong> &middot; Serial No. ${serialNo}
     </div>
     <div style="display: flex; gap: 8px;">
       <button class="btn btn-primary" onclick="window.print()">
-        🖨️ Print Sheet (A4)
+        🖨️ Print ${safeCategoryLabel} Sheet (A4)
+      </button>
+      <button class="btn btn-primary" style="background: #059669;" onclick="window.downloadSelf()">
+        💾 Download ${safeCategoryLabel} Sheet
       </button>
       <button class="btn btn-outline" onclick="window.close()">
         ✕ Close
@@ -1171,6 +1216,19 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
 
   ${targetCategories.map((cat) => renderSingleSheet(cat)).join('\n')}
 
+  <script>
+    window.downloadSelf = function() {
+      var blob = new Blob([document.documentElement.outerHTML], { type: 'text/html;charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'Production_Sheet_${safeFilenameCategory}_${serialNo}.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+    };
+  </script>
 </body>
 </html>`;
 }
@@ -1180,9 +1238,10 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
  */
 export async function downloadProductionSheetHtml(program: any, category: GarmentCategory | 'ALL' = 'TOP') {
   try {
-    const preparedProgram = await prepareProductionSheetImages(program);
+    const completeProgram = await loadProgramDocument(program);
+    const preparedProgram = await prepareProductionSheetImages(completeProgram);
     const html = generateProductionSheetHtml(preparedProgram, category);
-    const serialNo = program.programSerialNo || program.programNumber || 'PRG-SHEET';
+    const serialNo = completeProgram.programSerialNo || completeProgram.programNumber || 'PRG-SHEET';
     const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -1206,7 +1265,8 @@ export function printProductionSheet(program: any, category: GarmentCategory | '
   if (printWindow) {
     void (async () => {
       try {
-        const preparedProgram = await prepareProductionSheetImages(program);
+        const completeProgram = await loadProgramDocument(program);
+        const preparedProgram = await prepareProductionSheetImages(completeProgram);
         printWindow.document.open();
         printWindow.document.write(generateProductionSheetHtml(preparedProgram, category));
         printWindow.document.close();

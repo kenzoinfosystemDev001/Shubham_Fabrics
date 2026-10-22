@@ -36,16 +36,10 @@ import {
   Scale
 } from 'lucide-react';
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
+import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
-import { 
-  downloadProductionSheetHtml, 
-  printProductionSheet 
-} from '@/lib/download-production-sheet';
-import { 
-  downloadChallanHtml, 
-  printChallan 
-} from '@/lib/download-challan';
-import BarcodeStickerCard from '@/components/BarcodeStickerCard';
+import { downloadChallanHtml, printChallan } from '@/lib/download-challan';
+import { downloadProductionSheetHtml, printProductionSheet } from '@/lib/download-production-sheet';
 
 interface QCWashingChallan {
   id: string;
@@ -852,69 +846,11 @@ export default function QCWashingMyWorkPage() {
                                   )}
                                 </div>
 
-                                {/* CHALLAN & SHEET ACTIONS */}
-                                <div className="flex items-center gap-1 flex-wrap justify-end">
-                                  {/* CHALLAN CLUSTER */}
-                                  <Link
-                                    href={`/challans/${c.id}`}
-                                    className="px-1.5 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] font-semibold flex items-center gap-0.5"
-                                    title="View Challan Slip"
-                                  >
-                                    <Eye className="w-2.5 h-2.5" />
-                                    <span>Slip</span>
-                                  </Link>
-                                  <button
-                                    type="button"
-                                    onClick={() => downloadChallanHtml(c)}
-                                    className="px-1.5 py-0.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded text-[10px] font-semibold flex items-center gap-0.5"
-                                    title="Download Challan HTML"
-                                  >
-                                    <Download className="w-2.5 h-2.5" />
-                                    <span>Challan</span>
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => printChallan(c)}
-                                    className="px-1.5 py-0.5 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded text-[10px] font-semibold flex items-center gap-0.5"
-                                    title="Print Challan Slip"
-                                  >
-                                    <Printer className="w-2.5 h-2.5" />
-                                    <span>Print</span>
-                                  </button>
-
-                                  {/* PRODUCTION SHEET CLUSTER */}
-                                  {c.program && (
-                                    <>
-                                      <button
-                                        type="button"
-                                        onClick={() => setSelectedSheetForView(c.program)}
-                                        className="px-1.5 py-0.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded text-[10px] font-semibold flex items-center gap-0.5 ml-1"
-                                        title="View Production Sheet Traveler"
-                                      >
-                                        <FileText className="w-2.5 h-2.5" />
-                                        <span>Sheet</span>
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => downloadProductionSheetHtml(c.program)}
-                                        className="px-1.5 py-0.5 bg-sky-50 hover:bg-sky-100 text-sky-700 rounded text-[10px] font-semibold flex items-center gap-0.5"
-                                        title="Download Production Sheet HTML"
-                                      >
-                                        <Download className="w-2.5 h-2.5" />
-                                        <span>Sheet</span>
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => printProductionSheet(c.program)}
-                                        className="px-1.5 py-0.5 bg-blue-100/70 hover:bg-blue-200/70 text-blue-800 rounded text-[10px] font-semibold flex items-center gap-0.5"
-                                        title="Print Production Sheet Traveler"
-                                      >
-                                        <Printer className="w-2.5 h-2.5" />
-                                        <span>Sheet</span>
-                                      </button>
-                                    </>
-                                  )}
-                                </div>
+                                <DocumentActionButtons
+                                  challan={c}
+                                  program={c.program}
+                                  size="xs"
+                                />
                               </div>
                             </td>
                           </tr>
@@ -1093,29 +1029,10 @@ export default function QCWashingMyWorkPage() {
                     <p className="text-[11px] text-slate-500">{prog.fabricName} ({prog.fabricColor})</p>
                   </div>
                   <div className="flex items-center gap-1.5 mt-3">
-                    <button
-                      onClick={() => setSelectedSheetForView(prog)}
-                      className="flex-1 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition"
-                    >
-                      <FileText className="w-3.5 h-3.5" />
-                      <span>View</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => downloadProductionSheetHtml(prog)}
-                      className="p-1.5 bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 rounded-lg text-xs font-semibold transition"
-                      title="Download Production Sheet HTML"
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => printProductionSheet(prog)}
-                      className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition"
-                      title="Print Production Sheet Traveler"
-                    >
-                      <Printer className="w-3.5 h-3.5" />
-                    </button>
+                    <DocumentActionButtons
+                      program={prog}
+                      size="xs"
+                    />
                   </div>
                 </div>
               ))}

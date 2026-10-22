@@ -21,6 +21,7 @@ import {
   Scissors,
 } from 'lucide-react';
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
+import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
 
 export default function StitchingIncomingPage() {
   const router = useRouter();
@@ -337,14 +338,12 @@ export default function StitchingIncomingPage() {
                   </div>
 
                   {/* ACTION FOOTER */}
-                  <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between gap-2">
-                    <button
-                      onClick={() => setPreviewProgram(ch.program)}
-                      className="text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1 transition"
-                    >
-                      <FileText className="w-3.5 h-3.5" />
-                      <span>Tech Sheet</span>
-                    </button>
+                  <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between gap-2 flex-wrap">
+                    <DocumentActionButtons
+                      challan={ch}
+                      program={ch.program}
+                      size="xs"
+                    />
 
                     {isIssued ? (
                       <button

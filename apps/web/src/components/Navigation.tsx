@@ -99,7 +99,8 @@ export function Navigation() {
     pathname.startsWith('/recutting') ||
     pathname.startsWith('/stitching') ||
     pathname.startsWith('/finishing') ||
-    pathname.startsWith('/steam-press')
+    pathname.startsWith('/steam-press') ||
+    pathname.startsWith('/final-check')
   ) {
     return null;
   }
