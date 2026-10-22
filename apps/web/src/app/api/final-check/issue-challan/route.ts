@@ -1,12 +1,25 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { STANDARD_FACTORY_ROUTE } from '@subham/config';
+import { DepartmentCode } from '@subham/types';
+import { getFinalCheckActor } from '@/lib/final-check-auth';
+import {
+  availableAcceptedQuantity,
+  FinalCheckValidationError,
+  parseWholeNumber,
+  validateHandoverQuantity,
+} from '@/lib/final-check-rules.mjs';
 
 export const dynamic = 'force-dynamic';
 
 const FINAL_CHECK_DEPTS = ['FINAL_CHECK', 'FINAL CHECK', 'FINAL_QC', 'FINAL-CHECK'];
+class HandoverValidationError extends Error {}
 
 export async function GET(request: Request) {
   try {
+    const auth = await getFinalCheckActor(request);
+    if (!auth.actor) return auth.response;
+
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search')?.trim();
     const status = searchParams.get('status');
@@ -18,6 +31,14 @@ export async function GET(request: Request) {
       'COMPLETED',
       'READY_FOR_DISPATCH',
     ];
+    const finalCheckIndex = STANDARD_FACTORY_ROUTE.indexOf(DepartmentCode.FINAL_CHECK);
+    const targetDepartment = STANDARD_FACTORY_ROUTE[finalCheckIndex + 1];
+    if (finalCheckIndex < 0 || !targetDepartment) {
+      return NextResponse.json(
+        { error: 'Final QC has no next department configured in the standard factory route.' },
+        { status: 503 },
+      );
+    }
     // Accepted inspection results are eligible for downstream handover.
     const challans = await prisma.challan.findMany({
       where: {
@@ -59,6 +80,11 @@ export async function GET(request: Request) {
         issuedBy: { select: { id: true, fullName: true, username: true } },
         receivedBy: { select: { id: true, fullName: true, username: true } },
         childChallans: {
+          where: {
+            fromDepartment: DepartmentCode.FINAL_CHECK,
+            toDepartment: targetDepartment,
+            challanType: 'INTER_DEPARTMENT',
+          },
           include: { items: true },
         },
       },
@@ -70,10 +96,10 @@ export async function GET(request: Request) {
         (sum, child) => sum + child.items.reduce((itemSum, item) => itemSum + (Number(item.quantity) || 0), 0),
         0,
       );
-      const acceptedQuantity = Number(challan.fabricOut ?? challan.fabricIn ?? 0);
+      const acceptedQuantity = Number(challan.fabricOut ?? 0);
       return {
         ...challan,
-        availableToHandover: Math.max(0, acceptedQuantity - previouslyHandedOver),
+        availableToHandover: availableAcceptedQuantity(acceptedQuantity, previouslyHandedOver),
       };
     });
 
@@ -89,15 +115,16 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const auth = await getFinalCheckActor(request);
+    if (!auth.actor) return auth.response;
+
     const body = await request.json();
     const {
       parentChallanId,
-      programId,
       toDepartment: requestedTargetDept,
       priority,
       remarks,
       items,
-      actorId: customActorId,
     } = body;
 
     if (!parentChallanId) {
@@ -108,28 +135,25 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'At least one item is required for the handover Challan.' }, { status: 400 });
     }
 
-    // Resolve target department — dynamically from route config, default to PACKING
-    let targetDepartment = requestedTargetDept;
-    if (!targetDepartment) {
-      try {
-        const { STANDARD_FACTORY_ROUTE } = await import('@subham/config');
-        const fqcIndex = STANDARD_FACTORY_ROUTE.findIndex(
-          (d: string) => d === 'FINAL_CHECK' || d === 'FINAL_QC'
-        );
-        if (fqcIndex !== -1 && fqcIndex < STANDARD_FACTORY_ROUTE.length - 1) {
-          targetDepartment = STANDARD_FACTORY_ROUTE[fqcIndex + 1];
-        }
-      } catch {
-        // config package may not export STANDARD_FACTORY_ROUTE
-      }
-      if (!targetDepartment) targetDepartment = 'PACKING';
+    const finalCheckIndex = STANDARD_FACTORY_ROUTE.indexOf(DepartmentCode.FINAL_CHECK);
+    const targetDepartment = STANDARD_FACTORY_ROUTE[finalCheckIndex + 1];
+    if (finalCheckIndex < 0 || !targetDepartment) {
+      return NextResponse.json(
+        { error: 'Final QC has no next department configured in the standard factory route.' },
+        { status: 503 },
+      );
+    }
+    if (requestedTargetDept && requestedTargetDept !== targetDepartment) {
+      return NextResponse.json(
+        { error: `Final QC handover must go to the configured next department: ${targetDepartment}.` },
+        { status: 400 },
+      );
     }
 
     const parentChallan = await prisma.challan.findUnique({
       where: { id: parentChallanId },
       include: {
         program: true,
-        childChallans: { include: { items: true } },
       },
     });
 
@@ -151,56 +175,64 @@ export async function POST(request: Request) {
       );
     }
 
-    // Compute available balance preventing over-issuance
-    const totalAcceptedQty = Number(parentChallan.fabricOut ?? parentChallan.fabricIn ?? 0);
-    const previouslyHandedOver = parentChallan.childChallans.reduce(
-      (sum, ch) => sum + ch.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0),
-      0
-    );
-    const availableToHandover = Math.max(0, totalAcceptedQty - previouslyHandedOver);
-
-    const itemQuantities = items.map((item: any) => Number(item.quantity));
-    if (itemQuantities.some((quantity) => !Number.isInteger(quantity) || quantity <= 0)) {
-      return NextResponse.json({ error: 'Every handover item must have a positive whole-number quantity.' }, { status: 400 });
+    let itemQuantities: number[];
+    try {
+      itemQuantities = items.map((item: any) => {
+        const quantity = parseWholeNumber(item.quantity, 'Handover item quantity');
+        if (quantity <= 0) throw new FinalCheckValidationError('Every handover item quantity must be greater than zero.');
+        return quantity;
+      });
+    } catch (error) {
+      return NextResponse.json(
+        { error: error instanceof Error ? error.message : 'Handover item quantity is invalid.' },
+        { status: 400 },
+      );
     }
     const requestingQty = itemQuantities.reduce((sum, quantity) => sum + quantity, 0);
 
-    if (requestingQty > availableToHandover) {
-      return NextResponse.json(
-        {
-          error: `Cannot issue ${requestingQty} pieces. Available accepted balance is only ${availableToHandover} (Total accepted: ${totalAcceptedQty}, Previously issued: ${previouslyHandedOver}).`,
-        },
-        { status: 400 }
-      );
-    }
-
-    // Resolve actor
-    let actorId = customActorId;
-    if (!actorId) {
-      const fcUser = await prisma.user.findFirst({
-        where: { OR: [{ username: 'finalcheck' }, { username: 'final_check' }, { departmentCode: 'FINAL_CHECK' }] },
-        select: { id: true },
-      });
-      actorId = fcUser?.id;
-    }
-    if (!actorId) {
-      const fallback = await prisma.user.findFirst({ select: { id: true } });
-      actorId = fallback?.id;
-    }
+    const actorId = auth.actor.id;
 
     // Generate unique challan number
-    const count = await prisma.challan.count({ where: { fromDepartment: 'FINAL_CHECK' } });
-    const timestamp = Date.now().toString().slice(-4);
-    const challanNumber = `CH-FQC-${String(count + 1).padStart(4, '0')}-${timestamp}`;
+    const challanNumber = `CH-FQC-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
 
     const newChallan = await prisma.$transaction(async (tx) => {
-      // Create outgoing challan to downstream (PACKING)
+      const claimed = await tx.challan.updateMany({
+        where: { id: parentChallan.id, status: parentChallan.status },
+        data: { status: 'HANDOVER_PROCESSING' },
+      });
+      if (claimed.count !== 1) {
+        throw new HandoverValidationError('This Final QC job changed during handover. Refresh and retry.');
+      }
+
+      const currentParent = await tx.challan.findUnique({
+        where: { id: parentChallan.id },
+        include: {
+          childChallans: {
+            where: {
+              fromDepartment: DepartmentCode.FINAL_CHECK,
+              toDepartment: targetDepartment,
+              challanType: 'INTER_DEPARTMENT',
+            },
+            include: { items: true },
+          },
+        },
+      });
+      if (!currentParent) throw new HandoverValidationError('Final QC parent challan no longer exists.');
+
+      const totalAcceptedQty = Number(currentParent.fabricOut ?? 0);
+      const previouslyHandedOver = currentParent.childChallans.reduce(
+        (sum, child) => sum + child.items.reduce((itemSum, item) => itemSum + (Number(item.quantity) || 0), 0),
+        0,
+      );
+      const availableToHandover = availableAcceptedQuantity(totalAcceptedQty, previouslyHandedOver);
+      validateHandoverQuantity(requestingQty, availableToHandover);
+
       const ch = await tx.challan.create({
         data: {
           challanNumber,
           challanType: 'INTER_DEPARTMENT',
-          programId: programId || parentChallan.programId,
-          parentChallanId: parentChallan.id,
+          programId: currentParent.programId,
+          parentChallanId: currentParent.id,
           fromDepartment: 'FINAL_CHECK',
           toDepartment: targetDepartment,
           status: 'ISSUED',
@@ -208,22 +240,20 @@ export async function POST(request: Request) {
           issuedDate: new Date(),
           createdById: actorId,
           issuedById: actorId,
-          remarks:
-            remarks ||
-            `Handover from Final QC to ${targetDepartment}: Inspected & accepted garments ready for dispatch.`,
+          remarks: remarks || `Handover from Final QC to ${targetDepartment}: accepted garments ready for the next production stage.`,
           fabricIn: requestingQty,
           fabricOut: requestingQty,
           items: {
             create: items.map((it: any) => ({
               itemDescription:
                 it.itemDescription ||
-                `${parentChallan.program?.styleCode || 'Garment'} — Final QC Passed — Ready for ${targetDepartment}`,
+                `${parentChallan.program?.styleCode || 'Garment'} — Final QC Accepted — Ready for ${targetDepartment}`,
               fabricCode: it.fabricCode || 'GARMENT',
               colour: it.colour || it.color || parentChallan.program?.fabricColor || 'Standard',
               quantity: Number(it.quantity) || 0,
               uom: it.uom || 'PCS',
               unitType: it.unitType || 'PCS',
-              barcode: it.barcode || `BC-FQC-${Date.now().toString().slice(-6)}`,
+              barcode: it.barcode || `BC-FQC-${Date.now().toString().slice(-6)}-${crypto.randomUUID().slice(0, 6)}`,
               remarks: it.remarks || it.notes || 'Passed final quality inspection',
             })),
           },
@@ -251,14 +281,9 @@ export async function POST(request: Request) {
       // If entire accepted balance transferred, mark parent as HANDED_OVER
       const remainingBalance = availableToHandover - requestingQty;
       if (remainingBalance <= 0) {
-        await tx.challan.update({
-          where: { id: parentChallan.id },
-          data: { status: 'HANDED_OVER' },
-        });
-
         await tx.challanEvent.create({
           data: {
-            challanId: parentChallan.id,
+            challanId: currentParent.id,
             action: 'CHALLAN_HANDED_OVER',
             fromStatus: parentChallan.status,
             toStatus: 'HANDED_OVER',
@@ -267,6 +292,11 @@ export async function POST(request: Request) {
           },
         });
       }
+
+      await tx.challan.update({
+        where: { id: currentParent.id },
+        data: { status: remainingBalance <= 0 ? 'HANDED_OVER' : parentChallan.status },
+      });
 
       return ch;
     });
@@ -277,6 +307,12 @@ export async function POST(request: Request) {
       data: newChallan,
     });
   } catch (error: any) {
+    if (error instanceof HandoverValidationError || error instanceof FinalCheckValidationError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: error instanceof HandoverValidationError ? 409 : 400 },
+      );
+    }
     console.error('Error issuing Final QC Challan:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to issue Final QC Challan' },

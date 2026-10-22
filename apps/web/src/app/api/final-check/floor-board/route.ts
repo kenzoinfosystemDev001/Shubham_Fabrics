@@ -1,12 +1,16 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { getFinalCheckActor } from '@/lib/final-check-auth';
 
 export const dynamic = 'force-dynamic';
 
 const FINAL_CHECK_DEPTS = ['FINAL_CHECK', 'FINAL CHECK', 'FINAL_QC', 'FINAL-CHECK'];
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const auth = await getFinalCheckActor(request);
+    if (!auth.actor) return auth.response;
+
     const allJobs = await prisma.challan.findMany({
       where: {
         toDepartment: { in: FINAL_CHECK_DEPTS },

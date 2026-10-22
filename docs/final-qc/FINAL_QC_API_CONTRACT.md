@@ -44,11 +44,12 @@ Acknowledges physical bundle receipt and count verification.
   }
   ```
 - **Validation**:
-  - `receivedQuantity > 0` and `receivedQuantity <= issuedQuantity`.
-- **Transitions**: Updates Challan status to `'RECEIVED'`, logs `ChallanEvent`.
+  - Issued and received counts must be positive whole-number quantities.
+  - `receivedQuantity <= issuedQuantity`.
+- **Transitions**: Conditionally changes `ISSUED` to `RECEIVED` (or `ON_HOLD` when a shortage is explicitly held), logs `ChallanEvent`, and returns `409` when another action already changed the record.
 
 ### `GET /api/final-check/queue`
-Returns active jobs in Final QC (`RECEIVED`, `IN_PROCESS`, `COMPLETED`, `READY_FOR_HANDOVER`, `ON_HOLD`).
+Returns Final QC jobs with linked program, items, recent production transactions, inspections/defects, and outgoing challans. Available handover quantity is accepted output minus prior normal downstream transfers.
 
 ### `GET /api/final-check/jobs/[id]`
 Returns single job details including linked Production Sheet (`Program`), events, defect records, and prior inspections.
@@ -70,41 +71,37 @@ Allocates inspection table and inspector.
 - **Transitions**: Updates Challan status to `'IN_PROCESS'`.
 
 ### `POST /api/final-check/jobs/[id]/inspect`
-Submits authoritative inspection results, parameter checkpoints, defect categorization, and output quantity reconciliation.
+Submits authoritative inspection results, parameter checkpoints, defect categorization, and output quantity reconciliation. Inspector/operator identity comes from the authenticated session.
 - **Request Body**:
   ```json
   {
-    "inspectedQuantity": 100,
+    "inputQuantity": 100,
     "acceptedQuantity": 95,
     "reworkQuantity": 3,
-    "rejectQuantity": 2,
-    "balanceQuantity": 0,
-    "inspectionChecks": {
-      "visualAppearance": "PASS",
-      "stitchingSeams": "PASS",
-      "embroideryIntegrity": "PASS",
-      "trimmingCleanliness": "PASS",
-      "pressingQuality": "PASS",
-      "measurements": "PASS",
-      "trimsAndLabels": "PASS"
-    },
-    "defects": [
-      { "type": "Loose seam thread", "count": 3, "severity": "MINOR" },
-      { "type": "Non-removable fabric stain", "count": 2, "severity": "CRITICAL" }
-    ],
-    "notes": "Passed full AQL audit with 2 fabric stain scraps quarantined.",
-    "autoAdvance": true
+    "rejectedQuantity": 2,
+    "pendingQuantity": 0,
+    "appearanceCheck": "PASS",
+    "measurementCheck": "PASS",
+    "labelCheck": "PASS",
+    "stitchingQuality": "PASS",
+    "packagingReadiness": "PASS",
+    "overallResult": "PASS",
+    "defectReason": "",
+    "reworkReason": "",
+    "notes": "Inspection observations"
   }
   ```
 - **Validation**:
-  - `inspectedQuantity == acceptedQuantity + reworkQuantity + rejectQuantity + balanceQuantity`.
-  - Non-negative integers.
+  - `inputQuantity == acceptedQuantity + reworkQuantity + rejectedQuantity + pendingQuantity`.
+  - Non-negative safe integers; input must equal the remaining batch balance.
+  - All five checkpoints and the overall result are required.
 - **Database Operations**:
   - Creates `QualityInspection`, `QualityInspectionParameter` records, `DefectLog` records.
   - Creates `ProductionTransaction` (`departmentCode: 'FINAL_CHECK'`).
-  - Creates `DefectRecord` (`status: 'SCRAP'`) if `rejectQuantity > 0`.
-  - Updates Challan `fabricOut = acceptedQuantity`, `reworkQty = reworkQuantity`, `rejectQty = rejectQuantity`.
-  - Status updated to `'READY_FOR_HANDOVER'` (if autoAdvance) or `'COMPLETED'`.
+  - Creates `DefectRecord` with `OPEN` disposition for rejected pieces; it does not automatically classify them as scrap.
+  - Tracks accepted output cumulatively in `fabricOut`.
+  - Routes rejected pieces to the Final QC defective shelf and records rework without inventing a downstream route.
+  - Conditionally claims the `IN_PROCESS` state to prevent duplicate concurrent submissions.
 
 ### `POST /api/final-check/jobs/[id]/hold` & `POST /api/final-check/jobs/[id]/resume`
 Places job on hold for supervisor review or resumes it.
@@ -114,12 +111,11 @@ Places job on hold for supervisor review or resumes it.
 ## 3. DOWNSTREAM HANDOVER & REPORTING
 
 ### `POST /api/final-check/issue-challan`
-Generates outgoing handover Challan to next stage (`PACKING`).
+Generates outgoing handover Challan to the next stage from `STANDARD_FACTORY_ROUTE` (currently `PACKING`).
 - **Request Body**:
   ```json
   {
     "parentChallanId": "uuid",
-    "programId": "uuid",
     "toDepartment": "PACKING",
     "priority": "NORMAL",
     "remarks": "Final QC passed garments transferred for folding & packaging.",
@@ -136,8 +132,8 @@ Generates outgoing handover Challan to next stage (`PACKING`).
     ]
   }
   ```
-- **Guards**: Handover quantity cannot exceed available accepted good quantity.
-- **Outputs**: Generates sequential Challan (`CH-FQC-XXXX-XXXX`), assigns Code-128 barcode, marks parent `HANDED_OVER`.
+- **Guards**: Each item count is a positive whole number; requested transfer cannot exceed accepted quantity minus previous normal downstream transfers. A client-supplied destination must match configured routing.
+- **Outputs**: Creates an audited child Challan with a unique `CH-FQC-...` identifier. Code-128 image generation is not implemented.
 
 ### `GET /api/final-check/floor-board`
 Returns 4-lane live Kanban board:
@@ -147,4 +143,4 @@ Returns 4-lane live Kanban board:
 4. `READY_FOR_DISPATCH`
 
 ### `GET /api/final-check/reports`
-First-pass yield, defect Pareto distribution, style throughput, and audit trail.
+Returns database-derived inspection totals, yield, defect summary, style metrics, and transaction history for the requested reporting period.

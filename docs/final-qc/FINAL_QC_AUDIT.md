@@ -23,9 +23,10 @@ $$\text{Finishing} \longrightarrow \text{Steam Press} \longrightarrow \mathbf{Fi
    - Subsequent destinations in the route include `FINISHED_GOODS` (Warehouse) and `DISPATCH`.
    - Routing should dynamically resolve the next department from `STANDARD_FACTORY_ROUTE`, defaulting to `PACKING`.
 4. **Current Final QC Implementation State**:
-   - `FINAL_CHECK_INSPECTOR` and `FINAL_CHECK_SUPERVISOR` exist in `packages/types/src/index.ts`.
-   - Core user `finalcheck` (PIN: `1234`, Department: `FINAL_CHECK`, Role: `FINAL_CHECK_INSPECTOR`) exists in `scripts/setup-core-users.js` and `coreUserMap` in `apps/web/src/app/api/auth/login/route.ts`.
-   - However, the UI workspace (`apps/web/src/app/final-check`), backend API handlers (`apps/web/src/app/api/final-check/*`), navigation bar (`FinalCheckNavigation.tsx`), and RBAC route enforcement in `rbac.ts` have not yet been built.
+   - Final QC has a dedicated login station, route group, department navigation, queue, floor board, reports, and API handlers under `apps/web/src/app/api/final-check`.
+   - The web API handlers use Prisma directly and are protected by `getFinalCheckActor`; access is based on the existing `mes_jwt_<userId>_<timestamp>` token, an active database user, and Final QC department/role or admin membership.
+   - The token format is not cryptographically signed. The Final QC guard verifies the active user and token timestamp but does not resolve the shared platform's token-forgery limitation; authentication must be migrated centrally to signed sessions.
+   - Focused quantity-rule tests and web TypeScript validation have been run. Database-backed end-to-end validation requires an isolated test database and has not been performed.
 
 ---
 
@@ -46,7 +47,7 @@ The Prisma schema (`packages/database/prisma/schema.prisma`) already provides th
    - Quantitative tracking record.
    - Fields: `departmentCode: 'FINAL_CHECK'`, `operationName: 'FINAL_QUALITY_INSPECTION'`, `inputQuantity`, `goodQuantity`, `reworkQuantity`, `rejectQuantity`, `balanceQuantity`.
 5. **`DefectRecord`**:
-   - Quarantined defect tracking for scrap or major rework items (`defectCode`, `severity`, `quantity`, `reason`, `status: 'SCRAP'`).
+   - Defect tracking for rejected or rework items (`defectCode`, `severity`, `quantity`, `reason`, `status: 'OPEN'` or `'REWORK'`); rejected garments are not automatically classified as scrap.
 6. **`Challan` & `ChallanEvent`**:
    - Inward and outward bundle transfers, status lifecycle (`ISSUED`, `RECEIVED`, `IN_PROCESS`, `COMPLETED`, `READY_FOR_HANDOVER`, `HANDED_OVER`, `ON_HOLD`).
 7. **`Program` (Production Sheet)**:
@@ -69,7 +70,7 @@ The Prisma schema (`packages/database/prisma/schema.prisma`) already provides th
 | **Quality Gate Execution** | `POST /api/final-check/jobs/[id]/inspect` executing complete appearance, seam, stitch, measurement, and defect checks. |
 | **Strict Quantity Accounting** | Validate $Input = Accepted + Rework + Rejected + PendingBalance$, persist `ProductionTransaction` and `DefectRecord`. |
 | **Supervisor Hold & Review** | `POST /api/final-check/jobs/[id]/hold` and `POST /api/final-check/jobs/[id]/resume` for non-conforming batches. |
-| **Outgoing Handover Challan** | `POST /api/final-check/issue-challan` to next configured stage (`PACKING`), Code-128 barcode sticker, mark parent `HANDED_OVER`. |
+| **Outgoing Handover Challan** | `POST /api/final-check/issue-challan` to the next configured stage (`PACKING` today), accepted-quantity validation, child-challan genealogy, and atomic parent closure. Code-128 image generation is not implemented. |
 | **Live Kanban Board** | 4-lane live synchronized floor board (`GET /api/final-check/floor-board`). |
 | **Analytics & Reports** | First-pass yield, defect Pareto distribution, measurement variance, and audit history (`GET /api/final-check/reports`). |
 
@@ -81,13 +82,13 @@ For every batch received into Final QC:
 1. **Receipt Guard**:
    $$\text{Received Quantity} \le \text{Issued Quantity}$$
 2. **Inspection Reconciliation**:
-   $$\text{Pieces Inspected} = \text{Accepted (Good)} + \text{Rework (Alteration)} + \text{Rejected (Scrap)}$$
+   $$\text{Pieces Inspected} = \text{Accepted (Good)} + \text{Rework} + \text{Rejected} + \text{Pending}$$
 3. **Batch Balance**:
    $$\text{Received Input} = \text{Pieces Inspected} + \text{Pieces Pending Inspection}$$
 4. **Transfer Eligibility**:
    - ONLY `Accepted (Good)` pieces are eligible for downstream transfer.
-   - `Rework` pieces are routed to the alteration loop or held under supervisor review.
-   - `Rejected` pieces are quarantined as `DefectRecord` with status `SCRAP`.
+   - `Rework` pieces are recorded, but no automatic route is configured in the standard workflow.
+   - `Rejected` pieces are recorded as `OPEN` defects and directed to the Final QC defective shelf; they are not silently marked `SCRAP`.
 5. **Integer Validation**:
    - All piece counts must be non-negative integers ($\ge 0$). No decimals, no negatives.
 
@@ -101,12 +102,13 @@ For every batch received into Final QC:
 
 ---
 
-## 6. IMPLEMENTATION ROADMAP
+## 6. DELIVERY STATUS AND KNOWN LIMITATIONS
 
-- [x] Phase A: Repository Audit & Architectural Design (`FINAL_QC_AUDIT.md`)
-- [ ] Phase B: Core Documents (`docs/final-qc/*.md` - 10 remaining documents)
-- [ ] Phase C: Authentication, RBAC & Navigation Integration
-- [ ] Phase D: Backend REST APIs (`apps/web/src/app/api/final-check/*`)
-- [ ] Phase E: Frontend User Interface Pages (`apps/web/src/app/final-check/*`)
-- [ ] Phase F: Automated Test Suite (`scripts/test-final-qc-workflow.js`)
-- [ ] Phase G: Type-check, Production Build, Git Merge & Push
+- [x] Dedicated Final QC access, navigation, sections, database-backed queues, polling refresh, inspection, hold/resume, and handover.
+- [x] Server-side department/admin authorization and authenticated actor assignment on the web API actions.
+- [x] Inspection reconciliation, whole-number validation, accepted-only transfer limits, and conditional state claims.
+- [x] Documentation set under `docs/final-qc/`, focused accounting tests, and web TypeScript validation.
+- [ ] Database-backed/browser end-to-end suite: not run; use an isolated test database before exercising mutating workflows.
+- [ ] Rework route: not configured; no destination has been invented.
+- [ ] Shared signed-session authentication: remains a platform-level security gap.
+- [ ] Latest changes pushed to GitHub: not performed.

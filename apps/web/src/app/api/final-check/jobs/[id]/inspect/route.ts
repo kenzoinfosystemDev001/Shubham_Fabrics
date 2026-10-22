@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { getFinalCheckActor } from '@/lib/final-check-auth';
+import { validateInspectionQuantities, inspectionPassed } from '@/lib/final-check-rules.mjs';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,6 +12,9 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await getFinalCheckActor(request);
+    if (!auth.actor) return auth.response;
+
     const { id } = await params;
     const body = await request.json().catch(() => ({}));
 
@@ -33,22 +38,7 @@ export async function POST(
       );
     }
 
-    const actorUser = await prisma.user.findFirst({
-      where: {
-        OR: [
-          { id: typeof body.actorId === 'string' ? body.actorId : '' },
-          { username: 'finalcheck' },
-          { username: 'final_check' },
-          { departmentCode: 'FINAL_CHECK' },
-          { username: 'admin' },
-        ],
-      },
-      select: { id: true },
-    }) ?? await prisma.user.findFirst({ select: { id: true } });
-    const actorId = actorUser?.id;
-    if (!actorId) {
-      return NextResponse.json({ error: 'No user is available to record the Final QC inspection.' }, { status: 500 });
-    }
+    const actorId = auth.actor.id;
 
     const totalIssuedQty = challan.items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
     const [previousTransaction, previousTotals] = await Promise.all([
@@ -68,17 +58,26 @@ export async function POST(
     const remainingQuantity = previousTransaction
       ? Number(previousTransaction.balanceQuantity)
       : Number(challan.fabricIn ?? totalIssuedQty);
-    const inputQuantity = Number(body.inputQuantity ?? remainingQuantity);
-    const acceptedQuantity = Number(body.acceptedQuantity ?? body.goodQuantity ?? 0);
-    const reworkQuantity = Number(body.reworkQuantity ?? 0);
-    const rejectedQuantity = Number(body.rejectedQuantity ?? body.rejectQuantity ?? 0);
-    const pendingQuantity = Number(body.pendingQuantity ?? body.balanceQuantity ?? 0);
-
-    if (![inputQuantity, acceptedQuantity, reworkQuantity, rejectedQuantity, pendingQuantity].every(
-      (quantity) => Number.isInteger(quantity) && quantity >= 0,
-    ) || inputQuantity <= 0) {
+    let quantities;
+    try {
+      quantities = validateInspectionQuantities({
+        inputQuantity: body.inputQuantity ?? remainingQuantity,
+        acceptedQuantity: body.acceptedQuantity ?? body.goodQuantity ?? 0,
+        reworkQuantity: body.reworkQuantity ?? 0,
+        rejectedQuantity: body.rejectedQuantity ?? body.rejectQuantity ?? 0,
+        pendingQuantity: body.pendingQuantity ?? body.balanceQuantity ?? 0,
+      });
+    } catch (error) {
       return NextResponse.json(
-        { error: 'Input, accepted, rework, rejected, and pending quantities must be whole, non-negative garment counts; input must be greater than zero.' },
+        { error: error instanceof Error ? error.message : 'Inspection quantities are invalid.' },
+        { status: 400 },
+      );
+    }
+    const { input: inputQuantity, accepted: acceptedQuantity, rework: reworkQuantity, rejected: rejectedQuantity, pending: pendingQuantity } = quantities;
+
+    if (!Number.isSafeInteger(remainingQuantity) || remainingQuantity < 0) {
+      return NextResponse.json(
+        { error: 'The recorded remaining quantity is invalid. Contact a supervisor before inspecting this batch.' },
         { status: 400 },
       );
     }
@@ -101,12 +100,12 @@ export async function POST(
     }
 
     const {
-      stitchingQuality = 'PASS',
-      measurementCheck = 'PASS',
-      appearanceCheck = 'PASS',
-      labelCheck = 'PASS',
-      packagingReadiness = 'PASS',
-      overallResult = 'PASS',
+      stitchingQuality,
+      measurementCheck,
+      appearanceCheck,
+      labelCheck,
+      packagingReadiness,
+      overallResult,
       notes = '',
     } = body;
 
@@ -118,16 +117,13 @@ export async function POST(
       ['PACKAGING_READINESS', packagingReadiness],
     ] as const;
     if (checks.some(([, value]) => value !== 'PASS' && value !== 'FAIL')) {
-      return NextResponse.json({ error: 'Inspection checkpoints must be PASS or FAIL.' }, { status: 400 });
+      return NextResponse.json({ error: 'All inspection checkpoints are required and must be PASS or FAIL.' }, { status: 400 });
     }
 
-    const isPassed =
-      overallResult === 'PASS' &&
-      stitchingQuality === 'PASS' &&
-      measurementCheck === 'PASS' &&
-      appearanceCheck === 'PASS' &&
-      labelCheck === 'PASS' &&
-      packagingReadiness === 'PASS';
+    const isPassed = inspectionPassed(
+      [stitchingQuality, measurementCheck, appearanceCheck, labelCheck, packagingReadiness],
+      overallResult,
+    );
 
     if (overallResult !== 'PASS' && overallResult !== 'FAIL') {
       return NextResponse.json({ error: 'Overall inspection result must be PASS or FAIL.' }, { status: 400 });
@@ -171,7 +167,7 @@ export async function POST(
     const result = await prisma.$transaction(async (tx) => {
       const claimed = await tx.challan.updateMany({
         where: { id: challan.id, status: 'IN_PROCESS' },
-        data: { status: 'IN_PROCESS' },
+        data: { status: 'QC_DECISION_PENDING' },
       });
       if (claimed.count !== 1) return null;
 
@@ -196,7 +192,7 @@ export async function POST(
         data: checks.map(([parameterName, value]) => ({
           inspectionId: inspectionRecord.id,
           parameterName,
-          expectedValue: 'Final QC standard',
+          expectedValue: 'PASS',
           measuredValue: value,
           status: value,
           uom,
@@ -237,69 +233,10 @@ export async function POST(
         },
       });
 
-      let reworkReturnChallan = null;
-      if (reworkQuantity > 0) {
-        const year = new Date().getFullYear();
-        const prefix = `CH-RET-FQC-${year}-`;
-        const count = await tx.challan.count({
-          where: { challanNumber: { startsWith: prefix } },
-        });
-        const challanNumber = `${prefix}${String(count + 1).padStart(5, '0')}`;
-        const reason = String(body.reworkReason).trim();
-
-        reworkReturnChallan = await tx.challan.create({
-          data: {
-            challanNumber,
-            challanType: 'REWORK_RETURN',
-            programId: challan.programId,
-            parentChallanId: challan.id,
-            fromDepartment: 'FINAL_CHECK',
-            toDepartment: 'STEAM_PRESS',
-            status: 'ISSUED',
-            priority: challan.priority || 'HIGH',
-            createdById: actorId,
-            issuedById: actorId,
-            issuedDate: new Date(),
-            fabricIn: reworkQuantity,
-            fabricOut: 0,
-            fabricUnit: uom,
-            remarks: `Final QC rework return to Steam Press for ${challan.program?.programSerialNo || challan.program?.programNumber || challan.challanNumber}. Reason: ${reason}. Must return for Final QC re-inspection.`,
-          },
-        });
-
-        await tx.challanItem.create({
-          data: {
-            challanId: reworkReturnChallan.id,
-            itemDescription: `${challan.items[0]?.itemDescription || 'Garments'} - Final QC Rework Return`,
-            fabricCode: challan.items[0]?.fabricCode || 'GARMENT',
-            colour: challan.items[0]?.colour || challan.program?.fabricColor || 'Standard',
-            unitType: 'PCS',
-            quantity: reworkQuantity,
-            uom,
-            remarks: `Returned to Steam Press for rework. Reason: ${reason}`,
-          },
-        });
-
-        await tx.challanEvent.create({
-          data: {
-            challanId: reworkReturnChallan.id,
-            action: 'CHALLAN_ISSUED',
-            fromStatus: 'DRAFT',
-            toStatus: 'ISSUED',
-            actorId,
-            notes: `Final QC issued ${reworkQuantity} garments back to Steam Press for rework. Parent: ${challan.challanNumber}.`,
-          },
-        });
-      }
-
       let rejectReturnChallan = null;
       if (rejectedQuantity > 0) {
         const year = new Date().getFullYear();
-        const prefix = `CH-REJ-FQC-${year}-`;
-        const count = await tx.challan.count({
-          where: { challanNumber: { startsWith: prefix } },
-        });
-        const challanNumber = `${prefix}${String(count + 1).padStart(5, '0')}`;
+        const challanNumber = `CH-REJ-FQC-${year}-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
         const reason = String(body.defectReason).trim();
 
         rejectReturnChallan = await tx.challan.create({
@@ -356,16 +293,15 @@ export async function POST(
       if (rejectedQuantity > 0) {
         await tx.defectRecord.create({
           data: {
-            defectCode: `DEF-FQC-${Date.now().toString().slice(-6)}`,
+            defectCode: `DEF-FQC-${Date.now().toString().slice(-6)}-${crypto.randomUUID().slice(0, 6)}`,
             programId: challan.programId,
             challanId: challan.id,
             departmentCode: 'FINAL_CHECK',
             itemDescription: challan.items[0]?.itemDescription || `${challan.program?.styleCode || 'Garment'} - Final QC Rejected`,
             severity: 'CRITICAL',
-            status: 'SCRAP',
+            status: 'OPEN',
             quantity: rejectedQuantity,
             reason: body.defectReason || 'Failed final quality inspection - does not meet dispatch standards',
-            resolutionNotes: body.defectDescription || 'Rejected at Final QC gate',
             detectedById: actorId,
           },
         });
@@ -375,7 +311,7 @@ export async function POST(
       if (reworkQuantity > 0) {
         await tx.defectRecord.create({
           data: {
-            defectCode: `DEF-FQC-RW-${Date.now().toString().slice(-6)}`,
+            defectCode: `DEF-FQC-RW-${Date.now().toString().slice(-6)}-${crypto.randomUUID().slice(0, 6)}`,
             programId: challan.programId,
             challanId: challan.id,
             departmentCode: 'FINAL_CHECK',
@@ -396,7 +332,8 @@ export async function POST(
         data: {
           status: nextStatus,
           fabricOut: totalAcceptedQuantity,
-          remarks: `${challan.remarks ? challan.remarks + ' | ' : ''}Final QC: ${acceptedQuantity} Accepted, ${reworkQuantity} Rework${reworkReturnChallan ? ` (${reworkReturnChallan.challanNumber} to Steam Press)` : ''}, ${rejectedQuantity} Rejected${rejectReturnChallan ? ` (${rejectReturnChallan.challanNumber} to defective shelf)` : ''}. ${notes || 'Inspection complete.'}`,
+          completedDate: pendingQuantity === 0 ? new Date() : null,
+          remarks: `${challan.remarks ? challan.remarks + ' | ' : ''}Final QC: ${acceptedQuantity} Accepted, ${reworkQuantity} Rework (routing pending), ${rejectedQuantity} Rejected${rejectReturnChallan ? ` (${rejectReturnChallan.challanNumber} to defective shelf)` : ''}. ${notes || 'Inspection complete.'}`,
         },
         include: { program: true, items: true },
       });
@@ -413,7 +350,7 @@ export async function POST(
         },
       });
 
-      return { updatedChallan, transaction, inspection: inspectionRecord, reworkReturnChallan, rejectReturnChallan };
+      return { updatedChallan, transaction, inspection: inspectionRecord, rejectReturnChallan };
     });
 
     if (!result) {
@@ -425,11 +362,7 @@ export async function POST(
 
     return NextResponse.json({
       success: true,
-      message: [
-        `Final QC inspection recorded: ${acceptedQuantity} accepted. Status: ${result.updatedChallan.status}.`,
-        result.reworkReturnChallan ? `Rework challan ${result.reworkReturnChallan.challanNumber} sent to Steam Press.` : '',
-        result.rejectReturnChallan ? `Rejected garments sent to DEF-SHELF-FINAL-CHECK via ${result.rejectReturnChallan.challanNumber}.` : '',
-      ].filter(Boolean).join(' '),
+      message: `Final QC inspection recorded: ${acceptedQuantity} accepted. Status: ${result.updatedChallan.status}.${result.rejectReturnChallan ? ` Rejected garments quarantined via ${result.rejectReturnChallan.challanNumber}.` : ''}`,
       data: result,
     });
   } catch (error: any) {
