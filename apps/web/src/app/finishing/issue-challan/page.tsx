@@ -61,9 +61,8 @@ function FinishingIssueChallanContent() {
         const json = await res.json();
         const list = json.data || [];
 
-        // Prioritize jobs that are ready for handover or completed
         const eligible = list.filter((j: any) =>
-          ['READY_FOR_HANDOVER', 'COMPLETED', 'IN_PROCESS', 'RECEIVED'].includes(j.status)
+          ['READY_FOR_HANDOVER', 'COMPLETED'].includes(j.status)
         );
         setSourceJobs(eligible);
 
@@ -85,7 +84,7 @@ function FinishingIssueChallanContent() {
 
   const selectJob = (job: any) => {
     setSelectedJob(job);
-    const availableGood = job.fabricOut ?? job.fabricIn ?? 0;
+    const availableGood = job.fabricOut ?? 0;
     setItems([
       {
         itemDescription: `${job.program?.styleCode || 'Finished'} Garments - Ready for Handover`,
@@ -128,7 +127,7 @@ function FinishingIssueChallanContent() {
   };
 
   const totalQuantityToIssue = items.reduce((sum, it) => sum + (Number(it.quantity) || 0), 0);
-  const maxGoodAvailable = selectedJob ? (selectedJob.fabricOut ?? selectedJob.fabricIn ?? 0) : 0;
+  const maxGoodAvailable = selectedJob ? (selectedJob.fabricOut ?? 0) : 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -142,7 +141,12 @@ function FinishingIssueChallanContent() {
       return;
     }
 
-    if (maxGoodAvailable > 0 && totalQuantityToIssue > maxGoodAvailable) {
+    if (!Number.isSafeInteger(maxGoodAvailable) || maxGoodAvailable <= 0) {
+      alert('This job has no completed good quantity available for handover.');
+      return;
+    }
+
+    if (totalQuantityToIssue > maxGoodAvailable) {
       alert(
         `Cannot issue ${totalQuantityToIssue} garments. Maximum available unissued balance is ${maxGoodAvailable}.`
       );
