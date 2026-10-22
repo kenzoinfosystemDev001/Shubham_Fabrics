@@ -13,7 +13,7 @@ Any attempt to acknowledge more than the issued quantity from the upstream Chall
 
 ### Invariant 2: Mutually Exclusive Output Accounting
 For any inspected batch:
-$$\text{Pieces Inspected} = Q_{\text{accepted}} + Q_{\text{rework}} + Q_{\text{rejected}}$$
+$$\text{Pieces Inspected} = Q_{\text{accepted}} + Q_{\text{rework}} + Q_{\text{rejected}} + Q_{\text{pending}}$$
 
 Where:
 - $Q_{\text{accepted}} \ge 0$: Pieces fully meeting AQL specifications.
@@ -21,12 +21,12 @@ Where:
 - $Q_{\text{rejected}} \ge 0$: Pieces with non-recoverable defects (e.g. cut yarn, scorch burn, fabric tear).
 
 ### Invariant 3: Total Batch Balance
-$$\text{Total Inward Input} = \text{Pieces Inspected} + Q_{\text{pending}}$$
+$$\text{Current Inspection Input} = \text{Accepted} + \text{Rework} + \text{Rejected} + \text{Pending}$$
 
 Where:
 - $Q_{\text{pending}} \ge 0$: Uninspected garments remaining in WIP balance.
 
-$$\text{Total Inward Input} = Q_{\text{accepted}} + Q_{\text{rework}} + Q_{\text{rejected}} + Q_{\text{pending}}$$
+Each subsequent inspection input must equal the latest Final QC `ProductionTransaction.balanceQuantity`. Accepted, rework, and rejected outcomes accumulate across inspections; pending is the next inspection balance.
 
 ---
 
@@ -42,10 +42,10 @@ Under no circumstances may $Q_{\text{rework}}$ or $Q_{\text{rejected}}$ be added
 ## 3. DEFECT QUARANTINE LEDGER
 
 When $Q_{\text{rejected}} > 0$:
-1. A permanent `DefectRecord` is written with status `'SCRAP'`.
-2. The item is isolated from active inventory and linked to the Challan and Program for scrap tracking.
+1. A `DefectRecord` is written with status `'OPEN'` and linked to the Challan and Program.
+2. A defective-return Challan records the quantity at `DEF-SHELF-FINAL-CHECK`.
 3. The defect reason is captured (e.g., "Permanent oil mark", "Fabric cut during trimming").
 
 When $Q_{\text{rework}} > 0$:
-1. A `ReworkTransaction` is initiated or the pieces are flagged for internal line touch-up.
-2. The pieces must be reinspected before becoming eligible for handover.
+1. A `DefectRecord` with status `'REWORK'` and a reason is recorded.
+2. Rework is not eligible for handover. No automatic return route or reinspection process is configured.

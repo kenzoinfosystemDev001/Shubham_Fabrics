@@ -14,13 +14,15 @@ flowchart TD
     A["Steam Press / Finishing Handover"] -->|"Challan (Status: ISSUED)"| B["Final QC Inward Queue"]
     B -->|"Physical Bundle Count Verification"| C["Receipt Confirmed (Status: RECEIVED)"]
     C -->|"Workstation & Table Allocation"| D["Inspection In Progress (Status: IN_PROCESS)"]
-    D -->|"AQL 100% Comprehensive Audit"| E{"Quality Evaluation"}
-    E -->|"Pass All Checkpoints"| F["Authoritative Decision: PASSED"]
-    E -->|"Critical / Major Defects"| G["Rework / Scorch Scrap Quarantined"]
-    E -->|"Technical Discrepancy"| H["Supervisor Hold (Status: ON_HOLD)"]
-    F -->|"Status: READY_FOR_HANDOVER"| I["Generate Outgoing Handover Challan"]
-    I -->|"Target: PACKING (or Next Configured)"| J["Parent Challan Marked HANDED_OVER"]
-    J -->|"Code-128 Barcode Tag Attached"| K["Dispatched to Packing Inward Queue"]
+    D -->|"Record checkpoints and reconcile pieces"| E{"Quality Evaluation"}
+    E -->|"Pass all required checkpoints"| F["QC_APPROVED"]
+    E -->|"Rejected quantity"| G["OPEN DefectRecord and defective shelf"]
+    E -->|"Rework quantity"| H["REWORK DefectRecord (route not configured)"]
+    E -->|"Pending pieces or manual review"| I["ON_HOLD"]
+    F -->|"Accepted quantity only"| J["Generate Outgoing Handover Challan"]
+    G --> J
+    H --> J
+    J -->|"Next stage from STANDARD_FACTORY_ROUTE"| K["Parent closes when accepted balance is transferred"]
 ```
 
 ---
@@ -30,8 +32,8 @@ flowchart TD
 ### Stage 1: Inward Receipt & Verification
 - **Trigger**: Upstream department issues a Challan addressed to `toDepartment: 'FINAL_CHECK'`.
 - **Action**: Inspector compares physical garment count against the issued Challan quantity.
-- **Rule**: $Received \le Issued$. If $Received < Issued$, a shortage discrepancy note is recorded on the `ChallanEvent`.
-- **Status Change**: Transitions from `ISSUED` $\rightarrow$ `RECEIVED`.
+- **Rule**: $0 < Received \le Issued$. If $Received < Issued$, a shortage discrepancy note is recorded on the `ChallanEvent`; the operator may explicitly place it on hold.
+- **Status Change**: Conditionally transitions from `ISSUED` to `RECEIVED` (or `ON_HOLD` for an explicitly held shortage).
 
 ### Stage 2: Inspection Station Allocation
 - **Trigger**: Inspector selects a received batch from the active queue.
@@ -39,25 +41,21 @@ flowchart TD
 - **Status Change**: Transitions from `RECEIVED` $\rightarrow$ `IN_PROCESS`.
 
 ### Stage 3: Quality Checkpoints & Parameter Evaluation
-Inspector executes comprehensive checks against the linked Production Sheet (`Program`):
-1. **Visual Appearance & Workmanship**: Fabric flaws, shading variations, alignment.
-2. **Embroidery & Motif Integrity**: Jump stitches, loose threads, sequin attachment, registration.
-3. **Stitching & Seam Construction**: Seam slippage, skipped stitches, puckering, tension balance.
-4. **Trimming & Cleanliness**: Thread tails $< 2\text{mm}$, zero oil spots, zero chalk marks.
-5. **Pressing Quality & Glaze Check**: Crisp crease lines, zero scorch glaze or shine, 100% dry.
-6. **Key Measurement Verification**: Chest width, body length, sleeve length within tolerance ($\pm 0.5$ inch).
-7. **Trims, Buttons & Labels**: Correct washcare label, size label, brand tag placement.
+Inspector records the implemented checkpoints against the linked Production Sheet (`Program`): stitching quality, measurement, appearance, labels, and packaging readiness. Checkpoint values must be `PASS` or `FAIL`; all five are required.
 
 ### Stage 4: Output Reconciliation & Disposition
 - Every single piece must be accounted for:
   $$\text{Input Pieces} = \text{Accepted Pieces} + \text{Rework Pieces} + \text{Rejected Pieces} + \text{Pending Pieces}$$
 - `Accepted (Good)` $\rightarrow$ Eligible for downstream transfer.
 - `Rework (Alteration)` $\rightarrow$ Logged with specific alteration reason (e.g. "Restitch hem puckering").
-- `Rejected (Scrap)` $\rightarrow$ Quarantined with `DefectRecord` (status: `SCRAP`).
-- If batch passes audit: Transitions to `COMPLETED` and advances to `READY_FOR_HANDOVER`.
+- `Rejected` $\rightarrow$ `DefectRecord` with `OPEN` disposition and a defective-return Challan to `DEF-SHELF-FINAL-CHECK`; it is not automatically classified as scrap.
+- `Rework` $\rightarrow$ a `REWORK` defect record; no automatic rework destination is configured.
+- Inspection statuses are `QC_APPROVED`, `QC_REJECTED`, `REWORK_REQUESTED`, or `ON_HOLD`, according to checkpoints and dispositions.
 
 ### Stage 5: Downstream Handover to Packing
-- Inspector generates an outgoing Challan with format `CH-FQC-XXXX-XXXX`.
-- Dynamically resolves next destination from `STANDARD_FACTORY_ROUTE` (defaults to `PACKING`).
-- Generates a Code-128 barcode sticker tag.
-- Marks parent Challan as `HANDED_OVER`.
+- Inspector issues an outgoing Challan with a unique `CH-FQC-...` identifier.
+- Dynamically resolves the next destination from `STANDARD_FACTORY_ROUTE` (currently `PACKING`).
+- Transfers only accepted quantity, minus quantities previously handed over.
+- Marks the parent `HANDED_OVER` once its accepted balance is fully transferred. Code-128 barcode image generation is not currently implemented.
+
+The browser refreshes Final QC sections by polling the database-backed endpoints; it does not use WebSockets.

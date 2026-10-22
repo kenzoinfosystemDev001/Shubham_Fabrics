@@ -29,7 +29,7 @@ erDiagram
 - `departmentCode`: `'FINAL_CHECK'`
 - `inspectorId`: References `User(id)`
 - `sampleSize`: Total pieces inspected in this audit session
-- `status`: `'PASSED'` | `'REWORK_REQUIRED'` | `'REJECTED'` | `'ON_HOLD'`
+- `status`: workflow values such as `'PASS'`, `'REWORK'`, `'REJECT'`, or `'HOLD'`
 - `notes`: Inspector summary observations
 - `inspectedAt`: Timestamp of audit completion
 
@@ -61,17 +61,24 @@ erDiagram
 - `balanceQuantity`: Remaining uninspected WIP pieces
 - `unitOfMeasure`: `'PCS'`
 
-### `DefectRecord` (Quarantined Scrap)
+### `DefectRecord` (Rejected or Rework Tracking)
 - `defectCode`: Unique code e.g. `DEF-FQC-YYYY-XXXX`
 - `departmentCode`: `'FINAL_CHECK'`
 - `itemDescription`: Garment description
 - `severity`: `'CRITICAL'`
 - `quantity`: Number of rejected pieces
-- `status`: `'SCRAP'`
+- `status`: `'OPEN'` for rejected garments and `'REWORK'` for rework garments; Final QC does not silently mark pieces as scrap.
 - `reason`: Primary defect cause (e.g. `'Fabric tear'`, `'Oil stain non-removable'`)
 
 ### `Challan` & Outgoing Transfer
-- Sequential outgoing numbering: `CH-FQC-XXXX-XXXX`
+- Unique outgoing identifier: `CH-FQC-<timestamp>-<random suffix>`
 - `fromDepartment`: `'FINAL_CHECK'`
 - `toDepartment`: Dynamically resolved (`'PACKING'` by default)
-- `parentChallanId`: Direct reference to the incoming Steam Press / Finishing Challan.
+- `parentChallanId`: Direct reference to the incoming Steam Press / Finishing Challan. Child items preserve transferred quantities and genealogy.
+
+## 3. IMPLEMENTATION BOUNDARIES
+
+- No new schema migration is required for the implemented workflow.
+- Final QC uses the web application's Prisma API handlers. A previously added NestJS Final QC module also exists; inspect its consumers before removing or redirecting it.
+- Production Sheet identification comes from the linked `Program` (including `programSerialNo` where present); no separate ProductionSheet model is assumed.
+- Rework is recorded in `DefectLog`, `DefectRecord`, and `ProductionTransaction`; no rework-loop destination is configured.

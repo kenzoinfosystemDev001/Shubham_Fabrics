@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { getFinalCheckActor } from '@/lib/final-check-auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,6 +11,9 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await getFinalCheckActor(request);
+    if (!auth.actor) return auth.response;
+
     const { id } = await params;
 
     const job = await prisma.challan.findUnique({

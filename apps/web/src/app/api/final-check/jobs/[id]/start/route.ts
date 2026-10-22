@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { getFinalCheckActor } from '@/lib/final-check-auth';
 
 export const dynamic = 'force-dynamic';
 const FINAL_CHECK_DEPTS = ['FINAL_CHECK', 'FINAL CHECK', 'FINAL_QC', 'FINAL-CHECK'];
@@ -9,6 +10,9 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await getFinalCheckActor(request);
+    if (!auth.actor) return auth.response;
+
     const { id } = await params;
     const body = await request.json().catch(() => ({}));
 
@@ -32,29 +36,23 @@ export async function POST(
       );
     }
 
-    let actorId = body.actorId;
-    if (!actorId) {
-      const fcUser = await prisma.user.findFirst({
-        where: { OR: [{ username: 'finalcheck' }, { username: 'final_check' }, { departmentCode: 'FINAL_CHECK' }] },
-        select: { id: true },
-      });
-      actorId = fcUser?.id;
-    }
-    if (!actorId) {
-      const fallback = await prisma.user.findFirst({ select: { id: true } });
-      actorId = fallback?.id;
-    }
+    const actorId = auth.actor.id;
 
     const tableNumber = body.tableNumber || body.workstationNumber || 'Inspection Table 1';
     const inspectorName = body.inspectorName || body.operatorName || 'Final QC Inspector';
 
     const updated = await prisma.$transaction(async (tx) => {
-      const ch = await tx.challan.update({
-        where: { id: challan.id },
+      const claim = await tx.challan.updateMany({
+        where: { id: challan.id, status: 'RECEIVED' },
         data: {
           status: 'IN_PROCESS',
           remarks: `${challan.remarks ? challan.remarks + ' | ' : ''}Table: ${tableNumber}, Inspector: ${inspectorName}`,
         },
+      });
+      if (claim.count !== 1) return null;
+
+      const ch = await tx.challan.findUniqueOrThrow({
+        where: { id: challan.id },
         include: { program: true, items: true },
       });
 
@@ -71,6 +69,13 @@ export async function POST(
 
       return ch;
     });
+
+    if (!updated) {
+      return NextResponse.json(
+        { error: 'This job was changed by another user. Refresh and try again.' },
+        { status: 409 },
+      );
+    }
 
     return NextResponse.json({
       success: true,

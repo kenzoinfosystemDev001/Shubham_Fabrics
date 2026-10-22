@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { getFinalCheckActor } from '@/lib/final-check-auth';
+import { parseWholeNumber } from '@/lib/final-check-rules.mjs';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,6 +12,9 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await getFinalCheckActor(request);
+    if (!auth.actor) return auth.response;
+
     const { id } = await params;
     const body = await request.json().catch(() => ({}));
 
@@ -36,30 +41,27 @@ export async function POST(
       );
     }
 
-    let actorId = body.actorId;
-    if (!actorId) {
-      const fcUser = await prisma.user.findFirst({
-        where: {
-          OR: [
-            { username: 'finalcheck' },
-            { username: 'final_check' },
-            { departmentCode: 'FINAL_CHECK' },
-          ],
-        },
-        select: { id: true },
-      });
-      actorId = fcUser?.id;
-    }
-    if (!actorId) {
-      const fallback = await prisma.user.findFirst({ select: { id: true } });
-      actorId = fallback?.id;
+    const actorId = auth.actor.id;
+
+    let totalIssuedQty: number;
+    let receivedQuantity: number;
+    try {
+      totalIssuedQty = challan.items.reduce(
+        (sum, item) => sum + parseWholeNumber(item.quantity, 'Issued garment quantity'),
+        0,
+      );
+      receivedQuantity = body.receivedQuantity !== undefined
+        ? parseWholeNumber(body.receivedQuantity, 'Received garment piece count')
+        : totalIssuedQty;
+    } catch (error) {
+      return NextResponse.json(
+        { error: error instanceof Error ? error.message : 'Garment quantities are invalid.' },
+        { status: 400 },
+      );
     }
 
-    const totalIssuedQty = challan.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
-    const receivedQuantity = body.receivedQuantity !== undefined ? Number(body.receivedQuantity) : totalIssuedQty;
-
-    if (!Number.isInteger(receivedQuantity) || receivedQuantity <= 0) {
-      return NextResponse.json({ error: 'Received garment piece count must be a positive whole number.' }, { status: 400 });
+    if (receivedQuantity <= 0 || totalIssuedQty <= 0 || !Number.isSafeInteger(totalIssuedQty)) {
+      return NextResponse.json({ error: 'Issued and received garment counts must be positive whole numbers.' }, { status: 400 });
     }
 
     if (receivedQuantity > totalIssuedQty) {
@@ -73,8 +75,8 @@ export async function POST(
     const nextStatus = (body.markOnHold && hasShortage) ? 'ON_HOLD' : 'RECEIVED';
 
     const updated = await prisma.$transaction(async (tx) => {
-      const ch = await tx.challan.update({
-        where: { id: challan.id },
+      const claim = await tx.challan.updateMany({
+        where: { id: challan.id, status: 'ISSUED' },
         data: {
           status: nextStatus,
           receivedDate: new Date(),
@@ -84,6 +86,11 @@ export async function POST(
             ? `${challan.remarks ? challan.remarks + ' | ' : ''}Final QC Receipt: ${body.remarks}`
             : challan.remarks,
         },
+      });
+      if (claim.count !== 1) return null;
+
+      const ch = await tx.challan.findUniqueOrThrow({
+        where: { id: challan.id },
         include: {
           program: true,
           items: true,
@@ -106,6 +113,13 @@ export async function POST(
 
       return ch;
     });
+
+    if (!updated) {
+      return NextResponse.json(
+        { error: 'This challan was received or changed by another user. Refresh and try again.' },
+        { status: 409 },
+      );
+    }
 
     return NextResponse.json({
       success: true,

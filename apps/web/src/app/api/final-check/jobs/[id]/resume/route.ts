@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { getFinalCheckActor } from '@/lib/final-check-auth';
 
 export const dynamic = 'force-dynamic';
 const FINAL_CHECK_DEPTS = ['FINAL_CHECK', 'FINAL CHECK', 'FINAL_QC', 'FINAL-CHECK'];
@@ -9,6 +10,9 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await getFinalCheckActor(request);
+    if (!auth.actor) return auth.response;
+
     const { id } = await params;
     const body = await request.json().catch(() => ({}));
 
@@ -23,16 +27,17 @@ export async function POST(
       return NextResponse.json({ error: `Job is not ON_HOLD. Current status: '${challan.status}'.` }, { status: 400 });
     }
 
-    let actorId = body.actorId;
-    if (!actorId) {
-      const fcUser = await prisma.user.findFirst({ where: { OR: [{ username: 'finalcheck' }, { departmentCode: 'FINAL_CHECK' }] }, select: { id: true } });
-      actorId = fcUser?.id ?? (await prisma.user.findFirst({ select: { id: true } }))?.id;
-    }
+    const actorId = auth.actor.id;
 
     const updated = await prisma.$transaction(async (tx) => {
-      const ch = await tx.challan.update({
-        where: { id },
+      const claim = await tx.challan.updateMany({
+        where: { id, status: 'ON_HOLD' },
         data: { status: 'IN_PROCESS' },
+      });
+      if (claim.count !== 1) return null;
+
+      const ch = await tx.challan.findUniqueOrThrow({
+        where: { id },
         include: { program: true, items: true },
       });
       await tx.challanEvent.create({
@@ -47,6 +52,13 @@ export async function POST(
       });
       return ch;
     });
+
+    if (!updated) {
+      return NextResponse.json(
+        { error: 'This job was changed by another user. Refresh and try again.' },
+        { status: 409 },
+      );
+    }
 
     return NextResponse.json({ success: true, message: 'Job resumed from hold', data: updated });
   } catch (error: any) {

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { getFinalCheckActor } from '@/lib/final-check-auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -7,6 +8,9 @@ const FINAL_CHECK_DEPTS = ['FINAL_CHECK', 'FINAL CHECK', 'FINAL_QC', 'FINAL-CHEC
 
 export async function GET(request: Request) {
   try {
+    const auth = await getFinalCheckActor(request);
+    if (!auth.actor) return auth.response;
+
     const { searchParams } = new URL(request.url);
     const requestedDays = Number.parseInt(searchParams.get('days') || '30', 10);
     const days = Number.isFinite(requestedDays) ? Math.min(365, Math.max(1, requestedDays)) : 30;

@@ -13,6 +13,7 @@ import {
   Play,
   Pause,
 } from 'lucide-react';
+import { api } from '@/lib/api';
 
 type FinalCheckSection = 'incoming' | 'queue' | 'issue-challan' | 'floor-board' | 'reports';
 type WorkflowAction = 'receive' | 'start' | 'hold' | 'resume' | 'inspect' | 'handover';
@@ -137,13 +138,9 @@ function quantityOf(job: FinalCheckJob) {
   return job.items.reduce((total, item) => total + (Number(item.quantity) || 0), 0);
 }
 
-function getActorId() {
-  try {
-    const user = JSON.parse(localStorage.getItem('subham_mes_user') || '{}');
-    return typeof user.id === 'string' ? user.id : undefined;
-  } catch {
-    return undefined;
-  }
+function authorizationHeaders(): HeadersInit {
+  const token = api.getToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
 export function FinalCheckWorkspace({ section }: { section: FinalCheckSection }) {
@@ -185,14 +182,20 @@ export function FinalCheckWorkspace({ section }: { section: FinalCheckSection })
       const queryString = query.size ? `?${query.toString()}` : '';
 
       if (section === 'reports') {
-        const response = await fetch('/api/final-check/reports?days=30', { cache: 'no-store' });
+        const response = await fetch('/api/final-check/reports?days=30', {
+          cache: 'no-store',
+          headers: authorizationHeaders(),
+        });
         const result = await response.json();
         if (!response.ok || !result.success) {
           throw new Error(result.error || 'Could not load Final QC reports.');
         }
         setReports(result.data);
       } else if (section === 'floor-board') {
-        const response = await fetch('/api/final-check/floor-board', { cache: 'no-store' });
+        const response = await fetch('/api/final-check/floor-board', {
+          cache: 'no-store',
+          headers: authorizationHeaders(),
+        });
         const result = await response.json();
         if (!response.ok || !result.success) {
           throw new Error(result.error || 'Could not load the Final QC floor board.');
@@ -204,7 +207,10 @@ export function FinalCheckWorkspace({ section }: { section: FinalCheckSection })
           : section === 'issue-challan'
             ? 'issue-challan'
             : 'queue';
-        const response = await fetch(`/api/final-check/${endpoint}${queryString}`, { cache: 'no-store' });
+        const response = await fetch(`/api/final-check/${endpoint}${queryString}`, {
+          cache: 'no-store',
+          headers: authorizationHeaders(),
+        });
         const result = await response.json();
         if (!response.ok || !result.success) {
           throw new Error(result.error || `Could not load the Final QC ${endpoint}.`);
@@ -261,9 +267,8 @@ export function FinalCheckWorkspace({ section }: { section: FinalCheckSection })
     setNotice('');
 
     try {
-      const actorId = getActorId();
       let endpoint = '';
-      let body: Record<string, unknown> = { actorId };
+      let body: Record<string, unknown> = {};
 
       switch (action) {
         case 'receive':
@@ -331,9 +336,7 @@ export function FinalCheckWorkspace({ section }: { section: FinalCheckSection })
         case 'handover':
           endpoint = '/api/final-check/issue-challan';
           body = {
-            ...body,
             parentChallanId: actionJob.id,
-            toDepartment: 'PACKING',
             items: [{ quantity: Number(handoverQuantity), uom: actionJob.items[0]?.uom || 'PCS' }],
           };
           break;
@@ -341,7 +344,7 @@ export function FinalCheckWorkspace({ section }: { section: FinalCheckSection })
 
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...authorizationHeaders() },
         body: JSON.stringify(body),
       });
       const result = await response.json();
@@ -683,7 +686,7 @@ export function FinalCheckWorkspace({ section }: { section: FinalCheckSection })
                     </p>
                     <label className="block text-sm text-slate-300">
                       Accepted quantity to transfer
-                      <input type="number" min="1" max={Number(actionJob.availableToHandover ?? actionJob.fabricOut ?? actionJob.fabricIn ?? quantityOf(actionJob))} required value={handoverQuantity} onChange={(event) => setHandoverQuantity(event.target.value)} className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white" />
+                      <input type="number" min="1" max={Number(actionJob.availableToHandover ?? actionJob.fabricOut ?? 0)} required value={handoverQuantity} onChange={(event) => setHandoverQuantity(event.target.value)} className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-white" />
                     </label>
                   </>
                 )}
