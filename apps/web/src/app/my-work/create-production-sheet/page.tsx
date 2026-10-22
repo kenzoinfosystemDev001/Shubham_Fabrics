@@ -64,6 +64,27 @@ interface ComponentState {
   signatureName: string;
 }
 
+interface AvailableFabricStock {
+  itemName: string;
+  balance: number;
+  unit: string;
+  fabricType: string;
+}
+
+function calculateSizeTotal(expression?: string): number | null {
+  const value = String(expression || '').trim();
+  if (!value || !/^(?:\d+(?:\.\d*)?|\.\d+)(?:\s*\+\s*(?:\d+(?:\.\d*)?|\.\d+))*$/.test(value)) {
+    return null;
+  }
+
+  const total = value.split('+').reduce((sum, part) => sum + Number(part.trim()), 0);
+  return Number.isFinite(total) ? total : null;
+}
+
+function formatSizeTotal(total: number): string {
+  return Number(total.toFixed(2)).toString();
+}
+
 const CATEGORY_META: Record<string, {
   label: string;
   badgeBg: string;
@@ -545,6 +566,10 @@ export default function CreateProductionSheetPage() {
   const [serialNoCounter, setSerialNoCounter] = useState('');
   const [fabricName, setFabricName] = useState('');
   const [fabricWidth, setFabricWidth] = useState('');
+  const [availableFabricStocks, setAvailableFabricStocks] = useState<AvailableFabricStock[]>([]);
+  const [fabricStocksLoaded, setFabricStocksLoaded] = useState(false);
+  const [loadingFabricStocks, setLoadingFabricStocks] = useState(false);
+  const [activeFabricPicker, setActiveFabricPicker] = useState<GarmentCategory | null>(null);
 
   // OTHER is the internal category for user-named production sheets.
   // Starts clean with NO dummy data
@@ -698,6 +723,32 @@ export default function CreateProductionSheetPage() {
     });
     return Math.round(sum * 100) / 100;
   }, [components, componentCategories]);
+
+  const loadAvailableFabricStocks = async () => {
+    if (loadingFabricStocks) return;
+    setLoadingFabricStocks(true);
+    try {
+      const response = await fetch('/api/fabric-store/total-stock');
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Could not load Fabric Store stock');
+      setAvailableFabricStocks(
+        (Array.isArray(result.data) ? result.data : [])
+          .filter((item: any) => Number(item.balance) > 0)
+          .map((item: any) => ({
+            itemName: String(item.itemName || ''),
+            balance: Number(item.balance) || 0,
+            unit: String(item.unit || 'MTR'),
+            fabricType: String(item.fabricType || ''),
+          }))
+          .filter((item: AvailableFabricStock) => item.itemName)
+      );
+      setFabricStocksLoaded(true);
+    } catch (stockError) {
+      console.error('Failed to load available Fabric Store stock:', stockError);
+    } finally {
+      setLoadingFabricStocks(false);
+    }
+  };
 
   const handleAddCustomStyle = () => {
     const newCategory = `CUSTOM_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
@@ -1805,7 +1856,7 @@ export default function CreateProductionSheetPage() {
 
                     {/* FABRIC & WIDTH (UNIFORM BOX SIZE) */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
-                      <div>
+                      <div className="relative">
                         <label className="block text-[11px] font-black uppercase tracking-wider text-black mb-1">
                           FABRIC:
                         </label>
@@ -1819,10 +1870,58 @@ export default function CreateProductionSheetPage() {
                               [cat]: { ...prev[cat], fabricName: val },
                             }));
                           }}
-                          onFocus={(e) => e.target.select()}
+                          onFocus={(e) => {
+                            e.target.select();
+                            setActiveFabricPicker(cat);
+                            void loadAvailableFabricStocks();
+                          }}
+                          onBlur={() => {
+                            window.setTimeout(() => {
+                              setActiveFabricPicker((current) => current === cat ? null : current);
+                            }, 120);
+                          }}
                           placeholder="e.g. Cotton Viscose..."
                           className="w-full border-[1.5px] border-black px-3 py-1.5 h-10 font-bold text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600 shadow-2xs"
                         />
+                        {activeFabricPicker === cat && (
+                          <div className="absolute left-0 right-0 top-full z-40 mt-1 max-h-56 overflow-y-auto rounded border border-slate-300 bg-white shadow-lg">
+                            <div className="sticky top-0 border-b border-slate-200 bg-slate-50 px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-slate-600">
+                              Fabric available in Store
+                            </div>
+                            {loadingFabricStocks ? (
+                              <div className="px-3 py-3 text-xs text-slate-500">Loading available fabrics...</div>
+                            ) : (() => {
+                              const query = String(comp.fabricName || fabricName || '').trim().toLowerCase();
+                              const matchingStocks = availableFabricStocks.filter((stock) =>
+                                !query || stock.itemName.toLowerCase().includes(query)
+                              );
+                              return matchingStocks.length > 0 ? matchingStocks.map((stock) => (
+                                <button
+                                  key={`${stock.itemName}-${stock.fabricType}-${stock.unit}`}
+                                  type="button"
+                                  onMouseDown={(event) => event.preventDefault()}
+                                  onClick={() => {
+                                    setComponents((prev) => ({
+                                      ...prev,
+                                      [cat]: { ...prev[cat], fabricName: stock.itemName },
+                                    }));
+                                    setActiveFabricPicker(null);
+                                  }}
+                                  className="flex w-full items-center justify-between gap-3 border-b border-slate-100 px-3 py-2 text-left hover:bg-blue-50"
+                                >
+                                  <span className="truncate text-xs font-semibold text-slate-800">{stock.itemName}</span>
+                                  <span className="shrink-0 text-[11px] font-bold text-emerald-700">
+                                    {stock.balance.toLocaleString('en-IN', { maximumFractionDigits: 2 })} {stock.unit} available
+                                  </span>
+                                </button>
+                              )) : (
+                                <div className="px-3 py-3 text-xs text-slate-500">
+                                  {fabricStocksLoaded ? 'No matching fabric in stock.' : 'No fabrics available.'}
+                                </div>
+                              );
+                            })()}
+                          </div>
+                        )}
                       </div>
 
                       <div>
@@ -1968,6 +2067,13 @@ export default function CreateProductionSheetPage() {
                                 : row.subStyle
                                   ? row.subStyle.split(',').map((s) => s.trim().toUpperCase()).filter(Boolean)
                                   : [];
+                              const rowSizeExpression = row.size ?? (rowSubStyles[0] ? row.sizes?.[rowSubStyles[0]] : '') ?? (row.sizes?.['SIZE'] || '');
+                              const rowSubStyleTotals = rowSubStyles.map((sub) => calculateSizeTotal(row.sizes?.[sub]));
+                              const rowSizeTotal = rowSubStyleTotals.length > 1 &&
+                                rowSubStyles.every((sub) => String(row.sizes?.[sub] || '').trim()) &&
+                                rowSubStyleTotals.every((total) => total !== null)
+                                ? rowSubStyleTotals.reduce((sum, total) => sum + (total || 0), 0)
+                                : null;
 
                               return (
                               <tr key={row.id || rIdx} className="h-8">
@@ -2049,26 +2155,40 @@ export default function CreateProductionSheetPage() {
                                             value={row.sizes?.[sub] || ''}
                                             onChange={(e) => handleGridSizeChange(cat, rIdx, sub, e.target.value)}
                                             onFocus={(e) => e.target.select()}
-                                            placeholder="Size"
-                                            className="w-full text-center font-bold text-xs text-black border-none focus:outline-none uppercase bg-transparent"
+                                            placeholder="1 + 3 + 0.5"
+                                            className="min-w-0 flex-1 text-center font-bold text-xs text-black border-none focus:outline-none uppercase bg-transparent"
                                           />
+                                          {calculateSizeTotal(row.sizes?.[sub]) !== null && (
+                                            <span className="shrink-0 border-l border-slate-200 pl-1.5 text-[10px] font-black text-emerald-700">
+                                              {formatSizeTotal(calculateSizeTotal(row.sizes?.[sub])!)}
+                                            </span>
+                                          )}
                                         </div>
                                       ))}
+                                      {rowSizeTotal !== null && (
+                                        <div className="text-right text-[10px] font-black text-emerald-800">
+                                          TOTAL {formatSizeTotal(rowSizeTotal)}
+                                        </div>
+                                      )}
                                     </div>
                                   ) : (
-                                    <input
-                                      type="text"
-                                      value={row.size ?? (rowSubStyles[0] ? row.sizes?.[rowSubStyles[0]] : '') ?? (row.sizes?.['SIZE'] || '')}
-                                      onChange={(e) => {
-                                        handleGridRowChange(cat, rIdx, 'size', e.target.value);
-                                        if (rowSubStyles[0]) {
-                                          handleGridSizeChange(cat, rIdx, rowSubStyles[0], e.target.value);
-                                        }
-                                      }}
-                                      onFocus={(e) => e.target.select()}
-                                      placeholder=""
-                                      className="w-full px-2 py-1 text-center font-bold text-xs text-black border-none focus:outline-none focus:bg-blue-50 uppercase"
-                                    />
+                                    <div className="flex items-center gap-1 px-1">
+                                      <input
+                                        type="text"
+                                        value={rowSizeExpression}
+                                        onChange={(e) => rowSubStyles[0]
+                                          ? handleGridSizeChange(cat, rIdx, rowSubStyles[0], e.target.value)
+                                          : handleGridRowChange(cat, rIdx, 'size', e.target.value)}
+                                        onFocus={(e) => e.target.select()}
+                                        placeholder="1 + 3 + 0.5"
+                                        className="min-w-0 flex-1 px-1 py-1 text-center font-bold text-xs text-black border-none focus:outline-none focus:bg-blue-50 uppercase"
+                                      />
+                                      {calculateSizeTotal(rowSizeExpression) !== null && (
+                                        <span className="shrink-0 border-l border-slate-200 pl-1.5 text-[10px] font-black text-emerald-700">
+                                          {formatSizeTotal(calculateSizeTotal(rowSizeExpression)!)}
+                                        </span>
+                                      )}
+                                    </div>
                                   )}
                                 </td>
 

@@ -3,7 +3,6 @@ import { prisma } from '@subham/database';
 import {
   cleanFabricName,
   getChallanItemFabricType,
-  isFabricStoreDepartment,
   normalizeFabricStockType,
 } from '@/lib/fabric-stock';
 
@@ -25,10 +24,7 @@ export async function GET(request: Request) {
     const storeChallans = (await prisma.challan.findMany({
       where: {
         NOT: { toDepartment: { equals: 'STORE', mode: 'insensitive' } },
-        OR: [
-          { fromDepartment: { contains: 'STORE', mode: 'insensitive' } },
-          { fromDepartment: { equals: 'FABRIC', mode: 'insensitive' } },
-        ],
+        status: { notIn: ['DRAFT', 'CANCELLED'] },
       },
       include: {
         program: {
@@ -46,22 +42,50 @@ export async function GET(request: Request) {
         items: true,
       },
       orderBy: { createdAt: 'desc' },
-    })).filter((challan) => isFabricStoreDepartment(challan.fromDepartment));
+    }));
 
     // 3. Fetch all manual Outward records
     const manualOutwards = await (prisma as any).fabricOutward.findMany({
       orderBy: { date: 'desc' },
     });
 
-    // 4. Fetch defective count in Store Shelf
+    // 4. Fetch Store shelf defect records and defective-return challans.
     const defectiveRecords = await prisma.defectRecord.findMany({
       where: {
         departmentCode: 'STORE',
         status: 'OPEN',
       },
-      select: { quantity: true },
+      select: { quantity: true, challanId: true },
     });
-    const defectiveTotal = defectiveRecords.reduce((sum, d) => sum + (Number(d.quantity) || 0), 0);
+    const defectiveReturnChallans = await prisma.challan.findMany({
+      where: {
+        toDepartment: 'STORE',
+        defectivePieces: { gt: 0 },
+        defectiveShelfLocation: { contains: 'DEF-SHELF-STORE', mode: 'insensitive' },
+      },
+      select: {
+        id: true,
+        defectivePieces: true,
+        fabricUnit: true,
+        items: {
+          select: { quantity: true, uom: true },
+        },
+      },
+    });
+
+    const returnChallanIds = new Set(defectiveReturnChallans.map((challan) => challan.id));
+    const defectiveStockByUnit: Record<string, number> = {};
+    for (const record of defectiveRecords) {
+      if (record.challanId && returnChallanIds.has(record.challanId)) continue;
+      defectiveStockByUnit.PCS = (defectiveStockByUnit.PCS || 0) + (Number(record.quantity) || 0);
+    }
+    for (const challan of defectiveReturnChallans) {
+      const quantity = Number(challan.defectivePieces) ||
+        challan.items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
+      const unit = (challan.fabricUnit || challan.items[0]?.uom || 'PCS').toUpperCase();
+      defectiveStockByUnit[unit] = (defectiveStockByUnit[unit] || 0) + quantity;
+    }
+    const defectiveTotal = defectiveStockByUnit.PCS || 0;
 
     // Build item-wise aggregates
     // Key format: `${cleanName.toLowerCase()}___${fabricType}___${unit}`
@@ -80,7 +104,7 @@ export async function GET(request: Request) {
     // 1. Accumulate Inward entries (establishes inward stock)
     for (const inw of inwardEntries) {
       const type = normalizeFabricStockType(inw.entryType);
-      const unit = inw.unit || 'MTR';
+      const unit = String(inw.unit || 'MTR').toUpperCase();
       const cleanName = cleanFabricName(inw.itemName) || inw.itemName.trim();
       const key = `${cleanName.toLowerCase()}___${type}___${unit}`;
 
@@ -131,23 +155,44 @@ export async function GET(request: Request) {
       return exactKey;
     };
 
-    // 2. Accumulate Outward from Challans
+    // 2. Accumulate outward from every issued challan and retain rows for the dated register.
+    const outwardHistory: Array<Record<string, any>> = [];
+    const challanNumbers = new Set(storeChallans.map((challan) => String(challan.challanNumber || '').trim().toLowerCase()).filter(Boolean));
     for (const ch of storeChallans) {
       const isDyeing = ch.toDepartment.toUpperCase().includes('DYE');
       const challanType: 'UNDYED' | 'DYED' = isDyeing ? 'UNDYED' : 'DYED';
       const challanDate = ch.issuedDate || ch.createdAt;
 
       if (Array.isArray(ch.items) && ch.items.length > 0) {
+        const challanUnit = String(ch.fabricUnit || ch.items[0]?.uom || 'MTR').toUpperCase();
+        const itemQuantityTotal = ch.items.reduce((sum, item) =>
+          sum + (String(item.uom || challanUnit).toUpperCase() === challanUnit ? (Number(item.quantity) || 0) : 0), 0);
+        const issuedQuantity = Number(ch.fabricOut) > 0 ? Number(ch.fabricOut) : itemQuantityTotal;
+        const quantityScale = itemQuantityTotal > 0 && issuedQuantity > 0 ? issuedQuantity / itemQuantityTotal : 0;
         for (const it of ch.items) {
           const itemType = getChallanItemFabricType(it, ch.toDepartment);
 
           const rawName = it.fabricCode || cleanFabricName(it.itemDescription) || ch.program?.fabricName || 'Fabric Material';
-          const itemUnit = it.uom || ch.fabricUnit || 'MTR';
-          const qty = Number(it.quantity) || (ch.fabricOut ? Number(ch.fabricOut) / ch.items.length : 0);
+          const itemUnit = String(it.uom || challanUnit).toUpperCase();
+          const itemQuantity = Number(it.quantity) || 0;
+          const qty = itemUnit === challanUnit
+            ? (itemQuantityTotal > 0 ? itemQuantity * quantityScale : (it === ch.items[0] ? issuedQuantity : 0))
+            : itemQuantity;
 
           if (qty <= 0) continue;
 
           const matchedKey = resolveMatchingKey(rawName, itemType, itemUnit) || `${cleanFabricName(rawName).toLowerCase()}___${itemType}___${itemUnit}`;
+          outwardHistory.push({
+            id: `challan-${ch.id}-${it.id || outwardHistory.length}`,
+            date: challanDate,
+            challanNumber: ch.challanNumber,
+            sourceDepartment: ch.fromDepartment,
+            destination: ch.toDepartment,
+            itemName: cleanFabricName(it.itemDescription) || rawName,
+            quantity: qty,
+            unit: itemUnit,
+            fabricType: itemType,
+          });
           const existing = map.get(matchedKey) || {
             itemName: cleanFabricName(rawName) || rawName.trim(),
             fabricType: itemType,
@@ -169,10 +214,21 @@ export async function GET(request: Request) {
         }
       } else {
         const rawName = ch.program?.fabricName || (isDyeing ? 'Grey / Undyed Fabric' : 'Processed Fabric');
-        const unit = ch.fabricUnit || 'MTR';
+        const unit = String(ch.fabricUnit || 'MTR').toUpperCase();
         const issueQty = Number(ch.fabricOut ?? ch.fabricIn ?? 0);
 
         if (issueQty > 0) {
+          outwardHistory.push({
+            id: `challan-${ch.id}`,
+            date: challanDate,
+            challanNumber: ch.challanNumber,
+            sourceDepartment: ch.fromDepartment,
+            destination: ch.toDepartment,
+            itemName: cleanFabricName(rawName) || rawName,
+            quantity: issueQty,
+            unit,
+            fabricType: challanType,
+          });
           const matchedKey = resolveMatchingKey(rawName, challanType, unit) || `${cleanFabricName(rawName).toLowerCase()}___${challanType}___${unit}`;
           const existing = map.get(matchedKey) || {
             itemName: cleanFabricName(rawName) || rawName.trim(),
@@ -198,13 +254,26 @@ export async function GET(request: Request) {
 
     // 3. Accumulate Outward from Manual records
     for (const outw of manualOutwards) {
+      if (outw.challanId || (outw.challanNumber && challanNumbers.has(String(outw.challanNumber).trim().toLowerCase()))) continue;
       const type = normalizeFabricStockType(outw.fabricType);
-      const unit = outw.unit || 'MTR';
+      const unit = String(outw.unit || 'MTR').toUpperCase();
       const rawName = outw.itemName || 'Fabric Material';
       const issueQty = Number(outw.issueQty) || 0;
       const actDate = outw.date || outw.createdAt;
 
       if (issueQty <= 0) continue;
+
+      outwardHistory.push({
+        id: `manual-${outw.id}`,
+        date: actDate,
+        challanNumber: outw.challanNumber || '—',
+        sourceDepartment: 'STORE',
+        destination: outw.destination || '—',
+        itemName: cleanFabricName(rawName) || rawName,
+        quantity: issueQty,
+        unit,
+        fabricType: type,
+      });
 
       const matchedKey = resolveMatchingKey(rawName, type, unit) || `${cleanFabricName(rawName).toLowerCase()}___${type}___${unit}`;
       const existing = map.get(matchedKey) || {
@@ -268,11 +337,20 @@ export async function GET(request: Request) {
       kora: summarizeItems(undyedItems), // backwards-compatibility alias for undyed
       dyed: summarizeItems(dyedItems),
       defectiveStockPcs: defectiveTotal,
+      defectiveStockByUnit,
     };
+
+    const normalizedSearch = search?.trim().toLowerCase();
+    const filteredOutwardHistory = outwardHistory
+      .filter((row) => !filterType || filterType === 'ALL' || row.fabricType === ((filterType === 'KORA') ? 'UNDYED' : filterType))
+      .filter((row) => !normalizedSearch || [row.itemName, row.challanNumber, row.destination, row.sourceDepartment]
+        .some((value) => String(value || '').toLowerCase().includes(normalizedSearch)))
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     return NextResponse.json({
       data: items,
       summary,
+      outwardHistory: filteredOutwardHistory,
     });
   } catch (error: any) {
     console.error('Error fetching total fabric stock:', error);

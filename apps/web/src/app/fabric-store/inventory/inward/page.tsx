@@ -16,6 +16,7 @@ import {
   AlertCircle,
   X,
   Boxes,
+  Pencil,
 } from 'lucide-react';
 
 interface InwardItem {
@@ -33,6 +34,18 @@ interface InwardItem {
   createdAt: string;
 }
 
+const createEmptyFormData = () => ({
+  entryType: 'UNDYED',
+  itemName: '',
+  billNo: '',
+  billDate: new Date().toISOString().split('T')[0],
+  receivingDate: new Date().toISOString().split('T')[0],
+  billQty: '',
+  unit: 'MTR',
+  supplierName: '',
+  remarks: '',
+});
+
 export default function InwardStockPage() {
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<InwardItem[]>([]);
@@ -48,22 +61,13 @@ export default function InwardStockPage() {
   const [typeFilter, setTypeFilter] = useState<'ALL' | 'UNDYED' | 'DYED' | 'KORA'>('ALL');
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
   // Form State
-  const [formData, setFormData] = useState({
-    entryType: 'UNDYED',
-    itemName: '',
-    billNo: '',
-    billDate: new Date().toISOString().split('T')[0],
-    receivingDate: new Date().toISOString().split('T')[0],
-    billQty: '',
-    unit: 'MTR',
-    supplierName: '',
-    remarks: '',
-  });
+  const [formData, setFormData] = useState(createEmptyFormData);
 
   const loadData = async () => {
     try {
@@ -104,30 +108,26 @@ export default function InwardStockPage() {
         throw new Error('Please fill all required fields (Item Name, Bill No., Bill Qty).');
       }
 
-      const res = await fetch('/api/fabric-store/inward', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
+      const res = await fetch(
+        editingItemId ? `/api/fabric-store/inward/${editingItemId}` : '/api/fabric-store/inward',
+        {
+          method: editingItemId ? 'PATCH' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        }
+      );
 
       const json = await res.json();
       if (!res.ok) {
-        throw new Error(json.error || 'Failed to save inward stock');
+        throw new Error(json.error || `Failed to ${editingItemId ? 'update' : 'save'} inward stock`);
       }
 
-      setSuccessMsg(`Inward record for "${formData.itemName}" saved successfully!`);
+      setSuccessMsg(
+        `Inward record for "${formData.itemName}" ${editingItemId ? 'updated' : 'saved'} successfully!`
+      );
       setModalOpen(false);
-      setFormData({
-        entryType: 'UNDYED',
-        itemName: '',
-        billNo: '',
-        billDate: new Date().toISOString().split('T')[0],
-        receivingDate: new Date().toISOString().split('T')[0],
-        billQty: '',
-        unit: 'MTR',
-        supplierName: '',
-        remarks: '',
-      });
+      setEditingItemId(null);
+      setFormData(createEmptyFormData());
       loadData();
       setTimeout(() => setSuccessMsg(''), 4000);
     } catch (err: any) {
@@ -135,6 +135,29 @@ export default function InwardStockPage() {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleEditInward = (item: InwardItem) => {
+    setEditingItemId(item.id);
+    setFormError('');
+    setFormData({
+      entryType: item.entryType === 'DYED' ? 'DYED' : 'UNDYED',
+      itemName: item.itemName,
+      billNo: item.billNo,
+      billDate: new Date(item.billDate).toISOString().split('T')[0],
+      receivingDate: new Date(item.receivingDate).toISOString().split('T')[0],
+      billQty: String(item.billQty),
+      unit: item.unit === 'PCS' ? 'PCS' : 'MTR',
+      supplierName: item.supplierName || '',
+      remarks: item.remarks || '',
+    });
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setEditingItemId(null);
+    setFormError('');
   };
 
   const formatDate = (dateStr: string) => {
@@ -177,7 +200,9 @@ export default function InwardStockPage() {
           <div className="flex items-center gap-2.5">
             <button
               onClick={() => {
+                setEditingItemId(null);
                 setFormError('');
+                setFormData(createEmptyFormData());
                 setModalOpen(true);
               }}
               className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-xs transition cursor-pointer"
@@ -372,12 +397,15 @@ export default function InwardStockPage() {
                   <th className="px-4 py-2 font-black">
                     SUPPLIER / REMARKS
                   </th>
+                  <th className="px-3 py-2 font-black text-center w-20">
+                    ACTION
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
                 {items.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="px-4 py-12 text-center text-slate-500 space-y-2">
+                    <td colSpan={9} className="px-4 py-12 text-center text-slate-500 space-y-2">
                       <ArrowDownToLine className="w-8 h-8 mx-auto text-slate-300" />
                       <div className="text-sm font-bold text-slate-700">No inward records found</div>
                       <p className="text-xs text-slate-400">
@@ -424,6 +452,18 @@ export default function InwardStockPage() {
                         <div className="font-semibold text-slate-800">{item.supplierName || '—'}</div>
                         {item.remarks && <div className="text-[11px] text-slate-500 truncate max-w-xs">{item.remarks}</div>}
                       </td>
+                      <td className="px-3 py-2 text-center">
+                        <button
+                          type="button"
+                          onClick={() => handleEditInward(item)}
+                          aria-label={`Edit inward record ${item.billNo}`}
+                          title="Edit inward record"
+                          className="inline-flex items-center gap-1 rounded-md border border-teal-200 px-2 py-1 text-[11px] font-bold text-teal-800 hover:bg-teal-50 transition"
+                        >
+                          <Pencil className="w-3 h-3" />
+                          Edit
+                        </button>
+                      </td>
                     </tr>
                   ))
                 )}
@@ -433,7 +473,7 @@ export default function InwardStockPage() {
         </div>
       </main>
 
-      {/* MODAL: NEW FABRIC ARRIVAL (INWARD ENTRY) */}
+      {/* MODAL: CREATE OR EDIT FABRIC ARRIVAL */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-3 overflow-y-auto">
           <div className="bg-white rounded-xl shadow-2xl border border-slate-300 w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-150">
@@ -441,12 +481,12 @@ export default function InwardStockPage() {
               <div className="flex items-center gap-2">
                 <ArrowDownToLine className="w-5 h-5 text-emerald-600" />
                 <h3 className="font-black text-sm text-slate-900 uppercase tracking-wide">
-                  New Fabric Arrival (Inward Entry)
+                  {editingItemId ? 'Edit Inward Entry' : 'New Fabric Arrival (Inward Entry)'}
                 </h3>
               </div>
               <button
                 type="button"
-                onClick={() => setModalOpen(false)}
+                onClick={closeModal}
                 className="text-slate-400 hover:text-slate-700 p-1 rounded-lg"
               >
                 <X className="w-4 h-4" />
@@ -609,7 +649,7 @@ export default function InwardStockPage() {
               <div className="pt-2 flex items-center justify-end gap-3 border-t border-slate-200">
                 <button
                   type="button"
-                  onClick={() => setModalOpen(false)}
+                  onClick={closeModal}
                   className="px-4 py-2 border border-slate-300 text-slate-700 text-xs font-semibold rounded-lg hover:bg-slate-50 transition"
                 >
                   Cancel
@@ -619,7 +659,13 @@ export default function InwardStockPage() {
                   disabled={submitting}
                   className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                 >
-                  {submitting ? 'Saving...' : 'Confirm Inward Arrival'}
+                  {submitting
+                    ? editingItemId
+                      ? 'Updating...'
+                      : 'Saving...'
+                    : editingItemId
+                      ? 'Save Changes'
+                      : 'Confirm Inward Arrival'}
                 </button>
               </div>
             </form>

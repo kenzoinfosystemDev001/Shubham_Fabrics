@@ -38,6 +38,10 @@ export async function GET(request: Request) {
             programSerialNo: true,
             buyerName: true,
             clientName: true,
+            mainStyle: true,
+            wilcomDesignNumber: true,
+            fabricName: true,
+            fabricColor: true,
             styleCode: true,
             orderNumber: true,
             designName: true,
@@ -400,6 +404,7 @@ export async function POST(request: Request) {
       : null;
 
     // 6. Transactional challan creation
+    const isDyeingToQc1Challan = fromDept === 'DYEING' && toDept === 'QC1';
     const created = await prisma.$transaction(async (tx) => {
       const challan = await tx.challan.create({
         data: {
@@ -516,7 +521,7 @@ export async function POST(request: Request) {
       }
 
       return challan;
-    });
+    }, isDyeingToQc1Challan ? { maxWait: 15000, timeout: 30000 } : undefined);
 
     // If dispatched to Dyeing, immediately sync to DyeingOrders
     // 6. Sync inbound challans to DyeingOrders once when sent to Dyeing

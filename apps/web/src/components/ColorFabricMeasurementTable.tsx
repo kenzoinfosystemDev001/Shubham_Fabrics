@@ -367,6 +367,9 @@ export function ColorFabricMeasurementTable({
     if (readOnly) return;
     const updated = items.map((item, i) => (i === index ? { ...item, [field]: value } : item));
     onChange(updated);
+    if (field === 'unit') {
+      setFabricUnit(value as 'MTR' | 'PCS');
+    }
   };
 
   const showRequiredDyeColor = context === 'STORE_DYEING' || context === 'DYEING_QC1';

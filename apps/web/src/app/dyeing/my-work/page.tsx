@@ -356,6 +356,10 @@ export default function DyeingMyWorkPage() {
       setFormError('Please enter at least one item in the Color / Fabric / Measurement table.');
       return;
     }
+    if (new Set(validItems.map((item) => item.unit)).size > 1) {
+      setFormError('Use the same unit for every quantity in one challan.');
+      return;
+    }
 
     try {
       setSubmittingChallan(true);
@@ -396,7 +400,7 @@ export default function DyeingMyWorkPage() {
         defectiveShelfLocation: dyeingTracking.defectiveShelfLocation,
         defectReason: dyeingTracking.defectReason,
         fabricOut: dyeingTracking.fabricOut,
-        fabricUnit: dyeingTracking.fabricUnit,
+        fabricUnit: validItems[0]?.unit || dyeingTracking.fabricUnit,
         detectedFromDepartment: dyeingTracking.detectedFromDept || 'STORE',
         detectedFromChallanId: dyeingTracking.detectedFromChallanId,
         remarks: inchargeInfo,

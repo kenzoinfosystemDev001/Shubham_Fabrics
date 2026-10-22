@@ -44,6 +44,11 @@ export default function QC2IssueChallanPage() {
     },
   ]);
   const [tracking, setTracking] = useState(() => createDepartmentInOutTracking('QC2'));
+  const totalQuantityLabel = Object.entries(items.reduce<Record<string, number>>((totals, item) => {
+    const unit = item.uom || 'PCS';
+    totals[unit] = (totals[unit] || 0) + (Number(item.quantity) || 0);
+    return totals;
+  }, {})).map(([unit, quantity]) => `${quantity.toLocaleString()} ${unit}`).join(' + ');
 
   useEffect(() => {
     const init = async () => {
@@ -93,6 +98,10 @@ export default function QC2IssueChallanPage() {
       alert('Please select a Production Program / Sheet.');
       return;
     }
+    if (new Set(items.map((item) => item.uom)).size > 1) {
+      alert('Use the same unit for every quantity in one challan.');
+      return;
+    }
     const validItems = items.filter((it) => Number(it.quantity) > 0);
     if (validItems.length === 0) {
       alert('Please enter a valid quantity greater than 0.');
@@ -111,6 +120,7 @@ export default function QC2IssueChallanPage() {
           fromDepartment: 'QC2',
           toDepartment: toDepartment,
           ...tracking,
+          fabricUnit: validItems[0]?.uom || tracking.fabricUnit,
           detectedFromDepartment: tracking.detectedFromDept,
           priority,
           remarks: `${remarks} | Production Sheet #${selectedProgram.programSerialNo || selectedProgram.programNumber}`,
@@ -285,11 +295,12 @@ export default function QC2IssueChallanPage() {
                     className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs"
                   />
                 </div>
-                <div className="sm:col-span-3">
-                  <label className="block text-[10px] font-bold text-slate-600 mb-1">Quantity (PCS) *</label>
+                <div className="sm:col-span-2">
+                  <label className="block text-[10px] font-bold text-slate-600 mb-1">Quantity *</label>
                   <input
                     type="number"
-                    min="1"
+                    min="0.01"
+                    step="any"
                     required
                     value={it.quantity}
                     onChange={(e) => {
@@ -300,6 +311,23 @@ export default function QC2IssueChallanPage() {
                     className="w-full px-3 py-1.5 bg-white border border-emerald-300 rounded-lg text-xs font-mono font-bold text-emerald-700"
                     placeholder="e.g. 500"
                   />
+                </div>
+                <div className="sm:col-span-1">
+                  <label className="block text-[10px] font-bold text-slate-600 mb-1">Unit *</label>
+                  <select
+                    value={it.uom}
+                    onChange={(e) => {
+                      const next = [...items];
+                      next[idx].uom = e.target.value;
+                      (next[idx] as any).unitType = e.target.value;
+                      setItems(next);
+                      setTracking((prev) => ({ ...prev, fabricUnit: e.target.value as 'MTR' | 'PCS' }));
+                    }}
+                    className="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs"
+                  >
+                    <option value="MTR">MTR</option>
+                    <option value="PCS">PCS</option>
+                  </select>
                 </div>
                 <div className="sm:col-span-4">
                   <label className="block text-[10px] font-bold text-slate-600 mb-1">Remarks</label>
@@ -386,10 +414,12 @@ export default function QC2IssueChallanPage() {
                 programSerialNo: selectedProgram?.programSerialNo,
                 clientName: selectedProgram?.clientName,
                 totalQuantity: generatedChallan.items?.reduce((s: number, it: any) => s + (Number(it.quantity) || 0), 0) || 0,
-                uom: 'PCS',
+                uom: items[0]?.uom || 'PCS',
               }}
               title="Official Washing Dispatch Tag"
             />
+
+            <p className="text-right text-xs font-bold text-slate-700">Total Quantity: {totalQuantityLabel}</p>
 
             <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200">
               <button

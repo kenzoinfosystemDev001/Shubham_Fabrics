@@ -3,7 +3,6 @@ import { prisma } from '@subham/database';
 import {
   cleanFabricName,
   getChallanItemFabricType,
-  isFabricStoreDepartment,
   normalizeFabricStockType,
 } from '@/lib/fabric-stock';
 
@@ -54,10 +53,13 @@ export async function GET(request: Request) {
       return null;
     };
 
-    // 2. Fetch all Challans issued from Fabric Store (to Dyeing, Embroidery, etc.)
+    // 2. Fetch every challan issued to another department.
     const storeChallans = (await prisma.challan.findMany({
       where: {
-        NOT: { toDepartment: { equals: 'STORE', mode: 'insensitive' } },
+        NOT: [
+          { toDepartment: { equals: 'STORE', mode: 'insensitive' } },
+          { status: { in: ['DRAFT', 'CANCELLED'] } },
+        ],
         OR: [
           { fromDepartment: { contains: 'STORE', mode: 'insensitive' } },
           { fromDepartment: { equals: 'FABRIC', mode: 'insensitive' } },
@@ -86,7 +88,7 @@ export async function GET(request: Request) {
         },
       },
       orderBy: { createdAt: 'desc' },
-    })).filter((challan) => isFabricStoreDepartment(challan.fromDepartment));
+    }));
 
     // 3. Fetch any manual outward records
     const manualOutward = await (prisma as any).fabricOutward.findMany({
@@ -107,12 +109,19 @@ export async function GET(request: Request) {
         'Standard Order';
 
       if (ch.items && ch.items.length > 0) {
+        const itemQuantityTotal = ch.items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
+        const issuedQuantity = Number(ch.fabricOut) > 0 ? Number(ch.fabricOut) : itemQuantityTotal;
+        const quantityScale = itemQuantityTotal > 0 && issuedQuantity > 0 ? issuedQuantity / itemQuantityTotal : 0;
+
         ch.items.forEach((it, idx) => {
           const itemType = getChallanItemFabricType(it, ch.toDepartment);
 
           const rawName = it.fabricCode || cleanFabricName(it.itemDescription) || ch.program?.fabricName || 'Fabric Material';
           const unit = it.uom || ch.fabricUnit || 'MTR';
-          const issueQty = Number(it.quantity) || (ch.fabricOut ? Number(ch.fabricOut) / ch.items.length : 0);
+          const itemQuantity = Number(it.quantity) || 0;
+          const issueQty = itemQuantityTotal > 0
+            ? itemQuantity * quantityScale
+            : (idx === 0 ? issuedQuantity : 0);
 
           if (issueQty <= 0) return;
 
@@ -141,6 +150,8 @@ export async function GET(request: Request) {
             byOrderName: orderName,
             remarks: ch.remarks || `Issued to ${ch.toDepartment}`,
             destination: ch.toDepartment,
+            sourceDepartment: ch.fromDepartment,
+            issuedBy: ch.createdBy?.fullName || ch.createdBy?.username || null,
             fabricType: itemType,
             status: ch.status,
             verifiedInwardDetails: verifiedDetails,
@@ -180,6 +191,8 @@ export async function GET(request: Request) {
             byOrderName: orderName,
             remarks: ch.remarks || `Issued to ${ch.toDepartment}`,
             destination: ch.toDepartment,
+            sourceDepartment: ch.fromDepartment,
+            issuedBy: ch.createdBy?.fullName || ch.createdBy?.username || null,
             fabricType: defaultType,
             status: ch.status,
             verifiedInwardDetails: verifiedDetails,
@@ -215,6 +228,8 @@ export async function GET(request: Request) {
         byOrderName: item.byOrderName || '—',
         remarks: item.remarks || '—',
         destination: item.destination || 'OUTWARD',
+        sourceDepartment: 'STORE',
+        issuedBy: null,
         fabricType: type,
         status: 'ISSUED',
         verifiedInwardDetails: verifiedDetails,
@@ -243,6 +258,8 @@ export async function GET(request: Request) {
           it.itemName?.toLowerCase().includes(q) ||
           it.byOrderName?.toLowerCase().includes(q) ||
           it.destination?.toLowerCase().includes(q) ||
+          it.sourceDepartment?.toLowerCase().includes(q) ||
+          it.issuedBy?.toLowerCase().includes(q) ||
           it.verifiedInwardDetails?.toLowerCase().includes(q)
       );
     }
