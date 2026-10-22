@@ -10,7 +10,24 @@ export async function GET() {
     const allJobs = await prisma.challan.findMany({
       where: {
         toDepartment: { in: FINAL_CHECK_DEPTS },
-        status: { in: ['ISSUED', 'RECEIVED', 'IN_PROCESS', 'COMPLETED', 'READY_FOR_HANDOVER', 'ON_HOLD', 'HANDED_OVER'] },
+        status: {
+          in: [
+            'ISSUED',
+            'RECEIVED',
+            'IN_PROCESS',
+            'QC_PENDING',
+            'REWORK',
+            'REWORK_REQUESTED',
+            'QC_APPROVED',
+            'QC_REJECTED',
+            'COMPLETED',
+            'READY_FOR_HANDOVER',
+            'READY_FOR_DISPATCH',
+            'ON_HOLD',
+            'HANDED_OVER',
+            'CLOSED',
+          ],
+        },
       },
       include: {
         program: {
@@ -39,9 +56,11 @@ export async function GET() {
 
     const lanes = {
       PENDING: allJobs.filter((j) => j.status === 'ISSUED'),
-      IN_INSPECTION: allJobs.filter((j) => ['RECEIVED', 'IN_PROCESS'].includes(j.status)),
-      COMPLETED: allJobs.filter((j) => ['COMPLETED', 'READY_FOR_HANDOVER', 'READY_FOR_DISPATCH'].includes(j.status)),
-      HANDED_OVER: allJobs.filter((j) => j.status === 'HANDED_OVER'),
+      IN_INSPECTION: allJobs.filter((j) => ['RECEIVED', 'IN_PROCESS', 'QC_PENDING', 'REWORK', 'ON_HOLD'].includes(j.status)),
+      COMPLETED: allJobs.filter((j) => ['QC_APPROVED', 'COMPLETED', 'READY_FOR_HANDOVER', 'READY_FOR_DISPATCH'].includes(j.status)),
+      REJECTED: allJobs.filter((j) => j.status === 'QC_REJECTED'),
+      REWORK: allJobs.filter((j) => j.status === 'REWORK_REQUESTED'),
+      HANDED_OVER: allJobs.filter((j) => ['HANDED_OVER', 'CLOSED'].includes(j.status)),
     };
 
     return NextResponse.json({

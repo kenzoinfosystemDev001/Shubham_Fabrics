@@ -14,7 +14,20 @@ export async function GET(request: Request) {
     const whereClause: any = {
       toDepartment: { in: FINAL_CHECK_DEPTS },
       status: {
-        in: ['RECEIVED', 'IN_PROCESS', 'COMPLETED', 'READY_FOR_HANDOVER', 'READY_FOR_DISPATCH', 'ON_HOLD'],
+        in: [
+          'ISSUED',
+          'RECEIVED',
+          'IN_PROCESS',
+          'QC_PENDING',
+          'REWORK',
+          'QC_APPROVED',
+          'QC_REJECTED',
+          'REWORK_REQUESTED',
+          'COMPLETED',
+          'READY_FOR_HANDOVER',
+          'READY_FOR_DISPATCH',
+          'ON_HOLD',
+        ],
       },
     };
 

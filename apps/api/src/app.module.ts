@@ -27,6 +27,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { SearchModule } from './modules/search/search.module';
 import { DiagnosticsModule } from './modules/diagnostics/diagnostics.module';
 import { ReportsModule } from './modules/reports/reports.module';
+import { FinalCheckModule } from './modules/finalcheck/finalcheck.module';
 import { IdempotencyInterceptor } from './common/interceptors/idempotency.interceptor';
 import { AppController } from './app.controller';
 
@@ -62,6 +63,7 @@ import { AppController } from './app.controller';
     SearchModule,
     DiagnosticsModule,
     ReportsModule,
+    FinalCheckModule,
   ],
   providers: [
     {

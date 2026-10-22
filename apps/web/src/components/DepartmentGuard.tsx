@@ -22,6 +22,7 @@ export type DepartmentScope =
   | 'STITCHING'
   | 'FINISHING'
   | 'STEAM_PRESS'
+  | 'FINAL_CHECK'
   | 'PROGRAMMING'
   | 'ADMIN'
   | 'AUTH'
@@ -41,6 +42,7 @@ export function getDepartmentScope(path: string): DepartmentScope {
   if (path.startsWith('/stitching')) return 'STITCHING';
   if (path.startsWith('/finishing')) return 'FINISHING';
   if (path.startsWith('/steam-press')) return 'STEAM_PRESS';
+  if (path.startsWith('/final-check')) return 'FINAL_CHECK';
   if (path.startsWith('/programming')) return 'PROGRAMMING';
   if (path.startsWith('/admin')) return 'ADMIN';
   if (path.startsWith('/challans') || path.startsWith('/programs')) return 'SHARED';
@@ -61,6 +63,7 @@ export function getDepartmentRoot(scope: DepartmentScope): string {
     case 'STITCHING': return '/stitching';
     case 'FINISHING': return '/finishing';
     case 'STEAM_PRESS': return '/steam-press';
+    case 'FINAL_CHECK': return '/final-check';
     case 'PROGRAMMING': return '/programming';
     case 'ADMIN': return '/admin';
     default: return '/login';

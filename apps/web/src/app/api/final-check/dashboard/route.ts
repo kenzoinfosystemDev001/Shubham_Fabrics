@@ -7,69 +7,77 @@ export async function GET() {
   try {
     const FINAL_CHECK_DEPTS = ['FINAL_CHECK', 'FINAL CHECK', 'FINAL_QC', 'FINAL-CHECK'];
 
-    const incomingChallans = await prisma.challan.findMany({
-      where: {
-        toDepartment: { in: FINAL_CHECK_DEPTS },
-      },
-      include: {
-        program: {
-          select: {
-            id: true,
-            programNumber: true,
-            programSerialNo: true,
-            clientName: true,
-            buyerName: true,
-            styleCode: true,
-            designNumber: true,
-            wilcomDesignNumber: true,
-            fabricName: true,
-            targetQuantity: true,
-            quantityMeasurement: true,
-          },
+    const [incomingChallans, outgoingChallans, finalCheckTransactions, statusTotals] = await Promise.all([
+      prisma.challan.findMany({
+        where: {
+          toDepartment: { in: FINAL_CHECK_DEPTS },
         },
-        items: true,
-        issuedBy: { select: { fullName: true, username: true } },
-        receivedBy: { select: { fullName: true, username: true } },
-      },
-      orderBy: { createdAt: 'desc' },
-      take: 50,
-    });
-
-    const outgoingChallans = await prisma.challan.findMany({
-      where: {
-        fromDepartment: { in: FINAL_CHECK_DEPTS },
-      },
-      include: {
-        program: {
-          select: {
-            programNumber: true,
-            programSerialNo: true,
-            clientName: true,
-            styleCode: true,
-            designNumber: true,
-            wilcomDesignNumber: true,
+        include: {
+          program: {
+            select: {
+              id: true,
+              programNumber: true,
+              programSerialNo: true,
+              clientName: true,
+              buyerName: true,
+              styleCode: true,
+              designNumber: true,
+              wilcomDesignNumber: true,
+              fabricName: true,
+              targetQuantity: true,
+              quantityMeasurement: true,
+            },
           },
+          items: true,
+          issuedBy: { select: { fullName: true, username: true } },
+          receivedBy: { select: { fullName: true, username: true } },
         },
-        items: true,
-        issuedBy: { select: { fullName: true, username: true } },
-        receivedBy: { select: { fullName: true, username: true } },
-      },
-      orderBy: { createdAt: 'desc' },
-      take: 30,
-    });
+        orderBy: { createdAt: 'desc' },
+        take: 50,
+      }),
 
-    const finalCheckTransactions = await prisma.productionTransaction.findMany({
-      where: {
-        departmentCode: { in: FINAL_CHECK_DEPTS },
-      },
-      include: {
-        operator: { select: { fullName: true, username: true } },
-        program: { select: { programNumber: true, designNumber: true, wilcomDesignNumber: true, styleCode: true } },
-        challan: { select: { challanNumber: true } },
-      },
-      orderBy: { recordedAt: 'desc' },
-      take: 30,
-    });
+      prisma.challan.findMany({
+        where: {
+          fromDepartment: { in: FINAL_CHECK_DEPTS },
+        },
+        include: {
+          program: {
+            select: {
+              programNumber: true,
+              programSerialNo: true,
+              clientName: true,
+              styleCode: true,
+              designNumber: true,
+              wilcomDesignNumber: true,
+            },
+          },
+          items: true,
+          issuedBy: { select: { fullName: true, username: true } },
+          receivedBy: { select: { fullName: true, username: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 30,
+      }),
+
+      prisma.productionTransaction.findMany({
+        where: {
+          departmentCode: { in: FINAL_CHECK_DEPTS },
+        },
+        include: {
+          operator: { select: { fullName: true, username: true } },
+          program: { select: { programNumber: true, designNumber: true, wilcomDesignNumber: true, styleCode: true } },
+          challan: { select: { challanNumber: true } },
+        },
+        orderBy: { recordedAt: 'desc' },
+        take: 30,
+      }),
+      prisma.challan.groupBy({
+        by: ['status'],
+        where: { toDepartment: { in: FINAL_CHECK_DEPTS } },
+        _count: { _all: true },
+        _sum: { fabricIn: true, fabricOut: true },
+      }),
+    ]);
 
     let awaitingReceiptCount = 0, awaitingReceiptPcs = 0;
     let inQueueCount = 0, inQueuePcs = 0;
@@ -79,19 +87,24 @@ export async function GET() {
     let handedOverCount = 0, handedOverPcs = 0;
     let onHoldCount = 0, onHoldPcs = 0;
 
-    incomingChallans.forEach((ch) => {
-      const pcs = ch.items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
-      switch (ch.status) {
-        case 'ISSUED': awaitingReceiptCount++; awaitingReceiptPcs += pcs; break;
-        case 'RECEIVED': inQueueCount++; inQueuePcs += pcs; break;
-        case 'IN_PROCESS': inProgressCount++; inProgressPcs += pcs; break;
-        case 'COMPLETED': completedCount++; completedPcs += pcs; break;
-        case 'READY_FOR_HANDOVER':
-        case 'READY_FOR_DISPATCH': readyForHandoverCount++; readyForHandoverPcs += pcs; break;
-        case 'HANDED_OVER': handedOverCount++; handedOverPcs += pcs; break;
-        case 'ON_HOLD': onHoldCount++; onHoldPcs += pcs; break;
-      }
-    });
+    const totalsByStatus = new Map(statusTotals.map((entry) => [entry.status, entry]));
+    const statusCount = (status: string) => totalsByStatus.get(status)?._count._all || 0;
+    const statusInput = (status: string) => Number(totalsByStatus.get(status)?._sum.fabricIn || 0);
+    const statusOutput = (status: string) => Number(totalsByStatus.get(status)?._sum.fabricOut || 0);
+    awaitingReceiptCount = statusCount('ISSUED');
+    awaitingReceiptPcs = statusInput('ISSUED');
+    inQueueCount = statusCount('RECEIVED');
+    inQueuePcs = statusInput('RECEIVED');
+    inProgressCount = statusCount('IN_PROCESS') + statusCount('QC_PENDING') + statusCount('REWORK');
+    inProgressPcs = statusInput('IN_PROCESS') + statusInput('QC_PENDING') + statusInput('REWORK');
+    completedCount = statusCount('QC_APPROVED') + statusCount('COMPLETED');
+    completedPcs = statusOutput('QC_APPROVED') + statusOutput('COMPLETED');
+    readyForHandoverCount = statusCount('QC_APPROVED') + statusCount('READY_FOR_HANDOVER') + statusCount('READY_FOR_DISPATCH');
+    readyForHandoverPcs = statusOutput('QC_APPROVED') + statusOutput('READY_FOR_HANDOVER') + statusOutput('READY_FOR_DISPATCH');
+    handedOverCount = statusCount('HANDED_OVER') + statusCount('CLOSED');
+    handedOverPcs = statusOutput('HANDED_OVER') + statusOutput('CLOSED');
+    onHoldCount = statusCount('ON_HOLD');
+    onHoldPcs = statusInput('ON_HOLD');
 
     let totalInputPcs = 0, totalAcceptedPcs = 0, totalReworkPcs = 0, totalRejectPcs = 0;
 

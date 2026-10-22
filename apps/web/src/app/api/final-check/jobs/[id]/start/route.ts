@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 
 export const dynamic = 'force-dynamic';
+const FINAL_CHECK_DEPTS = ['FINAL_CHECK', 'FINAL CHECK', 'FINAL_QC', 'FINAL-CHECK'];
 
 export async function POST(
   request: Request,
@@ -20,9 +21,13 @@ export async function POST(
       return NextResponse.json({ error: 'Final QC job not found' }, { status: 404 });
     }
 
-    if (challan.status !== 'RECEIVED' && challan.status !== 'ON_HOLD') {
+    if (!FINAL_CHECK_DEPTS.includes(challan.toDepartment.toUpperCase())) {
+      return NextResponse.json({ error: 'This challan is not routed to Final QC.' }, { status: 400 });
+    }
+
+    if (challan.status !== 'RECEIVED') {
       return NextResponse.json(
-        { error: `Job must be in 'RECEIVED' or 'ON_HOLD' status to start. Current status: '${challan.status}'.` },
+        { error: `Job must be in 'RECEIVED' status to start. Current status: '${challan.status}'.` },
         { status: 400 }
       );
     }

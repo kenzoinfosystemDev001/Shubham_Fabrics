@@ -581,6 +581,18 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
     };
   }
 
+  // Final QC Department routes protection
+  if (pathname.startsWith('/final-check')) {
+    if (isFinalCheckUser(user)) {
+      return { allowed: true, redirectTarget: pathname };
+    }
+    return {
+      allowed: false,
+      redirectTarget: defaultUserHome,
+      reason: 'Access Restricted: Final QC is restricted to Final QC personnel and Admins.',
+    };
+  }
+
   // Programming department routes protection (/programming, my-work, floor-board)
   const isProgrammingRoute =
     pathname === '/programming' ||

@@ -29,9 +29,9 @@ export async function POST(
       );
     }
 
-    if (['RECEIVED', 'IN_PROCESS', 'COMPLETED'].includes(challan.status)) {
+    if (challan.status !== 'ISSUED') {
       return NextResponse.json(
-        { error: `Challan is already in '${challan.status}' status. Duplicate receipt rejected.` },
+        { error: `Only an ISSUED challan can be received. Current status: '${challan.status}'.` },
         { status: 400 }
       );
     }
@@ -58,8 +58,8 @@ export async function POST(
     const totalIssuedQty = challan.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
     const receivedQuantity = body.receivedQuantity !== undefined ? Number(body.receivedQuantity) : totalIssuedQty;
 
-    if (isNaN(receivedQuantity) || receivedQuantity <= 0) {
-      return NextResponse.json({ error: 'Valid received garment piece count is required.' }, { status: 400 });
+    if (!Number.isInteger(receivedQuantity) || receivedQuantity <= 0) {
+      return NextResponse.json({ error: 'Received garment piece count must be a positive whole number.' }, { status: 400 });
     }
 
     if (receivedQuantity > totalIssuedQty) {

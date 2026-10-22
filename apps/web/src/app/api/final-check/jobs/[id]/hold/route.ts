@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 
 export const dynamic = 'force-dynamic';
+const FINAL_CHECK_DEPTS = ['FINAL_CHECK', 'FINAL CHECK', 'FINAL_QC', 'FINAL-CHECK'];
 
 export async function POST(
   request: Request,
@@ -13,6 +14,10 @@ export async function POST(
 
     const challan = await prisma.challan.findUnique({ where: { id }, include: { items: true } });
     if (!challan) return NextResponse.json({ error: 'Job not found' }, { status: 404 });
+
+    if (!FINAL_CHECK_DEPTS.includes(challan.toDepartment.toUpperCase())) {
+      return NextResponse.json({ error: 'This challan is not routed to Final QC.' }, { status: 400 });
+    }
 
     if (!['RECEIVED', 'IN_PROCESS'].includes(challan.status)) {
       return NextResponse.json({ error: `Cannot place on hold from status '${challan.status}'.` }, { status: 400 });
