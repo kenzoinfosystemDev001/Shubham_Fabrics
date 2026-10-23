@@ -295,7 +295,7 @@ export function WilcomPrintModal({
               <div className="space-y-4">
                 {filteredEntries.map((entry, idx) => (
                   <div key={entry.id || idx} className="border border-slate-200 rounded-xl p-4 bg-white space-y-3 shadow-2xs">
-                    <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2">
                       <div className="flex items-center gap-2">
                         <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase text-white ${
                           entry.category === 'TOP'
@@ -312,7 +312,7 @@ export function WilcomPrintModal({
                           {entry.styleName || styleVal || mainStyleVal}
                         </span>
                       </div>
-                      <span className="font-mono font-bold text-xs px-2 py-0.5 bg-slate-100 text-slate-900 rounded border border-slate-200">
+                      <span className="min-w-0 max-w-full sm:max-w-[58%] break-all text-right font-mono text-[11px] leading-tight font-bold px-2 py-0.5 bg-slate-100 text-slate-900 rounded border border-slate-200">
                         {entry.wilcomDesignNumber || designNo || 'N/A'}
                       </span>
                     </div>

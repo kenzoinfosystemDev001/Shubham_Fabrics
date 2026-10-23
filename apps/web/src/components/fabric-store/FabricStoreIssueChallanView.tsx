@@ -98,14 +98,17 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
 
   // Fabric Store Stock Availability Gate State
   const [fabricAvailability, setFabricAvailability] = useState<any | null>(null);
+  const [availabilityUnit, setAvailabilityUnit] = useState<'MTR' | 'PCS'>('MTR');
   const [checkingAvailability, setCheckingAvailability] = useState(false);
   const [updatingAvailability, setUpdatingAvailability] = useState(false);
 
-  const loadAvailability = async (progId: string) => {
+  const loadAvailability = async (progId: string, unit?: 'MTR' | 'PCS') => {
     if (!progId) return;
     try {
       setCheckingAvailability(true);
-      const res = await fetch(`/api/fabric-store/check-availability?programId=${progId}`);
+      const params = new URLSearchParams({ programId: progId });
+      if (unit) params.set('unit', unit);
+      const res = await fetch(`/api/fabric-store/check-availability?${params.toString()}`);
       const json = await res.json();
       if (res.ok && json.data) {
         setFabricAvailability(json.data);
@@ -218,16 +221,31 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
     }
 
     const targetQ = Number(prog.targetQuantity || prog.fabricIssuedToDyeing || 0);
+    const initialUnit: 'MTR' | 'PCS' = prog.quantityMeasurement === 'PCS' ? 'PCS' : 'MTR';
+    setAvailabilityUnit(initialUnit);
+    setItems((currentItems) => currentItems.map((item) => ({ ...item, unit: initialUnit })));
     setStoreTracking((prev) => ({
       ...prev,
       fabricIn: targetQ,
       fabricOut: Math.max(0, targetQ - prev.defectivePieces),
-      fabricUnit: prog.quantityMeasurement === 'PCS' ? 'PCS' : 'MTR',
+      fabricUnit: initialUnit,
       detectedFromDept: 'PROGRAMMING',
     }));
 
     // Trigger Fabric Store stock verification
-    loadAvailability(prog.id);
+    loadAvailability(prog.id, initialUnit);
+  };
+
+  const handleItemsChange = (nextItems: ChallanItemData[]) => {
+    setItems(nextItems);
+    const selectedRow = nextItems.find(
+      (item) => Number(item.measurement) > 0 || item.fabric.trim() || item.color.trim()
+    ) || nextItems[0];
+    const nextUnit = selectedRow?.unit || 'MTR';
+    if (selectedProgramId && nextUnit !== availabilityUnit) {
+      setAvailabilityUnit(nextUnit);
+      loadAvailability(selectedProgramId, nextUnit);
+    }
   };
 
   const selectedProgram = programs.find((p) => p.id === selectedProgramId);
@@ -241,26 +259,18 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
       return;
     }
 
-    // MANDATORY GATE: Check if fabric is available in store
-    if (fabricAvailability && !fabricAvailability.isAvailable) {
-      setError(
-        `Fabric (${fabricAvailability.fabricName || 'fabric'}) is unavailable in the Fabric Store. Production sheet cannot move to ${destDept} until fabric arrives and is in stock.`
-      );
-      if (typeof window !== 'undefined') {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-      return;
-    }
-
     if (!challanNumber.trim()) {
       setError('Please provide a Challan Number.');
       return;
     }
 
-    // Filter valid items
-    const validItems = items.filter(
-      (it) => it.fabric.trim() || it.color.trim() || parseFloat(String(it.measurement)) > 0
-    );
+    // Only measured rows represent material moving out of the store.
+    const rowsWithDetails = items.filter((it) => it.fabric.trim() || it.color.trim() || String(it.measurement).trim());
+    if (rowsWithDetails.some((item) => !Number.isFinite(Number(item.measurement)) || Number(item.measurement) <= 0)) {
+      setError('Enter a positive measurement for every challan item.');
+      return;
+    }
+    const validItems = rowsWithDetails.filter((item) => Number(item.measurement) > 0);
 
     if (validItems.length === 0) {
       setError('Please enter at least one item in the Color / Fabric / Measurement table.');
@@ -271,6 +281,25 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
       return;
     }
 
+    const issueUnit: 'MTR' | 'PCS' = validItems[0].unit === 'PCS' ? 'PCS' : 'MTR';
+    const issueQuantity = validItems.reduce((sum, item) => sum + Number(item.measurement), 0);
+    // The API also checks availability against this exact unit before creating the challan.
+    if (
+      fabricAvailability?.requiredUnit === issueUnit &&
+      !fabricAvailability.isAvailable
+    ) {
+      setError(
+        `Fabric (${fabricAvailability.fabricName || 'fabric'}) is unavailable in the Fabric Store. Production sheet cannot move to ${destDept} until fabric arrives and is in stock.`
+      );
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      return;
+    }
+    const trackingMatchesUnit = storeTracking.fabricUnit === issueUnit;
+    const challanDefectiveQuantity = trackingMatchesUnit ? storeTracking.defectivePieces : 0;
+    const challanFabricIn = issueQuantity + challanDefectiveQuantity;
+
     try {
       setSubmitting(true);
       setError('');
@@ -279,8 +308,8 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
       const challanItems = validItems.map((item) => ({
         itemDescription: `${item.fabric || 'Fabric'} — ${item.color || 'Standard'}`,
         unitType: 'ROLL',
-        quantity: parseFloat(String(item.measurement)) || storeTracking.fabricOut || 1,
-        uom: item.unit || storeTracking.fabricUnit || selectedProgram.quantityMeasurement || 'MTR',
+        quantity: Number(item.measurement),
+        uom: issueUnit,
         fabricCode: item.fabric || selectedProgram.fabricName || 'FABRIC',
         colour: item.color || null,
         shade: item.requiredDyeColor || null,
@@ -294,7 +323,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
         storeInchargeName ? `Store Incharge: ${storeInchargeName}` : null,
         storeInchargeContact ? `Contact: ${storeInchargeContact}` : null,
         designNumber ? `Design #: ${designNumber}` : null,
-        `Accounting: In: ${storeTracking.fabricIn} ${storeTracking.fabricUnit} | Defective Cut: ${storeTracking.defectivePieces} ${storeTracking.fabricUnit} (${storeTracking.defectiveShelfLocation}) | Leftover Out to ${destinationDepartment}: ${storeTracking.fabricOut} ${storeTracking.fabricUnit}`,
+        `Accounting: In: ${challanFabricIn} ${issueUnit} | Defective Cut: ${challanDefectiveQuantity} ${issueUnit} (${storeTracking.defectiveShelfLocation}) | Out to ${destinationDepartment}: ${issueQuantity} ${issueUnit}`,
       ]
         .filter(Boolean)
         .join(' · ');
@@ -307,12 +336,12 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
         toDepartment: destinationDepartment,
         priority: priority || 'NORMAL',
         issuedDate: challanDate,
-        fabricIn: storeTracking.fabricIn,
-        defectivePieces: storeTracking.defectivePieces,
+        fabricIn: challanFabricIn,
+        defectivePieces: challanDefectiveQuantity,
         defectiveShelfLocation: storeTracking.defectiveShelfLocation,
         defectReason: storeTracking.defectReason,
-        fabricOut: storeTracking.fabricOut,
-        fabricUnit: validItems[0]?.unit || storeTracking.fabricUnit,
+        fabricOut: issueQuantity,
+        fabricUnit: issueUnit,
         detectedFromDepartment: storeTracking.detectedFromDept || 'PROGRAMMING',
         remarks: inchargeInfo,
         items: challanItems,
@@ -620,8 +649,8 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                         <span>·</span>
                         <span>Color: <strong>{fabricAvailability?.fabricColor || selectedProgram.fabricColor || 'Natural'}</strong></span>
                         <span>·</span>
-                        <span>Store Stock: <strong className={fabricAvailability?.totalStoreStockMeters > 0 ? 'text-emerald-700' : 'text-rose-700'}>
-                          {fabricAvailability?.totalStoreStockMeters ?? 0} MTR
+                        <span>Store Stock: <strong className={(fabricAvailability?.totalStoreStockMeters > 0 || fabricAvailability?.totalStoreStockPcs > 0) ? 'text-emerald-700' : 'text-rose-700'}>
+                          {fabricAvailability?.totalStoreStockMeters ?? 0} MTR / {fabricAvailability?.totalStoreStockPcs ?? 0} PCS
                         </strong></span>
                         <span>·</span>
                         <span>Rolls: <strong>{fabricAvailability?.rollCount ?? 0}</strong></span>
@@ -813,7 +842,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
               <div className="pt-3 border-t border-slate-200">
                 <ColorFabricMeasurementTable
                   items={items}
-                  onChange={setItems}
+                  onChange={handleItemsChange}
                   context={challanContext}
                   programId={selectedProgram?.id}
                   currentDepartment="STORE"

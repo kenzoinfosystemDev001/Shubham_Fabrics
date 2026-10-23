@@ -6,8 +6,6 @@ import {
   Download, 
   Printer, 
   Sparkles,
-  Eye,
-  Layers
 } from 'lucide-react';
 import { 
   downloadProductionSheetHtml, 
@@ -43,7 +41,7 @@ export function DocumentActionButtons({
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isChallanOpen, setIsChallanOpen] = useState(false);
   const [isWilcomOpen, setIsWilcomOpen] = useState(false);
-  const [wilcomCategory, setWilcomCategory] = useState<any>('TOP');
+  const wilcomCategory = 'TOP';
 
   const activeProgram = program || challan?.program;
   const activeChallan = challan;
@@ -161,11 +159,6 @@ export function DocumentActionButtons({
           program={activeProgram}
           isOpen={isSheetOpen}
           onClose={() => setIsSheetOpen(false)}
-          onViewWilcom={(cat) => {
-            if (cat) setWilcomCategory(cat);
-            setIsSheetOpen(false);
-            setIsWilcomOpen(true);
-          }}
           onViewChallan={activeChallan ? () => {
             setIsSheetOpen(false);
             setIsChallanOpen(true);

@@ -88,8 +88,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'billQty must be a positive number' }, { status: 400 });
     }
 
+    const normalizedUnit = String(unit).toUpperCase();
+    if (!['MTR', 'PCS'].includes(normalizedUnit)) {
+      return NextResponse.json({ error: 'unit must be MTR or PCS' }, { status: 400 });
+    }
+
+    const normalizedEntryType = String(entryType).toUpperCase();
+    if (!['UNDYED', 'KORA', 'DYED'].includes(normalizedEntryType)) {
+      return NextResponse.json({ error: 'entryType must be UNDYED, KORA, or DYED' }, { status: 400 });
+    }
+
     const normalizedType =
-      String(entryType).toUpperCase() === 'KORA' || String(entryType).toUpperCase() === 'UNDYED'
+      normalizedEntryType === 'KORA' || normalizedEntryType === 'UNDYED'
         ? 'UNDYED'
         : 'DYED';
 
@@ -101,7 +111,7 @@ export async function POST(request: Request) {
         billDate: new Date(billDate),
         receivingDate: new Date(receivingDate),
         billQty: qty,
-        unit: unit.toUpperCase() === 'PCS' ? 'PCS' : 'MTR',
+        unit: normalizedUnit,
         supplierName: supplierName ? String(supplierName).trim() : null,
         remarks: remarks ? String(remarks).trim() : null,
       },

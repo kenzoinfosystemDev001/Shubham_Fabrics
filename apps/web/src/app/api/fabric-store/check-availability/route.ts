@@ -11,9 +11,11 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const programId = searchParams.get('programId');
+    const requestedUnit = searchParams.get('unit')?.toUpperCase();
+    const unitOverride = requestedUnit === 'PCS' || requestedUnit === 'MTR' ? requestedUnit : undefined;
 
     if (programId) {
-      const status = await checkFabricStoreAvailability(programId);
+      const status = await checkFabricStoreAvailability(programId, unitOverride);
       return NextResponse.json({ success: true, data: status });
     }
 

@@ -29,6 +29,31 @@ import {
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { printProductionSheet, downloadProductionSheetHtml } from '@/lib/download-production-sheet';
 
+function getWilcomDesignEntries(program: any): Array<{ styleName?: string; category?: string; wilcomDesignNumber: string }> {
+  let metadata: any = {};
+  try {
+    metadata = typeof program?.metadataJson === 'string'
+      ? JSON.parse(program.metadataJson)
+      : program?.metadataJson || {};
+  } catch {}
+
+  const programEntries = Array.isArray(program?.wilcomEntries) ? program.wilcomEntries : [];
+  const metadataEntries = Array.isArray(metadata?.wilcomEntries) ? metadata.wilcomEntries : [];
+  const entries = programEntries.length > 0 ? programEntries : metadataEntries;
+  const designs = entries
+    .filter((entry: any) => String(entry?.wilcomDesignNumber || '').trim())
+    .map((entry: any) => ({
+      styleName: String(entry.styleName || '').trim(),
+      category: String(entry.category || '').trim(),
+      wilcomDesignNumber: String(entry.wilcomDesignNumber).trim(),
+    }));
+
+  if (designs.length > 0) return designs;
+
+  const legacyDesignNumber = String(program?.wilcomDesignNumber || '').trim();
+  return legacyDesignNumber ? [{ wilcomDesignNumber: legacyDesignNumber }] : [];
+}
+
 function IssueChallanContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -72,6 +97,8 @@ function IssueChallanContent() {
   const [error, setError] = useState<string | null>(null);
   const [issuedChallan, setIssuedChallan] = useState<any | null>(null);
   const [showSheetModal, setShowSheetModal] = useState(false);
+
+  const wilcomDesignEntries = selectedProgram ? getWilcomDesignEntries(selectedProgram) : [];
 
   // Load programs and next Challan number
   useEffect(() => {
@@ -455,9 +482,25 @@ function IssueChallanContent() {
                       <span className="text-slate-400 block text-[10px]">Fabric Name</span>
                       <span className="font-semibold text-slate-900">{selectedProgram.fabricName || 'Cotton'}</span>
                     </div>
-                    <div>
-                      <span className="text-slate-400 block text-[10px]">Wilcom #</span>
-                      <span className="font-mono font-bold text-purple-900">{selectedProgram.wilcomDesignNumber || 'WLC-N/A'}</span>
+                    <div className="min-w-0 sm:col-span-2">
+                      <span className="text-slate-400 block text-[10px]">Wilcom Designs</span>
+                      {wilcomDesignEntries.length > 0 ? (
+                        <div className="mt-1 flex flex-wrap gap-1.5">
+                          {wilcomDesignEntries.map((entry, index) => (
+                            <span
+                              key={`${entry.wilcomDesignNumber}-${index}`}
+                              className="inline-flex min-w-0 max-w-full items-center gap-1 rounded bg-purple-50 px-1.5 py-0.5 font-mono text-[10px] font-bold text-purple-900"
+                            >
+                              <span className="shrink-0 font-sans font-semibold text-purple-700">
+                                {entry.styleName || entry.category || `Design ${index + 1}`}
+                              </span>
+                              <span className="break-all">{entry.wilcomDesignNumber}</span>
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="font-mono font-bold text-purple-900">WLC-N/A</span>
+                      )}
                     </div>
                   </div>
                 </div>

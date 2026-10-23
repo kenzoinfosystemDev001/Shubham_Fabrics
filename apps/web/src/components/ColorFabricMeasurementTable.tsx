@@ -335,7 +335,9 @@ export function ColorFabricMeasurementTable({
 
   const handleAddItem = () => {
     if (readOnly) return;
-    onChange([...items, createBlankChallanItem(context)]);
+    const newItem = createBlankChallanItem(context);
+    newItem.unit = items[0]?.unit || 'MTR';
+    onChange([...items, newItem]);
   };
 
   const handleAddColorMeasurement = (index: number) => {
@@ -346,6 +348,7 @@ export function ColorFabricMeasurementTable({
       fabric: sourceItem.fabric,
       width: sourceItem.width,
       colorCode: sourceItem.colorCode,
+      unit: sourceItem.unit,
     };
     onChange([
       ...items.slice(0, index + 1),
