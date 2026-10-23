@@ -280,7 +280,7 @@ export function extractSubStylesAndGrid(program: any, category: GarmentCategory 
       if (comp) {
         isEnabled = comp.enabled !== false;
         isForwarded = comp.forwarded !== false || forwardedComponents.includes(category);
-        if (comp.styleName) topName = comp.styleName;
+        topName = String(comp.styleName || (category === 'OTHER' ? 'INPUT' : category)).trim();
         if (comp.pattern) pattern = comp.pattern;
         if (comp.fabricName) fabricName = comp.fabricName;
         if (comp.fabricWidth) fabricWidth = comp.fabricWidth;
@@ -310,6 +310,13 @@ export function extractSubStylesAndGrid(program: any, category: GarmentCategory 
         if (meta?.note) noteText = meta.note;
       }
     } catch {}
+  }
+
+  // Older sheets saved the design number as the style when no style name was entered.
+  // In that case, show the component category, matching the production sheet form.
+  const designNumber = String(program.designNumber || program.designName || '').trim();
+  if (topName.trim() && designNumber && topName.trim().toLowerCase() === designNumber.toLowerCase()) {
+    topName = category === 'OTHER' ? 'INPUT' : category;
   }
 
   // Fallback for subStylesWithAverages if not found
