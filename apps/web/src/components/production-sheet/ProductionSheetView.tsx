@@ -16,6 +16,8 @@ import {
   printProductionSheet,
   downloadProductionSheetHtml
 } from '@/lib/download-production-sheet';
+import { useProgramDocument } from '@/hooks/useProgramDocument';
+import { extractRootWilcomPhoto } from '@/lib/download-wilcom';
 
 interface ProductionSheetViewProps {
   program: any;
@@ -26,12 +28,13 @@ interface ProductionSheetViewProps {
 }
 
 export function ProductionSheetView({
-  program,
+  program: sourceProgram,
   activeCategory,
   onCategoryChange,
   onOpenPrintModal,
   isClientCodeVisible = false,
 }: ProductionSheetViewProps) {
+  const { program, loading, error } = useProgramDocument(sourceProgram);
   let meta: any = null;
   if (program?.metadataJson) {
     try {
@@ -40,6 +43,11 @@ export function ProductionSheetView({
   }
 
   const components = meta?.components || null;
+  const componentCategories: GarmentCategory[] = components
+    ? Object.keys(components)
+    : ['TOP', 'BOTTOM', 'DUPATTA', 'OTHER'];
+  const activeCategoryName = components?.[activeCategory]?.styleName || (activeCategory === 'OTHER' ? 'INPUT' : activeCategory);
+  const artworkPhoto = extractRootWilcomPhoto(program, meta);
   const forwardedComponents: string[] = Array.isArray(meta?.forwardedComponents) ? meta.forwardedComponents : ['TOP'];
 
   const {
@@ -64,19 +72,28 @@ export function ProductionSheetView({
     pcs: string | number;
     mtr: string | number;
     subStyle?: string;
+    subStyles?: string[];
     size?: string;
     sizes: Record<string, string>;
   }[] = [];
 
   for (let i = 0; i < TOTAL_GRID_ROWS; i++) {
     if (i < productionGrid.length) {
+      const item = productionGrid[i];
+      let itemSubStyles = Array.isArray(item.subStyles) ? item.subStyles : [];
+      if (itemSubStyles.length === 0 && item.subStyle) {
+        itemSubStyles = String(item.subStyle).split(',').map((s) => s.trim()).filter(Boolean);
+      }
+      const itemSubStyleStr = itemSubStyles.length > 0 ? itemSubStyles.join(', ') : (item.subStyle || '');
+
       gridRows.push({
-        color: productionGrid[i].color || '',
-        pcs: productionGrid[i].pcs !== undefined ? productionGrid[i].pcs : '',
-        mtr: productionGrid[i].mtr !== undefined ? productionGrid[i].mtr : '',
-        subStyle: productionGrid[i].subStyle || '',
-        size: productionGrid[i].size || productionGrid[i].sizes?.['SIZE'] || '',
-        sizes: productionGrid[i].sizes || {},
+        color: item.color || '',
+        pcs: item.pcs !== undefined ? item.pcs : '',
+        mtr: item.mtr !== undefined ? item.mtr : '',
+        subStyle: itemSubStyleStr,
+        subStyles: itemSubStyles,
+        size: item.size || item.sizes?.['SIZE'] || '',
+        sizes: item.sizes || {},
       });
     } else {
       gridRows.push({
@@ -84,6 +101,7 @@ export function ProductionSheetView({
         pcs: '',
         mtr: '',
         subStyle: '',
+        subStyles: [],
         size: '',
         sizes: {},
       });
@@ -95,6 +113,17 @@ export function ProductionSheetView({
 
   return (
     <div className="space-y-4">
+      {(loading || error) && (
+        <div className={`rounded-md px-3 py-2 text-xs ${error ? 'bg-rose-50 text-rose-800' : 'bg-blue-50 text-blue-800'}`}>
+          {error || 'Loading complete production sheet details…'}
+        </div>
+      )}
+      {artworkPhoto && (
+        <div className="flex items-center gap-3 rounded-md border border-slate-300 bg-white p-3">
+          <span className="text-[10px] font-bold uppercase text-slate-500">Wilcom Artwork</span>
+          <img src={artworkPhoto} alt={`Wilcom artwork for design ${program.designNumber || program.designName || ''}`} className="max-h-20 max-w-48 object-contain" />
+        </div>
+      )}
       {/* HEADER & ACTIONS */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-black/15 pb-3">
         <div>
@@ -102,7 +131,7 @@ export function ProductionSheetView({
             PRODUCTION SHEET &middot; TRAVELER #{program.programSerialNo || program.programNumber}
           </span>
           <h3 className="text-sm font-black text-black mt-1 uppercase tracking-wide flex items-center gap-2">
-            <span>{activeCategory} Production Sheet Breakdown</span>
+            <span>{activeCategoryName} Production Sheet Breakdown</span>
             {isClientCodeVisible && program.clientCode && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-100 text-amber-950 text-[10px] font-mono font-black border border-amber-300 normal-case">
                 🔒 Client Code: {program.clientCode}
@@ -143,9 +172,10 @@ export function ProductionSheetView({
 
       {/* COMPONENT TAB SELECTOR */}
       <div className="flex items-center gap-2 pb-2 border-b border-black/10 overflow-x-auto">
-        {(['TOP', 'BOTTOM', 'DUPATTA'] as GarmentCategory[]).map((cat) => {
+        {componentCategories.map((cat) => {
           const isEnabled = components ? components[cat]?.enabled !== false : (cat === 'TOP');
           const isForwarded = forwardedComponents.includes(cat);
+          const categoryName = components?.[cat]?.styleName || (cat === 'OTHER' ? 'INPUT' : cat);
           return (
             <button
               key={cat}
@@ -159,7 +189,7 @@ export function ProductionSheetView({
                     : 'bg-slate-50 text-slate-400 border border-slate-200'
               }`}
             >
-              <span>{cat} Sheet</span>
+              <span>{categoryName} Sheet</span>
               {isForwarded && (
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" title="Forwarded Component" />
               )}
@@ -171,7 +201,7 @@ export function ProductionSheetView({
       {/* SUB-STYLES & INDIVIDUAL CONSUMPTION AVERAGE TABLE */}
       <div className="space-y-1">
         <div className="font-black text-xs uppercase tracking-wider text-slate-800">
-          {activeCategory} AVERAGE CONSUMPTION (METERS PER PIECE)
+          {activeCategoryName} AVERAGE CONSUMPTION (METERS PER PIECE)
         </div>
         <div className="overflow-x-auto">
           <table className="w-full border-collapse border-[1.5px] border-black text-center text-xs">
@@ -207,7 +237,7 @@ export function ProductionSheetView({
       <div className="space-y-1">
         <div className="flex items-center justify-between">
           <span className="font-black text-xs uppercase tracking-wider text-slate-800">
-            {activeCategory} PRODUCTION BREAKDOWN GRID
+            {activeCategoryName} PRODUCTION BREAKDOWN GRID
           </span>
           <span className="text-[11px] font-bold text-slate-500">
             {productionGrid.length} Active Colors Recorded
@@ -218,34 +248,70 @@ export function ProductionSheetView({
           <table className="w-full border-collapse border-[1.5px] border-black text-center text-xs">
             <thead>
               <tr className="bg-slate-50">
-                <th className="border-[1.5px] border-black p-1.5 font-black text-left w-28 uppercase">COLOR</th>
-                {subStyleColumns.map((colName, cIdx) => (
-                  <th key={cIdx} className="border-[1.5px] border-black p-1.5 font-black uppercase">
-                    {colName}
-                  </th>
-                ))}
-                <th className="border-[1.5px] border-black p-1.5 font-black w-16 bg-slate-100">PCS</th>
-                <th className="border-[1.5px] border-black p-1.5 font-black w-16 bg-slate-100">MTR</th>
+                <th rowSpan={2} className="border-[1.5px] border-black p-1.5 font-black text-left w-28 uppercase">COLOR</th>
+                <th colSpan={2} className="border-[1.5px] border-black p-1.5 font-black uppercase">QTY</th>
+                <th rowSpan={2} className="border-[1.5px] border-black p-1.5 font-black uppercase">
+                  SUB STYLE
+                </th>
+                <th rowSpan={2} className="border-[1.5px] border-black p-1.5 font-black w-24 uppercase">SIZE</th>
+              </tr>
+              <tr className="bg-slate-50">
+                <th className="border-[1.5px] border-black p-1 font-black w-20 bg-slate-100">MTR</th>
+                <th className="border-[1.5px] border-black p-1 font-black w-16 bg-slate-100">PCS</th>
               </tr>
             </thead>
             <tbody>
               {gridRows.map((row, rIdx) => {
                 const hasData = Boolean(row.color || row.pcs !== '' || row.mtr !== '');
+                const rowSubStyles = row.subStyles && row.subStyles.length > 0
+                  ? row.subStyles
+                  : row.subStyle
+                    ? row.subStyle.split(',').map((s) => s.trim()).filter(Boolean)
+                    : [];
+
                 return (
-                  <tr key={rIdx} className={`h-6 ${hasData ? 'font-medium' : 'bg-slate-50/20'}`}>
+                  <tr key={rIdx} className={`h-7 ${hasData ? 'font-medium' : 'bg-slate-50/20'}`}>
                     <td className="border-[1.5px] border-black p-1 text-left font-bold truncate">
                       {row.color}
                     </td>
-                    {subStyleColumns.map((colName, cIdx) => (
-                      <td key={cIdx} className="border-[1.5px] border-black p-1">
-                        {row.sizes[colName] || (cIdx === 0 && row.subStyle === colName ? row.size : '') || ''}
-                      </td>
-                    ))}
+                    <td className="border-[1.5px] border-black p-1 font-bold bg-slate-50/40">
+                      {row.mtr !== '' ? row.mtr : ''}
+                    </td>
                     <td className="border-[1.5px] border-black p-1 font-bold bg-slate-50/40">
                       {row.pcs !== '' ? row.pcs : ''}
                     </td>
-                    <td className="border-[1.5px] border-black p-1 font-bold bg-slate-50/40">
-                      {row.mtr !== '' ? row.mtr : ''}
+                    <td className="border-[1.5px] border-black p-1 text-center font-bold">
+                      {rowSubStyles.length > 0 ? (
+                        <div className="flex flex-wrap items-center justify-center gap-1">
+                          {rowSubStyles.map((sub, sIdx) => (
+                            <span
+                              key={sIdx}
+                              className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-black uppercase bg-blue-50 border border-blue-200 text-blue-900 shadow-2xs"
+                            >
+                              {sub}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-slate-400 font-normal italic text-[11px]">—</span>
+                      )}
+                    </td>
+                    <td className="border-[1.5px] border-black p-1 font-bold text-center">
+                      {rowSubStyles.length > 1 && row.sizes && Object.keys(row.sizes).length > 0 ? (
+                        <div className="flex flex-col items-center justify-center gap-0.5 text-xs">
+                          {rowSubStyles.map((sub) => {
+                            const sz = row.sizes?.[sub];
+                            return (
+                              <div key={sub} className="flex items-center gap-1 text-[11px]">
+                                <span className="font-semibold text-slate-500 uppercase">{sub}:</span>
+                                <span className="font-black text-black">{sz || '—'}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <span>{row.size || (rowSubStyles[0] ? row.sizes?.[rowSubStyles[0]] : '') || '—'}</span>
+                      )}
                     </td>
                   </tr>
                 );
@@ -254,16 +320,16 @@ export function ProductionSheetView({
             <tfoot>
               <tr className="h-7 bg-slate-100 font-black border-t-2 border-black">
                 <td className="border-[1.5px] border-black p-1 text-left uppercase">
-                  TOTAL
+                  {activeCategoryName} TOTALS:
                 </td>
-                {subStyleColumns.map((_, cIdx) => (
-                  <td key={cIdx} className="border-[1.5px] border-black p-1" />
-                ))}
-                <td className="border-[1.5px] border-black p-1 font-black text-blue-950">
+                <td className="border-[1.5px] border-black p-1 font-black text-emerald-800 text-center">
+                  {totalMtr > 0 ? totalMtr.toFixed(2) : '—'}
+                </td>
+                <td className="border-[1.5px] border-black p-1 font-black text-[#163767] text-center">
                   {totalPcs > 0 ? totalPcs : '—'}
                 </td>
-                <td className="border-[1.5px] border-black p-1 font-black text-blue-950">
-                  {totalMtr > 0 ? totalMtr.toFixed(2) : '—'}
+                <td colSpan={2} className="border-[1.5px] border-black p-1 text-right text-[10px] text-slate-500 italic pr-3">
+                  {totalMtrAverage > 0 ? `Fabric consumption @ ${totalMtrAverage.toFixed(2)} Mtr/Pc` : ''}
                 </td>
               </tr>
             </tfoot>

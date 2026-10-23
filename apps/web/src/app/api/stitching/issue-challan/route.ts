@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import { STANDARD_FACTORY_ROUTE } from '@subham/config';
 import { DepartmentCode } from '@subham/types';
+import { buildDepartmentTrackingData } from '@/lib/challan-tracking';
 
 export const dynamic = 'force-dynamic';
 
@@ -64,6 +65,16 @@ export async function POST(request: Request) {
     if (requestingQty <= 0) {
       return NextResponse.json({ error: 'Challan item quantity must be greater than zero.' }, { status: 400 });
     }
+    const tracking = buildDepartmentTrackingData(
+      body,
+      requestingQty,
+      Number(parentChallan.fabricOut ?? parentChallan.fabricIn ?? requestingQty),
+      parentChallan.id,
+      parentChallan.fromDepartment
+    );
+    if ('error' in tracking) {
+      return NextResponse.json({ error: tracking.error }, { status: 400 });
+    }
 
     if (totalGoodProduced > 0 && requestingQty > availableToHandover) {
       return NextResponse.json(
@@ -112,8 +123,7 @@ export async function POST(request: Request) {
           createdById: actorId,
           issuedById: actorId,
           remarks: remarks || `Handover from Stitching to ${targetDepartment}: Verified assembled garments.`,
-          fabricIn: requestingQty,
-          fabricOut: requestingQty,
+          ...tracking.data,
           items: {
             create: items.map((it: any) => ({
               itemDescription: it.itemDescription || `${parentChallan.program?.styleCode || 'Assembled'} Finished Garments - Ready for ${targetDepartment}`,
@@ -134,6 +144,24 @@ export async function POST(request: Request) {
           parentChallan: true,
         },
       });
+
+      if (tracking.data.defectivePieces > 0 && actorId) {
+        await tx.defectRecord.create({
+          data: {
+            defectCode: `DEF-STITCHING-${Date.now().toString().slice(-4)}`,
+            programId: parentChallan.programId,
+            challanId: ch.id,
+            departmentCode: 'STITCHING',
+            itemDescription: `Defective pieces from Stitching — quarantined on ${tracking.data.defectiveShelfLocation || 'department shelf'}`,
+            severity: 'MAJOR',
+            quantity: Math.max(1, Math.round(tracking.data.defectivePieces)),
+            reason: tracking.data.defectReason || 'Defective piece found during department processing',
+            detectedById: actorId,
+            status: 'OPEN',
+            resolutionNotes: `Defective ${tracking.data.defectivePieces} ${tracking.data.fabricUnit} segregated. ${requestingQty} ${tracking.data.fabricUnit} dispatched to ${targetDepartment}.`,
+          },
+        });
+      }
 
       // Audit event for newly created outgoing Challan
       await tx.challanEvent.create({

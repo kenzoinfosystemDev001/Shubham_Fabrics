@@ -6,7 +6,8 @@ import {
   Download, 
   X, 
   FileText,
-  Layers
+  Layers,
+  Sparkles
 } from 'lucide-react';
 import { 
   downloadProductionSheetHtml, 
@@ -16,6 +17,8 @@ import {
   GarmentCategory
 } from '@/lib/download-production-sheet';
 import { getCurrentUser, canViewClientCode } from '@/lib/rbac';
+import { useProgramDocument } from '@/hooks/useProgramDocument';
+import { extractRootWilcomPhoto } from '@/lib/download-wilcom';
 
 interface ProductionSheetPrintModalProps {
   program?: any;
@@ -23,6 +26,8 @@ interface ProductionSheetPrintModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialTab?: GarmentCategory;
+  onViewWilcom?: (category?: GarmentCategory) => void;
+  onViewChallan?: () => void;
 }
 
 export function ProductionSheetPrintModal({
@@ -31,9 +36,18 @@ export function ProductionSheetPrintModal({
   isOpen,
   onClose,
   initialTab = 'TOP',
+  onViewWilcom,
+  onViewChallan,
 }: ProductionSheetPrintModalProps) {
-  const program = propProgram || sheetData;
+  const sourceProgram = propProgram || sheetData;
+  const { program, loading, error } = useProgramDocument(sourceProgram, isOpen);
   const [activeTab, setActiveTab] = useState<GarmentCategory>(initialTab);
+
+  React.useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
 
   if (!isOpen || !program) return null;
 
@@ -48,6 +62,11 @@ export function ProductionSheetPrintModal({
   }
 
   const components = meta?.components || null;
+  const componentCategories: GarmentCategory[] = components
+    ? Object.keys(components)
+    : ['TOP', 'BOTTOM', 'DUPATTA', 'OTHER'];
+  const activeTabName = components?.[activeTab]?.styleName || (activeTab === 'OTHER' ? 'INPUT' : activeTab);
+  const artworkPhoto = extractRootWilcomPhoto(program, meta);
   const forwardedComponents: string[] = Array.isArray(meta?.forwardedComponents) ? meta.forwardedComponents : ['TOP'];
 
   const serialNo = program.programSerialNo || program.programNumber || '';
@@ -78,19 +97,28 @@ export function ProductionSheetPrintModal({
     pcs: string | number;
     mtr: string | number;
     subStyle?: string;
+    subStyles?: string[];
     size?: string;
     sizes: Record<string, string>;
   }[] = [];
 
   for (let i = 0; i < TOTAL_GRID_ROWS; i++) {
     if (i < productionGrid.length) {
+      const item = productionGrid[i];
+      let itemSubStyles = Array.isArray(item.subStyles) ? item.subStyles : [];
+      if (itemSubStyles.length === 0 && item.subStyle) {
+        itemSubStyles = String(item.subStyle).split(',').map((s) => s.trim()).filter(Boolean);
+      }
+      const itemSubStyleStr = itemSubStyles.length > 0 ? itemSubStyles.join(', ') : (item.subStyle || '');
+
       gridRows.push({
-        color: productionGrid[i].color || '',
-        pcs: productionGrid[i].pcs !== undefined ? productionGrid[i].pcs : '',
-        mtr: productionGrid[i].mtr !== undefined ? productionGrid[i].mtr : '',
-        subStyle: productionGrid[i].subStyle || '',
-        size: productionGrid[i].size || productionGrid[i].sizes?.['SIZE'] || '',
-        sizes: productionGrid[i].sizes || {},
+        color: item.color || '',
+        pcs: item.pcs !== undefined ? item.pcs : '',
+        mtr: item.mtr !== undefined ? item.mtr : '',
+        subStyle: itemSubStyleStr,
+        subStyles: itemSubStyles,
+        size: item.size || item.sizes?.['SIZE'] || '',
+        sizes: item.sizes || {},
       });
     } else {
       gridRows.push({
@@ -98,6 +126,7 @@ export function ProductionSheetPrintModal({
         pcs: '',
         mtr: '',
         subStyle: '',
+        subStyles: [],
         size: '',
         sizes: {},
       });
@@ -132,11 +161,32 @@ export function ProductionSheetPrintModal({
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            {onViewWilcom && (
+              <button
+                type="button"
+                onClick={() => onViewWilcom(activeTab)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-lg text-xs font-bold border border-purple-200 transition cursor-pointer"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-purple-700" />
+                <span>View Wilcom {activeTab}</span>
+              </button>
+            )}
+            {onViewChallan && (
+              <button
+                type="button"
+                onClick={onViewChallan}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-lg text-xs font-bold border border-emerald-200 transition cursor-pointer"
+              >
+                <FileText className="w-3.5 h-3.5 text-emerald-700" />
+                <span>View Challan</span>
+              </button>
+            )}
             <button
               type="button"
               onClick={handlePrint}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer"
+              disabled={loading}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer disabled:cursor-wait"
             >
               <Printer className="w-3.5 h-3.5" />
               <span>Print {activeTab} Sheet</span>
@@ -144,10 +194,11 @@ export function ProductionSheetPrintModal({
             <button
               type="button"
               onClick={handleDownload}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#163767] hover:bg-[#0F264A] text-white rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer"
+              disabled={loading}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#163767] hover:bg-[#0F264A] disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer disabled:cursor-wait"
             >
               <Download className="w-3.5 h-3.5" />
-              <span>Download {activeTab}</span>
+              <span>Download {activeTab} Sheet</span>
             </button>
             <button
               type="button"
@@ -159,12 +210,19 @@ export function ProductionSheetPrintModal({
           </div>
         </div>
 
+        {(loading || error) && (
+          <div className={`px-5 py-2 text-xs ${error ? 'bg-rose-50 text-rose-800' : 'bg-blue-50 text-blue-800'}`}>
+            {error || 'Loading complete production sheet details…'}
+          </div>
+        )}
+
         {/* COMPONENT TAB SELECTOR */}
         <div className="px-5 py-2 bg-slate-100 border-b border-slate-200 flex items-center justify-between gap-2 overflow-x-auto">
           <div className="flex items-center gap-1.5">
-            {(['TOP', 'BOTTOM', 'DUPATTA', 'OTHER'] as GarmentCategory[]).map((cat) => {
+            {componentCategories.map((cat) => {
               const isEnabled = components ? components[cat]?.enabled !== false : (cat === 'TOP');
               const isForwarded = forwardedComponents.includes(cat);
+              const categoryName = components?.[cat]?.styleName || (cat === 'OTHER' ? 'INPUT' : cat);
               return (
                 <button
                   key={cat}
@@ -178,7 +236,7 @@ export function ProductionSheetPrintModal({
                         : 'bg-slate-100 text-slate-400 border border-slate-200'
                   }`}
                 >
-                  <span>{cat} Sheet</span>
+                  <span>{categoryName} Sheet</span>
                   {isForwarded && (
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" title="Selected for forwarding" />
                   )}
@@ -208,7 +266,7 @@ export function ProductionSheetPrintModal({
                 SHUBHAM FABRICS INDIA PVT. LTD.
               </div>
               <div className="text-xl font-black tracking-widest uppercase text-blue-950 mt-1">
-                PRODUCTION SHEET &middot; {activeTab}
+                PRODUCTION SHEET &middot; {activeTabName}
               </div>
             </div>
 
@@ -238,6 +296,13 @@ export function ProductionSheetPrintModal({
                 </span>
               </div>
             </div>
+
+            {artworkPhoto && (
+              <div className="border border-slate-300 rounded p-3 bg-white">
+                <div className="text-[10px] font-bold text-slate-500 uppercase mb-2">Wilcom Artwork Reference</div>
+                <img src={artworkPhoto} alt={`Wilcom artwork for design ${designNo}`} className="max-h-48 max-w-full object-contain mx-auto" />
+              </div>
+            )}
 
             {/* Style & Fabric Row */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs border border-black p-2.5 bg-white">
@@ -303,35 +368,73 @@ export function ProductionSheetPrintModal({
                 <table className="w-full border-collapse border-[1.5px] border-black text-xs text-center">
                   <thead>
                     <tr className="bg-slate-50">
-                      <th className="border-[1.5px] border-black p-1.5 font-black text-left w-24">COLOR</th>
-                      {subStyleColumns.map((colName, cIdx) => (
-                        <th key={cIdx} className="border-[1.5px] border-black p-1.5 font-black uppercase">
-                          {colName}
-                        </th>
-                      ))}
-                      <th className="border-[1.5px] border-black p-1.5 font-black w-14 bg-slate-100">PCS</th>
-                      <th className="border-[1.5px] border-black p-1.5 font-black w-14 bg-slate-100">MTR</th>
+                      <th rowSpan={2} className="border-[1.5px] border-black p-1.5 font-black text-left w-24 uppercase">COLOR</th>
+                      <th colSpan={2} className="border-[1.5px] border-black p-1.5 font-black uppercase">QTY</th>
+                      <th rowSpan={2} className="border-[1.5px] border-black p-1.5 font-black uppercase">
+                        SUB STYLE
+                      </th>
+                      <th rowSpan={2} className="border-[1.5px] border-black p-1.5 font-black w-20 uppercase">SIZE</th>
+                    </tr>
+                    <tr className="bg-slate-50">
+                      <th className="border-[1.5px] border-black p-1 font-black w-16 bg-slate-100">MTR</th>
+                      <th className="border-[1.5px] border-black p-1 font-black w-14 bg-slate-100">PCS</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {gridRows.map((row, rIdx) => (
-                      <tr key={rIdx} className="h-6">
-                        <td className="border-[1.5px] border-black p-1 text-left font-bold truncate">
-                          {row.color}
-                        </td>
-                        {subStyleColumns.map((colName, cIdx) => (
-                          <td key={cIdx} className="border-[1.5px] border-black p-1 font-semibold">
-                            {row.sizes[colName] || (cIdx === 0 && row.subStyle === colName ? row.size : '') || ''}
+                    {gridRows.map((row, rIdx) => {
+                      const rowSubStyles = row.subStyles && row.subStyles.length > 0
+                        ? row.subStyles
+                        : row.subStyle
+                          ? row.subStyle.split(',').map((s) => s.trim()).filter(Boolean)
+                          : [];
+
+                      return (
+                        <tr key={rIdx} className="h-6">
+                          <td className="border-[1.5px] border-black p-1 text-left font-bold truncate">
+                            {row.color}
                           </td>
-                        ))}
-                        <td className="border-[1.5px] border-black p-1 font-bold bg-slate-50/50">
-                          {row.pcs !== '' ? row.pcs : ''}
-                        </td>
-                        <td className="border-[1.5px] border-black p-1 font-bold bg-slate-50/50">
-                          {row.mtr !== '' ? row.mtr : ''}
-                        </td>
-                      </tr>
-                    ))}
+                          <td className="border-[1.5px] border-black p-1 font-bold bg-slate-50/50">
+                            {row.mtr !== '' ? row.mtr : ''}
+                          </td>
+                          <td className="border-[1.5px] border-black p-1 font-bold bg-slate-50/50">
+                            {row.pcs !== '' ? row.pcs : ''}
+                          </td>
+                          <td className="border-[1.5px] border-black p-1 text-center font-bold">
+                            {rowSubStyles.length > 0 ? (
+                              <div className="flex flex-wrap items-center justify-center gap-1">
+                                {rowSubStyles.map((sub, sIdx) => (
+                                  <span
+                                    key={sIdx}
+                                    className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-black uppercase bg-blue-50 border border-blue-200 text-blue-900 shadow-2xs"
+                                  >
+                                    {sub}
+                                  </span>
+                                ))}
+                              </div>
+                            ) : (
+                              <span className="text-slate-400 font-normal italic text-[11px]">—</span>
+                            )}
+                          </td>
+                          <td className="border-[1.5px] border-black p-1 font-bold text-center">
+                            {rowSubStyles.length > 1 && row.sizes && Object.keys(row.sizes).length > 0 ? (
+                              <div className="flex flex-col items-center justify-center gap-0.5 text-xs">
+                                {rowSubStyles.map((sub) => {
+                                  const sz = row.sizes?.[sub];
+                                  return (
+                                    <div key={sub} className="flex items-center gap-1 text-[10px]">
+                                      <span className="font-semibold text-slate-500 uppercase">{sub}:</span>
+                                      <span className="font-black text-black">{sz || '—'}</span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            ) : (
+                              <span>{row.size || (rowSubStyles[0] ? row.sizes?.[rowSubStyles[0]] : '') || ''}</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

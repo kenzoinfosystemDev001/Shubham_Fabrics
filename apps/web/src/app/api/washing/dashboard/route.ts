@@ -12,23 +12,11 @@ export async function GET() {
       },
       include: {
         program: {
-          select: {
-            id: true,
-            programNumber: true,
-            programSerialNo: true,
-            clientName: true,
-            buyerName: true,
-            styleCode: true,
-            mainStyle: true,
-            fabricName: true,
-            fabricType: true,
-            fabricColor: true,
-            targetQuantity: true,
-            deliveryDate: true,
-            priority: true,
-            status: true,
-            quantityMeasurement: true,
-            wilcomDesignNumber: true,
+          include: {
+            fabrics: true,
+            colours: true,
+            sizes: true,
+            specifications: true,
           },
         },
         items: true,
@@ -63,14 +51,11 @@ export async function GET() {
       },
       include: {
         program: {
-          select: {
-            id: true,
-            programNumber: true,
-            programSerialNo: true,
-            clientName: true,
-            buyerName: true,
-            styleCode: true,
-            mainStyle: true,
+          include: {
+            fabrics: true,
+            colours: true,
+            sizes: true,
+            specifications: true,
           },
         },
         items: true,

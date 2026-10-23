@@ -40,16 +40,7 @@ export class ChallansService {
     const challans = await this.prisma.challan.findMany({
       where,
       include: {
-        program: {
-          select: {
-            id: true,
-            programNumber: true,
-            buyerName: true,
-            styleCode: true,
-            orderNumber: true,
-            designName: true,
-          },
-        },
+        program: true,
         fromDeptRel: true,
         toDeptRel: true,
         createdBy: { select: { id: true, username: true, fullName: true } },

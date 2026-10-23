@@ -19,6 +19,7 @@ import {
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import BarcodeStickerCard from '@/components/BarcodeStickerCard';
+import { ColorFabricMeasurementTable, createDepartmentInOutTracking } from '@/components/ColorFabricMeasurementTable';
 
 export default function QC2IssueChallanPage() {
   const router = useRouter();
@@ -42,6 +43,12 @@ export default function QC2IssueChallanPage() {
       remarks: 'QC2 Approved. Ready for drum washer & hydro-extractor.',
     },
   ]);
+  const [tracking, setTracking] = useState(() => createDepartmentInOutTracking('QC2'));
+  const totalQuantityLabel = Object.entries(items.reduce<Record<string, number>>((totals, item) => {
+    const unit = item.uom || 'PCS';
+    totals[unit] = (totals[unit] || 0) + (Number(item.quantity) || 0);
+    return totals;
+  }, {})).map(([unit, quantity]) => `${quantity.toLocaleString()} ${unit}`).join(' + ');
 
   useEffect(() => {
     const init = async () => {
@@ -71,6 +78,10 @@ export default function QC2IssueChallanPage() {
 
   const handleSelectProgram = (prog: any) => {
     setSelectedProgram(prog);
+    setTracking(createDepartmentInOutTracking('QC2', {
+      fabricIn: Number(prog.targetQuantity) || 0,
+      fabricUnit: 'PCS',
+    }));
     setItems((prev) => [
       {
         ...prev[0],
@@ -85,6 +96,10 @@ export default function QC2IssueChallanPage() {
     e.preventDefault();
     if (!selectedProgram) {
       alert('Please select a Production Program / Sheet.');
+      return;
+    }
+    if (new Set(items.map((item) => item.uom)).size > 1) {
+      alert('Use the same unit for every quantity in one challan.');
       return;
     }
     const validItems = items.filter((it) => Number(it.quantity) > 0);
@@ -104,6 +119,9 @@ export default function QC2IssueChallanPage() {
           programId: selectedProgram.id,
           fromDepartment: 'QC2',
           toDepartment: toDepartment,
+          ...tracking,
+          fabricUnit: validItems[0]?.uom || tracking.fabricUnit,
+          detectedFromDepartment: tracking.detectedFromDept,
           priority,
           remarks: `${remarks} | Production Sheet #${selectedProgram.programSerialNo || selectedProgram.programNumber}`,
           items: validItems.map((it) => ({
@@ -224,6 +242,7 @@ export default function QC2IssueChallanPage() {
               onChange={(e) => {
                 const prog = programs.find((p) => p.id === e.target.value);
                 if (prog) handleSelectProgram(prog);
+                else setSelectedProgram(null);
               }}
               className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium focus:ring-2 focus:ring-blue-500"
             >
@@ -233,6 +252,20 @@ export default function QC2IssueChallanPage() {
                 </option>
               ))}
             </select>
+
+            <ColorFabricMeasurementTable
+              items={[]}
+              onChange={() => {}}
+              currentDepartment="QC2"
+              programId={selectedProgram?.id}
+              tracking={tracking}
+              onTrackingChange={setTracking}
+              trackingOnly
+              showInOutController
+              onSyncToItems={(fabricOut, fabricUnit) => {
+                setItems((prev) => prev.map((item, index) => index === 0 ? { ...item, quantity: String(fabricOut), uom: fabricUnit } : item));
+              }}
+            />
 
             {selectedProgram && (
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-slate-600 pt-2 border-t border-sky-200/60">
@@ -262,11 +295,12 @@ export default function QC2IssueChallanPage() {
                     className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs"
                   />
                 </div>
-                <div className="sm:col-span-3">
-                  <label className="block text-[10px] font-bold text-slate-600 mb-1">Quantity (PCS) *</label>
+                <div className="sm:col-span-2">
+                  <label className="block text-[10px] font-bold text-slate-600 mb-1">Quantity *</label>
                   <input
                     type="number"
-                    min="1"
+                    min="0.01"
+                    step="any"
                     required
                     value={it.quantity}
                     onChange={(e) => {
@@ -277,6 +311,23 @@ export default function QC2IssueChallanPage() {
                     className="w-full px-3 py-1.5 bg-white border border-emerald-300 rounded-lg text-xs font-mono font-bold text-emerald-700"
                     placeholder="e.g. 500"
                   />
+                </div>
+                <div className="sm:col-span-1">
+                  <label className="block text-[10px] font-bold text-slate-600 mb-1">Unit *</label>
+                  <select
+                    value={it.uom}
+                    onChange={(e) => {
+                      const next = [...items];
+                      next[idx].uom = e.target.value;
+                      (next[idx] as any).unitType = e.target.value;
+                      setItems(next);
+                      setTracking((prev) => ({ ...prev, fabricUnit: e.target.value as 'MTR' | 'PCS' }));
+                    }}
+                    className="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs"
+                  >
+                    <option value="MTR">MTR</option>
+                    <option value="PCS">PCS</option>
+                  </select>
                 </div>
                 <div className="sm:col-span-4">
                   <label className="block text-[10px] font-bold text-slate-600 mb-1">Remarks</label>
@@ -363,10 +414,12 @@ export default function QC2IssueChallanPage() {
                 programSerialNo: selectedProgram?.programSerialNo,
                 clientName: selectedProgram?.clientName,
                 totalQuantity: generatedChallan.items?.reduce((s: number, it: any) => s + (Number(it.quantity) || 0), 0) || 0,
-                uom: 'PCS',
+                uom: items[0]?.uom || 'PCS',
               }}
               title="Official Washing Dispatch Tag"
             />
+
+            <p className="text-right text-xs font-bold text-slate-700">Total Quantity: {totalQuantityLabel}</p>
 
             <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200">
               <button

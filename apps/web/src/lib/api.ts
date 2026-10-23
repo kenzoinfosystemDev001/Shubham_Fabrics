@@ -43,7 +43,7 @@ class ApiClient {
     return existing || '';
   }
 
-  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  private async request<T>(endpoint: string, options: RequestInit & { timeoutMs?: number } = {}): Promise<T> {
     const token = this.getToken();
 
     const headers: Record<string, string> = {
@@ -72,9 +72,16 @@ class ApiClient {
 
     const url = `${API_BASE_URL}${endpoint}`;
     
-    // Safety 8-second timeout to prevent requests hanging indefinitely
+    // Generous 60-second timeout to handle remote cloud database latency
+    const timeoutMs = options.timeoutMs ?? 60000;
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 8000);
+    const timer = setTimeout(() => {
+      try {
+        controller.abort(new Error('Request timed out. Please check your connection and try again.'));
+      } catch {
+        controller.abort();
+      }
+    }, timeoutMs);
 
     try {
       const res = await fetch(url, {
@@ -98,6 +105,9 @@ class ApiClient {
       return res.json();
     } catch (err: any) {
       clearTimeout(timer);
+      if (err.name === 'AbortError' || err.message?.toLowerCase().includes('abort')) {
+        throw new Error('Connection timed out. Please check your network connection and retry.');
+      }
       throw err;
     }
   }

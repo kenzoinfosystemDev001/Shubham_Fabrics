@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { downloadChallanHtml, printChallan } from '@/lib/download-challan';
 import { ChallanPrintModal } from './ChallanPrintModal';
+import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
 
 interface ChallanListTableProps {
   challans: any[];
@@ -108,31 +109,12 @@ export function ChallanListTable({
                       </span>
                     </td>
                     <td className="p-2.5 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => printChallan(challan)}
-                          className="p-1.5 rounded hover:bg-slate-200/70 text-slate-600 hover:text-slate-900 transition cursor-pointer"
-                          title="Print Challan Slip"
-                        >
-                          <Printer className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => void downloadChallanHtml(challan)}
-                          className="p-1.5 rounded hover:bg-slate-200/70 text-slate-600 hover:text-slate-900 transition cursor-pointer"
-                          title="Download HTML Slip"
-                        >
-                          <Download className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setSelectedChallan(challan)}
-                          className="p-1.5 rounded hover:bg-slate-200/70 text-slate-600 hover:text-slate-900 transition cursor-pointer"
-                          title="Preview Slip Modal"
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                        </button>
+                      <div className="flex items-center justify-end">
+                        <DocumentActionButtons
+                          challan={challan}
+                          program={challan.program}
+                          size="xs"
+                        />
                       </div>
                     </td>
                   </tr>

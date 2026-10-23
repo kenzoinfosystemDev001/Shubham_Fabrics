@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import {
+  cleanFabricName,
+  getChallanItemFabricType,
+  normalizeFabricStockType,
+} from '@/lib/fabric-stock';
 
 export const dynamic = 'force-dynamic';
 
@@ -7,13 +12,58 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const fabricType = searchParams.get('fabricType'); // "KORA" | "DYED" | "ALL"
+    const rawFilter = searchParams.get('fabricType')?.toUpperCase(); // "UNDYED" | "KORA" | "DYED" | "ALL"
+    const fabricType = (rawFilter === 'KORA' || rawFilter === 'UNDYED') ? 'UNDYED' : rawFilter;
     const search = searchParams.get('search');
 
-    // 1. Fetch all Challans issued from Fabric Store
-    const storeChallans = await prisma.challan.findMany({
+    // 1. Fetch Inward entries for verified origin tracing
+    const inwardEntries = await (prisma as any).fabricInward.findMany({
+      orderBy: { receivingDate: 'desc' },
+    });
+
+    // Helper to find verified matching Inward record
+    const findMatchedInward = (rawName: string, targetType: 'UNDYED' | 'DYED', targetUnit: string) => {
+      const clean = cleanFabricName(rawName).toLowerCase();
+      if (!clean || inwardEntries.length === 0) return null;
+
+      // Exact clean name + type + unit
+      const sameUnitEntries = inwardEntries.filter(
+        (inw: any) => (inw.unit || 'MTR').toUpperCase() === targetUnit.toUpperCase()
+      );
+      const exactNameEntries = sameUnitEntries.filter(
+        (inw: any) => cleanFabricName(inw.itemName).toLowerCase() === clean
+      );
+      const exactTypeMatch = exactNameEntries.find(
+        (inw: any) => normalizeFabricStockType(inw.entryType) === targetType
+      );
+      if (exactTypeMatch) return exactTypeMatch;
+      if (exactNameEntries.length > 0 && new Set(exactNameEntries.map((inw: any) => normalizeFabricStockType(inw.entryType))).size === 1) {
+        return exactNameEntries[0];
+      }
+
+      const similarEntries = sameUnitEntries.filter((inw: any) => {
+        const inwardName = cleanFabricName(inw.itemName).toLowerCase();
+        return inwardName.includes(clean) || clean.includes(inwardName);
+      });
+      const similarTypeMatch = similarEntries.filter(
+        (inw: any) => normalizeFabricStockType(inw.entryType) === targetType
+      );
+      if (similarTypeMatch.length === 1) return similarTypeMatch[0];
+      if (similarEntries.length === 1) return similarEntries[0];
+      return null;
+    };
+
+    // 2. Fetch every challan issued to another department.
+    const storeChallans = (await prisma.challan.findMany({
       where: {
-        fromDepartment: 'STORE',
+        NOT: [
+          { toDepartment: { equals: 'STORE', mode: 'insensitive' } },
+          { status: { in: ['DRAFT', 'CANCELLED'] } },
+        ],
+        OR: [
+          { fromDepartment: { contains: 'STORE', mode: 'insensitive' } },
+          { fromDepartment: { equals: 'FABRIC', mode: 'insensitive' } },
+        ],
       },
       include: {
         program: {
@@ -38,86 +88,161 @@ export async function GET(request: Request) {
         },
       },
       orderBy: { createdAt: 'desc' },
-    });
+    }));
 
-    // 2. Fetch any manual outward records
+    // 3. Fetch any manual outward records
     const manualOutward = await (prisma as any).fabricOutward.findMany({
       orderBy: { date: 'desc' },
     });
 
     // Transform Challans to Outward entries
-    const challanOutward = storeChallans.map((ch, idx) => {
-      const isDyeing = ch.toDepartment === 'DYEING';
-      const type = isDyeing ? 'KORA' : 'DYED';
-      const itemDesc =
-        ch.items && ch.items.length > 0
-          ? ch.items.map((it) => it.itemDescription).filter(Boolean).join(', ')
-          : ch.program?.fabricName || 'Fabric Material';
+    const challanOutward: any[] = [];
 
-      const itemsQty = ch.items?.reduce((s, it) => s + (Number(it.quantity) || 0), 0) || 0;
-      const issueQty = ch.fabricOut ?? (itemsQty > 0 ? itemsQty : ch.fabricIn ?? 0);
+    for (const ch of storeChallans) {
+      const isDyeing = ch.toDepartment.toUpperCase().includes('DYE');
+      const defaultType: 'UNDYED' | 'DYED' = isDyeing ? 'UNDYED' : 'DYED';
       const avg = ch.program?.fabricAverage ? Number(ch.program.fabricAverage) : null;
-      const issuePcs =
-        avg && avg > 0 && issueQty > 0
-          ? Math.round(issueQty / avg)
-          : ch.program?.targetQuantity || null;
-
       const orderName =
         ch.program?.clientName ||
         ch.program?.buyerName ||
         ch.program?.orderNumber ||
         'Standard Order';
 
-      return {
-        id: `ch-${ch.id}`,
-        source: 'CHALLAN',
-        date: ch.issuedDate || ch.createdAt,
-        challanNumber: ch.challanNumber,
-        challanId: ch.id,
-        designNumber: ch.program?.designNumber || ch.program?.programNumber || '—',
-        itemName: itemDesc,
-        issueQty: Number(issueQty),
-        unit: ch.fabricUnit || ch.items?.[0]?.uom || 'MTR',
-        avgPerPcs: avg,
-        issuePcsQty: issuePcs,
-        byOrderName: orderName,
-        remarks: ch.remarks || `Issued to ${ch.toDepartment}`,
-        destination: ch.toDepartment,
-        fabricType: type,
-        status: ch.status,
-      };
-    });
+      if (ch.items && ch.items.length > 0) {
+        const itemQuantityTotal = ch.items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
+        const issuedQuantity = Number(ch.fabricOut) > 0 ? Number(ch.fabricOut) : itemQuantityTotal;
+        const quantityScale = itemQuantityTotal > 0 && issuedQuantity > 0 ? issuedQuantity / itemQuantityTotal : 0;
+
+        ch.items.forEach((it, idx) => {
+          const itemType = getChallanItemFabricType(it, ch.toDepartment);
+
+          const rawName = it.fabricCode || cleanFabricName(it.itemDescription) || ch.program?.fabricName || 'Fabric Material';
+          const unit = it.uom || ch.fabricUnit || 'MTR';
+          const itemQuantity = Number(it.quantity) || 0;
+          const issueQty = itemQuantityTotal > 0
+            ? itemQuantity * quantityScale
+            : (idx === 0 ? issuedQuantity : 0);
+
+          if (issueQty <= 0) return;
+
+          const issuePcs =
+            avg && avg > 0 && issueQty > 0
+              ? Math.round(issueQty / avg)
+              : ch.program?.targetQuantity || null;
+
+          const matched = findMatchedInward(rawName, itemType, unit);
+          const verifiedDetails = matched
+            ? `Inward: Bill #${matched.billNo}${matched.supplierName ? ` • ${matched.supplierName}` : ''}${matched.receivingDate ? ` (${new Date(matched.receivingDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })})` : ''}`
+            : 'No matching inward record';
+
+          challanOutward.push({
+            id: `ch-${ch.id}-${it.id || idx}`,
+            source: 'CHALLAN',
+            date: ch.issuedDate || ch.createdAt,
+            challanNumber: ch.challanNumber,
+            challanId: ch.id,
+            designNumber: ch.program?.designNumber || ch.program?.programNumber || '—',
+            itemName: cleanFabricName(it.itemDescription) || rawName,
+            issueQty: Number(issueQty),
+            unit,
+            avgPerPcs: avg,
+            issuePcsQty: issuePcs,
+            byOrderName: orderName,
+            remarks: ch.remarks || `Issued to ${ch.toDepartment}`,
+            destination: ch.toDepartment,
+            sourceDepartment: ch.fromDepartment,
+            issuedBy: ch.createdBy?.fullName || ch.createdBy?.username || null,
+            fabricType: itemType,
+            status: ch.status,
+            verifiedInwardDetails: verifiedDetails,
+            inwardVerified: !!matched,
+            inwardBillNo: matched?.billNo || null,
+            inwardSupplier: matched?.supplierName || null,
+          });
+        });
+      } else {
+        const rawName = ch.program?.fabricName || (isDyeing ? 'Grey / Undyed Fabric' : 'Processed Fabric');
+        const unit = ch.fabricUnit || 'MTR';
+        const issueQty = Number(ch.fabricOut ?? ch.fabricIn ?? 0);
+
+        if (issueQty > 0) {
+          const issuePcs =
+            avg && avg > 0 && issueQty > 0
+              ? Math.round(issueQty / avg)
+              : ch.program?.targetQuantity || null;
+
+          const matched = findMatchedInward(rawName, defaultType, unit);
+          const verifiedDetails = matched
+            ? `Inward: Bill #${matched.billNo}${matched.supplierName ? ` • ${matched.supplierName}` : ''}${matched.receivingDate ? ` (${new Date(matched.receivingDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })})` : ''}`
+            : 'No matching inward record';
+
+          challanOutward.push({
+            id: `ch-${ch.id}`,
+            source: 'CHALLAN',
+            date: ch.issuedDate || ch.createdAt,
+            challanNumber: ch.challanNumber,
+            challanId: ch.id,
+            designNumber: ch.program?.designNumber || ch.program?.programNumber || '—',
+            itemName: cleanFabricName(rawName) || rawName,
+            issueQty: Number(issueQty),
+            unit,
+            avgPerPcs: avg,
+            issuePcsQty: issuePcs,
+            byOrderName: orderName,
+            remarks: ch.remarks || `Issued to ${ch.toDepartment}`,
+            destination: ch.toDepartment,
+            sourceDepartment: ch.fromDepartment,
+            issuedBy: ch.createdBy?.fullName || ch.createdBy?.username || null,
+            fabricType: defaultType,
+            status: ch.status,
+            verifiedInwardDetails: verifiedDetails,
+            inwardVerified: !!matched,
+            inwardBillNo: matched?.billNo || null,
+            inwardSupplier: matched?.supplierName || null,
+          });
+        }
+      }
+    }
 
     // Format manual outward
-    const manualMapped = manualOutward.map((item: any) => ({
-      id: item.id,
-      source: 'MANUAL',
-      date: item.date,
-      challanNumber: item.challanNumber || '—',
-      challanId: item.challanId || null,
-      designNumber: item.designNumber || '—',
-      itemName: item.itemName,
-      issueQty: Number(item.issueQty),
-      unit: item.unit || 'MTR',
-      avgPerPcs: item.avgPerPcs ? Number(item.avgPerPcs) : null,
-      issuePcsQty: item.issuePcsQty ? Number(item.issuePcsQty) : null,
-      byOrderName: item.byOrderName || '—',
-      remarks: item.remarks || '—',
-      destination: item.destination || 'OUTWARD',
-      fabricType: item.fabricType || 'DYED',
-      status: 'ISSUED',
-    }));
+    const manualMapped = manualOutward.map((item: any) => {
+      const type = normalizeFabricStockType(item.fabricType);
+      const unit = item.unit || 'MTR';
+      const matched = findMatchedInward(item.itemName, type, unit);
+      const verifiedDetails = matched
+        ? `Inward: Bill #${matched.billNo}${matched.supplierName ? ` • ${matched.supplierName}` : ''}`
+        : 'Manual Outward Dispatch';
+
+      return {
+        id: item.id,
+        source: 'MANUAL',
+        date: item.date,
+        challanNumber: item.challanNumber || '—',
+        challanId: item.challanId || null,
+        designNumber: item.designNumber || '—',
+        itemName: cleanFabricName(item.itemName) || item.itemName,
+        issueQty: Number(item.issueQty),
+        unit,
+        avgPerPcs: item.avgPerPcs ? Number(item.avgPerPcs) : null,
+        issuePcsQty: item.issuePcsQty ? Number(item.issuePcsQty) : null,
+        byOrderName: item.byOrderName || '—',
+        remarks: item.remarks || '—',
+        destination: item.destination || 'OUTWARD',
+        sourceDepartment: 'STORE',
+        issuedBy: null,
+        fabricType: type,
+        status: 'ISSUED',
+        verifiedInwardDetails: verifiedDetails,
+        inwardVerified: !!matched,
+        inwardBillNo: matched?.billNo || null,
+        inwardSupplier: matched?.supplierName || null,
+      };
+    });
 
     // Combine and sort by date descending
     let combined = [...challanOutward, ...manualMapped].sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );
-
-    // Add 1-based sequential sNo
-    combined = combined.map((entry, index) => ({
-      ...entry,
-      sNo: index + 1,
-    }));
 
     // Apply filters
     if (fabricType && fabricType !== 'ALL') {
@@ -132,9 +257,18 @@ export async function GET(request: Request) {
           it.designNumber?.toLowerCase().includes(q) ||
           it.itemName?.toLowerCase().includes(q) ||
           it.byOrderName?.toLowerCase().includes(q) ||
-          it.destination?.toLowerCase().includes(q)
+          it.destination?.toLowerCase().includes(q) ||
+          it.sourceDepartment?.toLowerCase().includes(q) ||
+          it.issuedBy?.toLowerCase().includes(q) ||
+          it.verifiedInwardDetails?.toLowerCase().includes(q)
       );
     }
+
+    // Add 1-based sequential sNo
+    combined = combined.map((entry, index) => ({
+      ...entry,
+      sNo: index + 1,
+    }));
 
     const summary = {
       totalEntries: combined.length,
@@ -144,8 +278,11 @@ export async function GET(request: Request) {
       totalPcs: combined
         .filter((it) => it.unit === 'PCS')
         .reduce((s, it) => s + (Number(it.issueQty) || 0), 0),
+      undyedMeters: combined
+        .filter((it) => it.fabricType === 'UNDYED' && it.unit === 'MTR')
+        .reduce((s, it) => s + (Number(it.issueQty) || 0), 0),
       koraMeters: combined
-        .filter((it) => it.fabricType === 'KORA' && it.unit === 'MTR')
+        .filter((it) => it.fabricType === 'UNDYED' && it.unit === 'MTR')
         .reduce((s, it) => s + (Number(it.issueQty) || 0), 0),
       dyedMeters: combined
         .filter((it) => it.fabricType === 'DYED' && it.unit === 'MTR')
@@ -190,6 +327,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'issueQty must be a positive number' }, { status: 400 });
     }
 
+    const normalizedType = (fabricType === 'KORA' || fabricType === 'UNDYED') ? 'UNDYED' : 'DYED';
+
     const outward = await (prisma as any).fabricOutward.create({
       data: {
         date: new Date(date),
@@ -203,7 +342,7 @@ export async function POST(request: Request) {
         byOrderName: byOrderName ? String(byOrderName).trim() : null,
         remarks: remarks ? String(remarks).trim() : null,
         destination: String(destination).toUpperCase(),
-        fabricType: String(fabricType).toUpperCase(),
+        fabricType: normalizedType,
       },
     });
 

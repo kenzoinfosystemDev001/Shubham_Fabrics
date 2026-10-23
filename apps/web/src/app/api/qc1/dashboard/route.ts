@@ -99,7 +99,9 @@ export async function GET() {
     const received = qc1Challans.filter((c) => c.status === 'RECEIVED').length;
     const underInspection = qc1Challans.filter((c) => c.status === 'UNDER_INSPECTION').length;
     const passed = qc1Challans.filter((c) => c.status === 'QC_APPROVED').length;
-    const failed = qc1Challans.filter((c) => c.status === 'QC_REJECTED').length;
+    const failed = qc1Challans.filter(
+      (c) => c.status === 'QC_REJECTED' || Number(c.defectivePieces) > 0
+    ).length;
     const rework = qc1Challans.filter((c) => c.status === 'REWORK_REQUESTED').length;
     const hold = qc1Challans.filter((c) => c.status === 'ON_HOLD').length;
     const completed = passed + failed + rework;

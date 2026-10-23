@@ -212,15 +212,29 @@ export async function GET(request: Request) {
       return 'STORE';
     };
 
-    const departmentStats: Record<string, { shelfCode: string; shelfName: string; totalPieces: number; totalIncidents: number }> = {
-      STORE: { shelfCode: 'DEF-SHELF-STORE', shelfName: 'Raw Fabric Store Quarantined Shelf', totalPieces: 0, totalIncidents: 0 },
-      DYEING: { shelfCode: 'DEF-SHELF-DYEING', shelfName: 'Dyeing Station Defective Shelf', totalPieces: 0, totalIncidents: 0 },
-      QC1: { shelfCode: 'DEF-SHELF-QC1', shelfName: 'Dyeing QC Defective Shelf', totalPieces: 0, totalIncidents: 0 },
-      EMBROIDERY: { shelfCode: 'DEF-SHELF-EMBROIDERY', shelfName: 'Embroidery Station Defective Shelf', totalPieces: 0, totalIncidents: 0 },
-      THREAD_CUTTING: { shelfCode: 'DEF-SHELF-THREAD-CUTTING', shelfName: 'Thread Cutting Trimming & Snip Shelf', totalPieces: 0, totalIncidents: 0 },
-      QC2: { shelfCode: 'DEF-SHELF-QC2', shelfName: 'Thread Cut QC Defective Shelf', totalPieces: 0, totalIncidents: 0 },
-      QC3: { shelfCode: 'DEF-SHELF-QC3', shelfName: 'Washing QC Defective Shelf', totalPieces: 0, totalIncidents: 0 },
-      FINAL_CHECK: { shelfCode: 'DEF-SHELF-FINAL-CHECK', shelfName: 'Final check Defective Shelf', totalPieces: 0, totalIncidents: 0 },
+    const departmentStats: Record<string, {
+      shelfCode: string;
+      shelfName: string;
+      totalPieces: number;
+      totalIncidents: number;
+      quantitiesByUnit: Record<string, number>;
+    }> = {
+      STORE: { shelfCode: 'DEF-SHELF-STORE', shelfName: 'Raw Fabric Store Quarantined Shelf', totalPieces: 0, totalIncidents: 0, quantitiesByUnit: {} },
+      DYEING: { shelfCode: 'DEF-SHELF-DYEING', shelfName: 'Dyeing Station Defective Shelf', totalPieces: 0, totalIncidents: 0, quantitiesByUnit: {} },
+      QC1: { shelfCode: 'DEF-SHELF-QC1', shelfName: 'Dyeing QC Defective Shelf', totalPieces: 0, totalIncidents: 0, quantitiesByUnit: {} },
+      EMBROIDERY: { shelfCode: 'DEF-SHELF-EMBROIDERY', shelfName: 'Embroidery Station Defective Shelf', totalPieces: 0, totalIncidents: 0, quantitiesByUnit: {} },
+      THREAD_CUTTING: { shelfCode: 'DEF-SHELF-THREAD-CUTTING', shelfName: 'Thread Cutting Trimming & Snip Shelf', totalPieces: 0, totalIncidents: 0, quantitiesByUnit: {} },
+      QC2: { shelfCode: 'DEF-SHELF-QC2', shelfName: 'Thread Cut QC Defective Shelf', totalPieces: 0, totalIncidents: 0, quantitiesByUnit: {} },
+      QC3: { shelfCode: 'DEF-SHELF-QC3', shelfName: 'Washing QC Defective Shelf', totalPieces: 0, totalIncidents: 0, quantitiesByUnit: {} },
+      FINAL_CHECK: { shelfCode: 'DEF-SHELF-FINAL-CHECK', shelfName: 'Final check Defective Shelf', totalPieces: 0, totalIncidents: 0, quantitiesByUnit: {} },
+    };
+
+    const addDepartmentDefect = (department: string, quantity: number, unit: string) => {
+      const stats = departmentStats[department];
+      if (!stats) return;
+      stats.totalPieces += quantity;
+      stats.totalIncidents += 1;
+      stats.quantitiesByUnit[unit] = (stats.quantitiesByUnit[unit] || 0) + quantity;
     };
 
     let factoryTotalDefectivePieces = 0;
@@ -228,11 +242,19 @@ export async function GET(request: Request) {
     for (const ch of allDefectChallans) {
       const pcs = ch.defectivePieces || ch.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
       const dKey = normalizeDeptKey(ch.fromDepartment);
-      if (departmentStats[dKey]) {
-        departmentStats[dKey].totalPieces += Number(pcs) || 0;
-        departmentStats[dKey].totalIncidents += 1;
+      const quantity = Number(pcs) || 0;
+      const unit = (ch.fabricUnit || 'PCS').toUpperCase();
+      addDepartmentDefect(dKey, quantity, unit);
+      const shelfLocation = (ch.defectiveShelfLocation || '').toUpperCase();
+      if (
+        dKey !== 'STORE' &&
+        ch.toDepartment?.toUpperCase() === 'STORE' &&
+        shelfLocation.includes('DEF-SHELF-STORE') &&
+        departmentStats.STORE
+      ) {
+        addDepartmentDefect('STORE', quantity, unit);
       }
-      factoryTotalDefectivePieces += Number(pcs) || 0;
+      factoryTotalDefectivePieces += quantity;
     }
 
     const totalQuarantinedMeters = rolls.reduce(

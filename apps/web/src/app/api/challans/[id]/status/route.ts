@@ -95,6 +95,10 @@ export async function PATCH(
       data.fabricOut = Math.max(0, data.fabricIn - data.defectivePieces);
     }
 
+    const isDyeingReceive =
+      status === 'RECEIVED' &&
+      (existing.toDepartment === 'DYEING' || existing.toDepartment.toLowerCase().includes('dye'));
+
     // 2. Perform Transaction to update Challan and operational logs
     const updated = await prisma.$transaction(async (tx) => {
       const ch = await tx.challan.update({
@@ -177,7 +181,7 @@ export async function PATCH(
       }
 
       return ch;
-    });
+    }, isDyeingReceive ? { maxWait: 15000, timeout: 30000 } : undefined);
 
     return NextResponse.json(updated);
   } catch (error: any) {

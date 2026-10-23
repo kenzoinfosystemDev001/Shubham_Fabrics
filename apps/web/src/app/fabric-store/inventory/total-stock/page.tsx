@@ -24,27 +24,46 @@ interface StockSummary {
     totalInwardMeters: number;
     totalOutwardMeters: number;
     availableBalanceMeters: number;
+    totalInwardPcs: number;
+    totalOutwardPcs: number;
+    availableBalancePcs: number;
     itemCount: number;
   };
-  kora: {
+  undyed?: {
     totalInwardMeters: number;
     totalOutwardMeters: number;
     availableBalanceMeters: number;
+    totalInwardPcs: number;
+    totalOutwardPcs: number;
+    availableBalancePcs: number;
+    itemCount: number;
+  };
+  kora?: {
+    totalInwardMeters: number;
+    totalOutwardMeters: number;
+    availableBalanceMeters: number;
+    totalInwardPcs: number;
+    totalOutwardPcs: number;
+    availableBalancePcs: number;
     itemCount: number;
   };
   dyed: {
     totalInwardMeters: number;
     totalOutwardMeters: number;
     availableBalanceMeters: number;
+    totalInwardPcs: number;
+    totalOutwardPcs: number;
+    availableBalancePcs: number;
     itemCount: number;
   };
   defectiveStockPcs: number;
+  defectiveStockByUnit: Record<string, number>;
 }
 
 interface StockItem {
   sNo: number;
   itemName: string;
-  fabricType: 'KORA' | 'DYED';
+  fabricType: 'UNDYED' | 'DYED' | 'KORA';
   unit: string;
   totalInward: number;
   totalOutward: number;
@@ -55,21 +74,40 @@ interface StockItem {
   status: 'IN_STOCK' | 'OUT_OF_STOCK';
 }
 
+interface OutwardHistoryItem {
+  id: string;
+  date: string;
+  challanNumber?: string;
+  sourceDepartment?: string;
+  destination?: string;
+  itemName: string;
+  quantity: number;
+  unit: string;
+  fabricType: string;
+}
+
 function TotalStockContent() {
   const searchParams = useSearchParams();
   const initialType = searchParams?.get('type')?.toUpperCase();
 
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<StockItem[]>([]);
+  const [outwardHistory, setOutwardHistory] = useState<OutwardHistoryItem[]>([]);
   const [summary, setSummary] = useState<StockSummary>({
-    overall: { totalInwardMeters: 0, totalOutwardMeters: 0, availableBalanceMeters: 0, itemCount: 0 },
-    kora: { totalInwardMeters: 0, totalOutwardMeters: 0, availableBalanceMeters: 0, itemCount: 0 },
-    dyed: { totalInwardMeters: 0, totalOutwardMeters: 0, availableBalanceMeters: 0, itemCount: 0 },
+    overall: { totalInwardMeters: 0, totalOutwardMeters: 0, availableBalanceMeters: 0, totalInwardPcs: 0, totalOutwardPcs: 0, availableBalancePcs: 0, itemCount: 0 },
+    undyed: { totalInwardMeters: 0, totalOutwardMeters: 0, availableBalanceMeters: 0, totalInwardPcs: 0, totalOutwardPcs: 0, availableBalancePcs: 0, itemCount: 0 },
+    kora: { totalInwardMeters: 0, totalOutwardMeters: 0, availableBalanceMeters: 0, totalInwardPcs: 0, totalOutwardPcs: 0, availableBalancePcs: 0, itemCount: 0 },
+    dyed: { totalInwardMeters: 0, totalOutwardMeters: 0, availableBalanceMeters: 0, totalInwardPcs: 0, totalOutwardPcs: 0, availableBalancePcs: 0, itemCount: 0 },
     defectiveStockPcs: 0,
+    defectiveStockByUnit: {},
   });
 
-  const [typeFilter, setTypeFilter] = useState<'ALL' | 'KORA' | 'DYED'>(
-    initialType === 'KORA' ? 'KORA' : initialType === 'DYED' ? 'DYED' : 'ALL'
+  const [typeFilter, setTypeFilter] = useState<'ALL' | 'UNDYED' | 'DYED'>(
+    initialType === 'KORA' || initialType === 'UNDYED'
+      ? 'UNDYED'
+      : initialType === 'DYED'
+      ? 'DYED'
+      : 'ALL'
   );
   const [search, setSearch] = useState('');
 
@@ -84,6 +122,7 @@ function TotalStockContent() {
       const json = await res.json();
       if (res.ok) {
         setItems(json.data || []);
+        setOutwardHistory(json.outwardHistory || []);
         if (json.summary) setSummary(json.summary);
       }
     } catch (err) {
@@ -94,8 +133,10 @@ function TotalStockContent() {
   };
 
   useEffect(() => {
-    if (initialType === 'KORA' || initialType === 'DYED') {
-      setTypeFilter(initialType);
+    if (initialType === 'KORA' || initialType === 'UNDYED') {
+      setTypeFilter('UNDYED');
+    } else if (initialType === 'DYED') {
+      setTypeFilter('DYED');
     }
   }, [initialType]);
 
@@ -121,6 +162,19 @@ function TotalStockContent() {
     }
   };
 
+  const undyedData = summary.undyed || summary.kora || {
+    totalInwardMeters: 0,
+    totalOutwardMeters: 0,
+    availableBalanceMeters: 0,
+    totalInwardPcs: 0,
+    totalOutwardPcs: 0,
+    availableBalancePcs: 0,
+    itemCount: 0,
+  };
+  const defectiveStockByUnit = Object.keys(summary.defectiveStockByUnit || {}).length > 0
+    ? summary.defectiveStockByUnit
+    : { PCS: summary.defectiveStockPcs };
+
   return (
     <div className="min-h-screen bg-[#F0FAF9] pb-16">
       {/* HEADER */}
@@ -138,10 +192,10 @@ function TotalStockContent() {
             </div>
             <h1 className="text-lg font-bold text-slate-900 flex items-center gap-2">
               <Boxes className="w-5 h-5 text-teal-600" />
-              <span>Total Stock Balance</span>
+              <span>TOTAL STOCK: DYED &amp; UNDYED</span>
             </h1>
             <p className="text-[11px] text-slate-500 mt-0.5">
-              Live in-store inventory &middot; Automatically updates when fabric arrives (Inward) or is dispatched to other departments (Outward)
+              Live in-store inventory &middot; Automatically updates when fabric arrives in Inward or when Challans are issued for Dyeing / other processes
             </p>
           </div>
 
@@ -173,7 +227,7 @@ function TotalStockContent() {
       </header>
 
       <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
-        {/* SUMMARY TILES */}
+        {/* SUMMARY TILES - THREE FIELDS: OVERALL, 1. UNDYED, 2. DYED (+ DEFECTIVE) */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {/* Tile 1: OVERALL AVAILABLE STOCK */}
           <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
@@ -189,29 +243,45 @@ function TotalStockContent() {
               <span>&middot;</span>
               <span className="text-rose-700 font-bold">-{summary.overall.totalOutwardMeters.toFixed(0)} Out</span>
             </div>
+            <div className="text-[10px] text-slate-500 mt-1 font-medium">
+              {summary.overall.availableBalancePcs.toLocaleString('en-IN')} PCS available
+            </div>
           </div>
 
-          {/* Tile 2: KORA (UNDYED) BALANCE */}
+          {/* Tile 2: 1. UNDYED STOCK */}
           <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 block">
-              KORA (UNDYED) BALANCE
-            </span>
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 block">
+                1. UNDYED STOCK
+              </span>
+              <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-100 text-amber-900">
+                UNDYED
+              </span>
+            </div>
             <div className="text-2xl font-black text-amber-900 mt-1">
-              {summary.kora.availableBalanceMeters.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+              {undyedData.availableBalanceMeters.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
               <span className="text-xs font-semibold text-amber-700 ml-1">MTR</span>
             </div>
             <div className="flex items-center gap-2 text-[10px] text-slate-500 mt-1 font-medium">
-              <span className="text-emerald-700 font-bold">+{summary.kora.totalInwardMeters.toFixed(0)} In</span>
+              <span className="text-emerald-700 font-bold">+{undyedData.totalInwardMeters.toFixed(0)} In</span>
               <span>&middot;</span>
-              <span className="text-rose-700 font-bold">-{summary.kora.totalOutwardMeters.toFixed(0)} to Dyeing</span>
+              <span className="text-rose-700 font-bold">-{undyedData.totalOutwardMeters.toFixed(0)} Dispatched</span>
+            </div>
+            <div className="text-[10px] text-slate-500 mt-1 font-medium">
+              {undyedData.availableBalancePcs.toLocaleString('en-IN')} PCS available
             </div>
           </div>
 
-          {/* Tile 3: DYED FABRIC BALANCE */}
+          {/* Tile 3: 2. DYED STOCK */}
           <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-purple-700 block">
-              DYED FABRIC BALANCE
-            </span>
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-purple-700 block">
+                2. DYED STOCK
+              </span>
+              <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-purple-100 text-purple-900">
+                DYED
+              </span>
+            </div>
             <div className="text-2xl font-black text-purple-900 mt-1">
               {summary.dyed.availableBalanceMeters.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
               <span className="text-xs font-semibold text-purple-700 ml-1">MTR</span>
@@ -219,7 +289,10 @@ function TotalStockContent() {
             <div className="flex items-center gap-2 text-[10px] text-slate-500 mt-1 font-medium">
               <span className="text-emerald-700 font-bold">+{summary.dyed.totalInwardMeters.toFixed(0)} In</span>
               <span>&middot;</span>
-              <span className="text-rose-700 font-bold">-{summary.dyed.totalOutwardMeters.toFixed(0)} to Embroidery</span>
+              <span className="text-rose-700 font-bold">-{summary.dyed.totalOutwardMeters.toFixed(0)} Dispatched</span>
+            </div>
+            <div className="text-[10px] text-slate-500 mt-1 font-medium">
+              {summary.dyed.availableBalancePcs.toLocaleString('en-IN')} PCS available
             </div>
           </div>
 
@@ -235,8 +308,13 @@ function TotalStockContent() {
               <ExternalLink className="w-3.5 h-3.5 text-rose-400 group-hover:text-rose-700 transition" />
             </div>
             <div className="text-2xl font-black text-rose-900 mt-1">
-              {summary.defectiveStockPcs.toLocaleString('en-IN')}
-              <span className="text-xs font-semibold text-rose-700 ml-1">PCS</span>
+              {Object.entries(defectiveStockByUnit)
+                .map(([unit, quantity]) => (
+                  <span key={unit} className="mr-2">
+                    {quantity.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                    <span className="text-xs font-semibold text-rose-700 ml-1">{unit}</span>
+                  </span>
+                ))}
             </div>
             <span className="text-[10px] text-rose-700/80 mt-0.5 block">
               DEF-SHELF-STORE Quarantined
@@ -264,14 +342,14 @@ function TotalStockContent() {
             </button>
             <button
               type="button"
-              onClick={() => setTypeFilter('KORA')}
+              onClick={() => setTypeFilter('UNDYED')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                typeFilter === 'KORA'
+                typeFilter === 'UNDYED'
                   ? 'bg-amber-700 text-white'
                   : 'bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200'
               }`}
             >
-              KORA (Undyed)
+              1. UNDYED
             </button>
             <button
               type="button"
@@ -282,7 +360,7 @@ function TotalStockContent() {
                   : 'bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-200'
               }`}
             >
-              Dyed Fabric
+              2. DYED
             </button>
           </div>
 
@@ -310,10 +388,10 @@ function TotalStockContent() {
         <div className="bg-white rounded-xl border-[1.5px] border-black shadow-xs overflow-hidden">
           <div className="px-5 py-3 border-b-[1.5px] border-black bg-slate-50 flex items-center justify-between">
             <span className="font-black text-xs uppercase tracking-wider text-slate-900">
-              FABRIC STOCK BALANCE TABLE ({items.length} FABRIC ITEMS)
+              TOTAL STOCK TABLE: DYED &amp; UNDYED ({items.length} FABRIC ITEMS)
             </span>
             <span className="text-[11px] font-semibold text-slate-500">
-              Formula: Available Balance = Total Inward &minus; Total Outward
+              Available Balance = Total Inward &minus; Total Outward (Challans Issued)
             </span>
           </div>
 
@@ -362,77 +440,115 @@ function TotalStockContent() {
                     </td>
                   </tr>
                 ) : (
-                  items.map((item, index) => (
-                    <tr key={`${item.itemName}-${item.fabricType}`} className="hover:bg-slate-50 transition h-10">
-                      <td className="border-r-[1.5px] border-black px-3 py-2 text-center font-bold font-mono text-slate-700">
-                        {item.sNo ?? index + 1}
-                      </td>
-                      <td className="border-r-[1.5px] border-black px-4 py-2 font-bold text-slate-900">
-                        {item.itemName}
-                      </td>
-                      <td className="border-r-[1.5px] border-black px-3 py-2 text-center">
-                        <span
-                          className={`inline-block px-2 py-0.5 rounded text-[10px] font-black tracking-wider uppercase ${
-                            item.fabricType === 'KORA'
-                              ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                              : 'bg-purple-100 text-purple-900 border border-purple-300'
-                          }`}
-                        >
-                          {item.fabricType === 'KORA' ? 'KORA' : 'DYED'}
-                        </span>
-                      </td>
-                      <td className="border-r-[1.5px] border-black px-4 py-2 text-right font-bold text-slate-800">
-                        {item.totalInward.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                        <span className="text-[10px] text-slate-500 ml-1">{item.unit}</span>
-                      </td>
-                      <td className="border-r-[1.5px] border-black px-4 py-2 text-right font-bold text-slate-800">
-                        {item.totalOutward.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                        <span className="text-[10px] text-slate-500 ml-1">{item.unit}</span>
-                      </td>
-                      <td className="border-r-[1.5px] border-black px-4 py-2 text-right font-black text-sm text-teal-950 bg-teal-50/50">
-                        {item.balance.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                        <span className="text-xs font-bold text-teal-700 ml-1">{item.unit}</span>
-                      </td>
-                      <td className="border-r-[1.5px] border-black px-3 py-2 text-center">
-                        {item.balance > 0 ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
-                            IN STOCK
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-black bg-slate-100 text-slate-600 border border-slate-300">
-                            EXHAUSTED
-                          </span>
-                        )}
-                      </td>
-                      <td className="border-r-[1.5px] border-black px-3 py-2 text-center text-slate-600 font-medium">
-                        {formatDate(item.lastActivity)}
-                      </td>
-                      <td className="px-3 py-2 text-center">
-                        {item.fabricType === 'KORA' ? (
-                          <Link
-                            href="/fabric-store/my-work/challan-to-dyeing"
-                            className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-700 hover:text-indigo-900 hover:underline"
+                  items.map((item, index) => {
+                    const isUndyed = item.fabricType === 'UNDYED' || (item.fabricType as string) === 'KORA';
+                    return (
+                      <tr key={`${item.itemName}-${item.fabricType}-${item.unit}`} className="hover:bg-slate-50 transition h-10">
+                        <td className="border-r-[1.5px] border-black px-3 py-2 text-center font-bold font-mono text-slate-700">
+                          {item.sNo ?? index + 1}
+                        </td>
+                        <td className="border-r-[1.5px] border-black px-4 py-2 font-bold text-slate-900">
+                          {item.itemName}
+                        </td>
+                        <td className="border-r-[1.5px] border-black px-3 py-2 text-center">
+                          <span
+                            className={`inline-block px-2 py-0.5 rounded text-[10px] font-black tracking-wider uppercase ${
+                              isUndyed
+                                ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                                : 'bg-purple-100 text-purple-900 border border-purple-300'
+                            }`}
                           >
-                            <span>Issue Dyeing</span>
-                            <ArrowRight className="w-3 h-3" />
-                          </Link>
-                        ) : (
-                          <Link
-                            href="/fabric-store/my-work/challan-to-embroidery"
-                            className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 hover:text-emerald-900 hover:underline"
-                          >
-                            <span>Issue Emb.</span>
-                            <ArrowRight className="w-3 h-3" />
-                          </Link>
-                        )}
-                      </td>
-                    </tr>
-                  ))
+                            {isUndyed ? 'UNDYED' : 'DYED'}
+                          </span>
+                        </td>
+                        <td className="border-r-[1.5px] border-black px-4 py-2 text-right font-bold text-slate-800">
+                          {item.totalInward.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                          <span className="text-[10px] text-slate-500 ml-1">{item.unit}</span>
+                        </td>
+                        <td className="border-r-[1.5px] border-black px-4 py-2 text-right font-bold text-slate-800">
+                          {item.totalOutward.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                          <span className="text-[10px] text-slate-500 ml-1">{item.unit}</span>
+                        </td>
+                        <td className="border-r-[1.5px] border-black px-4 py-2 text-right font-black text-sm text-teal-950 bg-teal-50/50">
+                          {item.balance.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                          <span className="text-xs font-bold text-teal-700 ml-1">{item.unit}</span>
+                        </td>
+                        <td className="border-r-[1.5px] border-black px-3 py-2 text-center">
+                          {item.balance > 0 ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
+                              IN STOCK
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-black bg-slate-100 text-slate-600 border border-slate-300">
+                              EXHAUSTED
+                            </span>
+                          )}
+                        </td>
+                        <td className="border-r-[1.5px] border-black px-3 py-2 text-center text-slate-600 font-medium">
+                          {formatDate(item.lastActivity)}
+                        </td>
+                        <td className="px-3 py-2 text-center">
+                          {isUndyed ? (
+                            <Link
+                              href="/fabric-store/my-work/challan-to-dyeing"
+                              className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-700 hover:text-indigo-900 hover:underline"
+                            >
+                              <span>Issue Dyeing</span>
+                              <ArrowRight className="w-3 h-3" />
+                            </Link>
+                          ) : (
+                            <Link
+                              href="/fabric-store/my-work/challan-to-embroidery"
+                              className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 hover:text-emerald-900 hover:underline"
+                            >
+                              <span>Issue Emb.</span>
+                              <ArrowRight className="w-3 h-3" />
+                            </Link>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>
           </div>
         </div>
+
+        <section className="bg-white rounded-xl border-[1.5px] border-black shadow-xs overflow-hidden">
+          <div className="px-5 py-3 border-b-[1.5px] border-black bg-slate-50 flex items-center justify-between">
+            <h2 className="font-black text-xs uppercase tracking-wider text-slate-900">Fabric Outward History</h2>
+            <span className="text-[11px] font-semibold text-slate-500">{outwardHistory.length} issued entries</span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-left text-xs">
+              <thead>
+                <tr className="bg-slate-100 border-b border-slate-300 text-slate-700">
+                  <th className="px-4 py-2 font-bold">DATE</th>
+                  <th className="px-4 py-2 font-bold">CHALLAN</th>
+                  <th className="px-4 py-2 font-bold">FABRIC</th>
+                  <th className="px-4 py-2 font-bold">FROM</th>
+                  <th className="px-4 py-2 font-bold">TO</th>
+                  <th className="px-4 py-2 font-bold text-right">QUANTITY</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200">
+                {outwardHistory.length === 0 ? (
+                  <tr><td colSpan={6} className="px-4 py-8 text-center text-slate-500">No outward challans found</td></tr>
+                ) : outwardHistory.map((entry) => (
+                  <tr key={entry.id} className="hover:bg-slate-50">
+                    <td className="px-4 py-2 whitespace-nowrap">{formatDate(entry.date)}</td>
+                    <td className="px-4 py-2 font-semibold">{entry.challanNumber || '—'}</td>
+                    <td className="px-4 py-2">{entry.itemName}</td>
+                    <td className="px-4 py-2">{entry.sourceDepartment || '—'}</td>
+                    <td className="px-4 py-2">{entry.destination || '—'}</td>
+                    <td className="px-4 py-2 text-right font-bold">{Number(entry.quantity).toLocaleString('en-IN', { maximumFractionDigits: 2 })} {entry.unit}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
       </main>
     </div>
   );

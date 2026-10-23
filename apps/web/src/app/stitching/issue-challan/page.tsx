@@ -22,6 +22,7 @@ import {
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import BarcodeStickerCard from '@/components/BarcodeStickerCard';
+import { ColorFabricMeasurementTable, createDepartmentInOutTracking } from '@/components/ColorFabricMeasurementTable';
 
 function StitchingIssueChallanContent() {
   const router = useRouter();
@@ -52,6 +53,7 @@ function StitchingIssueChallanContent() {
       remarks: 'Passed end-line quality check (seam strength, SPI 10-12, fit checked).',
     },
   ]);
+  const [tracking, setTracking] = useState(() => createDepartmentInOutTracking('STITCHING'));
 
   useEffect(() => {
     const loadEligibleJobs = async () => {
@@ -86,14 +88,21 @@ function StitchingIssueChallanContent() {
   const selectJob = (job: any) => {
     setSelectedJob(job);
     const goodQty = job.fabricOut ?? job.fabricIn ?? 0;
+    setTracking(createDepartmentInOutTracking('STITCHING', {
+      fabricIn: Number(goodQty) || 0,
+      fabricUnit: job.fabricUnit === 'MTR' ? 'MTR' : 'PCS',
+      detectedFromDept: job.fromDepartment || null,
+      detectedFromChallanId: job.id,
+      detectedFromChallanNumber: job.challanNumber || null,
+    }));
     setItems([
       {
         itemDescription: `Assembled Finished Garments (${job.program?.styleCode || 'Garment'} - ${job.program?.fabricName || 'Fabric'})`,
         fabricCode: 'GARMENT',
         colour: job.program?.color || 'Standard',
         quantity: String(goodQty),
-        uom: 'PCS',
-        unitType: 'PCS',
+        uom: job.fabricUnit || job.items?.[0]?.uom || 'PCS',
+        unitType: job.fabricUnit || job.items?.[0]?.uom || 'PCS',
         remarks: 'Passed end-line quality inspection. Transferred downstream.',
       },
     ]);
@@ -107,8 +116,8 @@ function StitchingIssueChallanContent() {
         fabricCode: 'ACCESSORY',
         colour: selectedJob?.program?.color || 'Standard',
         quantity: '',
-        uom: 'PCS',
-        unitType: 'PCS',
+        uom: prev[0]?.uom || selectedJob?.fabricUnit || selectedJob?.items?.[0]?.uom || 'PCS',
+        unitType: prev[0]?.uom || selectedJob?.fabricUnit || selectedJob?.items?.[0]?.uom || 'PCS',
         remarks: 'Passed quality check.',
       },
     ]);
@@ -128,12 +137,27 @@ function StitchingIssueChallanContent() {
   };
 
   const totalQuantityToIssue = items.reduce((sum, it) => sum + (Number(it.quantity) || 0), 0);
+  const sourceQuantityUnit = selectedJob?.fabricUnit || selectedJob?.items?.[0]?.uom || 'PCS';
+  const totalQuantityLabel = Object.entries(items.reduce<Record<string, number>>((totals, item) => {
+    const unit = item.uom || 'PCS';
+    totals[unit] = (totals[unit] || 0) + (Number(item.quantity) || 0);
+    return totals;
+  }, {})).map(([unit, quantity]) => `${quantity.toLocaleString()} ${unit}`).join(' + ');
   const maxGoodAvailable = selectedJob ? (selectedJob.fabricOut ?? selectedJob.fabricIn ?? 0) : 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedJob) {
       alert('Please select a source Stitching Job.');
+      return;
+    }
+
+    if (new Set(items.map((item) => item.uom)).size > 1) {
+      alert('Use the same unit for every quantity in one challan.');
+      return;
+    }
+    if (items[0]?.uom !== sourceQuantityUnit) {
+      alert(`Quantity unit must match the source job (${sourceQuantityUnit}).`);
       return;
     }
 
@@ -156,6 +180,9 @@ function StitchingIssueChallanContent() {
         parentChallanId: selectedJob.id,
         programId: selectedJob.programId,
         toDepartment: targetDepartment,
+        ...tracking,
+        fabricUnit: items[0]?.uom || tracking.fabricUnit,
+        detectedFromDepartment: tracking.detectedFromDept,
         priority,
         remarks,
         items: items.map((it) => ({
@@ -223,6 +250,19 @@ function StitchingIssueChallanContent() {
       {/* FORM BODY */}
       <main className="max-w-5xl mx-auto w-full p-4 md:p-6 space-y-6 flex-1">
         <form onSubmit={handleSubmit} className="space-y-6">
+          <ColorFabricMeasurementTable
+            items={[]}
+            onChange={() => {}}
+            currentDepartment="STITCHING"
+            programId={selectedJob?.programId}
+            tracking={tracking}
+            onTrackingChange={setTracking}
+            trackingOnly
+            showInOutController
+            onSyncToItems={(fabricOut, fabricUnit) => {
+              setItems((prev) => prev.map((item, index) => index === 0 ? { ...item, quantity: String(fabricOut), uom: fabricUnit, unitType: fabricUnit } : item));
+            }}
+          />
           {/* SOURCE JOB SELECTOR */}
           <div className="p-5 rounded-2xl bg-slate-900/70 border border-slate-800 space-y-4">
             <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
@@ -313,7 +353,7 @@ function StitchingIssueChallanContent() {
               <div>
                 <label className="block text-slate-300 font-semibold mb-1">Available Unissued Balance</label>
                 <div className="p-2 bg-slate-950 border border-slate-700 rounded-lg text-sm font-black text-emerald-400">
-                  {maxGoodAvailable} PCS
+                  {maxGoodAvailable} {sourceQuantityUnit}
                 </div>
               </div>
             </div>
@@ -388,7 +428,8 @@ function StitchingIssueChallanContent() {
                     <label className="block text-slate-400 text-[11px] mb-1">Quantity *</label>
                     <input
                       type="number"
-                      min="1"
+                        min="0.01"
+                        step="any"
                       value={it.quantity}
                       onChange={(e) => handleItemChange(idx, 'quantity', e.target.value)}
                       className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-white font-bold"
@@ -398,13 +439,18 @@ function StitchingIssueChallanContent() {
 
                   <div className="flex items-center gap-2">
                     <div className="flex-1">
-                      <label className="block text-slate-400 text-[11px] mb-1">UOM</label>
-                      <input
-                        type="text"
+                      <label className="block text-slate-400 text-[11px] mb-1">Unit *</label>
+                      <select
                         value={it.uom}
-                        onChange={(e) => handleItemChange(idx, 'uom', e.target.value)}
+                        onChange={(e) => {
+                          handleItemChange(idx, 'uom', e.target.value);
+                          handleItemChange(idx, 'unitType', e.target.value);
+                        }}
                         className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-white"
-                      />
+                      >
+                        <option value="MTR">MTR</option>
+                        <option value="PCS">PCS</option>
+                      </select>
                     </div>
 
                     {items.length > 1 && (
@@ -423,7 +469,7 @@ function StitchingIssueChallanContent() {
 
             <div className="flex items-center justify-between pt-2 px-1 text-xs">
               <span className="text-slate-400">Total Quantity to Dispatch:</span>
-              <span className="text-sm font-black text-white">{totalQuantityToIssue} PCS</span>
+              <span className="text-sm font-black text-white">{totalQuantityLabel}</span>
             </div>
           </div>
 
@@ -484,7 +530,7 @@ function StitchingIssueChallanContent() {
               <div className="flex justify-between">
                 <span className="text-slate-400">Handover Quantity:</span>
                 <span className="font-black text-emerald-400">
-                  {totalQuantityToIssue} PCS
+                  {totalQuantityLabel}
                 </span>
               </div>
             </div>
@@ -499,7 +545,7 @@ function StitchingIssueChallanContent() {
                   fromDepartment: 'STITCHING',
                   toDepartment: generatedChallan.toDepartment,
                   totalQuantity: totalQuantityToIssue,
-                  uom: 'PCS',
+                  uom: items[0]?.uom || 'PCS',
                   date: new Date().toLocaleDateString(),
                   clientName: selectedJob?.program?.clientName || 'N/A',
                 }}
