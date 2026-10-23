@@ -154,6 +154,16 @@ const DEPARTMENTS = [
     hoverClass: 'hover:bg-emerald-500/10 hover:text-emerald-300',
     activeBg: 'bg-emerald-500/15 text-emerald-300 font-bold',
   },
+  {
+    name: 'Packing & Inventory',
+    code: 'PACKING',
+    href: '/packing',
+    color: 'amber',
+    badge: 'PCK',
+    dotClass: 'bg-amber-400',
+    hoverClass: 'hover:bg-amber-500/10 hover:text-amber-300',
+    activeBg: 'bg-amber-500/15 text-amber-300 font-bold',
+  },
 ];
 
 export function DepartmentSwitcher({

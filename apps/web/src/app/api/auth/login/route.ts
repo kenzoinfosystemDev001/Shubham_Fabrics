@@ -375,6 +375,12 @@ export async function POST(request: Request) {
       ? 'EMBROIDERY_INCHARGE'
       : isProgramming
       ? 'PROGRAMMER'
+      : isPacking
+      ? 'PACKING_SUPERVISOR'
+      : isFinalCheck
+      ? 'FINAL_CHECK_INSPECTOR'
+      : isSteamPress
+      ? 'STEAM_PRESS_OPERATOR'
       : roleCodes[0] || 'USER';
 
     const normalizedDept = isAdmin
@@ -403,6 +409,12 @@ export async function POST(request: Request) {
       ? 'EMBROIDERY'
       : isProgramming
       ? 'PROGRAMMING'
+      : isPacking
+      ? 'PACKING'
+      : isFinalCheck
+      ? 'FINAL_CHECK'
+      : isSteamPress
+      ? 'STEAM_PRESS'
       : user.departmentCode || 'FINISHING';
 
     const defaultRedirect = isAdmin
@@ -429,6 +441,12 @@ export async function POST(request: Request) {
       ? '/fabric-store'
       : isEmbroidery
       ? '/embroidery'
+      : isPacking
+      ? '/packing'
+      : isFinalCheck
+      ? '/final-check'
+      : isSteamPress
+      ? '/steam-press'
       : '/programming';
 
     const token = `mes_jwt_${user.id}_${Date.now()}`;
