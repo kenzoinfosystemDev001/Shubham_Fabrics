@@ -401,7 +401,15 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
     }
     .meta-item { display: flex; flex-direction: column; }
     .meta-label { font-size: 10px; font-weight: 900; text-transform: uppercase; color: #475569; }
-    .meta-val { font-size: 12px; font-weight: 800; color: #000; }
+    .meta-val {
+      min-width: 0;
+      font-size: 12px;
+      font-weight: 800;
+      color: #000;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
     .entries-grid {
       display: flex;
       flex-direction: column;
@@ -418,6 +426,8 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
       border-bottom: 1px solid #cbd5e1;
       padding-bottom: 8px;
       margin-bottom: 10px;
@@ -436,11 +446,17 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
     .cat-BOTTOM { background: #059669; }
     .cat-DUPATTA { background: #d97706; }
     .wilcom-no {
-      font-size: 15px;
+      max-width: 58%;
+      font-size: 12px;
       font-weight: 900;
       font-family: monospace;
-      letter-spacing: 0.05em;
+      line-height: 1.25;
+      letter-spacing: 0.02em;
       color: #1e1b4b;
+      text-align: right;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
     .card-body {
       display: grid;
@@ -473,6 +489,8 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
     .info-row {
       display: flex;
       gap: 6px;
+      min-width: 0;
+      flex-wrap: wrap;
     }
     .info-key {
       font-weight: 800;
@@ -480,8 +498,11 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
       color: #334155;
     }
     .info-val {
+      min-width: 0;
       font-weight: 600;
       color: #000000;
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
     @media print {
       body { background: transparent; padding: 0; }

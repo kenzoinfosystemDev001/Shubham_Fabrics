@@ -12,12 +12,13 @@ import {
 import { 
   GarmentCategory,
   extractSubStylesAndGrid,
+  calculateProductionMeasurementTotal,
+  formatSizeExpressionTotal,
   SWATCH_CLIP_PATH,
   printProductionSheet,
   downloadProductionSheetHtml
 } from '@/lib/download-production-sheet';
 import { useProgramDocument } from '@/hooks/useProgramDocument';
-import { extractRootWilcomPhoto } from '@/lib/download-wilcom';
 
 interface ProductionSheetViewProps {
   program: any;
@@ -47,7 +48,6 @@ export function ProductionSheetView({
     ? Object.keys(components)
     : ['TOP', 'BOTTOM', 'DUPATTA', 'OTHER'];
   const activeCategoryName = components?.[activeCategory]?.styleName || (activeCategory === 'OTHER' ? 'INPUT' : activeCategory);
-  const artworkPhoto = extractRootWilcomPhoto(program, meta);
   const forwardedComponents: string[] = Array.isArray(meta?.forwardedComponents) ? meta.forwardedComponents : ['TOP'];
 
   const {
@@ -110,18 +110,13 @@ export function ProductionSheetView({
 
   const totalPcs = productionGrid.reduce((acc, row) => acc + (Number(row.pcs) || 0), 0);
   const totalMtr = productionGrid.reduce((acc, row) => acc + (Number(row.mtr) || 0), 0);
+  const totalMeasurement = calculateProductionMeasurementTotal(productionGrid);
 
   return (
     <div className="space-y-4">
       {(loading || error) && (
         <div className={`rounded-md px-3 py-2 text-xs ${error ? 'bg-rose-50 text-rose-800' : 'bg-blue-50 text-blue-800'}`}>
           {error || 'Loading complete production sheet details…'}
-        </div>
-      )}
-      {artworkPhoto && (
-        <div className="flex items-center gap-3 rounded-md border border-slate-300 bg-white p-3">
-          <span className="text-[10px] font-bold uppercase text-slate-500">Wilcom Artwork</span>
-          <img src={artworkPhoto} alt={`Wilcom artwork for design ${program.designNumber || program.designName || ''}`} className="max-h-20 max-w-48 object-contain" />
         </div>
       )}
       {/* HEADER & ACTIONS */}
@@ -310,7 +305,12 @@ export function ProductionSheetView({
                           })}
                         </div>
                       ) : (
-                        <span>{row.size || (rowSubStyles[0] ? row.sizes?.[rowSubStyles[0]] : '') || '—'}</span>
+                      <span>{row.size || (rowSubStyles[0] ? row.sizes?.[rowSubStyles[0]] : '') || '—'}</span>
+                      )}
+                      {calculateProductionMeasurementTotal([row]) !== null && (
+                        <div className="mt-0.5 text-[10px] font-black text-emerald-700">
+                          TOTAL {formatSizeExpressionTotal(calculateProductionMeasurementTotal([row])!)}
+                        </div>
                       )}
                     </td>
                   </tr>
@@ -328,8 +328,15 @@ export function ProductionSheetView({
                 <td className="border-[1.5px] border-black p-1 font-black text-[#163767] text-center">
                   {totalPcs > 0 ? totalPcs : '—'}
                 </td>
-                <td colSpan={2} className="border-[1.5px] border-black p-1 text-right text-[10px] text-slate-500 italic pr-3">
-                  {totalMtrAverage > 0 ? `Fabric consumption @ ${totalMtrAverage.toFixed(2)} Mtr/Pc` : ''}
+                <td colSpan={2} className="border-[1.5px] border-black p-1 text-right text-[10px] pr-3">
+                  <span className="font-black not-italic text-slate-800">
+                    TOTAL MEASUREMENT: {totalMeasurement !== null ? formatSizeExpressionTotal(totalMeasurement) : '—'}
+                  </span>
+                  {totalMtrAverage > 0 && (
+                    <span className="ml-3 text-slate-500 italic">
+                      Fabric consumption @ {totalMtrAverage.toFixed(2)} Mtr/Pc
+                    </span>
+                  )}
                 </td>
               </tr>
             </tfoot>

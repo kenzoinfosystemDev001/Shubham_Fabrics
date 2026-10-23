@@ -24,6 +24,10 @@ export async function GET(request: Request) {
     const storeChallans = (await prisma.challan.findMany({
       where: {
         NOT: { toDepartment: { equals: 'STORE', mode: 'insensitive' } },
+        OR: [
+          { fromDepartment: { contains: 'STORE', mode: 'insensitive' } },
+          { fromDepartment: { equals: 'FABRIC', mode: 'insensitive' } },
+        ],
         status: { notIn: ['DRAFT', 'CANCELLED'] },
       },
       include: {
@@ -165,19 +169,13 @@ export async function GET(request: Request) {
 
       if (Array.isArray(ch.items) && ch.items.length > 0) {
         const challanUnit = String(ch.fabricUnit || ch.items[0]?.uom || 'MTR').toUpperCase();
-        const itemQuantityTotal = ch.items.reduce((sum, item) =>
-          sum + (String(item.uom || challanUnit).toUpperCase() === challanUnit ? (Number(item.quantity) || 0) : 0), 0);
-        const issuedQuantity = Number(ch.fabricOut) > 0 ? Number(ch.fabricOut) : itemQuantityTotal;
-        const quantityScale = itemQuantityTotal > 0 && issuedQuantity > 0 ? issuedQuantity / itemQuantityTotal : 0;
         for (const it of ch.items) {
           const itemType = getChallanItemFabricType(it, ch.toDepartment);
 
           const rawName = it.fabricCode || cleanFabricName(it.itemDescription) || ch.program?.fabricName || 'Fabric Material';
           const itemUnit = String(it.uom || challanUnit).toUpperCase();
           const itemQuantity = Number(it.quantity) || 0;
-          const qty = itemUnit === challanUnit
-            ? (itemQuantityTotal > 0 ? itemQuantity * quantityScale : (it === ch.items[0] ? issuedQuantity : 0))
-            : itemQuantity;
+          const qty = itemQuantity;
 
           if (qty <= 0) continue;
 

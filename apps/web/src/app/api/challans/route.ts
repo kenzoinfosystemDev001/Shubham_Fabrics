@@ -277,7 +277,19 @@ export async function POST(request: Request) {
 
     if (isMovingOutFromStore || isBypassingToProcessing) {
       const { checkFabricStoreAvailability } = await import('@/lib/fabric-availability');
-      const availability = await checkFabricStoreAvailability(resolvedProgramId);
+      const firstItemWithUnit = Array.isArray(body.items)
+        ? body.items.find((item: any) => item?.uom || item?.unit)
+        : undefined;
+      const requestedUnit = String(
+        firstItemWithUnit?.uom ||
+        firstItemWithUnit?.unit ||
+        body.fabricUnit ||
+        ''
+      ).toUpperCase();
+      const unitOverride = requestedUnit === 'MTR' || requestedUnit === 'PCS'
+        ? requestedUnit
+        : undefined;
+      const availability = await checkFabricStoreAvailability(resolvedProgramId, unitOverride);
       if (!availability.isAvailable) {
         return NextResponse.json(
           {
@@ -368,17 +380,44 @@ export async function POST(request: Request) {
       0
     );
 
-    const fabricIn = body.fabricIn !== undefined && body.fabricIn !== null && body.fabricIn !== ''
-      ? Number(body.fabricIn)
-      : (detectedFabricIn ?? (rawItemsSum || Number(body.quantity || 1)));
+    const isFabricStoreIssue = fromDept === 'STORE' &&
+      (body.challanType === 'STORE_TO_DYEING' || body.challanType === 'STORE_TO_EMBROIDERY');
+    const storeItemUnits = isFabricStoreIssue
+      ? new Set((Array.isArray(body.items) ? body.items : [])
+          .map((item: any) => String(item?.uom || item?.unit || body.fabricUnit || 'MTR').toUpperCase()))
+      : new Set<string>();
+    if (isFabricStoreIssue && storeItemUnits.size > 1) {
+      return NextResponse.json({ error: 'Use one stock unit (MTR or PCS) for every item in a Fabric Store challan.' }, { status: 400 });
+    }
+    const storeItemUnit = storeItemUnits.values().next().value as string | undefined;
+    if (isFabricStoreIssue && storeItemUnit && !['MTR', 'PCS'].includes(storeItemUnit)) {
+      return NextResponse.json({ error: 'Fabric Store challan items must use MTR or PCS.' }, { status: 400 });
+    }
 
     const defectivePieces = Number(body.defectivePieces || 0);
+    const fabricUnit = (isFabricStoreIssue && storeItemUnit) || body.fabricUnit || detectedUnit || body.uom || 'MTR';
+    const hasMeasuredStoreItems = isFabricStoreIssue && Boolean(storeItemUnit) && rawItemsSum > 0;
 
-    const fabricOut = body.fabricOut !== undefined && body.fabricOut !== null && body.fabricOut !== ''
-      ? Number(body.fabricOut)
-      : Math.max(0, fabricIn - defectivePieces);
+    if (
+      isFabricStoreIssue &&
+      defectivePieces > 0 &&
+      body.fabricUnit &&
+      String(body.fabricUnit).toUpperCase() !== fabricUnit
+    ) {
+      return NextResponse.json({ error: 'The defective quantity unit must match the challan item unit.' }, { status: 400 });
+    }
 
-    const fabricUnit = body.fabricUnit || detectedUnit || body.uom || 'MTR';
+    const fabricIn = hasMeasuredStoreItems
+      ? rawItemsSum + defectivePieces
+      : body.fabricIn !== undefined && body.fabricIn !== null && body.fabricIn !== ''
+        ? Number(body.fabricIn)
+        : (detectedFabricIn ?? (rawItemsSum || Number(body.quantity || 1)));
+
+    const fabricOut = hasMeasuredStoreItems
+      ? rawItemsSum
+      : body.fabricOut !== undefined && body.fabricOut !== null && body.fabricOut !== ''
+        ? Number(body.fabricOut)
+        : Math.max(0, fabricIn - defectivePieces);
     const getDefaultDefectiveShelf = (dept: string) => {
       const up = dept.toUpperCase();
       if (up.includes('QC1') || up.includes('DYEING QC') || up.includes('DYE QC'))
@@ -499,7 +538,7 @@ export async function POST(request: Request) {
               `${item.fabric || item.fabricCode || 'Fabric'} — ${item.colour || item.color || 'Standard'}`,
             unitType: item.unitType || 'ROLL',
             quantity: Number(item.quantity ?? item.measurement ?? 1),
-            uom: item.uom || item.unit || 'MTR',
+            uom: item.uom || item.unit || fabricUnit || 'MTR',
             fabricCode: item.fabricCode || item.fabric || null,
             colour: item.colour || item.color || null,
             shade: item.shade || item.requiredDyeColor || null,

@@ -248,7 +248,7 @@ export function WilcomSheetView({
                 key={entry.id || idx} 
                 className="p-4 border border-slate-200 rounded-xl bg-white space-y-3 shadow-2xs hover:border-slate-300 transition"
               >
-                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2">
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${
                     entry.category === 'TOP'
                       ? 'bg-blue-50 text-blue-900 border border-blue-200'
@@ -260,7 +260,7 @@ export function WilcomSheetView({
                   }`}>
                     WILCOM {entry.category}
                   </span>
-                  <span className="font-mono font-bold text-xs text-slate-900">
+                  <span className="min-w-0 max-w-full sm:max-w-[58%] break-all text-right font-mono text-[11px] leading-tight font-bold text-slate-900">
                     {entry.wilcomDesignNumber || '—'}
                   </span>
                 </div>

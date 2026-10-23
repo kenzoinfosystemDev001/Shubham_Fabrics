@@ -16,7 +16,6 @@ import {
   Scissors, 
   AlertCircle,
   Calendar,
-  Sparkles,
   Palette,
   Ruler,
   Plus,
@@ -39,9 +38,7 @@ import {
   GarmentCategory 
 } from '@/lib/download-production-sheet';
 import { WilcomPrintModal } from '@/components/wilcom/WilcomPrintModal';
-import { WilcomSheetView } from '@/components/wilcom/WilcomSheetView';
 import { 
-  WilcomEntry, 
   printWilcomForm, 
   downloadWilcomFormHtml,
   extractRootWilcomPhoto
@@ -64,9 +61,8 @@ export default function ProgramDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [showWilcomPrintModal, setShowWilcomPrintModal] = useState(false);
-  const [wilcomCategoryTab, setWilcomCategoryTab] = useState<GarmentCategory | 'ALL'>('TOP');
   const [currentUser, setCurrentUser] = useState<any>(null);
-  const [activeCategoryTab, setActiveCategoryTab] = useState<GarmentCategory | 'WILCOM'>('TOP');
+  const [activeCategoryTab, setActiveCategoryTab] = useState<GarmentCategory>('TOP');
 
   useEffect(() => {
     setCurrentUser(getCurrentUser());
@@ -266,7 +262,7 @@ export default function ProgramDetailPage() {
     }));
   }
 
-  const activeCategory: GarmentCategory = activeCategoryTab === 'WILCOM' ? 'TOP' : activeCategoryTab;
+  const activeCategory = activeCategoryTab;
 
   const {
     subStylesWithAverages,
@@ -670,10 +666,10 @@ export default function ProgramDetailPage() {
               </span>
               <button
                 type="button"
-                onClick={() => setActiveCategoryTab('WILCOM')}
+                onClick={() => setShowWilcomPrintModal(true)}
                 className="text-[11px] font-bold text-purple-700 hover:text-purple-900 flex items-center gap-1 cursor-pointer"
               >
-                <span>Wilcom Details</span>
+                <span>View Wilcom Form</span>
                 <span className="font-mono text-[10px] bg-purple-100 text-purple-900 px-1.5 py-0.2 rounded-full font-bold">
                   {wilcomEntries.length}
                 </span>
@@ -819,7 +815,7 @@ export default function ProgramDetailPage() {
 
           {/* PRODUCTION SHEET SPECIFICATION & BREAKDOWN */}
           <div className="bg-white border-2 border-black rounded-lg p-5 shadow-xs space-y-4 md:col-span-2 text-black">
-            {/* COMPONENT & WILCOM TAB SELECTOR */}
+            {/* PRODUCTION SHEET COMPONENT SELECTOR */}
             <div className="flex items-center gap-2 pb-2 border-b border-black/10 overflow-x-auto">
               {componentCategories.map((cat) => {
                 const isEnabled = components ? components[cat]?.enabled !== false : (cat === 'TOP');
@@ -846,40 +842,15 @@ export default function ProgramDetailPage() {
                 );
               })}
 
-              <button
-                type="button"
-                onClick={() => setActiveCategoryTab('WILCOM')}
-                className={`px-3 py-1 rounded text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-                  activeCategoryTab === 'WILCOM'
-                    ? 'bg-purple-700 text-white shadow-2xs'
-                    : 'bg-purple-50 text-purple-900 hover:bg-purple-100 border border-purple-200'
-                }`}
-              >
-                <Sparkles className="w-3 h-3 text-purple-500" />
-                <span>Wilcom Form</span>
-                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-black bg-purple-200/70 text-purple-950">
-                  {wilcomEntries.length}
-                </span>
-              </button>
             </div>
 
-            {activeCategoryTab === 'WILCOM' ? (
-              <WilcomSheetView
-                program={program}
-                wilcomEntries={wilcomEntries}
-                rootWilcomPhoto={rootWilcomPhoto}
-                onOpenPrintModal={() => setShowWilcomPrintModal(true)}
-                onProgramUpdate={(updated) => setProgram((prev: any) => ({ ...prev, ...updated }))}
-              />
-            ) : (
-              <ProductionSheetView
-                program={program}
-                activeCategory={activeCategoryTab as GarmentCategory}
-                onCategoryChange={(cat) => setActiveCategoryTab(cat)}
-                onOpenPrintModal={() => setShowPrintModal(true)}
-                isClientCodeVisible={isClientCodeVisible}
-              />
-            )}
+            <ProductionSheetView
+              program={program}
+              activeCategory={activeCategoryTab}
+              onCategoryChange={(cat) => setActiveCategoryTab(cat)}
+              onOpenPrintModal={() => setShowPrintModal(true)}
+              isClientCodeVisible={isClientCodeVisible}
+            />
           </div>
 
           {/* PRODUCTION DATES */}
@@ -930,19 +901,14 @@ export default function ProgramDetailPage() {
         program={program}
         isOpen={showPrintModal}
         onClose={() => setShowPrintModal(false)}
-        initialTab={activeCategoryTab === 'WILCOM' ? 'TOP' : activeCategoryTab}
-        onViewWilcom={(cat) => {
-          setWilcomCategoryTab(cat || 'TOP');
-          setShowPrintModal(false);
-          setShowWilcomPrintModal(true);
-        }}
+        initialTab={activeCategoryTab}
       />
 
       <WilcomPrintModal
         program={program}
         isOpen={showWilcomPrintModal}
         onClose={() => setShowWilcomPrintModal(false)}
-        initialCategory={wilcomCategoryTab}
+        initialCategory="ALL"
         onViewSheet={() => {
           setShowWilcomPrintModal(false);
           setShowPrintModal(true);
