@@ -1270,6 +1270,7 @@ export default function CreateProductionSheetPage() {
         designNumber: designNumber.trim(),
         topName: primary.styleName.trim() || primaryCat,
         mainStyle: primary.styleName.trim() || primaryCat,
+        primaryCategory: primaryCat,
         pattern: (primary.pattern || '').trim(),
         startDate: sheetDate,
         deliveryDate: deliveryDate,

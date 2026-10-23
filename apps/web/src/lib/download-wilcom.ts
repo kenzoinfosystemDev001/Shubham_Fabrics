@@ -18,6 +18,58 @@ export interface WilcomEntry {
   createdAt?: string;
 }
 
+export function resolveWilcomMainStyle(program: any, providedMeta?: any): string {
+  let meta = providedMeta;
+  if (!meta && program?.metadataJson) {
+    try {
+      meta = typeof program.metadataJson === 'string' ? JSON.parse(program.metadataJson) : program.metadataJson;
+    } catch {
+      meta = null;
+    }
+  }
+
+  const designNumber = String(
+    program?.designNumber || program?.designName || program?.wilcomDesignNumber || meta?.wilcomDesignNumber || ''
+  ).trim().toLowerCase();
+  const isDesignNumber = (value: string) => Boolean(designNumber && value.trim().toLowerCase() === designNumber);
+  const rootStyleCandidates = [
+    program?.mainStyle,
+    program?.topName,
+    meta?.mainStyle,
+    meta?.topName,
+    program?.styleCode,
+    meta?.styleCode,
+  ].map((candidate) => String(candidate || '').trim())
+    .filter((value) => value && value !== '—' && !isDesignNumber(value));
+  const components = meta?.components;
+  if (components && typeof components === 'object') {
+    const componentRows = Object.entries(components) as Array<[string, any]>;
+    const primaryCategory = String(program?.primaryCategory || meta?.primaryCategory || '').trim().toLowerCase();
+    const categoryFromRoot = componentRows.find(([category, component]) => {
+      const categoryNames = [category, component?.category]
+        .map((value) => String(value || '').trim().toLowerCase())
+        .filter(Boolean);
+      return rootStyleCandidates.some((value) => categoryNames.includes(value.toLowerCase()));
+    });
+    const primary = componentRows.find(([category]) => category.toLowerCase() === primaryCategory)
+      || categoryFromRoot
+      || componentRows.find(([, component]) => component?.enabled !== false)
+      || componentRows[0];
+
+    if (primary) {
+      const [category, component] = primary;
+      const styleName = String(component?.styleName || '').trim();
+      if (styleName && !isDesignNumber(styleName)) return styleName;
+      const componentCategory = String(component?.category || category).trim();
+      return (componentCategory.toUpperCase() === 'OTHER' ? 'INPUT' : componentCategory) || '—';
+    }
+  }
+
+  if (rootStyleCandidates.length > 0) return rootStyleCandidates[0];
+
+  return '—';
+}
+
 /**
  * Resizes and compresses an uploaded image file into an optimized JPEG Data URL.
  * Prevents massive payloads (e.g. 10MB phone photos) from choking memory, network, or printing.
@@ -208,7 +260,7 @@ export async function prepareWilcomImages(program: any) {
     }
 
     const designNo = preparedProgram.designNumber || preparedProgram.designName || '—';
-    const mainStyle = preparedProgram.mainStyle || preparedProgram.topName || meta?.mainStyle || meta?.topName || '—';
+    const mainStyle = resolveWilcomMainStyle(preparedProgram, meta);
     const subStyle = preparedProgram.subStyle || preparedProgram.styleCode || meta?.subStyle || meta?.style || '—';
 
     if (entries.length === 0) {
@@ -263,7 +315,7 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
     } catch {}
   }
 
-  const mainStyle = program.mainStyle || program.topName || meta?.mainStyle || meta?.topName || '—';
+  const mainStyle = resolveWilcomMainStyle(program, meta);
   const subStyle = program.subStyle || program.styleCode || meta?.subStyle || meta?.style || '—';
 
   const rootWilcomPhoto = extractRootWilcomPhoto(program, meta);

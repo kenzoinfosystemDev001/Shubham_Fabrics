@@ -257,6 +257,7 @@ export async function POST(request: Request) {
     metadataObj.subStylesWithAverages = rawSubStylesWithAverages;
     metadataObj.productionGrid = rawGrid;
     metadataObj.topName = data.topName || data.mainStyle || '';
+    metadataObj.primaryCategory = data.primaryCategory || metadataObj.primaryCategory || '';
     metadataObj.serialNoCounter = data.serialNoCounter || '000';
     metadataObj.note = data.note || data.comments || data.remarks || '';
     metadataObj.clientCode = data.clientCode ? String(data.clientCode).trim() : (metadataObj.clientCode || '');

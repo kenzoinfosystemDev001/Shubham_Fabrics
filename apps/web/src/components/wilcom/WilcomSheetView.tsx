@@ -16,7 +16,8 @@ import {
   printWilcomForm,
   downloadWilcomFormHtml,
   compressImageForUpload,
-  extractRootWilcomPhoto
+  extractRootWilcomPhoto,
+  resolveWilcomMainStyle
 } from '@/lib/download-wilcom';
 import { useProgramDocument } from '@/hooks/useProgramDocument';
 
@@ -54,7 +55,7 @@ export function WilcomSheetView({
 
   const serialNo = program?.programSerialNo || program?.programNumber || '—';
   const designNo = program?.designNumber || program?.designName || '—';
-  const mainStyleVal = program?.mainStyle || program?.topName || meta?.mainStyle || meta?.topName || '—';
+  const mainStyleVal = resolveWilcomMainStyle(program, meta);
   const styleVal = program?.subStyle || program?.styleCode || meta?.subStyle || meta?.style || '—';
 
   const buildInitialEntries = (): WilcomEntry[] => {
