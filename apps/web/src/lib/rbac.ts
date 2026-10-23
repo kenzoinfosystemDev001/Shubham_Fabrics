@@ -340,6 +340,25 @@ export function isSteamPressUser(user: MESUser | null): boolean {
   );
 }
 
+export function isPackingUser(user: MESUser | null): boolean {
+  if (!user) return false;
+  if (isAdminUser(user)) return true; // Admins have all access
+
+  const username = (user.username || '').toLowerCase();
+  const dept = (user.departmentCode || '').toUpperCase();
+  const role = (user.role || '').toUpperCase();
+  const roles = (user.roles || []).map((r) => r.toUpperCase());
+
+  return (
+    username === 'packing' ||
+    username === 'packing_supervisor' ||
+    dept === 'PACKING' ||
+    dept === 'FINISHED_GOODS' ||
+    role === 'PACKING_SUPERVISOR' ||
+    roles.includes('PACKING_SUPERVISOR')
+  );
+}
+
 export function isFinalCheckUser(user: MESUser | null): boolean {
   if (!user) return false;
   if (isAdminUser(user)) return true; // Admins have all access
@@ -386,6 +405,7 @@ export function isFinishingUser(user: MESUser | null): boolean {
 export function getUserStationHome(user: MESUser | null): string {
   if (!user) return '/login';
   if (isAdminUser(user)) return '/admin';
+  if (isPackingUser(user)) return '/packing';
   if (isFinalCheckUser(user)) return '/final-check';
   if (isSteamPressUser(user)) return '/steam-press';
   if (isFinishingUser(user)) return '/finishing';
@@ -581,6 +601,18 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
     };
   }
 
+  // Packing & Inventory Department routes protection
+  if (pathname.startsWith('/packing')) {
+    if (isPackingUser(user)) {
+      return { allowed: true, redirectTarget: pathname };
+    }
+    return {
+      allowed: false,
+      redirectTarget: defaultUserHome,
+      reason: 'Access Restricted: You are not authorized for Packing & Inventory. Access is restricted to Packing personnel and Admins.',
+    };
+  }
+
   // Final QC Department routes protection
   if (pathname.startsWith('/final-check')) {
     if (isFinalCheckUser(user)) {
@@ -611,6 +643,7 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
       !pathname.startsWith('/finishing/floor-board') &&
       !pathname.startsWith('/steam-press/floor-board') &&
       !pathname.startsWith('/final-check/floor-board') &&
+      !pathname.startsWith('/packing/floor-board') &&
       !pathname.startsWith('/thread-cutting/floor-board'));
 
   if (isProgrammingRoute) {

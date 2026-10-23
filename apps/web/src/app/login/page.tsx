@@ -19,6 +19,7 @@ import {
   Shirt,
   Sparkles,
   Wind,
+  Package,
 } from 'lucide-react';
 
 interface StationOption {
@@ -167,6 +168,15 @@ const STATIONS: StationOption[] = [
     borderActive: 'border-emerald-500/80 shadow-[0_0_15px_rgba(16,185,129,0.25)]',
     bgActive: 'bg-emerald-500/15 text-white',
   },
+  {
+    id: 'packing',
+    name: 'Packing & Inventory',
+    username: 'packing',
+    icon: Package,
+    accentColor: 'text-amber-400',
+    borderActive: 'border-amber-500/80 shadow-[0_0_15px_rgba(245,158,11,0.4)]',
+    bgActive: 'bg-amber-500/15 text-white',
+  },
 ];
 
 export default function LoginPage() {
@@ -232,7 +242,7 @@ export default function LoginPage() {
       <div className="absolute inset-0 bg-radial-gradient from-transparent via-[#090D16]/70 to-[#090D16] pointer-events-none" />
 
       {/* CENTERED PREMIUM GLASS CARD */}
-      <div className="relative z-10 w-full max-w-[540px] bg-slate-900/80 backdrop-blur-xl border border-slate-700/60 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-black/60">
+      <div className="relative z-10 w-full max-w-[560px] bg-slate-900/80 backdrop-blur-xl border border-slate-700/60 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-black/60">
         
         {/* BRANDING HEADER */}
         <div className="flex flex-col items-center text-center mb-6">

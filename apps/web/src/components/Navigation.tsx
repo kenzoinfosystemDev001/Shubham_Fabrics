@@ -100,7 +100,8 @@ export function Navigation() {
     pathname.startsWith('/stitching') ||
     pathname.startsWith('/finishing') ||
     pathname.startsWith('/steam-press') ||
-    pathname.startsWith('/final-check')
+    pathname.startsWith('/final-check') ||
+    pathname.startsWith('/packing')
   ) {
     return null;
   }

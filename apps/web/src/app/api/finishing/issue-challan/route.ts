@@ -36,17 +36,30 @@ export async function POST(request: Request) {
     }
 
     const finishingIndex = STANDARD_FACTORY_ROUTE.indexOf(DepartmentCode.FINISHING);
-    const targetDepartment = STANDARD_FACTORY_ROUTE[finishingIndex + 1];
-    if (finishingIndex < 0 || !targetDepartment) {
+    if (finishingIndex < 0) {
       return NextResponse.json(
-        { error: 'Finishing has no downstream department configured in the factory route.' },
+        { error: 'Finishing is not configured in the factory route.' },
         { status: 503 },
       );
     }
-    if (requestedTargetDept && requestedTargetDept !== targetDepartment) {
+
+    // Allow issuing to the immediate next department OR any downstream department.
+    // Supervisors may skip BUTTON_ATTACHMENT and send directly to STEAM_PRESS or FINAL_CHECK.
+    const defaultNextDept = STANDARD_FACTORY_ROUTE[finishingIndex + 1];
+    const downstreamDepts = STANDARD_FACTORY_ROUTE.slice(finishingIndex + 1) as string[];
+
+    if (requestedTargetDept && !downstreamDepts.includes(requestedTargetDept)) {
       return NextResponse.json(
-        { error: `Finishing handovers must go to the configured next department: ${targetDepartment}.` },
+        { error: `'${requestedTargetDept}' is not a valid downstream destination from Finishing. Valid destinations: ${downstreamDepts.join(', ')}.` },
         { status: 400 },
+      );
+    }
+
+    const targetDepartment: string = requestedTargetDept || defaultNextDept;
+    if (!targetDepartment) {
+      return NextResponse.json(
+        { error: 'No downstream department available for Finishing handover.' },
+        { status: 503 },
       );
     }
 
@@ -66,6 +79,19 @@ export async function POST(request: Request) {
     if (!['FINISHING', 'FINISH', 'TRIMMING'].includes(parentChallan.toDepartment.toUpperCase())) {
       return NextResponse.json({ error: 'The selected challan is not assigned to Finishing.' }, { status: 400 });
     }
+
+    const quantities = items.map((item: any) => Number(item?.quantity));
+    if (quantities.some((quantity: number) => !Number.isSafeInteger(quantity) || quantity <= 0)) {
+      return NextResponse.json(
+        { error: 'Each handover item quantity must be a positive whole number of garments.' },
+        { status: 400 },
+      );
+    }
+    const requestingQty = quantities.reduce((sum: number, quantity: number) => sum + quantity, 0);
+    if (!Number.isSafeInteger(requestingQty)) {
+      return NextResponse.json({ error: 'The total handover quantity is outside the supported range.' }, { status: 400 });
+    }
+
     const tracking = buildDepartmentTrackingData(
       body,
       requestingQty,
@@ -82,18 +108,6 @@ export async function POST(request: Request) {
         { error: `Finishing must be completed before handover. Current status: '${parentChallan.status}'.` },
         { status: 400 }
       );
-    }
-
-    const quantities = items.map((item: any) => Number(item?.quantity));
-    if (quantities.some((quantity: number) => !Number.isSafeInteger(quantity) || quantity <= 0)) {
-      return NextResponse.json(
-        { error: 'Each handover item quantity must be a positive whole number of garments.' },
-        { status: 400 },
-      );
-    }
-    const requestingQty = quantities.reduce((sum: number, quantity: number) => sum + quantity, 0);
-    if (!Number.isSafeInteger(requestingQty)) {
-      return NextResponse.json({ error: 'The total handover quantity is outside the supported range.' }, { status: 400 });
     }
 
     const actor = await prisma.user.findFirst({

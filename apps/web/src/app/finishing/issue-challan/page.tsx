@@ -35,7 +35,7 @@ function FinishingIssueChallanContent() {
   const [selectedSheetForView, setSelectedSheetForView] = useState<any | null>(null);
   const [generatedChallan, setGeneratedChallan] = useState<any | null>(null);
 
-  const [targetDepartment, setTargetDepartment] = useState('BUTTON_ATTACHMENT');
+  const [targetDepartment, setTargetDepartment] = useState('STEAM_PRESS');
   const [priority, setPriority] = useState('NORMAL');
   const [remarks, setRemarks] = useState(
     'Trimmed, cleaned, and pressed garments verified against Production Sheet. Transferred to downstream department.'

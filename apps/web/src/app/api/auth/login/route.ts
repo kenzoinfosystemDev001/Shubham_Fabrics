@@ -311,6 +311,24 @@ export async function POST(request: Request) {
         roleCodes.includes('FINISHING_OPERATOR') ||
         roleCodes.includes('FINISHING_INCHARGE'));
 
+    const isPacking =
+      !isAdmin &&
+      (user.username.toLowerCase() === 'packing' ||
+        user.username.toLowerCase() === 'packing_supervisor' ||
+        user.departmentCode === 'PACKING' ||
+        user.departmentCode === 'FINISHED_GOODS' ||
+        roleCodes.includes('PACKING_SUPERVISOR') ||
+        roleCodes.includes('PACKING_OPERATOR') ||
+        roleCodes.includes('PACKING_INCHARGE'));
+
+    const isFinalCheck =
+      !isAdmin &&
+      (user.username.toLowerCase() === 'finalcheck' ||
+        user.username.toLowerCase() === 'final_check' ||
+        user.departmentCode === 'FINAL_CHECK' ||
+        roleCodes.includes('FINAL_CHECK_INSPECTOR') ||
+        roleCodes.includes('FINAL_CHECK_SUPERVISOR'));
+
     const isSteamPress =
       !isAdmin &&
       !isStore &&

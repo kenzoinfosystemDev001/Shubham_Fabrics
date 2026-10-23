@@ -749,6 +749,54 @@ class ApiClient {
     });
   }
 
+  // Packing & Finished Goods Inventory
+  async getPackingDashboard() {
+    return this.request<any>('/packing/dashboard');
+  }
+
+  async getPackingIncoming(params?: { status?: string; search?: string }) {
+    const query = new URLSearchParams();
+    if (params?.status) query.append("status", params.status);
+    if (params?.search) query.append("search", params.search);
+    return this.request<any>("/packing/incoming?" + query.toString());
+  }
+
+  async receivePackingChallan(id: string, data: { receivedQuantity?: number; remarks?: string; markOnHold?: boolean }) {
+    return this.request<any>("/packing/challans/" + id + "/receive", {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async getPackingQueue(params?: { status?: string; search?: string }) {
+    const query = new URLSearchParams();
+    if (params?.status) query.append("status", params.status);
+    if (params?.search) query.append("search", params.search);
+    return this.request<any>("/packing/queue?" + query.toString());
+  }
+
+  async getPackingJob(id: string) {
+    return this.request<any>("/packing/jobs/" + id);
+  }
+
+  async packJob(id: string, data: any) {
+    return this.request<any>("/packing/jobs/" + id + "/pack", {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async getFinishedGoodsInventory(params?: { search?: string; status?: string }) {
+    const query = new URLSearchParams();
+    if (params?.search) query.append("search", params.search);
+    if (params?.status) query.append("status", params.status);
+    return this.request<any>("/packing/inventory?" + query.toString());
+  }
+
+  async getPackingReports(days: number = 30) {
+    return this.request<any>("/packing/reports?days=" + days);
+  }
+
   // Health
   async getHealth() {
     return this.request<any>('/health');
