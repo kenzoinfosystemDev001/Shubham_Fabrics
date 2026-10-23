@@ -1,13 +1,16 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
 // GET /api/fabric-store/batches/[id]
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE');
+  if (!authUser) return authResponse;
   try {
     const { id } = await params;
     const batch = await prisma.fabricBatch.findUnique({
@@ -49,6 +52,8 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE');
+  if (!authUser) return authResponse;
   try {
     const { id } = await params;
     const body = await request.json();

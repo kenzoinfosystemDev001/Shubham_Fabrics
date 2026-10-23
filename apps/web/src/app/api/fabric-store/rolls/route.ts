@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
 // GET /api/fabric-store/rolls
 export async function GET(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE');
+  if (!authUser) return authResponse;
   try {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');

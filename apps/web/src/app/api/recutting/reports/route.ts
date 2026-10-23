@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'RECUTTING');
+  if (!authUser) return authResponse;
   try {
     const { searchParams } = new URL(request.url);
     const startDate = searchParams.get('startDate');

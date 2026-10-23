@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import { syncInboundChallansToDyeingOrders } from '@/lib/dyeing-sync';
+import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'DYEING');
+  if (!authUser) return authResponse;
   try {
     await syncInboundChallansToDyeingOrders();
 

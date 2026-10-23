@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,6 +43,8 @@ async function getNextSLENumber(): Promise<string> {
 
 // GET /api/fabric-store/grn
 export async function GET(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE');
+  if (!authUser) return authResponse;
   try {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
@@ -74,6 +77,8 @@ export async function GET(request: Request) {
 
 // POST /api/fabric-store/grn — atomic: create batch + GRN + rolls + ledger entries
 export async function POST(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE');
+  if (!authUser) return authResponse;
   try {
     const body = await request.json();
     const {
@@ -106,13 +111,7 @@ export async function POST(request: Request) {
     }
 
     // Resolve actor
-    const actor = await prisma.user.findFirst({
-      where: { OR: [{ username: 'admin' }, { username: 'store_mgr' }, { username: 'jitender' }] },
-      orderBy: { username: 'asc' },
-    });
-    if (!actor) {
-      return NextResponse.json({ error: 'No authorized user found' }, { status: 401 });
-    }
+    const actor = { id: authUser.id };
 
     const year = new Date().getFullYear();
     const batchPrefix = `BATCH-${year}-`;

@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireUser } from '@/lib/auth/require-user';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: Request) {
+  const { user: authUser, response: authResponse } = await requireUser(request, { admin: true });
+  if (!authUser) return authResponse;
   try {
     const fabrics = await prisma.fabric.findMany({
       include: {
@@ -22,6 +25,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const { user: authUser, response: authResponse } = await requireUser(request, { admin: true });
+  if (!authUser) return authResponse;
   try {
     const body = await request.json();
     const name = (body.name || '').trim();

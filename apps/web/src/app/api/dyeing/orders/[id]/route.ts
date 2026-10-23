@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,6 +9,8 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'DYEING');
+  if (!authUser) return authResponse;
   try {
     const { id } = await params;
 
@@ -71,6 +74,8 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'DYEING');
+  if (!authUser) return authResponse;
   try {
     const { id } = await params;
     const body = await request.json();
@@ -140,20 +145,7 @@ export async function PATCH(
     }
 
     // Resolve an actor ID for audit / production log
-    let actorUser = await prisma.user.findFirst({
-      where: {
-        OR: [
-          { id: resolvedInchargeId || '' },
-          { username: 'dyeing' },
-          { departmentCode: 'DYEING' },
-          { username: 'admin' },
-        ],
-      },
-      select: { id: true },
-    });
-    if (!actorUser) {
-      actorUser = await prisma.user.findFirst({ select: { id: true } });
-    }
+    const actorUser = { id: authUser.id, fullName: authUser.fullName, username: authUser.username };
 
     // Prefetch fallback challan outside transaction
     let fallbackChallanId = existingOrder.inboundChallanId;

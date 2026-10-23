@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
-import { getUserStationHome } from '@/lib/rbac';
+import { checkRouteAccess, getUserStationHome } from '@/lib/rbac';
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import {
   Shield,
@@ -181,14 +181,14 @@ const STATIONS: StationOption[] = [
 
 export default function LoginPage() {
   const router = useRouter();
-  const [username, setUsername] = useState('admin');
-  const [pin, setPin] = useState('1234');
+  const [username, setUsername] = useState('');
+  const [pin, setPin] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const selectStation = (stationUsername: string) => {
     setUsername(stationUsername);
-    setPin('1234');
+    setPin('');
     setError(null);
   };
 
@@ -203,15 +203,17 @@ export default function LoginPage() {
         password: pin.trim(),
       });
 
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('subham_mes_token', res.accessToken);
-        localStorage.setItem('subham_mes_user', JSON.stringify(res.user));
-        document.cookie = `subham_mes_token=${res.accessToken}; path=/; max-age=604800; SameSite=Lax`;
-        document.cookie = `subham_mes_role=${res.user.role}; path=/; max-age=604800; SameSite=Lax`;
-        document.cookie = `subham_mes_dept=${res.user.departmentCode}; path=/; max-age=604800; SameSite=Lax`;
-      }
+      // The session cookie is set (httpOnly) by the server; only the display profile is cached here.
+      localStorage.setItem('subham_mes_user', JSON.stringify(res.user));
 
-      const target = res.user.defaultRedirect || getUserStationHome(res.user);
+      const requested = new URLSearchParams(window.location.search).get('next');
+      const isSafeNext =
+        !!requested &&
+        requested.startsWith('/') &&
+        !requested.startsWith('//') &&
+        !requested.startsWith('/login') &&
+        checkRouteAccess(requested.split('?')[0], res.user).allowed;
+      const target = (isSafeNext && requested) || res.user.defaultRedirect || getUserStationHome(res.user);
       router.replace(target);
     } catch (err: any) {
       setError(err.message || 'Invalid credentials. Please verify username and PIN.');

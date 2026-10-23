@@ -4,9 +4,12 @@ import { prisma } from '@subham/database';
 export const dynamic = 'force-dynamic';
 
 import { syncInboundChallansToDyeingOrders } from '@/lib/dyeing-sync';
+import { requireDepartment } from '@/lib/auth/department-access';
 
 // GET /api/dyeing/orders
 export async function GET(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'DYEING');
+  if (!authUser) return authResponse;
   try {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');

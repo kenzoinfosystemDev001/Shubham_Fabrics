@@ -3,10 +3,13 @@ import { prisma } from '@subham/database';
 import { STANDARD_FACTORY_ROUTE } from '@subham/config';
 import { DepartmentCode } from '@subham/types';
 import { buildDepartmentTrackingData } from '@/lib/challan-tracking';
+import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STEAM_PRESS');
+  if (!authUser) return authResponse;
   try {
     const body = await request.json();
     const {
@@ -86,18 +89,7 @@ export async function POST(request: Request) {
     }
 
     // 4. Resolve user identity
-    let actorId = customActorId;
-    if (!actorId) {
-      const steamPressUser = await prisma.user.findFirst({
-        where: { OR: [{ username: 'steampress' }, { username: 'steam_press' }, { departmentCode: 'STEAM_PRESS' }] },
-        select: { id: true },
-      });
-      actorId = steamPressUser?.id;
-    }
-    if (!actorId) {
-      const fallbackUser = await prisma.user.findFirst({ select: { id: true } });
-      actorId = fallbackUser?.id;
-    }
+    const actorId = authUser.id;
 
     // 5. Generate unique sequential Challan Number
     const count = await prisma.challan.count({

@@ -1,13 +1,16 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import { buildDepartmentTrackingData } from '@/lib/challan-tracking';
+import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'RECUTTING');
+  if (!authUser) return authResponse;
   try {
     const body = await request.json();
-    const { parentChallanId, programId, priority, remarks, items, actorId: customActorId } = body;
+    const { parentChallanId, programId, priority, remarks, items } = body;
 
     if (!parentChallanId) {
       return NextResponse.json({ error: 'Parent Recutting Challan ID is required.' }, { status: 400 });
@@ -66,18 +69,7 @@ export async function POST(request: Request) {
     }
 
     // 3. Resolve user identity
-    let actorId = customActorId;
-    if (!actorId) {
-      const recUser = await prisma.user.findFirst({
-        where: { OR: [{ username: 'recutting' }, { departmentCode: 'RECUTTING' }] },
-        select: { id: true },
-      });
-      actorId = recUser?.id;
-    }
-    if (!actorId) {
-      const fallbackUser = await prisma.user.findFirst({ select: { id: true } });
-      actorId = fallbackUser?.id;
-    }
+    const actorId = authUser.id;
 
     // 4. Generate unique sequential Challan Number
     const count = await prisma.challan.count({

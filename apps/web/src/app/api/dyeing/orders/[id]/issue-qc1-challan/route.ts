@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -7,6 +8,8 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'DYEING');
+  if (!authUser) return authResponse;
   try {
     const { id } = await params;
     const body = await request.json();
@@ -70,20 +73,7 @@ export async function POST(
     }
 
     // 2. Resolve Actor ID
-    let actorUser = await prisma.user.findFirst({
-      where: {
-        OR: [
-          { id: inchargeId || order.inchargeId || '' },
-          { username: 'dyeing' },
-          { departmentCode: 'DYEING' },
-          { username: 'admin' },
-        ],
-      },
-      select: { id: true, fullName: true, username: true },
-    });
-    if (!actorUser) {
-      actorUser = await prisma.user.findFirst({ select: { id: true, fullName: true, username: true } });
-    }
+    const actorUser = { id: authUser.id, fullName: authUser.fullName, username: authUser.username };
     const actorId = actorUser?.id || '';
 
     // 3. Ensure DYEING and QC1 exist in Department table

@@ -4,9 +4,10 @@ import { PrismaClient, formatDatabaseUrl } from '@subham/database';
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   constructor() {
-    const NEON_DATABASE_URL =
-      'postgresql://neondb_owner:npg_3h1GKCDxtAeX@ep-jolly-tree-b5ebsnbj-pooler.c-7.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require';
-    const url = formatDatabaseUrl(process.env.DATABASE_URL || NEON_DATABASE_URL);
+    if (!process.env.DATABASE_URL) {
+      throw new Error('DATABASE_URL is not set. Refusing to start without an explicit database connection.');
+    }
+    const url = formatDatabaseUrl(process.env.DATABASE_URL);
 
     super({
       datasources: { db: { url } },

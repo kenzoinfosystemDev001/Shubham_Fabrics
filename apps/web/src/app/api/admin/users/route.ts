@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import bcrypt from 'bcryptjs';
+import { requireUser } from '@/lib/auth/require-user';
+import { validatePin } from '@/lib/auth/pin';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: Request) {
+  const { user: authUser, response: authResponse } = await requireUser(request, { admin: true });
+  if (!authUser) return authResponse;
   try {
     const users = await prisma.user.findMany({
       select: {
@@ -54,11 +58,13 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const { user: authUser, response: authResponse } = await requireUser(request, { admin: true });
+  if (!authUser) return authResponse;
   try {
     const body = await request.json();
     const username = (body.username || '').trim().toLowerCase();
     const fullName = (body.fullName || '').trim();
-    const pin = (body.pin || body.password || '1234').trim();
+    const pin = String(body.pin || body.password || '').trim();
     const departmentCode = (body.departmentCode || 'PROGRAMMING').trim().toUpperCase();
     const roleCode = (body.roleCode || (departmentCode === 'ADMIN' ? 'ADMIN' : departmentCode === 'STORE' ? 'FABRIC_STORE' : 'PROGRAMMING_INCHARGE')).trim();
     const email = (body.email || `${username}@subhamfabrics.com`).trim().toLowerCase();
@@ -68,6 +74,11 @@ export async function POST(request: Request) {
         { error: 'Username and Full Name are required.' },
         { status: 400 }
       );
+    }
+
+    const pinError = validatePin(pin);
+    if (pinError) {
+      return NextResponse.json({ error: pinError }, { status: 400 });
     }
 
     // Check if username already exists

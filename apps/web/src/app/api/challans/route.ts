@@ -2,6 +2,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import { syncInboundChallansToDyeingOrders } from '@/lib/dyeing-sync';
+import { requireUser } from '@/lib/auth/require-user';
+import { userBelongsToDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -138,53 +140,13 @@ function parseSafeDate(val: any, fallback?: Date | null): Date | null {
 }
 
 export async function POST(request: Request) {
+  const { user: authUser, response: authResponse } = await requireUser(request);
+  if (!authUser) return authResponse;
   try {
     const body = await request.json();
 
-    // 1. Resolve Actor ID reliably
-    let user = null;
-
-    if (body.issuedById) {
-      user = await prisma.user.findUnique({
-        where: { id: body.issuedById },
-        select: { id: true },
-      }).catch(() => null);
-    }
-
-    if (!user) {
-      user = await prisma.user.findFirst({
-        where: {
-          OR: [
-            { username: 'store' },
-            { username: 'programmer' },
-            { username: 'admin' },
-            { username: 'jitender' },
-          ],
-        },
-        select: { id: true },
-      });
-    }
-
-    if (!user) {
-      user = await prisma.user.findFirst({
-        select: { id: true },
-      });
-    }
-
-    if (!user) {
-      user = await prisma.user.create({
-        data: {
-          username: 'programmer',
-          email: 'programmer@subhamfabrics.com',
-          fullName: 'Programming Incharge',
-          passwordHash: '$2b$10$e7v1vT7Qf0K6bSubhamFabricsMESSecureHash',
-          departmentCode: 'PROGRAMMING',
-        },
-        select: { id: true },
-      });
-    }
-
-    const actorId = user.id;
+    // 1. The issuing user is always the signed-in user
+    const actorId = authUser.id;
 
     // 2. Resolve Program ID reliably
     let resolvedProgramId = body.programId;
@@ -231,6 +193,14 @@ export async function POST(request: Request) {
     // 3. Ensure departments exist in the Department table
     const fromDept = (body.fromDepartment || 'PROGRAMMING').toUpperCase();
     const toDept = (body.toDepartment || 'STORE').toUpperCase();
+
+    // A department may only issue challans from itself.
+    if (!userBelongsToDepartment(authUser, fromDept)) {
+      return NextResponse.json(
+        { error: `You can only issue challans from your own department, not from ${fromDept}.` },
+        { status: 403 }
+      );
+    }
 
     await prisma.department.upsert({
       where: { code: fromDept },

@@ -43,8 +43,7 @@ export class AuthService {
 
     const compareFn = (bcrypt as any).compare || (bcrypt as any).default?.compare;
     const isBcryptValid = await compareFn(input.password, user.passwordHash).catch(() => false);
-    const isPinValid = input.password === '1234' || input.password === '1111' || input.password === '0000' || input.password === 'Admin@12345';
-    if (!isBcryptValid && !isPinValid) {
+    if (!isBcryptValid) {
       throw new UnauthorizedException('Invalid credentials provided');
     }
 

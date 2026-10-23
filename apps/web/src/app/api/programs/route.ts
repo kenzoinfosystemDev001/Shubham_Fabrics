@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { canViewClientCode, getSessionUser } from '@/lib/auth/require-user';
 
 export const dynamic = 'force-dynamic';
 
@@ -68,22 +69,8 @@ export async function GET(request: Request) {
     });
 
     // Role/department access restriction: ONLY Programming and Admin can see clientCode
-    const cookieHeader = request.headers.get('cookie') || '';
-    const deptHeader = request.headers.get('x-user-department') || '';
-    const roleHeader = request.headers.get('x-user-role') || '';
-
-    const isAuthorized = 
-      deptHeader.toUpperCase() === 'ADMIN' ||
-      deptHeader.toUpperCase() === 'PROGRAMMING' ||
-      roleHeader.toUpperCase() === 'ADMIN' ||
-      roleHeader.toUpperCase() === 'SUPER_ADMIN' ||
-      roleHeader.toUpperCase() === 'PROGRAMMER' ||
-      roleHeader.toUpperCase() === 'PROGRAMMING_INCHARGE' ||
-      cookieHeader.includes('subham_mes_dept=ADMIN') ||
-      cookieHeader.includes('subham_mes_dept=PROGRAMMING') ||
-      cookieHeader.includes('subham_mes_role=ADMIN') ||
-      cookieHeader.includes('subham_mes_role=SUPER_ADMIN') ||
-      cookieHeader.includes('subham_mes_role=PROGRAMMER');
+    const sessionUser = await getSessionUser(request);
+    const isAuthorized = !!sessionUser && canViewClientCode(sessionUser);
 
     const mapped = programs.map((p: any) => {
       let items: any[] = [];

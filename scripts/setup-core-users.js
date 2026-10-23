@@ -5,7 +5,12 @@ const prisma = new PrismaClient();
 
 async function setup() {
   console.log('--- Setting up core MES users (Admin, Programming, Fabric Store) ---');
-  const hash = await bcrypt.hash('1234', 10);
+  // PIN for users this script creates. Existing users keep their current PIN.
+  const initialPin = (process.env.CORE_USER_PIN || '').trim();
+  if (initialPin.length < 6 || ['123456', '000000', '111111'].includes(initialPin)) {
+    throw new Error('Set CORE_USER_PIN to a non-trivial PIN of at least 6 characters before running this script.');
+  }
+  const hash = await bcrypt.hash(initialPin, 10);
 
   // 1. Ensure Roles
   let adminRole = await prisma.role.findFirst({ where: { code: 'ADMIN' } });
@@ -49,7 +54,7 @@ async function setup() {
   // 2. Admin User
   const adminUser = await prisma.user.upsert({
     where: { username: 'admin' },
-    update: { passwordHash: hash, departmentCode: 'ADMIN', fullName: 'System Administrator' },
+    update: { departmentCode: 'ADMIN', fullName: 'System Administrator' },
     create: {
       username: 'admin',
       email: 'admin@subhamfabrics.com',
@@ -64,17 +69,15 @@ async function setup() {
       data: { code: 'SUPER_ADMIN', name: 'Super Administrator', isSystem: true },
     });
   }
-  const adminHash = await bcrypt.hash('Admin@12345', 10);
-  await prisma.user.update({ where: { id: adminUser.id }, data: { passwordHash: adminHash } });
   await prisma.userRole.deleteMany({ where: { userId: adminUser.id } });
   await prisma.userRole.create({ data: { userId: adminUser.id, roleId: superAdminRole.id } });
   await prisma.userRole.create({ data: { userId: adminUser.id, roleId: adminRole.id } });
-  console.log('✓ Admin user ready: admin / 1234 (SUPER_ADMIN)');
+  console.log('✓ Admin user ready: admin (SUPER_ADMIN)');
 
   // 3. Programming User
   const progUser = await prisma.user.upsert({
     where: { username: 'program' },
-    update: { passwordHash: hash, departmentCode: 'PROGRAMMING', fullName: 'Programming Department' },
+    update: { departmentCode: 'PROGRAMMING', fullName: 'Programming Department' },
     create: {
       username: 'program',
       email: 'program@subhamfabrics.com',
@@ -85,12 +88,12 @@ async function setup() {
   });
   await prisma.userRole.deleteMany({ where: { userId: progUser.id } });
   await prisma.userRole.create({ data: { userId: progUser.id, roleId: progRole.id } });
-  console.log('✓ Programming user ready: program / 1234');
+  console.log('✓ Programming user ready: program');
 
   // 4. Fabric Store User
   const storeUser = await prisma.user.upsert({
     where: { username: 'store' },
-    update: { passwordHash: hash, departmentCode: 'STORE', fullName: 'Fabric Store Department' },
+    update: { departmentCode: 'STORE', fullName: 'Fabric Store Department' },
     create: {
       username: 'store',
       email: 'store@subhamfabrics.com',
@@ -101,17 +104,8 @@ async function setup() {
   });
   await prisma.userRole.deleteMany({ where: { userId: storeUser.id } });
   await prisma.userRole.create({ data: { userId: storeUser.id, roleId: storeRole.id } });
-  console.log('✓ Fabric Store user ready: store / 1234');
+  console.log('✓ Fabric Store user ready: store');
 
-  // Also support alias 'programmer' for backward compatibility
-  const programmerUser = await prisma.user.findFirst({ where: { username: 'programmer' } });
-  if (programmerUser) {
-    await prisma.user.update({
-      where: { id: programmerUser.id },
-      data: { passwordHash: hash },
-    });
-    console.log('✓ Programmer alias PIN updated to 1234');
-  }
 
   // 5. QC Washing Department & Role & User
   await prisma.department.upsert({
@@ -142,7 +136,7 @@ async function setup() {
 
   const qcwashingUser = await prisma.user.upsert({
     where: { username: 'qcwashing' },
-    update: { passwordHash: hash, departmentCode: 'QC3', fullName: 'QC Washing Inspector' },
+    update: { departmentCode: 'QC3', fullName: 'QC Washing Inspector' },
     create: {
       username: 'qcwashing',
       email: 'qcwashing@subhamfabrics.com',
@@ -154,12 +148,12 @@ async function setup() {
   await prisma.userRole.deleteMany({ where: { userId: qcwashingUser.id } });
   await prisma.userRole.create({ data: { userId: qcwashingUser.id, roleId: qcWashingRole.id } });
   await prisma.userRole.create({ data: { userId: qcwashingUser.id, roleId: qcInspectorRole.id } });
-  console.log('✓ QC Washing user ready: qcwashing / 1234 (QC3_INSPECTOR)');
+  console.log('✓ QC Washing user ready: qcwashing (QC3_INSPECTOR)');
 
   // Also support alias 'qc3'
   const qc3User = await prisma.user.upsert({
     where: { username: 'qc3' },
-    update: { passwordHash: hash, departmentCode: 'QC3', fullName: 'QC Washing Inspector' },
+    update: { departmentCode: 'QC3', fullName: 'QC Washing Inspector' },
     create: {
       username: 'qc3',
       email: 'qc3@subhamfabrics.com',
@@ -170,7 +164,7 @@ async function setup() {
   });
   await prisma.userRole.deleteMany({ where: { userId: qc3User.id } });
   await prisma.userRole.create({ data: { userId: qc3User.id, roleId: qcWashingRole.id } });
-  console.log('✓ QC Washing alias ready: qc3 / 1234');
+  console.log('✓ QC Washing alias ready: qc3');
 
   // 6. Recutting & Stitching Departments, Roles, and User
   await prisma.department.upsert({
@@ -194,7 +188,7 @@ async function setup() {
 
   const recuttingUser = await prisma.user.upsert({
     where: { username: 'recutting' },
-    update: { passwordHash: hash, departmentCode: 'RECUTTING', fullName: 'Recutting Incharge' },
+    update: { departmentCode: 'RECUTTING', fullName: 'Recutting Incharge' },
     create: {
       username: 'recutting',
       email: 'recutting@subhamfabrics.com',
@@ -205,7 +199,7 @@ async function setup() {
   });
   await prisma.userRole.deleteMany({ where: { userId: recuttingUser.id } });
   await prisma.userRole.create({ data: { userId: recuttingUser.id, roleId: recuttingRole.id } });
-  console.log('✓ Recutting user ready: recutting / 1234 (RECUTTING_SUPERVISOR)');
+  console.log('✓ Recutting user ready: recutting (RECUTTING_SUPERVISOR)');
 
   // 7. Stitching Department & Role & User
   let stitchingRole = await prisma.role.findFirst({ where: { code: 'STITCHING_SUPERVISOR' } });
@@ -217,7 +211,7 @@ async function setup() {
 
   const stitchingUser = await prisma.user.upsert({
     where: { username: 'stitching' },
-    update: { passwordHash: hash, departmentCode: 'STITCHING', fullName: 'Stitching Incharge' },
+    update: { departmentCode: 'STITCHING', fullName: 'Stitching Incharge' },
     create: {
       username: 'stitching',
       email: 'stitching@subhamfabrics.com',
@@ -228,7 +222,7 @@ async function setup() {
   });
   await prisma.userRole.deleteMany({ where: { userId: stitchingUser.id } });
   await prisma.userRole.create({ data: { userId: stitchingUser.id, roleId: stitchingRole.id } });
-  console.log('✓ Stitching user ready: stitching / 1234 (STITCHING_SUPERVISOR)');
+  console.log('✓ Stitching user ready: stitching (STITCHING_SUPERVISOR)');
 
   // 8. Finishing Department & Role & User
   let finishingRole = await prisma.role.findFirst({ where: { code: 'FINISHING_SUPERVISOR' } });
@@ -240,7 +234,7 @@ async function setup() {
 
   const finishingUser = await prisma.user.upsert({
     where: { username: 'finishing' },
-    update: { passwordHash: hash, departmentCode: 'FINISHING', fullName: 'Finishing Incharge' },
+    update: { departmentCode: 'FINISHING', fullName: 'Finishing Incharge' },
     create: {
       username: 'finishing',
       email: 'finishing@subhamfabrics.com',
@@ -251,7 +245,7 @@ async function setup() {
   });
   await prisma.userRole.deleteMany({ where: { userId: finishingUser.id } });
   await prisma.userRole.create({ data: { userId: finishingUser.id, roleId: finishingRole.id } });
-  console.log('✓ Finishing user ready: finishing / 1234 (FINISHING_SUPERVISOR)');
+  console.log('✓ Finishing user ready: finishing (FINISHING_SUPERVISOR)');
 
   // 9. Downstream factory route departments
   await prisma.department.upsert({
@@ -288,7 +282,7 @@ async function setup() {
 
   const steamPressUser = await prisma.user.upsert({
     where: { username: 'steampress' },
-    update: { passwordHash: hash, departmentCode: 'STEAM_PRESS', fullName: 'Steam Press Incharge' },
+    update: { departmentCode: 'STEAM_PRESS', fullName: 'Steam Press Incharge' },
     create: {
       username: 'steampress',
       email: 'steampress@subhamfabrics.com',
@@ -299,7 +293,7 @@ async function setup() {
   });
   await prisma.userRole.deleteMany({ where: { userId: steamPressUser.id } });
   await prisma.userRole.create({ data: { userId: steamPressUser.id, roleId: steamPressRole.id } });
-  console.log('✓ Steam Press user ready: steampress / 1234 (STEAM_PRESS_SUPERVISOR)');
+  console.log('✓ Steam Press user ready: steampress (STEAM_PRESS_SUPERVISOR)');
 
   // 11. Final QC Department & User
   let finalCheckRole = await prisma.role.findFirst({ where: { code: 'FINAL_CHECK_INSPECTOR' } });
@@ -311,7 +305,7 @@ async function setup() {
 
   const finalCheckUser = await prisma.user.upsert({
     where: { username: 'finalcheck' },
-    update: { passwordHash: hash, departmentCode: 'FINAL_CHECK', fullName: 'Final QC Inspector' },
+    update: { departmentCode: 'FINAL_CHECK', fullName: 'Final QC Inspector' },
     create: {
       username: 'finalcheck',
       email: 'finalcheck@subhamfabrics.com',
@@ -322,7 +316,7 @@ async function setup() {
   });
   await prisma.userRole.deleteMany({ where: { userId: finalCheckUser.id } });
   await prisma.userRole.create({ data: { userId: finalCheckUser.id, roleId: finalCheckRole.id } });
-  console.log('✓ Final QC user ready: finalcheck / 1234 (FINAL_CHECK_INSPECTOR)');
+  console.log('✓ Final QC user ready: finalcheck (FINAL_CHECK_INSPECTOR)');
 
   // 12. Packing & Inventory Department & User
   await prisma.department.upsert({
@@ -340,7 +334,7 @@ async function setup() {
 
   const packingUser = await prisma.user.upsert({
     where: { username: 'packing' },
-    update: { passwordHash: hash, departmentCode: 'PACKING', fullName: 'Packing Supervisor' },
+    update: { departmentCode: 'PACKING', fullName: 'Packing Supervisor' },
     create: {
       username: 'packing',
       email: 'packing@subhamfabrics.com',
@@ -351,7 +345,7 @@ async function setup() {
   });
   await prisma.userRole.deleteMany({ where: { userId: packingUser.id } });
   await prisma.userRole.create({ data: { userId: packingUser.id, roleId: packingRole.id } });
-  console.log('✓ Packing user ready: packing / 1234 (PACKING_SUPERVISOR)');
+  console.log('✓ Packing user ready: packing (PACKING_SUPERVISOR)');
 
   console.log('✓ Downstream factory route departments verified');
 

@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'WASHING');
+  if (!authUser) return authResponse;
   try {
     const body = await request.json();
     const {
@@ -84,21 +87,7 @@ export async function POST(request: Request) {
     const shrinkageRate = (((pIn - pOut) / pIn) * 100).toFixed(2);
 
     // 4. Resolve Actor / Operator
-    let actorUser = await prisma.user.findFirst({
-      where: {
-        OR: [
-          { id: operatorId || '' },
-          { username: 'washing' },
-          { username: 'washing_incharge' },
-          { departmentCode: 'WASHING' },
-          { username: 'admin' },
-        ],
-      },
-      select: { id: true, fullName: true, username: true },
-    });
-    if (!actorUser) {
-      actorUser = await prisma.user.findFirst({ select: { id: true, fullName: true, username: true } });
-    }
+    const actorUser = { id: authUser.id, fullName: authUser.fullName, username: authUser.username };
 
     // 5. Update Challan & Items in Transaction
     const result = await prisma.$transaction(async (tx) => {

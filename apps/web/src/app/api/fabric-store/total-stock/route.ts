@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireDepartment } from '@/lib/auth/department-access';
 import {
   cleanFabricName,
   getChallanItemFabricType,
@@ -9,6 +10,8 @@ import {
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE', 'PROGRAMMING');
+  if (!authUser) return authResponse;
   try {
     const { searchParams } = new URL(request.url);
     const filterType = searchParams.get('type')?.toUpperCase(); // "UNDYED" | "KORA" | "DYED" | "ALL"

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireDepartment } from '@/lib/auth/department-access';
 import {
   checkFabricStoreAvailability,
   updateFabricStoreAvailability,
@@ -8,6 +9,8 @@ import {
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE', 'PROGRAMMING');
+  if (!authUser) return authResponse;
   try {
     const { searchParams } = new URL(request.url);
     const programId = searchParams.get('programId');
@@ -52,9 +55,11 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE');
+  if (!authUser) return authResponse;
   try {
     const body = await request.json();
-    const { programId, isAvailable, actorName, remarks } = body;
+    const { programId, isAvailable, remarks } = body;
 
     if (!programId) {
       return NextResponse.json(
@@ -73,7 +78,7 @@ export async function POST(request: Request) {
     const updated = await updateFabricStoreAvailability(
       programId,
       isAvailable,
-      actorName || 'Fabric Store Incharge',
+      authUser.fullName,
       remarks
     );
 

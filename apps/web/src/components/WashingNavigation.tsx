@@ -44,7 +44,7 @@ export function WashingNavigation() {
     }
     const syncUser = async () => {
       try {
-        if (api.getToken()) {
+        if (api.hasSession()) {
           const profile = await api.getProfile();
           if (profile) {
             setCurrentUser(profile);

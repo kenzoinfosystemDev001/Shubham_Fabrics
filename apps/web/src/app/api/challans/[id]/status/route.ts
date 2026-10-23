@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireUser } from '@/lib/auth/require-user';
+import { canUpdateChallan } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -7,13 +9,14 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { user: authUser, response: authResponse } = await requireUser(request);
+  if (!authUser) return authResponse;
   try {
     const { id } = await params;
     const body = await request.json();
     const {
       status,
       notes,
-      receiverId,
       fabricIn,
       fabricOut,
       fabricUnit,
@@ -35,28 +38,19 @@ export async function PATCH(
       return NextResponse.json({ error: 'Challan not found' }, { status: 404 });
     }
 
+    if (!canUpdateChallan(authUser, existing, status)) {
+      return NextResponse.json(
+        { error: 'Only the sending or receiving department can update this challan.' },
+        { status: 403 }
+      );
+    }
+
     const data: any = {};
     if (status) {
       data.status = status;
       if (status === 'RECEIVED') {
         data.receivedDate = new Date();
-        if (receiverId) {
-          data.receivedById = receiverId;
-        } else {
-          // Find department user or fallback
-          const deptUser = await prisma.user.findFirst({
-            where: {
-              OR: [
-                { departmentCode: existing.toDepartment },
-                { username: existing.toDepartment.toLowerCase() },
-              ],
-            },
-            select: { id: true },
-          });
-          if (deptUser) {
-            data.receivedById = deptUser.id;
-          }
-        }
+        data.receivedById = authUser.id;
       } else if (status === 'COMPLETED') {
         data.completedDate = new Date();
       }
@@ -114,7 +108,7 @@ export async function PATCH(
 
       // Log ChallanEvent if status changed
       if (status && status !== existing.status) {
-        const actor = await tx.user.findFirst({ select: { id: true } });
+        const actor = { id: authUser.id };
         if (actor) {
           try {
             await tx.challanEvent.create({
@@ -156,7 +150,7 @@ export async function PATCH(
 
       // If defective pieces cut, ensure DefectRecord is logged
       if (data.defectivePieces && data.defectivePieces > 0) {
-        const actor = await tx.user.findFirst({ select: { id: true } });
+        const actor = { id: authUser.id };
         if (actor) {
           try {
             await tx.defectRecord.create({

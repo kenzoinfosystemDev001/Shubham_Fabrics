@@ -1,9 +1,14 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { destructiveAdminActionsDisabled, requireUser } from '@/lib/auth/require-user';
 
 export const dynamic = 'force-dynamic';
 
-export async function DELETE() {
+export async function DELETE(request: Request) {
+  const { user: authUser, response: authResponse } = await requireUser(request, { admin: true });
+  if (!authUser) return authResponse;
+  const disabledResponse = destructiveAdminActionsDisabled();
+  if (disabledResponse) return disabledResponse;
   try {
     await prisma.$transaction(
       async (tx) => {
