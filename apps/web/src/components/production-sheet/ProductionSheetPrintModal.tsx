@@ -6,19 +6,18 @@ import {
   Download, 
   X, 
   FileText,
-  Layers,
-  Sparkles
 } from 'lucide-react';
 import { 
   downloadProductionSheetHtml, 
   printProductionSheet,
   extractSubStylesAndGrid,
+  calculateProductionMeasurementTotal,
+  formatSizeExpressionTotal,
   SWATCH_CLIP_PATH,
   GarmentCategory
 } from '@/lib/download-production-sheet';
 import { getCurrentUser, canViewClientCode } from '@/lib/rbac';
 import { useProgramDocument } from '@/hooks/useProgramDocument';
-import { extractRootWilcomPhoto } from '@/lib/download-wilcom';
 
 interface ProductionSheetPrintModalProps {
   program?: any;
@@ -26,7 +25,6 @@ interface ProductionSheetPrintModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialTab?: GarmentCategory;
-  onViewWilcom?: (category?: GarmentCategory) => void;
   onViewChallan?: () => void;
 }
 
@@ -36,7 +34,6 @@ export function ProductionSheetPrintModal({
   isOpen,
   onClose,
   initialTab = 'TOP',
-  onViewWilcom,
   onViewChallan,
 }: ProductionSheetPrintModalProps) {
   const sourceProgram = propProgram || sheetData;
@@ -66,7 +63,6 @@ export function ProductionSheetPrintModal({
     ? Object.keys(components)
     : ['TOP', 'BOTTOM', 'DUPATTA', 'OTHER'];
   const activeTabName = components?.[activeTab]?.styleName || (activeTab === 'OTHER' ? 'INPUT' : activeTab);
-  const artworkPhoto = extractRootWilcomPhoto(program, meta);
   const forwardedComponents: string[] = Array.isArray(meta?.forwardedComponents) ? meta.forwardedComponents : ['TOP'];
 
   const serialNo = program.programSerialNo || program.programNumber || '';
@@ -87,8 +83,6 @@ export function ProductionSheetPrintModal({
     fabricName,
     fabricWidth,
   } = extractSubStylesAndGrid(program, activeTab);
-
-  const subStyleColumns = subStylesWithAverages.map((s) => s.name);
 
   // 14 rows total to mirror the authentic physical factory sheet
   const TOTAL_GRID_ROWS = 14;
@@ -133,6 +127,10 @@ export function ProductionSheetPrintModal({
     }
   }
 
+  const totalMtr = productionGrid.reduce((sum, row) => sum + (Number(row.mtr) || 0), 0);
+  const totalPcs = productionGrid.reduce((sum, row) => sum + (Number(row.pcs) || 0), 0);
+  const totalMeasurement = calculateProductionMeasurementTotal(productionGrid);
+
   const handlePrint = () => {
     printProductionSheet(program, activeTab);
   };
@@ -162,16 +160,6 @@ export function ProductionSheetPrintModal({
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
-            {onViewWilcom && (
-              <button
-                type="button"
-                onClick={() => onViewWilcom(activeTab)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-lg text-xs font-bold border border-purple-200 transition cursor-pointer"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-purple-700" />
-                <span>View Wilcom {activeTab}</span>
-              </button>
-            )}
             {onViewChallan && (
               <button
                 type="button"
@@ -296,13 +284,6 @@ export function ProductionSheetPrintModal({
                 </span>
               </div>
             </div>
-
-            {artworkPhoto && (
-              <div className="border border-slate-300 rounded p-3 bg-white">
-                <div className="text-[10px] font-bold text-slate-500 uppercase mb-2">Wilcom Artwork Reference</div>
-                <img src={artworkPhoto} alt={`Wilcom artwork for design ${designNo}`} className="max-h-48 max-w-full object-contain mx-auto" />
-              </div>
-            )}
 
             {/* Style & Fabric Row */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs border border-black p-2.5 bg-white">
@@ -431,11 +412,27 @@ export function ProductionSheetPrintModal({
                             ) : (
                               <span>{row.size || (rowSubStyles[0] ? row.sizes?.[rowSubStyles[0]] : '') || ''}</span>
                             )}
+                            {calculateProductionMeasurementTotal([row]) !== null && (
+                              <div className="mt-0.5 text-[10px] font-black text-emerald-700">
+                                TOTAL {formatSizeExpressionTotal(calculateProductionMeasurementTotal([row])!)}
+                              </div>
+                            )}
                           </td>
                         </tr>
                       );
                     })}
                   </tbody>
+                  <tfoot>
+                    <tr className="bg-slate-100 font-black border-t-2 border-black">
+                      <td className="border-[1.5px] border-black p-1 text-left uppercase">{activeTabName} TOTALS:</td>
+                      <td className="border-[1.5px] border-black p-1 text-center text-emerald-800">{totalMtr > 0 ? totalMtr.toFixed(2) : '—'}</td>
+                      <td className="border-[1.5px] border-black p-1 text-center text-[#163767]">{totalPcs > 0 ? totalPcs : '—'}</td>
+                      <td colSpan={2} className="border-[1.5px] border-black p-1 text-right text-[10px]">
+                        TOTAL MEASUREMENT: {totalMeasurement !== null ? formatSizeExpressionTotal(totalMeasurement) : '—'}
+                        {totalMtrAverage > 0 && <span className="ml-3 text-slate-500 italic">Fabric consumption @ {totalMtrAverage.toFixed(2)} Mtr/Pc</span>}
+                      </td>
+                    </tr>
+                  </tfoot>
                 </table>
               </div>
             </div>

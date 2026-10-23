@@ -39,7 +39,10 @@ import {
   getSwatchColorHex,
   SwatchItem,
   GarmentCategory,
-  ComponentSheetData
+  ComponentSheetData,
+  calculateSizeExpressionTotal,
+  formatSizeExpressionTotal,
+  calculateProductionMeasurementTotal
 } from '@/lib/download-production-sheet';
 import { WilcomDesignModal } from '@/components/wilcom/WilcomDesignModal';
 import { WilcomPrintModal } from '@/components/wilcom/WilcomPrintModal';
@@ -72,17 +75,11 @@ interface AvailableFabricStock {
 }
 
 function calculateSizeTotal(expression?: string): number | null {
-  const value = String(expression || '').trim();
-  if (!value || !/^(?:\d+(?:\.\d*)?|\.\d+)(?:\s*\+\s*(?:\d+(?:\.\d*)?|\.\d+))*$/.test(value)) {
-    return null;
-  }
-
-  const total = value.split('+').reduce((sum, part) => sum + Number(part.trim()), 0);
-  return Number.isFinite(total) ? total : null;
+  return calculateSizeExpressionTotal(expression);
 }
 
 function formatSizeTotal(total: number): string {
-  return Number(total.toFixed(2)).toString();
+  return formatSizeExpressionTotal(total);
 }
 
 const CATEGORY_META: Record<string, {
@@ -1355,7 +1352,7 @@ export default function CreateProductionSheetPage() {
               SHUBHAM FABRICS &middot; PROGRAMMING DEPARTMENT
             </span>
             <h1 className="text-lg font-black text-slate-900 flex items-center gap-2">
-              <span>Production Sheet &amp; Wilcom Management</span>
+              <span>Production Sheet Management</span>
               {designNumber && (
                 <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-300">
                   {designNumber}
@@ -1526,6 +1523,7 @@ export default function CreateProductionSheetPage() {
             const catAvg = getTotalMtrAverage(cat);
             const catPieces = getTotalPieces(cat);
             const catMeters = getTotalFabricMeters(cat);
+            const catMeasurementTotal = calculateProductionMeasurementTotal(comp.productionGrid);
             const catSwatches = getDisplaySwatches(cat);
             const isForwarded = forwardedComponents.includes(cat);
 
@@ -1588,9 +1586,9 @@ export default function CreateProductionSheetPage() {
                       {categoryDisplayName} PRODUCTION SHEET
                     </div>
 
-                    {/* TOP META ROW: DESIGN NUMBER, WILCOM, STYLE, PATTERN, SERIAL NO, DATE, DELIVERY DATE */}
+                    {/* TOP META ROW: DESIGN NUMBER, STYLE, PATTERN, SERIAL NO, DATE, DELIVERY DATE */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {/* Left: DESIGN NUMBER, WILCOM, STYLE & PATTERN */}
+                      {/* Left: DESIGN NUMBER, STYLE & PATTERN */}
                       <div className="space-y-3">
                         <div>
                           <label className="block text-[11px] font-black uppercase tracking-wider text-black mb-1">
@@ -1605,72 +1603,18 @@ export default function CreateProductionSheetPage() {
                             className="w-full border-[1.5px] border-black px-3 py-1.5 h-10 font-bold text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600 shadow-2xs"
                           />
                         </div>
-
-                        {/* WILCOM OPTION BELOW DESIGN NO. */}
-                        <div>
-                          <label className="block text-[11px] font-black uppercase tracking-wider text-slate-800 mb-1">
-                            WILCOM:
-                          </label>
-                          <div className="flex items-center gap-2">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setWilcomCategory(cat);
-                                setShowWilcomModal(true);
-                              }}
-                              className="flex-1 border-[1.5px] border-black bg-slate-50 hover:bg-slate-100 text-slate-900 px-3 py-1.5 h-10 font-bold text-xs uppercase tracking-wider flex items-center justify-between transition cursor-pointer shadow-2xs"
-                            >
-                              <span className="flex items-center gap-1.5">
-                                <Sparkles className="w-3.5 h-3.5 text-[#163767]" />
-                                <span>WILCOM ({categoryDisplayName})</span>
-                              </span>
-                              {(() => {
-                                const matching = wilcomEntries.filter((e) =>
-                                  cat === 'OTHER'
-                                    ? e.category === 'OTHER' || !['TOP', 'BOTTOM', 'DUPATTA'].includes(e.category)
-                                    : e.category === cat
-                                );
-                                return matching.length > 0 ? (
-                                  <span className="px-2 py-0.5 rounded bg-[#163767] text-white font-mono text-[11px]">
-                                    № {matching.map((e) => `${e.wilcomDesignNumber}${cat === 'OTHER' && e.category !== 'OTHER' ? ` (${e.category})` : ''}`).join(', ')}
-                                  </span>
-                                ) : null;
-                              })()}
-                            </button>
-
-                            {/* Photo uploads are managed from the Wilcom sheet. */}
-                            {(() => {
-                              const matching = wilcomEntries.filter((e) =>
-                                cat === 'OTHER'
-                                  ? e.category === 'OTHER' || !['TOP', 'BOTTOM', 'DUPATTA'].includes(e.category)
-                                  : e.category === cat
-                              );
-                              const photo = matching.find((m) => m.photoUrl)?.photoUrl || wilcomEntries[0]?.photoUrl;
-
-                              if (!photo) return null;
-
-                              return (
-                                <div className="h-10 border-[1.5px] border-black bg-white flex items-center px-2.5 shrink-0 gap-1.5 shadow-2xs">
-                                  <div className="flex items-center gap-1.5">
-                                    <img
-                                      src={photo}
-                                      alt="Wilcom Photo"
-                                      className="w-7 h-7 object-contain rounded border border-slate-300 cursor-pointer hover:scale-105 transition"
-                                      onClick={() => {
-                                        setWilcomCategory(cat);
-                                        setShowWilcomModal(true);
-                                      }}
-                                      title="Click to view/manage Wilcom photo"
-                                    />
-                                    <span className="text-[10px] font-bold text-emerald-700 hidden sm:inline">
-                                      ✓ Photo
-                                    </span>
-                                  </div>
-                                </div>
-                              );
-                            })()}
-                          </div>
-                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setWilcomCategory(cat);
+                            setShowWilcomModal(true);
+                          }}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-900 text-[10px] font-bold border border-purple-200 rounded transition cursor-pointer"
+                          title={`Manage Wilcom specifications for ${categoryDisplayName}`}
+                        >
+                          <Sparkles className="w-3 h-3" />
+                          Manage Wilcom
+                        </button>
 
                         {/* STYLE & PATTERN (SIDE-BY-SIDE EQUAL BOXES) */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -2221,8 +2165,15 @@ export default function CreateProductionSheetPage() {
                               <td className="border-[1.5px] border-black p-1.5 text-center font-black text-sm text-[#163767]">
                                 {catPieces > 0 ? catPieces : ''}
                               </td>
-                              <td colSpan={3} className="border-[1.5px] border-black p-1.5 text-right text-[10px] text-slate-500 italic">
-                                {catAvg > 0 ? `Fabric consumption @ ${catAvg.toFixed(2)} Mtr/Pc` : ''}
+                              <td colSpan={3} className="border-[1.5px] border-black p-1.5 text-right text-[10px]">
+                                <span className="font-black text-slate-800 not-italic">
+                                  TOTAL MEASUREMENT: {catMeasurementTotal !== null ? formatSizeTotal(catMeasurementTotal) : '—'}
+                                </span>
+                                {catAvg > 0 && (
+                                  <span className="ml-3 text-slate-500 italic">
+                                    Fabric consumption @ {catAvg.toFixed(2)} Mtr/Pc
+                                  </span>
+                                )}
                               </td>
                             </tr>
                           </tfoot>
@@ -2396,11 +2347,6 @@ export default function CreateProductionSheetPage() {
         isOpen={showPrintModal}
         onClose={() => setShowPrintModal(false)}
         initialTab={selectedCategory}
-        onViewWilcom={(cat) => {
-          if (cat) setWilcomCategory(cat);
-          setShowPrintModal(false);
-          setShowWilcomPrintModal(true);
-        }}
       />
 
       <WilcomPrintModal

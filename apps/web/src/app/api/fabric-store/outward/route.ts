@@ -109,24 +109,19 @@ export async function GET(request: Request) {
         'Standard Order';
 
       if (ch.items && ch.items.length > 0) {
-        const itemQuantityTotal = ch.items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
-        const issuedQuantity = Number(ch.fabricOut) > 0 ? Number(ch.fabricOut) : itemQuantityTotal;
-        const quantityScale = itemQuantityTotal > 0 && issuedQuantity > 0 ? issuedQuantity / itemQuantityTotal : 0;
-
         ch.items.forEach((it, idx) => {
           const itemType = getChallanItemFabricType(it, ch.toDepartment);
 
           const rawName = it.fabricCode || cleanFabricName(it.itemDescription) || ch.program?.fabricName || 'Fabric Material';
-          const unit = it.uom || ch.fabricUnit || 'MTR';
+          const unit = String(it.uom || ch.fabricUnit || 'MTR').toUpperCase();
           const itemQuantity = Number(it.quantity) || 0;
-          const issueQty = itemQuantityTotal > 0
-            ? itemQuantity * quantityScale
-            : (idx === 0 ? issuedQuantity : 0);
+          const issueQty = itemQuantity;
 
           if (issueQty <= 0) return;
 
-          const issuePcs =
-            avg && avg > 0 && issueQty > 0
+          const issuePcs = unit === 'PCS'
+            ? issueQty
+            : avg && avg > 0 && issueQty > 0
               ? Math.round(issueQty / avg)
               : ch.program?.targetQuantity || null;
 

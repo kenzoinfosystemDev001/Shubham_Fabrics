@@ -610,8 +610,8 @@ export default function InwardStockPage() {
                       onChange={(e) => setFormData((prev) => ({ ...prev, unit: e.target.value }))}
                       className="h-10 px-2.5 border-[1.5px] border-black rounded-lg text-xs font-bold text-black bg-white focus:outline-none"
                     >
-                      <option value="MTR">MTR</option>
-                      <option value="PCS">PCS</option>
+                      <option value="MTR">MTR (Meters)</option>
+                      <option value="PCS">PCS (Pieces)</option>
                     </select>
                   </div>
                 </div>

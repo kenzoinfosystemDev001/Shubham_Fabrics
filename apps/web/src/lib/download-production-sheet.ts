@@ -24,6 +24,53 @@ export interface ProductionGridItem {
   sizes?: Record<string, string>;
 }
 
+export function calculateSizeExpressionTotal(expression?: unknown): number | null {
+  const value = String(expression || '').trim();
+  if (!value || !/^(?:\d+(?:\.\d*)?|\.\d+)(?:\s*\+\s*(?:\d+(?:\.\d*)?|\.\d+))*$/.test(value)) {
+    return null;
+  }
+
+  const total = value.split('+').reduce((sum, part) => sum + Number(part.trim()), 0);
+  return Number.isFinite(total) ? total : null;
+}
+
+export function formatSizeExpressionTotal(total: number): string {
+  return Number(total.toFixed(2)).toString();
+}
+
+export function calculateProductionMeasurementTotal(items: ProductionGridItem[]): number | null {
+  let total = 0;
+  let hasMeasurement = false;
+
+  for (const row of items) {
+    const subStyles = Array.isArray(row.subStyles) && row.subStyles.length > 0
+      ? row.subStyles
+      : row.subStyle
+        ? String(row.subStyle).split(',').map((style) => style.trim()).filter(Boolean)
+        : [];
+    const expressions = subStyles.length > 0
+      ? subStyles.map((style) => row.sizes?.[style] || '').filter((value) => String(value).trim())
+      : [];
+    if (expressions.length === 0 && String(row.size || row.sizes?.SIZE || '').trim()) {
+      expressions.push(row.size || row.sizes?.SIZE || '');
+    }
+
+    if (expressions.length === 0) continue;
+
+    let rowTotal = 0;
+    for (const expression of expressions) {
+      const expressionTotal = calculateSizeExpressionTotal(expression);
+      if (expressionTotal === null) return null;
+      rowTotal += expressionTotal;
+    }
+
+    total += rowTotal;
+    hasMeasurement = true;
+  }
+
+  return hasMeasurement ? Math.round(total * 100) / 100 : null;
+}
+
 export interface SwatchItem {
   id?: string;
   name: string;
@@ -149,9 +196,6 @@ export interface ComponentSheetData {
   totalFabricMeters?: number;
 }
 
-import { extractRootWilcomPhoto, type WilcomEntry } from './download-wilcom';
-export type { WilcomEntry };
-
 export const DEFAULT_SUB_STYLES: SubStyleAverage[] = [
   { name: 'FRONT', average: '' },
   { name: 'BACK', average: '' },
@@ -185,88 +229,6 @@ export function getDefaultSubStylesForCategory(category: GarmentCategory): SubSt
   return DEFAULT_SUB_STYLES.map(s => ({ ...s }));
 }
 
-async function embedImage(source: string, label: string): Promise<string> {
-  if (!source) return '';
-  if (source.startsWith('data:image/')) return source;
-
-  try {
-    const imageUrl = new URL(source, window.location.href);
-    const response = await fetch(imageUrl, { credentials: 'omit' });
-    if (!response.ok) return source;
-
-    const image = await response.blob();
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (typeof reader.result === 'string') resolve(reader.result);
-        else resolve(source);
-      };
-      reader.onerror = () => resolve(source);
-      reader.readAsDataURL(image);
-    });
-  } catch {
-    return source;
-  }
-}
-
-async function prepareProductionSheetImages(program: any) {
-  const preparedProgram = { ...program };
-  if (preparedProgram.baseDesignPhoto) {
-    preparedProgram.baseDesignPhoto = await embedImage(preparedProgram.baseDesignPhoto, 'Base design photo');
-  }
-  if (preparedProgram.wilcomDesignPhoto) {
-    preparedProgram.wilcomDesignPhoto = await embedImage(preparedProgram.wilcomDesignPhoto, 'Wilcom design photo');
-  }
-
-  // Ensure all photos in wilcomEntries inside metadataJson are embedded as base64 data URLs
-  try {
-    let meta: any = null;
-    if (preparedProgram.metadataJson) {
-      meta = typeof preparedProgram.metadataJson === 'string'
-        ? JSON.parse(preparedProgram.metadataJson)
-        : { ...preparedProgram.metadataJson };
-    }
-
-    const fallbackPhoto = preparedProgram.wilcomDesignPhoto || meta?.wilcomDesignPhoto || preparedProgram.baseDesignPhoto || '';
-
-    let entries: WilcomEntry[] = Array.isArray(meta?.wilcomEntries) ? meta.wilcomEntries : [];
-    if (entries.length === 0 && (preparedProgram.wilcomDesignNumber || fallbackPhoto || preparedProgram.embroideryDesign)) {
-      entries = [
-        {
-          id: 'wilcom-auto-1',
-          category: 'TOP',
-          styleName: preparedProgram.topName || preparedProgram.mainStyle || 'Primary Top Style',
-          wilcomDesignNumber: preparedProgram.wilcomDesignNumber || preparedProgram.embroideryDesign || '',
-          photoUrl: fallbackPhoto,
-          remarks: preparedProgram.remarks || preparedProgram.comments || '',
-        },
-      ];
-    }
-
-    if (entries.length > 0) {
-      meta = meta || {};
-      meta.wilcomEntries = await Promise.all(
-        entries.map(async (entry: any, idx: number) => {
-          const rawPhoto = entry.photoUrl || entry.photo || entry.imageUrl || entry.image || (idx === 0 ? fallbackPhoto : '') || '';
-          const embedded = rawPhoto ? await embedImage(rawPhoto, 'Wilcom entry photo') : '';
-          return {
-            ...entry,
-            photoUrl: embedded,
-          };
-        })
-      );
-      preparedProgram.metadataJson = JSON.stringify(meta);
-      if (meta.wilcomEntries[0]?.photoUrl && !preparedProgram.wilcomDesignPhoto) {
-        preparedProgram.wilcomDesignPhoto = meta.wilcomEntries[0].photoUrl;
-      }
-    }
-  } catch (err) {
-    console.warn('Error embedding wilcomEntries images:', err);
-  }
-
-  return preparedProgram;
-}
-
 export function extractSubStylesAndGrid(program: any, category: GarmentCategory = 'TOP'): {
   subStylesWithAverages: SubStyleAverage[];
   productionGrid: ProductionGridItem[];
@@ -283,7 +245,6 @@ export function extractSubStylesAndGrid(program: any, category: GarmentCategory 
   category: GarmentCategory;
   allComponents?: Record<GarmentCategory, ComponentSheetData>;
   forwardedComponents: string[];
-  wilcomEntries: WilcomEntry[];
   isEnabled: boolean;
   isForwarded: boolean;
 } {
@@ -300,7 +261,6 @@ export function extractSubStylesAndGrid(program: any, category: GarmentCategory 
   let fabricWidth = program.fabricWidth || (program.fabricWidthInches ? `${program.fabricWidthInches}"` : '') || '';
   let allComponents: Record<string, ComponentSheetData> | undefined;
   let forwardedComponents: string[] = ['TOP'];
-  let wilcomEntries: WilcomEntry[] = [];
   let isEnabled = true;
   let isForwarded = true;
 
@@ -312,9 +272,6 @@ export function extractSubStylesAndGrid(program: any, category: GarmentCategory 
       }
       if (Array.isArray(meta?.forwardedComponents)) {
         forwardedComponents = meta.forwardedComponents;
-      }
-      if (Array.isArray(meta?.wilcomEntries)) {
-        wilcomEntries = meta.wilcomEntries;
       }
       if (meta?.clientCode) clientCode = meta.clientCode;
       if (meta?.serialNoCounter) serialNoCounter = meta.serialNoCounter;
@@ -450,7 +407,6 @@ export function extractSubStylesAndGrid(program: any, category: GarmentCategory 
     category,
     allComponents,
     forwardedComponents,
-    wilcomEntries,
     isEnabled,
     isForwarded,
   };
@@ -509,6 +465,9 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       fabricName,
       fabricWidth,
     } = extractSubStylesAndGrid(program, activeCategory);
+    const totalMtr = productionGrid.reduce((sum, row) => sum + (Number(row.mtr) || 0), 0);
+    const totalPcs = productionGrid.reduce((sum, row) => sum + (Number(row.pcs) || 0), 0);
+    const totalMeasurement = calculateProductionMeasurementTotal(productionGrid);
     const activeCategoryName = activeCategory === 'TOP' || activeCategory === 'BOTTOM' || activeCategory === 'DUPATTA'
       ? activeCategory
       : topName.trim() || 'INPUT';
@@ -562,25 +521,18 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       : '';
     const priorityVal = program.clientPriority || program.priority || 'NORMAL';
     const dyeingVal = program.fabricDyeingRequired ? 'YES (Kora)' : 'NO (Pre-Dyed)';
-    const wilcomVal = program.wilcomDesignNumber ? `№ ${program.wilcomDesignNumber}` : 'None';
-    const artworkPhoto = extractRootWilcomPhoto(program, meta);
-
     return `
     <div class="sheet-wrapper">
       <div>
         <!-- TITLE -->
         <div class="header-title">PRODUCTION SHEET &mdash; ${safeActiveCategoryName}</div>
 
-        <!-- HEADER META: DESIGN NO, WILCOM, STYLE, PATTERN, DATE, SERIAL NO, DELIVERY DATE -->
+        <!-- HEADER META: DESIGN NO, STYLE, PATTERN, DATE, SERIAL NO, DELIVERY DATE -->
         <div class="top-meta-row">
           <div class="meta-col-left">
             <div class="field-row">
               <span class="label-bold">DESIGN NUMBER:</span>
               <div class="box-input">${designNo}</div>
-            </div>
-            <div class="field-row" style="margin-top: 6px;">
-              <span class="label-bold">WILCOM:</span>
-              <div class="box-input">${wilcomVal}</div>
             </div>
             <div class="field-row" style="margin-top: 6px;">
               <span class="label-bold">STYLE:</span>
@@ -621,13 +573,6 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
             <div class="summary-box-value">${dyeingVal}</div>
           </div>
         </div>
-
-        ${artworkPhoto ? `
-        <div style="display:flex;align-items:center;gap:12px;border:1px solid #111;padding:6px;margin-top:6px;">
-          <strong style="font-size:9px;text-transform:uppercase;">Wilcom Artwork</strong>
-          <img src="${artworkPhoto}" alt="Wilcom artwork for design ${designNo}" style="max-height:72px;max-width:180px;object-fit:contain;">
-        </div>
-        ` : ''}
 
         <!-- FABRIC & WIDTH BOX -->
         <div class="fabric-section">
@@ -686,10 +631,24 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
                 <td class="cell-number">${row.mtr !== '' && row.mtr !== undefined ? row.mtr : ''}</td>
                 <td class="cell-number">${row.pcs !== '' && row.pcs !== undefined ? row.pcs : ''}</td>
                 <td class="cell-substyle">${row.subStyle || ''}</td>
-                <td class="cell-size">${row.subStyles && row.subStyles.length > 1 && row.sizes ? row.subStyles.map(s => row.sizes[s] ? `${s}: ${row.sizes[s]}` : '').filter(Boolean).join('<br>') || row.size || '' : row.size || (row.subStyles?.[0] ? row.sizes?.[row.subStyles[0]] : '') || row.sizes?.['SIZE'] || ''}</td>
+                <td class="cell-size">
+                  ${row.subStyles && row.subStyles.length > 1 && row.sizes ? row.subStyles.map(s => row.sizes[s] ? `${s}: ${row.sizes[s]}` : '').filter(Boolean).join('<br>') || row.size || '' : row.size || (row.subStyles?.[0] ? row.sizes?.[row.subStyles[0]] : '') || row.sizes?.['SIZE'] || ''}
+                  ${calculateProductionMeasurementTotal([row]) !== null ? `<div class="size-total">TOTAL ${formatSizeExpressionTotal(calculateProductionMeasurementTotal([row])!)}</div>` : ''}
+                </td>
               </tr>
             `).join('')}
           </tbody>
+          <tfoot>
+            <tr class="grid-total-row">
+              <td class="cell-color">${safeActiveCategoryName} TOTALS:</td>
+              <td class="cell-number">${totalMtr > 0 ? totalMtr.toFixed(2) : ''}</td>
+              <td class="cell-number">${totalPcs > 0 ? totalPcs : ''}</td>
+              <td colspan="2" class="grid-total-details">
+                <span>TOTAL MEASUREMENT: ${totalMeasurement !== null ? formatSizeExpressionTotal(totalMeasurement) : '—'}</span>
+                ${totalMtrAverage > 0 ? `<span>Fabric consumption @ ${totalMtrAverage.toFixed(2)} Mtr/Pc</span>` : ''}
+              </td>
+            </tr>
+          </tfoot>
         </table>
       </div>
 
@@ -1063,6 +1022,28 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       font-weight: 800;
       font-size: 11px;
     }
+    .size-total {
+      color: #047857;
+      font-size: 9px;
+      font-weight: 900;
+      margin-top: 2px;
+    }
+    .grid-total-row td {
+      height: 28px;
+      border: 1.5px solid #000000;
+      padding: 3.5px 3px;
+      background: #f1f5f9;
+      font-weight: 900;
+    }
+    .grid-total-details {
+      text-align: right;
+    }
+    .grid-total-details span + span {
+      margin-left: 12px;
+      color: #475569;
+      font-size: 9px;
+      font-style: italic;
+    }
 
     /* FOOTER SECTION: NOTE, SWATCHES, SIGNATURE */
     .footer-block {
@@ -1239,8 +1220,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
 export async function downloadProductionSheetHtml(program: any, category: GarmentCategory | 'ALL' = 'TOP') {
   try {
     const completeProgram = await loadProgramDocument(program);
-    const preparedProgram = await prepareProductionSheetImages(completeProgram);
-    const html = generateProductionSheetHtml(preparedProgram, category);
+    const html = generateProductionSheetHtml(completeProgram, category);
     const serialNo = completeProgram.programSerialNo || completeProgram.programNumber || 'PRG-SHEET';
     const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -1266,9 +1246,8 @@ export function printProductionSheet(program: any, category: GarmentCategory | '
     void (async () => {
       try {
         const completeProgram = await loadProgramDocument(program);
-        const preparedProgram = await prepareProductionSheetImages(completeProgram);
         printWindow.document.open();
-        printWindow.document.write(generateProductionSheetHtml(preparedProgram, category));
+        printWindow.document.write(generateProductionSheetHtml(completeProgram, category));
         printWindow.document.close();
         printWindow.focus();
         printWindow.print();
