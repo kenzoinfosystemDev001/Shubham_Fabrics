@@ -21,7 +21,6 @@ import {
   Wind,
   Flame,
 } from 'lucide-react';
-import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 
 export default function SteamPressIncomingPage() {
   const router = useRouter();
@@ -141,26 +140,21 @@ export default function SteamPressIncomingPage() {
 
   return (
     <div
-      className="min-h-screen text-slate-100 flex flex-col"
-      style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.94), rgba(10, 15, 29, 0.98)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
-      }}
+      className="min-h-screen text-neutral-900 flex flex-col"
+      
     >
       {/* HEADER */}
-      <header className="border-b border-slate-800/80 bg-slate-950/60 backdrop-blur-md px-6 py-4 sticky top-0 z-30 shadow-md">
+      <header className="border-b border-neutral-200 bg-white backdrop-blur-md px-6 py-4 sticky top-0 z-30 shadow-md">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-inner">
+            <div className="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-600 shadow-inner">
               <Wind className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+              <h1 className="text-xl font-bold tracking-tight text-neutral-900 flex items-center gap-2">
                 Inward Challans (Finishing Handover)
               </h1>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-neutral-500">
                 Acknowledge physical bundle receipts, count verification, and transfer to steam pressing queue
               </p>
             </div>
@@ -170,14 +164,14 @@ export default function SteamPressIncomingPage() {
             <button
               onClick={() => loadData(true)}
               disabled={loading}
-              className="p-2 rounded-lg bg-slate-900 border border-slate-700/80 hover:bg-slate-800 text-slate-300 hover:text-white transition disabled:opacity-50"
+              className="p-2 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-100 text-neutral-700 hover:text-neutral-900 transition disabled:opacity-50"
               title="Refresh Inward Challans"
             >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-cyan-400' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-brand-600' : ''}`} />
             </button>
             <Link
               href="/steam-press/my-work"
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold shadow-md shadow-cyan-900/30 transition"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold shadow-sm transition"
             >
               <Flame className="w-4 h-4" />
               <span>Pressing Workstation</span>
@@ -189,15 +183,15 @@ export default function SteamPressIncomingPage() {
       {/* MAIN CONTENT */}
       <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-6 space-y-6">
         {/* CONTROLS BAR: SEARCH & TABS */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-slate-900/60 border border-slate-800 rounded-xl p-3.5 backdrop-blur-xs">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white border border-neutral-200 rounded-xl p-3.5 backdrop-blur-xs">
           {/* Tabs */}
-          <div className="flex items-center gap-1.5 p-1 bg-slate-950/60 border border-slate-800 rounded-lg">
+          <div className="flex items-center gap-1.5 p-1 bg-white border border-neutral-200 rounded-lg">
             <button
               onClick={() => setActiveTab('ALL')}
               className={`px-3 py-1.5 rounded-md text-xs font-semibold transition ${
                 activeTab === 'ALL'
-                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-brand-500/20 text-brand-600 border border-brand-500/40'
+                  : 'text-neutral-500 hover:text-neutral-900'
               }`}
             >
               All Inward ({challans.length})
@@ -206,8 +200,8 @@ export default function SteamPressIncomingPage() {
               onClick={() => setActiveTab('ISSUED')}
               className={`px-3 py-1.5 rounded-md text-xs font-semibold transition ${
                 activeTab === 'ISSUED'
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-accent-400/20 text-accent-700 border border-accent-500/40'
+                  : 'text-neutral-500 hover:text-neutral-900'
               }`}
             >
               Pending Receipt ({challans.filter((c) => c.status === 'ISSUED').length})
@@ -216,8 +210,8 @@ export default function SteamPressIncomingPage() {
               onClick={() => setActiveTab('RECEIVED')}
               className={`px-3 py-1.5 rounded-md text-xs font-semibold transition ${
                 activeTab === 'RECEIVED'
-                  ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-brand-500/20 text-brand-600 border border-brand-500/40'
+                  : 'text-neutral-500 hover:text-neutral-900'
               }`}
             >
               In Steam Press Queue ({challans.filter((c) => c.status !== 'ISSUED').length})
@@ -226,18 +220,18 @@ export default function SteamPressIncomingPage() {
 
           {/* Search Input */}
           <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-500" />
+            <Search className="w-4 h-4 absolute left-3 top-2.5 text-neutral-500" />
             <input
               type="text"
               placeholder="Search by Challan, Program, Style, Client..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-slate-950/80 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400/60 transition"
+              className="w-full pl-9 pr-4 py-2 bg-white border border-neutral-200 rounded-lg text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-brand-500/60 transition"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-2.5 text-slate-500 hover:text-slate-300 text-xs"
+                className="absolute right-2.5 top-2.5 text-neutral-500 hover:text-neutral-700 text-xs"
               >
                 Clear
               </button>
@@ -247,7 +241,7 @@ export default function SteamPressIncomingPage() {
 
         {/* ERROR DISPLAY */}
         {error && (
-          <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl flex items-center gap-3 text-rose-300 text-xs">
+          <div className="p-3 bg-danger-500/10 border border-danger-500/30 rounded-xl flex items-center gap-3 text-danger-600 text-xs">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
@@ -255,15 +249,15 @@ export default function SteamPressIncomingPage() {
 
         {/* CHALLANS TABLE / GRID */}
         {loading ? (
-          <div className="py-20 text-center text-slate-400 text-xs flex flex-col items-center justify-center">
-            <RefreshCw className="w-8 h-8 animate-spin text-cyan-400 mb-3" />
+          <div className="py-20 text-center text-neutral-500 text-xs flex flex-col items-center justify-center">
+            <RefreshCw className="w-8 h-8 animate-spin text-brand-600 mb-3" />
             <span>Loading incoming Challans...</span>
           </div>
         ) : filteredChallans.length === 0 ? (
-          <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-12 text-center text-slate-400 backdrop-blur-xs">
-            <Package className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-            <h3 className="text-base font-bold text-white mb-1">No Inward Challans Found</h3>
-            <p className="text-xs text-slate-400 max-w-sm mx-auto">
+          <div className="bg-white border border-neutral-200 rounded-2xl p-12 text-center text-neutral-500 backdrop-blur-xs">
+            <Package className="w-12 h-12 text-neutral-600 mx-auto mb-3" />
+            <h3 className="text-base font-bold text-neutral-900 mb-1">No Inward Challans Found</h3>
+            <p className="text-xs text-neutral-500 max-w-sm mx-auto">
               {searchQuery
                 ? 'No matching challans for your search query.'
                 : 'There are currently no challans routed to the Steam Press Department.'}
@@ -286,36 +280,36 @@ export default function SteamPressIncomingPage() {
               return (
                 <div
                   key={ch.id}
-                  className={`rounded-2xl border bg-slate-900/70 p-5 flex flex-col justify-between space-y-4 backdrop-blur-xs transition shadow-sm ${
+                  className={`rounded-2xl border bg-white p-5 flex flex-col justify-between space-y-4 backdrop-blur-xs transition shadow-sm ${
                     isIssued
-                      ? 'border-cyan-500/40 hover:border-cyan-400/70'
-                      : 'border-slate-800 hover:border-slate-700'
+                      ? 'border-brand-500/40 hover:border-brand-500/70'
+                      : 'border-neutral-200 hover:border-neutral-200'
                   }`}
                 >
                   {/* Top Bar: Challan & Status Badge */}
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <span className="font-mono text-xs font-bold text-cyan-300 block">
+                      <span className="font-mono text-xs font-bold text-brand-600 block">
                         {ch.challanNumber}
                       </span>
-                      <span className="text-[11px] text-slate-400">
-                        From: <span className="font-semibold text-slate-300">{ch.fromDepartment || 'FINISHING'}</span>
+                      <span className="text-[11px] text-neutral-500">
+                        From: <span className="font-semibold text-neutral-700">{ch.fromDepartment || 'FINISHING'}</span>
                       </span>
                     </div>
 
                     <span
                       className={`px-2 py-0.5 rounded text-[10px] font-bold border uppercase tracking-wider ${
                         isIssued
-                          ? 'bg-amber-500/10 text-amber-400 border-amber-500/30 animate-pulse'
+                          ? 'bg-accent-400/10 text-accent-700 border-accent-500/30 animate-pulse'
                           : isReceived
-                          ? 'bg-teal-500/10 text-teal-300 border-teal-500/30'
+                          ? 'bg-brand-500/10 text-brand-600 border-brand-500/30'
                           : isInProcess
-                          ? 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30'
+                          ? 'bg-brand-500/10 text-brand-600 border-brand-500/30'
                           : isCompleted || isReady
-                          ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
+                          ? 'bg-accent-400/10 text-accent-700 border-accent-500/30'
                           : isHold
-                          ? 'bg-rose-500/10 text-rose-400 border-rose-500/30'
-                          : 'bg-slate-800 text-slate-300 border-slate-700'
+                          ? 'bg-danger-500/10 text-danger-600 border-danger-500/30'
+                          : 'bg-neutral-100 text-neutral-700 border-neutral-200'
                       }`}
                     >
                       {ch.status.replace(/_/g, ' ')}
@@ -323,12 +317,12 @@ export default function SteamPressIncomingPage() {
                   </div>
 
                   {/* Program & Style Summary */}
-                  <div className="space-y-1.5 bg-slate-950/60 p-3 rounded-xl border border-slate-800/80">
+                  <div className="space-y-1.5 bg-white p-3 rounded-xl border border-neutral-200">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-400">Program Sheet:</span>
+                      <span className="text-neutral-500">Program Sheet:</span>
                       <button
                         onClick={() => setPreviewProgram(ch.program)}
-                        className="font-mono font-bold text-cyan-400 hover:underline flex items-center gap-1"
+                        className="font-mono font-bold text-brand-600 hover:underline flex items-center gap-1"
                       >
                         <FileText className="w-3.5 h-3.5" />
                         <span>{ch.program?.programNumber || 'N/A'}</span>
@@ -336,42 +330,42 @@ export default function SteamPressIncomingPage() {
                     </div>
 
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-400">Style:</span>
-                      <span className="font-semibold text-slate-200">
+                      <span className="text-neutral-500">Style:</span>
+                      <span className="font-semibold text-neutral-900">
                         {ch.program?.styleCode || 'Standard Style'}
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-400">Client / Buyer:</span>
-                      <span className="text-slate-300 truncate max-w-[150px]">
+                      <span className="text-neutral-500">Client / Buyer:</span>
+                      <span className="text-neutral-700 truncate max-w-[150px]">
                         {ch.program?.clientName || 'Standard Client'}
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-800/60">
-                      <span className="text-slate-400 font-semibold">Total Handover:</span>
-                      <span className="font-mono text-sm font-bold text-cyan-300">
-                        {totalPieces} <span className="text-[10px] font-normal text-slate-400">PCS</span>
+                    <div className="flex items-center justify-between text-xs pt-1 border-t border-neutral-200">
+                      <span className="text-neutral-500 font-semibold">Total Handover:</span>
+                      <span className="font-mono text-sm font-bold text-brand-600">
+                        {totalPieces} <span className="text-[10px] font-normal text-neutral-500">PCS</span>
                       </span>
                     </div>
                   </div>
 
                   {/* Items breakdown pill */}
-                  <div className="text-[11px] text-slate-400 space-y-1">
-                    <span className="block font-medium text-slate-500 uppercase tracking-wider text-[9px]">
+                  <div className="text-[11px] text-neutral-500 space-y-1">
+                    <span className="block font-medium text-neutral-500 uppercase tracking-wider text-[9px]">
                       Bundle Contents ({ch.items.length} line items):
                     </span>
                     <div className="max-h-20 overflow-y-auto space-y-1 pr-1">
                       {ch.items.map((it: any, idx: number) => (
                         <div
                           key={it.id || idx}
-                          className="flex items-center justify-between bg-slate-950/40 px-2 py-1 rounded border border-slate-800/50 text-[11px]"
+                          className="flex items-center justify-between bg-white px-2 py-1 rounded border border-neutral-200 text-[11px]"
                         >
-                          <span className="text-slate-300 truncate mr-2">
+                          <span className="text-neutral-700 truncate mr-2">
                             {it.itemDescription || 'Garments'}
                           </span>
-                          <span className="font-mono font-bold text-white shrink-0">
+                          <span className="font-mono font-bold text-neutral-900 shrink-0">
                             {it.quantity} {it.uom || 'PCS'}
                           </span>
                         </div>
@@ -380,8 +374,8 @@ export default function SteamPressIncomingPage() {
                   </div>
 
                   {/* Footer Action */}
-                  <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between gap-2">
-                    <span className="text-[10px] text-slate-500 flex items-center gap-1">
+                  <div className="pt-2 border-t border-neutral-200 flex items-center justify-between gap-2">
+                    <span className="text-[10px] text-neutral-500 flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       {new Date(ch.createdAt).toLocaleDateString()}
                     </span>
@@ -389,7 +383,7 @@ export default function SteamPressIncomingPage() {
                     {isIssued ? (
                       <button
                         onClick={() => openReceiveModal(ch)}
-                        className="px-3.5 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold shadow-md shadow-cyan-900/30 transition flex items-center gap-1.5"
+                        className="px-3.5 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-sm transition flex items-center gap-1.5"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5" />
                         <span>Acknowledge Receipt</span>
@@ -397,7 +391,7 @@ export default function SteamPressIncomingPage() {
                     ) : (
                       <Link
                         href={`/steam-press/my-work?jobId=${ch.id}`}
-                        className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5"
+                        className="px-3 py-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-brand-600 text-xs font-semibold border border-neutral-200 transition flex items-center gap-1.5"
                       >
                         <span>Open Workstation</span>
                         <ArrowRight className="w-3 h-3" />
@@ -412,46 +406,46 @@ export default function SteamPressIncomingPage() {
 
         {/* PHYSICAL RECEIPT MODAL */}
         {selectedChallan && (
-          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl relative">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div className="fixed inset-0 z-50 bg-neutral-900/70 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="bg-white border border-neutral-200 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl relative">
+              <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
                 <div className="flex items-center gap-2">
-                  <Wind className="w-5 h-5 text-cyan-400" />
-                  <h3 className="text-base font-bold text-white">
+                  <Wind className="w-5 h-5 text-brand-600" />
+                  <h3 className="text-base font-bold text-neutral-900">
                     Inward Receipt Verification
                   </h3>
                 </div>
                 <button
                   onClick={() => setSelectedChallan(null)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                  className="p-1 rounded-lg text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 transition"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               {receiveSuccess ? (
-                <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-300 text-xs flex items-center gap-2">
+                <div className="p-4 bg-accent-400/10 border border-accent-500/30 rounded-xl text-accent-700 text-xs flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 shrink-0" />
                   <span>{receiveSuccess}</span>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <div className="bg-slate-950/60 p-3.5 rounded-xl border border-slate-800 space-y-2">
+                  <div className="bg-white p-3.5 rounded-xl border border-neutral-200 space-y-2">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-400">Challan Number:</span>
-                      <span className="font-mono font-bold text-cyan-300">
+                      <span className="text-neutral-500">Challan Number:</span>
+                      <span className="font-mono font-bold text-brand-600">
                         {selectedChallan.challanNumber}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-400">Origin Department:</span>
-                      <span className="font-semibold text-slate-200">
+                      <span className="text-neutral-500">Origin Department:</span>
+                      <span className="font-semibold text-neutral-900">
                         {selectedChallan.fromDepartment || 'FINISHING'}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-400">Issued Quantity:</span>
-                      <span className="font-mono font-bold text-white">
+                      <span className="text-neutral-500">Issued Quantity:</span>
+                      <span className="font-mono font-bold text-neutral-900">
                         {selectedChallan.items.reduce(
                           (s: number, it: any) => s + (Number(it.quantity) || 0),
                           0
@@ -462,7 +456,7 @@ export default function SteamPressIncomingPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">
+                    <label className="block text-xs font-semibold text-neutral-700 mb-1">
                       Physically Counted & Received Quantity (PCS) *
                     </label>
                     <input
@@ -476,14 +470,14 @@ export default function SteamPressIncomingPage() {
                       onChange={(e) =>
                         setReceiveQuantity(e.target.value === '' ? '' : Number(e.target.value))
                       }
-                      className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-sm text-white font-mono font-bold focus:outline-none focus:border-cyan-400"
+                      className="w-full px-3 py-2 bg-canvas border border-neutral-200 rounded-lg text-sm text-neutral-900 font-mono font-bold focus:outline-none focus:border-brand-500"
                     />
                     {Number(receiveQuantity) <
                       selectedChallan.items.reduce(
                         (s: number, it: any) => s + (Number(it.quantity) || 0),
                         0
                       ) && (
-                      <p className="text-[11px] text-amber-400 mt-1 flex items-center gap-1">
+                      <p className="text-[11px] text-accent-700 mt-1 flex items-center gap-1">
                         <AlertCircle className="w-3.5 h-3.5" />
                         Discrepancy detected: short by{' '}
                         {selectedChallan.items.reduce(
@@ -501,15 +495,15 @@ export default function SteamPressIncomingPage() {
                       id="markHold"
                       checked={markOnHold}
                       onChange={(e) => setMarkOnHold(e.target.checked)}
-                      className="rounded border-slate-700 bg-slate-950 text-cyan-500 focus:ring-0"
+                      className="rounded border-neutral-200 bg-canvas text-brand-600 focus:ring-0"
                     />
-                    <label htmlFor="markHold" className="text-xs text-slate-300">
+                    <label htmlFor="markHold" className="text-xs text-neutral-700">
                       Flag bundle on hold (requires supervisor or finishing clarification)
                     </label>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">
+                    <label className="block text-xs font-semibold text-neutral-700 mb-1">
                       Inward Remarks / Inspection Notes
                     </label>
                     <textarea
@@ -517,28 +511,28 @@ export default function SteamPressIncomingPage() {
                       value={receiveRemarks}
                       onChange={(e) => setReceiveRemarks(e.target.value)}
                       placeholder="e.g., Bundle count verified, tags intact, ready for steam pressing"
-                      className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-400 resize-none"
+                      className="w-full px-3 py-2 bg-canvas border border-neutral-200 rounded-lg text-xs text-neutral-900 focus:outline-none focus:border-brand-500 resize-none"
                     />
                   </div>
 
                   {receiveError && (
-                    <div className="p-2.5 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-300 text-xs flex items-center gap-2">
+                    <div className="p-2.5 bg-danger-500/10 border border-danger-500/30 rounded-lg text-danger-600 text-xs flex items-center gap-2">
                       <AlertCircle className="w-4 h-4 shrink-0" />
                       <span>{receiveError}</span>
                     </div>
                   )}
 
-                  <div className="pt-2 flex items-center justify-end gap-3 border-t border-slate-800">
+                  <div className="pt-2 flex items-center justify-end gap-3 border-t border-neutral-200">
                     <button
                       onClick={() => setSelectedChallan(null)}
-                      className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition"
+                      className="px-4 py-2 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-semibold transition"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleConfirmReceive}
                       disabled={submittingReceive}
-                      className="px-5 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold shadow-md shadow-cyan-900/30 transition disabled:opacity-50 flex items-center gap-1.5"
+                      className="px-5 py-2 rounded-lg bg-brand-500 hover:bg-brand-600 text-neutral-900 text-xs font-bold shadow-sm transition disabled:opacity-50 flex items-center gap-1.5"
                     >
                       <CheckCircle2 className="w-4 h-4" />
                       <span>{submittingReceive ? 'Verifying...' : 'Confirm Inward'}</span>
@@ -552,44 +546,44 @@ export default function SteamPressIncomingPage() {
 
         {/* PRODUCTION SHEET PREVIEW MODAL */}
         {previewProgram && (
-          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 space-y-4 shadow-2xl relative max-h-[85vh] overflow-y-auto">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div className="fixed inset-0 z-50 bg-neutral-900/70 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="bg-white border border-neutral-200 rounded-2xl max-w-xl w-full p-6 space-y-4 shadow-2xl relative max-h-[85vh] overflow-y-auto">
+              <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
                 <div className="flex items-center gap-2.5">
-                  <FileText className="w-5 h-5 text-cyan-400" />
-                  <h3 className="text-base font-bold text-white">Production Sheet Specifications</h3>
+                  <FileText className="w-5 h-5 text-brand-600" />
+                  <h3 className="text-base font-bold text-neutral-900">Production Sheet Specifications</h3>
                 </div>
                 <button
                   onClick={() => setPreviewProgram(null)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                  className="p-1 rounded-lg text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 transition"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               <div className="space-y-3 text-xs">
-                <div className="grid grid-cols-2 gap-3 bg-slate-950/60 p-3 rounded-xl border border-slate-800">
+                <div className="grid grid-cols-2 gap-3 bg-white p-3 rounded-xl border border-neutral-200">
                   <div>
-                    <span className="text-slate-400 block text-[10px]">Program Number:</span>
-                    <span className="font-mono font-bold text-white">{previewProgram.programNumber}</span>
+                    <span className="text-neutral-500 block text-[10px]">Program Number:</span>
+                    <span className="font-mono font-bold text-neutral-900">{previewProgram.programNumber}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block text-[10px]">Style Code:</span>
-                    <span className="font-bold text-cyan-300">{previewProgram.styleCode || 'Standard'}</span>
+                    <span className="text-neutral-500 block text-[10px]">Style Code:</span>
+                    <span className="font-bold text-brand-600">{previewProgram.styleCode || 'Standard'}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block text-[10px]">Client / Buyer:</span>
-                    <span className="text-slate-200">{previewProgram.buyerName || previewProgram.clientName || 'Standard'}</span>
+                    <span className="text-neutral-500 block text-[10px]">Client / Buyer:</span>
+                    <span className="text-neutral-900">{previewProgram.buyerName || previewProgram.clientName || 'Standard'}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block text-[10px]">Target Quantity:</span>
-                    <span className="font-mono font-bold text-white">{previewProgram.targetQuantity || 'N/A'}</span>
+                    <span className="text-neutral-500 block text-[10px]">Target Quantity:</span>
+                    <span className="font-mono font-bold text-neutral-900">{previewProgram.targetQuantity || 'N/A'}</span>
                   </div>
                 </div>
 
-                <div className="bg-slate-950/60 p-3 rounded-xl border border-slate-800 space-y-1.5">
-                  <span className="text-slate-400 font-semibold block">Steam Press Quality Guidelines:</span>
-                  <ul className="list-disc pl-4 space-y-1 text-slate-300">
+                <div className="bg-white p-3 rounded-xl border border-neutral-200 space-y-1.5">
+                  <span className="text-neutral-500 font-semibold block">Steam Press Quality Guidelines:</span>
+                  <ul className="list-disc pl-4 space-y-1 text-neutral-700">
                     <li>Maintain boiler steam pressure at 3.5 - 4.5 bar and plate temperature appropriate for fabric composition.</li>
                     <li>Avoid prolonged direct contact on delicate embroidery or sequins to prevent scorching, glazing, or melting.</li>
                     <li>Ensure vacuum extraction table is engaged post-pressing to rapidly dissipate residual moisture.</li>
@@ -598,10 +592,10 @@ export default function SteamPressIncomingPage() {
                 </div>
               </div>
 
-              <div className="pt-2 flex justify-end border-t border-slate-800">
+              <div className="pt-2 flex justify-end border-t border-neutral-200">
                 <button
                   onClick={() => setPreviewProgram(null)}
-                  className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition"
+                  className="px-4 py-2 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-900 text-xs font-semibold transition"
                 >
                   Close
                 </button>

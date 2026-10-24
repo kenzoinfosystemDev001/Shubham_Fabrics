@@ -178,49 +178,49 @@ function CreateGRNContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F0FAF9] pb-16">
-      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+    <div className="min-h-screen bg-brand-50 pb-16">
+      <header className="bg-white border-b border-neutral-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div className="flex items-center gap-3">
           <Link
             href="/fabric-store/my-work/material-receipt"
-            className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-md transition"
+            className="p-1.5 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 rounded-md transition"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-teal-700 block">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-700 block">
               MATERIAL RECEIPT
             </span>
-            <h1 className="text-xl font-bold text-slate-900">Create Goods Receipt Note (GRN)</h1>
+            <h1 className="text-xl font-bold text-neutral-900">Create Goods Receipt Note (GRN)</h1>
           </div>
         </div>
       </header>
 
       <main className="p-4 sm:p-8 max-w-5xl mx-auto space-y-6">
         {error && (
-          <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-3 text-rose-800 text-xs font-semibold">
-            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+          <div className="p-4 bg-danger-50 border border-danger-200 rounded-xl flex items-center gap-3 text-danger-800 text-xs font-semibold">
+            <AlertCircle className="w-4 h-4 text-danger-600 shrink-0" />
             <span>{error}</span>
           </div>
         )}
         {success && (
-          <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3 text-emerald-800 text-xs font-semibold">
-            <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+          <div className="p-4 bg-accent-50 border border-accent-200 rounded-xl flex items-center gap-3 text-accent-800 text-xs font-semibold">
+            <CheckCircle className="w-4 h-4 text-accent-700 shrink-0" />
             <span>{success}</span>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Supplier & Delivery Info Card */}
-          <div className="bg-white border border-slate-200/90 rounded-xl p-6 shadow-xs space-y-4">
-            <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
-              <PackageCheck className="w-4 h-4 text-teal-600" />
+          <div className="bg-white border border-neutral-200/90 rounded-xl p-6 shadow-xs space-y-4">
+            <h2 className="text-sm font-bold text-neutral-900 border-b border-neutral-100 pb-3 flex items-center gap-2">
+              <PackageCheck className="w-4 h-4 text-brand-600" />
               1. Supplier &amp; Dispatch Information
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Supplier Name <span className="text-rose-500">*</span>
+                <label className="block text-xs font-bold text-neutral-700 mb-1">
+                  Supplier Name <span className="text-danger-600">*</span>
                 </label>
                 <input
                   type="text"
@@ -228,11 +228,11 @@ function CreateGRNContent() {
                   placeholder=""
                   value={supplierName}
                   onChange={(e) => setSupplierName(e.target.value)}
-                  className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                  className="w-full text-xs border border-neutral-300 rounded-md px-3 py-2 bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-neutral-700 mb-1">
                   Vehicle Number
                 </label>
                 <input
@@ -240,17 +240,17 @@ function CreateGRNContent() {
                   placeholder=""
                   value={vehicleNumber}
                   onChange={(e) => setVehicleNumber(e.target.value)}
-                  className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-teal-500 font-mono"
+                  className="w-full text-xs border border-neutral-300 rounded-md px-3 py-2 bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 font-mono"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-neutral-700 mb-1">
                   Associated Program (Optional)
                 </label>
                 <select
                   value={programId}
                   onChange={(e) => setProgramId(e.target.value)}
-                  className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                  className="w-full text-xs border border-neutral-300 rounded-md px-3 py-2 bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500"
                 >
                   <option value="">-- No Direct Program Link --</option>
                   {programs.map((p) => (
@@ -262,7 +262,7 @@ function CreateGRNContent() {
               </div>
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label className="block text-xs font-bold text-neutral-700 mb-1">
                 Receipt Remarks / Notes
               </label>
               <input
@@ -270,26 +270,26 @@ function CreateGRNContent() {
                 placeholder=""
                 value={remarks}
                 onChange={(e) => setRemarks(e.target.value)}
-                className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                className="w-full text-xs border border-neutral-300 rounded-md px-3 py-2 bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500"
               />
             </div>
           </div>
 
           {/* Fabric Specifications */}
-          <div className="bg-white border border-slate-200/90 rounded-xl p-6 shadow-xs space-y-4">
-            <h2 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
-              <Layers className="w-4 h-4 text-teal-600" />
+          <div className="bg-white border border-neutral-200/90 rounded-xl p-6 shadow-xs space-y-4">
+            <h2 className="text-sm font-bold text-neutral-900 border-b border-neutral-100 pb-3 flex items-center gap-2">
+              <Layers className="w-4 h-4 text-brand-600" />
               2. Fabric Batch Specifications
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Fabric Type <span className="text-rose-500">*</span>
+                <label className="block text-xs font-bold text-neutral-700 mb-1">
+                  Fabric Type <span className="text-danger-600">*</span>
                 </label>
                 <select
                   value={fabricType}
                   onChange={(e) => setFabricType(e.target.value)}
-                  className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-teal-500 font-semibold"
+                  className="w-full text-xs border border-neutral-300 rounded-md px-3 py-2 bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 font-semibold"
                 >
                   <option value="KORA">KORA (Undyed / Greige)</option>
                   <option value="DYED">DYED</option>
@@ -298,8 +298,8 @@ function CreateGRNContent() {
                 </select>
               </div>
               <div className="md:col-span-2">
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Fabric Description <span className="text-rose-500">*</span>
+                <label className="block text-xs font-bold text-neutral-700 mb-1">
+                  Fabric Description <span className="text-danger-600">*</span>
                 </label>
                 <input
                   type="text"
@@ -307,11 +307,11 @@ function CreateGRNContent() {
                   placeholder=""
                   value={fabricDescription}
                   onChange={(e) => setFabricDescription(e.target.value)}
-                  className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                  className="w-full text-xs border border-neutral-300 rounded-md px-3 py-2 bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-neutral-700 mb-1">
                   Color / Shade Name
                 </label>
                 <input
@@ -319,22 +319,22 @@ function CreateGRNContent() {
                   placeholder=""
                   value={colorName}
                   onChange={(e) => setColorName(e.target.value)}
-                  className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                  className="w-full text-xs border border-neutral-300 rounded-md px-3 py-2 bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500"
                 />
               </div>
             </div>
           </div>
 
           {/* Roll Entry Table */}
-          <div className="bg-white border border-slate-200/90 rounded-xl p-6 shadow-xs space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="bg-white border border-neutral-200/90 rounded-xl p-6 shadow-xs space-y-4">
+            <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
               <div>
-                <h2 className="text-sm font-bold text-slate-900">3. Individual Roll Verification</h2>
+                <h2 className="text-sm font-bold text-neutral-900">3. Individual Roll Verification</h2>
               </div>
               <button
                 type="button"
                 onClick={addRoll}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 rounded-md text-xs font-bold transition"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-800 border border-brand-200 rounded-md text-xs font-bold transition"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Add Roll</span>
@@ -343,7 +343,7 @@ function CreateGRNContent() {
 
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
+                <thead className="bg-neutral-50 text-neutral-700 font-semibold border-b border-neutral-200">
                   <tr>
                     <th className="py-2.5 px-3 w-16">#</th>
                     <th className="py-2.5 px-3">Length (Meters) *</th>
@@ -353,10 +353,10 @@ function CreateGRNContent() {
                     <th className="py-2.5 px-3 text-right w-16">Remove</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-slate-800">
+                <tbody className="divide-y divide-neutral-100 text-neutral-900">
                   {rolls.map((roll, idx) => (
-                    <tr key={roll.id} className="hover:bg-slate-50/50">
-                      <td className="py-2.5 px-3 font-mono font-bold text-slate-500">
+                    <tr key={roll.id} className="hover:bg-neutral-50/50">
+                      <td className="py-2.5 px-3 font-mono font-bold text-neutral-500">
                         {String(idx + 1).padStart(2, '0')}
                       </td>
                       <td className="py-2.5 px-3">
@@ -367,7 +367,7 @@ function CreateGRNContent() {
                           placeholder=""
                           value={roll.length}
                           onChange={(e) => updateRoll(idx, 'length', e.target.value)}
-                          className="w-36 text-xs border border-slate-300 rounded px-2.5 py-1.5 font-mono focus:ring-1 focus:ring-teal-500"
+                          className="w-36 text-xs border border-neutral-300 rounded px-2.5 py-1.5 font-mono focus:ring-1 focus:ring-brand-500"
                         />
                       </td>
                       <td className="py-2.5 px-3">
@@ -377,7 +377,7 @@ function CreateGRNContent() {
                           placeholder=""
                           value={roll.width}
                           onChange={(e) => updateRoll(idx, 'width', e.target.value)}
-                          className="w-28 text-xs border border-slate-300 rounded px-2.5 py-1.5 font-mono focus:ring-1 focus:ring-teal-500"
+                          className="w-28 text-xs border border-neutral-300 rounded px-2.5 py-1.5 font-mono focus:ring-1 focus:ring-brand-500"
                         />
                       </td>
                       <td className="py-2.5 px-3">
@@ -387,7 +387,7 @@ function CreateGRNContent() {
                           placeholder=""
                           value={roll.weight}
                           onChange={(e) => updateRoll(idx, 'weight', e.target.value)}
-                          className="w-28 text-xs border border-slate-300 rounded px-2.5 py-1.5 font-mono focus:ring-1 focus:ring-teal-500"
+                          className="w-28 text-xs border border-neutral-300 rounded px-2.5 py-1.5 font-mono focus:ring-1 focus:ring-brand-500"
                         />
                       </td>
                       <td className="py-2.5 px-3">
@@ -396,7 +396,7 @@ function CreateGRNContent() {
                           placeholder=""
                           value={roll.remarks}
                           onChange={(e) => updateRoll(idx, 'remarks', e.target.value)}
-                          className="w-full text-xs border border-slate-300 rounded px-2.5 py-1.5 focus:ring-1 focus:ring-teal-500"
+                          className="w-full text-xs border border-neutral-300 rounded px-2.5 py-1.5 focus:ring-1 focus:ring-brand-500"
                         />
                       </td>
                       <td className="py-2.5 px-3 text-right">
@@ -404,7 +404,7 @@ function CreateGRNContent() {
                           type="button"
                           onClick={() => removeRoll(idx)}
                           disabled={rolls.length <= 1}
-                          className="p-1 text-slate-400 hover:text-rose-600 disabled:opacity-30 transition"
+                          className="p-1 text-neutral-500 hover:text-danger-600 disabled:opacity-30 transition"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -416,19 +416,19 @@ function CreateGRNContent() {
             </div>
 
             {/* Totals Summary */}
-            <div className="bg-teal-50/60 border border-teal-200/60 rounded-lg p-3.5 flex flex-wrap items-center justify-between gap-4 text-xs">
-              <span className="font-semibold text-slate-700">
-                Total Rolls: <strong className="text-teal-900 font-bold">{rolls.length}</strong>
+            <div className="bg-brand-50/60 border border-brand-200/60 rounded-lg p-3.5 flex flex-wrap items-center justify-between gap-4 text-xs">
+              <span className="font-semibold text-neutral-700">
+                Total Rolls: <strong className="text-brand-900 font-bold">{rolls.length}</strong>
               </span>
-              <span className="font-semibold text-slate-700">
+              <span className="font-semibold text-neutral-700">
                 Total Measured Length:{' '}
-                <strong className="text-teal-900 font-mono font-bold">
+                <strong className="text-brand-900 font-mono font-bold">
                   {totalMeters.toFixed(2)} m
                 </strong>
               </span>
-              <span className="font-semibold text-slate-700">
+              <span className="font-semibold text-neutral-700">
                 Total Measured Weight:{' '}
-                <strong className="text-teal-900 font-mono font-bold">
+                <strong className="text-brand-900 font-mono font-bold">
                   {totalWeight.toFixed(2)} kg
                 </strong>
               </span>
@@ -439,14 +439,14 @@ function CreateGRNContent() {
           <div className="flex items-center justify-end gap-3">
             <Link
               href="/fabric-store/my-work/material-receipt"
-              className="px-4 py-2 border border-slate-300 rounded-md text-xs font-semibold text-slate-700 hover:bg-slate-100 transition"
+              className="px-4 py-2 border border-neutral-300 rounded-md text-xs font-semibold text-neutral-700 hover:bg-neutral-100 transition"
             >
               Cancel
             </Link>
             <button
               type="submit"
               disabled={loading}
-              className="flex items-center gap-2 px-6 py-2.5 bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold rounded-md shadow-xs transition disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-2.5 bg-brand-700 hover:bg-brand-800 text-white text-xs font-bold rounded-md shadow-xs transition disabled:opacity-50"
             >
               <Save className="w-4 h-4" />
               <span>{loading ? 'Submitting GRN...' : 'Save & Generate GRN'}</span>
@@ -460,7 +460,7 @@ function CreateGRNContent() {
 
 export default function CreateGRNPage() {
   return (
-    <React.Suspense fallback={<div className="min-h-screen bg-[#F0FAF9] p-8 text-xs text-slate-400">Loading GRN form...</div>}>
+    <React.Suspense fallback={<div className="min-h-screen bg-brand-50 p-8 text-xs text-neutral-500">Loading GRN form...</div>}>
       <CreateGRNContent />
     </React.Suspense>
   );

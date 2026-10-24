@@ -19,7 +19,6 @@ import {
   Sparkles,
   Barcode,
 } from 'lucide-react';
-import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import BarcodeStickerCard from '@/components/BarcodeStickerCard';
 import { ColorFabricMeasurementTable, createDepartmentInOutTracking } from '@/components/ColorFabricMeasurementTable';
@@ -209,28 +208,23 @@ function RecuttingIssueChallanContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] pb-16">
+    <div className="min-h-screen bg-neutral-50 pb-16">
       {/* HEADER */}
       <header
-        style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-        className="border-b border-slate-700/80 sticky top-0 z-30 px-4 sm:px-8 py-4 shadow-md text-white"
+        className="bg-white border-b border-neutral-200 sticky top-0 z-30 px-4 sm:px-8 py-4 shadow-md text-neutral-900"
       >
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-accent-400/20 text-accent-700 border border-accent-500/30">
                 RECUTTING DISPATCH
               </span>
-              <span className="text-xs text-slate-300 font-medium">
+              <span className="text-xs text-neutral-700 font-medium">
                 Outgoing Handover to Stitching
               </span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight mt-1 flex items-center gap-2">
-              <Send className="w-6 h-6 text-emerald-400" />
+            <h1 className="text-xl sm:text-2xl font-extrabold text-neutral-900 tracking-tight mt-1 flex items-center gap-2">
+              <Send className="w-6 h-6 text-accent-700" />
               <span>Issue Handover Challan to Stitching Department</span>
             </h1>
           </div>
@@ -238,7 +232,7 @@ function RecuttingIssueChallanContent() {
           <div className="flex items-center gap-2">
             <Link
               href="/recutting/my-work"
-              className="px-3 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-600 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition"
+              className="px-3 py-1.5 bg-neutral-50 hover:bg-neutral-200 text-neutral-900 border border-neutral-200 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition"
             >
               <Scissors className="w-3.5 h-3.5" />
               <span>Cutting Queue</span>
@@ -264,14 +258,14 @@ function RecuttingIssueChallanContent() {
             }}
           />
           {/* STEP 1: SELECT SOURCE RECUTTING JOB */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="bg-white rounded-xl border border-neutral-200 shadow-xs p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
               <div>
-                <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide flex items-center gap-2">
-                  <Scissors className="w-4 h-4 text-rose-600" />
+                <h2 className="text-sm font-bold text-neutral-900 uppercase tracking-wide flex items-center gap-2">
+                  <Scissors className="w-4 h-4 text-danger-600" />
                   <span>1. Select Verified Source Job (Recutting Challan)</span>
                 </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-neutral-500 mt-0.5">
                   Traceability genealogy: Outgoing Challan will be permanently linked to this parent job.
                 </p>
               </div>
@@ -280,26 +274,26 @@ function RecuttingIssueChallanContent() {
                 <button
                   type="button"
                   onClick={() => setSelectedSheetForView(selectedJob.program)}
-                  className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1 border border-slate-200"
+                  className="px-3 py-1 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-lg text-xs font-semibold flex items-center gap-1 border border-neutral-200"
                 >
-                  <FileText className="w-3.5 h-3.5 text-sky-600" />
+                  <FileText className="w-3.5 h-3.5 text-brand-600" />
                   <span>View Tech Sheet</span>
                 </button>
               )}
             </div>
 
             {fetchingJobs ? (
-              <div className="p-6 text-center text-slate-400">
-                <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-rose-500" />
+              <div className="p-6 text-center text-neutral-500">
+                <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-danger-600" />
                 <span className="text-xs">Loading available jobs...</span>
               </div>
             ) : sourceJobs.length === 0 ? (
-              <div className="p-6 bg-slate-50 rounded-xl text-center text-slate-500 text-xs">
+              <div className="p-6 bg-neutral-50 rounded-xl text-center text-neutral-500 text-xs">
                 No active recutting jobs available. Receive and process jobs first.
               </div>
             ) : (
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-neutral-700 mb-1">
                   Source Challan Number *
                 </label>
                 <select
@@ -308,7 +302,7 @@ function RecuttingIssueChallanContent() {
                     const found = sourceJobs.find((j) => j.id === e.target.value);
                     if (found) selectJob(found);
                   }}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white font-medium"
+                  className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/40 bg-white font-medium"
                 >
                   {sourceJobs.map((j) => {
                     const good = j.fabricOut ?? j.fabricIn ?? 0;
@@ -324,61 +318,61 @@ function RecuttingIssueChallanContent() {
 
             {/* Selected Job Specs Banner */}
             {selectedJob && (
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+              <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-xl grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                 <div>
-                  <span className="text-slate-400 block text-[10px]">Program Sheet</span>
-                  <strong className="text-slate-800 font-mono">{selectedJob.program?.programNumber || 'N/A'}</strong>
+                  <span className="text-neutral-500 block text-[10px]">Program Sheet</span>
+                  <strong className="text-neutral-900 font-mono">{selectedJob.program?.programNumber || 'N/A'}</strong>
                 </div>
                 <div>
-                  <span className="text-slate-400 block text-[10px]">Wilcom File #</span>
-                  <strong className="text-rose-700 font-mono">{selectedJob.program?.wilcomDesignNumber || 'N/A'}</strong>
+                  <span className="text-neutral-500 block text-[10px]">Wilcom File #</span>
+                  <strong className="text-danger-700 font-mono">{selectedJob.program?.wilcomDesignNumber || 'N/A'}</strong>
                 </div>
                 <div>
-                  <span className="text-slate-400 block text-[10px]">Buyer / Client</span>
-                  <strong className="text-slate-800">{selectedJob.program?.buyerName || selectedJob.program?.clientName || 'N/A'}</strong>
+                  <span className="text-neutral-500 block text-[10px]">Buyer / Client</span>
+                  <strong className="text-neutral-900">{selectedJob.program?.buyerName || selectedJob.program?.clientName || 'N/A'}</strong>
                 </div>
                 <div>
-                  <span className="text-slate-400 block text-[10px]">Verified Good Available</span>
-                  <strong className="text-emerald-700 font-black">{maxGoodAvailable} {sourceQuantityUnit}</strong>
+                  <span className="text-neutral-500 block text-[10px]">Verified Good Available</span>
+                  <strong className="text-accent-800 font-black">{maxGoodAvailable} {sourceQuantityUnit}</strong>
                 </div>
               </div>
             )}
           </div>
 
           {/* STEP 2: DISPATCH DESTINATION & ROUTING */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-6 space-y-4">
-            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide flex items-center gap-2 border-b border-slate-100 pb-3">
-              <Send className="w-4 h-4 text-emerald-600" />
+          <div className="bg-white rounded-xl border border-neutral-200 shadow-xs p-6 space-y-4">
+            <h2 className="text-sm font-bold text-neutral-900 uppercase tracking-wide flex items-center gap-2 border-b border-neutral-100 pb-3">
+              <Send className="w-4 h-4 text-accent-700" />
               <span>2. Handover Routing & Priority</span>
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">From Department</label>
+                <label className="block text-xs font-bold text-neutral-700 mb-1">From Department</label>
                 <input
                   type="text"
                   disabled
                   value="RECUTTING (Embroidery Recutting Dept)"
-                  className="w-full px-3 py-2 text-xs border border-slate-200 bg-slate-100 rounded-lg text-slate-600 font-semibold"
+                  className="w-full px-3 py-2 text-xs border border-neutral-200 bg-neutral-100 rounded-lg text-neutral-600 font-semibold"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">To Department *</label>
+                <label className="block text-xs font-bold text-neutral-700 mb-1">To Department *</label>
                 <input
                   type="text"
                   disabled
                   value="STITCHING (Garment Stitching Dept)"
-                  className="w-full px-3 py-2 text-xs border border-emerald-300 bg-emerald-50 text-emerald-800 font-bold rounded-lg"
+                  className="w-full px-3 py-2 text-xs border border-accent-300 bg-accent-50 text-accent-800 font-bold rounded-lg"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Priority</label>
+                <label className="block text-xs font-bold text-neutral-700 mb-1">Priority</label>
                 <select
                   value={priority}
                   onChange={(e) => setPriority(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white font-medium"
+                  className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/40 bg-white font-medium"
                 >
                   <option value="NORMAL">Normal</option>
                   <option value="HIGH">High Priority</option>
@@ -388,27 +382,27 @@ function RecuttingIssueChallanContent() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label className="block text-xs font-bold text-neutral-700 mb-1">
                 Dispatch Remarks / Stitching Instructions
               </label>
               <textarea
                 rows={2}
                 value={remarks}
                 onChange={(e) => setRemarks(e.target.value)}
-                className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/40"
               />
             </div>
           </div>
 
           {/* STEP 3: CHALLAN ITEMS & PIECES */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="bg-white rounded-xl border border-neutral-200 shadow-xs p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
               <div>
-                <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide flex items-center gap-2">
-                  <PackageCheck className="w-4 h-4 text-emerald-600" />
+                <h2 className="text-sm font-bold text-neutral-900 uppercase tracking-wide flex items-center gap-2">
+                  <PackageCheck className="w-4 h-4 text-accent-700" />
                   <span>3. Outgoing Items & Quantities</span>
                 </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-neutral-500 mt-0.5">
                   Specify the cut panels and components being transferred to Stitching.
                 </p>
               </div>
@@ -416,7 +410,7 @@ function RecuttingIssueChallanContent() {
               <button
                 type="button"
                 onClick={handleAddItem}
-                className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg text-xs font-bold transition flex items-center gap-1 border border-emerald-200"
+                className="px-3 py-1.5 bg-accent-50 hover:bg-accent-100 text-accent-800 rounded-lg text-xs font-bold transition flex items-center gap-1 border border-accent-200"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Add Item Line</span>
@@ -427,13 +421,13 @@ function RecuttingIssueChallanContent() {
               {items.map((item, index) => (
                 <div
                   key={index}
-                  className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3 relative group"
+                  className="p-4 bg-neutral-50 border border-neutral-200 rounded-xl space-y-3 relative group"
                 >
                   {items.length > 1 && (
                     <button
                       type="button"
                       onClick={() => handleRemoveItem(index)}
-                      className="absolute top-3 right-3 text-slate-400 hover:text-rose-600 p-1"
+                      className="absolute top-3 right-3 text-neutral-500 hover:text-danger-600 p-1"
                       title="Remove Item"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -442,7 +436,7 @@ function RecuttingIssueChallanContent() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
                     <div className="sm:col-span-6">
-                      <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                      <label className="block text-[11px] font-bold text-neutral-700 mb-1">
                         Item Description *
                       </label>
                       <input
@@ -450,12 +444,12 @@ function RecuttingIssueChallanContent() {
                         value={item.itemDescription}
                         onChange={(e) => handleItemChange(index, 'itemDescription', e.target.value)}
                         required
-                        className="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg bg-white"
+                        className="w-full px-3 py-1.5 text-xs border border-neutral-300 rounded-lg bg-white"
                       />
                     </div>
 
                     <div className="sm:col-span-2">
-                      <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                      <label className="block text-[11px] font-bold text-neutral-700 mb-1">
                         Quantity *
                       </label>
                       <input
@@ -465,12 +459,12 @@ function RecuttingIssueChallanContent() {
                         value={item.quantity}
                         onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
                         required
-                        className="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg bg-white font-bold text-slate-900"
+                        className="w-full px-3 py-1.5 text-xs border border-neutral-300 rounded-lg bg-white font-bold text-neutral-900"
                       />
                     </div>
 
                     <div className="sm:col-span-2">
-                      <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                      <label className="block text-[11px] font-bold text-neutral-700 mb-1">
                         Unit *
                       </label>
                       <select
@@ -479,7 +473,7 @@ function RecuttingIssueChallanContent() {
                           handleItemChange(index, 'uom', e.target.value);
                           handleItemChange(index, 'unitType', e.target.value);
                         }}
-                        className="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg bg-white"
+                        className="w-full px-3 py-1.5 text-xs border border-neutral-300 rounded-lg bg-white"
                       >
                         <option value="MTR">MTR</option>
                         <option value="PCS">PCS</option>
@@ -487,14 +481,14 @@ function RecuttingIssueChallanContent() {
                     </div>
 
                     <div className="sm:col-span-2">
-                      <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                      <label className="block text-[11px] font-bold text-neutral-700 mb-1">
                         Color / Code
                       </label>
                       <input
                         type="text"
                         value={item.colour}
                         onChange={(e) => handleItemChange(index, 'colour', e.target.value)}
-                        className="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg bg-white"
+                        className="w-full px-3 py-1.5 text-xs border border-neutral-300 rounded-lg bg-white"
                       />
                     </div>
                   </div>
@@ -503,16 +497,16 @@ function RecuttingIssueChallanContent() {
             </div>
 
             {/* Total Quantity & Balance Check */}
-            <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+            <div className="pt-3 border-t border-neutral-100 flex items-center justify-between text-xs">
               <div>
-                <span className="text-slate-500 font-medium">Total Quantity to Dispatch: </span>
-                <span className="font-mono font-black text-slate-900 text-sm">
+                <span className="text-neutral-500 font-medium">Total Quantity to Dispatch: </span>
+                <span className="font-mono font-black text-neutral-900 text-sm">
                   {totalQuantityLabel}
                 </span>
               </div>
               <div>
-                <span className="text-slate-500 font-medium">Available Good: </span>
-                <span className="font-mono font-bold text-emerald-700 text-sm">
+                <span className="text-neutral-500 font-medium">Available Good: </span>
+                <span className="font-mono font-bold text-accent-800 text-sm">
                   {maxGoodAvailable.toLocaleString()} {sourceQuantityUnit}
                 </span>
               </div>
@@ -523,14 +517,14 @@ function RecuttingIssueChallanContent() {
           <div className="flex items-center justify-end gap-3">
             <Link
               href="/recutting"
-              className="px-4 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-800"
+              className="px-4 py-2.5 text-xs font-bold text-neutral-600 hover:text-neutral-900"
             >
               Cancel
             </Link>
             <button
               type="submit"
               disabled={loading || totalQuantityToIssue <= 0}
-              className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-2 disabled:opacity-50"
+              className="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-2 disabled:opacity-50"
             >
               {loading ? (
                 <>
@@ -550,43 +544,43 @@ function RecuttingIssueChallanContent() {
 
       {/* SUCCESS MODAL WITH BARCODE CARD */}
       {generatedChallan && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-lg w-full overflow-hidden p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="fixed inset-0 z-50 bg-neutral-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl border border-neutral-200 shadow-2xl max-w-lg w-full overflow-hidden p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                <h3 className="text-sm font-bold text-slate-900">
+                <CheckCircle2 className="w-5 h-5 text-accent-700" />
+                <h3 className="text-sm font-bold text-neutral-900">
                   Challan Issued to Stitching Successfully!
                 </h3>
               </div>
               <button
                 onClick={() => setGeneratedChallan(null)}
-                className="text-slate-400 hover:text-slate-600 p-1"
+                className="text-neutral-500 hover:text-neutral-600 p-1"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Summary Details */}
-            <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5 text-xs">
+            <div className="p-3 bg-neutral-50 border border-neutral-200 rounded-xl space-y-1.5 text-xs">
               <div className="flex justify-between">
-                <span className="text-slate-500">Challan Number:</span>
-                <span className="font-mono font-bold text-slate-900">{generatedChallan.challanNumber}</span>
+                <span className="text-neutral-500">Challan Number:</span>
+                <span className="font-mono font-bold text-neutral-900">{generatedChallan.challanNumber}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Route:</span>
-                <span className="font-semibold text-slate-800">RECUTTING &rarr; STITCHING</span>
+                <span className="text-neutral-500">Route:</span>
+                <span className="font-semibold text-neutral-900">RECUTTING &rarr; STITCHING</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Handover Quantity:</span>
-                <span className="font-black text-emerald-700">
+                <span className="text-neutral-500">Handover Quantity:</span>
+                <span className="font-black text-accent-800">
                   {generatedChallan.totalQuantity || totalQuantityToIssue} {items[0]?.uom || 'PCS'}
                 </span>
               </div>
             </div>
 
             {/* Printable Barcode Sticker Card */}
-            <div className="p-3 bg-slate-100 rounded-xl border border-slate-200">
+            <div className="p-3 bg-neutral-100 rounded-xl border border-neutral-200">
               <BarcodeStickerCard
                 params={{
                   challanNumber: generatedChallan.challanNumber,
@@ -605,7 +599,7 @@ function RecuttingIssueChallanContent() {
             <div className="flex items-center justify-end gap-2 pt-2">
               <Link
                 href="/recutting"
-                className="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold text-center transition"
+                className="w-full py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold text-center transition"
               >
                 Return to Recutting Dashboard
               </Link>
@@ -630,9 +624,9 @@ export default function RecuttingIssueChallanPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center p-8">
-          <div className="text-center text-slate-500">
-            <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-rose-600" />
+        <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-8">
+          <div className="text-center text-neutral-500">
+            <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-danger-600" />
             <p className="text-xs font-semibold">Loading Handover Form...</p>
           </div>
         </div>

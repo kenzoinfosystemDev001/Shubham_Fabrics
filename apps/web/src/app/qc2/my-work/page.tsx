@@ -31,7 +31,6 @@ import {
   Waves,
   Send
 } from 'lucide-react';
-import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import BarcodeStickerCard from '@/components/BarcodeStickerCard';
@@ -433,26 +432,21 @@ export default function QC2MyWorkPage() {
   }, [challans, statusFilter, searchTerm]);
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] pb-16">
+    <div className="min-h-screen bg-neutral-50 pb-16">
       {/* HEADER */}
       <header
-        style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-        className="border-b border-slate-700/80 sticky top-0 z-30 px-4 sm:px-8 py-4 shadow-md text-white"
+        className="bg-white border-b border-neutral-200 sticky top-0 z-30 px-4 sm:px-8 py-4 shadow-md text-neutral-900"
       >
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-400 block drop-shadow-sm">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-700 block drop-shadow-sm">
               SHUBHAM FABRICS MES · QC2 INSPECTION WORKSTATION
             </span>
-            <h1 className="text-xl font-bold text-white flex items-center gap-2.5 drop-shadow-sm">
-              <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+            <h1 className="text-xl font-bold text-neutral-900 flex items-center gap-2.5 drop-shadow-sm">
+              <CheckCircle2 className="w-5 h-5 text-accent-700" />
               <span>QC2 · My Work &amp; Inspection Station</span>
             </h1>
-            <p className="text-xs text-slate-300 mt-0.5">
+            <p className="text-xs text-neutral-700 mt-0.5">
               Incoming from Thread Cutting · Physical Garment Piece Inspection &amp; Rejection to Defected Shelf
             </p>
           </div>
@@ -461,7 +455,7 @@ export default function QC2MyWorkPage() {
             <button
               onClick={loadData}
               disabled={loading}
-              className="p-2 text-slate-300 hover:text-white hover:bg-slate-800/80 rounded-lg border border-slate-700/60 transition"
+              className="p-2 text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg border border-neutral-200 transition"
               title="Refresh Queue"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -469,14 +463,14 @@ export default function QC2MyWorkPage() {
 
             <Link
               href="/qc2"
-              className="flex items-center gap-1.5 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold border border-slate-700 transition"
+              className="flex items-center gap-1.5 px-3 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 rounded-lg text-xs font-semibold border border-neutral-200 transition"
             >
               <span>Dashboard</span>
             </Link>
 
             <Link
               href="/qc2/issue-challan"
-              className="flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-lg text-xs font-semibold shadow-sm transition"
+              className="flex items-center gap-1.5 px-3 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-semibold shadow-sm transition"
             >
               <Send className="w-4 h-4" />
               <span>Issue Challan</span>
@@ -484,7 +478,7 @@ export default function QC2MyWorkPage() {
 
             <Link
               href="/qc2/floor-board"
-              className="flex items-center gap-1.5 px-3 py-2 bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 rounded-lg text-xs font-semibold transition"
+              className="flex items-center gap-1.5 px-3 py-2 bg-accent-400/20 text-accent-700 border border-accent-500/40 hover:bg-accent-400/30 rounded-lg text-xs font-semibold transition"
             >
               <Kanban className="w-4 h-4" />
               <span>Floor Board</span>
@@ -496,8 +490,8 @@ export default function QC2MyWorkPage() {
       {/* TOAST MESSAGE */}
       {toastMessage && (
         <div className="max-w-7xl mx-auto px-4 sm:px-8 mt-4 animate-in fade-in">
-          <div className="p-3 bg-emerald-50 border border-emerald-300 text-emerald-900 rounded-xl text-xs font-semibold flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+          <div className="p-3 bg-accent-50 border border-accent-300 text-accent-800 rounded-xl text-xs font-semibold flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-accent-700 shrink-0" />
             <span>{toastMessage}</span>
           </div>
         </div>
@@ -505,20 +499,20 @@ export default function QC2MyWorkPage() {
 
       {/* TABS NAVIGATION */}
       <div className="max-w-7xl mx-auto px-4 sm:px-8 mt-6">
-        <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
+        <div className="flex items-center gap-2 border-b border-neutral-200 pb-2">
           <button
             onClick={() => setActiveTab('INCOMING')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition ${
               activeTab === 'INCOMING'
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'text-slate-600 hover:bg-slate-200/60'
+                ? 'bg-accent-400 text-neutral-900 shadow-xs'
+                : 'text-neutral-600 hover:bg-neutral-200/60'
             }`}
           >
             <Scissors className="w-3.5 h-3.5" />
             <span>Incoming from Thread Cutting</span>
             <span
               className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
-                activeTab === 'INCOMING' ? 'bg-emerald-800 text-white' : 'bg-slate-200 text-slate-700'
+                activeTab === 'INCOMING' ? 'bg-accent-500 text-neutral-900' : 'bg-neutral-200 text-neutral-700'
               }`}
             >
               {challans.length}
@@ -529,15 +523,15 @@ export default function QC2MyWorkPage() {
             onClick={() => setActiveTab('DEFECTED_SHELF')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition ${
               activeTab === 'DEFECTED_SHELF'
-                ? 'bg-rose-600 text-white shadow-xs'
-                : 'text-slate-600 hover:bg-slate-200/60'
+                ? 'bg-danger-600 text-white shadow-xs'
+                : 'text-neutral-600 hover:bg-neutral-200/60'
             }`}
           >
             <ShieldAlert className="w-3.5 h-3.5" />
             <span>Defected Shelf Dispatches (DEF-SHELF-01)</span>
             <span
               className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
-                activeTab === 'DEFECTED_SHELF' ? 'bg-rose-800 text-white' : 'bg-slate-200 text-slate-700'
+                activeTab === 'DEFECTED_SHELF' ? 'bg-danger-800 text-white' : 'bg-neutral-200 text-neutral-700'
               }`}
             >
               {defectiveReturns.length}
@@ -548,15 +542,15 @@ export default function QC2MyWorkPage() {
             onClick={() => setActiveTab('REWORK_HISTORY')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition ${
               activeTab === 'REWORK_HISTORY'
-                ? 'bg-amber-600 text-white shadow-xs'
-                : 'text-slate-600 hover:bg-slate-200/60'
+                ? 'bg-accent-400 text-neutral-900 shadow-xs'
+                : 'text-neutral-600 hover:bg-neutral-200/60'
             }`}
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Rework Returns to Thread Cutting</span>
             <span
               className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
-                activeTab === 'REWORK_HISTORY' ? 'bg-amber-800 text-white' : 'bg-slate-200 text-slate-700'
+                activeTab === 'REWORK_HISTORY' ? 'bg-accent-500 text-neutral-900' : 'bg-neutral-200 text-neutral-700'
               }`}
             >
               {reworkReturns.length}
@@ -567,8 +561,8 @@ export default function QC2MyWorkPage() {
             onClick={() => setActiveTab('PRODUCTION_SHEETS')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition ${
               activeTab === 'PRODUCTION_SHEETS'
-                ? 'bg-blue-600 text-white shadow-xs'
-                : 'text-slate-600 hover:bg-slate-200/60'
+                ? 'bg-brand-600 text-white shadow-xs'
+                : 'text-neutral-600 hover:bg-neutral-200/60'
             }`}
           >
             <FileText className="w-3.5 h-3.5" />
@@ -581,24 +575,24 @@ export default function QC2MyWorkPage() {
       {activeTab === 'INCOMING' && (
         <div className="max-w-7xl mx-auto px-4 sm:px-8 mt-5 space-y-4">
           {/* SEARCH & FILTERS BAR */}
-          <div className="bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="bg-white p-3.5 rounded-xl border border-neutral-200/90 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="relative flex-1 max-w-md">
               <input
                 type="text"
                 placeholder="Search Challan #, Sheet #, Client, Style..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                className="w-full pl-9 pr-4 py-2 text-xs border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500/40 focus:border-brand-500"
               />
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+              <Search className="w-4 h-4 text-neutral-500 absolute left-3 top-2.5" />
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-500 font-semibold">Status:</span>
+              <span className="text-xs text-neutral-500 font-semibold">Status:</span>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-3 py-1.5 text-xs font-medium border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 bg-white"
+                className="px-3 py-1.5 text-xs font-medium border border-neutral-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-500/40 bg-white"
               >
                 <option value="ALL">All Statuses</option>
                 <option value="PENDING">Pending (Issued / Received)</option>
@@ -611,10 +605,10 @@ export default function QC2MyWorkPage() {
           </div>
 
           {/* CHALLANS TABLE */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+          <div className="bg-white rounded-xl border border-neutral-200 shadow-xs overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs min-w-[760px]">
-                <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase tracking-wider text-[10px]">
+                <thead className="bg-neutral-50 border-b border-neutral-200 text-neutral-600 uppercase tracking-wider text-[10px]">
                   <tr>
                     <th className="py-3 px-4 font-bold">Challan Number</th>
                     <th className="py-3 px-4 font-bold">Sheet / Program #</th>
@@ -625,10 +619,10 @@ export default function QC2MyWorkPage() {
                     <th className="py-3 px-4 font-bold text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-neutral-100">
                   {filteredChallans.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="py-12 text-center text-slate-400">
+                      <td colSpan={7} className="py-12 text-center text-neutral-500">
                         No challans match the current filter.
                       </td>
                     </tr>
@@ -640,44 +634,44 @@ export default function QC2MyWorkPage() {
                       );
                       const uom = c.items[0]?.uom || 'PCS';
                       return (
-                        <tr key={c.id} className="hover:bg-slate-50/70 transition">
-                          <td className="py-3 px-4 font-mono font-bold text-emerald-950">
+                        <tr key={c.id} className="hover:bg-neutral-50/70 transition">
+                          <td className="py-3 px-4 font-mono font-bold text-accent-800">
                             {c.challanNumber}
                           </td>
-                          <td className="py-3 px-4 font-mono text-slate-700 font-semibold">
+                          <td className="py-3 px-4 font-mono text-neutral-700 font-semibold">
                             {c.program?.programSerialNo || c.program?.programNumber || '—'}
                           </td>
-                          <td className="py-3 px-4 text-slate-700">
+                          <td className="py-3 px-4 text-neutral-700">
                             <span className="font-semibold block truncate">
                               {c.program?.clientName || c.program?.buyerName || 'Standard Client'}
                             </span>
-                            <span className="text-[10px] text-slate-500 block truncate">
+                            <span className="text-[10px] text-neutral-500 block truncate">
                               {c.program?.mainStyle || c.program?.styleCode || 'General Lot'}
                             </span>
                           </td>
-                          <td className="py-3 px-4 font-mono font-bold text-slate-900">
+                          <td className="py-3 px-4 font-mono font-bold text-neutral-900">
                             {totalQty.toLocaleString()} {uom}
                           </td>
                           <td className="py-3 px-4">
                             <span
                               className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
                                 c.status === 'QC_APPROVED'
-                                  ? 'bg-emerald-100 text-emerald-800'
+                                  ? 'bg-accent-100 text-accent-800'
                                   : c.status === 'QC_REJECTED'
-                                  ? 'bg-rose-100 text-rose-800'
+                                  ? 'bg-danger-100 text-danger-800'
                                   : c.status === 'REWORK_REQUESTED'
-                                  ? 'bg-amber-100 text-amber-800'
+                                  ? 'bg-accent-100 text-accent-800'
                                   : c.status === 'UNDER_INSPECTION'
-                                  ? 'bg-blue-100 text-blue-800'
+                                  ? 'bg-brand-100 text-brand-800'
                                   : c.status === 'RECEIVED'
-                                  ? 'bg-teal-100 text-teal-800'
-                                  : 'bg-slate-100 text-slate-700'
+                                  ? 'bg-brand-100 text-brand-800'
+                                  : 'bg-neutral-100 text-neutral-700'
                               }`}
                             >
                               {c.status}
                             </span>
                           </td>
-                          <td className="py-3 px-4 text-slate-500 font-mono text-[11px]">
+                          <td className="py-3 px-4 text-neutral-500 font-mono text-[11px]">
                             {new Date(c.createdAt).toLocaleDateString('en-IN')}
                           </td>
                           <td className="py-3 px-4 text-right">
@@ -685,7 +679,7 @@ export default function QC2MyWorkPage() {
                               {c.status === 'ISSUED' && (
                                 <button
                                   onClick={() => handleReceiveChallan(c)}
-                                  className="px-2.5 py-1 bg-teal-600 hover:bg-teal-700 text-white rounded text-[11px] font-semibold transition shadow-2xs"
+                                  className="px-2.5 py-1 bg-brand-600 hover:bg-brand-700 text-white rounded text-[11px] font-semibold transition shadow-2xs"
                                 >
                                   Receive
                                 </button>
@@ -694,7 +688,7 @@ export default function QC2MyWorkPage() {
                               {['ISSUED', 'RECEIVED', 'UNDER_INSPECTION'].includes(c.status) && (
                                 <button
                                   onClick={() => handleOpenInspection(c)}
-                                  className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[11px] font-semibold transition shadow-2xs flex items-center gap-1"
+                                  className="px-2.5 py-1 bg-accent-400 hover:bg-accent-500 text-neutral-900 rounded text-[11px] font-semibold transition shadow-2xs flex items-center gap-1"
                                 >
                                   <span>Inspect</span>
                                   <ArrowRight className="w-3 h-3" />
@@ -704,7 +698,7 @@ export default function QC2MyWorkPage() {
                               {c.status === 'QC_APPROVED' && (
                                 <button
                                   onClick={() => handleIssueToWashing(c)}
-                                  className="px-2.5 py-1 bg-sky-600 hover:bg-sky-700 text-white rounded text-[11px] font-semibold transition shadow-2xs flex items-center gap-1"
+                                  className="px-2.5 py-1 bg-brand-600 hover:bg-brand-700 text-white rounded text-[11px] font-semibold transition shadow-2xs flex items-center gap-1"
                                   title="Issue Handover Challan to Washing Department"
                                 >
                                   <Waves className="w-3 h-3" />
@@ -733,9 +727,9 @@ export default function QC2MyWorkPage() {
       {/* CONTENT FOR TAB 2: DEFECTED SHELF DISPATCHES */}
       {activeTab === 'DEFECTED_SHELF' && (
         <div className="max-w-7xl mx-auto px-4 sm:px-8 mt-5 space-y-4">
-          <div className="bg-rose-50/60 border border-rose-200 p-4 rounded-xl flex items-center justify-between text-xs text-rose-900">
+          <div className="bg-danger-50/60 border border-danger-200 p-4 rounded-xl flex items-center justify-between text-xs text-danger-900">
             <div className="flex items-center gap-3">
-              <ShieldAlert className="w-5 h-5 text-rose-600 shrink-0" />
+              <ShieldAlert className="w-5 h-5 text-danger-600 shrink-0" />
               <div>
                 <strong className="block font-bold">Direct Defected Shelf Handoff Rules</strong>
                 <span>
@@ -745,10 +739,10 @@ export default function QC2MyWorkPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+          <div className="bg-white rounded-xl border border-neutral-200 shadow-xs overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs min-w-[700px]">
-                <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase tracking-wider text-[10px]">
+                <thead className="bg-neutral-50 border-b border-neutral-200 text-neutral-600 uppercase tracking-wider text-[10px]">
                   <tr>
                     <th className="py-3 px-4 font-bold">Return Slip #</th>
                     <th className="py-3 px-4 font-bold">Sheet #</th>
@@ -758,10 +752,10 @@ export default function QC2MyWorkPage() {
                     <th className="py-3 px-4 font-bold">Date Dispatched</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-neutral-100">
                   {defectiveReturns.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="py-10 text-center text-slate-400">
+                      <td colSpan={6} className="py-10 text-center text-neutral-500">
                         No rejected lots sent to defective shelf yet.
                       </td>
                     </tr>
@@ -772,25 +766,25 @@ export default function QC2MyWorkPage() {
                         0
                       );
                       return (
-                        <tr key={dr.id} className="hover:bg-rose-50/20 transition">
-                          <td className="py-3 px-4 font-mono font-bold text-rose-900">
+                        <tr key={dr.id} className="hover:bg-danger-50/20 transition">
+                          <td className="py-3 px-4 font-mono font-bold text-danger-900">
                             {dr.challanNumber}
                           </td>
-                          <td className="py-3 px-4 font-mono text-slate-700">
+                          <td className="py-3 px-4 font-mono text-neutral-700">
                             {dr.program?.programSerialNo || dr.program?.programNumber || '—'}
                           </td>
-                          <td className="py-3 px-4 font-mono font-bold text-rose-700">
+                          <td className="py-3 px-4 font-mono font-bold text-danger-700">
                             {qty} PCS
                           </td>
                           <td className="py-3 px-4">
-                            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-100 text-rose-800">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-danger-100 text-danger-800">
                               DEF-SHELF-01
                             </span>
                           </td>
-                          <td className="py-3 px-4 text-slate-600 text-[11px] truncate max-w-sm">
+                          <td className="py-3 px-4 text-neutral-600 text-[11px] truncate max-w-sm">
                             {dr.remarks || 'QC2 Rejection'}
                           </td>
-                          <td className="py-3 px-4 font-mono text-slate-500 text-[11px]">
+                          <td className="py-3 px-4 font-mono text-neutral-500 text-[11px]">
                             {new Date(dr.createdAt).toLocaleDateString('en-IN')}
                           </td>
                         </tr>
@@ -807,9 +801,9 @@ export default function QC2MyWorkPage() {
       {/* CONTENT FOR TAB 3: REWORK RETURNS */}
       {activeTab === 'REWORK_HISTORY' && (
         <div className="max-w-7xl mx-auto px-4 sm:px-8 mt-5 space-y-4">
-          <div className="bg-amber-50/60 border border-amber-200 p-4 rounded-xl flex items-center justify-between text-xs text-amber-900">
+          <div className="bg-accent-50/60 border border-accent-200 p-4 rounded-xl flex items-center justify-between text-xs text-accent-800">
             <div className="flex items-center gap-3">
-              <RotateCcw className="w-5 h-5 text-amber-600 shrink-0" />
+              <RotateCcw className="w-5 h-5 text-accent-700 shrink-0" />
               <div>
                 <strong className="block font-bold">Rework Returns to Thread Cutting</strong>
                 <span>
@@ -819,10 +813,10 @@ export default function QC2MyWorkPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+          <div className="bg-white rounded-xl border border-neutral-200 shadow-xs overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs min-w-[700px]">
-                <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase tracking-wider text-[10px]">
+                <thead className="bg-neutral-50 border-b border-neutral-200 text-neutral-600 uppercase tracking-wider text-[10px]">
                   <tr>
                     <th className="py-3 px-4 font-bold">Rework Slip #</th>
                     <th className="py-3 px-4 font-bold">Sheet #</th>
@@ -831,10 +825,10 @@ export default function QC2MyWorkPage() {
                     <th className="py-3 px-4 font-bold">Date Dispatched</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-neutral-100">
                   {reworkReturns.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="py-10 text-center text-slate-400">
+                      <td colSpan={5} className="py-10 text-center text-neutral-500">
                         No rework returns recorded yet.
                       </td>
                     </tr>
@@ -845,20 +839,20 @@ export default function QC2MyWorkPage() {
                         0
                       );
                       return (
-                        <tr key={rr.id} className="hover:bg-amber-50/20 transition">
-                          <td className="py-3 px-4 font-mono font-bold text-amber-900">
+                        <tr key={rr.id} className="hover:bg-accent-50/20 transition">
+                          <td className="py-3 px-4 font-mono font-bold text-accent-800">
                             {rr.challanNumber}
                           </td>
-                          <td className="py-3 px-4 font-mono text-slate-700">
+                          <td className="py-3 px-4 font-mono text-neutral-700">
                             {rr.program?.programSerialNo || rr.program?.programNumber || '—'}
                           </td>
-                          <td className="py-3 px-4 font-mono font-bold text-amber-700">
+                          <td className="py-3 px-4 font-mono font-bold text-accent-800">
                             {qty} PCS
                           </td>
-                          <td className="py-3 px-4 text-slate-600 text-[11px] truncate max-w-sm">
+                          <td className="py-3 px-4 text-neutral-600 text-[11px] truncate max-w-sm">
                             {rr.remarks || 'Thread Alteration'}
                           </td>
-                          <td className="py-3 px-4 font-mono text-slate-500 text-[11px]">
+                          <td className="py-3 px-4 font-mono text-neutral-500 text-[11px]">
                             {new Date(rr.createdAt).toLocaleDateString('en-IN')}
                           </td>
                         </tr>
@@ -875,14 +869,14 @@ export default function QC2MyWorkPage() {
       {/* CONTENT FOR TAB 4: PRODUCTION SHEETS (QC2 TRAVELERS) */}
       {activeTab === 'PRODUCTION_SHEETS' && (
         <div className="max-w-7xl mx-auto px-4 sm:px-8 mt-5 space-y-4">
-          <div className="bg-white rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden">
-            <div className="p-4 border-b border-slate-200/80 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="bg-white rounded-xl border border-neutral-200/90 shadow-2xs overflow-hidden">
+            <div className="p-4 border-b border-neutral-200/80 bg-neutral-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-blue-600" />
+                <h3 className="text-sm font-bold text-neutral-900 flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-brand-600" />
                   <span>QC2 Garment Production Sheets &amp; Travelers</span>
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-neutral-500 mt-0.5">
                   Full production specifications, client styles, target quantities, and embroidery details for active QC2 lots.
                 </p>
               </div>
@@ -890,7 +884,7 @@ export default function QC2MyWorkPage() {
 
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50/80 text-slate-600 font-semibold border-b border-slate-200 uppercase text-[10px] tracking-wider">
+                <thead className="bg-neutral-50/80 text-neutral-600 font-semibold border-b border-neutral-200 uppercase text-[10px] tracking-wider">
                   <tr>
                     <th className="py-3 px-4 font-bold">Sheet #</th>
                     <th className="py-3 px-4 font-bold">Client / Buyer</th>
@@ -900,10 +894,10 @@ export default function QC2MyWorkPage() {
                     <th className="py-3 px-4 font-bold text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-neutral-100">
                   {challans.filter((c) => c.program).length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="py-12 text-center text-slate-400">
+                      <td colSpan={6} className="py-12 text-center text-neutral-500">
                         No production sheets linked to current QC2 challans.
                       </td>
                     </tr>
@@ -916,25 +910,25 @@ export default function QC2MyWorkPage() {
                           .map((c) => [c.program!.id, c.program!])
                       ).values()
                     ).map((prg: any) => (
-                      <tr key={prg.id} className="hover:bg-slate-50/50 transition">
-                        <td className="py-3 px-4 font-mono font-bold text-blue-900">
+                      <tr key={prg.id} className="hover:bg-neutral-50/50 transition">
+                        <td className="py-3 px-4 font-mono font-bold text-brand-900">
                           {prg.programSerialNo || prg.programNumber}
                         </td>
-                        <td className="py-3 px-4 font-semibold text-slate-800">
+                        <td className="py-3 px-4 font-semibold text-neutral-900">
                           {prg.clientName || prg.buyerName || 'Standard Client'}
                         </td>
-                        <td className="py-3 px-4 text-slate-700">
+                        <td className="py-3 px-4 text-neutral-700">
                           {prg.mainStyle || prg.styleCode || '—'}
                           {prg.wilcomDesignNumber && (
-                            <span className="text-[10px] text-slate-500 font-mono block">
+                            <span className="text-[10px] text-neutral-500 font-mono block">
                               Wilcom: {prg.wilcomDesignNumber}
                             </span>
                           )}
                         </td>
-                        <td className="py-3 px-4 text-slate-600">
+                        <td className="py-3 px-4 text-neutral-600">
                           {prg.fabricName || '—'} · {prg.fabricColor || '—'}
                         </td>
-                        <td className="py-3 px-4 font-mono font-bold text-slate-900">
+                        <td className="py-3 px-4 font-mono font-bold text-neutral-900">
                           {prg.targetQuantity || '—'} PCS
                         </td>
                         <td className="py-3 px-4 text-right">
@@ -945,7 +939,7 @@ export default function QC2MyWorkPage() {
                             />
                             <Link
                               href={`/programs/${prg.id}`}
-                              className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded transition"
+                              className="p-1.5 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 rounded transition"
                               title="Open Full Page"
                             >
                               <ExternalLink className="w-3.5 h-3.5" />
@@ -964,17 +958,17 @@ export default function QC2MyWorkPage() {
 
       {/* INSPECTION TERMINAL MODAL */}
       {selectedChallanForInspect && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/70 backdrop-blur-xs animate-in fade-in overflow-y-auto">
-          <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden my-auto max-h-[92vh] flex flex-col text-slate-800">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-neutral-900/70 backdrop-blur-xs animate-in fade-in overflow-y-auto">
+          <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-neutral-200 overflow-hidden my-auto max-h-[92vh] flex flex-col text-neutral-900">
             {/* MODAL HEADER */}
-            <div className="p-4 sm:p-5 bg-gradient-to-r from-[#0F172A] to-[#1E293B] text-white flex items-center justify-between border-b border-slate-700">
+            <div className="p-4 sm:p-5 bg-white text-neutral-900 flex items-center justify-between border-b border-neutral-200">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                  <CheckCircle2 className="w-5 h-5 text-white" />
+                <div className="w-10 h-10 rounded-xl bg-accent-400 flex items-center justify-center shadow-sm">
+                  <CheckCircle2 className="w-5 h-5 text-neutral-900" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white">QC2 Garment Inspection Terminal</h3>
-                  <p className="text-xs text-emerald-400 font-mono">
+                  <h3 className="text-base font-bold text-neutral-900">QC2 Garment Inspection Terminal</h3>
+                  <p className="text-xs text-accent-700 font-mono">
                     Challan: {selectedChallanForInspect.challanNumber} · Sheet:{' '}
                     {selectedChallanForInspect.program?.programSerialNo ||
                       selectedChallanForInspect.program?.programNumber ||
@@ -987,7 +981,7 @@ export default function QC2MyWorkPage() {
                 <button
                   type="button"
                   onClick={() => setSelectedSheetForView(selectedChallanForInspect.program)}
-                  className="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-xs transition"
+                  className="px-2.5 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-xs transition"
                   title="View Official Production Sheet"
                 >
                   <FileText className="w-3.5 h-3.5" />
@@ -995,7 +989,7 @@ export default function QC2MyWorkPage() {
                 </button>
                 <button
                   onClick={() => setSelectedChallanForInspect(null)}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                  className="p-1.5 rounded-lg text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 transition"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1003,28 +997,28 @@ export default function QC2MyWorkPage() {
             </div>
 
             {/* LOT SUMMARY STRIP */}
-            <div className="bg-slate-50 px-5 py-3 border-b border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div className="bg-neutral-50 px-5 py-3 border-b border-neutral-200 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <div>
-                <span className="text-[10px] text-slate-400 uppercase font-bold block">Client</span>
-                <span className="font-semibold text-slate-900 truncate block">
+                <span className="text-[10px] text-neutral-500 uppercase font-bold block">Client</span>
+                <span className="font-semibold text-neutral-900 truncate block">
                   {selectedChallanForInspect.program?.clientName || 'Standard Client'}
                 </span>
               </div>
               <div>
-                <span className="text-[10px] text-slate-400 uppercase font-bold block">Style / Design</span>
-                <span className="font-semibold text-slate-900 truncate block">
+                <span className="text-[10px] text-neutral-500 uppercase font-bold block">Style / Design</span>
+                <span className="font-semibold text-neutral-900 truncate block">
                   {selectedChallanForInspect.program?.mainStyle ||
                     selectedChallanForInspect.program?.styleCode ||
                     '—'}
                 </span>
               </div>
               <div>
-                <span className="text-[10px] text-slate-400 uppercase font-bold block">Source Dept</span>
-                <span className="font-semibold text-cyan-800 block">Thread Cutting</span>
+                <span className="text-[10px] text-neutral-500 uppercase font-bold block">Source Dept</span>
+                <span className="font-semibold text-brand-800 block">Thread Cutting</span>
               </div>
               <div>
-                <span className="text-[10px] text-slate-400 uppercase font-bold block">Lot Total</span>
-                <span className="font-mono font-bold text-emerald-700 block">
+                <span className="text-[10px] text-neutral-500 uppercase font-bold block">Lot Total</span>
+                <span className="font-mono font-bold text-accent-800 block">
                   {inspectionForm.quantityInspected} PCS
                 </span>
               </div>
@@ -1034,12 +1028,12 @@ export default function QC2MyWorkPage() {
             <form onSubmit={handleSubmitInspection} className="p-5 space-y-4 overflow-y-auto flex-1">
               {/* QUANTITIES GRID */}
               <div>
-                <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-bold text-neutral-900 uppercase tracking-wider mb-2">
                   1. Piece Accounting &amp; Verification (PCS)
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <div>
-                    <span className="text-[11px] font-semibold text-slate-600 block mb-1">
+                    <span className="text-[11px] font-semibold text-neutral-600 block mb-1">
                       Total Inspected
                     </span>
                     <input
@@ -1048,12 +1042,12 @@ export default function QC2MyWorkPage() {
                       min="1"
                       value={inspectionForm.quantityInspected}
                       onChange={(e) => handleQuantityChange('quantityInspected', e.target.value)}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-900 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-xs font-mono font-bold text-neutral-900 focus:ring-2 focus:ring-brand-500/40 focus:outline-none"
                     />
                   </div>
 
                   <div>
-                    <span className="text-[11px] font-semibold text-emerald-800 block mb-1">
+                    <span className="text-[11px] font-semibold text-accent-800 block mb-1">
                       Passed (Good)
                     </span>
                     <input
@@ -1062,12 +1056,12 @@ export default function QC2MyWorkPage() {
                       min="0"
                       value={inspectionForm.quantityPassed}
                       onChange={(e) => handleQuantityChange('quantityPassed', e.target.value)}
-                      className="w-full px-3 py-2 border border-emerald-300 bg-emerald-50/30 rounded-lg text-xs font-mono font-bold text-emerald-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                      className="w-full px-3 py-2 border border-accent-300 bg-accent-50/30 rounded-lg text-xs font-mono font-bold text-accent-800 focus:ring-2 focus:ring-brand-500/40 focus:outline-none"
                     />
                   </div>
 
                   <div>
-                    <span className="text-[11px] font-semibold text-rose-800 block mb-1">
+                    <span className="text-[11px] font-semibold text-danger-800 block mb-1">
                       Defective (Reject)
                     </span>
                     <input
@@ -1075,12 +1069,12 @@ export default function QC2MyWorkPage() {
                       min="0"
                       value={inspectionForm.quantityFailed}
                       onChange={(e) => handleQuantityChange('quantityFailed', e.target.value)}
-                      className="w-full px-3 py-2 border border-rose-300 bg-rose-50/30 rounded-lg text-xs font-mono font-bold text-rose-700 focus:ring-2 focus:ring-rose-500 focus:outline-none"
+                      className="w-full px-3 py-2 border border-danger-300 bg-danger-50/30 rounded-lg text-xs font-mono font-bold text-danger-700 focus:ring-2 focus:ring-danger-500 focus:outline-none"
                     />
                   </div>
 
                   <div>
-                    <span className="text-[11px] font-semibold text-amber-800 block mb-1">
+                    <span className="text-[11px] font-semibold text-accent-800 block mb-1">
                       Rework (Trimming)
                     </span>
                     <input
@@ -1088,15 +1082,15 @@ export default function QC2MyWorkPage() {
                       min="0"
                       value={inspectionForm.quantityRework}
                       onChange={(e) => handleQuantityChange('quantityRework', e.target.value)}
-                      className="w-full px-3 py-2 border border-amber-300 bg-amber-50/30 rounded-lg text-xs font-mono font-bold text-amber-700 focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                      className="w-full px-3 py-2 border border-accent-300 bg-accent-50/30 rounded-lg text-xs font-mono font-bold text-accent-800 focus:ring-2 focus:ring-brand-500/40 focus:outline-none"
                     />
                   </div>
                 </div>
 
                 {/* USER NOTICE: REJECTION TO DEFECTED SHELF */}
                 {Number(inspectionForm.quantityFailed) > 0 && (
-                  <div className="mt-2.5 p-2.5 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-900 flex items-center gap-2">
-                    <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0" />
+                  <div className="mt-2.5 p-2.5 rounded-lg bg-danger-50 border border-danger-200 text-xs text-danger-900 flex items-center gap-2">
+                    <ShieldAlert className="w-4 h-4 text-danger-600 shrink-0" />
                     <span>
                       <strong>Automated Action:</strong> {inspectionForm.quantityFailed} defective pieces will be dispatched directly to <strong className="font-mono">Fabric Store Defected Shelf (DEF-SHELF-01)</strong>.
                     </span>
@@ -1107,7 +1101,7 @@ export default function QC2MyWorkPage() {
               {/* DEFECT CATEGORIES CHECKLIST */}
               {Number(inspectionForm.quantityFailed) > 0 && (
                 <div>
-                  <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-bold text-neutral-900 uppercase tracking-wider mb-2">
                     2. Defect Classification Checklist
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -1118,8 +1112,8 @@ export default function QC2MyWorkPage() {
                           key={cat.id}
                           className={`p-2 rounded-lg border text-xs cursor-pointer transition flex flex-col justify-between ${
                             count > 0
-                              ? 'border-rose-400 bg-rose-50/60 text-rose-900 font-semibold'
-                              : 'border-slate-200 hover:border-slate-300 text-slate-700'
+                              ? 'border-danger-500 bg-danger-50/60 text-danger-900 font-semibold'
+                              : 'border-neutral-200 hover:border-neutral-300 text-neutral-700'
                           }`}
                         >
                           <div className="truncate text-[11px] mb-1.5">{cat.label}</div>
@@ -1127,7 +1121,7 @@ export default function QC2MyWorkPage() {
                             <button
                               type="button"
                               onClick={() => handleDefectCountChange(cat.id, Math.max(0, count - 1))}
-                              className="w-5 h-5 rounded bg-slate-200 hover:bg-slate-300 flex items-center justify-center text-xs font-bold text-slate-700"
+                              className="w-5 h-5 rounded bg-neutral-200 hover:bg-neutral-300 flex items-center justify-center text-xs font-bold text-neutral-700"
                             >
                               -
                             </button>
@@ -1135,7 +1129,7 @@ export default function QC2MyWorkPage() {
                             <button
                               type="button"
                               onClick={() => handleDefectCountChange(cat.id, count + 1)}
-                              className="w-5 h-5 rounded bg-rose-600 text-white hover:bg-rose-700 flex items-center justify-center text-xs font-bold"
+                              className="w-5 h-5 rounded bg-danger-600 text-white hover:bg-danger-700 flex items-center justify-center text-xs font-bold"
                             >
                               +
                             </button>
@@ -1150,7 +1144,7 @@ export default function QC2MyWorkPage() {
               {/* DEFECT REMARKS */}
               {Number(inspectionForm.quantityFailed) > 0 && (
                 <div>
-                  <label className="block text-xs font-bold text-rose-800 mb-1">
+                  <label className="block text-xs font-bold text-danger-800 mb-1">
                     Defect Remarks &amp; Quarantine Notes (Required for Defected Shelf) *
                   </label>
                   <textarea
@@ -1159,7 +1153,7 @@ export default function QC2MyWorkPage() {
                     placeholder="Describe specific needle holes, broken stitches, unfixable fabric flaws..."
                     value={inspectionForm.defectRemarks}
                     onChange={(e) => setInspectionForm({ ...inspectionForm, defectRemarks: e.target.value })}
-                    className="w-full px-3 py-2 border border-rose-300 rounded-lg text-xs focus:ring-2 focus:ring-rose-500 focus:outline-none"
+                    className="w-full px-3 py-2 border border-danger-300 rounded-lg text-xs focus:ring-2 focus:ring-danger-500 focus:outline-none"
                   />
                 </div>
               )}
@@ -1167,7 +1161,7 @@ export default function QC2MyWorkPage() {
               {/* REWORK REASON */}
               {Number(inspectionForm.quantityRework) > 0 && (
                 <div>
-                  <label className="block text-xs font-bold text-amber-800 mb-1">
+                  <label className="block text-xs font-bold text-accent-800 mb-1">
                     Rework Instructions for Thread Cutting Section *
                   </label>
                   <textarea
@@ -1176,14 +1170,14 @@ export default function QC2MyWorkPage() {
                     placeholder="Specify threads needing re-trimming or needle points to clean..."
                     value={inspectionForm.reworkReason}
                     onChange={(e) => setInspectionForm({ ...inspectionForm, reworkReason: e.target.value })}
-                    className="w-full px-3 py-2 border border-amber-300 rounded-lg text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                    className="w-full px-3 py-2 border border-accent-300 rounded-lg text-xs focus:ring-2 focus:ring-brand-500/40 focus:outline-none"
                   />
                 </div>
               )}
 
               {/* OVERALL REMARKS */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-neutral-700 mb-1">
                   General QC2 Observation Notes
                 </label>
                 <input
@@ -1191,23 +1185,23 @@ export default function QC2MyWorkPage() {
                   placeholder="e.g. Dimensions verified. Thread trims cleared. Passed inspection."
                   value={inspectionForm.remarks}
                   onChange={(e) => setInspectionForm({ ...inspectionForm, remarks: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-xs focus:ring-2 focus:ring-brand-500/40 focus:outline-none"
                 />
               </div>
 
               {/* ACTIONS */}
-              <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-2.5">
+              <div className="pt-3 border-t border-neutral-200 flex items-center justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={() => setSelectedChallanForInspect(null)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition"
+                  className="px-4 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-semibold text-xs rounded-lg transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submittingInspection}
-                  className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg shadow-sm transition flex items-center gap-1.5 disabled:opacity-50"
+                  className="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-lg shadow-sm transition flex items-center gap-1.5 disabled:opacity-50"
                 >
                   {submittingInspection ? (
                     <span>Submitting Inspection...</span>
@@ -1226,39 +1220,39 @@ export default function QC2MyWorkPage() {
 
       {/* INSPECTION RESULT SUCCESS MODAL */}
       {inspectionResultModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in">
-          <div className="relative w-full max-w-md bg-white rounded-2xl p-6 shadow-2xl border border-slate-200 text-slate-800 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-900/70 backdrop-blur-xs animate-in fade-in">
+          <div className="relative w-full max-w-md bg-white rounded-2xl p-6 shadow-2xl border border-neutral-200 text-neutral-900 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+              <div className="w-12 h-12 rounded-xl bg-accent-100 text-accent-700 flex items-center justify-center shrink-0">
                 <CheckCircle2 className="w-7 h-7" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-900">QC2 Inspection Completed!</h3>
-                <p className="text-xs text-slate-500">
-                  Result: <strong className="text-emerald-700">{inspectionResultModal.result}</strong>
+                <h3 className="text-base font-bold text-neutral-900">QC2 Inspection Completed!</h3>
+                <p className="text-xs text-neutral-500">
+                  Result: <strong className="text-accent-800">{inspectionResultModal.result}</strong>
                 </p>
               </div>
             </div>
 
-            <div className="bg-slate-50 rounded-xl p-3 space-y-2 text-xs border border-slate-200">
+            <div className="bg-neutral-50 rounded-xl p-3 space-y-2 text-xs border border-neutral-200">
               <div className="flex items-center justify-between">
-                <span className="text-slate-600">Passed (Good PCS):</span>
-                <span className="font-mono font-bold text-emerald-700">
+                <span className="text-neutral-600">Passed (Good PCS):</span>
+                <span className="font-mono font-bold text-accent-800">
                   {inspectionResultModal.quantityPassed} PCS
                 </span>
               </div>
               {inspectionResultModal.quantityFailed > 0 && (
-                <div className="flex items-center justify-between border-t border-slate-200 pt-1.5">
-                  <span className="text-rose-700 font-semibold">Defective Shelf Return:</span>
-                  <span className="font-mono font-bold text-rose-700">
+                <div className="flex items-center justify-between border-t border-neutral-200 pt-1.5">
+                  <span className="text-danger-700 font-semibold">Defective Shelf Return:</span>
+                  <span className="font-mono font-bold text-danger-700">
                     {inspectionResultModal.defectiveReturnChallan || 'Dispatched to DEF-SHELF-01'}
                   </span>
                 </div>
               )}
               {inspectionResultModal.quantityRework > 0 && (
-                <div className="flex items-center justify-between border-t border-slate-200 pt-1.5">
-                  <span className="text-amber-700 font-semibold">Rework Return (TC):</span>
-                  <span className="font-mono font-bold text-amber-700">
+                <div className="flex items-center justify-between border-t border-neutral-200 pt-1.5">
+                  <span className="text-accent-800 font-semibold">Rework Return (TC):</span>
+                  <span className="font-mono font-bold text-accent-800">
                     {inspectionResultModal.reworkReturnChallan || 'Dispatched to TC'}
                   </span>
                 </div>
@@ -1267,7 +1261,7 @@ export default function QC2MyWorkPage() {
 
             <button
               onClick={() => setInspectionResultModal(null)}
-              className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition"
+              className="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl shadow-xs transition"
             >
               Done
             </button>
@@ -1277,14 +1271,14 @@ export default function QC2MyWorkPage() {
 
       {/* VIEW CHALLAN SLIP MODAL */}
       {selectedChallanForView && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in overflow-y-auto">
-          <div className="relative w-full max-w-lg bg-white rounded-2xl p-6 shadow-2xl border border-slate-200 text-slate-800 space-y-4 my-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-900/70 backdrop-blur-xs animate-in fade-in overflow-y-auto">
+          <div className="relative w-full max-w-lg bg-white rounded-2xl p-6 shadow-2xl border border-neutral-200 text-neutral-900 space-y-4 my-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-neutral-200">
               <div>
-                <h3 className="text-base font-bold text-slate-900">
+                <h3 className="text-base font-bold text-neutral-900">
                   Challan #{selectedChallanForView.challanNumber}
                 </h3>
-                <span className="text-xs text-slate-500 font-mono">
+                <span className="text-xs text-neutral-500 font-mono">
                   From: Thread Cutting → To: QC2
                 </span>
               </div>
@@ -1292,7 +1286,7 @@ export default function QC2MyWorkPage() {
                 <button
                   type="button"
                   onClick={() => setSelectedSheetForView(selectedChallanForView.program)}
-                  className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold flex items-center gap-1 shadow-xs transition"
+                  className="px-2.5 py-1 bg-brand-600 hover:bg-brand-700 text-white rounded text-xs font-semibold flex items-center gap-1 shadow-xs transition"
                   title="View Official Production Sheet"
                 >
                   <FileText className="w-3.5 h-3.5" />
@@ -1300,7 +1294,7 @@ export default function QC2MyWorkPage() {
                 </button>
                 <button
                   onClick={() => setSelectedChallanForView(null)}
-                  className="p-1 rounded text-slate-400 hover:text-slate-700"
+                  className="p-1 rounded text-neutral-500 hover:text-neutral-700"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1309,35 +1303,35 @@ export default function QC2MyWorkPage() {
 
             <div className="space-y-2 text-xs">
               <div className="flex justify-between">
-                <span className="text-slate-500">Sheet #:</span>
-                <span className="font-mono font-bold text-slate-800">
+                <span className="text-neutral-500">Sheet #:</span>
+                <span className="font-mono font-bold text-neutral-900">
                   {selectedChallanForView.program?.programSerialNo ||
                     selectedChallanForView.program?.programNumber ||
                     '—'}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Client:</span>
-                <span className="font-semibold text-slate-800">
+                <span className="text-neutral-500">Client:</span>
+                <span className="font-semibold text-neutral-900">
                   {selectedChallanForView.program?.clientName || 'Standard Client'}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Style:</span>
-                <span className="font-semibold text-slate-800">
+                <span className="text-neutral-500">Style:</span>
+                <span className="font-semibold text-neutral-900">
                   {selectedChallanForView.program?.mainStyle ||
                     selectedChallanForView.program?.styleCode ||
                     'General Lot'}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Status:</span>
-                <span className="font-bold text-emerald-700">{selectedChallanForView.status}</span>
+                <span className="text-neutral-500">Status:</span>
+                <span className="font-bold text-accent-800">{selectedChallanForView.status}</span>
               </div>
-              <div className="border-t border-slate-200 pt-2">
-                <span className="text-[11px] font-bold text-slate-700 block mb-1">Items:</span>
+              <div className="border-t border-neutral-200 pt-2">
+                <span className="text-[11px] font-bold text-neutral-700 block mb-1">Items:</span>
                 {selectedChallanForView.items.map((it: any, idx: number) => (
-                  <div key={idx} className="flex justify-between py-1 bg-slate-50 px-2 rounded mb-1">
+                  <div key={idx} className="flex justify-between py-1 bg-neutral-50 px-2 rounded mb-1">
                     <span>{it.itemDescription}</span>
                     <span className="font-mono font-bold">
                       {it.quantity} {it.uom || 'PCS'}
@@ -1347,10 +1341,10 @@ export default function QC2MyWorkPage() {
               </div>
             </div>
 
-            <div className="pt-3 border-t border-slate-200 flex justify-end">
+            <div className="pt-3 border-t border-neutral-200 flex justify-end">
               <button
                 onClick={() => setSelectedChallanForView(null)}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition"
+                className="px-4 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-semibold text-xs rounded-lg transition"
               >
                 Close
               </button>
@@ -1361,43 +1355,43 @@ export default function QC2MyWorkPage() {
 
       {/* MODAL: CHALLAN ISSUED TO WASHING SUCCESSFULLY */}
       {washingChallanModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in overflow-y-auto">
-          <div className="relative w-full max-w-lg bg-white rounded-2xl p-6 shadow-2xl border border-slate-200 text-slate-800 space-y-4 my-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-900/70 backdrop-blur-xs animate-in fade-in overflow-y-auto">
+          <div className="relative w-full max-w-lg bg-white rounded-2xl p-6 shadow-2xl border border-neutral-200 text-neutral-900 space-y-4 my-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-neutral-200">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-sky-100 flex items-center justify-center text-sky-700">
+                <div className="w-9 h-9 rounded-xl bg-brand-100 flex items-center justify-center text-brand-700">
                   <Waves className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">
+                  <h3 className="text-base font-bold text-neutral-900">
                     Handover Challan Issued to Washing!
                   </h3>
-                  <p className="text-xs text-slate-500 font-mono">
+                  <p className="text-xs text-neutral-500 font-mono">
                     {washingChallanModal.challanNumber}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setWashingChallanModal(null)}
-                className="p-1 rounded text-slate-400 hover:text-slate-700"
+                className="p-1 rounded text-neutral-500 hover:text-neutral-700"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="space-y-3">
-              <div className="bg-sky-50/60 p-3 rounded-xl border border-sky-100 text-xs space-y-1">
+              <div className="bg-brand-50/60 p-3 rounded-xl border border-brand-100 text-xs space-y-1">
                 <div className="flex justify-between">
-                  <span className="text-slate-600">From Department:</span>
-                  <span className="font-semibold text-slate-800">QC2 Department</span>
+                  <span className="text-neutral-600">From Department:</span>
+                  <span className="font-semibold text-neutral-900">QC2 Department</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-600">To Department:</span>
-                  <span className="font-bold text-sky-700">WASHING DEPARTMENT</span>
+                  <span className="text-neutral-600">To Department:</span>
+                  <span className="font-bold text-brand-700">WASHING DEPARTMENT</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-600">Pieces Dispatched:</span>
-                  <span className="font-mono font-bold text-slate-900">
+                  <span className="text-neutral-600">Pieces Dispatched:</span>
+                  <span className="font-mono font-bold text-neutral-900">
                     {washingChallanModal.items?.reduce((s: number, it: any) => s + (Number(it.quantity) || 0), 0) || '—'} PCS
                   </span>
                 </div>
@@ -1430,17 +1424,17 @@ export default function QC2MyWorkPage() {
               />
             </div>
 
-            <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
+            <div className="pt-3 border-t border-neutral-200 flex items-center justify-end gap-2">
               <Link
                 href={`/challans/${washingChallanModal.id}`}
-                className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition"
+                className="px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition"
               >
                 <Printer className="w-3.5 h-3.5" />
                 <span>View Full Challan Slip</span>
               </Link>
               <button
                 onClick={() => setWashingChallanModal(null)}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition"
+                className="px-4 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-semibold text-xs rounded-lg transition"
               >
                 Close
               </button>

@@ -7,21 +7,25 @@ interface StatusBadgeProps {
   type?: 'challan' | 'program' | 'priority' | 'quality';
 }
 
+// Theme mapping: done = lavender, in progress = chartreuse, needs attention = solid
+// chartreuse, failed/rejected = tomato, everything else (pending, on hold) = neutral.
 export function StatusBadge({ status, type = 'challan' }: StatusBadgeProps) {
-  let colorClass = 'bg-slate-800 text-slate-300 border-slate-700';
+  let colorClass = 'bg-white text-neutral-700 border-neutral-300';
 
   const s = (status || '').toUpperCase();
 
   if (s === 'APPROVED' || s === 'COMPLETED' || s === 'PASSED' || s === 'QC_APPROVED' || s === 'CLOSED') {
-    colorClass = 'bg-emerald-950/80 text-emerald-400 border-emerald-800';
+    colorClass = 'bg-brand-50 text-brand-800 border-brand-200';
   } else if (s === 'IN_PRODUCTION' || s === 'IN_PROCESS' || s === 'RECEIVED' || s === 'ISSUED') {
-    colorClass = 'bg-blue-950/80 text-blue-400 border-blue-800';
+    colorClass = 'bg-accent-100 text-accent-800 border-accent-500';
   } else if (s === 'QC_PENDING' || s === 'SUBMITTED' || s === 'NORMAL' || s === 'MEDIUM') {
-    colorClass = 'bg-amber-950/80 text-amber-400 border-amber-800';
+    colorClass = 'bg-white text-neutral-700 border-neutral-300';
   } else if (s === 'REWORK' || s === 'HIGH' || s === 'URGENT') {
-    colorClass = 'bg-orange-950/80 text-orange-400 border-orange-800';
-  } else if (s === 'FAILED' || s === 'REJECTED' || s === 'CANCELLED' || s === 'ON_HOLD') {
-    colorClass = 'bg-rose-950/80 text-rose-400 border-rose-800';
+    colorClass = 'bg-accent-400 text-neutral-900 border-accent-600';
+  } else if (s === 'FAILED' || s === 'REJECTED') {
+    colorClass = 'bg-danger-50 text-danger-700 border-danger-300';
+  } else if (s === 'CANCELLED' || s === 'ON_HOLD') {
+    colorClass = 'bg-neutral-100 text-neutral-600 border-neutral-200';
   }
 
   return (

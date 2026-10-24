@@ -133,14 +133,14 @@ function MaterialIssueContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F0FAF9] pb-24">
-      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+    <div className="min-h-screen bg-brand-50 pb-24">
+      <header className="bg-white border-b border-neutral-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-700 block">
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-700 block">
             FABRIC STORE · DISPATCH &amp; ISSUE
           </span>
-          <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-            <ArrowUpFromLine className="w-5 h-5 text-blue-600" />
+          <h1 className="text-xl font-bold text-neutral-900 flex items-center gap-2">
+            <ArrowUpFromLine className="w-5 h-5 text-brand-600" />
             Material Issue to Production
           </h1>
         </div>
@@ -148,7 +148,7 @@ function MaterialIssueContent() {
           <button
             onClick={loadData}
             disabled={loading}
-            className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-md transition"
+            className="p-2 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 rounded-md transition"
             title="Refresh"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -158,31 +158,31 @@ function MaterialIssueContent() {
 
       <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
         {error && (
-          <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-xs font-semibold">
+          <div className="p-4 bg-danger-50 border border-danger-200 rounded-xl text-danger-800 text-xs font-semibold">
             {error}
           </div>
         )}
         {success && (
-          <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs font-semibold">
+          <div className="p-4 bg-accent-50 border border-accent-200 rounded-xl text-accent-800 text-xs font-semibold">
             {success}
           </div>
         )}
 
         {/* Issue Configuration Card */}
-        <form onSubmit={handleIssueSubmit} className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-4">
-          <h2 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-2">
+        <form onSubmit={handleIssueSubmit} className="bg-white border border-neutral-200/90 rounded-xl p-5 shadow-xs space-y-4">
+          <h2 className="text-xs font-bold text-neutral-900 uppercase tracking-wider border-b border-neutral-100 pb-2">
             Target Production Program &amp; Assignment
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="md:col-span-2">
-              <label className="block text-xs font-bold text-slate-700 mb-1">
-                Select Destination Program <span className="text-rose-500">*</span>
+              <label className="block text-xs font-bold text-neutral-700 mb-1">
+                Select Destination Program <span className="text-danger-600">*</span>
               </label>
               <select
                 required
                 value={targetProgramId}
                 onChange={(e) => setTargetProgramId(e.target.value)}
-                className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 font-semibold focus:ring-1 focus:ring-blue-500"
+                className="w-full text-xs border border-neutral-300 rounded-md px-3 py-2 bg-white text-neutral-900 font-semibold focus:ring-1 focus:ring-brand-500"
               >
                 <option value="">-- Choose Target Program --</option>
                 {programs.map((p) => (
@@ -193,7 +193,7 @@ function MaterialIssueContent() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label className="block text-xs font-bold text-neutral-700 mb-1">
                 Issue Challan / Job Reference
               </label>
               <input
@@ -201,20 +201,20 @@ function MaterialIssueContent() {
                 placeholder=""
                 value={issueRemarks}
                 onChange={(e) => setIssueRemarks(e.target.value)}
-                className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 focus:ring-1 focus:ring-blue-500"
+                className="w-full text-xs border border-neutral-300 rounded-md px-3 py-2 focus:ring-1 focus:ring-brand-500"
               />
             </div>
           </div>
         </form>
 
         {/* Available Rolls Table */}
-        <div className="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
-          <div className="p-4 border-b border-slate-200/80 flex flex-wrap items-center justify-between gap-4">
+        <div className="bg-white border border-neutral-200/90 rounded-xl shadow-xs overflow-hidden">
+          <div className="p-4 border-b border-neutral-200/80 flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h2 className="text-sm font-bold text-slate-900">
+              <h2 className="text-sm font-bold text-neutral-900">
                 Available Stock (Status: IN_STOCK &amp; QC_PASSED)
               </h2>
-              <p className="text-[11px] text-slate-500 mt-0.5">
+              <p className="text-[11px] text-neutral-500 mt-0.5">
                 Only approved, inspected fabric rolls can be issued to production.
               </p>
             </div>
@@ -224,12 +224,12 @@ function MaterialIssueContent() {
                 placeholder="Search roll, batch, fabric..."
                 value={searchFilter}
                 onChange={(e) => setSearchFilter(e.target.value)}
-                className="text-xs border border-slate-300 rounded-md px-3 py-1.5 w-52"
+                className="text-xs border border-neutral-300 rounded-md px-3 py-1.5 w-52"
               />
               <select
                 value={fabricTypeFilter}
                 onChange={(e) => setFabricTypeFilter(e.target.value)}
-                className="text-xs border border-slate-300 rounded-md px-3 py-1.5"
+                className="text-xs border border-neutral-300 rounded-md px-3 py-1.5"
               >
                 <option value="">All Fabric Types</option>
                 <option value="KORA">KORA</option>
@@ -241,19 +241,19 @@ function MaterialIssueContent() {
           </div>
 
           {loading ? (
-            <div className="p-12 text-center text-xs text-slate-400">Loading available rolls...</div>
+            <div className="p-12 text-center text-xs text-neutral-500">Loading available rolls...</div>
           ) : filteredRolls.length === 0 ? (
             <div className="p-16 text-center space-y-3">
-              <Layers className="w-10 h-10 text-slate-300 mx-auto" />
-              <p className="text-sm font-semibold text-slate-700">No stock ready for issue</p>
-              <p className="text-xs text-slate-500">
+              <Layers className="w-10 h-10 text-neutral-700 mx-auto" />
+              <p className="text-sm font-semibold text-neutral-700">No stock ready for issue</p>
+              <p className="text-xs text-neutral-500">
                 Ensure rolls have completed and passed QC inspection before issuing.
               </p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50/80 text-slate-600 font-semibold border-b border-slate-200">
+                <thead className="bg-neutral-50/80 text-neutral-600 font-semibold border-b border-neutral-200">
                   <tr>
                     <th className="py-3 px-4 w-12 text-center">
                       <input
@@ -263,7 +263,7 @@ function MaterialIssueContent() {
                           selectedRollIds.length === filteredRolls.length
                         }
                         onChange={selectAllFiltered}
-                        className="rounded border-slate-300 text-blue-600"
+                        className="rounded border-neutral-300 text-brand-600"
                       />
                     </th>
                     <th className="py-3 px-4">Roll Number</th>
@@ -275,7 +275,7 @@ function MaterialIssueContent() {
                     <th className="py-3 px-4">QC Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-slate-700">
+                <tbody className="divide-y divide-neutral-100 text-neutral-700">
                   {filteredRolls.map((roll) => {
                     const isSelected = selectedRollIds.includes(roll.id);
                     return (
@@ -283,7 +283,7 @@ function MaterialIssueContent() {
                         key={roll.id}
                         onClick={() => toggleSelectRoll(roll.id)}
                         className={`cursor-pointer transition ${
-                          isSelected ? 'bg-blue-50/60 font-medium' : 'hover:bg-slate-50/60'
+                          isSelected ? 'bg-brand-50/60 font-medium' : 'hover:bg-neutral-50/60'
                         }`}
                       >
                         <td className="py-3.5 px-4 text-center" onClick={(e) => e.stopPropagation()}>
@@ -291,34 +291,34 @@ function MaterialIssueContent() {
                             type="checkbox"
                             checked={isSelected}
                             onChange={() => toggleSelectRoll(roll.id)}
-                            className="rounded border-slate-300 text-blue-600"
+                            className="rounded border-neutral-300 text-brand-600"
                           />
                         </td>
-                        <td className="py-3.5 px-4 font-mono font-bold text-blue-900">
+                        <td className="py-3.5 px-4 font-mono font-bold text-brand-900">
                           {roll.rollNumber}
                         </td>
-                        <td className="py-3.5 px-4 font-mono text-slate-600">
+                        <td className="py-3.5 px-4 font-mono text-neutral-600">
                           {roll.batch?.batchNumber}
                         </td>
                         <td className="py-3.5 px-4">
-                          <span className="font-semibold block text-slate-900">
+                          <span className="font-semibold block text-neutral-900">
                             {roll.batch?.fabricType}
                           </span>
-                          <span className="text-[10px] text-slate-500">
+                          <span className="text-[10px] text-neutral-500">
                             {roll.batch?.fabricDescription}
                           </span>
                         </td>
-                        <td className="py-3.5 px-4 text-slate-700">
+                        <td className="py-3.5 px-4 text-neutral-700">
                           {roll.batch?.colorName || 'Natural'}
                         </td>
-                        <td className="py-3.5 px-4 font-mono font-bold text-slate-900">
+                        <td className="py-3.5 px-4 font-mono font-bold text-neutral-900">
                           {parseFloat(roll.length).toFixed(2)} m
                         </td>
-                        <td className="py-3.5 px-4 font-mono text-slate-600">
+                        <td className="py-3.5 px-4 font-mono text-neutral-600">
                           {roll.location?.locationCode || 'UNASSIGNED'}
                         </td>
                         <td className="py-3.5 px-4">
-                          <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                          <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-bold bg-accent-100 text-accent-800 border border-accent-200">
                             PASSED
                           </span>
                         </td>
@@ -334,15 +334,15 @@ function MaterialIssueContent() {
 
       {/* Floating Action Bar when rolls are selected */}
       {selectedRollIds.length > 0 && (
-        <div className="fixed bottom-0 inset-x-0 bg-slate-900/95 backdrop-blur-xs border-t border-slate-800 p-4 z-40 flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-8 text-white">
+        <div className="fixed bottom-0 inset-x-0 bg-white backdrop-blur-xs border-t border-neutral-200 p-4 z-40 flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-8 text-neutral-900">
           <div className="flex items-center gap-6 text-xs">
             <div>
-              <span className="text-slate-400 block text-[10px] uppercase font-bold">Selected Rolls</span>
-              <span className="text-base font-bold text-blue-400">{selectedRollIds.length} rolls</span>
+              <span className="text-neutral-500 block text-[10px] uppercase font-bold">Selected Rolls</span>
+              <span className="text-base font-bold text-brand-600">{selectedRollIds.length} rolls</span>
             </div>
             <div>
-              <span className="text-slate-400 block text-[10px] uppercase font-bold">Total Meters</span>
-              <span className="text-base font-bold font-mono text-emerald-400">
+              <span className="text-neutral-500 block text-[10px] uppercase font-bold">Total Meters</span>
+              <span className="text-base font-bold font-mono text-accent-700">
                 {totalSelectedMeters.toFixed(2)} m
               </span>
             </div>
@@ -351,10 +351,10 @@ function MaterialIssueContent() {
             type="button"
             disabled={submitting}
             onClick={handleIssueSubmit}
-            className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-bold rounded-lg shadow-sm transition cursor-pointer"
+            className="flex items-center gap-2 px-6 py-2.5 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white text-xs font-bold rounded-lg shadow-sm transition cursor-pointer"
           >
             {submitting ? (
-              <RefreshCw className="w-4 h-4 animate-spin text-blue-200" />
+              <RefreshCw className="w-4 h-4 animate-spin text-brand-800" />
             ) : (
               <Send className="w-4 h-4" />
             )}
@@ -368,7 +368,7 @@ function MaterialIssueContent() {
 
 export default function MaterialIssuePage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#F0FAF9] flex items-center justify-center text-xs text-slate-500">Loading Material Issue...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-brand-50 flex items-center justify-center text-xs text-neutral-500">Loading Material Issue...</div>}>
       <MaterialIssueContent />
     </Suspense>
   );

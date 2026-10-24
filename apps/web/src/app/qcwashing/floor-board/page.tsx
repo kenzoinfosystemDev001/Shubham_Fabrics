@@ -20,7 +20,6 @@ import {
   FileText,
   Waves
 } from 'lucide-react';
-import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 
 export default function QCWashingFloorBoard() {
@@ -102,19 +101,19 @@ export default function QCWashingFloorBoard() {
     return (
       <div
         key={c.id}
-        className="bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs hover:shadow-md transition space-y-2.5"
+        className="bg-white rounded-xl border border-neutral-200 p-3.5 shadow-2xs hover:shadow-md transition space-y-2.5"
       >
         <div className="flex items-center justify-between">
-          <span className="font-mono font-bold text-xs text-slate-900 bg-slate-100 px-2 py-0.5 rounded">
+          <span className="font-mono font-bold text-xs text-neutral-900 bg-neutral-100 px-2 py-0.5 rounded">
             {c.challanNumber}
           </span>
           <span
             className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
               c.priority === 'URGENT'
-                ? 'bg-rose-100 text-rose-800'
+                ? 'bg-danger-100 text-danger-800'
                 : c.priority === 'HIGH'
-                ? 'bg-amber-100 text-amber-800'
-                : 'bg-slate-100 text-slate-700'
+                ? 'bg-accent-100 text-accent-800'
+                : 'bg-neutral-100 text-neutral-700'
             }`}
           >
             {c.priority}
@@ -122,23 +121,23 @@ export default function QCWashingFloorBoard() {
         </div>
 
         <div>
-          <div className="text-xs font-bold text-slate-800">
+          <div className="text-xs font-bold text-neutral-900">
             {c.program?.clientName || 'Standard Client'}
           </div>
-          <div className="text-[11px] text-slate-500 font-mono">
+          <div className="text-[11px] text-neutral-500 font-mono">
             Sheet #{c.program?.programSerialNo || c.program?.programNumber || '—'} · Style:{' '}
             {c.program?.styleCode || 'Std'}
           </div>
         </div>
 
-        <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-100">
-          <span className="font-mono font-bold text-emerald-700 text-sm">{qty} PCS</span>
+        <div className="flex items-center justify-between text-xs pt-1 border-t border-neutral-100">
+          <span className="font-mono font-bold text-accent-800 text-sm">{qty} PCS</span>
           <div className="flex items-center gap-1.5">
             {c.program && (
               <button
                 type="button"
                 onClick={() => setSelectedSheetForView(c.program)}
-                className="p-1 hover:bg-slate-100 text-slate-400 hover:text-slate-700 rounded transition"
+                className="p-1 hover:bg-neutral-100 text-neutral-500 hover:text-neutral-700 rounded transition"
                 title="View Sheet"
               >
                 <FileText className="w-3.5 h-3.5" />
@@ -146,7 +145,7 @@ export default function QCWashingFloorBoard() {
             )}
             <Link
               href={`/qcwashing/my-work?challanId=${c.id}`}
-              className="px-2 py-0.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[10px] font-bold transition flex items-center gap-0.5"
+              className="px-2 py-0.5 bg-accent-400 hover:bg-accent-500 text-neutral-900 rounded text-[10px] font-bold transition flex items-center gap-0.5"
             >
               <span>Work</span>
               <ArrowRight className="w-2.5 h-2.5" />
@@ -155,8 +154,8 @@ export default function QCWashingFloorBoard() {
         </div>
 
         {totalDefects > 0 && (
-          <div className="text-[10px] text-rose-700 bg-rose-50 px-2 py-0.5 rounded flex items-center gap-1 font-medium">
-            <ShieldAlert className="w-3 h-3 text-rose-600" />
+          <div className="text-[10px] text-danger-700 bg-danger-50 px-2 py-0.5 rounded flex items-center gap-1 font-medium">
+            <ShieldAlert className="w-3 h-3 text-danger-600" />
             <span>{totalDefects} Defect(s) Flagged</span>
           </div>
         )}
@@ -165,32 +164,27 @@ export default function QCWashingFloorBoard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] pb-16">
+    <div className="min-h-screen bg-neutral-50 pb-16">
       {/* HEADER */}
       <header
-        style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-        className="border-b border-slate-700/80 sticky top-0 z-30 px-4 sm:px-8 py-4 shadow-md text-white"
+        className="bg-white border-b border-neutral-200 sticky top-0 z-30 px-4 sm:px-8 py-4 shadow-md text-neutral-900"
       >
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-accent-400/20 text-accent-700 border border-accent-500/30">
                 QC WASHING SHOP-FLOOR
               </span>
-              <span className="flex items-center gap-1.5 text-[11px] text-emerald-400 font-medium">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="flex items-center gap-1.5 text-[11px] text-accent-700 font-medium">
+                <span className="w-2 h-2 rounded-full bg-accent-400 animate-pulse" />
                 Live Real-Time Kanban
               </span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight mt-1 flex items-center gap-2">
-              <Kanban className="w-6 h-6 text-amber-400" />
+            <h1 className="text-xl sm:text-2xl font-extrabold text-neutral-900 tracking-tight mt-1 flex items-center gap-2">
+              <Kanban className="w-6 h-6 text-accent-700" />
               <span>QC Washing Floor Board</span>
             </h1>
-            <p className="text-xs text-slate-300 mt-0.5">
+            <p className="text-xs text-neutral-700 mt-0.5">
               Live visual Kanban board tracking washed lots from arrival to verification and handover.
             </p>
           </div>
@@ -199,7 +193,7 @@ export default function QCWashingFloorBoard() {
             <button
               onClick={() => loadBoard(true)}
               disabled={loading}
-              className="px-3 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-600 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition shadow-xs disabled:opacity-50"
+              className="px-3 py-1.5 bg-neutral-50 hover:bg-neutral-200 text-neutral-900 border border-neutral-200 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition shadow-xs disabled:opacity-50"
               title="Refresh Board"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
@@ -208,7 +202,7 @@ export default function QCWashingFloorBoard() {
 
             <Link
               href="/qcwashing/my-work"
-              className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
+              className="px-3.5 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
             >
               <Briefcase className="w-3.5 h-3.5" />
               <span>My Work</span>
@@ -220,37 +214,37 @@ export default function QCWashingFloorBoard() {
       {/* MAIN CONTENT */}
       <main className="max-w-7xl mx-auto px-4 sm:px-8 py-6 space-y-6">
         {/* SEARCH BAR */}
-        <div className="flex items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+        <div className="flex items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-neutral-200 shadow-xs">
           <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Filter by Challan #, Serial #, Client, or Style..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+              className="w-full pl-9 pr-4 py-2 rounded-xl border border-neutral-200 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500/40 focus:border-brand-500"
             />
           </div>
 
-          <div className="flex items-center gap-3 text-xs text-slate-500">
-            <span>Total Challans: <strong className="text-slate-900 font-mono">{counts.total}</strong></span>
+          <div className="flex items-center gap-3 text-xs text-neutral-500">
+            <span>Total Challans: <strong className="text-neutral-900 font-mono">{counts.total}</strong></span>
             <span>·</span>
-            <span>Synced: <strong className="text-slate-900 font-mono">{lastSyncTime.toLocaleTimeString()}</strong></span>
+            <span>Synced: <strong className="text-neutral-900 font-mono">{lastSyncTime.toLocaleTimeString()}</strong></span>
           </div>
         </div>
 
         {/* KANBAN LANES GRID */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* LANE 1: INCOMING */}
-          <div className="bg-slate-100/70 rounded-2xl p-4 border border-slate-200 flex flex-col min-h-[500px]">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200 mb-3">
+          <div className="bg-neutral-100/70 rounded-2xl p-4 border border-neutral-200 flex flex-col min-h-[500px]">
+            <div className="flex items-center justify-between pb-3 border-b border-neutral-200 mb-3">
               <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-amber-600" />
-                <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                <Clock className="w-4 h-4 text-accent-700" />
+                <h3 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
                   Inbound from Wash
                 </h3>
               </div>
-              <span className="px-2 py-0.5 bg-white text-slate-700 font-mono font-bold text-xs rounded-full border border-slate-200">
+              <span className="px-2 py-0.5 bg-white text-neutral-700 font-mono font-bold text-xs rounded-full border border-neutral-200">
                 {counts.incoming}
               </span>
             </div>
@@ -258,21 +252,21 @@ export default function QCWashingFloorBoard() {
             <div className="space-y-3 flex-1 overflow-y-auto">
               {filterCards(lanes.incoming).map(renderCard)}
               {filterCards(lanes.incoming).length === 0 && (
-                <div className="py-12 text-center text-slate-400 text-xs">No incoming challans</div>
+                <div className="py-12 text-center text-neutral-500 text-xs">No incoming challans</div>
               )}
             </div>
           </div>
 
           {/* LANE 2: UNDER INSPECTION */}
-          <div className="bg-blue-50/50 rounded-2xl p-4 border border-blue-200 flex flex-col min-h-[500px]">
-            <div className="flex items-center justify-between pb-3 border-b border-blue-200 mb-3">
+          <div className="bg-brand-50/50 rounded-2xl p-4 border border-brand-200 flex flex-col min-h-[500px]">
+            <div className="flex items-center justify-between pb-3 border-b border-brand-200 mb-3">
               <div className="flex items-center gap-2">
-                <RefreshCw className="w-4 h-4 text-blue-600" />
-                <h3 className="text-xs font-bold text-blue-900 uppercase tracking-wider">
+                <RefreshCw className="w-4 h-4 text-brand-600" />
+                <h3 className="text-xs font-bold text-brand-900 uppercase tracking-wider">
                   On Test Table
                 </h3>
               </div>
-              <span className="px-2 py-0.5 bg-white text-blue-800 font-mono font-bold text-xs rounded-full border border-blue-200">
+              <span className="px-2 py-0.5 bg-white text-brand-800 font-mono font-bold text-xs rounded-full border border-brand-200">
                 {counts.underInspection}
               </span>
             </div>
@@ -280,21 +274,21 @@ export default function QCWashingFloorBoard() {
             <div className="space-y-3 flex-1 overflow-y-auto">
               {filterCards(lanes.underInspection).map(renderCard)}
               {filterCards(lanes.underInspection).length === 0 && (
-                <div className="py-12 text-center text-slate-400 text-xs">No lots on test table</div>
+                <div className="py-12 text-center text-neutral-500 text-xs">No lots on test table</div>
               )}
             </div>
           </div>
 
           {/* LANE 3: PASSED / HANDOVER READY */}
-          <div className="bg-emerald-50/50 rounded-2xl p-4 border border-emerald-200 flex flex-col min-h-[500px]">
-            <div className="flex items-center justify-between pb-3 border-b border-emerald-200 mb-3">
+          <div className="bg-accent-50/50 rounded-2xl p-4 border border-accent-200 flex flex-col min-h-[500px]">
+            <div className="flex items-center justify-between pb-3 border-b border-accent-200 mb-3">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <h3 className="text-xs font-bold text-emerald-900 uppercase tracking-wider">
+                <CheckCircle2 className="w-4 h-4 text-accent-700" />
+                <h3 className="text-xs font-bold text-neutral-700 uppercase tracking-wider">
                   Approved ➔ Handover
                 </h3>
               </div>
-              <span className="px-2 py-0.5 bg-white text-emerald-800 font-mono font-bold text-xs rounded-full border border-emerald-200">
+              <span className="px-2 py-0.5 bg-white text-accent-800 font-mono font-bold text-xs rounded-full border border-accent-200">
                 {counts.passed}
               </span>
             </div>
@@ -302,21 +296,21 @@ export default function QCWashingFloorBoard() {
             <div className="space-y-3 flex-1 overflow-y-auto">
               {filterCards(lanes.passed).map(renderCard)}
               {filterCards(lanes.passed).length === 0 && (
-                <div className="py-12 text-center text-slate-400 text-xs">No approved lots pending</div>
+                <div className="py-12 text-center text-neutral-500 text-xs">No approved lots pending</div>
               )}
             </div>
           </div>
 
           {/* LANE 4: REWORK & QUARANTINE */}
-          <div className="bg-rose-50/50 rounded-2xl p-4 border border-rose-200 flex flex-col min-h-[500px]">
-            <div className="flex items-center justify-between pb-3 border-b border-rose-200 mb-3">
+          <div className="bg-danger-50/50 rounded-2xl p-4 border border-danger-200 flex flex-col min-h-[500px]">
+            <div className="flex items-center justify-between pb-3 border-b border-danger-200 mb-3">
               <div className="flex items-center gap-2">
-                <RotateCcw className="w-4 h-4 text-orange-600" />
-                <h3 className="text-xs font-bold text-rose-900 uppercase tracking-wider">
+                <RotateCcw className="w-4 h-4 text-accent-700" />
+                <h3 className="text-xs font-bold text-danger-900 uppercase tracking-wider">
                   Re-Wash & Quarantine
                 </h3>
               </div>
-              <span className="px-2 py-0.5 bg-white text-rose-800 font-mono font-bold text-xs rounded-full border border-rose-200">
+              <span className="px-2 py-0.5 bg-white text-danger-800 font-mono font-bold text-xs rounded-full border border-danger-200">
                 {counts.rework + counts.rejected}
               </span>
             </div>
@@ -324,7 +318,7 @@ export default function QCWashingFloorBoard() {
             <div className="space-y-3 flex-1 overflow-y-auto">
               {[...filterCards(lanes.rework), ...filterCards(lanes.rejected)].map(renderCard)}
               {[...filterCards(lanes.rework), ...filterCards(lanes.rejected)].length === 0 && (
-                <div className="py-12 text-center text-slate-400 text-xs">Zero rework or quarantine lots</div>
+                <div className="py-12 text-center text-neutral-500 text-xs">Zero rework or quarantine lots</div>
               )}
             </div>
           </div>

@@ -90,49 +90,49 @@ const LANES_CONFIG: {
   {
     key: 'RECEIVED',
     label: '1. Received',
-    badgeBg: 'bg-slate-200',
-    badgeText: 'text-slate-800',
-    borderTop: 'border-t-slate-400',
+    badgeBg: 'bg-neutral-200',
+    badgeText: 'text-neutral-900',
+    borderTop: 'border-t-neutral-300',
     description: 'Inward from Fabric Store awaiting processing',
   },
   {
     key: 'IN_DYEING',
     label: '2. In Dyeing',
-    badgeBg: 'bg-blue-100',
-    badgeText: 'text-blue-800',
-    borderTop: 'border-t-blue-600',
+    badgeBg: 'bg-brand-100',
+    badgeText: 'text-brand-800',
+    borderTop: 'border-t-brand-500',
     description: 'Active inside dyeing machines & vats',
   },
   {
     key: 'PARTIALLY_DYED',
     label: '3. Partially Dyed',
-    badgeBg: 'bg-amber-100',
-    badgeText: 'text-amber-800',
-    borderTop: 'border-t-amber-500',
+    badgeBg: 'bg-accent-100',
+    badgeText: 'text-accent-800',
+    borderTop: 'border-t-accent-500',
     description: 'Batch in progress; balance remaining',
   },
   {
     key: 'DYED',
     label: '4. Fully Dyed',
-    badgeBg: 'bg-teal-100',
-    badgeText: 'text-teal-800',
-    borderTop: 'border-t-teal-600',
+    badgeBg: 'bg-brand-100',
+    badgeText: 'text-brand-800',
+    borderTop: 'border-t-brand-500',
     description: 'Target dyed; drying & finishing stage',
   },
   {
     key: 'READY_FOR_QC1',
     label: '5. Ready for QC1',
-    badgeBg: 'bg-indigo-100',
-    badgeText: 'text-indigo-800',
-    borderTop: 'border-t-indigo-600',
+    badgeBg: 'bg-brand-100',
+    badgeText: 'text-brand-800',
+    borderTop: 'border-t-brand-500',
     description: 'Batch inspected & staged for dispatch',
   },
   {
     key: 'SENT_TO_QC1',
     label: '6. Sent to QC1',
-    badgeBg: 'bg-emerald-100',
-    badgeText: 'text-emerald-800',
-    borderTop: 'border-t-emerald-600',
+    badgeBg: 'bg-accent-100',
+    badgeText: 'text-accent-800',
+    borderTop: 'border-t-accent-500',
     description: 'Dispatched with verified QC1 Challan',
   },
 ];
@@ -319,14 +319,14 @@ export default function DyeingFloorBoardPage() {
     <div className="space-y-6 max-w-[1600px] mx-auto pb-16">
       {/* SUCCESS BANNER WHEN CHALLAN ISSUED */}
       {issuedSuccessChallan && (
-        <div className="p-4 bg-emerald-50 border-2 border-emerald-500 rounded-xl flex items-center justify-between shadow-sm animate-in fade-in duration-200">
+        <div className="p-4 bg-accent-50 border-2 border-accent-500 rounded-xl flex items-center justify-between shadow-sm animate-in fade-in duration-200">
           <div className="flex items-center gap-3">
-            <CheckCircle2 className="w-6 h-6 text-emerald-600 flex-shrink-0" />
+            <CheckCircle2 className="w-6 h-6 text-accent-700 flex-shrink-0" />
             <div>
-              <h4 className="text-sm font-bold text-emerald-950">
+              <h4 className="text-sm font-bold text-accent-800">
                 Challan Successfully Issued to QC1!
               </h4>
-              <p className="text-xs text-emerald-700">
+              <p className="text-xs text-accent-800">
                 Dispatch Challan <span className="font-mono font-bold">{issuedSuccessChallan.challanNumber}</span> has been dispatched to QC1.
               </p>
             </div>
@@ -334,14 +334,14 @@ export default function DyeingFloorBoardPage() {
           <div className="flex items-center gap-2">
             <Link
               href={`/challans/${issuedSuccessChallan.id}`}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-lg shadow-xs transition"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-lg shadow-xs transition"
             >
               <Printer className="w-3.5 h-3.5" />
               <span>View &amp; Print Slip</span>
             </Link>
             <button
               onClick={() => setIssuedSuccessChallan(null)}
-              className="p-1.5 text-emerald-700 hover:bg-emerald-100 rounded-md"
+              className="p-1.5 text-accent-800 hover:bg-accent-100 rounded-md"
             >
               <X className="w-4 h-4" />
             </button>
@@ -350,30 +350,30 @@ export default function DyeingFloorBoardPage() {
       )}
 
       {/* HEADER */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-xl border border-neutral-200 shadow-xs">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-purple-100 text-purple-800 border border-purple-200">
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-brand-100 text-brand-800 border border-brand-200">
               MES Shop Floor Board
             </span>
-            <span className="text-xs text-slate-400">· Real-time Stage Tracking</span>
+            <span className="text-xs text-neutral-500">· Real-time Stage Tracking</span>
           </div>
-          <h1 className="text-2xl font-bold font-serif text-slate-900 mt-1">
+          <h1 className="text-2xl font-bold font-serif text-neutral-900 mt-1">
             Dyeing Floor Kanban
           </h1>
-          <p className="text-xs text-slate-600 mt-0.5">
+          <p className="text-xs text-neutral-600 mt-0.5">
             Visualize the live flow of material lots across 6 physical stages: Received → In Dyeing → Partially Dyed → Fully Dyed → Ready for QC1 → Sent to QC1.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="text-xs font-mono font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
+          <div className="text-xs font-mono font-bold text-neutral-700 bg-neutral-100 px-3 py-1.5 rounded-lg border border-neutral-200">
             Total Active Orders: {totalOrders}
           </div>
           <button
             onClick={() => fetchFloorBoard()}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-lg text-xs font-semibold transition"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             <span>Refresh Board</span>
@@ -383,8 +383,8 @@ export default function DyeingFloorBoardPage() {
 
       {/* ERROR BANNER */}
       {error && (
-        <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-3 text-rose-900 text-xs">
-          <AlertCircle className="w-5 h-5 text-rose-600 flex-shrink-0" />
+        <div className="p-4 bg-danger-50 border border-danger-200 rounded-xl flex items-center gap-3 text-danger-900 text-xs">
+          <AlertCircle className="w-5 h-5 text-danger-600 flex-shrink-0" />
           <span>Error loading floor board: {error}</span>
         </div>
       )}
@@ -397,19 +397,19 @@ export default function DyeingFloorBoardPage() {
           return (
             <div
               key={lane.key}
-              className={`bg-slate-100/90 rounded-xl border border-slate-200 border-t-4 ${lane.borderTop} flex flex-col min-h-[580px] shadow-xs`}
+              className={`bg-neutral-100/90 rounded-xl border border-neutral-200 border-t-4 ${lane.borderTop} flex flex-col min-h-[580px] shadow-xs`}
             >
               {/* LANE HEADER */}
-              <div className="p-3 border-b border-slate-200/80 bg-white/70 rounded-t-lg">
+              <div className="p-3 border-b border-neutral-200/80 bg-white/70 rounded-t-lg">
                 <div className="flex items-center justify-between mb-1">
-                  <h3 className="text-xs font-bold text-slate-900">{lane.label}</h3>
+                  <h3 className="text-xs font-bold text-neutral-900">{lane.label}</h3>
                   <span
                     className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${lane.badgeBg} ${lane.badgeText}`}
                   >
                     {ordersInLane.length}
                   </span>
                 </div>
-                <p className="text-[10px] text-slate-500 leading-tight">
+                <p className="text-[10px] text-neutral-500 leading-tight">
                   {lane.description}
                 </p>
               </div>
@@ -417,8 +417,8 @@ export default function DyeingFloorBoardPage() {
               {/* LANE CARDS CONTAINER */}
               <div className="p-2 space-y-2.5 flex-1 overflow-y-auto max-h-[70vh]">
                 {ordersInLane.length === 0 ? (
-                  <div className="h-32 border-2 border-dashed border-slate-200 rounded-lg flex items-center justify-center p-3 text-center">
-                    <span className="text-[11px] text-slate-400 font-mono">
+                  <div className="h-32 border-2 border-dashed border-neutral-200 rounded-lg flex items-center justify-center p-3 text-center">
+                    <span className="text-[11px] text-neutral-500 font-mono">
                       No lots in this stage
                     </span>
                   </div>
@@ -430,43 +430,43 @@ export default function DyeingFloorBoardPage() {
                     return (
                       <div
                         key={order.id}
-                        className="bg-white rounded-lg p-3 border border-slate-200 hover:border-[#163767]/50 shadow-xs hover:shadow-sm transition space-y-2"
+                        className="bg-white rounded-lg p-3 border border-neutral-200 hover:border-brand-500/50 shadow-xs hover:shadow-sm transition space-y-2"
                       >
                         {/* TOP: ORDER # & PRIORITY */}
                         <div className="flex items-start justify-between gap-1">
                           <div>
-                            <span className="font-mono font-bold text-xs text-slate-900 block">
+                            <span className="font-mono font-bold text-xs text-neutral-900 block">
                               {order.program?.programSerialNo || order.orderNumber}
                             </span>
-                            <span className="text-[10px] font-mono text-slate-400 block">
+                            <span className="text-[10px] font-mono text-neutral-500 block">
                               {order.program?.programNumber || order.orderNumber}
                             </span>
                           </div>
                           {order.priority === 'HIGH' && (
-                            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-rose-100 text-rose-800">
+                            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-danger-100 text-danger-800">
                               HIGH
                             </span>
                           )}
                         </div>
 
                         {/* CLIENT & STYLE */}
-                        <div className="text-[11px] text-slate-700 leading-tight">
+                        <div className="text-[11px] text-neutral-700 leading-tight">
                           <span className="font-semibold block truncate">
                             {order.program?.clientName || order.program?.buyerName || 'Standard Client'}
                           </span>
-                          <span className="text-[10px] text-slate-500 block truncate">
+                          <span className="text-[10px] text-neutral-500 block truncate">
                             {order.program?.styleCode || 'General Lot'}
                           </span>
                         </div>
 
                         {/* FABRIC & COLOR */}
-                        <div className="bg-slate-50 p-2 rounded border border-slate-100 text-[11px] space-y-1">
-                          <div className="font-semibold text-slate-900 truncate">
+                        <div className="bg-neutral-50 p-2 rounded border border-neutral-100 text-[11px] space-y-1">
+                          <div className="font-semibold text-neutral-900 truncate">
                             {order.fabricName}
                           </div>
                           <div className="flex items-center gap-1.5 text-[10px]">
                             <span
-                              className="w-2.5 h-2.5 rounded-full border border-slate-300 flex-shrink-0"
+                              className="w-2.5 h-2.5 rounded-full border border-neutral-300 flex-shrink-0"
                               style={{
                                 backgroundColor:
                                   order.colorCode ||
@@ -477,7 +477,7 @@ export default function DyeingFloorBoardPage() {
                                    order.dyedColor?.toLowerCase() === 'green' ? '#16A34A' : '#94A3B8')
                               }}
                             />
-                            <span className="text-slate-600 font-medium truncate">
+                            <span className="text-neutral-600 font-medium truncate">
                               {order.dyedColor || order.targetColor}
                             </span>
                           </div>
@@ -485,27 +485,27 @@ export default function DyeingFloorBoardPage() {
 
                         {/* QUANTITY PILLS */}
                         <div className="grid grid-cols-2 gap-1 text-[10px] font-mono text-center">
-                          <div className="bg-slate-100 rounded px-1.5 py-0.5">
-                            <span className="text-slate-400 block text-[8px] uppercase">Req</span>
-                            <span className="font-bold text-slate-800">{order.requiredQuantity}</span>
+                          <div className="bg-neutral-100 rounded px-1.5 py-0.5">
+                            <span className="text-neutral-500 block text-[8px] uppercase">Req</span>
+                            <span className="font-bold text-neutral-900">{order.requiredQuantity}</span>
                           </div>
-                          <div className="bg-emerald-50 rounded px-1.5 py-0.5">
-                            <span className="text-emerald-700 block text-[8px] uppercase">Dyed</span>
-                            <span className="font-bold text-emerald-800">{order.dyedQuantity}</span>
+                          <div className="bg-accent-50 rounded px-1.5 py-0.5">
+                            <span className="text-accent-800 block text-[8px] uppercase">Dyed</span>
+                            <span className="font-bold text-accent-800">{order.dyedQuantity}</span>
                           </div>
-                          <div className="bg-amber-50 rounded px-1.5 py-0.5">
-                            <span className="text-amber-700 block text-[8px] uppercase">Undyed</span>
-                            <span className="font-bold text-amber-800">{order.undyedQuantity}</span>
+                          <div className="bg-accent-50 rounded px-1.5 py-0.5">
+                            <span className="text-accent-800 block text-[8px] uppercase">Undyed</span>
+                            <span className="font-bold text-accent-800">{order.undyedQuantity}</span>
                           </div>
-                          <div className="bg-blue-50 rounded px-1.5 py-0.5">
-                            <span className="text-blue-700 block text-[8px] uppercase">Sent QC</span>
-                            <span className="font-bold text-blue-800">{order.sentToQc1Quantity}</span>
+                          <div className="bg-brand-50 rounded px-1.5 py-0.5">
+                            <span className="text-brand-700 block text-[8px] uppercase">Sent QC</span>
+                            <span className="font-bold text-brand-800">{order.sentToQc1Quantity}</span>
                           </div>
                         </div>
 
                         {/* INBOUND / OUTBOUND CHALLAN LINKS */}
                         {order.qc1Challan && (
-                          <div className="text-[10px] text-emerald-700 font-mono flex items-center justify-between border-t border-slate-100 pt-1">
+                          <div className="text-[10px] text-accent-800 font-mono flex items-center justify-between border-t border-neutral-100 pt-1">
                             <span>QC1 Slip:</span>
                             <Link
                               href={`/challans/${order.qc1Challan.id}`}
@@ -518,12 +518,12 @@ export default function DyeingFloorBoardPage() {
                         )}
 
                         {/* CARD ACTION BUTTONS */}
-                        <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-1">
+                        <div className="pt-2 border-t border-neutral-100 flex items-center justify-between gap-1">
                           <button
                             onClick={() => openUpdateModal(order)}
-                            className="flex-1 py-1 px-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] font-bold transition flex items-center justify-center gap-1"
+                            className="flex-1 py-1 px-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded text-[10px] font-bold transition flex items-center justify-center gap-1"
                           >
-                            <Edit3 className="w-3 h-3 text-[#163767]" />
+                            <Edit3 className="w-3 h-3 text-brand-600" />
                             <span>Update</span>
                           </button>
 
@@ -531,7 +531,7 @@ export default function DyeingFloorBoardPage() {
                             <button
                               onClick={() => openChallanModal(order)}
                               title={`Send to QC1 (${availableForQc} ${order.uom} available)`}
-                              className="py-1 px-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded text-[10px] font-bold transition flex items-center justify-center gap-1 shadow-xs"
+                              className="py-1 px-2 bg-accent-500 hover:bg-accent-600 text-neutral-900 rounded text-[10px] font-bold transition flex items-center justify-center gap-1 shadow-xs"
                             >
                               <Send className="w-3 h-3" />
                               <span>QC1</span>
@@ -550,17 +550,17 @@ export default function DyeingFloorBoardPage() {
 
       {/* UPDATE MODAL */}
       {selectedOrderForUpdate && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 bg-neutral-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-neutral-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <form onSubmit={handleUpdateSubmit}>
-              <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+              <div className="px-6 py-4 border-b border-neutral-200 flex items-center justify-between bg-neutral-50">
                 <div className="flex items-center gap-3">
-                  <Edit3 className="w-5 h-5 text-[#163767]" />
+                  <Edit3 className="w-5 h-5 text-brand-600" />
                   <div>
-                    <h3 className="text-base font-bold text-slate-900">
+                    <h3 className="text-base font-bold text-neutral-900">
                       Record Dyeing Work Progress
                     </h3>
-                    <p className="text-xs text-slate-500 font-mono">
+                    <p className="text-xs text-neutral-500 font-mono">
                       Order: {selectedOrderForUpdate.orderNumber} · {selectedOrderForUpdate.fabricName}
                     </p>
                   </div>
@@ -568,7 +568,7 @@ export default function DyeingFloorBoardPage() {
                 <button
                   type="button"
                   onClick={() => setSelectedOrderForUpdate(null)}
-                  className="p-1.5 text-slate-400 hover:text-slate-700 rounded-md"
+                  className="p-1.5 text-neutral-500 hover:text-neutral-700 rounded-md"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -576,41 +576,41 @@ export default function DyeingFloorBoardPage() {
 
               <div className="p-6 space-y-4 text-xs">
                 {updateError && (
-                  <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg text-rose-800 text-xs flex items-center gap-2">
+                  <div className="p-3 bg-danger-50 border border-danger-200 rounded-lg text-danger-800 text-xs flex items-center gap-2">
                     <AlertCircle className="w-4 h-4 flex-shrink-0" />
                     <span>{updateError}</span>
                   </div>
                 )}
 
                 {/* QUANTITY RECONCILIATION SUMMARY BOX */}
-                <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl grid grid-cols-3 gap-3 text-center">
+                <div className="p-3.5 bg-neutral-50 border border-neutral-200 rounded-xl grid grid-cols-3 gap-3 text-center">
                   <div>
-                    <span className="text-[10px] text-slate-500 font-bold uppercase block">Required Total</span>
-                    <span className="font-mono font-bold text-slate-900 text-base">
+                    <span className="text-[10px] text-neutral-500 font-bold uppercase block">Required Total</span>
+                    <span className="font-mono font-bold text-neutral-900 text-base">
                       {selectedOrderForUpdate.requiredQuantity}
                     </span>
-                    <span className="text-[10px] text-slate-400 block">{selectedOrderForUpdate.uom}</span>
+                    <span className="text-[10px] text-neutral-500 block">{selectedOrderForUpdate.uom}</span>
                   </div>
-                  <div className="border-x border-slate-200 px-2">
-                    <span className="text-[10px] text-amber-700 font-bold uppercase block">Remaining Undyed</span>
-                    <span className="font-mono font-bold text-amber-800 text-base">
+                  <div className="border-x border-neutral-200 px-2">
+                    <span className="text-[10px] text-accent-800 font-bold uppercase block">Remaining Undyed</span>
+                    <span className="font-mono font-bold text-accent-800 text-base">
                       {Math.max(0, selectedOrderForUpdate.requiredQuantity - Number(updateForm.dyedQuantity || 0))}
                     </span>
-                    <span className="text-[10px] text-slate-400 block">{selectedOrderForUpdate.uom}</span>
+                    <span className="text-[10px] text-neutral-500 block">{selectedOrderForUpdate.uom}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-blue-700 font-bold uppercase block">Ready for QC1</span>
-                    <span className="font-mono font-bold text-blue-800 text-base">
+                    <span className="text-[10px] text-brand-700 font-bold uppercase block">Ready for QC1</span>
+                    <span className="font-mono font-bold text-brand-800 text-base">
                       {Math.max(0, Number(updateForm.dyedQuantity || 0) - selectedOrderForUpdate.sentToQc1Quantity)}
                     </span>
-                    <span className="text-[10px] text-slate-400 block">{selectedOrderForUpdate.uom}</span>
+                    <span className="text-[10px] text-neutral-500 block">{selectedOrderForUpdate.uom}</span>
                   </div>
                 </div>
 
                 {/* FORM INPUTS */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
+                    <label className="block text-[11px] font-bold uppercase text-neutral-700 mb-1">
                       Dyed Quantity ({selectedOrderForUpdate.uom}) *
                     </label>
                     <input
@@ -620,12 +620,12 @@ export default function DyeingFloorBoardPage() {
                       required
                       value={updateForm.dyedQuantity}
                       onChange={(e) => setUpdateForm({ ...updateForm, dyedQuantity: Number(e.target.value) })}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg font-mono font-bold text-sm text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#163767]"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg font-mono font-bold text-sm text-neutral-900 focus:outline-hidden focus:ring-2 focus:ring-brand-500"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
+                    <label className="block text-[11px] font-bold uppercase text-neutral-700 mb-1">
                       Dyed Color *
                     </label>
                     <input
@@ -634,32 +634,32 @@ export default function DyeingFloorBoardPage() {
                       value={updateForm.dyedColor}
                       onChange={(e) => setUpdateForm({ ...updateForm, dyedColor: e.target.value })}
                       placeholder=""
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#163767]"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-xs font-semibold text-neutral-900 focus:outline-hidden focus:ring-2 focus:ring-brand-500"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
+                    <label className="block text-[11px] font-bold uppercase text-neutral-700 mb-1">
                       Dyeing Incharge
                     </label>
                     <input
                       type="text"
                       value={updateForm.inchargeName}
                       onChange={(e) => setUpdateForm({ ...updateForm, inchargeName: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-medium text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#163767]"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-xs font-medium text-neutral-900 focus:outline-hidden focus:ring-2 focus:ring-brand-500"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
+                    <label className="block text-[11px] font-bold uppercase text-neutral-700 mb-1">
                       Workflow Status
                     </label>
                     <select
                       value={updateForm.status}
                       onChange={(e) => setUpdateForm({ ...updateForm, status: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#163767]"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-xs font-semibold text-neutral-900 focus:outline-hidden focus:ring-2 focus:ring-brand-500"
                     >
                       <option value="IN_DYEING">IN DYEING</option>
                       <option value="PARTIALLY_DYED">PARTIALLY DYED</option>
@@ -671,7 +671,7 @@ export default function DyeingFloorBoardPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
+                    <label className="block text-[11px] font-bold uppercase text-neutral-700 mb-1">
                       Machine Number
                     </label>
                     <input
@@ -679,12 +679,12 @@ export default function DyeingFloorBoardPage() {
                       value={updateForm.machineNumber}
                       onChange={(e) => setUpdateForm({ ...updateForm, machineNumber: e.target.value })}
                       placeholder=""
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#163767]"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-xs font-mono text-neutral-900 focus:outline-hidden focus:ring-2 focus:ring-brand-500"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
+                    <label className="block text-[11px] font-bold uppercase text-neutral-700 mb-1">
                       Batch / Lot Number
                     </label>
                     <input
@@ -692,13 +692,13 @@ export default function DyeingFloorBoardPage() {
                       value={updateForm.batchNumber}
                       onChange={(e) => setUpdateForm({ ...updateForm, batchNumber: e.target.value })}
                       placeholder=""
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#163767]"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-xs font-mono text-neutral-900 focus:outline-hidden focus:ring-2 focus:ring-brand-500"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
+                  <label className="block text-[11px] font-bold uppercase text-neutral-700 mb-1">
                     Process Remarks / Observation
                   </label>
                   <textarea
@@ -706,23 +706,23 @@ export default function DyeingFloorBoardPage() {
                     value={updateForm.processRemarks}
                     onChange={(e) => setUpdateForm({ ...updateForm, processRemarks: e.target.value })}
                     placeholder=""
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#163767]"
+                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-xs text-neutral-900 focus:outline-hidden focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
               </div>
 
-              <div className="px-6 py-3.5 border-t border-slate-200 bg-slate-50 flex items-center justify-end gap-3">
+              <div className="px-6 py-3.5 border-t border-neutral-200 bg-neutral-50 flex items-center justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => setSelectedOrderForUpdate(null)}
-                  className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-xs font-semibold hover:bg-slate-100 transition"
+                  className="px-4 py-2 border border-neutral-300 text-neutral-700 rounded-lg text-xs font-semibold hover:bg-neutral-100 transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={updating}
-                  className="px-5 py-2 bg-[#163767] hover:bg-[#0F264A] text-white rounded-lg text-xs font-semibold transition disabled:opacity-50 inline-flex items-center gap-1.5"
+                  className="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-semibold transition disabled:opacity-50 inline-flex items-center gap-1.5"
                 >
                   {updating ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
                   <span>Save Production Progress</span>
@@ -735,19 +735,19 @@ export default function DyeingFloorBoardPage() {
 
       {/* ISSUE CHALLAN MODAL */}
       {selectedOrderForChallan && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 bg-neutral-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-neutral-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <form onSubmit={handleChallanSubmit}>
-              <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+              <div className="px-6 py-4 border-b border-neutral-200 flex items-center justify-between bg-neutral-50">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-accent-100 text-accent-800 flex items-center justify-center">
                     <Send className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-slate-900">
+                    <h3 className="text-base font-bold text-neutral-900">
                       Issue Material Challan to QC1
                     </h3>
-                    <p className="text-xs text-slate-500 font-mono">
+                    <p className="text-xs text-neutral-500 font-mono">
                       Order: {selectedOrderForChallan.orderNumber} · {selectedOrderForChallan.fabricName}
                     </p>
                   </div>
@@ -755,7 +755,7 @@ export default function DyeingFloorBoardPage() {
                 <button
                   type="button"
                   onClick={() => setSelectedOrderForChallan(null)}
-                  className="p-1.5 text-slate-400 hover:text-slate-700 rounded-md"
+                  className="p-1.5 text-neutral-500 hover:text-neutral-700 rounded-md"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -763,36 +763,36 @@ export default function DyeingFloorBoardPage() {
 
               <div className="p-6 space-y-4 text-xs">
                 {challanError && (
-                  <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg text-rose-800 text-xs flex items-center gap-2">
+                  <div className="p-3 bg-danger-50 border border-danger-200 rounded-lg text-danger-800 text-xs flex items-center gap-2">
                     <AlertCircle className="w-4 h-4 flex-shrink-0" />
                     <span>{challanError}</span>
                   </div>
                 )}
 
                 {/* TRANSFER SUMMARY */}
-                <div className="p-3.5 bg-blue-50/60 border border-blue-200 rounded-xl space-y-2">
+                <div className="p-3.5 bg-brand-50/60 border border-brand-200 rounded-xl space-y-2">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-bold text-blue-900">Transfer Route:</span>
-                    <span className="font-mono font-bold text-blue-950 bg-white px-2 py-0.5 rounded border border-blue-200">
+                    <span className="font-bold text-brand-900">Transfer Route:</span>
+                    <span className="font-mono font-bold text-brand-900 bg-white px-2 py-0.5 rounded border border-brand-200">
                       DYEING → QC1
                     </span>
                   </div>
-                  <div className="grid grid-cols-3 gap-2 text-center pt-2 border-t border-blue-200/60">
+                  <div className="grid grid-cols-3 gap-2 text-center pt-2 border-t border-brand-200/60">
                     <div>
-                      <span className="text-[10px] text-slate-500 block uppercase">Dyed Total</span>
-                      <span className="font-mono font-bold text-slate-900 text-sm">
+                      <span className="text-[10px] text-neutral-500 block uppercase">Dyed Total</span>
+                      <span className="font-mono font-bold text-neutral-900 text-sm">
                         {selectedOrderForChallan.dyedQuantity} {selectedOrderForChallan.uom}
                       </span>
                     </div>
                     <div>
-                      <span className="text-[10px] text-slate-500 block uppercase">Already Sent</span>
-                      <span className="font-mono font-bold text-slate-600 text-sm">
+                      <span className="text-[10px] text-neutral-500 block uppercase">Already Sent</span>
+                      <span className="font-mono font-bold text-neutral-600 text-sm">
                         {selectedOrderForChallan.sentToQc1Quantity} {selectedOrderForChallan.uom}
                       </span>
                     </div>
                     <div>
-                      <span className="text-[10px] text-emerald-700 font-bold block uppercase">Available Now</span>
-                      <span className="font-mono font-bold text-emerald-800 text-sm">
+                      <span className="text-[10px] text-accent-800 font-bold block uppercase">Available Now</span>
+                      <span className="font-mono font-bold text-accent-800 text-sm">
                         {Math.max(0, selectedOrderForChallan.dyedQuantity - selectedOrderForChallan.sentToQc1Quantity)} {selectedOrderForChallan.uom}
                       </span>
                     </div>
@@ -802,7 +802,7 @@ export default function DyeingFloorBoardPage() {
                 {/* QUANTITY TO SEND INPUT */}
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="text-[11px] font-bold uppercase text-slate-700">
+                    <label className="text-[11px] font-bold uppercase text-neutral-700">
                       Dispatch Quantity ({selectedOrderForChallan.uom}) *
                     </label>
                     <button
@@ -811,7 +811,7 @@ export default function DyeingFloorBoardPage() {
                         const avail = Math.max(0, selectedOrderForChallan.dyedQuantity - selectedOrderForChallan.sentToQc1Quantity);
                         setChallanForm({ ...challanForm, quantityToSend: avail });
                       }}
-                      className="text-[11px] font-bold text-[#163767] hover:underline"
+                      className="text-[11px] font-bold text-brand-600 hover:underline"
                     >
                       Fill Max Available ({Math.max(0, selectedOrderForChallan.dyedQuantity - selectedOrderForChallan.sentToQc1Quantity)} {selectedOrderForChallan.uom})
                     </button>
@@ -824,26 +824,26 @@ export default function DyeingFloorBoardPage() {
                     required
                     value={challanForm.quantityToSend}
                     onChange={(e) => setChallanForm({ ...challanForm, quantityToSend: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg font-mono font-bold text-base text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-emerald-600"
+                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg font-mono font-bold text-base text-neutral-900 focus:outline-hidden focus:ring-2 focus:ring-brand-500/40"
                   />
                 </div>
 
                 {/* COLOR & LOGISTICS */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
+                    <label className="block text-[11px] font-bold uppercase text-neutral-700 mb-1">
                       Dyed Color
                     </label>
                     <input
                       type="text"
                       value={challanForm.color}
                       onChange={(e) => setChallanForm({ ...challanForm, color: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#163767]"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-xs font-semibold text-neutral-900 focus:outline-hidden focus:ring-2 focus:ring-brand-500"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
+                    <label className="block text-[11px] font-bold uppercase text-neutral-700 mb-1">
                       Vehicle / Cart No. (Optional)
                     </label>
                     <input
@@ -851,13 +851,13 @@ export default function DyeingFloorBoardPage() {
                       value={challanForm.vehicleNumber}
                       onChange={(e) => setChallanForm({ ...challanForm, vehicleNumber: e.target.value })}
                       placeholder=""
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#163767]"
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-xs text-neutral-900 focus:outline-hidden focus:ring-2 focus:ring-brand-500"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
+                  <label className="block text-[11px] font-bold uppercase text-neutral-700 mb-1">
                     Dispatch Remarks &amp; QC Instructions
                   </label>
                   <textarea
@@ -865,23 +865,23 @@ export default function DyeingFloorBoardPage() {
                     value={challanForm.remarks}
                     onChange={(e) => setChallanForm({ ...challanForm, remarks: e.target.value })}
                     placeholder=""
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#163767]"
+                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-xs text-neutral-900 focus:outline-hidden focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
               </div>
 
-              <div className="px-6 py-3.5 border-t border-slate-200 bg-slate-50 flex items-center justify-end gap-3">
+              <div className="px-6 py-3.5 border-t border-neutral-200 bg-neutral-50 flex items-center justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => setSelectedOrderForChallan(null)}
-                  className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-xs font-semibold hover:bg-slate-100 transition"
+                  className="px-4 py-2 border border-neutral-300 text-neutral-700 rounded-lg text-xs font-semibold hover:bg-neutral-100 transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={issuingChallan}
-                  className="px-5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-semibold transition disabled:opacity-50 inline-flex items-center gap-1.5 shadow-xs"
+                  className="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-semibold transition disabled:opacity-50 inline-flex items-center gap-1.5 shadow-xs"
                 >
                   {issuingChallan ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
                   <span>Generate &amp; Issue Challan to QC1</span>

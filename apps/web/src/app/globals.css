@@ -4,20 +4,54 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Subham Fabrics MES theme tokens (RGB channels). See tailwind.config.js for usage rules. */
 :root {
-  --background: #0b0f17;
-  --foreground: #f1f5f9;
+  --brand-50: 247 241 252; /* #F7F1FC */
+  --brand-100: 239 226 248; /* #EFE2F8 */
+  --brand-200: 223 198 241; /* #DFC6F1 */
+  --brand-300: 204 165 232; /* #CCA5E8 */
+  --brand-400: 196 154 228; /* #C49AE4 */
+  --brand-500: 181 126 220; /* #B57EDC */
+  --brand-600: 142 85 196; /* #8E55C4 */
+  --brand-700: 116 66 166; /* #7442A6 */
+  --brand-800: 91 52 131; /* #5B3483 */
+  --brand-900: 67 38 96; /* #432660 */
+  --accent-50: 251 255 230; /* #FBFFE6 */
+  --accent-100: 245 255 194; /* #F5FFC2 */
+  --accent-200: 238 255 138; /* #EEFF8A */
+  --accent-300: 231 255 77; /* #E7FF4D */
+  --accent-400: 223 255 0; /* #DFFF00 */
+  --accent-500: 201 230 0; /* #C9E600 */
+  --accent-600: 157 179 0; /* #9DB300 */
+  --accent-700: 101 117 0; /* #657500 */
+  --accent-800: 74 86 0; /* #4A5600 */
+  --accent-900: 52 61 0; /* #343D00 */
+  --danger-50: 255 244 242; /* #FFF4F2 */
+  --danger-100: 255 229 224; /* #FFE5E0 */
+  --danger-200: 255 202 191; /* #FFCABF */
+  --danger-300: 255 165 147; /* #FFA593 */
+  --danger-400: 255 129 105; /* #FF8169 */
+  --danger-500: 255 99 71; /* #FF6347 */
+  --danger-600: 201 58 34; /* #C93A22 */
+  --danger-700: 165 46 26; /* #A52E1A */
+  --danger-800: 129 36 18; /* #812412 */
+  --danger-900: 92 26 12; /* #5C1A0C */
+  --neutral-0: 255 255 255; /* #FFFFFF */
+  --neutral-50: 248 247 250; /* #F8F7FA */
+  --neutral-100: 241 239 244; /* #F1EFF4 */
+  --neutral-200: 229 225 232; /* #E5E1E8 */
+  --neutral-300: 211 206 216; /* #D3CED8 */
+  --neutral-400: 143 138 150; /* #8F8A96 */
+  --neutral-500: 107 104 114; /* #6B6872 */
+  --neutral-600: 87 84 94; /* #57545E */
+  --neutral-700: 67 64 74; /* #43404A */
+  --neutral-800: 52 49 58; /* #34313A */
+  --neutral-900: 37 35 42; /* #25232A */
+
+  --background: rgb(var(--neutral-50));
+  --foreground: rgb(var(--neutral-900));
   --font-manrope: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
-}
-
-html[data-theme="light"] {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-}
-
-html[data-theme="dark"] {
-  --background: #0b0f17;
-  --foreground: #f1f5f9;
+  color-scheme: light;
 }
 
 html,
@@ -40,16 +74,27 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: rgb(var(--neutral-100));
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: rgb(var(--neutral-300));
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: rgb(var(--neutral-400));
+}
+
+/* Keyboard focus: one lavender ring everywhere */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid rgb(var(--brand-500));
+  outline-offset: 2px;
+}
+
+::selection {
+  background: rgb(var(--brand-200));
+  color: rgb(var(--neutral-900));
 }
 
 @media print {

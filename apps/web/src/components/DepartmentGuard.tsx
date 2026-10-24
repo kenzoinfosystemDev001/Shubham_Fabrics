@@ -190,29 +190,29 @@ export function DepartmentGuard({ children }: GuardProps) {
     const stationHome = getUserStationHome(user);
 
     return (
-      <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center p-6">
-        <div className="max-w-md w-full bg-slate-800 border border-rose-500/40 rounded-2xl p-6 shadow-2xl text-center space-y-4">
-          <div className="w-14 h-14 rounded-full bg-rose-500/20 border border-rose-500/50 mx-auto flex items-center justify-center text-rose-400">
+      <div className="min-h-screen bg-canvas text-neutral-900 flex items-center justify-center p-6">
+        <div className="max-w-md w-full bg-white border border-danger-200 rounded-2xl p-6 shadow-sm text-center space-y-4">
+          <div className="w-14 h-14 rounded-full bg-danger-50 border border-danger-200 mx-auto flex items-center justify-center text-danger-600">
             <ShieldAlert className="w-7 h-7" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-white mb-2">Access Restricted (RBAC)</h2>
-            <p className="text-xs text-slate-300 leading-relaxed">{denialReason}</p>
+            <h2 className="text-lg font-bold text-neutral-900 mb-2">Access Restricted (RBAC)</h2>
+            <p className="text-xs text-neutral-700 leading-relaxed">{denialReason}</p>
           </div>
-          <div className="inline-flex items-center gap-2 text-xs text-amber-400 bg-amber-950/40 px-3 py-1.5 rounded-lg border border-amber-800/40">
-            <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+          <div className="inline-flex items-center gap-2 text-xs text-accent-700 bg-accent-50 px-3 py-1.5 rounded-lg border border-accent-500/40">
+            <span className="w-2 h-2 rounded-full bg-accent-400 animate-ping"></span>
             Redirecting to your authorized station...
           </div>
           <div className="pt-2 flex flex-col sm:flex-row gap-2 justify-center">
             <button
               onClick={() => router.replace(stationHome)}
-              className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-xs font-semibold transition"
+              className="px-4 py-2 bg-neutral-200 hover:bg-neutral-300 text-neutral-900 rounded-lg text-xs font-semibold transition"
             >
               Return to My Department
             </button>
             <button
               onClick={handleSignOut}
-              className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-semibold transition"
+              className="px-4 py-2 bg-danger-600 hover:bg-danger-700 text-white rounded-lg text-xs font-semibold transition"
             >
               Sign Out to Switch
             </button>
@@ -228,10 +228,10 @@ export function DepartmentGuard({ children }: GuardProps) {
 
   if (!authorized && pathname !== '/login' && pathname !== '/signup') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-3 border-slate-700 border-t-transparent rounded-full animate-spin"></div>
-          <span className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
+          <div className="w-8 h-8 border-3 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
+          <span className="text-xs font-semibold text-neutral-600 uppercase tracking-wider">
             Verifying Station Security...
           </span>
         </div>

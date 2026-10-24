@@ -16,7 +16,6 @@ import {
   X,
   PackageCheck
 } from 'lucide-react';
-import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import BarcodeStickerCard from '@/components/BarcodeStickerCard';
 import { ColorFabricMeasurementTable, createDepartmentInOutTracking } from '@/components/ColorFabricMeasurementTable';
@@ -145,23 +144,18 @@ export default function QC2IssueChallanPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] pb-16">
+    <div className="min-h-screen bg-neutral-50 pb-16">
       {/* HEADER */}
       <header
-        style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-        className="border-b border-slate-700/80 sticky top-0 z-30 px-4 sm:px-8 py-4 shadow-md text-white"
+        className="bg-white border-b border-neutral-200 sticky top-0 z-30 px-4 sm:px-8 py-4 shadow-md text-neutral-900"
       >
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-400 block drop-shadow-sm">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-700 block drop-shadow-sm">
               SHUBHAM FABRICS MES · QC2 DEPARTMENT
             </span>
-            <h1 className="text-xl font-bold text-white flex items-center gap-2.5 drop-shadow-sm">
-              <Send className="w-5 h-5 text-emerald-400" />
+            <h1 className="text-xl font-bold text-neutral-900 flex items-center gap-2.5 drop-shadow-sm">
+              <Send className="w-5 h-5 text-accent-700" />
               <span>Issue Handover Challan to Washing</span>
             </h1>
           </div>
@@ -169,7 +163,7 @@ export default function QC2IssueChallanPage() {
           <div className="flex items-center gap-2">
             <Link
               href="/qc2/my-work"
-              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold border border-slate-600/50"
+              className="px-3 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 rounded-lg text-xs font-semibold border border-neutral-200"
             >
               Inspection Station
             </Link>
@@ -179,25 +173,25 @@ export default function QC2IssueChallanPage() {
 
       {/* FORM CONTAINER */}
       <div className="max-w-5xl mx-auto px-4 sm:px-8 py-6">
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-6">
+        <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-neutral-200 p-6 shadow-xs space-y-6">
           {/* ROW 1: CHALLAN #, TARGET DEPT, PRIORITY */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Challan Number</label>
+              <label className="block text-xs font-bold text-neutral-700 mb-1">Challan Number</label>
               <input
                 type="text"
                 readOnly
                 value={challanNumber}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-800"
+                className="w-full px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-xs font-mono font-bold text-neutral-900"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">To Department</label>
+              <label className="block text-xs font-bold text-neutral-700 mb-1">To Department</label>
               <select
                 value={toDepartment}
                 onChange={(e) => setToDepartment(e.target.value)}
-                className="w-full px-3 py-2 bg-white border border-emerald-300 rounded-lg text-xs font-bold text-emerald-700 focus:ring-2 focus:ring-emerald-500"
+                className="w-full px-3 py-2 bg-white border border-accent-300 rounded-lg text-xs font-bold text-accent-800 focus:ring-2 focus:ring-brand-500/40"
               >
                 <option value="WASHING">WASHING DEPARTMENT (Next Stage)</option>
                 <option value="THREAD_CUTTING">THREAD CUTTING (Rework Return)</option>
@@ -206,11 +200,11 @@ export default function QC2IssueChallanPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Priority</label>
+              <label className="block text-xs font-bold text-neutral-700 mb-1">Priority</label>
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value)}
-                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold"
+                className="w-full px-3 py-2 bg-white border border-neutral-200 rounded-lg text-xs font-semibold"
               >
                 <option value="NORMAL">NORMAL</option>
                 <option value="HIGH">HIGH PRIORITY</option>
@@ -220,16 +214,16 @@ export default function QC2IssueChallanPage() {
           </div>
 
           {/* ROW 2: SELECT PRODUCTION SHEET (TRAVELER) */}
-          <div className="p-4 bg-sky-50/60 rounded-xl border border-sky-100 space-y-3">
+          <div className="p-4 bg-brand-50/60 rounded-xl border border-brand-100 space-y-3">
             <div className="flex items-center justify-between">
-              <label className="block text-xs font-bold text-slate-900">
+              <label className="block text-xs font-bold text-neutral-900">
                 Link Master Production Sheet (Traveler) *
               </label>
               {selectedProgram && (
                 <button
                   type="button"
                   onClick={() => setSelectedSheetForView(selectedProgram)}
-                  className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold flex items-center gap-1 shadow-xs"
+                  className="px-2.5 py-1 bg-brand-600 hover:bg-brand-700 text-white rounded text-xs font-semibold flex items-center gap-1 shadow-xs"
                 >
                   <FileText className="w-3.5 h-3.5" />
                   <span>Preview Sheet</span>
@@ -244,7 +238,7 @@ export default function QC2IssueChallanPage() {
                 if (prog) handleSelectProgram(prog);
                 else setSelectedProgram(null);
               }}
-              className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-lg text-xs font-medium focus:ring-2 focus:ring-brand-500"
             >
               {programs.map((p) => (
                 <option key={p.id} value={p.id}>
@@ -268,22 +262,22 @@ export default function QC2IssueChallanPage() {
             />
 
             {selectedProgram && (
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-slate-600 pt-2 border-t border-sky-200/60">
-                <div>Client: <strong className="text-slate-900">{selectedProgram.clientName}</strong></div>
-                <div>Style: <strong className="text-slate-900">{selectedProgram.mainStyle || selectedProgram.styleCode}</strong></div>
-                <div>Fabric: <strong className="text-slate-900">{selectedProgram.fabricName || '—'}</strong></div>
-                <div>Target: <strong className="text-slate-900">{selectedProgram.targetQuantity || '—'} PCS</strong></div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-neutral-600 pt-2 border-t border-brand-200/60">
+                <div>Client: <strong className="text-neutral-900">{selectedProgram.clientName}</strong></div>
+                <div>Style: <strong className="text-neutral-900">{selectedProgram.mainStyle || selectedProgram.styleCode}</strong></div>
+                <div>Fabric: <strong className="text-neutral-900">{selectedProgram.fabricName || '—'}</strong></div>
+                <div>Target: <strong className="text-neutral-900">{selectedProgram.targetQuantity || '—'} PCS</strong></div>
               </div>
             )}
           </div>
 
           {/* ITEMS TO DISPATCH */}
           <div className="space-y-3">
-            <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Pieces to Dispatch</h3>
+            <h3 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">Pieces to Dispatch</h3>
             {items.map((it, idx) => (
-              <div key={idx} className="grid grid-cols-1 sm:grid-cols-12 gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200 items-end">
+              <div key={idx} className="grid grid-cols-1 sm:grid-cols-12 gap-3 p-3 bg-neutral-50 rounded-xl border border-neutral-200 items-end">
                 <div className="sm:col-span-5">
-                  <label className="block text-[10px] font-bold text-slate-600 mb-1">Item Description</label>
+                  <label className="block text-[10px] font-bold text-neutral-600 mb-1">Item Description</label>
                   <input
                     type="text"
                     value={it.itemDescription}
@@ -292,11 +286,11 @@ export default function QC2IssueChallanPage() {
                       next[idx].itemDescription = e.target.value;
                       setItems(next);
                     }}
-                    className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs"
+                    className="w-full px-3 py-1.5 bg-white border border-neutral-300 rounded-lg text-xs"
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-[10px] font-bold text-slate-600 mb-1">Quantity *</label>
+                  <label className="block text-[10px] font-bold text-neutral-600 mb-1">Quantity *</label>
                   <input
                     type="number"
                     min="0.01"
@@ -308,12 +302,12 @@ export default function QC2IssueChallanPage() {
                       next[idx].quantity = e.target.value;
                       setItems(next);
                     }}
-                    className="w-full px-3 py-1.5 bg-white border border-emerald-300 rounded-lg text-xs font-mono font-bold text-emerald-700"
+                    className="w-full px-3 py-1.5 bg-white border border-accent-300 rounded-lg text-xs font-mono font-bold text-accent-800"
                     placeholder="e.g. 500"
                   />
                 </div>
                 <div className="sm:col-span-1">
-                  <label className="block text-[10px] font-bold text-slate-600 mb-1">Unit *</label>
+                  <label className="block text-[10px] font-bold text-neutral-600 mb-1">Unit *</label>
                   <select
                     value={it.uom}
                     onChange={(e) => {
@@ -323,14 +317,14 @@ export default function QC2IssueChallanPage() {
                       setItems(next);
                       setTracking((prev) => ({ ...prev, fabricUnit: e.target.value as 'MTR' | 'PCS' }));
                     }}
-                    className="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs"
+                    className="w-full px-2 py-1.5 bg-white border border-neutral-300 rounded-lg text-xs"
                   >
                     <option value="MTR">MTR</option>
                     <option value="PCS">PCS</option>
                   </select>
                 </div>
                 <div className="sm:col-span-4">
-                  <label className="block text-[10px] font-bold text-slate-600 mb-1">Remarks</label>
+                  <label className="block text-[10px] font-bold text-neutral-600 mb-1">Remarks</label>
                   <input
                     type="text"
                     value={it.remarks}
@@ -339,7 +333,7 @@ export default function QC2IssueChallanPage() {
                       next[idx].remarks = e.target.value;
                       setItems(next);
                     }}
-                    className="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs"
+                    className="w-full px-3 py-1.5 bg-white border border-neutral-300 rounded-lg text-xs"
                   />
                 </div>
               </div>
@@ -347,27 +341,27 @@ export default function QC2IssueChallanPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">Handover Notes</label>
+            <label className="block text-xs font-bold text-neutral-700 mb-1">Handover Notes</label>
             <textarea
               rows={2}
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
-              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs"
+              className="w-full px-3 py-2 bg-white border border-neutral-200 rounded-lg text-xs"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-neutral-200">
             <button
               type="button"
               onClick={() => router.push('/qc2/my-work')}
-              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition"
+              className="px-4 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-semibold text-xs rounded-lg transition"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center gap-2"
+              className="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center gap-2"
             >
               {loading ? (
                 <>
@@ -387,19 +381,19 @@ export default function QC2IssueChallanPage() {
 
       {/* SUCCESS MODAL WITH BARCODE TAG */}
       {generatedChallan && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in">
-          <div className="relative w-full max-w-lg bg-white rounded-2xl p-6 shadow-2xl border border-slate-200 text-slate-800 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-900/70 backdrop-blur-xs animate-in fade-in">
+          <div className="relative w-full max-w-lg bg-white rounded-2xl p-6 shadow-2xl border border-neutral-200 text-neutral-900 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-neutral-200">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-700">
+                <div className="w-9 h-9 rounded-xl bg-accent-100 flex items-center justify-center text-accent-800">
                   <PackageCheck className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">Challan Issued to Washing!</h3>
-                  <p className="text-xs text-slate-500 font-mono">{generatedChallan.challanNumber}</p>
+                  <h3 className="text-base font-bold text-neutral-900">Challan Issued to Washing!</h3>
+                  <p className="text-xs text-neutral-500 font-mono">{generatedChallan.challanNumber}</p>
                 </div>
               </div>
-              <button onClick={() => router.push('/qc2/my-work')} className="p-1 rounded text-slate-400 hover:text-slate-700">
+              <button onClick={() => router.push('/qc2/my-work')} className="p-1 rounded text-neutral-500 hover:text-neutral-700">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -419,13 +413,13 @@ export default function QC2IssueChallanPage() {
               title="Official Washing Dispatch Tag"
             />
 
-            <p className="text-right text-xs font-bold text-slate-700">Total Quantity: {totalQuantityLabel}</p>
+            <p className="text-right text-xs font-bold text-neutral-700">Total Quantity: {totalQuantityLabel}</p>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200">
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-neutral-200">
               <button
                 type="button"
                 onClick={() => router.push('/qc2/my-work')}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg shadow-sm"
+                className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-lg shadow-sm"
               >
                 Go to Inspection Terminal
               </button>

@@ -1,4 +1,25 @@
 /** @type {import('tailwindcss').Config} */
+
+// Subham Fabrics MES design tokens.
+// The palette is intentionally closed: only these colors exist as Tailwind
+// utilities, so off-brand classes (indigo, emerald, slate...) generate nothing.
+// Values live as RGB channels in src/app/globals.css (:root) so opacity
+// modifiers like `bg-brand-500/10` keep working.
+//
+//   brand   Lavender  #B57EDC  primary actions, active nav/tabs, focus, links
+//   accent  Chartreuse #DFFF00 progress, small accent borders, highlights (dark text only)
+//   danger  Tomato    #FF6347  destructive actions, rejections, critical errors
+//   neutral           #F8F7FA canvas, #E5E1E8 line, #6B6872 muted, #25232A ink
+//
+// White text only sits on brand-600+ / danger-600+ (WCAG AA).
+const SHADES = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
+
+const scale = (name, defaultShade) => {
+  const out = { DEFAULT: `rgb(var(--${name}-${defaultShade}) / <alpha-value>)` };
+  for (const s of SHADES) out[s] = `rgb(var(--${name}-${s}) / <alpha-value>)`;
+  return out;
+};
+
 module.exports = {
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -6,24 +27,29 @@ module.exports = {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
+    colors: {
+      transparent: 'transparent',
+      current: 'currentColor',
+      inherit: 'inherit',
+      white: 'rgb(var(--neutral-0) / <alpha-value>)',
+      black: '#000000',
+      brand: scale('brand', 500),
+      accent: scale('accent', 400),
+      danger: scale('danger', 500),
+      neutral: scale('neutral', 500),
+      // Semantic neutral aliases
+      canvas: 'rgb(var(--neutral-50) / <alpha-value>)',
+      surface: 'rgb(var(--neutral-0) / <alpha-value>)',
+      line: 'rgb(var(--neutral-200) / <alpha-value>)',
+      muted: 'rgb(var(--neutral-500) / <alpha-value>)',
+      ink: 'rgb(var(--neutral-900) / <alpha-value>)',
+    },
     extend: {
       fontFamily: {
         sans: ['var(--font-manrope)', 'Manrope', 'sans-serif'],
       },
-      colors: {
-        factory: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a',
-          950: '#020617',
-        },
+      ringColor: {
+        DEFAULT: 'rgb(var(--brand-500) / 0.5)',
       },
     },
   },

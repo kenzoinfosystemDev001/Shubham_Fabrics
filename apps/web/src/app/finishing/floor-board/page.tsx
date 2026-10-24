@@ -16,7 +16,6 @@ import {
   FileText,
   Package,
 } from 'lucide-react';
-import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 
 export default function FinishingFloorBoard() {
   const [loading, setLoading] = useState(true);
@@ -88,57 +87,52 @@ export default function FinishingFloorBoard() {
       title: 'Incoming from Stitching',
       cards: filterCards(lanes.INCOMING || []),
       color: 'amber',
-      borderColor: 'border-amber-500/30',
-      badgeBg: 'bg-amber-500/20 text-amber-300',
+      borderColor: 'border-accent-500/30',
+      badgeBg: 'bg-accent-400/20 text-accent-700',
     },
     {
       id: 'IN_FINISHING',
       title: 'Active Finishing Tables',
       cards: filterCards(lanes.IN_FINISHING || []),
       color: 'teal',
-      borderColor: 'border-teal-500/40',
-      badgeBg: 'bg-teal-500/20 text-teal-300',
+      borderColor: 'border-brand-500/40',
+      badgeBg: 'bg-brand-500/20 text-brand-600',
     },
     {
       id: 'INSPECTION',
       title: 'Quality & Sizing Audit',
       cards: filterCards(lanes.INSPECTION || []),
       color: 'purple',
-      borderColor: 'border-purple-500/40',
-      badgeBg: 'bg-purple-500/20 text-purple-300',
+      borderColor: 'border-brand-500/40',
+      badgeBg: 'bg-brand-500/20 text-brand-600',
     },
     {
       id: 'READY_FOR_DISPATCH',
       title: 'Ready for Handover',
       cards: filterCards(lanes.READY_FOR_DISPATCH || []),
       color: 'emerald',
-      borderColor: 'border-emerald-500/40',
-      badgeBg: 'bg-emerald-500/20 text-emerald-300',
+      borderColor: 'border-accent-500/40',
+      badgeBg: 'bg-accent-400/20 text-accent-700',
     },
   ];
 
   return (
     <div
-      className="min-h-screen text-slate-100 flex flex-col"
-      style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.94), rgba(10, 15, 29, 0.98)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
-      }}
+      className="min-h-screen text-neutral-900 flex flex-col"
+      
     >
       {/* HEADER */}
-      <header className="border-b border-slate-800/80 bg-slate-950/60 backdrop-blur-md px-6 py-4 sticky top-0 z-30 shadow-md">
+      <header className="border-b border-neutral-200 bg-white backdrop-blur-md px-6 py-4 sticky top-0 z-30 shadow-md">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
+            <div className="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-600">
               <Kanban className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+              <h1 className="text-xl font-bold tracking-tight text-neutral-900 flex items-center gap-2">
                 Finishing Floor Board (Kanban)
               </h1>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-neutral-500">
                 Live department workflow pipeline &bull; Auto-sync 5s &bull; Last update: {lastSyncTime.toLocaleTimeString()}
               </p>
             </div>
@@ -146,23 +140,23 @@ export default function FinishingFloorBoard() {
 
           <div className="flex items-center gap-3">
             <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-500" />
+              <Search className="w-4 h-4 absolute left-3 top-2.5 text-neutral-500" />
               <input
                 type="text"
                 placeholder="Search board..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-9 pr-4 py-1.5 bg-slate-900 border border-slate-700/80 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-teal-400 w-48 sm:w-64"
+                className="pl-9 pr-4 py-1.5 bg-white border border-neutral-200 rounded-lg text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-brand-500 w-48 sm:w-64"
               />
             </div>
 
             <button
               onClick={() => loadBoard(true)}
               disabled={loading}
-              className="p-2 rounded-lg bg-slate-900 border border-slate-700/80 hover:bg-slate-800 text-slate-300 hover:text-white transition disabled:opacity-50"
+              className="p-2 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-100 text-neutral-700 hover:text-neutral-900 transition disabled:opacity-50"
               title="Refresh Floor Board"
             >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-teal-400' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-brand-600' : ''}`} />
             </button>
           </div>
         </div>
@@ -171,7 +165,7 @@ export default function FinishingFloorBoard() {
       {/* ERROR */}
       {error && (
         <div className="max-w-7xl mx-auto w-full px-6 pt-4">
-          <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl flex items-center gap-3 text-rose-300 text-xs">
+          <div className="p-3 bg-danger-500/10 border border-danger-500/30 rounded-xl flex items-center gap-3 text-danger-600 text-xs">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
@@ -184,13 +178,13 @@ export default function FinishingFloorBoard() {
           {laneDefinitions.map((lane) => (
             <div
               key={lane.id}
-              className="flex flex-col rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-xs p-4 space-y-3 min-h-[500px]"
+              className="flex flex-col rounded-2xl bg-white border border-neutral-200 backdrop-blur-xs p-4 space-y-3 min-h-[500px]"
             >
               {/* Lane Header */}
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="flex items-center justify-between pb-3 border-b border-neutral-200">
                 <div className="flex items-center gap-2">
                   <span className={`w-2.5 h-2.5 rounded-full bg-${lane.color}-400`}></span>
-                  <h3 className="text-xs font-bold text-white tracking-wide uppercase">
+                  <h3 className="text-xs font-bold text-neutral-900 tracking-wide uppercase">
                     {lane.title}
                   </h3>
                 </div>
@@ -202,24 +196,24 @@ export default function FinishingFloorBoard() {
               {/* Cards List */}
               <div className="flex-1 space-y-3 overflow-y-auto max-h-[calc(100vh-250px)] pr-1">
                 {lane.cards.length === 0 ? (
-                  <div className="py-12 text-center text-slate-500 text-xs">
+                  <div className="py-12 text-center text-neutral-500 text-xs">
                     No jobs in this stage.
                   </div>
                 ) : (
                   lane.cards.map((card) => (
                     <div
                       key={card.id}
-                      className={`p-3.5 rounded-xl bg-slate-950/70 border ${lane.borderColor} hover:border-slate-600 transition flex flex-col justify-between space-y-2 shadow-sm`}
+                      className={`p-3.5 rounded-xl bg-white border ${lane.borderColor} hover:border-neutral-200 transition flex flex-col justify-between space-y-2 shadow-sm`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-mono text-xs font-bold text-white">
+                        <span className="font-mono text-xs font-bold text-neutral-900">
                           {card.challanNumber}
                         </span>
                         <span
                           className={`text-[9px] font-bold px-1.5 py-0.5 rounded uppercase ${
                             card.priority === 'HIGH' || card.priority === 'URGENT'
-                              ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                              : 'bg-slate-800 text-slate-300'
+                              ? 'bg-danger-500/20 text-danger-600 border border-danger-500/30'
+                              : 'bg-neutral-100 text-neutral-700'
                           }`}
                         >
                           {card.priority || 'NORMAL'}
@@ -227,21 +221,21 @@ export default function FinishingFloorBoard() {
                       </div>
 
                       <div>
-                        <div className="text-xs font-semibold text-teal-300">{card.styleCode}</div>
-                        <div className="text-[11px] font-mono text-slate-400">
+                        <div className="text-xs font-semibold text-brand-600">{card.styleCode}</div>
+                        <div className="text-[11px] font-mono text-neutral-500">
                           Program: {card.programNumber}
                         </div>
-                        <div className="text-[11px] text-slate-400 truncate">
+                        <div className="text-[11px] text-neutral-500 truncate">
                           Client: {card.clientName}
                         </div>
                       </div>
 
-                      <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
-                        <span className="text-slate-400">
-                          Pieces: <strong className="text-white font-mono">{card.totalPieces}</strong>
+                      <div className="pt-2 border-t border-neutral-200 flex items-center justify-between text-[11px]">
+                        <span className="text-neutral-500">
+                          Pieces: <strong className="text-neutral-900 font-mono">{card.totalPieces}</strong>
                         </span>
                         {card.goodPieces > 0 && (
-                          <span className="text-emerald-400 font-mono font-bold">
+                          <span className="text-accent-700 font-mono font-bold">
                             Good: {card.goodPieces}
                           </span>
                         )}
@@ -250,7 +244,7 @@ export default function FinishingFloorBoard() {
                       <div className="pt-2 flex justify-end">
                         <Link
                           href={`/finishing/workspace/${card.id}`}
-                          className="text-[10px] font-semibold text-teal-400 hover:text-teal-300 flex items-center gap-1 transition"
+                          className="text-[10px] font-semibold text-brand-600 hover:text-brand-600 flex items-center gap-1 transition"
                         >
                           <span>Open Station</span>
                           <ArrowRight className="w-3 h-3" />

@@ -35,7 +35,6 @@ import {
   Check,
   Scale
 } from 'lucide-react';
-import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { downloadChallanHtml, printChallan } from '@/lib/download-challan';
@@ -533,32 +532,27 @@ export default function QCWashingMyWorkPage() {
   }, [challans, statusFilter, searchTerm]);
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] pb-16">
+    <div className="min-h-screen bg-neutral-50 pb-16">
       {/* HEADER BANNER */}
       <header
-        style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-        className="border-b border-slate-700/80 sticky top-0 z-30 px-4 sm:px-8 py-4 shadow-md text-white"
+        className="bg-white border-b border-neutral-200 sticky top-0 z-30 px-4 sm:px-8 py-4 shadow-md text-neutral-900"
       >
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-accent-400/20 text-accent-700 border border-accent-500/30">
                 QC WASHING TERMINAL
               </span>
-              <span className="flex items-center gap-1.5 text-[11px] text-emerald-400 font-medium">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="flex items-center gap-1.5 text-[11px] text-accent-700 font-medium">
+                <span className="w-2 h-2 rounded-full bg-accent-400 animate-pulse" />
                 Live Real-Time Sync
               </span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight mt-1 flex items-center gap-2">
-              <Waves className="w-6 h-6 text-cyan-400" />
+            <h1 className="text-xl sm:text-2xl font-extrabold text-neutral-900 tracking-tight mt-1 flex items-center gap-2">
+              <Waves className="w-6 h-6 text-brand-600" />
               <span>QC Washing Operational Work Center</span>
             </h1>
-            <p className="text-xs text-slate-300 mt-0.5">
+            <p className="text-xs text-neutral-700 mt-0.5">
               Receive washed lots, verify shrinkage & wash quality parameters, isolate defective pieces, and issue handovers to Finishing.
             </p>
           </div>
@@ -567,7 +561,7 @@ export default function QCWashingMyWorkPage() {
             <button
               onClick={() => loadData(true)}
               disabled={loading}
-              className="px-3 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-600 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition shadow-xs disabled:opacity-50"
+              className="px-3 py-1.5 bg-neutral-50 hover:bg-neutral-200 text-neutral-900 border border-neutral-200 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition shadow-xs disabled:opacity-50"
               title="Refresh Work Center"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
@@ -576,7 +570,7 @@ export default function QCWashingMyWorkPage() {
 
             <Link
               href="/qcwashing/issue-challan"
-              className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
+              className="px-3.5 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
             >
               <Send className="w-3.5 h-3.5" />
               <span>Issue Challan</span>
@@ -584,7 +578,7 @@ export default function QCWashingMyWorkPage() {
 
             <Link
               href="/qcwashing/floor-board"
-              className="px-3.5 py-1.5 bg-cyan-700 hover:bg-cyan-600 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
+              className="px-3.5 py-1.5 bg-brand-700 hover:bg-brand-800 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition shadow-sm"
             >
               <Kanban className="w-3.5 h-3.5" />
               <span>Floor Board</span>
@@ -595,10 +589,10 @@ export default function QCWashingMyWorkPage() {
 
       {/* TOAST MESSAGE */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-emerald-900 text-emerald-100 border border-emerald-700 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-xs animate-in fade-in slide-in-from-bottom-4">
-          <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+        <div className="fixed bottom-6 right-6 z-50 bg-accent-50 text-neutral-900 border border-accent-600 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-xs animate-in fade-in slide-in-from-bottom-4">
+          <CheckCircle2 className="w-5 h-5 text-accent-700 shrink-0" />
           <span className="font-semibold">{toastMessage}</span>
-          <button onClick={() => setToastMessage(null)} className="text-emerald-300 hover:text-white ml-2">
+          <button onClick={() => setToastMessage(null)} className="text-accent-700 hover:text-neutral-900 ml-2">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -607,32 +601,32 @@ export default function QCWashingMyWorkPage() {
       {/* MAIN CONTAINER */}
       <main className="max-w-7xl mx-auto px-4 sm:px-8 py-6 space-y-6">
         {error && (
-          <div className="p-4 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-xs flex items-center justify-between">
+          <div className="p-4 bg-danger-50 border border-danger-200 text-danger-800 rounded-xl text-xs flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+              <AlertCircle className="w-4 h-4 text-danger-600 shrink-0" />
               <span>{error}</span>
             </div>
-            <button onClick={() => loadData(true)} className="text-rose-700 font-bold underline">
+            <button onClick={() => loadData(true)} className="text-danger-700 font-bold underline">
               Retry
             </button>
           </div>
         )}
 
         {/* WORKCENTER TABS */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 border-b border-slate-200">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 border-b border-neutral-200">
           <button
             onClick={() => setActiveTab('INCOMING')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 ${
               activeTab === 'INCOMING'
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                ? 'bg-accent-400 text-neutral-900 shadow-xs'
+                : 'bg-white text-neutral-600 hover:bg-neutral-100 border border-neutral-200'
             }`}
           >
             <Waves className="w-4 h-4" />
             <span>Incoming Washed Lots</span>
             <span
               className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                activeTab === 'INCOMING' ? 'bg-emerald-700 text-white' : 'bg-slate-100 text-slate-700'
+                activeTab === 'INCOMING' ? 'bg-accent-500 text-neutral-900' : 'bg-neutral-100 text-neutral-700'
               }`}
             >
               {challans.length}
@@ -643,15 +637,15 @@ export default function QCWashingMyWorkPage() {
             onClick={() => setActiveTab('DEFECTED_SHELF')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 ${
               activeTab === 'DEFECTED_SHELF'
-                ? 'bg-rose-600 text-white shadow-xs'
-                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                ? 'bg-danger-600 text-white shadow-xs'
+                : 'bg-white text-neutral-600 hover:bg-neutral-100 border border-neutral-200'
             }`}
           >
             <Archive className="w-4 h-4" />
             <span>Defective Shelf (DEF-SHELF-QC3)</span>
             <span
               className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                activeTab === 'DEFECTED_SHELF' ? 'bg-rose-700 text-white' : 'bg-slate-100 text-slate-700'
+                activeTab === 'DEFECTED_SHELF' ? 'bg-danger-700 text-white' : 'bg-neutral-100 text-neutral-700'
               }`}
             >
               {defectiveReturns.length}
@@ -662,15 +656,15 @@ export default function QCWashingMyWorkPage() {
             onClick={() => setActiveTab('REWORK_HISTORY')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 ${
               activeTab === 'REWORK_HISTORY'
-                ? 'bg-orange-600 text-white shadow-xs'
-                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                ? 'bg-accent-400 text-neutral-900 shadow-xs'
+                : 'bg-white text-neutral-600 hover:bg-neutral-100 border border-neutral-200'
             }`}
           >
             <RotateCcw className="w-4 h-4" />
             <span>Re-Wash Log</span>
             <span
               className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                activeTab === 'REWORK_HISTORY' ? 'bg-orange-700 text-white' : 'bg-slate-100 text-slate-700'
+                activeTab === 'REWORK_HISTORY' ? 'bg-accent-500 text-neutral-900' : 'bg-neutral-100 text-neutral-700'
               }`}
             >
               {reworkReturns.length}
@@ -681,8 +675,8 @@ export default function QCWashingMyWorkPage() {
             onClick={() => setActiveTab('PRODUCTION_SHEETS')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 ${
               activeTab === 'PRODUCTION_SHEETS'
-                ? 'bg-slate-800 text-white shadow-xs'
-                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                ? 'bg-brand-600 text-white shadow-xs'
+                : 'bg-white text-neutral-600 hover:bg-neutral-100 border border-neutral-200'
             }`}
           >
             <FileText className="w-4 h-4" />
@@ -694,28 +688,28 @@ export default function QCWashingMyWorkPage() {
         {activeTab === 'INCOMING' && (
           <div className="space-y-4">
             {/* SEARCH & FILTERS BAR */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs flex flex-col sm:flex-row gap-3 items-center justify-between">
+            <div className="bg-white rounded-2xl border border-neutral-200 p-4 shadow-xs flex flex-col sm:flex-row gap-3 items-center justify-between">
               <div className="relative flex-1 w-full">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Search className="w-4 h-4 text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   placeholder="Search by Challan #, Program Serial #, Style Code, or Client..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition"
+                  className="w-full pl-9 pr-4 py-2 rounded-xl border border-neutral-200 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500/40 focus:border-brand-500 transition"
                 />
               </div>
 
               <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto">
-                <Filter className="w-4 h-4 text-slate-400 shrink-0" />
+                <Filter className="w-4 h-4 text-neutral-500 shrink-0" />
                 {['ALL', 'PENDING', 'IN_PROCESS', 'APPROVED', 'REWORK', 'REJECTED'].map((st) => (
                   <button
                     key={st}
                     onClick={() => setStatusFilter(st)}
                     className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition ${
                       statusFilter === st
-                        ? 'bg-slate-900 text-white shadow-xs'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        ? 'bg-brand-600 text-white shadow-xs'
+                        : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
                     }`}
                   >
                     {st}
@@ -725,11 +719,11 @@ export default function QCWashingMyWorkPage() {
             </div>
 
             {/* CHALLANS TABLE */}
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+            <div className="bg-white rounded-2xl border border-neutral-200 overflow-hidden shadow-xs">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-slate-50 text-slate-500 text-[11px] font-semibold border-b border-slate-200">
+                    <tr className="bg-neutral-50 text-neutral-500 text-[11px] font-semibold border-b border-neutral-200">
                       <th className="py-3 px-4">Challan #</th>
                       <th className="py-3 px-4">From</th>
                       <th className="py-3 px-4">Program / Style</th>
@@ -740,11 +734,11 @@ export default function QCWashingMyWorkPage() {
                       <th className="py-3 px-4 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-neutral-100">
                     {filteredChallans.length === 0 ? (
                       <tr>
-                        <td colSpan={8} className="py-12 text-center text-slate-400">
-                          <CheckCircle2 className="w-8 h-8 mx-auto text-slate-300 mb-2" />
+                        <td colSpan={8} className="py-12 text-center text-neutral-500">
+                          <CheckCircle2 className="w-8 h-8 mx-auto text-neutral-700 mb-2" />
                           <p className="font-medium text-xs">No challans matching the criteria.</p>
                         </td>
                       </tr>
@@ -757,49 +751,49 @@ export default function QCWashingMyWorkPage() {
                         const isApproved = ['QC_APPROVED', 'COMPLETED'].includes(c.status);
 
                         return (
-                          <tr key={c.id} className="hover:bg-slate-50/70 transition">
-                            <td className="py-3 px-4 font-mono font-bold text-slate-900">
+                          <tr key={c.id} className="hover:bg-neutral-50/70 transition">
+                            <td className="py-3 px-4 font-mono font-bold text-neutral-900">
                               {c.challanNumber}
                             </td>
                             <td className="py-3 px-4">
-                              <span className="font-mono text-[11px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded">
+                              <span className="font-mono text-[11px] font-bold text-neutral-600 bg-neutral-100 px-1.5 py-0.5 rounded">
                                 {c.fromDepartment}
                               </span>
                             </td>
                             <td className="py-3 px-4">
-                              <span className="font-bold text-slate-800 block">
+                              <span className="font-bold text-neutral-900 block">
                                 {c.program?.programSerialNo || c.program?.programNumber || '—'}
                               </span>
-                              <span className="text-[10px] text-slate-500 font-mono">
+                              <span className="text-[10px] text-neutral-500 font-mono">
                                 Style: {c.program?.styleCode || 'Standard'}
                               </span>
                             </td>
-                            <td className="py-3 px-4 text-slate-600">
+                            <td className="py-3 px-4 text-neutral-600">
                               {c.program?.clientName || 'Standard Client'}
                             </td>
-                            <td className="py-3 px-4 text-slate-600">
+                            <td className="py-3 px-4 text-neutral-600">
                               <span>{c.program?.fabricName || 'Garment Pieces'}</span>
-                              <span className="block text-[10px] text-slate-400">
+                              <span className="block text-[10px] text-neutral-500">
                                 {c.program?.fabricColor || 'Standard'}
                               </span>
                             </td>
-                            <td className="py-3 px-4 font-mono font-bold text-slate-900">
+                            <td className="py-3 px-4 font-mono font-bold text-neutral-900">
                               {totalQty} PCS
                             </td>
                             <td className="py-3 px-4">
                               <span
                                 className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                                   c.status === 'QC_APPROVED'
-                                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                                    ? 'bg-accent-100 text-accent-800 border border-accent-200'
                                     : c.status === 'UNDER_INSPECTION'
-                                    ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                                    ? 'bg-brand-100 text-brand-800 border border-brand-200'
                                     : c.status === 'RECEIVED'
-                                    ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                                    ? 'bg-accent-100 text-accent-800 border border-accent-200'
                                     : c.status === 'QC_REJECTED'
-                                    ? 'bg-rose-100 text-rose-800 border border-rose-200'
+                                    ? 'bg-danger-100 text-danger-800 border border-danger-200'
                                     : c.status === 'REWORK_REQUESTED'
-                                    ? 'bg-orange-100 text-orange-800 border border-orange-200'
-                                    : 'bg-slate-100 text-slate-800 border border-slate-200'
+                                    ? 'bg-accent-100 text-accent-800 border border-accent-200'
+                                    : 'bg-neutral-100 text-neutral-900 border border-neutral-200'
                                 }`}
                               >
                                 {c.status}
@@ -814,7 +808,7 @@ export default function QCWashingMyWorkPage() {
                                     <button
                                       onClick={() => handleReceiveChallan(c)}
                                       disabled={submittingAction}
-                                      className="px-2.5 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded text-[11px] font-bold flex items-center gap-1 transition shadow-2xs"
+                                      className="px-2.5 py-1 bg-accent-400 hover:bg-accent-500 text-neutral-900 rounded text-[11px] font-bold flex items-center gap-1 transition shadow-2xs"
                                     >
                                       <Check className="w-3 h-3" />
                                       <span>Receive</span>
@@ -825,7 +819,7 @@ export default function QCWashingMyWorkPage() {
                                   {(isReceived || isUnderInspection) && (
                                     <button
                                       onClick={() => handleOpenInspectModal(c)}
-                                      className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[11px] font-bold flex items-center gap-1 transition shadow-2xs"
+                                      className="px-2.5 py-1 bg-accent-400 hover:bg-accent-500 text-neutral-900 rounded text-[11px] font-bold flex items-center gap-1 transition shadow-2xs"
                                     >
                                       <ShieldCheck className="w-3 h-3" />
                                       <span>Verify Work</span>
@@ -837,7 +831,7 @@ export default function QCWashingMyWorkPage() {
                                     <button
                                       onClick={() => handleIssueToFinishing(c)}
                                       disabled={submittingAction}
-                                      className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-[11px] font-bold flex items-center gap-1 transition shadow-2xs"
+                                      className="px-2.5 py-1 bg-brand-600 hover:bg-brand-700 text-white rounded text-[11px] font-bold flex items-center gap-1 transition shadow-2xs"
                                       title="Issue Handover Challan to Finishing"
                                     >
                                       <PackageCheck className="w-3 h-3" />
@@ -867,50 +861,50 @@ export default function QCWashingMyWorkPage() {
         {/* TAB 2: DEFECTED SHELF (DEF-SHELF-QC3) */}
         {activeTab === 'DEFECTED_SHELF' && (
           <div className="space-y-4">
-            <div className="bg-white rounded-2xl border border-rose-200 p-5 shadow-xs">
-              <div className="flex items-center justify-between pb-3 border-b border-rose-100">
+            <div className="bg-white rounded-2xl border border-danger-200 p-5 shadow-xs">
+              <div className="flex items-center justify-between pb-3 border-b border-danger-100">
                 <div className="flex items-center gap-2">
-                  <Archive className="w-5 h-5 text-rose-600" />
+                  <Archive className="w-5 h-5 text-danger-600" />
                   <div>
-                    <h3 className="text-sm font-bold text-rose-900">
+                    <h3 className="text-sm font-bold text-danger-900">
                       QC Washing Defective Shelf (DEF-SHELF-QC3)
                     </h3>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-neutral-500">
                       Scrapped & un-recoverable pieces identified during wash testing
                     </p>
                   </div>
                 </div>
-                <span className="text-xs font-mono font-bold text-rose-700 bg-rose-50 px-2 py-1 rounded">
+                <span className="text-xs font-mono font-bold text-danger-700 bg-danger-50 px-2 py-1 rounded">
                   {defectiveReturns.length} Quarantine Lots
                 </span>
               </div>
 
               {defectiveReturns.length === 0 ? (
-                <div className="py-12 text-center text-slate-400">
-                  <CheckCircle2 className="w-8 h-8 mx-auto text-emerald-500 mb-2" />
+                <div className="py-12 text-center text-neutral-500">
+                  <CheckCircle2 className="w-8 h-8 mx-auto text-accent-700 mb-2" />
                   <p className="text-xs font-medium">No defective lots quarantined in DEF-SHELF-QC3.</p>
                 </div>
               ) : (
-                <div className="divide-y divide-slate-100 pt-2">
+                <div className="divide-y divide-neutral-100 pt-2">
                   {defectiveReturns.map((c) => {
                     const qty = c.items?.reduce((s: number, it: any) => s + (Number(it.quantity) || 0), 0) || 0;
                     return (
                       <div key={c.id} className="py-3 flex items-center justify-between gap-3 text-xs">
                         <div className="space-y-0.5">
                           <div className="flex items-center gap-2">
-                            <span className="font-mono font-bold text-slate-900">{c.challanNumber}</span>
-                            <span className="text-rose-700 font-bold bg-rose-50 px-1.5 py-0.2 rounded text-[10px]">
+                            <span className="font-mono font-bold text-neutral-900">{c.challanNumber}</span>
+                            <span className="text-danger-700 font-bold bg-danger-50 px-1.5 py-0.2 rounded text-[10px]">
                               DEFECTIVE QUARANTINE
                             </span>
                           </div>
-                          <p className="text-slate-600 text-[11px]">{c.remarks}</p>
+                          <p className="text-neutral-600 text-[11px]">{c.remarks}</p>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="font-mono font-bold text-rose-700 text-sm">{qty} PCS</span>
+                          <span className="font-mono font-bold text-danger-700 text-sm">{qty} PCS</span>
                           <button
                             type="button"
                             onClick={() => downloadChallanHtml(c)}
-                            className="px-2 py-0.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded text-[10px] font-semibold flex items-center gap-1"
+                            className="px-2 py-0.5 bg-danger-50 hover:bg-danger-100 text-danger-700 rounded text-[10px] font-semibold flex items-center gap-1"
                             title="Download Challan HTML"
                           >
                             <Download className="w-2.5 h-2.5" />
@@ -919,7 +913,7 @@ export default function QCWashingMyWorkPage() {
                           <button
                             type="button"
                             onClick={() => printChallan(c)}
-                            className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] font-semibold flex items-center gap-1"
+                            className="px-2 py-0.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded text-[10px] font-semibold flex items-center gap-1"
                             title="Print Challan Slip"
                           >
                             <Printer className="w-2.5 h-2.5" />
@@ -938,50 +932,50 @@ export default function QCWashingMyWorkPage() {
         {/* TAB 3: REWORK LOG */}
         {activeTab === 'REWORK_HISTORY' && (
           <div className="space-y-4">
-            <div className="bg-white rounded-2xl border border-orange-200 p-5 shadow-xs">
-              <div className="flex items-center justify-between pb-3 border-b border-orange-100">
+            <div className="bg-white rounded-2xl border border-accent-200 p-5 shadow-xs">
+              <div className="flex items-center justify-between pb-3 border-b border-accent-100">
                 <div className="flex items-center gap-2">
-                  <RotateCcw className="w-5 h-5 text-orange-600" />
+                  <RotateCcw className="w-5 h-5 text-accent-700" />
                   <div>
-                    <h3 className="text-sm font-bold text-orange-900">
+                    <h3 className="text-sm font-bold text-accent-800">
                       Returned to Washing for Re-Wash / Treatment
                     </h3>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-neutral-500">
                       Lots requiring re-washing, re-softening, or chemical re-neutralization
                     </p>
                   </div>
                 </div>
-                <span className="text-xs font-mono font-bold text-orange-700 bg-orange-50 px-2 py-1 rounded">
+                <span className="text-xs font-mono font-bold text-accent-800 bg-accent-50 px-2 py-1 rounded">
                   {reworkReturns.length} Re-Wash Challans
                 </span>
               </div>
 
               {reworkReturns.length === 0 ? (
-                <div className="py-12 text-center text-slate-400">
-                  <CheckCircle2 className="w-8 h-8 mx-auto text-emerald-500 mb-2" />
+                <div className="py-12 text-center text-neutral-500">
+                  <CheckCircle2 className="w-8 h-8 mx-auto text-accent-700 mb-2" />
                   <p className="text-xs font-medium">Zero re-wash handoffs issued. All wash runs passed first-time.</p>
                 </div>
               ) : (
-                <div className="divide-y divide-slate-100 pt-2">
+                <div className="divide-y divide-neutral-100 pt-2">
                   {reworkReturns.map((c) => {
                     const qty = c.items?.reduce((s: number, it: any) => s + (Number(it.quantity) || 0), 0) || 0;
                     return (
                       <div key={c.id} className="py-3 flex items-center justify-between gap-3 text-xs">
                         <div className="space-y-0.5">
                           <div className="flex items-center gap-2">
-                            <span className="font-mono font-bold text-slate-900">{c.challanNumber}</span>
-                            <span className="text-orange-700 font-bold bg-orange-50 px-1.5 py-0.2 rounded text-[10px]">
+                            <span className="font-mono font-bold text-neutral-900">{c.challanNumber}</span>
+                            <span className="text-accent-800 font-bold bg-accent-50 px-1.5 py-0.2 rounded text-[10px]">
                               TO: WASHING
                             </span>
                           </div>
-                          <p className="text-slate-600 text-[11px]">{c.remarks}</p>
+                          <p className="text-neutral-600 text-[11px]">{c.remarks}</p>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="font-mono font-bold text-orange-700 text-sm">{qty} PCS</span>
+                          <span className="font-mono font-bold text-accent-800 text-sm">{qty} PCS</span>
                           <button
                             type="button"
                             onClick={() => downloadChallanHtml(c)}
-                            className="px-2 py-0.5 bg-orange-50 hover:bg-orange-100 text-orange-700 rounded text-[10px] font-semibold flex items-center gap-1"
+                            className="px-2 py-0.5 bg-accent-50 hover:bg-accent-100 text-accent-800 rounded text-[10px] font-semibold flex items-center gap-1"
                             title="Download Challan HTML"
                           >
                             <Download className="w-2.5 h-2.5" />
@@ -990,7 +984,7 @@ export default function QCWashingMyWorkPage() {
                           <button
                             type="button"
                             onClick={() => printChallan(c)}
-                            className="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] font-semibold flex items-center gap-1"
+                            className="px-2 py-0.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded text-[10px] font-semibold flex items-center gap-1"
                             title="Print Challan Slip"
                           >
                             <Printer className="w-2.5 h-2.5" />
@@ -1008,25 +1002,25 @@ export default function QCWashingMyWorkPage() {
 
         {/* TAB 4: PRODUCTION SHEETS */}
         {activeTab === 'PRODUCTION_SHEETS' && (
-          <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
-            <h3 className="text-sm font-bold text-slate-900 mb-3">Programs / Production Sheets</h3>
-            <p className="text-xs text-slate-500 mb-4">
+          <div className="bg-white rounded-2xl border border-neutral-200 p-5 shadow-xs">
+            <h3 className="text-sm font-bold text-neutral-900 mb-3">Programs / Production Sheets</h3>
+            <p className="text-xs text-neutral-500 mb-4">
               Access complete tech specs, Wilcom embroidery numbers, target delivery dates, and color tolerances.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
               {Array.from(new Set(challans.map((c) => c.program).filter(Boolean))).map((prog: any) => (
-                <div key={prog.id} className="p-3 border border-slate-200 rounded-xl bg-slate-50/50 hover:bg-slate-50 transition">
+                <div key={prog.id} className="p-3 border border-neutral-200 rounded-xl bg-neutral-50/50 hover:bg-neutral-50 transition">
                   <div className="flex items-center justify-between">
-                    <span className="font-mono font-bold text-xs text-slate-900">
+                    <span className="font-mono font-bold text-xs text-neutral-900">
                       {prog.programSerialNo || prog.programNumber}
                     </span>
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 text-blue-800">
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-brand-100 text-brand-800">
                       {prog.styleCode || 'Style'}
                     </span>
                   </div>
-                  <div className="text-xs text-slate-600 mt-2">
-                    <p className="font-medium text-slate-800">{prog.clientName}</p>
-                    <p className="text-[11px] text-slate-500">{prog.fabricName} ({prog.fabricColor})</p>
+                  <div className="text-xs text-neutral-600 mt-2">
+                    <p className="font-medium text-neutral-900">{prog.clientName}</p>
+                    <p className="text-[11px] text-neutral-500">{prog.fabricName} ({prog.fabricColor})</p>
                   </div>
                   <div className="flex items-center gap-1.5 mt-3">
                     <DocumentActionButtons
@@ -1043,17 +1037,17 @@ export default function QCWashingMyWorkPage() {
 
       {/* INSPECTION / VERIFICATION MODAL */}
       {selectedChallanForInspect && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-3xl w-full my-8 overflow-hidden animate-in fade-in zoom-in-95">
+        <div className="fixed inset-0 z-50 bg-neutral-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl border border-neutral-200 max-w-3xl w-full my-8 overflow-hidden animate-in fade-in zoom-in-95">
             {/* Modal Header */}
-            <div className="px-6 py-4 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
+            <div className="px-6 py-4 bg-white text-neutral-900 flex items-center justify-between border-b border-neutral-200">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                <ShieldCheck className="w-5 h-5 text-accent-700" />
                 <div>
                   <h3 className="text-sm font-bold">
                     Verify Washed Garments — Challan #{selectedChallanForInspect.challanNumber}
                   </h3>
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-[11px] text-neutral-500">
                     Program: {selectedChallanForInspect.program?.programSerialNo || selectedChallanForInspect.program?.programNumber || '—'}
                     {' · '}Client: {selectedChallanForInspect.program?.clientName || 'Standard Client'}
                   </p>
@@ -1065,7 +1059,7 @@ export default function QCWashingMyWorkPage() {
                     <button
                       type="button"
                       onClick={() => setSelectedSheetForView(selectedChallanForInspect.program)}
-                      className="px-2.5 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded text-xs font-semibold flex items-center gap-1 transition"
+                      className="px-2.5 py-1 bg-brand-600 hover:bg-brand-700 text-white rounded text-xs font-semibold flex items-center gap-1 transition"
                       title="View Official Production Sheet"
                     >
                       <FileText className="w-3.5 h-3.5" />
@@ -1074,7 +1068,7 @@ export default function QCWashingMyWorkPage() {
                     <button
                       type="button"
                       onClick={() => downloadProductionSheetHtml(selectedChallanForInspect.program)}
-                      className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded text-xs font-semibold flex items-center gap-1 transition"
+                      className="px-2 py-1 bg-neutral-100 hover:bg-neutral-200 text-brand-600 border border-neutral-200 rounded text-xs font-semibold flex items-center gap-1 transition"
                       title="Download Production Sheet HTML"
                     >
                       <Download className="w-3.5 h-3.5" />
@@ -1083,7 +1077,7 @@ export default function QCWashingMyWorkPage() {
                     <button
                       type="button"
                       onClick={() => printProductionSheet(selectedChallanForInspect.program)}
-                      className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded text-xs font-semibold flex items-center gap-1 transition"
+                      className="px-2 py-1 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 border border-neutral-200 rounded text-xs font-semibold flex items-center gap-1 transition"
                       title="Print Production Sheet Traveler"
                     >
                       <Printer className="w-3.5 h-3.5" />
@@ -1093,7 +1087,7 @@ export default function QCWashingMyWorkPage() {
                 )}
                 <button
                   onClick={() => setSelectedChallanForInspect(null)}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                  className="p-1.5 rounded-lg text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 transition"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1103,9 +1097,9 @@ export default function QCWashingMyWorkPage() {
             {/* Modal Form */}
             <form onSubmit={handleSubmitInspection} className="p-6 space-y-5 max-h-[80vh] overflow-y-auto">
               {/* Quantities Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 bg-neutral-50 p-4 rounded-xl border border-neutral-200">
                 <div>
-                  <label className="text-[11px] font-bold text-slate-600 block mb-1">
+                  <label className="text-[11px] font-bold text-neutral-600 block mb-1">
                     Inspected Qty (PCS) *
                   </label>
                   <input
@@ -1114,12 +1108,12 @@ export default function QCWashingMyWorkPage() {
                     required
                     value={inspectionForm.quantityInspected}
                     onChange={(e) => handleQuantityChange('quantityInspected', e.target.value)}
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 font-mono font-bold text-xs bg-white"
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-neutral-300 font-mono font-bold text-xs bg-white"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[11px] font-bold text-emerald-700 block mb-1">
+                  <label className="text-[11px] font-bold text-accent-800 block mb-1">
                     Passed Qty (PCS) *
                   </label>
                   <input
@@ -1127,12 +1121,12 @@ export default function QCWashingMyWorkPage() {
                     min="0"
                     readOnly
                     value={inspectionForm.quantityPassed}
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-emerald-300 font-mono font-bold text-xs bg-emerald-50 text-emerald-900"
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-accent-300 font-mono font-bold text-xs bg-accent-50 text-accent-800"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[11px] font-bold text-orange-700 block mb-1">
+                  <label className="text-[11px] font-bold text-accent-800 block mb-1">
                     Re-Wash (PCS)
                   </label>
                   <input
@@ -1140,12 +1134,12 @@ export default function QCWashingMyWorkPage() {
                     min="0"
                     value={inspectionForm.quantityRework}
                     onChange={(e) => handleQuantityChange('quantityRework', e.target.value)}
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-orange-300 font-mono font-bold text-xs bg-white text-orange-900"
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-accent-300 font-mono font-bold text-xs bg-white text-accent-800"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[11px] font-bold text-rose-700 block mb-1">
+                  <label className="text-[11px] font-bold text-danger-700 block mb-1">
                     Scrap / Reject (PCS)
                   </label>
                   <input
@@ -1153,12 +1147,12 @@ export default function QCWashingMyWorkPage() {
                     min="0"
                     value={inspectionForm.quantityFailed}
                     onChange={(e) => handleQuantityChange('quantityFailed', e.target.value)}
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-rose-300 font-mono font-bold text-xs bg-white text-rose-900"
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-danger-300 font-mono font-bold text-xs bg-white text-danger-900"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[11px] font-bold text-amber-700 block mb-1">
+                  <label className="text-[11px] font-bold text-accent-800 block mb-1">
                     Hold (PCS)
                   </label>
                   <input
@@ -1166,24 +1160,24 @@ export default function QCWashingMyWorkPage() {
                     min="0"
                     value={inspectionForm.quantityHold}
                     onChange={(e) => handleQuantityChange('quantityHold', e.target.value)}
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-amber-300 font-mono font-bold text-xs bg-white text-amber-900"
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-accent-300 font-mono font-bold text-xs bg-white text-accent-800"
                   />
                 </div>
               </div>
 
               {/* Wash Verification Parameters Checklist */}
               <div className="space-y-2">
-                <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                  <Scale className="w-4 h-4 text-emerald-600" />
+                <span className="text-xs font-bold text-neutral-900 flex items-center gap-1.5">
+                  <Scale className="w-4 h-4 text-accent-700" />
                   <span>Wash Quality Parameters & Verification Checklist</span>
                 </span>
 
-                <div className="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden text-xs">
+                <div className="divide-y divide-neutral-100 border border-neutral-200 rounded-xl overflow-hidden text-xs">
                   {inspectionForm.parameters.map((param, idx) => (
-                    <div key={idx} className="p-3 bg-white hover:bg-slate-50 flex items-center justify-between gap-4">
+                    <div key={idx} className="p-3 bg-white hover:bg-neutral-50 flex items-center justify-between gap-4">
                       <div className="flex-1 min-w-0">
-                        <span className="font-bold text-slate-900 block">{param.parameterName}</span>
-                        <span className="text-[11px] text-slate-500 block">{param.standardValue}</span>
+                        <span className="font-bold text-neutral-900 block">{param.parameterName}</span>
+                        <span className="text-[11px] text-neutral-500 block">{param.standardValue}</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <input
@@ -1197,7 +1191,7 @@ export default function QCWashingMyWorkPage() {
                               return { ...prev, parameters: newP };
                             });
                           }}
-                          className="px-2 py-1 rounded border border-slate-200 text-xs w-40 font-mono"
+                          className="px-2 py-1 rounded border border-neutral-200 text-xs w-40 font-mono"
                           placeholder="Observed..."
                         />
                         <button
@@ -1211,8 +1205,8 @@ export default function QCWashingMyWorkPage() {
                           }}
                           className={`px-2.5 py-1 rounded text-[11px] font-bold transition ${
                             param.passed
-                              ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                              : 'bg-rose-100 text-rose-800 border border-rose-300'
+                              ? 'bg-accent-100 text-accent-800 border border-accent-300'
+                              : 'bg-danger-100 text-danger-800 border border-danger-300'
                           }`}
                         >
                           {param.passed ? '✓ PASS' : '✕ FAIL'}
@@ -1225,16 +1219,16 @@ export default function QCWashingMyWorkPage() {
 
               {/* Defect Reasons if Failed or Rework */}
               {(Number(inspectionForm.quantityFailed) > 0 || Number(inspectionForm.quantityRework) > 0) && (
-                <div className="p-4 bg-rose-50/70 border border-rose-200 rounded-xl space-y-3">
+                <div className="p-4 bg-danger-50/70 border border-danger-200 rounded-xl space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-rose-900 flex items-center gap-1.5">
-                      <ShieldAlert className="w-4 h-4 text-rose-600" />
+                    <span className="text-xs font-bold text-danger-900 flex items-center gap-1.5">
+                      <ShieldAlert className="w-4 h-4 text-danger-600" />
                       <span>Defect Attribution & Quarantining</span>
                     </span>
                     <button
                       type="button"
                       onClick={handleAddDefect}
-                      className="px-2 py-1 bg-rose-600 text-white rounded text-[11px] font-bold hover:bg-rose-700"
+                      className="px-2 py-1 bg-danger-600 text-white rounded text-[11px] font-bold hover:bg-danger-700"
                     >
                       + Add Defect
                     </button>
@@ -1242,7 +1236,7 @@ export default function QCWashingMyWorkPage() {
 
                   {Number(inspectionForm.quantityFailed) > 0 && (
                     <div>
-                      <label className="text-[11px] font-bold text-rose-900 block mb-1">
+                      <label className="text-[11px] font-bold text-danger-900 block mb-1">
                         Scrap / Defect Remarks * (Sent to DEF-SHELF-QC3)
                       </label>
                       <input
@@ -1251,14 +1245,14 @@ export default function QCWashingMyWorkPage() {
                         placeholder="e.g. Severe shrinkage exceeding 5%, bleach spot on front right chest"
                         value={inspectionForm.defectRemarks}
                         onChange={(e) => setInspectionForm({ ...inspectionForm, defectRemarks: e.target.value })}
-                        className="w-full px-3 py-1.5 rounded-lg border border-rose-300 text-xs bg-white"
+                        className="w-full px-3 py-1.5 rounded-lg border border-danger-300 text-xs bg-white"
                       />
                     </div>
                   )}
 
                   {Number(inspectionForm.quantityRework) > 0 && (
                     <div>
-                      <label className="text-[11px] font-bold text-orange-900 block mb-1">
+                      <label className="text-[11px] font-bold text-accent-800 block mb-1">
                         Re-Wash Instructions * (Sent back to Washing)
                       </label>
                       <input
@@ -1267,7 +1261,7 @@ export default function QCWashingMyWorkPage() {
                         placeholder="e.g. Fabric still stiff, add 20% extra silicone softener and re-tumble dry"
                         value={inspectionForm.reworkReason}
                         onChange={(e) => setInspectionForm({ ...inspectionForm, reworkReason: e.target.value })}
-                        className="w-full px-3 py-1.5 rounded-lg border border-orange-300 text-xs bg-white"
+                        className="w-full px-3 py-1.5 rounded-lg border border-accent-300 text-xs bg-white"
                       />
                     </div>
                   )}
@@ -1276,30 +1270,30 @@ export default function QCWashingMyWorkPage() {
 
               {/* General Remarks */}
               <div>
-                <label className="text-[11px] font-bold text-slate-700 block mb-1">
+                <label className="text-[11px] font-bold text-neutral-700 block mb-1">
                   General Verification Notes
                 </label>
                 <textarea
                   rows={2}
                   value={inspectionForm.remarks}
                   onChange={(e) => setInspectionForm({ ...inspectionForm, remarks: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-emerald-500/20 focus:outline-none"
+                  className="w-full px-3 py-2 rounded-xl border border-neutral-200 text-xs focus:ring-2 focus:ring-brand-500/40 focus:outline-none"
                 />
               </div>
 
               {/* Form Buttons */}
-              <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
+              <div className="pt-3 border-t border-neutral-200 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setSelectedChallanForInspect(null)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition"
+                  className="px-4 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-xl text-xs font-bold transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submittingAction}
-                  className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+                  className="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm disabled:opacity-50"
                 >
                   <CheckCircle2 className="w-4 h-4" />
                   <span>Confirm Verification & Pass</span>
@@ -1312,34 +1306,34 @@ export default function QCWashingMyWorkPage() {
 
       {/* FINISHING HANDOVER MODAL */}
       {finishingChallanModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-md w-full p-6 space-y-4 animate-in fade-in zoom-in-95">
+        <div className="fixed inset-0 z-50 bg-neutral-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl border border-neutral-200 max-w-md w-full p-6 space-y-4 animate-in fade-in zoom-in-95">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-full bg-accent-100 text-accent-700 flex items-center justify-center shrink-0">
                 <CheckCircle2 className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-slate-900">
+                <h3 className="text-sm font-bold text-neutral-900">
                   Handover Challan Issued to Finishing!
                 </h3>
-                <p className="text-xs text-slate-500 font-mono">
+                <p className="text-xs text-neutral-500 font-mono">
                   {finishingChallanModal.challanNumber}
                 </p>
               </div>
             </div>
 
-            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs space-y-2">
+            <div className="bg-neutral-50 p-4 rounded-xl border border-neutral-100 text-xs space-y-2">
               <div className="flex justify-between">
-                <span className="text-slate-500">From Station:</span>
-                <span className="font-bold text-slate-900">QC WASHING (QC3)</span>
+                <span className="text-neutral-500">From Station:</span>
+                <span className="font-bold text-neutral-900">QC WASHING (QC3)</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">To Station:</span>
-                <span className="font-bold text-emerald-700">FINISHING SECTION</span>
+                <span className="text-neutral-500">To Station:</span>
+                <span className="font-bold text-accent-800">FINISHING SECTION</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Passed Quantity:</span>
-                <span className="font-bold font-mono text-slate-900">
+                <span className="text-neutral-500">Passed Quantity:</span>
+                <span className="font-bold font-mono text-neutral-900">
                   {finishingChallanModal.items?.[0]?.quantity || 0} PCS
                 </span>
               </div>
@@ -1349,7 +1343,7 @@ export default function QCWashingMyWorkPage() {
               <button
                 type="button"
                 onClick={() => downloadChallanHtml(finishingChallanModal)}
-                className="flex-1 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5"
+                className="flex-1 py-2.5 bg-brand-50 hover:bg-brand-100 text-brand-700 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5"
               >
                 <Download className="w-4 h-4" />
                 <span>Download Challan</span>
@@ -1357,7 +1351,7 @@ export default function QCWashingMyWorkPage() {
               <button
                 type="button"
                 onClick={() => printChallan(finishingChallanModal)}
-                className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5"
+                className="flex-1 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5"
               >
                 <Printer className="w-4 h-4" />
                 <span>Print Challan</span>
@@ -1366,7 +1360,7 @@ export default function QCWashingMyWorkPage() {
 
             <button
               onClick={() => setFinishingChallanModal(null)}
-              className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition shadow-sm"
+              className="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold transition shadow-sm"
             >
               Done & Continue
             </button>

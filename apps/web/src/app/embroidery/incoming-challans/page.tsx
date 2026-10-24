@@ -23,7 +23,6 @@ import {
   Barcode as BarcodeIcon,
   Download
 } from 'lucide-react';
-import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { downloadBarcodeStickerPng } from '@/lib/barcode';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { 
@@ -157,23 +156,18 @@ export default function EmbroideryIncomingChallansPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-neutral-50">
       {/* HEADER WITH REAL DB BACKGROUND */}
       <header
-        style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-        className="border-b border-slate-700/80 sticky top-0 z-30 px-4 sm:px-8 py-4 shadow-md text-white"
+        className="bg-white border-b border-neutral-200 sticky top-0 z-30 px-4 sm:px-8 py-4 shadow-md text-neutral-900"
       >
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-fuchsia-400 block drop-shadow-sm">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-600 block drop-shadow-sm">
               SHUBHAM FABRICS MES · EMBROIDERY DEPARTMENT
             </span>
-            <h1 className="text-xl font-bold text-white flex items-center gap-2.5 drop-shadow-sm">
-              <Layers className="w-5 h-5 text-fuchsia-400" />
+            <h1 className="text-xl font-bold text-neutral-900 flex items-center gap-2.5 drop-shadow-sm">
+              <Layers className="w-5 h-5 text-brand-600" />
               <span>Checking of Incoming Challans</span>
             </h1>
           </div>
@@ -182,7 +176,7 @@ export default function EmbroideryIncomingChallansPage() {
             <button
               onClick={loadData}
               disabled={loading}
-              className="p-2 text-slate-300 hover:text-white hover:bg-slate-800/80 rounded-lg border border-slate-700/60 transition"
+              className="p-2 text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg border border-neutral-200 transition"
               title="Refresh Data"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -190,7 +184,7 @@ export default function EmbroideryIncomingChallansPage() {
 
             <Link
               href="/embroidery/my-work"
-              className="flex items-center gap-1.5 px-3.5 py-2 bg-fuchsia-600 hover:bg-fuchsia-700 text-white text-xs font-semibold rounded-lg shadow-xs transition"
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-lg shadow-xs transition"
             >
               <Send className="w-3.5 h-3.5" />
               <span>Create Challan to Thread Cutting</span>
@@ -198,7 +192,7 @@ export default function EmbroideryIncomingChallansPage() {
 
             <Link
               href="/embroidery"
-              className="px-3 py-2 bg-slate-800/80 hover:bg-slate-800 text-slate-300 text-xs font-semibold rounded-lg border border-slate-700 transition"
+              className="px-3 py-2 bg-neutral-50 hover:bg-neutral-100 text-neutral-700 text-xs font-semibold rounded-lg border border-neutral-200 transition"
             >
               Dashboard
             </Link>
@@ -209,8 +203,8 @@ export default function EmbroideryIncomingChallansPage() {
       {/* TOAST SUCCESS ALERT */}
       {actionSuccess && (
         <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-4">
-          <div className="p-3.5 bg-emerald-50 border border-emerald-300 rounded-xl text-emerald-900 text-xs font-semibold flex items-center gap-2 shadow-xs">
-            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+          <div className="p-3.5 bg-accent-50 border border-accent-300 rounded-xl text-accent-800 text-xs font-semibold flex items-center gap-2 shadow-xs">
+            <CheckCircle2 className="w-5 h-5 text-accent-700 shrink-0" />
             <span>{actionSuccess}</span>
           </div>
         </div>
@@ -219,23 +213,23 @@ export default function EmbroideryIncomingChallansPage() {
       {/* MAIN CONTAINER */}
       <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
         {/* TOP TAB SELECTOR: (1) FROM FABRIC STORE (UNDYED) & (2) FROM DYEING DEPT */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-2 shadow-xs">
+        <div className="bg-white border border-neutral-200 rounded-2xl p-2 shadow-xs">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <button
               type="button"
               onClick={() => setActiveTab('STORE')}
               className={`flex items-center justify-between p-3.5 rounded-xl border transition text-left ${
                 activeTab === 'STORE'
-                  ? 'bg-blue-50/80 border-blue-400 text-blue-950 shadow-xs'
-                  : 'bg-slate-50/60 border-slate-200 text-slate-700 hover:bg-slate-100'
+                  ? 'bg-brand-50/80 border-brand-500 text-brand-900 shadow-xs'
+                  : 'bg-neutral-50/60 border-neutral-200 text-neutral-700 hover:bg-neutral-100'
               }`}
             >
               <div className="flex items-center gap-3">
                 <div
                   className={`w-9 h-9 rounded-lg flex items-center justify-center font-bold text-sm ${
                     activeTab === 'STORE'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-slate-200 text-slate-700'
+                      ? 'bg-brand-600 text-white'
+                      : 'bg-neutral-200 text-neutral-700'
                   }`}
                 >
                   ①
@@ -244,12 +238,12 @@ export default function EmbroideryIncomingChallansPage() {
                   <span className="text-xs font-bold block uppercase tracking-wide">
                     From Fabric Store (No Dyeing Required)
                   </span>
-                  <p className="text-[11px] text-slate-500">
+                  <p className="text-[11px] text-neutral-500">
                     Pre-dyed / mill-finished fabric routed from Fabric Store
                   </p>
                 </div>
               </div>
-              <span className="text-xs font-bold font-mono px-2.5 py-1 rounded-full bg-blue-100 text-blue-800">
+              <span className="text-xs font-bold font-mono px-2.5 py-1 rounded-full bg-brand-100 text-brand-800">
                 {storeChallans.length} Challans
               </span>
             </button>
@@ -259,16 +253,16 @@ export default function EmbroideryIncomingChallansPage() {
               onClick={() => setActiveTab('DYEING')}
               className={`flex items-center justify-between p-3.5 rounded-xl border transition text-left ${
                 activeTab === 'DYEING'
-                  ? 'bg-purple-50/80 border-purple-400 text-purple-950 shadow-xs'
-                  : 'bg-slate-50/60 border-slate-200 text-slate-700 hover:bg-slate-100'
+                  ? 'bg-brand-50/80 border-brand-500 text-brand-900 shadow-xs'
+                  : 'bg-neutral-50/60 border-neutral-200 text-neutral-700 hover:bg-neutral-100'
               }`}
             >
               <div className="flex items-center gap-3">
                 <div
                   className={`w-9 h-9 rounded-lg flex items-center justify-center font-bold text-sm ${
                     activeTab === 'DYEING'
-                      ? 'bg-purple-600 text-white'
-                      : 'bg-slate-200 text-slate-700'
+                      ? 'bg-brand-600 text-white'
+                      : 'bg-neutral-200 text-neutral-700'
                   }`}
                 >
                   ②
@@ -277,12 +271,12 @@ export default function EmbroideryIncomingChallansPage() {
                   <span className="text-xs font-bold block uppercase tracking-wide">
                     From QC 1 (Post-Dyeing Passed)
                   </span>
-                  <p className="text-[11px] text-slate-500">
+                  <p className="text-[11px] text-neutral-500">
                     Dyed fabric inspected, approved, and released by QC 1 Gate
                   </p>
                 </div>
               </div>
-              <span className="text-xs font-bold font-mono px-2.5 py-1 rounded-full bg-purple-100 text-purple-800">
+              <span className="text-xs font-bold font-mono px-2.5 py-1 rounded-full bg-brand-100 text-brand-800">
                 {dyeingQc1Challans.length} Challans
               </span>
             </button>
@@ -297,27 +291,27 @@ export default function EmbroideryIncomingChallansPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search Challan #, Serial #, Design, Style..."
-              className="w-full pl-9 pr-3.5 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-600 shadow-2xs"
+              className="w-full pl-9 pr-3.5 py-2 bg-white border border-neutral-200 rounded-xl text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-2xs"
             />
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+            <Search className="w-4 h-4 text-neutral-500 absolute left-3 top-2.5" />
           </div>
 
-          <div className="text-xs text-slate-500 font-medium">
-            Showing <strong className="text-slate-800">{filteredChallans.length}</strong> incoming challans
+          <div className="text-xs text-neutral-500 font-medium">
+            Showing <strong className="text-neutral-900">{filteredChallans.length}</strong> incoming challans
           </div>
         </div>
 
         {/* CHALLAN LIST */}
         {loading ? (
-          <div className="bg-white border border-slate-200 rounded-xl p-12 text-center text-slate-500 text-xs">
-            <RefreshCw className="w-6 h-6 animate-spin mx-auto text-fuchsia-600 mb-2" />
+          <div className="bg-white border border-neutral-200 rounded-xl p-12 text-center text-neutral-500 text-xs">
+            <RefreshCw className="w-6 h-6 animate-spin mx-auto text-brand-600 mb-2" />
             Loading incoming embroidery challans from database...
           </div>
         ) : filteredChallans.length === 0 ? (
-          <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center text-slate-500 space-y-2">
-            <PackageCheck className="w-10 h-10 mx-auto text-slate-300" />
-            <h3 className="text-sm font-bold text-slate-800">No incoming challans found</h3>
-            <p className="text-xs text-slate-500 max-w-md mx-auto">
+          <div className="bg-white border border-neutral-200 rounded-2xl p-12 text-center text-neutral-500 space-y-2">
+            <PackageCheck className="w-10 h-10 mx-auto text-neutral-700" />
+            <h3 className="text-sm font-bold text-neutral-900">No incoming challans found</h3>
+            <p className="text-xs text-neutral-500 max-w-md mx-auto">
               There are no incoming challans matching the selected route{' '}
               {activeTab === 'STORE' ? 'from Fabric Store' : 'from Dyeing Department'}.
             </p>
@@ -334,42 +328,42 @@ export default function EmbroideryIncomingChallansPage() {
               return (
                 <div
                   key={ch.id}
-                  className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs hover:border-slate-300 transition space-y-4"
+                  className="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs hover:border-neutral-300 transition space-y-4"
                 >
                   {/* TOP ROW: CHALLAN #, ROUTE BADGE, DATES & STATUS */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-neutral-100 pb-3">
                     <div className="flex items-center gap-3">
-                      <span className="font-mono text-sm font-bold text-slate-900 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">
+                      <span className="font-mono text-sm font-bold text-neutral-900 bg-neutral-100 px-2.5 py-1 rounded-lg border border-neutral-200">
                         {ch.challanNumber}
                       </span>
 
                       {isStore ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-100 text-blue-900 font-bold text-xs">
-                          <Warehouse className="w-3.5 h-3.5 text-blue-700" />
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-brand-100 text-brand-900 font-bold text-xs">
+                          <Warehouse className="w-3.5 h-3.5 text-brand-700" />
                           <span>Route ①: Fabric Store (Undyed)</span>
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-900 font-bold text-xs">
-                          <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-accent-100 text-accent-800 font-bold text-xs">
+                          <ShieldCheck className="w-3.5 h-3.5 text-accent-800" />
                           <span>Route ②: Dyeing Dept (QC1 PASS Gate)</span>
                         </span>
                       )}
                     </div>
 
                     <div className="flex items-center gap-3 text-xs">
-                      <span className="text-slate-500 flex items-center gap-1 font-mono">
-                        <Clock className="w-3.5 h-3.5 text-slate-400" />
+                      <span className="text-neutral-500 flex items-center gap-1 font-mono">
+                        <Clock className="w-3.5 h-3.5 text-neutral-500" />
                         {new Date(ch.createdAt).toLocaleDateString('en-GB')}
                       </span>
                       <span
                         className={`px-2.5 py-0.5 rounded-full font-bold text-[10px] uppercase ${
                           ch.status === 'RECEIVED'
-                            ? 'bg-emerald-100 text-emerald-800'
+                            ? 'bg-accent-100 text-accent-800'
                             : ch.status === 'IN_PROGRESS'
-                            ? 'bg-fuchsia-100 text-fuchsia-800'
+                            ? 'bg-brand-100 text-brand-800'
                             : ch.status === 'COMPLETED'
-                            ? 'bg-slate-100 text-slate-800'
-                            : 'bg-amber-100 text-amber-800'
+                            ? 'bg-neutral-100 text-neutral-900'
+                            : 'bg-accent-100 text-accent-800'
                         }`}
                       >
                         {ch.status}
@@ -380,56 +374,56 @@ export default function EmbroideryIncomingChallansPage() {
                   {/* MIDDLE GRID: PROGRAM & FABRIC ATTRIBUTES */}
                   <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs">
                     <div>
-                      <span className="text-slate-400 text-[10px] uppercase font-bold block">
+                      <span className="text-neutral-500 text-[10px] uppercase font-bold block">
                         Master Sheet Serial #
                       </span>
-                      <strong className="text-slate-900 font-mono">
+                      <strong className="text-neutral-900 font-mono">
                         {ch.program?.programSerialNo || ch.program?.programNumber || '—'}
                       </strong>
                     </div>
 
                     <div>
-                      <span className="text-slate-400 text-[10px] uppercase font-bold block">
+                      <span className="text-neutral-500 text-[10px] uppercase font-bold block">
                         Wilcom Design #
                       </span>
-                      <strong className="text-fuchsia-700 font-mono">
+                      <strong className="text-brand-700 font-mono">
                         {ch.program?.wilcomDesignNumber || 'WILCOM-STD'}
                       </strong>
                     </div>
 
                     <div>
-                      <span className="text-slate-400 text-[10px] uppercase font-bold block">
+                      <span className="text-neutral-500 text-[10px] uppercase font-bold block">
                         Buyer & Style
                       </span>
-                      <span className="text-slate-800 font-semibold truncate block">
+                      <span className="text-neutral-900 font-semibold truncate block">
                         {ch.program?.clientName || ch.program?.buyerName || 'Standard Buyer'} /{' '}
                         {ch.program?.mainStyle || 'Style-01'}
                       </span>
                     </div>
 
                     <div>
-                      <span className="text-slate-400 text-[10px] uppercase font-bold block">
+                      <span className="text-neutral-500 text-[10px] uppercase font-bold block">
                         Fabric Condition
                       </span>
-                      <span className="text-slate-800 font-medium">
+                      <span className="text-neutral-900 font-medium">
                         {isStore ? 'Undyed / Greige Kora' : 'Dyed & QC1 Approved'}
                       </span>
                     </div>
 
                     <div>
-                      <span className="text-slate-400 text-[10px] uppercase font-bold block">
+                      <span className="text-neutral-500 text-[10px] uppercase font-bold block">
                         Total Quantity
                       </span>
-                      <span className="font-mono font-bold text-slate-900">
+                      <span className="font-mono font-bold text-neutral-900">
                         {totalMeters > 0 ? `${totalMeters} MTR` : `${(ch.items || []).length} Rolls`}
                       </span>
                     </div>
                   </div>
 
                   {/* ITEMS TABLE PREVIEW */}
-                  <div className="bg-slate-50 border border-slate-200/80 rounded-xl overflow-hidden">
+                  <div className="bg-neutral-50 border border-neutral-200/80 rounded-xl overflow-hidden">
                     <table className="w-full text-left text-xs">
-                      <thead className="bg-slate-100/80 text-slate-500 font-bold text-[10px] uppercase border-b border-slate-200">
+                      <thead className="bg-neutral-100/80 text-neutral-500 font-bold text-[10px] uppercase border-b border-neutral-200">
                         <tr>
                           <th className="py-2 px-3">Item Description</th>
                           <th className="py-2 px-3">Color / Shade</th>
@@ -437,19 +431,19 @@ export default function EmbroideryIncomingChallansPage() {
                           <th className="py-2 px-3 text-right">Quantity</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100">
+                      <tbody className="divide-y divide-neutral-100">
                         {(ch.items || []).map((it: any, idx: number) => (
                           <tr key={idx} className="hover:bg-white/80 transition">
-                            <td className="py-2 px-3 text-slate-800 font-medium">
+                            <td className="py-2 px-3 text-neutral-900 font-medium">
                               {it.itemDescription || 'Kora Fabric Roll'}
                             </td>
-                            <td className="py-2 px-3 text-slate-600">
+                            <td className="py-2 px-3 text-neutral-600">
                               {it.colour || (isStore ? 'Undyed' : 'Dyed Standard')}
                             </td>
-                            <td className="py-2 px-3 font-mono text-slate-500">
+                            <td className="py-2 px-3 font-mono text-neutral-500">
                               {it.rollNumber || it.lotNumber || `ROLL-${idx + 1}`}
                             </td>
-                            <td className="py-2 px-3 font-mono font-bold text-slate-800 text-right">
+                            <td className="py-2 px-3 font-mono font-bold text-neutral-900 text-right">
                               {it.quantity} {it.uom || 'MTR'}
                             </td>
                           </tr>
@@ -467,7 +461,7 @@ export default function EmbroideryIncomingChallansPage() {
                           setInspectModalChallan(ch);
                           setInspectionRemark('');
                         }}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-fuchsia-600 hover:bg-fuchsia-700 text-white rounded-lg text-xs font-semibold shadow-2xs transition"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-semibold shadow-2xs transition"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5" />
                         <span>Checking of Incoming Challan &amp; PASS</span>
@@ -496,16 +490,16 @@ export default function EmbroideryIncomingChallansPage() {
                             date: new Date(ch.createdAt).toLocaleDateString('en-IN')
                           });
                         }}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-lg text-xs font-bold transition cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent-50 hover:bg-accent-100 text-accent-800 border border-accent-300 rounded-lg text-xs font-bold transition cursor-pointer"
                         title="Download standalone barcode sticker with Design Number as PNG"
                       >
-                        <BarcodeIcon className="w-3.5 h-3.5 text-amber-700" />
+                        <BarcodeIcon className="w-3.5 h-3.5 text-accent-800" />
                         <span>Barcode PNG</span>
                       </button>
 
                       <Link
                         href={`/challans/${ch.id}`}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-semibold transition"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-semibold transition"
                       >
                         <Eye className="w-3.5 h-3.5" />
                         <span>View Details</span>
@@ -521,77 +515,77 @@ export default function EmbroideryIncomingChallansPage() {
 
       {/* INSPECTION CHECK MODAL ("Checking of Incoming Challans -> PASS") */}
       {inspectModalChallan && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="max-w-2xl w-full bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden space-y-4 p-6 my-8">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+        <div className="fixed inset-0 z-50 bg-neutral-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="max-w-2xl w-full bg-white rounded-2xl shadow-2xl border border-neutral-200 overflow-hidden space-y-4 p-6 my-8">
+            <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-fuchsia-600 block">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-brand-600 block">
                   Embroidery Receiving Station
                 </span>
-                <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-fuchsia-600" />
+                <h3 className="text-base font-bold text-neutral-900 flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-brand-600" />
                   <span>Checking of Incoming Challan: {inspectModalChallan.challanNumber}</span>
                 </h3>
               </div>
               <button
                 onClick={() => setInspectModalChallan(null)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
+                className="p-1 rounded-lg text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 transition"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="space-y-3 text-xs">
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="p-3 bg-neutral-50 border border-neutral-200 rounded-xl grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div>
-                  <span className="text-slate-400 text-[10px] block">Source Dept</span>
-                  <strong className="text-slate-800">
+                  <span className="text-neutral-500 text-[10px] block">Source Dept</span>
+                  <strong className="text-neutral-900">
                     {inspectModalChallan.fromDepartment === 'STORE'
                       ? 'Fabric Store (Undyed)'
                       : 'Dyeing Dept (QC1 Gate)'}
                   </strong>
                 </div>
                 <div>
-                  <span className="text-slate-400 text-[10px] block">Master Sheet Serial</span>
-                  <strong className="font-mono text-slate-800">
+                  <span className="text-neutral-500 text-[10px] block">Master Sheet Serial</span>
+                  <strong className="font-mono text-neutral-900">
                     {inspectModalChallan.program?.programSerialNo || '—'}
                   </strong>
                 </div>
                 <div>
-                  <span className="text-slate-400 text-[10px] block">Wilcom Design #</span>
-                  <strong className="font-mono text-fuchsia-700">
+                  <span className="text-neutral-500 text-[10px] block">Wilcom Design #</span>
+                  <strong className="font-mono text-brand-700">
                     {inspectModalChallan.program?.wilcomDesignNumber || 'WILCOM-STD'}
                   </strong>
                 </div>
                 <div>
-                  <span className="text-slate-400 text-[10px] block">Total Items/Rolls</span>
-                  <strong className="font-mono text-slate-800">
+                  <span className="text-neutral-500 text-[10px] block">Total Items/Rolls</span>
+                  <strong className="font-mono text-neutral-900">
                     {(inspectModalChallan.items || []).length} Rolls
                   </strong>
                 </div>
               </div>
 
               {/* CHECKLIST */}
-              <div className="space-y-2 border border-slate-200 rounded-xl p-3 bg-white">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600 block">
+              <div className="space-y-2 border border-neutral-200 rounded-xl p-3 bg-white">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-600 block">
                   Physical Verification Points
                 </span>
-                <label className="flex items-center gap-2 cursor-pointer text-slate-700">
-                  <input type="checkbox" defaultChecked className="rounded border-slate-300 text-fuchsia-600 focus:ring-fuchsia-500" />
+                <label className="flex items-center gap-2 cursor-pointer text-neutral-700">
+                  <input type="checkbox" defaultChecked className="rounded border-neutral-300 text-brand-600 focus:ring-brand-500" />
                   <span>Verified physical roll count matches Challan quantity.</span>
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer text-slate-700">
-                  <input type="checkbox" defaultChecked className="rounded border-slate-300 text-fuchsia-600 focus:ring-fuchsia-500" />
+                <label className="flex items-center gap-2 cursor-pointer text-neutral-700">
+                  <input type="checkbox" defaultChecked className="rounded border-neutral-300 text-brand-600 focus:ring-brand-500" />
                   <span>Verified fabric condition (Undyed Greige or Passed Dyed fabric intact).</span>
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer text-slate-700">
-                  <input type="checkbox" defaultChecked className="rounded border-slate-300 text-fuchsia-600 focus:ring-fuchsia-500" />
+                <label className="flex items-center gap-2 cursor-pointer text-neutral-700">
+                  <input type="checkbox" defaultChecked className="rounded border-neutral-300 text-brand-600 focus:ring-brand-500" />
                   <span>Wilcom stitching frame &amp; design parameters matched with Production Sheet.</span>
                 </label>
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-neutral-500 mb-1">
                   Embroidery Incharge Remark
                 </label>
                 <input
@@ -599,16 +593,16 @@ export default function EmbroideryIncomingChallansPage() {
                   value={inspectionRemark}
                   onChange={(e) => setInspectionRemark(e.target.value)}
                   placeholder=""
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-fuchsia-500 focus:outline-none"
+                  className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none"
                 />
               </div>
             </div>
 
-            <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-200">
+            <div className="pt-2 flex items-center justify-end gap-2 border-t border-neutral-200">
               <button
                 type="button"
                 onClick={() => setInspectModalChallan(null)}
-                className="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
+                className="px-4 py-2 border border-neutral-300 rounded-lg text-xs font-semibold text-neutral-700 hover:bg-neutral-50 transition"
               >
                 Cancel
               </button>
@@ -616,16 +610,16 @@ export default function EmbroideryIncomingChallansPage() {
                 type="button"
                 disabled={inspecting}
                 onClick={() => handleRejectToDefectiveShelf(inspectModalChallan)}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-lg text-xs font-semibold transition"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-danger-50 hover:bg-danger-100 text-danger-700 border border-danger-300 rounded-lg text-xs font-semibold transition"
               >
-                <AlertCircle className="w-4 h-4 text-rose-600" />
+                <AlertCircle className="w-4 h-4 text-danger-600" />
                 <span>REJECT to Defective Shelf</span>
               </button>
               <button
                 type="button"
                 disabled={inspecting}
                 onClick={() => handlePassAndReceive(inspectModalChallan)}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs transition"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-semibold shadow-xs transition"
               >
                 <CheckCircle2 className="w-4 h-4" />
                 <span>{inspecting ? 'Updating...' : 'PASS & Accept into Embroidery Floor'}</span>

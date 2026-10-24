@@ -26,7 +26,6 @@ import {
 import { api } from '@/lib/api';
 import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
-import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 
 import { isAdminUser, isProgrammingUser } from '@/lib/rbac';
 
@@ -142,21 +141,16 @@ export default function ProgrammingDashboardPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pl-0 md:pl-64">
+    <div className="min-h-screen bg-neutral-50 pl-0 md:pl-64">
       {/* TOP HEADER BAR (REAL DB BACKGROUND) */}
       <header
-        style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.70)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-        className="border-b border-slate-700/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md text-white"
+        className="bg-white border-b border-neutral-200 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md text-neutral-900"
       >
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-400 block drop-shadow-sm">
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-700 block drop-shadow-sm">
             SHUBHAM FABRICS MES · OPERATIONS
           </span>
-          <h1 className="text-xl font-bold text-white flex items-center gap-2.5 drop-shadow-sm">
+          <h1 className="text-xl font-bold text-neutral-900 flex items-center gap-2.5 drop-shadow-sm">
             Programming Department Dashboard
           </h1>
         </div>
@@ -165,7 +159,7 @@ export default function ProgrammingDashboardPage() {
           <button
             onClick={loadData}
             disabled={loading}
-            className="p-2 text-slate-300 hover:text-white hover:bg-slate-800/80 rounded-lg border border-slate-700/60 transition"
+            className="p-2 text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg border border-neutral-200 transition"
             title="Refresh Data"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -173,7 +167,7 @@ export default function ProgrammingDashboardPage() {
           
           <Link
             href="/my-work/create-production-sheet"
-            className="flex items-center gap-2 px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs rounded-lg shadow-md transition"
+            className="flex items-center gap-2 px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-lg shadow-sm transition"
           >
             <FilePlus className="w-4 h-4" />
             <span>Create Production Sheet</span>
@@ -181,7 +175,7 @@ export default function ProgrammingDashboardPage() {
           
           <Link
             href="/my-work/issue-challan"
-            className="flex items-center gap-2 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-md transition"
+            className="flex items-center gap-2 px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-lg shadow-sm transition"
           >
             <Send className="w-4 h-4" />
             <span>Issue Challan</span>
@@ -195,66 +189,66 @@ export default function ProgrammingDashboardPage() {
         {/* KPI METRICS OVERVIEW */}
         <section className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
           {/* Total Sheets */}
-          <div className="bg-white border border-slate-200/90 rounded-lg p-3.5 shadow-xs">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+          <div className="bg-white border border-neutral-200/90 rounded-lg p-3.5 shadow-xs">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block">
               Total Sheets
             </span>
-            <p className="text-2xl font-bold text-slate-900 mt-1">{totalSheets}</p>
-            <span className="text-[10px] text-slate-500 mt-0.5 block">Recorded programs</span>
+            <p className="text-2xl font-bold text-neutral-900 mt-1">{totalSheets}</p>
+            <span className="text-[10px] text-neutral-500 mt-0.5 block">Recorded programs</span>
           </div>
 
           {/* Draft */}
-          <div className="bg-white border border-slate-200/90 rounded-lg p-3.5 shadow-xs">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 block">
+          <div className="bg-white border border-neutral-200/90 rounded-lg p-3.5 shadow-xs">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block">
               Draft
             </span>
-            <p className="text-2xl font-bold text-amber-600 mt-1">{draftSheets}</p>
-            <span className="text-[10px] text-slate-500 mt-0.5 block">Under preparation</span>
+            <p className="text-2xl font-bold text-neutral-900 mt-1">{draftSheets}</p>
+            <span className="text-[10px] text-neutral-500 mt-0.5 block">Under preparation</span>
           </div>
 
           {/* In Progress */}
-          <div className="bg-white border border-slate-200/90 rounded-lg p-3.5 shadow-xs">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 block">
+          <div className="bg-white border border-neutral-200/90 rounded-lg p-3.5 shadow-xs">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-brand-600 block">
               In Progress
             </span>
-            <p className="text-2xl font-bold text-blue-600 mt-1">{inProgressSheets}</p>
-            <span className="text-[10px] text-slate-500 mt-0.5 block">CAD & specs sync</span>
+            <p className="text-2xl font-bold text-brand-600 mt-1">{inProgressSheets}</p>
+            <span className="text-[10px] text-neutral-500 mt-0.5 block">CAD & specs sync</span>
           </div>
 
           {/* Ready For Issue */}
-          <div className="bg-white border border-slate-200/90 rounded-lg p-3.5 shadow-xs">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 block">
+          <div className="bg-white border border-neutral-200/90 rounded-lg p-3.5 shadow-xs">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-brand-600 block">
               Ready for Issue
             </span>
-            <p className="text-2xl font-bold text-indigo-600 mt-1">{readySheets}</p>
-            <span className="text-[10px] text-slate-500 mt-0.5 block">Awaiting Challan</span>
+            <p className="text-2xl font-bold text-brand-600 mt-1">{readySheets}</p>
+            <span className="text-[10px] text-neutral-500 mt-0.5 block">Awaiting Challan</span>
           </div>
 
           {/* Issued */}
-          <div className="bg-white border border-slate-200/90 rounded-lg p-3.5 shadow-xs">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 block">
+          <div className="bg-white border border-neutral-200/90 rounded-lg p-3.5 shadow-xs">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block">
               Issued
             </span>
-            <p className="text-2xl font-bold text-emerald-600 mt-1">{issuedSheets}</p>
-            <span className="text-[10px] text-slate-500 mt-0.5 block">Passed downstream</span>
+            <p className="text-2xl font-bold text-neutral-900 mt-1">{issuedSheets}</p>
+            <span className="text-[10px] text-neutral-500 mt-0.5 block">Passed downstream</span>
           </div>
 
           {/* Challans Issued */}
-          <div className="bg-white border border-slate-200/90 rounded-lg p-3.5 shadow-xs">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600 block">
+          <div className="bg-white border border-neutral-200/90 rounded-lg p-3.5 shadow-xs">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-600 block">
               Challans Issued
             </span>
-            <p className="text-2xl font-bold text-slate-900 mt-1">{issuedChallans}</p>
-            <span className="text-[10px] text-slate-500 mt-0.5 block">{pendingChallans} draft/pending</span>
+            <p className="text-2xl font-bold text-neutral-900 mt-1">{issuedChallans}</p>
+            <span className="text-[10px] text-neutral-500 mt-0.5 block">{pendingChallans} draft/pending</span>
           </div>
 
           {/* Delivery Warning */}
-          <div className="bg-white border border-amber-200 rounded-lg p-3.5 shadow-xs bg-amber-50/30">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-rose-700 block">
+          <div className="bg-white border border-accent-200 rounded-lg p-3.5 shadow-xs bg-accent-50/30">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-danger-700 block">
               Deadlines (≤7d)
             </span>
-            <p className="text-2xl font-bold text-rose-600 mt-1">{upcomingDeadlines.length}</p>
-            <span className="text-[10px] text-amber-700 mt-0.5 block">High attention</span>
+            <p className="text-2xl font-bold text-danger-600 mt-1">{upcomingDeadlines.length}</p>
+            <span className="text-[10px] text-accent-800 mt-0.5 block">High attention</span>
           </div>
         </section>
 
@@ -265,27 +259,27 @@ export default function ProgrammingDashboardPage() {
           <div className="lg:col-span-2 space-y-6">
             
             {/* PRODUCTION SHEETS TABLE */}
-            <div className="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
-              <div className="p-4 border-b border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="bg-white border border-neutral-200/90 rounded-xl shadow-xs overflow-hidden">
+              <div className="p-4 border-b border-neutral-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <h2 className="text-sm font-bold text-neutral-900 flex items-center gap-2">
                     <span>Production Sheets / Production Programs</span>
                   </h2>
-                  <p className="text-[11px] text-slate-500 mt-0.5">
+                  <p className="text-[11px] text-neutral-500 mt-0.5">
                     Official technical production specifications authored by Programming
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Link
                     href="/production-history"
-                    className="text-xs font-semibold text-slate-700 hover:text-blue-900 bg-slate-100 hover:bg-slate-200 px-2.5 py-1.5 rounded-md flex items-center gap-1.5 transition"
+                    className="text-xs font-semibold text-neutral-700 hover:text-brand-900 bg-neutral-100 hover:bg-neutral-200 px-2.5 py-1.5 rounded-md flex items-center gap-1.5 transition"
                   >
-                    <History className="w-3.5 h-3.5 text-amber-600" />
+                    <History className="w-3.5 h-3.5 text-accent-700" />
                     <span>Production History Archive</span>
                   </Link>
                   <Link
                     href="/my-work/create-production-sheet"
-                    className="text-xs font-semibold text-white bg-[#163767] hover:bg-[#0F264A] px-2.5 py-1.5 rounded-md flex items-center gap-1 transition shadow-xs"
+                    className="text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 px-2.5 py-1.5 rounded-md flex items-center gap-1 transition shadow-xs"
                   >
                     <span>+ New Sheet</span>
                   </Link>
@@ -293,35 +287,35 @@ export default function ProgrammingDashboardPage() {
               </div>
 
               {/* SEARCH FILTER BAR */}
-              <div className="p-3 bg-slate-50/80 border-b border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+              <div className="p-3 bg-neutral-50/80 border-b border-neutral-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                 <div className="relative flex-1 max-w-md">
-                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Search className="w-3.5 h-3.5 text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-8 pr-8 py-1.5 bg-white border border-slate-200 rounded-md text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-[#163767]"
+                    className="w-full pl-8 pr-8 py-1.5 bg-white border border-neutral-200 rounded-md text-xs text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500"
                   />
                   {searchQuery && (
                     <button
                       type="button"
                       onClick={() => setSearchQuery('')}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-600"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
                   )}
                 </div>
-                <div className="text-[11px] text-slate-500 flex items-center justify-between sm:justify-end gap-3">
+                <div className="text-[11px] text-neutral-500 flex items-center justify-between sm:justify-end gap-3">
                   <span>
-                    Showing <strong className="text-slate-800">{filteredPrograms.length}</strong> of{' '}
-                    <strong className="text-slate-800">{programs.length}</strong> sheets
+                    Showing <strong className="text-neutral-900">{filteredPrograms.length}</strong> of{' '}
+                    <strong className="text-neutral-900">{programs.length}</strong> sheets
                   </span>
                   {searchQuery && (
                     <button
                       type="button"
                       onClick={() => setSearchQuery('')}
-                      className="text-blue-700 hover:underline font-semibold"
+                      className="text-brand-700 hover:underline font-semibold"
                     >
                       Clear
                     </button>
@@ -330,17 +324,17 @@ export default function ProgrammingDashboardPage() {
               </div>
 
               {loading ? (
-                <div className="p-8 text-center text-xs text-slate-400">Loading production sheets…</div>
+                <div className="p-8 text-center text-xs text-neutral-500">Loading production sheets…</div>
               ) : programs.length === 0 ? (
                 <div className="p-12 text-center space-y-3">
-                  <Layers className="w-10 h-10 text-slate-300 mx-auto" />
-                  <p className="text-xs font-semibold text-slate-700">No Production Sheets created yet</p>
-                  <p className="text-[11px] text-slate-500 max-w-sm mx-auto">
+                  <Layers className="w-10 h-10 text-neutral-700 mx-auto" />
+                  <p className="text-xs font-semibold text-neutral-700">No Production Sheets created yet</p>
+                  <p className="text-[11px] text-neutral-500 max-w-sm mx-auto">
                     Start by authoring the first official Production Sheet for Shubham Fabrics.
                   </p>
                   <Link
                     href="/my-work/create-production-sheet"
-                    className="inline-flex items-center gap-2 px-3.5 py-2 bg-[#163767] text-white text-xs font-semibold rounded-md shadow-xs"
+                    className="inline-flex items-center gap-2 px-3.5 py-2 bg-brand-600 text-white text-xs font-semibold rounded-md shadow-xs"
                   >
                     <FilePlus className="w-3.5 h-3.5" />
                     <span>Create Production Sheet</span>
@@ -348,16 +342,16 @@ export default function ProgrammingDashboardPage() {
                 </div>
               ) : filteredPrograms.length === 0 ? (
                 <div className="p-10 text-center space-y-2">
-                  <Search className="w-8 h-8 text-slate-300 mx-auto" />
-                  <p className="text-xs font-semibold text-slate-700">No matching production sheets found</p>
-                  <p className="text-[11px] text-slate-500">
+                  <Search className="w-8 h-8 text-neutral-700 mx-auto" />
+                  <p className="text-xs font-semibold text-neutral-700">No matching production sheets found</p>
+                  <p className="text-[11px] text-neutral-500">
                     Try another search term or click &quot;Clear&quot; to reset.
                   </p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-50/80 text-slate-600 font-semibold border-b border-slate-200">
+                    <thead className="bg-neutral-50/80 text-neutral-600 font-semibold border-b border-neutral-200">
                       <tr>
                         <th className="py-2.5 px-4">Serial / Program #</th>
                         <th className="py-2.5 px-4">Client</th>
@@ -369,54 +363,53 @@ export default function ProgrammingDashboardPage() {
                         <th className="py-2.5 px-4 text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100 text-slate-700">
+                    <tbody className="divide-y divide-neutral-100 text-neutral-700">
                       {filteredPrograms.slice(0, 15).map((prog) => {
                         const isDraft = prog.status === 'DRAFT';
                         const isReady = prog.status === 'READY_FOR_ISSUE' || prog.status === 'APPROVED';
                         const isIssued = prog.status === 'ISSUED' || prog.status === 'IN_PRODUCTION';
 
                         return (
-                          <tr key={prog.id} className="hover:bg-slate-50/60 transition">
-                            <td className="py-3 px-4 font-mono font-bold text-slate-900">
+                          <tr key={prog.id} className="hover:bg-neutral-50/60 transition">
+                            <td className="py-3 px-4 font-mono font-bold text-neutral-900">
                               {prog.programSerialNo || prog.programNumber}
                             </td>
-                            <td className="py-3 px-4 font-medium text-slate-900">
+                            <td className="py-3 px-4 font-medium text-neutral-900">
                               <div>{prog.clientName || prog.buyerName || '—'}</div>
                               {prog.clientCode && (
-                                <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-amber-900 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 mt-0.5">
-                                  <span>🔒</span>
+                                <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-accent-800 bg-accent-50 px-1.5 py-0.5 rounded border border-accent-200 mt-0.5">
                                   <span>{prog.clientCode}</span>
                                 </span>
                               )}
                             </td>
                             <td className="py-3 px-4">
-                              <span className="font-semibold block text-slate-900">
+                              <span className="font-semibold block text-neutral-900">
                                 {prog.designNumber || prog.designName || 'Standard'}
                               </span>
                               {prog.wilcomDesignNumber && (
-                                <span className="text-[10px] text-slate-400 font-mono">
+                                <span className="text-[10px] text-neutral-500 font-mono">
                                   W: {prog.wilcomDesignNumber}
                                 </span>
                               )}
                             </td>
                             <td className="py-3 px-4">
-                              <span className="block font-medium text-slate-800">
+                              <span className="block font-medium text-neutral-900">
                                 {prog.mainStyle || prog.styleCode || '—'}
                               </span>
                               {prog.subStyle && (
-                                <span className="text-[10px] text-amber-900 font-semibold block truncate max-w-[180px]" title={prog.subStyle}>
+                                <span className="text-[10px] text-accent-800 font-semibold block truncate max-w-[180px]" title={prog.subStyle}>
                                   Sub: {prog.subStyle}
                                 </span>
                               )}
-                              <span className="text-[10px] text-slate-500 block">
+                              <span className="text-[10px] text-neutral-500 block">
                                 {prog.fabricName || 'Cotton'}
                               </span>
                               {prog.items && prog.items.length > 1 ? (
-                                <span className="inline-flex items-center gap-1 text-[10px] text-blue-700 font-semibold bg-blue-50 px-1.5 py-0.5 rounded mt-0.5">
+                                <span className="inline-flex items-center gap-1 text-[10px] text-brand-700 font-semibold bg-brand-50 px-1.5 py-0.5 rounded mt-0.5">
                                   {prog.items.length} Items &middot; {Array.from(new Set(prog.items.map((it: any) => String(it.color || '').trim()).filter(Boolean))).length} Colors
                                 </span>
                               ) : (
-                                <span className="text-[10px] text-slate-500">
+                                <span className="text-[10px] text-neutral-500">
                                   {prog.fabricColor || 'Natural'}
                                 </span>
                               )}
@@ -424,7 +417,7 @@ export default function ProgrammingDashboardPage() {
                             <td className="py-3 px-4 font-mono font-semibold">
                               <div>{prog.colorQuantity || prog.targetQuantity} {prog.quantityMeasurement || 'PCS'}</div>
                               {prog.items && prog.items.length > 1 && (
-                                <span className="text-[10px] text-slate-400 block font-normal">
+                                <span className="text-[10px] text-neutral-500 block font-normal">
                                   {prog.items.length} colorways
                                 </span>
                               )}
@@ -436,12 +429,12 @@ export default function ProgrammingDashboardPage() {
                               <span
                                 className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
                                   isDraft
-                                    ? 'bg-amber-100 text-amber-800'
+                                    ? 'bg-accent-100 text-accent-800'
                                     : isReady
-                                    ? 'bg-indigo-100 text-indigo-800'
+                                    ? 'bg-brand-100 text-brand-800'
                                     : isIssued
-                                    ? 'bg-emerald-100 text-emerald-800'
-                                    : 'bg-blue-100 text-blue-800'
+                                    ? 'bg-accent-100 text-accent-800'
+                                    : 'bg-brand-100 text-brand-800'
                                 }`}
                               >
                                 {prog.status}
@@ -456,14 +449,14 @@ export default function ProgrammingDashboardPage() {
                                 {isReady && (
                                   <Link
                                     href={`/my-work/issue-challan?programId=${prog.id}`}
-                                    className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded transition"
+                                    className="inline-flex items-center gap-1 text-[11px] font-bold text-brand-700 hover:text-brand-900 bg-brand-50 hover:bg-brand-100 px-2 py-1 rounded transition"
                                   >
                                     <span>Issue Challan</span>
                                   </Link>
                                 )}
                                 <Link
                                   href={`/programs/${prog.id}`}
-                                  className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded transition"
+                                  className="inline-flex items-center gap-1 text-[11px] font-semibold text-neutral-600 hover:text-neutral-900 bg-neutral-100 hover:bg-neutral-200 px-2 py-1 rounded transition"
                                 >
                                   <span>Details</span>
                                 </Link>
@@ -479,32 +472,32 @@ export default function ProgrammingDashboardPage() {
             </div>
 
             {/* RECENT CHALLANS TABLE */}
-            <div className="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
-              <div className="p-4 border-b border-slate-200/80 flex items-center justify-between">
+            <div className="bg-white border border-neutral-200/90 rounded-xl shadow-xs overflow-hidden">
+              <div className="p-4 border-b border-neutral-200/80 flex items-center justify-between">
                 <div>
-                  <h2 className="text-sm font-bold text-slate-900">
+                  <h2 className="text-sm font-bold text-neutral-900">
                     Recent Challans Issued
                   </h2>
-                  <p className="text-[11px] text-slate-500 mt-0.5">
+                  <p className="text-[11px] text-neutral-500 mt-0.5">
                     Physical material &amp; program transfer records dispatched from Programming
                   </p>
                 </div>
                 <Link
                   href="/my-work/issue-challan"
-                  className="text-xs font-semibold text-blue-700 hover:text-blue-900"
+                  className="text-xs font-semibold text-brand-700 hover:text-brand-900"
                 >
                   + Issue Challan
                 </Link>
               </div>
 
               {challans.length === 0 ? (
-                <div className="p-8 text-center text-xs text-slate-400">
+                <div className="p-8 text-center text-xs text-neutral-500">
                   No Challans recorded yet. Issue a Challan from an approved Production Sheet.
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-50/80 text-slate-600 font-semibold border-b border-slate-200">
+                    <thead className="bg-neutral-50/80 text-neutral-600 font-semibold border-b border-neutral-200">
                       <tr>
                         <th className="py-2.5 px-4">Challan Number</th>
                         <th className="py-2.5 px-4">Program Sheet</th>
@@ -515,40 +508,40 @@ export default function ProgrammingDashboardPage() {
                         <th className="py-2.5 px-4 text-right">Actions (Challan &amp; Sheet)</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100 text-slate-700">
+                    <tbody className="divide-y divide-neutral-100 text-neutral-700">
                       {challans.slice(0, 10).map((ch) => (
-                        <tr key={ch.id} className="hover:bg-slate-50/60 transition">
-                          <td className="py-3 px-4 font-mono font-bold text-[#163767]">
+                        <tr key={ch.id} className="hover:bg-neutral-50/60 transition">
+                          <td className="py-3 px-4 font-mono font-bold text-brand-600">
                             <Link href={`/challans/${ch.id}`} className="hover:underline flex items-center gap-1">
                               <span>{ch.challanNumber}</span>
                             </Link>
                           </td>
                           <td className="py-3 px-4">
-                            <span className="font-mono font-semibold text-slate-900 block">
+                            <span className="font-mono font-semibold text-neutral-900 block">
                               {ch.program?.programSerialNo || ch.program?.programNumber || '—'}
                             </span>
                             {ch.program?.designNumber && (
-                              <span className="text-[10px] text-slate-500 block truncate max-w-[140px]">
+                              <span className="text-[10px] text-neutral-500 block truncate max-w-[140px]">
                                 Design: {ch.program.designNumber}
                               </span>
                             )}
                           </td>
                           <td className="py-3 px-4">
                             <div className="flex items-center gap-1 text-[11px] font-semibold">
-                              <span className="text-slate-800">{ch.fromDepartment}</span>
-                              <span className="text-slate-400">→</span>
-                              <span className="text-blue-900">{ch.toDepartment}</span>
+                              <span className="text-neutral-900">{ch.fromDepartment}</span>
+                              <span className="text-neutral-500">→</span>
+                              <span className="text-brand-900">{ch.toDepartment}</span>
                             </div>
                           </td>
-                          <td className="py-3 px-4 font-mono text-slate-900 font-medium">
+                          <td className="py-3 px-4 font-mono text-neutral-900 font-medium">
                             {ch.items?.[0]?.quantity || '—'} {ch.items?.[0]?.uom || ''}
                           </td>
                           <td className="py-3 px-4">
-                            <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-800 border border-blue-200">
+                            <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-bold bg-brand-50 text-brand-800 border border-brand-200">
                               {ch.status}
                             </span>
                           </td>
-                          <td className="py-3 px-4 text-[11px] text-slate-500">
+                          <td className="py-3 px-4 text-[11px] text-neutral-500">
                             {ch.createdAt ? new Date(ch.createdAt).toLocaleDateString() : '—'}
                           </td>
                           <td className="py-3 px-4 text-right">
@@ -574,46 +567,46 @@ export default function ProgrammingDashboardPage() {
           <div className="space-y-6">
             
             {/* QUICK ACTIONS CARD */}
-            <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-3">
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A66E22] block">
+            <div className="bg-white border border-neutral-200/90 rounded-xl p-5 shadow-xs space-y-3">
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-700 block">
                 PRIMARY WORKSPACE ACTIONS
               </span>
-              <h3 className="text-sm font-bold text-slate-900">
+              <h3 className="text-sm font-bold text-neutral-900">
                 Programming Department
               </h3>
 
               <div className="pt-2 space-y-2">
                 <Link
                   href="/my-work/create-production-sheet"
-                  className="w-full flex items-center justify-between p-3 rounded-lg bg-blue-50/70 hover:bg-blue-100/70 border border-blue-200/60 text-blue-950 font-semibold text-xs transition"
+                  className="w-full flex items-center justify-between p-3 rounded-lg bg-brand-50/70 hover:bg-brand-100/70 border border-brand-200/60 text-brand-900 font-semibold text-xs transition"
                 >
                   <div className="flex items-center gap-2.5">
-                    <FilePlus className="w-4 h-4 text-blue-700" />
+                    <FilePlus className="w-4 h-4 text-brand-700" />
                     <span>Create Production Sheet</span>
                   </div>
-                  <ArrowRight className="w-3.5 h-3.5 text-blue-600" />
+                  <ArrowRight className="w-3.5 h-3.5 text-brand-600" />
                 </Link>
 
                 <Link
                   href="/my-work/issue-challan"
-                  className="w-full flex items-center justify-between p-3 rounded-lg bg-emerald-50/70 hover:bg-emerald-100/70 border border-emerald-200/60 text-emerald-950 font-semibold text-xs transition"
+                  className="w-full flex items-center justify-between p-3 rounded-lg bg-accent-50/70 hover:bg-accent-100/70 border border-accent-200/60 text-accent-800 font-semibold text-xs transition"
                 >
                   <div className="flex items-center gap-2.5">
-                    <Send className="w-4 h-4 text-emerald-700" />
+                    <Send className="w-4 h-4 text-accent-800" />
                     <span>Issue Challan</span>
                   </div>
-                  <ArrowRight className="w-3.5 h-3.5 text-emerald-600" />
+                  <ArrowRight className="w-3.5 h-3.5 text-accent-700" />
                 </Link>
 
                 <Link
                   href="/floor-board"
-                  className="w-full flex items-center justify-between p-3 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 font-semibold text-xs transition"
+                  className="w-full flex items-center justify-between p-3 rounded-lg bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 text-neutral-900 font-semibold text-xs transition"
                 >
                   <div className="flex items-center gap-2.5">
-                    <Layers className="w-4 h-4 text-slate-600" />
+                    <Layers className="w-4 h-4 text-neutral-600" />
                     <span>View Floor Board</span>
                   </div>
-                  <ArrowRight className="w-3.5 h-3.5 text-slate-500" />
+                  <ArrowRight className="w-3.5 h-3.5 text-neutral-500" />
                 </Link>
               </div>
             </div>

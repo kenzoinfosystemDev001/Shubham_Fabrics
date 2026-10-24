@@ -91,30 +91,30 @@ const CATEGORY_META: Record<string, {
 }> = {
   TOP: {
     label: 'TOP Production Sheet',
-    badgeBg: 'bg-blue-100',
-    badgeText: 'text-blue-900',
-    accentBorder: 'border-blue-700',
+    badgeBg: 'bg-brand-100',
+    badgeText: 'text-brand-900',
+    accentBorder: 'border-brand-600',
     subHeader: 'TOP:-',
   },
   BOTTOM: {
     label: 'BOTTOM Production Sheet',
-    badgeBg: 'bg-emerald-100',
-    badgeText: 'text-emerald-900',
-    accentBorder: 'border-emerald-900',
+    badgeBg: 'bg-accent-100',
+    badgeText: 'text-accent-800',
+    accentBorder: 'border-accent-200',
     subHeader: 'BOTTOM:-',
   },
   DUPATTA: {
     label: 'DUPATTA Production Sheet',
-    badgeBg: 'bg-purple-100',
-    badgeText: 'text-purple-900',
-    accentBorder: 'border-purple-800',
+    badgeBg: 'bg-brand-100',
+    badgeText: 'text-brand-900',
+    accentBorder: 'border-brand-200',
     subHeader: 'DUPATTA:-',
   },
   OTHER: {
     label: 'INPUT Production Sheet',
-    badgeBg: 'bg-amber-100',
-    badgeText: 'text-amber-900',
-    accentBorder: 'border-amber-700',
+    badgeBg: 'bg-accent-100',
+    badgeText: 'text-accent-800',
+    accentBorder: 'border-accent-600',
     subHeader: 'OTHER:-',
   },
 };
@@ -228,7 +228,7 @@ function SubStyleMultiSelectCell({
         {rowSubStyles.map((sub, sIdx) => (
           <span
             key={sIdx}
-            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-black uppercase bg-blue-100 border border-blue-300 text-blue-950 shadow-2xs select-none"
+            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-black uppercase bg-brand-100 border border-brand-300 text-brand-900 shadow-2xs select-none"
           >
             <span>{sub}</span>
             <button
@@ -237,7 +237,7 @@ function SubStyleMultiSelectCell({
                 e.stopPropagation();
                 onToggleSubStyle(sub);
               }}
-              className="text-blue-800 hover:text-rose-600 transition p-0.5 rounded cursor-pointer"
+              className="text-brand-800 hover:text-danger-600 transition p-0.5 rounded cursor-pointer"
               title="Remove this sub style"
             >
               <X className="w-2.5 h-2.5" />
@@ -248,7 +248,7 @@ function SubStyleMultiSelectCell({
         <button
           type="button"
           onClick={onOpenPicker}
-          className="inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold text-blue-700 hover:text-blue-950 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded transition cursor-pointer shadow-2xs"
+          className="inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold text-brand-700 hover:text-brand-900 bg-brand-50 hover:bg-brand-100 border border-brand-200 rounded transition cursor-pointer shadow-2xs"
           title="Select or add sub styles"
         >
           <Plus className="w-2.5 h-2.5" />
@@ -258,26 +258,26 @@ function SubStyleMultiSelectCell({
       {isPickerOpen && (
         <>
           <div
-            className="fixed inset-0 z-40 bg-black/10 backdrop-blur-[0.5px]"
+            className="fixed inset-0 z-40 bg-neutral-900/10 backdrop-blur-[0.5px]"
             onClick={onClosePicker}
           />
           <div
-            className="absolute left-1/2 -translate-x-1/2 top-full mt-1 z-50 w-72 bg-white rounded-lg shadow-2xl border-2 border-black p-3 text-left"
+            className="absolute left-1/2 -translate-x-1/2 top-full mt-1 z-50 w-72 bg-white rounded-lg shadow-2xl border-2 border-neutral-200 p-3 text-left"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-slate-200 pb-2 mb-2">
+            <div className="flex items-center justify-between border-b border-neutral-200 pb-2 mb-2">
               <div>
-                <span className="text-[11px] font-black uppercase text-slate-900 block">
+                <span className="text-[11px] font-black uppercase text-neutral-900 block">
                   Sub Styles &middot; Row #{rIdx + 1}
                 </span>
-                <span className="text-[10px] text-blue-800 font-bold">
+                <span className="text-[10px] text-brand-800 font-bold">
                   {rowSubStyles.length} selected
                 </span>
               </div>
               <button
                 type="button"
                 onClick={onClosePicker}
-                className="text-slate-400 hover:text-slate-700 p-0.5 cursor-pointer"
+                className="text-neutral-500 hover:text-neutral-700 p-0.5 cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -291,14 +291,14 @@ function SubStyleMultiSelectCell({
                     const allNames = compSubStyles.map((s) => s.name);
                     onSetSubStyles(allNames);
                   }}
-                  className="text-[9px] font-bold text-blue-700 hover:bg-blue-50 border border-blue-300 px-1.5 py-0.5 rounded cursor-pointer transition"
+                  className="text-[9px] font-bold text-brand-700 hover:bg-brand-50 border border-brand-300 px-1.5 py-0.5 rounded cursor-pointer transition"
                 >
                   Select All
                 </button>
                 <button
                   type="button"
                   onClick={() => onSetSubStyles([])}
-                  className="text-[9px] font-bold text-slate-600 hover:bg-slate-100 border border-slate-300 px-1.5 py-0.5 rounded cursor-pointer transition"
+                  className="text-[9px] font-bold text-neutral-600 hover:bg-neutral-100 border border-neutral-300 px-1.5 py-0.5 rounded cursor-pointer transition"
                 >
                   Clear
                 </button>
@@ -307,7 +307,7 @@ function SubStyleMultiSelectCell({
                 <button
                   type="button"
                   onClick={onApplyAll}
-                  className="text-[9px] font-bold text-purple-700 hover:bg-purple-50 border border-purple-300 px-1.5 py-0.5 rounded cursor-pointer transition"
+                  className="text-[9px] font-bold text-brand-700 hover:bg-brand-50 border border-brand-300 px-1.5 py-0.5 rounded cursor-pointer transition"
                   title="Copy selected sub styles to all color rows in this grid"
                 >
                   Apply to All Rows
@@ -315,7 +315,7 @@ function SubStyleMultiSelectCell({
               )}
             </div>
 
-            <div className="max-h-40 overflow-y-auto space-y-1 mb-2 pr-1 border border-slate-100 rounded p-1 bg-slate-50/50">
+            <div className="max-h-40 overflow-y-auto space-y-1 mb-2 pr-1 border border-neutral-100 rounded p-1 bg-neutral-50/50">
               {compSubStyles.map((sub, sIdx) => {
                 const isChecked = rowSubStyles.includes(sub.name.toUpperCase());
                 return (
@@ -323,8 +323,8 @@ function SubStyleMultiSelectCell({
                     key={sIdx}
                     className={`flex items-center justify-between px-2 py-1 rounded text-xs cursor-pointer select-none transition ${
                       isChecked
-                        ? 'bg-blue-100 text-blue-950 font-bold border border-blue-300'
-                        : 'hover:bg-slate-100 text-slate-700 font-medium'
+                        ? 'bg-brand-100 text-brand-900 font-bold border border-brand-300'
+                        : 'hover:bg-neutral-100 text-neutral-700 font-medium'
                     }`}
                   >
                     <div className="flex items-center gap-2">
@@ -332,12 +332,12 @@ function SubStyleMultiSelectCell({
                         type="checkbox"
                         checked={isChecked}
                         onChange={() => onToggleSubStyle(sub.name)}
-                        className="w-3.5 h-3.5 rounded border-slate-300 text-blue-600 focus:ring-0 cursor-pointer"
+                        className="w-3.5 h-3.5 rounded border-neutral-300 text-brand-600 focus:ring-0 cursor-pointer"
                       />
                       <span>{sub.name}</span>
                     </div>
                     {sub.average && Number(sub.average) > 0 && (
-                      <span className="text-[10px] text-slate-500 font-mono">
+                      <span className="text-[10px] text-neutral-500 font-mono">
                         {Number(sub.average).toFixed(2)}m
                       </span>
                     )}
@@ -346,8 +346,8 @@ function SubStyleMultiSelectCell({
               })}
             </div>
 
-            <div className="pt-2 border-t border-slate-200">
-              <div className="text-[10px] font-bold text-slate-600 mb-1 uppercase">
+            <div className="pt-2 border-t border-neutral-200">
+              <div className="text-[10px] font-bold text-neutral-600 mb-1 uppercase">
                 Custom Part
               </div>
               <div className="flex items-center gap-1">
@@ -365,7 +365,7 @@ function SubStyleMultiSelectCell({
                     }
                   }}
                   placeholder="e.g. POCKET"
-                  className="flex-1 px-2 py-1 text-xs uppercase font-bold border border-slate-300 rounded focus:outline-none focus:border-blue-500"
+                  className="flex-1 px-2 py-1 text-xs uppercase font-bold border border-neutral-300 rounded focus:outline-none focus:border-brand-500"
                 />
                 <button
                   type="button"
@@ -375,15 +375,15 @@ function SubStyleMultiSelectCell({
                       setCustomSubStyleInput('');
                     }
                   }}
-                  className="px-2 py-1 bg-[#163767] hover:bg-[#0F264A] text-white text-xs font-bold rounded cursor-pointer transition"
+                  className="px-2 py-1 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded cursor-pointer transition"
                 >
                   Add
                 </button>
               </div>
             </div>
 
-            <div className="pt-2 mt-2 border-t border-slate-200">
-              <div className="text-[10px] font-bold text-slate-600 mb-1 uppercase">
+            <div className="pt-2 mt-2 border-t border-neutral-200">
+              <div className="text-[10px] font-bold text-neutral-600 mb-1 uppercase">
                 Manual Text Edit
               </div>
               <input
@@ -391,15 +391,15 @@ function SubStyleMultiSelectCell({
                 value={row.subStyle || ''}
                 onChange={(e) => onSubStyleTextChange(e.target.value)}
                 placeholder="Comma-separated: FRONT, SLEEVE"
-                className="w-full px-2 py-1 text-xs uppercase font-bold border border-slate-300 rounded focus:outline-none focus:border-blue-500"
+                className="w-full px-2 py-1 text-xs uppercase font-bold border border-neutral-300 rounded focus:outline-none focus:border-brand-500"
               />
             </div>
 
-            <div className="mt-2.5 pt-2 border-t border-slate-200 flex items-center justify-end">
+            <div className="mt-2.5 pt-2 border-t border-neutral-200 flex items-center justify-end">
               <button
                 type="button"
                 onClick={onClosePicker}
-                className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold rounded cursor-pointer transition shadow-2xs"
+                className="px-3 py-1 bg-accent-400 hover:bg-accent-500 text-neutral-900 text-[11px] font-bold rounded cursor-pointer transition shadow-2xs"
               >
                 Done
               </button>
@@ -449,31 +449,31 @@ function BatchSubStylesModal({
   const totalCount = selectedPresets.length + customInput.split(',').filter((s) => s.trim()).length;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
-      <div className="bg-white rounded-xl shadow-2xl border-2 border-black max-w-md w-full p-5 space-y-4 animate-in fade-in zoom-in-95 duration-150">
-        <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-900/50 backdrop-blur-xs p-4">
+      <div className="bg-white rounded-xl shadow-2xl border-2 border-neutral-200 max-w-md w-full p-5 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+        <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
           <div>
-            <h3 className="font-black text-sm uppercase text-slate-900">
+            <h3 className="font-black text-sm uppercase text-neutral-900">
               Add Multiple Sub Styles &middot; {cat}
             </h3>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-neutral-500">
               Select common garment components or enter custom names
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-700 p-1 cursor-pointer"
+            className="text-neutral-500 hover:text-neutral-700 p-1 cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         <div className="space-y-1.5">
-          <span className="text-xs font-bold text-slate-700 uppercase">
+          <span className="text-xs font-bold text-neutral-700 uppercase">
             Quick Preset Parts
           </span>
-          <div className="flex flex-wrap gap-1.5 max-h-44 overflow-y-auto p-1.5 border border-slate-200 rounded-lg bg-slate-50">
+          <div className="flex flex-wrap gap-1.5 max-h-44 overflow-y-auto p-1.5 border border-neutral-200 rounded-lg bg-neutral-50">
             {COMMON_GARMENT_SUB_STYLES.map((part) => {
               const isSelected = selectedPresets.includes(part);
               const isAlreadyAdded = existingSet.has(part);
@@ -486,10 +486,10 @@ function BatchSubStylesModal({
                   onClick={() => onTogglePreset(part)}
                   className={`px-2 py-1 rounded text-xs font-bold uppercase transition flex items-center gap-1 cursor-pointer ${
                     isAlreadyAdded
-                      ? 'bg-slate-200 text-slate-400 cursor-not-allowed opacity-60'
+                      ? 'bg-neutral-200 text-neutral-500 cursor-not-allowed opacity-60'
                       : isSelected
-                      ? 'bg-blue-600 text-white shadow-2xs'
-                      : 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-100'
+                      ? 'bg-brand-600 text-white shadow-2xs'
+                      : 'bg-white border border-neutral-300 text-neutral-700 hover:bg-neutral-100'
                   }`}
                 >
                   {isSelected && <Check className="w-3 h-3" />}
@@ -502,7 +502,7 @@ function BatchSubStylesModal({
         </div>
 
         <div className="space-y-1">
-          <label className="text-xs font-bold text-slate-700 uppercase block">
+          <label className="text-xs font-bold text-neutral-700 uppercase block">
             Or Enter Custom Sub Styles (Comma-Separated)
           </label>
           <textarea
@@ -510,15 +510,15 @@ function BatchSubStylesModal({
             value={customInput}
             onChange={(e) => onCustomInputChange(e.target.value)}
             placeholder="e.g. FRONT YOKE, BACK YOKE, INNER POCKET"
-            className="w-full px-2.5 py-1.5 border border-slate-300 rounded text-xs uppercase font-bold focus:outline-none focus:border-blue-500 resize-none"
+            className="w-full px-2.5 py-1.5 border border-neutral-300 rounded text-xs uppercase font-bold focus:outline-none focus:border-brand-500 resize-none"
           />
         </div>
 
-        <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200">
+        <div className="flex items-center justify-end gap-2 pt-2 border-t border-neutral-200">
           <button
             type="button"
             onClick={onClose}
-            className="px-3 py-1.5 border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-bold rounded cursor-pointer transition"
+            className="px-3 py-1.5 border border-neutral-300 hover:bg-neutral-100 text-neutral-700 text-xs font-bold rounded cursor-pointer transition"
           >
             Cancel
           </button>
@@ -526,7 +526,7 @@ function BatchSubStylesModal({
             type="button"
             onClick={handleConfirm}
             disabled={totalCount === 0}
-            className="px-4 py-1.5 bg-[#163767] hover:bg-[#0F264A] disabled:opacity-50 text-white text-xs font-bold rounded cursor-pointer transition shadow-xs"
+            className="px-4 py-1.5 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white text-xs font-bold rounded cursor-pointer transition shadow-xs"
           >
             Add to Average Table ({totalCount})
           </button>
@@ -1337,24 +1337,24 @@ export default function CreateProductionSheetPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F1F5F9] pl-0 md:pl-64 pb-24">
+    <div className="min-h-screen bg-neutral-100 pl-0 md:pl-64 pb-24">
       {/* TOP STICKY BAR */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 sm:px-8 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+      <header className="bg-white border-b border-neutral-200 sticky top-0 z-30 px-4 sm:px-8 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div className="flex items-center gap-3">
           <Link
             href="/my-work"
-            className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-md transition"
+            className="p-1.5 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 rounded-md transition"
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <div>
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#A66E22] block">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-700 block">
               SHUBHAM FABRICS &middot; PROGRAMMING DEPARTMENT
             </span>
-            <h1 className="text-lg font-black text-slate-900 flex items-center gap-2">
+            <h1 className="text-lg font-black text-neutral-900 flex items-center gap-2">
               <span>Production Sheet Management</span>
               {designNumber && (
-                <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-300">
+                <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-neutral-100 text-neutral-700 border border-neutral-300">
                   {designNumber}
                 </span>
               )}
@@ -1367,16 +1367,16 @@ export default function CreateProductionSheetPage() {
             type="button"
             onClick={() => handleSubmit('DRAFT')}
             disabled={loading}
-            className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded border border-slate-300 shadow-2xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+            className="px-3.5 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 text-xs font-bold rounded border border-neutral-300 shadow-2xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
           >
-            {loading ? <RefreshCw className="w-3.5 h-3.5 animate-spin text-slate-500" /> : null}
+            {loading ? <RefreshCw className="w-3.5 h-3.5 animate-spin text-neutral-500" /> : null}
             <span>{loading ? 'Saving...' : 'Save Draft'}</span>
           </button>
           <button
             type="button"
             onClick={() => handleSubmit('READY_FOR_ISSUE')}
             disabled={loading}
-            className="px-4 py-1.5 bg-[#163767] hover:bg-[#0F264A] disabled:opacity-50 text-white text-xs font-bold rounded shadow-2xs transition flex items-center gap-1.5 cursor-pointer"
+            className="px-4 py-1.5 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white text-xs font-bold rounded shadow-2xs transition flex items-center gap-1.5 cursor-pointer"
           >
             {loading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
             <span>{loading ? 'Submitting...' : 'Complete & Submit Ready'}</span>
@@ -1389,17 +1389,17 @@ export default function CreateProductionSheetPage() {
         
         {/* Error Banner */}
         {error && (
-          <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-lg text-rose-800 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+          <div className="p-3.5 bg-danger-50 border border-danger-200 rounded-lg text-danger-800 text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 text-danger-600" />
             <span>{error}</span>
           </div>
         )}
 
         {/* Success Modal / Banner */}
         {success && (
-          <div className="p-5 bg-emerald-50 border border-emerald-300 rounded-xl text-emerald-950 space-y-3.5 shadow-xs">
+          <div className="p-5 bg-accent-50 border border-accent-300 rounded-xl text-accent-800 space-y-3.5 shadow-xs">
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+              <CheckCircle2 className="w-5 h-5 text-accent-700" />
               <h3 className="text-sm font-bold">
                 Production Sheet Submitted Successfully
               </h3>
@@ -1410,7 +1410,7 @@ export default function CreateProductionSheetPage() {
               <button
                 type="button"
                 onClick={() => setShowPrintModal(true)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-brand-700 hover:bg-brand-800 text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
               >
                 <Eye className="w-3.5 h-3.5" />
                 <span>View Production Sheet</span>
@@ -1419,7 +1419,7 @@ export default function CreateProductionSheetPage() {
               <button
                 type="button"
                 onClick={() => downloadProductionSheetHtml(success, 'ALL')}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>Download Production Sheet</span>
@@ -1428,7 +1428,7 @@ export default function CreateProductionSheetPage() {
               <button
                 type="button"
                 onClick={() => printProductionSheet(success, 'ALL')}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-800 hover:bg-black text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
               >
                 <Printer className="w-3.5 h-3.5" />
                 <span>Print Production Sheet</span>
@@ -1438,7 +1438,7 @@ export default function CreateProductionSheetPage() {
               <button
                 type="button"
                 onClick={() => setShowWilcomPrintModal(true)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-brand-700 hover:bg-brand-800 text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
               >
                 <Eye className="w-3.5 h-3.5" />
                 <span>View Wilcom Sheet</span>
@@ -1455,7 +1455,7 @@ export default function CreateProductionSheetPage() {
                   };
                   void downloadWilcomFormHtml(progToDownload, 'ALL');
                 }}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-indigo-700 hover:bg-indigo-800 text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-brand-700 hover:bg-brand-800 text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>Download Wilcom Sheet</span>
@@ -1472,7 +1472,7 @@ export default function CreateProductionSheetPage() {
                   };
                   printWilcomForm(progToPrint, 'ALL');
                 }}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-purple-900 hover:bg-purple-950 text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-brand-800 hover:bg-brand-700 text-white text-xs font-bold rounded shadow-2xs transition cursor-pointer"
               >
                 <Printer className="w-3.5 h-3.5" />
                 <span>Print Wilcom Sheet</span>
@@ -1485,19 +1485,19 @@ export default function CreateProductionSheetPage() {
         {/* GARMENT COMPONENT PRODUCTION SHEETS                                       */}
         {/* ========================================================================= */}
         <section className="space-y-6">
-          <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+          <div className="flex items-center justify-between border-b border-neutral-200 pb-2">
             <div>
-              <span className="text-[10px] font-black uppercase tracking-wider text-[#A66E22] block">
+              <span className="text-[10px] font-black uppercase tracking-wider text-neutral-700 block">
                 STAGE 1 &middot; PRODUCTION SHEET MANAGEMENT
               </span>
-              <h2 className="text-base font-black text-slate-900 uppercase">
+              <h2 className="text-base font-black text-neutral-900 uppercase">
                 Garment Component Production Sheet
               </h2>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-slate-500">Active Category:</span>
+              <span className="text-xs font-bold text-neutral-500">Active Category:</span>
               <span
-                className={`text-[10px] font-black px-2.5 py-0.5 rounded border ${getCategoryMeta(selectedCategory).badgeBg} ${getCategoryMeta(selectedCategory).badgeText} border-black/20`}
+                className={`text-[10px] font-black px-2.5 py-0.5 rounded border ${getCategoryMeta(selectedCategory).badgeBg} ${getCategoryMeta(selectedCategory).badgeText} border-neutral-200`}
               >
                 {selectedCategory === 'OTHER' || isCustomCategory(selectedCategory)
                   ? components[selectedCategory].styleName.trim() || 'New Style'
@@ -1506,7 +1506,7 @@ export default function CreateProductionSheetPage() {
               <button
                 type="button"
                 onClick={handleAddCustomStyle}
-                className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#163767] hover:bg-[#0F264A] text-white text-[10px] font-bold rounded transition cursor-pointer"
+                className="inline-flex items-center gap-1 px-2.5 py-1 bg-brand-600 hover:bg-brand-700 text-white text-[10px] font-bold rounded transition cursor-pointer"
               >
                 <Plus className="w-3 h-3" />
                 Add Style
@@ -1529,11 +1529,11 @@ export default function CreateProductionSheetPage() {
 
             return (
               <div 
-                className="bg-white border-2 border-black rounded-md shadow-xs transition-all overflow-hidden"
+                className="bg-white border-2 border-neutral-200 rounded-md shadow-xs transition-all overflow-hidden"
               >
                 {/* COMPONENT HEADER BAR */}
                 <div 
-                  className={`px-5 py-3 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${meta.badgeBg} border-black`}
+                  className={`px-5 py-3 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${meta.badgeBg} border-neutral-200`}
                 >
                   <div className="flex items-center gap-3">
                     <span className={`text-sm font-black uppercase tracking-wider ${meta.badgeText}`}>
@@ -1559,7 +1559,7 @@ export default function CreateProductionSheetPage() {
                           setSelectedCategory('TOP');
                           setWilcomEntries((prev) => prev.filter((entry) => entry.category !== cat));
                         }}
-                        className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-bold text-rose-700 border border-rose-200 hover:bg-rose-50 rounded cursor-pointer"
+                        className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-bold text-danger-700 border border-danger-200 hover:bg-danger-50 rounded cursor-pointer"
                       >
                         <Trash2 className="w-3 h-3" />
                         Remove Style
@@ -1570,9 +1570,9 @@ export default function CreateProductionSheetPage() {
                         type="checkbox"
                         checked={isForwarded}
                         onChange={() => handleToggleForwarding(cat)}
-                        className="w-3.5 h-3.5 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer"
+                        className="w-3.5 h-3.5 text-accent-700 rounded border-neutral-300 focus:ring-brand-500/40 cursor-pointer"
                       />
-                      <span className={isForwarded ? 'text-emerald-950 font-black' : 'text-slate-600'}>
+                      <span className={isForwarded ? 'text-accent-800 font-black' : 'text-neutral-600'}>
                         {isForwarded ? '✓ Included for Forwarding' : 'Forward Later'}
                       </span>
                     </label>
@@ -1580,9 +1580,9 @@ export default function CreateProductionSheetPage() {
                 </div>
 
                 {/* EXPANDED PRODUCTION SHEET FORM (MATCHING PHYSICAL SPEC SHEET) */}
-                <div className="p-6 sm:p-8 space-y-5 text-black font-sans">
+                <div className="p-6 sm:p-8 space-y-5 text-neutral-900 font-sans">
                     {/* SHEET BANNER TITLE */}
-                    <div className="text-center font-black text-2xl sm:text-3xl tracking-[0.25em] uppercase text-black select-none border-b border-black/10 pb-2">
+                    <div className="text-center font-black text-2xl sm:text-3xl tracking-[0.25em] uppercase text-neutral-900 select-none border-b border-neutral-200 pb-2">
                       {categoryDisplayName} PRODUCTION SHEET
                     </div>
 
@@ -1591,7 +1591,7 @@ export default function CreateProductionSheetPage() {
                       {/* Left: DESIGN NUMBER, STYLE & PATTERN */}
                       <div className="space-y-3">
                         <div>
-                          <label className="block text-[11px] font-black uppercase tracking-wider text-black mb-1">
+                          <label className="block text-[11px] font-black uppercase tracking-wider text-neutral-900 mb-1">
                             DESIGN NUMBER:
                           </label>
                           <input
@@ -1600,7 +1600,7 @@ export default function CreateProductionSheetPage() {
                             onChange={(e) => setDesignNumber(e.target.value)}
                             onFocus={(e) => e.target.select()}
                             placeholder="Enter Design Number..."
-                            className="w-full border-[1.5px] border-black px-3 py-1.5 h-10 font-bold text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600 shadow-2xs"
+                            className="w-full border-[1.5px] border-neutral-200 px-3 py-1.5 h-10 font-bold text-xs bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 shadow-2xs"
                           />
                         </div>
                         <button
@@ -1609,7 +1609,7 @@ export default function CreateProductionSheetPage() {
                             setWilcomCategory(cat);
                             setShowWilcomModal(true);
                           }}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-900 text-[10px] font-bold border border-purple-200 rounded transition cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-900 text-[10px] font-bold border border-brand-200 rounded transition cursor-pointer"
                           title={`Manage Wilcom specifications for ${categoryDisplayName}`}
                         >
                           <Sparkles className="w-3 h-3" />
@@ -1619,7 +1619,7 @@ export default function CreateProductionSheetPage() {
                         {/* STYLE & PATTERN (SIDE-BY-SIDE EQUAL BOXES) */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           <div>
-                            <label className="block text-[11px] font-black uppercase tracking-wider text-black mb-1">
+                            <label className="block text-[11px] font-black uppercase tracking-wider text-neutral-900 mb-1">
                               STYLE:
                             </label>
                             <div className="relative">
@@ -1627,7 +1627,7 @@ export default function CreateProductionSheetPage() {
                                 value={cat}
                                 onChange={(e) => handleCategoryDropdownChange(e.target.value as GarmentCategory)}
                                 aria-label="Component Category"
-                                className="w-full appearance-none font-black text-xs tracking-wider uppercase bg-white text-black border-[1.5px] border-black pl-3 pr-8 py-1.5 h-10 focus:outline-none focus:ring-1 focus:ring-blue-600 cursor-pointer shadow-2xs"
+                                className="w-full appearance-none font-black text-xs tracking-wider uppercase bg-white text-neutral-900 border-[1.5px] border-neutral-200 pl-3 pr-8 py-1.5 h-10 focus:outline-none focus:ring-1 focus:ring-brand-500 cursor-pointer shadow-2xs"
                               >
                                 <option value="TOP">TOP</option>
                                 <option value="BOTTOM">BOTTOM</option>
@@ -1640,14 +1640,14 @@ export default function CreateProductionSheetPage() {
                                     </option>
                                   ))}
                               </select>
-                              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-black">
+                              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-neutral-900">
                                 <ChevronDown className="w-4 h-4 stroke-[2.5]" />
                               </div>
                             </div>
                           </div>
 
                           <div>
-                            <label className="block text-[11px] font-black uppercase tracking-wider text-black mb-1">
+                            <label className="block text-[11px] font-black uppercase tracking-wider text-neutral-900 mb-1">
                               PATTERN:
                             </label>
                             <input
@@ -1662,13 +1662,13 @@ export default function CreateProductionSheetPage() {
                               }}
                               onFocus={(e) => e.target.select()}
                               placeholder="Fill pattern manually..."
-                              className="w-full border-[1.5px] border-black px-3 py-1.5 h-10 font-bold text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600 shadow-2xs"
+                              className="w-full border-[1.5px] border-neutral-200 px-3 py-1.5 h-10 font-bold text-xs bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 shadow-2xs"
                             />
                           </div>
                         </div>
                         {(cat === 'OTHER' || isCustomCategory(cat)) && (
                           <div>
-                            <label className="block text-[11px] font-black uppercase tracking-wider text-black mb-1">
+                            <label className="block text-[11px] font-black uppercase tracking-wider text-neutral-900 mb-1">
                               PRODUCTION SHEET NAME:
                             </label>
                             <input
@@ -1683,7 +1683,7 @@ export default function CreateProductionSheetPage() {
                                 }));
                               }}
                               placeholder="Enter a production sheet name"
-                              className="w-full border-[1.5px] border-black px-3 py-1.5 h-10 font-bold text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600 shadow-2xs"
+                              className="w-full border-[1.5px] border-neutral-200 px-3 py-1.5 h-10 font-bold text-xs bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 shadow-2xs"
                             />
                           </div>
                         )}
@@ -1692,7 +1692,7 @@ export default function CreateProductionSheetPage() {
                       {/* Right: SERIAL NO, DATE, DELIVERY DATE */}
                       <div className="space-y-3">
                         <div>
-                          <label className="block text-[11px] font-black uppercase tracking-wider text-black mb-1">
+                          <label className="block text-[11px] font-black uppercase tracking-wider text-neutral-900 mb-1">
                             SERIAL NO.
                           </label>
                           <input
@@ -1701,31 +1701,31 @@ export default function CreateProductionSheetPage() {
                             onChange={(e) => setProgramSerialNo(e.target.value.replace(new RegExp(`-${cat}$`, 'i'), ''))}
                             onFocus={(e) => e.target.select()}
                             placeholder="e.g. 101"
-                            className="w-full border-[1.5px] border-black px-3 py-1.5 h-10 font-black text-center text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600 font-mono shadow-2xs"
+                            className="w-full border-[1.5px] border-neutral-200 px-3 py-1.5 h-10 font-black text-center text-xs bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 font-mono shadow-2xs"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-[11px] font-black uppercase tracking-wider text-black mb-1">
+                          <label className="block text-[11px] font-black uppercase tracking-wider text-neutral-900 mb-1">
                             DATE:
                           </label>
                           <input
                             type="date"
                             value={sheetDate}
                             onChange={(e) => setSheetDate(e.target.value)}
-                            className="w-full border-[1.5px] border-black px-3 py-1.5 h-10 font-bold text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600 shadow-2xs"
+                            className="w-full border-[1.5px] border-neutral-200 px-3 py-1.5 h-10 font-bold text-xs bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 shadow-2xs"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-[11px] font-black uppercase tracking-wider text-black mb-1">
+                          <label className="block text-[11px] font-black uppercase tracking-wider text-neutral-900 mb-1">
                             DELIVERY DATE:
                           </label>
                           <input
                             type="date"
                             value={deliveryDate}
                             onChange={(e) => setDeliveryDate(e.target.value)}
-                            className="w-full border-[1.5px] border-black px-3 py-1.5 h-10 font-bold text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600 shadow-2xs"
+                            className="w-full border-[1.5px] border-neutral-200 px-3 py-1.5 h-10 font-bold text-xs bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 shadow-2xs"
                           />
                         </div>
                       </div>
@@ -1735,7 +1735,7 @@ export default function CreateProductionSheetPage() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
                       {/* CLIENT NAME */}
                       <div>
-                        <label className="block text-[11px] font-black uppercase tracking-wider text-black mb-1">
+                        <label className="block text-[11px] font-black uppercase tracking-wider text-neutral-900 mb-1">
                           CLIENT NAME
                         </label>
                         {canViewClientName(currentUser) ? (
@@ -1745,33 +1745,33 @@ export default function CreateProductionSheetPage() {
                             onChange={(e) => setClientName(e.target.value)}
                             onFocus={(e) => e.target.select()}
                             placeholder="Client Name..."
-                            className="w-full border-[1.5px] border-black px-3 py-1.5 h-10 font-bold text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600 shadow-2xs"
+                            className="w-full border-[1.5px] border-neutral-200 px-3 py-1.5 h-10 font-bold text-xs bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 shadow-2xs"
                           />
                         ) : (
-                          <div className="w-full border-[1.5px] border-black px-3 py-1.5 h-10 font-bold text-xs bg-slate-100 text-slate-400 flex items-center justify-between shadow-2xs">
+                          <div className="w-full border-[1.5px] border-neutral-200 px-3 py-1.5 h-10 font-bold text-xs bg-neutral-100 text-neutral-500 flex items-center justify-between shadow-2xs">
                             <span>••••••••</span>
-                            <span className="text-[10px] text-slate-400 font-normal">Restricted</span>
+                            <span className="text-[10px] text-neutral-500 font-normal">Restricted</span>
                           </div>
                         )}
                       </div>
 
                       {/* PRIORITY */}
                       <div>
-                        <label className="block text-[11px] font-black uppercase tracking-wider text-black mb-1">
+                        <label className="block text-[11px] font-black uppercase tracking-wider text-neutral-900 mb-1">
                           PRIORITY
                         </label>
                         <div className="relative">
                           <select
                             value={clientPriority}
                             onChange={(e) => setClientPriority(e.target.value)}
-                            className="w-full appearance-none border-[1.5px] border-black pl-3 pr-8 py-1.5 h-10 font-bold text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600 cursor-pointer shadow-2xs"
+                            className="w-full appearance-none border-[1.5px] border-neutral-200 pl-3 pr-8 py-1.5 h-10 font-bold text-xs bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 cursor-pointer shadow-2xs"
                           >
                             <option value="LOW">LOW</option>
                             <option value="NORMAL">NORMAL</option>
                             <option value="HIGH">HIGH (Expedited)</option>
                             <option value="URGENT">URGENT (Top Floor)</option>
                           </select>
-                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-black">
+                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-neutral-900">
                             <ChevronDown className="w-4 h-4 stroke-[2.5]" />
                           </div>
                         </div>
@@ -1779,19 +1779,19 @@ export default function CreateProductionSheetPage() {
 
                       {/* IS DYEING REQUIRED */}
                       <div>
-                        <label className="block text-[11px] font-black uppercase tracking-wider text-black mb-1">
+                        <label className="block text-[11px] font-black uppercase tracking-wider text-neutral-900 mb-1">
                           IS DYEING REQUIRED?
                         </label>
                         <div className="relative">
                           <select
                             value={fabricDyeingRequired ? 'YES' : 'NO'}
                             onChange={(e) => setFabricDyeingRequired(e.target.value === 'YES')}
-                            className="w-full appearance-none border-[1.5px] border-black pl-3 pr-8 py-1.5 h-10 font-bold text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600 cursor-pointer shadow-2xs"
+                            className="w-full appearance-none border-[1.5px] border-neutral-200 pl-3 pr-8 py-1.5 h-10 font-bold text-xs bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 cursor-pointer shadow-2xs"
                           >
                             <option value="NO">NO (Pre-Dyed)</option>
                             <option value="YES">YES (Kora)</option>
                           </select>
-                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-black">
+                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-neutral-900">
                             <ChevronDown className="w-4 h-4 stroke-[2.5]" />
                           </div>
                         </div>
@@ -1801,7 +1801,7 @@ export default function CreateProductionSheetPage() {
                     {/* FABRIC & WIDTH (UNIFORM BOX SIZE) */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
                       <div className="relative">
-                        <label className="block text-[11px] font-black uppercase tracking-wider text-black mb-1">
+                        <label className="block text-[11px] font-black uppercase tracking-wider text-neutral-900 mb-1">
                           FABRIC:
                         </label>
                         <input
@@ -1825,15 +1825,15 @@ export default function CreateProductionSheetPage() {
                             }, 120);
                           }}
                           placeholder="e.g. Cotton Viscose..."
-                          className="w-full border-[1.5px] border-black px-3 py-1.5 h-10 font-bold text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600 shadow-2xs"
+                          className="w-full border-[1.5px] border-neutral-200 px-3 py-1.5 h-10 font-bold text-xs bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 shadow-2xs"
                         />
                         {activeFabricPicker === cat && (
-                          <div className="absolute left-0 right-0 top-full z-40 mt-1 max-h-56 overflow-y-auto rounded border border-slate-300 bg-white shadow-lg">
-                            <div className="sticky top-0 border-b border-slate-200 bg-slate-50 px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-slate-600">
+                          <div className="absolute left-0 right-0 top-full z-40 mt-1 max-h-56 overflow-y-auto rounded border border-neutral-300 bg-white shadow-lg">
+                            <div className="sticky top-0 border-b border-neutral-200 bg-neutral-50 px-3 py-2 text-[10px] font-bold uppercase tracking-wide text-neutral-600">
                               Fabric available in Store
                             </div>
                             {loadingFabricStocks ? (
-                              <div className="px-3 py-3 text-xs text-slate-500">Loading available fabrics...</div>
+                              <div className="px-3 py-3 text-xs text-neutral-500">Loading available fabrics...</div>
                             ) : (() => {
                               const query = String(comp.fabricName || fabricName || '').trim().toLowerCase();
                               const matchingStocks = availableFabricStocks.filter((stock) =>
@@ -1851,15 +1851,15 @@ export default function CreateProductionSheetPage() {
                                     }));
                                     setActiveFabricPicker(null);
                                   }}
-                                  className="flex w-full items-center justify-between gap-3 border-b border-slate-100 px-3 py-2 text-left hover:bg-blue-50"
+                                  className="flex w-full items-center justify-between gap-3 border-b border-neutral-100 px-3 py-2 text-left hover:bg-brand-50"
                                 >
-                                  <span className="truncate text-xs font-semibold text-slate-800">{stock.itemName}</span>
-                                  <span className="shrink-0 text-[11px] font-bold text-emerald-700">
+                                  <span className="truncate text-xs font-semibold text-neutral-900">{stock.itemName}</span>
+                                  <span className="shrink-0 text-[11px] font-bold text-accent-800">
                                     {stock.balance.toLocaleString('en-IN', { maximumFractionDigits: 2 })} {stock.unit} available
                                   </span>
                                 </button>
                               )) : (
-                                <div className="px-3 py-3 text-xs text-slate-500">
+                                <div className="px-3 py-3 text-xs text-neutral-500">
                                   {fabricStocksLoaded ? 'No matching fabric in stock.' : 'No fabrics available.'}
                                 </div>
                               );
@@ -1869,7 +1869,7 @@ export default function CreateProductionSheetPage() {
                       </div>
 
                       <div>
-                        <label className="block text-[11px] font-black uppercase tracking-wider text-black mb-1">
+                        <label className="block text-[11px] font-black uppercase tracking-wider text-neutral-900 mb-1">
                           WIDTH:
                         </label>
                         <input
@@ -1884,7 +1884,7 @@ export default function CreateProductionSheetPage() {
                           }}
                           onFocus={(e) => e.target.select()}
                           placeholder="e.g. 58 inches..."
-                          className="w-full border-[1.5px] border-black px-3 py-1.5 h-10 font-bold text-xs bg-white text-black focus:outline-none focus:ring-1 focus:ring-blue-600 shadow-2xs"
+                          className="w-full border-[1.5px] border-neutral-200 px-3 py-1.5 h-10 font-bold text-xs bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 shadow-2xs"
                         />
                       </div>
                     </div>
@@ -1896,7 +1896,7 @@ export default function CreateProductionSheetPage() {
                         <button
                           type="button"
                           onClick={() => handleAddSubStyle(cat)}
-                          className="text-[10px] font-bold text-blue-700 hover:text-blue-900 flex items-center gap-1 cursor-pointer"
+                          className="text-[10px] font-bold text-brand-700 hover:text-brand-900 flex items-center gap-1 cursor-pointer"
                         >
                           <Plus className="w-3 h-3" />
                           <span>Add Sub Style</span>
@@ -1904,11 +1904,11 @@ export default function CreateProductionSheetPage() {
                       </div>
 
                       <div className="overflow-x-auto">
-                        <table className="w-full border-collapse border-[1.5px] border-black text-center text-xs">
+                        <table className="w-full border-collapse border-[1.5px] border-neutral-200 text-center text-xs">
                           <thead>
                             <tr className="bg-white">
                               {comp.subStyles.map((sub, sIdx) => (
-                                <th key={sIdx} className="border-[1.5px] border-black p-1.5 font-black text-[11px] tracking-wider uppercase relative">
+                                <th key={sIdx} className="border-[1.5px] border-neutral-200 p-1.5 font-black text-[11px] tracking-wider uppercase relative">
                                   <div className="flex items-center justify-center gap-1">
                                     <input
                                       type="text"
@@ -1916,13 +1916,13 @@ export default function CreateProductionSheetPage() {
                                       onChange={(e) => handleSubStyleNameChange(cat, sIdx, e.target.value)}
                                       onFocus={(e) => e.target.select()}
                                       placeholder=""
-                                      className="font-black text-[11px] text-center w-full uppercase bg-transparent border-none focus:outline-none focus:bg-blue-50"
+                                      className="font-black text-[11px] text-center w-full uppercase bg-transparent border-none focus:outline-none focus:bg-brand-50"
                                     />
                                     {comp.subStyles.length > 1 && (
                                       <button
                                         type="button"
                                         onClick={() => handleRemoveSubStyle(cat, sIdx)}
-                                        className="text-slate-300 hover:text-rose-600 transition p-0.5 cursor-pointer"
+                                        className="text-neutral-700 hover:text-danger-600 transition p-0.5 cursor-pointer"
                                         title={`Remove ${sub.name}`}
                                       >
                                         &times;
@@ -1931,7 +1931,7 @@ export default function CreateProductionSheetPage() {
                                   </div>
                                 </th>
                               ))}
-                              <th className="border-[1.5px] border-black p-1.5 font-black text-[11px] tracking-wider uppercase bg-slate-50 w-24">
+                              <th className="border-[1.5px] border-neutral-200 p-1.5 font-black text-[11px] tracking-wider uppercase bg-neutral-50 w-24">
                                 TOTAL MTR
                               </th>
                             </tr>
@@ -1939,7 +1939,7 @@ export default function CreateProductionSheetPage() {
                           <tbody>
                             <tr className="h-8 font-bold text-xs">
                               {comp.subStyles.map((sub, sIdx) => (
-                                <td key={sIdx} className="border-[1.5px] border-black p-1">
+                                <td key={sIdx} className="border-[1.5px] border-neutral-200 p-1">
                                   <input
                                     type="number"
                                     step="0.01"
@@ -1948,11 +1948,11 @@ export default function CreateProductionSheetPage() {
                                     onChange={(e) => handleSubStyleAverageChange(cat, sIdx, e.target.value)}
                                     onFocus={(e) => e.target.select()}
                                     placeholder=""
-                                    className="w-full text-center font-bold text-xs py-1 px-1 border-none focus:outline-none focus:bg-blue-50/60"
+                                    className="w-full text-center font-bold text-xs py-1 px-1 border-none focus:outline-none focus:bg-brand-50/60"
                                   />
                                 </td>
                               ))}
-                              <td className="border-[1.5px] border-black p-1 font-black text-sm bg-slate-50 text-blue-950">
+                              <td className="border-[1.5px] border-neutral-200 p-1 font-black text-sm bg-neutral-50 text-brand-900">
                                 {catAvg > 0 ? catAvg.toFixed(2) : ''}
                               </td>
                             </tr>
@@ -1971,7 +1971,7 @@ export default function CreateProductionSheetPage() {
                           <button
                             type="button"
                             onClick={() => handleAddGridRow(cat)}
-                            className="text-[10px] font-bold text-blue-700 hover:text-blue-900 flex items-center gap-1 cursor-pointer"
+                            className="text-[10px] font-bold text-brand-700 hover:text-brand-900 flex items-center gap-1 cursor-pointer"
                           >
                             <Plus className="w-3 h-3" />
                             <span>Add Item / Color Row</span>
@@ -1980,28 +1980,28 @@ export default function CreateProductionSheetPage() {
                       </div>
 
                       <div className="overflow-x-auto">
-                        <table className="w-full border-collapse border-[1.5px] border-black text-center text-xs">
+                        <table className="w-full border-collapse border-[1.5px] border-neutral-200 text-center text-xs">
                           <thead>
                             <tr className="bg-white">
-                              <th rowSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase w-36">
+                              <th rowSpan={2} className="border-[1.5px] border-neutral-200 p-1 font-black text-xs tracking-wider uppercase w-36">
                                 COLOR
                               </th>
-                              <th colSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase">
+                              <th colSpan={2} className="border-[1.5px] border-neutral-200 p-1 font-black text-xs tracking-wider uppercase">
                                 QTY
                               </th>
-                              <th rowSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase w-48">
+                              <th rowSpan={2} className="border-[1.5px] border-neutral-200 p-1 font-black text-xs tracking-wider uppercase w-48">
                                 SUB STYLE
                               </th>
-                              <th rowSpan={2} className="border-[1.5px] border-black p-1 font-black text-xs tracking-wider uppercase w-36">
+                              <th rowSpan={2} className="border-[1.5px] border-neutral-200 p-1 font-black text-xs tracking-wider uppercase w-36">
                                 SIZE
                               </th>
-                              <th rowSpan={2} className="border-[1.5px] border-black p-1 font-bold text-[10px] w-8">
+                              <th rowSpan={2} className="border-[1.5px] border-neutral-200 p-1 font-bold text-[10px] w-8">
                                 &nbsp;
                               </th>
                             </tr>
                             <tr className="bg-white">
-                              <th className="border-[1.5px] border-black p-1 font-black text-[11px] w-24">MTR</th>
-                              <th className="border-[1.5px] border-black p-1 font-black text-[11px] w-20">PCS</th>
+                              <th className="border-[1.5px] border-neutral-200 p-1 font-black text-[11px] w-24">MTR</th>
+                              <th className="border-[1.5px] border-neutral-200 p-1 font-black text-[11px] w-20">PCS</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -2022,19 +2022,19 @@ export default function CreateProductionSheetPage() {
                               return (
                               <tr key={row.id || rIdx} className="h-8">
                                 {/* COLOR */}
-                                <td className="border-[1.5px] border-black p-0.5">
+                                <td className="border-[1.5px] border-neutral-200 p-0.5">
                                   <input
                                     type="text"
                                     value={row.color}
                                     onChange={(e) => handleGridRowChange(cat, rIdx, 'color', e.target.value)}
                                     onFocus={(e) => e.target.select()}
                                     placeholder=""
-                                    className="w-full px-2 py-1 font-bold text-xs text-black border-none focus:outline-none focus:bg-blue-50"
+                                    className="w-full px-2 py-1 font-bold text-xs text-neutral-900 border-none focus:outline-none focus:bg-brand-50"
                                   />
                                 </td>
 
                                 {/* MTR */}
-                                <td className="border-[1.5px] border-black p-0.5 font-bold text-center text-xs bg-slate-50/50">
+                                <td className="border-[1.5px] border-neutral-200 p-0.5 font-bold text-center text-xs bg-neutral-50/50">
                                   <input
                                     type="number"
                                     step="0.01"
@@ -2042,12 +2042,12 @@ export default function CreateProductionSheetPage() {
                                     onChange={(e) => handleGridRowChange(cat, rIdx, 'mtr', e.target.value)}
                                     onFocus={(e) => e.target.select()}
                                     placeholder=""
-                                    className="w-full px-1 py-1 font-bold text-center text-xs text-black border-none focus:outline-none focus:bg-blue-50 bg-transparent"
+                                    className="w-full px-1 py-1 font-bold text-center text-xs text-neutral-900 border-none focus:outline-none focus:bg-brand-50 bg-transparent"
                                   />
                                 </td>
 
                                 {/* PCS */}
-                                <td className="border-[1.5px] border-black p-0.5">
+                                <td className="border-[1.5px] border-neutral-200 p-0.5">
                                   <input
                                     type="number"
                                     min="0"
@@ -2055,12 +2055,12 @@ export default function CreateProductionSheetPage() {
                                     onChange={(e) => handleGridRowChange(cat, rIdx, 'pcs', e.target.value)}
                                     onFocus={(e) => e.target.select()}
                                     placeholder=""
-                                    className="w-full px-1 py-1 font-bold text-center text-xs text-black border-none focus:outline-none focus:bg-blue-50"
+                                    className="w-full px-1 py-1 font-bold text-center text-xs text-neutral-900 border-none focus:outline-none focus:bg-brand-50"
                                   />
                                 </td>
 
                                 {/* SUB STYLE (multi-select / chips) */}
-                                <td className="border-[1.5px] border-black p-0.5 relative">
+                                <td className="border-[1.5px] border-neutral-200 p-0.5 relative">
                                   <SubStyleMultiSelectCell
                                     cat={cat}
                                     rIdx={rIdx}
@@ -2083,15 +2083,15 @@ export default function CreateProductionSheetPage() {
                                 </td>
 
                                 {/* SIZE CELL (Per-SubStyle Inputs) */}
-                                <td className="border-[1.5px] border-black p-0.5 align-middle">
+                                <td className="border-[1.5px] border-neutral-200 p-0.5 align-middle">
                                   {rowSubStyles.length > 1 ? (
                                     <div className="flex flex-col gap-1 p-1">
                                       {rowSubStyles.map((sub) => (
                                         <div
                                           key={sub}
-                                          className="flex items-center gap-1 bg-white border border-slate-300 rounded px-1.5 py-0.5 shadow-2xs"
+                                          className="flex items-center gap-1 bg-white border border-neutral-300 rounded px-1.5 py-0.5 shadow-2xs"
                                         >
-                                          <span className="text-[10px] font-black uppercase text-blue-900 bg-blue-50 border border-blue-200 px-1 py-0.5 rounded shrink-0">
+                                          <span className="text-[10px] font-black uppercase text-brand-900 bg-brand-50 border border-brand-200 px-1 py-0.5 rounded shrink-0">
                                             {sub}
                                           </span>
                                           <input
@@ -2100,17 +2100,17 @@ export default function CreateProductionSheetPage() {
                                             onChange={(e) => handleGridSizeChange(cat, rIdx, sub, e.target.value)}
                                             onFocus={(e) => e.target.select()}
                                             placeholder="1 + 3 + 0.5"
-                                            className="min-w-0 flex-1 text-center font-bold text-xs text-black border-none focus:outline-none uppercase bg-transparent"
+                                            className="min-w-0 flex-1 text-center font-bold text-xs text-neutral-900 border-none focus:outline-none uppercase bg-transparent"
                                           />
                                           {calculateSizeTotal(row.sizes?.[sub]) !== null && (
-                                            <span className="shrink-0 border-l border-slate-200 pl-1.5 text-[10px] font-black text-emerald-700">
+                                            <span className="shrink-0 border-l border-neutral-200 pl-1.5 text-[10px] font-black text-accent-800">
                                               {formatSizeTotal(calculateSizeTotal(row.sizes?.[sub])!)}
                                             </span>
                                           )}
                                         </div>
                                       ))}
                                       {rowSizeTotal !== null && (
-                                        <div className="text-right text-[10px] font-black text-emerald-800">
+                                        <div className="text-right text-[10px] font-black text-accent-800">
                                           TOTAL {formatSizeTotal(rowSizeTotal)}
                                         </div>
                                       )}
@@ -2125,10 +2125,10 @@ export default function CreateProductionSheetPage() {
                                           : handleGridRowChange(cat, rIdx, 'size', e.target.value)}
                                         onFocus={(e) => e.target.select()}
                                         placeholder="1 + 3 + 0.5"
-                                        className="min-w-0 flex-1 px-1 py-1 text-center font-bold text-xs text-black border-none focus:outline-none focus:bg-blue-50 uppercase"
+                                        className="min-w-0 flex-1 px-1 py-1 text-center font-bold text-xs text-neutral-900 border-none focus:outline-none focus:bg-brand-50 uppercase"
                                       />
                                       {calculateSizeTotal(rowSizeExpression) !== null && (
-                                        <span className="shrink-0 border-l border-slate-200 pl-1.5 text-[10px] font-black text-emerald-700">
+                                        <span className="shrink-0 border-l border-neutral-200 pl-1.5 text-[10px] font-black text-accent-800">
                                           {formatSizeTotal(calculateSizeTotal(rowSizeExpression)!)}
                                         </span>
                                       )}
@@ -2137,12 +2137,12 @@ export default function CreateProductionSheetPage() {
                                 </td>
 
                                 {/* REMOVE ROW */}
-                                <td className="border-[1.5px] border-black p-0.5">
+                                <td className="border-[1.5px] border-neutral-200 p-0.5">
                                   {comp.productionGrid.length > 1 && (
                                     <button
                                       type="button"
                                       onClick={() => handleRemoveGridRow(cat, rIdx)}
-                                      className="text-slate-300 hover:text-rose-600 transition p-1 cursor-pointer"
+                                      className="text-neutral-700 hover:text-danger-600 transition p-1 cursor-pointer"
                                       title="Remove color row"
                                     >
                                       <Trash2 className="w-3.5 h-3.5" />
@@ -2155,22 +2155,22 @@ export default function CreateProductionSheetPage() {
                           </tbody>
 
                           <tfoot>
-                            <tr className="bg-slate-100 font-bold border-t-[1.5px] border-black text-xs">
-                              <td className="border-[1.5px] border-black p-1.5 text-right font-black uppercase text-[10px]">
+                            <tr className="bg-neutral-100 font-bold border-t-[1.5px] border-neutral-200 text-xs">
+                              <td className="border-[1.5px] border-neutral-200 p-1.5 text-right font-black uppercase text-[10px]">
                                 {cat} TOTALS:
                               </td>
-                              <td className="border-[1.5px] border-black p-1.5 text-center font-black text-sm text-emerald-800">
+                              <td className="border-[1.5px] border-neutral-200 p-1.5 text-center font-black text-sm text-accent-800">
                                 {catMeters > 0 ? catMeters.toFixed(2) : ''}
                               </td>
-                              <td className="border-[1.5px] border-black p-1.5 text-center font-black text-sm text-[#163767]">
+                              <td className="border-[1.5px] border-neutral-200 p-1.5 text-center font-black text-sm text-brand-600">
                                 {catPieces > 0 ? catPieces : ''}
                               </td>
-                              <td colSpan={3} className="border-[1.5px] border-black p-1.5 text-right text-[10px]">
-                                <span className="font-black text-slate-800 not-italic">
+                              <td colSpan={3} className="border-[1.5px] border-neutral-200 p-1.5 text-right text-[10px]">
+                                <span className="font-black text-neutral-900 not-italic">
                                   TOTAL MEASUREMENT: {catMeasurementTotal !== null ? formatSizeTotal(catMeasurementTotal) : '—'}
                                 </span>
                                 {catAvg > 0 && (
-                                  <span className="ml-3 text-slate-500 italic">
+                                  <span className="ml-3 text-neutral-500 italic">
                                     Fabric consumption @ {catAvg.toFixed(2)} Mtr/Pc
                                   </span>
                                 )}
@@ -2182,7 +2182,7 @@ export default function CreateProductionSheetPage() {
                     </div>
 
                     {/* FOOTER: NOTE, REMARKS, SWATCHES, SIGNATURE */}
-                    <div className="space-y-4 pt-3 border-t border-black/10">
+                    <div className="space-y-4 pt-3 border-t border-neutral-200">
                       {/* NOTE & REMARKS side-by-side */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -2200,7 +2200,7 @@ export default function CreateProductionSheetPage() {
                               }));
                             }}
                             placeholder=""
-                            className="w-full px-2.5 py-1.5 border-[1.5px] border-black text-xs font-sans text-black focus:outline-none focus:ring-1 focus:ring-blue-600 resize-none bg-white"
+                            className="w-full px-2.5 py-1.5 border-[1.5px] border-neutral-200 text-xs font-sans text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 resize-none bg-white"
                           />
                         </div>
 
@@ -2219,7 +2219,7 @@ export default function CreateProductionSheetPage() {
                               }));
                             }}
                             placeholder=""
-                            className="w-full px-2.5 py-1.5 border-[1.5px] border-black text-xs font-sans text-black focus:outline-none focus:ring-1 focus:ring-blue-600 resize-none bg-white"
+                            className="w-full px-2.5 py-1.5 border-[1.5px] border-neutral-200 text-xs font-sans text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 resize-none bg-white"
                           />
                         </div>
                       </div>
@@ -2227,11 +2227,11 @@ export default function CreateProductionSheetPage() {
                       <div className="flex flex-col sm:flex-row justify-between items-end gap-6 pt-2">
                         {/* Left: SWATCH SAMPLES */}
                         <div className="w-full sm:w-3/5 space-y-2">
-                          <label className="font-black text-xs tracking-wider uppercase text-[#163767] block mb-2">
+                          <label className="font-black text-xs tracking-wider uppercase text-brand-600 block mb-2">
                             COLOR SWATCHES:
                           </label>
 
-                          <div className="flex flex-wrap items-center gap-3 p-2.5 bg-slate-50/70 border border-slate-200 rounded-lg min-h-[64px]">
+                          <div className="flex flex-wrap items-center gap-3 p-2.5 bg-neutral-50/70 border border-neutral-200 rounded-lg min-h-[64px]">
                             {catSwatches.length > 0 ? (
                               catSwatches.map((swatch) => (
                                 <div key={swatch.id} className="group relative flex flex-col items-center gap-1">
@@ -2243,15 +2243,15 @@ export default function CreateProductionSheetPage() {
                                     }}
                                     title={`Click to pick shade for "${swatch.name}"`}
                                   >
-                                    <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-[2px] bg-slate-800 shadow-2xs pointer-events-none" />
+                                    <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-[2px] bg-neutral-100 shadow-2xs pointer-events-none" />
                                     <input
                                       type="color"
-                                      value={swatch.color.startsWith('#') ? swatch.color : '#CBD5E1'}
+                                      value={swatch.color.startsWith('#') ? swatch.color : '#D3CED8'}
                                       onChange={(e) => handleUpdateSwatchColor(cat, swatch.name, e.target.value)}
                                       className="sr-only"
                                     />
                                   </label>
-                                  <span className="text-[8.5px] font-bold text-slate-800 truncate max-w-[65px] text-center">
+                                  <span className="text-[8.5px] font-bold text-neutral-900 truncate max-w-[65px] text-center">
                                     {swatch.name}
                                   </span>
                                 </div>
@@ -2260,10 +2260,10 @@ export default function CreateProductionSheetPage() {
                               <div className="flex items-center gap-3">
                                 {[1, 2, 3, 4].map((i) => (
                                   <div key={i} className="flex flex-col items-center gap-1">
-                                    <div className="w-11 h-11 border-[1.5px] border-dashed border-slate-400 bg-white relative flex items-center justify-center rounded-xs shadow-2xs">
-                                      <span className="w-3.5 h-[2px] bg-slate-400 opacity-60" />
+                                    <div className="w-11 h-11 border-[1.5px] border-dashed border-neutral-300 bg-white relative flex items-center justify-center rounded-xs shadow-2xs">
+                                      <span className="w-3.5 h-[2px] bg-neutral-300 opacity-60" />
                                     </div>
-                                    <span className="text-[8px] font-bold text-slate-400">Attach Swatch</span>
+                                    <span className="text-[8px] font-bold text-neutral-500">Attach Swatch</span>
                                   </div>
                                 ))}
                               </div>
@@ -2288,7 +2288,7 @@ export default function CreateProductionSheetPage() {
                             }}
                             onFocus={(e) => e.target.select()}
                             placeholder=""
-                            className="w-full h-10 text-center font-bold text-xs border-[1.5px] border-black bg-white focus:outline-none focus:ring-1 focus:ring-blue-600 px-3"
+                            className="w-full h-10 text-center font-bold text-xs border-[1.5px] border-neutral-200 bg-white focus:outline-none focus:ring-1 focus:ring-brand-500 px-3"
                           />
                         </div>
                       </div>
@@ -2305,7 +2305,7 @@ export default function CreateProductionSheetPage() {
         <div className="pt-2 flex items-center justify-end gap-3">
           <Link
             href="/my-work"
-            className="px-4 py-2 bg-white border border-slate-300 text-slate-700 text-xs font-semibold rounded shadow-2xs hover:bg-slate-50 transition"
+            className="px-4 py-2 bg-white border border-neutral-300 text-neutral-700 text-xs font-semibold rounded shadow-2xs hover:bg-neutral-50 transition"
           >
             Cancel
           </Link>
@@ -2313,16 +2313,16 @@ export default function CreateProductionSheetPage() {
             type="button"
             onClick={() => handleSubmit('DRAFT')}
             disabled={loading}
-            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded border border-slate-300 shadow-2xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+            className="px-4 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 text-xs font-bold rounded border border-neutral-300 shadow-2xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
           >
-            {loading ? <RefreshCw className="w-3.5 h-3.5 animate-spin text-slate-500" /> : null}
+            {loading ? <RefreshCw className="w-3.5 h-3.5 animate-spin text-neutral-500" /> : null}
             <span>{loading ? 'Saving...' : 'Save as Draft'}</span>
           </button>
           <button
             type="button"
             onClick={() => handleSubmit('READY_FOR_ISSUE')}
             disabled={loading}
-            className="px-6 py-2 bg-[#163767] hover:bg-[#0F264A] disabled:opacity-50 text-white text-xs font-bold rounded shadow-xs transition flex items-center gap-2 cursor-pointer"
+            className="px-6 py-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white text-xs font-bold rounded shadow-xs transition flex items-center gap-2 cursor-pointer"
           >
             {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
             <span>{loading ? 'Submitting Ready for Issue...' : 'Complete & Submit Ready for Issue'}</span>

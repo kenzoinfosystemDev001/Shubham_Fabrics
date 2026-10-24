@@ -282,21 +282,21 @@ function IssueChallanContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pl-0 md:pl-64 pb-20">
+    <div className="min-h-screen bg-neutral-50 pl-0 md:pl-64 pb-20">
       {/* TOP HEADER */}
-      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+      <header className="bg-white border-b border-neutral-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div className="flex items-center gap-4">
           <Link
             href="/my-work"
-            className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-md transition"
+            className="p-2 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 rounded-md transition"
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A66E22] block">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-700 block">
               PROGRAMMING DEPARTMENT · CHALLAN ISSUANCE
             </span>
-            <h1 className="text-xl font-bold text-slate-900">
+            <h1 className="text-xl font-bold text-neutral-900">
               Programming → Fabric Store Challan
             </h1>
           </div>
@@ -305,7 +305,7 @@ function IssueChallanContent() {
         <div className="flex items-center gap-3">
           <Link
             href="/programming"
-            className="px-3 py-1.5 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md transition"
+            className="px-3 py-1.5 text-xs font-semibold bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-md transition"
           >
             Programming Dashboard
           </Link>
@@ -315,27 +315,27 @@ function IssueChallanContent() {
       {/* MAIN CONTAINER */}
       <main className="max-w-5xl mx-auto px-4 sm:px-8 py-8 space-y-6">
         {error && (
-          <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 flex items-center gap-2.5 shadow-2xs">
-            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+          <div className="p-4 bg-danger-50 border border-danger-200 rounded-xl text-xs text-danger-800 flex items-center gap-2.5 shadow-2xs">
+            <AlertCircle className="w-4 h-4 text-danger-600 shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
         {issuedChallan ? (
           /* CONFIRMATION CARD */
-          <div className="bg-white border border-emerald-200 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
+          <div className="bg-white border border-accent-200 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-xl flex items-center justify-center shrink-0">
+              <div className="w-12 h-12 bg-accent-100 text-accent-800 rounded-xl flex items-center justify-center shrink-0">
                 <CheckCircle2 className="w-7 h-7" />
               </div>
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-700 block">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-700 block">
                   CHALLAN ISSUED TO FABRIC STORE
                 </span>
-                <h2 className="text-xl font-bold text-slate-900 mt-0.5">
+                <h2 className="text-xl font-bold text-neutral-900 mt-0.5">
                   Challan {issuedChallan.challanNumber} Successfully Dispatched
                 </h2>
-                <p className="text-xs text-slate-600 mt-1">
+                <p className="text-xs text-neutral-600 mt-1">
                   The material issue order has been linked to Master Production Sheet #
                   {selectedProgram?.programSerialNo || selectedProgram?.programNumber} and queued for Fabric Store receipt.
                 </p>
@@ -343,41 +343,41 @@ function IssueChallanContent() {
             </div>
 
             {/* BARCODE BADGE */}
-            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-center space-y-1">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 block">
+            <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-xl text-center space-y-1">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 block">
                 Official Challan Security Barcode
               </span>
-              <div className="font-mono font-bold tracking-[0.3em] text-lg text-slate-900 py-1 border-y border-dashed border-slate-300">
+              <div className="font-mono font-bold tracking-[0.3em] text-lg text-neutral-900 py-1 border-y border-dashed border-neutral-300">
                 *{issuedChallan.challanNumber}*
               </div>
             </div>
 
             {/* VOUCHER DETAILS */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 bg-neutral-50 border border-neutral-200 rounded-lg text-xs">
               <div>
-                <span className="text-slate-400 block font-medium">Source Department</span>
-                <span className="font-bold text-slate-900">Programming Department</span>
+                <span className="text-neutral-500 block font-medium">Source Department</span>
+                <span className="font-bold text-neutral-900">Programming Department</span>
               </div>
               <div>
-                <span className="text-slate-400 block font-medium">Destination Department</span>
-                <span className="font-bold text-blue-900">Fabric Store</span>
+                <span className="text-neutral-500 block font-medium">Destination Department</span>
+                <span className="font-bold text-brand-900">Fabric Store</span>
               </div>
               <div>
-                <span className="text-slate-400 block font-medium">Production Program</span>
-                <span className="font-mono font-bold text-slate-900">
+                <span className="text-neutral-500 block font-medium">Production Program</span>
+                <span className="font-mono font-bold text-neutral-900">
                   {selectedProgram?.programSerialNo || selectedProgram?.programNumber}
                 </span>
               </div>
               <div>
-                <span className="text-slate-400 block font-medium">Total Items</span>
-                <span className="font-semibold text-slate-700">{items.length} Items</span>
+                <span className="text-neutral-500 block font-medium">Total Items</span>
+                <span className="font-semibold text-neutral-700">{items.length} Items</span>
               </div>
             </div>
 
-            <div className="pt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100">
+            <div className="pt-4 flex flex-wrap items-center justify-between gap-3 border-t border-neutral-100">
               <Link
                 href="/programming"
-                className="text-xs font-semibold text-slate-600 hover:text-slate-900"
+                className="text-xs font-semibold text-neutral-600 hover:text-neutral-900"
               >
                 ← Return to Programming Dashboard
               </Link>
@@ -385,7 +385,7 @@ function IssueChallanContent() {
               <div className="flex flex-wrap items-center gap-2">
                 <Link
                   href={`/challans/${issuedChallan.id}`}
-                  className="px-4 py-2 bg-slate-900 hover:bg-black text-white text-xs font-semibold rounded-md shadow-xs transition flex items-center gap-1.5"
+                  className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-md shadow-xs transition flex items-center gap-1.5"
                 >
                   <Printer className="w-3.5 h-3.5" />
                   <span>View &amp; Print Challan</span>
@@ -395,9 +395,9 @@ function IssueChallanContent() {
                   <button
                     type="button"
                     onClick={() => setShowSheetModal(true)}
-                    className="px-3.5 py-2 bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-300 text-xs font-bold rounded-md shadow-2xs transition flex items-center gap-1.5 cursor-pointer"
+                    className="px-3.5 py-2 bg-brand-50 hover:bg-brand-100 text-brand-900 border border-brand-300 text-xs font-bold rounded-md shadow-2xs transition flex items-center gap-1.5 cursor-pointer"
                   >
-                    <FileText className="w-3.5 h-3.5 text-teal-700" />
+                    <FileText className="w-3.5 h-3.5 text-brand-700" />
                     <span>View Production Sheet</span>
                   </button>
                 )}
@@ -410,7 +410,7 @@ function IssueChallanContent() {
                     setItems([createBlankChallanItem('PROGRAMMING_STORE')]);
                     router.push('/my-work/issue-challan');
                   }}
-                  className="px-4 py-2 bg-[#163767] hover:bg-[#0F264A] text-white text-xs font-semibold rounded-md shadow-xs transition cursor-pointer"
+                  className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-md shadow-xs transition cursor-pointer"
                 >
                   Issue Another Challan
                 </button>
@@ -420,26 +420,26 @@ function IssueChallanContent() {
         ) : (
           <form onSubmit={handleIssueChallan} className="space-y-6">
             {/* STEP 1: SELECT PRODUCTION SHEET */}
-            <div className="bg-white border border-slate-200/90 rounded-xl p-6 shadow-xs space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div className="bg-white border border-neutral-200/90 rounded-xl p-6 shadow-xs space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
                 <div>
-                  <h2 className="text-sm font-bold text-slate-900">Production Sheet Reference</h2>
-                  <p className="text-[11px] text-slate-500">
+                  <h2 className="text-sm font-bold text-neutral-900">Production Sheet Reference</h2>
+                  <p className="text-[11px] text-neutral-500">
                     Challans must remain strictly linked to an authorized Production Sheet
                   </p>
                 </div>
 
                 <Link
                   href="/my-work/create-production-sheet"
-                  className="text-xs font-semibold text-blue-700 hover:underline"
+                  className="text-xs font-semibold text-brand-700 hover:underline"
                 >
                   + Create New Production Sheet
                 </Link>
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                  Production Sheet / Program File <span className="text-rose-500">*</span>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-1.5">
+                  Production Sheet / Program File <span className="text-danger-600">*</span>
                 </label>
                 <select
                   required
@@ -448,7 +448,7 @@ function IssueChallanContent() {
                     const found = programs.find((p) => p.id === e.target.value);
                     if (found) handleSelectProgram(found);
                   }}
-                  className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-xs text-slate-800 font-medium focus:outline-none focus:ring-1 focus:ring-slate-900 bg-white"
+                  className="w-full px-3 py-2.5 border border-neutral-300 rounded-lg text-xs text-neutral-900 font-medium focus:outline-none focus:ring-1 focus:ring-brand-500/40 bg-white"
                 >
                   <option value="">-- Choose a Production Sheet --</option>
                   {programs.map((p) => (
@@ -460,38 +460,38 @@ function IssueChallanContent() {
               </div>
 
               {selectedProgram && (
-                <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg text-xs space-y-2 mt-2">
+                <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-lg text-xs space-y-2 mt-2">
                   <div className="flex items-center justify-between">
-                    <span className="font-mono font-bold text-slate-900 text-sm">
+                    <span className="font-mono font-bold text-neutral-900 text-sm">
                       Sheet #{selectedProgram.programSerialNo || selectedProgram.programNumber}
                     </span>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-100 text-blue-900">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-brand-100 text-brand-900">
                       {selectedProgram.status}
                     </span>
                   </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-slate-600">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-neutral-600">
                     <div>
-                      <span className="text-slate-400 block text-[10px]">Client</span>
-                      <span className="font-semibold text-slate-900">{selectedProgram.clientName || selectedProgram.buyerName}</span>
+                      <span className="text-neutral-500 block text-[10px]">Client</span>
+                      <span className="font-semibold text-neutral-900">{selectedProgram.clientName || selectedProgram.buyerName}</span>
                     </div>
                     <div>
-                      <span className="text-slate-400 block text-[10px]">Style &amp; Design</span>
-                      <span className="font-semibold text-slate-900">{selectedProgram.mainStyle || selectedProgram.styleCode}</span>
+                      <span className="text-neutral-500 block text-[10px]">Style &amp; Design</span>
+                      <span className="font-semibold text-neutral-900">{selectedProgram.mainStyle || selectedProgram.styleCode}</span>
                     </div>
                     <div>
-                      <span className="text-slate-400 block text-[10px]">Fabric Name</span>
-                      <span className="font-semibold text-slate-900">{selectedProgram.fabricName || 'Cotton'}</span>
+                      <span className="text-neutral-500 block text-[10px]">Fabric Name</span>
+                      <span className="font-semibold text-neutral-900">{selectedProgram.fabricName || 'Cotton'}</span>
                     </div>
                     <div className="min-w-0 sm:col-span-2">
-                      <span className="text-slate-400 block text-[10px]">Wilcom Designs</span>
+                      <span className="text-neutral-500 block text-[10px]">Wilcom Designs</span>
                       {wilcomDesignEntries.length > 0 ? (
                         <div className="mt-1 flex flex-wrap gap-1.5">
                           {wilcomDesignEntries.map((entry, index) => (
                             <span
                               key={`${entry.wilcomDesignNumber}-${index}`}
-                              className="inline-flex min-w-0 max-w-full items-center gap-1 rounded bg-purple-50 px-1.5 py-0.5 font-mono text-[10px] font-bold text-purple-900"
+                              className="inline-flex min-w-0 max-w-full items-center gap-1 rounded bg-brand-50 px-1.5 py-0.5 font-mono text-[10px] font-bold text-brand-900"
                             >
-                              <span className="shrink-0 font-sans font-semibold text-purple-700">
+                              <span className="shrink-0 font-sans font-semibold text-brand-700">
                                 {entry.styleName || entry.category || `Design ${index + 1}`}
                               </span>
                               <span className="break-all">{entry.wilcomDesignNumber}</span>
@@ -499,7 +499,7 @@ function IssueChallanContent() {
                           ))}
                         </div>
                       ) : (
-                        <span className="font-mono font-bold text-purple-900">WLC-N/A</span>
+                        <span className="font-mono font-bold text-brand-900">WLC-N/A</span>
                       )}
                     </div>
                   </div>
@@ -508,76 +508,76 @@ function IssueChallanContent() {
             </div>
 
             {/* STEP 2: CHALLAN METADATA & ROUTING */}
-            <div className="bg-white border border-slate-200/90 rounded-xl p-6 shadow-xs space-y-4">
-              <div className="pb-3 border-b border-slate-100">
-                <h2 className="text-sm font-bold text-slate-900">Challan Metadata &amp; Routing</h2>
-                <p className="text-[11px] text-slate-500">Fixed department routing and dispatch details</p>
+            <div className="bg-white border border-neutral-200/90 rounded-xl p-6 shadow-xs space-y-4">
+              <div className="pb-3 border-b border-neutral-100">
+                <h2 className="text-sm font-bold text-neutral-900">Challan Metadata &amp; Routing</h2>
+                <p className="text-[11px] text-neutral-500">Fixed department routing and dispatch details</p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
                 {/* Challan Number */}
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                    Challan Number <span className="text-rose-500">*</span>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                    Challan Number <span className="text-danger-600">*</span>
                   </label>
                   <input
                     type="text"
                     required
                     value={challanNumber}
                     onChange={(e) => setChallanNumber(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg font-mono font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-1 focus:ring-slate-900"
+                    className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 rounded-lg font-mono font-bold text-neutral-900 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-500/40"
                   />
                 </div>
 
                 {/* Challan Date */}
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                    Challan Date <span className="text-rose-500">*</span>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-1">
+                    Challan Date <span className="text-danger-600">*</span>
                   </label>
                   <input
                     type="date"
                     required
                     value={challanDate}
                     onChange={(e) => setChallanDate(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg font-medium text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                    className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-lg font-medium text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500/40"
                   />
                 </div>
 
                 {/* Source Department */}
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-1">
                     Source Department
                   </label>
                   <input
                     type="text"
                     disabled
                     value={sourceDept}
-                    className="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg font-bold text-slate-700 cursor-not-allowed"
+                    className="w-full px-3 py-2 bg-neutral-100 border border-neutral-200 rounded-lg font-bold text-neutral-700 cursor-not-allowed"
                   />
                 </div>
 
                 {/* Destination Department */}
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-1">
                     Destination Department
                   </label>
                   <input
                     type="text"
                     disabled
                     value={destinationDept}
-                    className="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg font-bold text-blue-900 cursor-not-allowed"
+                    className="w-full px-3 py-2 bg-neutral-100 border border-neutral-200 rounded-lg font-bold text-brand-900 cursor-not-allowed"
                   />
                 </div>
 
                 {/* Priority */}
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-1">
                     Priority
                   </label>
                   <select
                     value={priority}
                     onChange={(e: any) => setPriority(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                    className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-lg font-bold text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500/40"
                   >
                     <option value="NORMAL">Normal</option>
                     <option value="URGENT">Urgent</option>
@@ -587,7 +587,7 @@ function IssueChallanContent() {
 
                 {/* Design Number */}
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-1">
                     Design Number
                   </label>
                   <input
@@ -595,13 +595,13 @@ function IssueChallanContent() {
                     value={designNumber}
                     onChange={(e) => setDesignNumber(e.target.value)}
                     placeholder=""
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg font-semibold text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                    className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-lg font-semibold text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500/40"
                   />
                 </div>
 
                 {/* Serial Number */}
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-1">
                     Serial Number
                   </label>
                   <input
@@ -609,20 +609,20 @@ function IssueChallanContent() {
                     value={serialNumber}
                     onChange={(e) => setSerialNumber(e.target.value)}
                     placeholder=""
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg font-semibold text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                    className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-lg font-semibold text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500/40"
                   />
                 </div>
 
                 {/* Delivery Date */}
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-1">
                     Delivery Date
                   </label>
                   <input
                     type="date"
                     value={deliveryDate}
                     onChange={(e) => setDeliveryDate(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                    className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-lg text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500/40"
                   />
                 </div>
               </div>
@@ -630,7 +630,7 @@ function IssueChallanContent() {
               {/* Department Incharge Name & Remarks */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs pt-2">
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-1">
                     Department Incharge Name
                   </label>
                   <input
@@ -638,11 +638,11 @@ function IssueChallanContent() {
                     value={inchargeName}
                     onChange={(e) => setInchargeName(e.target.value)}
                     placeholder=""
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                    className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-lg text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500/40"
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-1">
                     Dispatch Notes / Remarks
                   </label>
                   <input
@@ -650,14 +650,14 @@ function IssueChallanContent() {
                     value={remarks}
                     onChange={(e) => setRemarks(e.target.value)}
                     placeholder=""
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                    className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-lg text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500/40"
                   />
                 </div>
               </div>
             </div>
 
             {/* STEP 3: COLOR / FABRIC / MEASUREMENT REUSABLE TABLE WITH IN/OUT TRACKING */}
-            <div className="bg-white border border-slate-200/90 rounded-xl p-6 shadow-xs">
+            <div className="bg-white border border-neutral-200/90 rounded-xl p-6 shadow-xs">
               <ColorFabricMeasurementTable
                 items={items}
                 onChange={setItems}
@@ -671,9 +671,9 @@ function IssueChallanContent() {
             </div>
 
             {/* AUDIT & SUBMIT BUTTON */}
-            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex items-center gap-2 text-xs text-slate-600">
-                <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
+            <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-2 text-xs text-neutral-600">
+                <ShieldCheck className="w-4 h-4 text-accent-800 shrink-0" />
                 <span>
                   Challan barcode and immutable transaction record will be created in the database.
                 </span>
@@ -682,7 +682,7 @@ function IssueChallanContent() {
               <div className="flex items-center gap-3">
                 <Link
                   href="/programming"
-                  className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900"
+                  className="px-4 py-2 text-xs font-semibold text-neutral-600 hover:text-neutral-900"
                 >
                   Cancel
                 </Link>
@@ -690,10 +690,10 @@ function IssueChallanContent() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-6 py-2.5 bg-slate-900 hover:bg-black disabled:opacity-50 text-white text-xs font-bold rounded-lg shadow-sm transition flex items-center gap-2 cursor-pointer"
+                  className="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white text-xs font-bold rounded-lg shadow-sm transition flex items-center gap-2 cursor-pointer"
                 >
                   {loading ? (
-                    <RefreshCw className="w-4 h-4 animate-spin text-amber-400" />
+                    <RefreshCw className="w-4 h-4 animate-spin text-accent-700" />
                   ) : (
                     <Send className="w-4 h-4" />
                   )}
@@ -717,7 +717,7 @@ function IssueChallanContent() {
 
 export default function IssueChallanPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center text-xs text-slate-500">Loading form...</div>}>
+    <Suspense fallback={<div className="p-8 text-center text-xs text-neutral-500">Loading form...</div>}>
       <IssueChallanContent />
     </Suspense>
   );
