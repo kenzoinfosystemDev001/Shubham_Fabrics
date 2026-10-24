@@ -9,6 +9,11 @@ import {
   parseWholeNumber,
   validateHandoverQuantity,
 } from '@/lib/final-check-rules.mjs';
+import {
+  assertChallanNumbersAvailable,
+  challanNumberErrorResponse,
+  requireChallanNumber,
+} from '@/lib/challan-number-server';
 
 export const dynamic = 'force-dynamic';
 
@@ -114,11 +119,13 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  let challanNumber = '';
   try {
     const auth = await getFinalCheckActor(request);
     if (!auth.actor) return auth.response;
 
     const body = await request.json();
+    challanNumber = requireChallanNumber(body?.challanNumber);
     const {
       parentChallanId,
       toDepartment: requestedTargetDept,
@@ -192,8 +199,8 @@ export async function POST(request: Request) {
 
     const actorId = auth.actor.id;
 
-    // Generate unique challan number
-    const challanNumber = `CH-FQC-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
+    // Challan number is typed by the user; reject numbers already in use.
+    await assertChallanNumbersAvailable(prisma, [{ value: challanNumber }]);
 
     const newChallan = await prisma.$transaction(async (tx) => {
       const claimed = await tx.challan.updateMany({
@@ -307,6 +314,8 @@ export async function POST(request: Request) {
       data: newChallan,
     });
   } catch (error: any) {
+    const numberResponse = challanNumberErrorResponse(error, challanNumber);
+    if (numberResponse) return numberResponse;
     if (error instanceof HandoverValidationError || error instanceof FinalCheckValidationError) {
       return NextResponse.json(
         { error: error.message },

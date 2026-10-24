@@ -3,6 +3,13 @@ import { prisma } from '@subham/database';
 import { requireUser } from '@/lib/auth/require-user';
 import { canUpdateChallan } from '@/lib/auth/department-access';
 
+import {
+  FabricStockError,
+  STOCK_TRANSACTION_OPTIONS,
+  fabricStockErrorBody,
+  syncChallanStock,
+} from '@/lib/fabric-stock-ledger';
+
 export const dynamic = 'force-dynamic';
 
 export async function GET(
@@ -153,7 +160,8 @@ export async function DELETE(
           where: { challanId: id },
         });
 
-        // 7. Delete challan items & events
+        // 7. Return any Fabric Store stock this challan issued, then delete items & events
+        await syncChallanStock(tx, id, authUser.id, { removed: true });
         await tx.challanItem.deleteMany({
           where: { challanId: id },
         });
@@ -290,6 +298,12 @@ export async function PATCH(
         },
       });
 
+      // Cancelling (or reinstating) a Fabric Store challan returns (or re-issues) its stock;
+      // the ledger reconcile posts only the difference, so repeated updates change nothing.
+      if (status) {
+        await syncChallanStock(tx, id, authUser.id);
+      }
+
       // If defective pieces were cut, ensure DefectRecord exists or is logged
       if (updateData.defectivePieces && updateData.defectivePieces > 0) {
         const actor = { id: authUser.id };
@@ -317,10 +331,13 @@ export async function PATCH(
       }
 
       return ch;
-    });
+    }, status ? STOCK_TRANSACTION_OPTIONS : undefined);
 
     return NextResponse.json(updated);
   } catch (error: any) {
+    if (error instanceof FabricStockError) {
+      return NextResponse.json(fabricStockErrorBody(error), { status: 400 });
+    }
     console.error('Error updating challan:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to update challan' },

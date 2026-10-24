@@ -29,21 +29,37 @@ interface InwardItem {
   receivingDate: string;
   billQty: number;
   unit: 'MTR' | 'PCS' | string;
+  colour?: string | null;
   supplierName?: string | null;
   remarks?: string | null;
   createdAt: string;
 }
 
+interface InwardLine {
+  key: string;
+  itemName: string;
+  colour: string;
+  billQty: string;
+  unit: 'MTR' | 'PCS';
+}
+
+const createInwardLine = (seed: Partial<InwardLine> = {}): InwardLine => ({
+  key: `line-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+  itemName: '',
+  colour: '',
+  billQty: '',
+  unit: 'MTR',
+  ...seed,
+});
+
 const createEmptyFormData = () => ({
   entryType: 'UNDYED',
-  itemName: '',
   billNo: '',
   billDate: new Date().toISOString().split('T')[0],
   receivingDate: new Date().toISOString().split('T')[0],
-  billQty: '',
-  unit: 'MTR',
   supplierName: '',
   remarks: '',
+  lines: [createInwardLine()],
 });
 
 export default function InwardStockPage() {
@@ -104,16 +120,31 @@ export default function InwardStockPage() {
     setSubmitting(true);
 
     try {
-      if (!formData.itemName || !formData.billNo || !formData.billQty) {
-        throw new Error('Please fill all required fields (Item Name, Bill No., Bill Qty).');
+      if (!formData.billNo.trim()) {
+        throw new Error('Bill No. is required.');
+      }
+      const lines = formData.lines.filter((line) => line.itemName.trim() || line.colour.trim() || line.billQty);
+      if (lines.length === 0) {
+        throw new Error('Add at least one fabric line.');
+      }
+      const invalidLine = lines.findIndex((line) => !line.itemName.trim() || !(Number(line.billQty) > 0));
+      if (invalidLine >= 0) {
+        throw new Error(`Line ${invalidLine + 1}: enter the fabric name and a quantity greater than zero.`);
       }
 
+      const { lines: _lines, ...header } = formData;
+      const payloadLines = lines.map(({ itemName, colour, billQty, unit }) => ({
+        itemName: itemName.trim(),
+        colour: colour.trim() || null,
+        billQty: Number(billQty),
+        unit,
+      }));
       const res = await fetch(
         editingItemId ? `/api/fabric-store/inward/${editingItemId}` : '/api/fabric-store/inward',
         {
           method: editingItemId ? 'PATCH' : 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(editingItemId ? { ...header, ...payloadLines[0] } : { ...header, lines: payloadLines }),
         }
       );
 
@@ -123,7 +154,9 @@ export default function InwardStockPage() {
       }
 
       setSuccessMsg(
-        `Inward record for "${formData.itemName}" ${editingItemId ? 'updated' : 'saved'} successfully!`
+        editingItemId
+          ? `Inward record for "${payloadLines[0].itemName}" updated.`
+          : `Bill ${formData.billNo.trim()}: ${payloadLines.length} inward line${payloadLines.length === 1 ? '' : 's'} saved.`
       );
       setModalOpen(false);
       setEditingItemId(null);
@@ -142,16 +175,28 @@ export default function InwardStockPage() {
     setFormError('');
     setFormData({
       entryType: item.entryType === 'DYED' ? 'DYED' : 'UNDYED',
-      itemName: item.itemName,
       billNo: item.billNo,
       billDate: new Date(item.billDate).toISOString().split('T')[0],
       receivingDate: new Date(item.receivingDate).toISOString().split('T')[0],
-      billQty: String(item.billQty),
-      unit: item.unit === 'PCS' ? 'PCS' : 'MTR',
       supplierName: item.supplierName || '',
       remarks: item.remarks || '',
+      lines: [
+        createInwardLine({
+          itemName: item.itemName,
+          colour: item.colour || '',
+          billQty: String(item.billQty),
+          unit: item.unit === 'PCS' ? 'PCS' : 'MTR',
+        }),
+      ],
     });
     setModalOpen(true);
+  };
+
+  const updateLine = (key: string, patch: Partial<InwardLine>) => {
+    setFormData((prev) => ({
+      ...prev,
+      lines: prev.lines.map((line) => (line.key === key ? { ...line, ...patch } : line)),
+    }));
   };
 
   const closeModal = () => {
@@ -345,7 +390,7 @@ export default function InwardStockPage() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search Item, Bill No..."
+                placeholder="Search Item, Colour, Bill No..."
                 className="pl-8 pr-3 py-1.5 border border-neutral-300 rounded-lg text-xs w-48 sm:w-64 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white"
               />
             </div>
@@ -382,6 +427,9 @@ export default function InwardStockPage() {
                   <th className="border-r-[1.5px] border-neutral-200 px-4 py-2 font-black">
                     ITEM NAME
                   </th>
+                  <th className="border-r-[1.5px] border-neutral-200 px-3 py-2 font-black w-28">
+                    COLOUR
+                  </th>
                   <th className="border-r-[1.5px] border-neutral-200 px-3 py-2 font-black w-32">
                     BILL NO.
                   </th>
@@ -405,7 +453,7 @@ export default function InwardStockPage() {
               <tbody className="divide-y divide-neutral-200">
                 {items.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="px-4 py-12 text-center text-neutral-500 space-y-2">
+                    <td colSpan={10} className="px-4 py-12 text-center text-neutral-500 space-y-2">
                       <ArrowDownToLine className="w-8 h-8 mx-auto text-neutral-700" />
                       <div className="text-sm font-bold text-neutral-700">No inward records found</div>
                       <p className="text-xs text-neutral-500">
@@ -432,6 +480,9 @@ export default function InwardStockPage() {
                       </td>
                       <td className="border-r-[1.5px] border-neutral-200 px-4 py-2 font-bold text-neutral-900">
                         {item.itemName}
+                      </td>
+                      <td className="border-r-[1.5px] border-neutral-200 px-3 py-2 text-neutral-900">
+                        {item.colour || <span className="text-neutral-500 italic">Not recorded</span>}
                       </td>
                       <td className="border-r-[1.5px] border-neutral-200 px-3 py-2 font-mono font-bold text-neutral-900">
                         {item.billNo}
@@ -476,7 +527,7 @@ export default function InwardStockPage() {
       {/* MODAL: CREATE OR EDIT FABRIC ARRIVAL */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-900/60 backdrop-blur-xs p-3 overflow-y-auto">
-          <div className="bg-white rounded-xl shadow-2xl border border-neutral-300 w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-xl shadow-2xl border border-neutral-300 w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="px-5 py-3.5 border-b border-neutral-200 bg-neutral-50 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <ArrowDownToLine className="w-5 h-5 text-accent-700" />
@@ -532,21 +583,6 @@ export default function InwardStockPage() {
                 </div>
               </div>
 
-              {/* Item Name */}
-              <div>
-                <label className="block text-xs font-black uppercase text-neutral-700 mb-1">
-                  ITEM NAME (FABRIC DESCRIPTION) *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.itemName}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, itemName: e.target.value }))}
-                  placeholder="e.g. Cotton 60x60 Cambric, Rayon 14kg, Chanderi"
-                  className="w-full h-10 px-3 border-[1.5px] border-neutral-200 rounded-lg text-xs font-bold text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white"
-                />
-              </div>
-
               {/* Bill No & Bill Date */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -576,7 +612,7 @@ export default function InwardStockPage() {
                 </div>
               </div>
 
-              {/* Receiving Date & Bill QTY */}
+              {/* Receiving Date */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-black uppercase text-neutral-700 mb-1">
@@ -590,31 +626,86 @@ export default function InwardStockPage() {
                     className="w-full h-10 px-3 border-[1.5px] border-neutral-200 rounded-lg text-xs font-bold text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white"
                   />
                 </div>
-                <div>
-                  <label className="block text-xs font-black uppercase text-neutral-700 mb-1">
-                    BILL QTY (MTR / PCS) *
+              </div>
+
+              {/* Fabric lines: each keeps its own colour, quantity and unit; MTR and PCS are never combined */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-black uppercase text-neutral-700">
+                    FABRIC LINES *
                   </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="number"
-                      step="0.01"
-                      required
-                      min="0.1"
-                      value={formData.billQty}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, billQty: e.target.value }))}
-                      placeholder="0.00"
-                      className="w-full h-10 px-3 border-[1.5px] border-neutral-200 rounded-lg text-xs font-black text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white"
-                    />
-                    <select
-                      value={formData.unit}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, unit: e.target.value }))}
-                      className="h-10 px-2.5 border-[1.5px] border-neutral-200 rounded-lg text-xs font-bold text-neutral-900 bg-white focus:outline-none"
+                  {!editingItemId && (
+                    <button
+                      type="button"
+                      onClick={() => setFormData((prev) => ({ ...prev, lines: [...prev.lines, createInwardLine({ unit: prev.lines[prev.lines.length - 1]?.unit || 'MTR' })] }))}
+                      className="inline-flex items-center gap-1 px-2 py-1 rounded-md border border-brand-200 text-[11px] font-bold text-brand-800 hover:bg-brand-50 transition"
                     >
-                      <option value="MTR">MTR (Meters)</option>
-                      <option value="PCS">PCS (Pieces)</option>
-                    </select>
-                  </div>
+                      <Plus className="w-3 h-3" />
+                      Add line
+                    </button>
+                  )}
                 </div>
+                <div className="border border-neutral-200 rounded-lg overflow-hidden">
+                  <div className="grid grid-cols-[1fr_7rem_6rem_5.5rem_2rem] gap-2 px-2 py-1.5 bg-neutral-50 text-[10px] font-black uppercase text-neutral-500">
+                    <span>Item name (fabric)</span>
+                    <span>Colour</span>
+                    <span className="text-right">Qty</span>
+                    <span>Unit</span>
+                    <span />
+                  </div>
+                  {formData.lines.map((line, idx) => (
+                    <div key={line.key} className="grid grid-cols-[1fr_7rem_6rem_5.5rem_2rem] gap-2 px-2 py-1.5 border-t border-neutral-200 items-center">
+                      <input
+                        type="text"
+                        value={line.itemName}
+                        onChange={(e) => updateLine(line.key, { itemName: e.target.value })}
+                        placeholder="e.g. Cotton 60x60 Cambric"
+                        aria-label={`Line ${idx + 1} item name`}
+                        className="h-8 px-2 border border-neutral-300 rounded-md text-xs font-bold text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white"
+                      />
+                      <input
+                        type="text"
+                        value={line.colour}
+                        onChange={(e) => updateLine(line.key, { colour: e.target.value })}
+                        placeholder="e.g. Off White"
+                        aria-label={`Line ${idx + 1} colour`}
+                        className="h-8 px-2 border border-neutral-300 rounded-md text-xs text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white"
+                      />
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0.01"
+                        value={line.billQty}
+                        onChange={(e) => updateLine(line.key, { billQty: e.target.value })}
+                        placeholder="0.00"
+                        aria-label={`Line ${idx + 1} quantity`}
+                        className="h-8 px-2 border border-neutral-300 rounded-md text-xs font-black text-right text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white"
+                      />
+                      <select
+                        value={line.unit}
+                        onChange={(e) => updateLine(line.key, { unit: e.target.value === 'PCS' ? 'PCS' : 'MTR' })}
+                        aria-label={`Line ${idx + 1} unit`}
+                        className="h-8 px-1.5 border border-neutral-300 rounded-md text-xs font-bold text-neutral-900 bg-white focus:outline-none"
+                      >
+                        <option value="MTR">MTR</option>
+                        <option value="PCS">PCS</option>
+                      </select>
+                      <button
+                        type="button"
+                        disabled={formData.lines.length === 1}
+                        onClick={() => setFormData((prev) => ({ ...prev, lines: prev.lines.filter((l) => l.key !== line.key) }))}
+                        title="Remove line"
+                        aria-label={`Remove line ${idx + 1}`}
+                        className="h-8 w-8 flex items-center justify-center rounded-md text-neutral-500 hover:text-danger-700 hover:bg-danger-50 disabled:opacity-30 disabled:hover:bg-transparent"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-[10px] text-neutral-500 mt-1">
+                  Meters and pieces are stocked separately and never converted.
+                </p>
               </div>
 
               {/* Supplier Name */}

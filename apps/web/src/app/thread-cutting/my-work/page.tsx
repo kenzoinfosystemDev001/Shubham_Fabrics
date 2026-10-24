@@ -43,7 +43,8 @@ import {
   downloadChallanHtml, 
   printChallan 
 } from '@/lib/download-challan';
-import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
+import { TransferDocuments } from '@/components/common/TransferDocuments';
+import { ChallanNumberField, newSubmissionKey } from '@/components/challan/ChallanNumberField';
 
 interface ItemRow {
   fabricMeasurementPcs: string; // Color / Fabric / Measurement (PCS)
@@ -67,6 +68,9 @@ export default function ThreadCuttingMyWorkPage() {
   const [defectReason, setDefectReason] = useState<string>('Broken Stitch / Needle Holes');
   const [customDefectReason, setCustomDefectReason] = useState<string>('');
   const [defectComments, setDefectComments] = useState<string>('');
+  const [defectChallanNumber, setDefectChallanNumber] = useState('');
+  const [defectChallanNumberError, setDefectChallanNumberError] = useState<string | null>(null);
+  const [defectSubmissionKey, setDefectSubmissionKey] = useState(newSubmissionKey);
   const [defectiveShelfLocation, setDefectiveShelfLocation] = useState<string>(
     'DEF-SHELF-THREAD-CUTTING (Thread Cutting Trimming Shelf)'
   );
@@ -77,6 +81,9 @@ export default function ThreadCuttingMyWorkPage() {
 
   // Form State: "Challan from Thread Cutting to QC2 (Quality check 2)"
   const [challanNumber, setChallanNumber] = useState('');
+  const [challanNumberError, setChallanNumberError] = useState<string | null>(null);
+  // One key per challan form fill, so a retried or double-clicked submit cannot create two challans.
+  const [submissionKey, setSubmissionKey] = useState(newSubmissionKey);
   const [challanDate, setChallanDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [sourceDept] = useState('Thread Cutting Department');
   const [destinationDept] = useState('Thread Cut QC');
@@ -124,16 +131,6 @@ export default function ThreadCuttingMyWorkPage() {
         if (json.data.incomingChallans?.length > 0 && !selectedIncoming) {
           selectIncomingChallan(json.data.incomingChallans[0]);
         }
-      }
-
-      // 2. Next Challan Number for QC2
-      const numRes = await fetch('/api/challans/next-number?department=THREAD_CUTTING');
-      const numData = await numRes.json();
-      if (numData.nextNumber) {
-        setChallanNumber(numData.nextNumber.replace('CH-THREAD_CUTTING-', 'CH-THC-QC2-'));
-      } else {
-        const year = new Date().getFullYear();
-        setChallanNumber(`CH-THC-QC2-${year}-${String(Date.now()).slice(-5)}`);
       }
     } catch (err) {
       console.error('Error loading Thread Cutting work data:', err);
@@ -333,14 +330,17 @@ export default function ThreadCuttingMyWorkPage() {
       alert('Please provide defect comments and reasons before returning to the Fabric Store defective shelf.');
       return;
     }
+    if (!defectChallanNumber.trim()) {
+      setDefectChallanNumberError('Defect return challan number is required.');
+      return;
+    }
+    setDefectChallanNumberError(null);
 
     try {
       setSubmittingDefectReturn(true);
-      const year = new Date().getFullYear();
-      const returnChallanNumber = `CH-THC-DEF-${year}-${String(Date.now()).slice(-5)}`;
-
       const payload = {
-        challanNumber: returnChallanNumber,
+        idempotencyKey: defectSubmissionKey,
+        challanNumber: defectChallanNumber.trim(),
         challanType: 'DEFECT_RETURN',
         fromDepartment: 'THREAD_CUTTING',
         toDepartment: 'STORE',
@@ -377,8 +377,11 @@ export default function ThreadCuttingMyWorkPage() {
 
       const json = await res.json();
       if (!res.ok) {
+        if (json.field === 'challanNumber') setDefectChallanNumberError(json.error);
         throw new Error(json.error || 'Failed to dispatch defect return to Fabric Store');
       }
+      setDefectChallanNumber('');
+      setDefectSubmissionKey(newSubmissionKey());
 
       // Update incoming Embroidery challan progress notes
       await fetch(`/api/challans/${selectedIncoming.id}/status`, {
@@ -408,9 +411,10 @@ export default function ThreadCuttingMyWorkPage() {
   const handleSubmitQC2Challan = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!challanNumber.trim()) {
-      alert('Please enter a valid Challan Number.');
+      setChallanNumberError('Challan Number is required.');
       return;
     }
+    setChallanNumberError(null);
     if (items.length === 0) {
       alert('Please add at least one item to the Challan.');
       return;
@@ -425,6 +429,7 @@ export default function ThreadCuttingMyWorkPage() {
           : defectReason;
 
       const payload = {
+        idempotencyKey: submissionKey,
         challanNumber: challanNumber.trim(),
         challanType: 'INTER_DEPARTMENT',
         fromDepartment: 'THREAD_CUTTING',
@@ -460,10 +465,13 @@ export default function ThreadCuttingMyWorkPage() {
 
       const json = await res.json();
       if (!res.ok) {
+        if (json.field === 'challanNumber') setChallanNumberError(json.error);
         throw new Error(json.error || 'Failed to issue challan to QC2');
       }
 
       setCreatedChallanModal(json);
+      setChallanNumber('');
+      setSubmissionKey(newSubmissionKey());
       setToastMsg(`Challan ${json.challanNumber} to QC2 created successfully!`);
       if (typeof window !== 'undefined') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -696,7 +704,7 @@ export default function ThreadCuttingMyWorkPage() {
 
                         {/* COMPLETE DOCUMENT ACTIONS: PRODUCTION SHEET, CHALLAN & WILCOM */}
                         <div className="mt-2 pt-2 border-t border-neutral-100 flex items-center justify-between gap-1 flex-wrap" onClick={(e) => e.stopPropagation()}>
-                          <DocumentActionButtons program={ch.program} challan={ch} size="xs" />
+                          <TransferDocuments challan={ch} size="xs" />
                         </div>
                       </div>
                     );
@@ -1117,6 +1125,18 @@ export default function ThreadCuttingMyWorkPage() {
                         />
                       </div>
 
+                      <ChallanNumberField
+                        label="Defect return challan number"
+                        compact
+                        className="max-w-xs"
+                        value={defectChallanNumber}
+                        onChange={(value) => {
+                          setDefectChallanNumber(value);
+                          setDefectChallanNumberError(null);
+                        }}
+                        error={defectChallanNumberError}
+                      />
+
                       {/* ACTION BUTTON TO RETURN TO FABRIC STORE DEFECTIVE SHELF */}
                       <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-danger-200">
                         <div className="text-[11px] font-medium text-neutral-600">
@@ -1309,19 +1329,14 @@ export default function ThreadCuttingMyWorkPage() {
                   - Serial Number */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
                 {/* 1. Challan Number */}
-                <div>
-                  <label className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider mb-1">
-                    Challan Number *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={challanNumber}
-                    onChange={(e) => setChallanNumber(e.target.value)}
-                    placeholder=""
-                    className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl font-mono font-bold text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/40 transition"
-                  />
-                </div>
+                <ChallanNumberField
+                  value={challanNumber}
+                  onChange={(value) => {
+                    setChallanNumber(value);
+                    setChallanNumberError(null);
+                  }}
+                  error={challanNumberError}
+                />
 
                 {/* 2. Challan Date */}
                 <div>

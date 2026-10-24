@@ -21,6 +21,7 @@ import {
   Wind,
   Flame,
 } from 'lucide-react';
+import { TransferDocuments } from '@/components/common/TransferDocuments';
 
 export default function SteamPressIncomingPage() {
   const router = useRouter();
@@ -373,6 +374,9 @@ export default function SteamPressIncomingPage() {
                     </div>
                   </div>
 
+                  {/* Documents of this challan: production sheet & challan */}
+                  <TransferDocuments challan={ch} size="xs" />
+
                   {/* Footer Action */}
                   <div className="pt-2 border-t border-neutral-200 flex items-center justify-between gap-2">
                     <span className="text-[10px] text-neutral-500 flex items-center gap-1">
@@ -422,6 +426,8 @@ export default function SteamPressIncomingPage() {
                   <X className="w-5 h-5" />
                 </button>
               </div>
+
+              <TransferDocuments challan={selectedChallan} size="xs" autoLoad />
 
               {receiveSuccess ? (
                 <div className="p-4 bg-accent-400/10 border border-accent-500/30 rounded-xl text-accent-700 text-xs flex items-center gap-2">

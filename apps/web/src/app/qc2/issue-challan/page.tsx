@@ -19,6 +19,7 @@ import {
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import BarcodeStickerCard from '@/components/BarcodeStickerCard';
 import { ColorFabricMeasurementTable, createDepartmentInOutTracking } from '@/components/ColorFabricMeasurementTable';
+import { ChallanNumberField, newSubmissionKey } from '@/components/challan/ChallanNumberField';
 
 export default function QC2IssueChallanPage() {
   const router = useRouter();
@@ -28,6 +29,9 @@ export default function QC2IssueChallanPage() {
   const [selectedSheetForView, setSelectedSheetForView] = useState<any | null>(null);
   const [generatedChallan, setGeneratedChallan] = useState<any | null>(null);
   const [challanNumber, setChallanNumber] = useState('');
+  const [challanNumberError, setChallanNumberError] = useState<string | null>(null);
+  // One key per challan form fill, so a retried or double-clicked submit cannot create two challans.
+  const [submissionKey, setSubmissionKey] = useState(newSubmissionKey);
   const [toDepartment, setToDepartment] = useState('WASHING');
   const [priority, setPriority] = useState('NORMAL');
   const [remarks, setRemarks] = useState('QC2 Inspected & Passed pieces handover to Washing for soft wash and drying.');
@@ -52,14 +56,7 @@ export default function QC2IssueChallanPage() {
   useEffect(() => {
     const init = async () => {
       try {
-        const [numRes, progRes] = await Promise.all([
-          fetch('/api/challans/next-number?department=QC2'),
-          fetch('/api/programs'),
-        ]);
-        if (numRes.ok) {
-          const numJson = await numRes.json();
-          setChallanNumber(numJson.nextNumber);
-        }
+        const progRes = await fetch('/api/programs');
         if (progRes.ok) {
           const progJson = await progRes.json();
           const list = Array.isArray(progJson) ? progJson : progJson.data || [];
@@ -101,6 +98,11 @@ export default function QC2IssueChallanPage() {
       alert('Use the same unit for every quantity in one challan.');
       return;
     }
+    if (!challanNumber.trim()) {
+      setChallanNumberError('Challan Number is required.');
+      return;
+    }
+    setChallanNumberError(null);
     const validItems = items.filter((it) => Number(it.quantity) > 0);
     if (validItems.length === 0) {
       alert('Please enter a valid quantity greater than 0.');
@@ -113,7 +115,8 @@ export default function QC2IssueChallanPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          challanNumber,
+          idempotencyKey: submissionKey,
+          challanNumber: challanNumber.trim(),
           challanType: 'REGULAR',
           programId: selectedProgram.id,
           fromDepartment: 'QC2',
@@ -131,11 +134,14 @@ export default function QC2IssueChallanPage() {
       });
 
       const json = await res.json();
-      if (!res.ok || !json.success) {
+      if (!res.ok) {
+        if (json.field === 'challanNumber') setChallanNumberError(json.error);
         throw new Error(json.error || 'Failed to issue challan');
       }
 
-      setGeneratedChallan(json.data);
+      setGeneratedChallan(json);
+      setChallanNumber('');
+      setSubmissionKey(newSubmissionKey());
     } catch (err: any) {
       alert(`Error: ${err.message}`);
     } finally {
@@ -176,15 +182,14 @@ export default function QC2IssueChallanPage() {
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-neutral-200 p-6 shadow-xs space-y-6">
           {/* ROW 1: CHALLAN #, TARGET DEPT, PRIORITY */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-neutral-700 mb-1">Challan Number</label>
-              <input
-                type="text"
-                readOnly
-                value={challanNumber}
-                className="w-full px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-xs font-mono font-bold text-neutral-900"
-              />
-            </div>
+            <ChallanNumberField
+              value={challanNumber}
+              onChange={(value) => {
+                setChallanNumber(value);
+                setChallanNumberError(null);
+              }}
+              error={challanNumberError}
+            />
 
             <div>
               <label className="block text-xs font-bold text-neutral-700 mb-1">To Department</label>

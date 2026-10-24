@@ -31,6 +31,7 @@ import {
   printProductionSheet,
 } from '@/lib/download-production-sheet';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
+import { newSubmissionKey } from '@/components/challan/ChallanNumberField';
 
 import {
   ColorFabricMeasurementTable,
@@ -62,6 +63,9 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
 
   // Form Fields
   const [challanNumber, setChallanNumber] = useState('');
+  const [challanNumberError, setChallanNumberError] = useState<string | null>(null);
+  // One key per form fill, so a retried or double-clicked submit cannot create two challans.
+  const [submissionKey, setSubmissionKey] = useState(newSubmissionKey);
   const [challanDate, setChallanDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [sourceDept] = useState('Fabric Store');
   const [destDept] = useState(destinationDepartment === 'DYEING' ? 'Dyeing' : 'Embroidery');
@@ -153,13 +157,8 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
       setLoading(true);
       setError('');
 
-      const [progRes, numRes] = await Promise.all([
-        fetch('/api/programs'),
-        fetch('/api/challans/next-number?department=STORE'),
-      ]);
-
+      const progRes = await fetch('/api/programs');
       const progData = await progRes.json();
-      const numData = await numRes.json();
 
       let progList: any[] = Array.isArray(progData) ? progData : [];
 
@@ -171,9 +170,6 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
       }
 
       setPrograms(progList);
-      if (numData?.nextNumber) {
-        setChallanNumber(numData.nextNumber);
-      }
 
       if (typeof window !== 'undefined') {
         try {
@@ -260,9 +256,11 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
     }
 
     if (!challanNumber.trim()) {
-      setError('Please provide a Challan Number.');
+      setChallanNumberError('Challan Number is required.');
+      setError('Enter the Challan Number.');
       return;
     }
+    setChallanNumberError(null);
 
     // Only measured rows represent material moving out of the store.
     const rowsWithDetails = items.filter((it) => it.fabric.trim() || it.color.trim() || String(it.measurement).trim());
@@ -311,9 +309,10 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
         quantity: Number(item.measurement),
         uom: issueUnit,
         fabricCode: item.fabric || selectedProgram.fabricName || 'FABRIC',
+        // Current colour and the colour Dyeing must achieve are stored separately per line.
         colour: item.color || null,
-        shade: item.requiredDyeColor || null,
-        requiredDyeQuantity: item.requiredDyeQuantity || null,
+        requiredDyeColor: destinationDepartment === 'DYEING' ? item.requiredDyeColor || null : null,
+        requiredDyeQuantity: destinationDepartment === 'DYEING' ? item.requiredDyeQuantity || null : null,
         fabricProcessingStatus: destinationDepartment === 'EMBROIDERY' ? 'Undyed' : undefined,
         rollNumber: item.rollNumber || null,
         remarks: item.remarks || null,
@@ -329,6 +328,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
         .join(' · ');
 
       const payload = {
+        idempotencyKey: submissionKey,
         challanNumber: challanNumber.trim(),
         challanType: destinationDepartment === 'DYEING' ? 'STORE_TO_DYEING' : 'STORE_TO_EMBROIDERY',
         programId: selectedProgram.id,
@@ -355,7 +355,8 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to dispatch challan to Dyeing');
+        if (data.field === 'challanNumber') setChallanNumberError(data.error);
+        throw new Error(data.error || `Failed to dispatch challan to ${destDept}`);
       }
 
       setIssuedChallan({
@@ -382,6 +383,10 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
   const handleReset = () => {
     setIssuedChallan(null);
     setError('');
+    setChallanNumber('');
+    setChallanNumberError(null);
+    setSubmissionKey(newSubmissionKey());
+    setItems([createBlankChallanItem(challanContext)]);
     loadData();
   };
 
@@ -711,10 +716,21 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                   <input
                     type="text"
                     value={challanNumber}
-                    onChange={(e) => setChallanNumber(e.target.value)}
+                    onChange={(e) => {
+                      setChallanNumber(e.target.value);
+                      setChallanNumberError(null);
+                    }}
                     required
-                    className="w-full text-xs font-mono font-bold text-neutral-900 border border-neutral-300 rounded-lg px-3 py-2 bg-neutral-50 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+                    placeholder="Enter challan number"
+                    autoComplete="off"
+                    aria-invalid={Boolean(challanNumberError)}
+                    className={`w-full text-xs font-mono font-bold text-neutral-900 border rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-brand-500 focus:border-transparent transition ${
+                      challanNumberError ? 'border-danger-500' : 'border-neutral-300'
+                    }`}
                   />
+                  {challanNumberError && (
+                    <p className="mt-1 text-[11px] font-semibold text-danger-700">{challanNumberError}</p>
+                  )}
                 </div>
               </div>
 

@@ -568,6 +568,8 @@ exports.Prisma.ChallanItemScalarFieldEnum = {
   fabricCode: 'fabricCode',
   colour: 'colour',
   shade: 'shade',
+  requiredColour: 'requiredColour',
+  requiredQuantity: 'requiredQuantity',
   size: 'size',
   unitType: 'unitType',
   rollNumber: 'rollNumber',
@@ -677,6 +679,7 @@ exports.Prisma.StockLedgerEntryScalarFieldEnum = {
   actorId: 'actorId',
   balanceAfter: 'balanceAfter',
   notes: 'notes',
+  idempotencyKey: 'idempotencyKey',
   createdAt: 'createdAt'
 };
 
@@ -1023,6 +1026,7 @@ exports.Prisma.FabricInwardScalarFieldEnum = {
   receivingDate: 'receivingDate',
   billQty: 'billQty',
   unit: 'unit',
+  colour: 'colour',
   supplierName: 'supplierName',
   remarks: 'remarks',
   createdAt: 'createdAt',
@@ -1039,6 +1043,7 @@ exports.Prisma.FabricOutwardScalarFieldEnum = {
   itemName: 'itemName',
   issueQty: 'issueQty',
   unit: 'unit',
+  colour: 'colour',
   avgPerPcs: 'avgPerPcs',
   issuePcsQty: 'issuePcsQty',
   byOrderName: 'byOrderName',

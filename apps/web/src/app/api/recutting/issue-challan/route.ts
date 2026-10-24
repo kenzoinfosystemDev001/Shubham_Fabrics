@@ -2,14 +2,21 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import { buildDepartmentTrackingData } from '@/lib/challan-tracking';
 import { requireDepartment } from '@/lib/auth/department-access';
+import {
+  assertChallanNumbersAvailable,
+  challanNumberErrorResponse,
+  requireChallanNumber,
+} from '@/lib/challan-number-server';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
   const { user: authUser, response: authResponse } = await requireDepartment(request, 'RECUTTING');
   if (!authUser) return authResponse;
+  let challanNumber = '';
   try {
     const body = await request.json();
+    challanNumber = requireChallanNumber(body?.challanNumber);
     const { parentChallanId, programId, priority, remarks, items } = body;
 
     if (!parentChallanId) {
@@ -71,12 +78,8 @@ export async function POST(request: Request) {
     // 3. Resolve user identity
     const actorId = authUser.id;
 
-    // 4. Generate unique sequential Challan Number
-    const count = await prisma.challan.count({
-      where: { fromDepartment: 'RECUTTING' },
-    });
-    const timestamp = Date.now().toString().slice(-4);
-    const challanNumber = `CH-RC-${String(count + 1).padStart(4, '0')}-${timestamp}`;
+    // 4. Challan number is typed by the user; reject numbers already in use.
+    await assertChallanNumbersAvailable(prisma, [{ value: challanNumber }]);
 
     // 5. ATOMIC DATABASE TRANSACTION
     const newChallan = await prisma.$transaction(async (tx) => {
@@ -165,6 +168,8 @@ export async function POST(request: Request) {
       data: newChallan,
     });
   } catch (error: any) {
+    const numberResponse = challanNumberErrorResponse(error, challanNumber);
+    if (numberResponse) return numberResponse;
     console.error('Error issuing Challan to Stitching:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to issue challan to Stitching' },

@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
-import { canViewClientCode, getSessionUser } from '@/lib/auth/require-user';
+import { getSessionUser } from '@/lib/auth/require-user';
 import { requireDepartment } from '@/lib/auth/department-access';
+import { programSheetInclude, shapeProgramSheet } from '@/lib/program-sheet';
+
+import { syncChallanStock } from '@/lib/fabric-stock-ledger';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,23 +14,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const programInclude = {
-      customer: true,
-      design: true,
-      createdBy: { select: { id: true, username: true, fullName: true } },
-      approvedBy: { select: { id: true, username: true, fullName: true } },
-      fabrics: true,
-      sizes: true,
-      colours: true,
-      challans: {
-        include: {
-          items: true,
-          fromDeptRel: true,
-          toDeptRel: true,
-        },
-        orderBy: { createdAt: 'desc' as const },
-      },
-    };
+    const programInclude = programSheetInclude;
 
     let program = await prisma.program.findUnique({
       where: { id },
@@ -52,56 +39,8 @@ export async function GET(
       return NextResponse.json({ error: 'Program not found' }, { status: 404 });
     }
 
-    let items: any[] = [];
-    let subStyles: string[] = [];
-    let subStylesWithAverages: any[] = [];
-    let productionGrid: any[] = [];
-    let topName = '';
-    let serialNoCounter = '000';
-    let note = '';
-    let clientCode = '';
-    let wilcomEntries: any[] = [];
-    let wilcomDesignPhoto = program.wilcomDesignPhoto;
-
-    try {
-      if (program.metadataJson) {
-        const parsed = JSON.parse(program.metadataJson);
-        if (Array.isArray(parsed.items)) items = parsed.items;
-        if (Array.isArray(parsed.subStyles)) subStyles = parsed.subStyles;
-        if (Array.isArray(parsed.subStylesWithAverages)) subStylesWithAverages = parsed.subStylesWithAverages;
-        if (Array.isArray(parsed.productionGrid)) productionGrid = parsed.productionGrid;
-        if (parsed.topName) topName = parsed.topName;
-        if (parsed.serialNoCounter) serialNoCounter = parsed.serialNoCounter;
-        if (parsed.note) note = parsed.note;
-        if (parsed.clientCode) clientCode = parsed.clientCode;
-        if (Array.isArray(parsed.wilcomEntries)) wilcomEntries = parsed.wilcomEntries;
-        if (!wilcomDesignPhoto) {
-          wilcomDesignPhoto = parsed.wilcomDesignPhoto || wilcomEntries.find((e: any) => e?.photoUrl)?.photoUrl || null;
-        }
-      }
-    } catch {}
-
-    if (subStyles.length === 0 && program.subStyle) {
-      subStyles = program.subStyle.split(',').map((s: string) => s.trim()).filter(Boolean);
-    }
-
-    // Role/department access restriction: ONLY Programming and Admin can see clientCode
     const sessionUser = await getSessionUser(request);
-    const isAuthorized = !!sessionUser && canViewClientCode(sessionUser);
-
-    return NextResponse.json({ 
-      ...program, 
-      wilcomDesignPhoto: wilcomDesignPhoto || program.wilcomDesignPhoto,
-      wilcomEntries,
-      items, 
-      subStyles,
-      subStylesWithAverages,
-      productionGrid,
-      topName: topName || program.mainStyle || program.styleCode,
-      serialNoCounter,
-      note: note || program.comments || program.remarks || '',
-      clientCode: isAuthorized ? clientCode : null,
-    });
+    return NextResponse.json(shapeProgramSheet(program, sessionUser));
   } catch (error: any) {
     console.error('Error fetching program:', error);
     return NextResponse.json({ error: error.message || 'Failed to fetch program' }, { status: 500 });
@@ -142,6 +81,11 @@ export async function DELETE(
           select: { id: true },
         });
         const challanIds = challans.map((c) => c.id);
+
+        // Fabric Store stock issued on these challans goes back to the store.
+        for (const challanId of challanIds) {
+          await syncChallanStock(tx, challanId, authUser.id, { removed: true });
+        }
 
         if (challanIds.length > 0) {
           // Unlink parentChallanId on any child challans

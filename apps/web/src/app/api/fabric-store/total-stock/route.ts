@@ -1,11 +1,9 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
-import {
-  cleanFabricName,
-  getChallanItemFabricType,
-  normalizeFabricStockType,
-} from '@/lib/fabric-stock';
+import { cleanFabricName, normalizeFabricStockType } from '@/lib/fabric-stock';
+import { isChallanMirror, loadStockBook } from '@/lib/fabric-stock-ledger';
+import { challanStockLines, roundQty, summarizeBuckets } from '@/lib/fabric-stock-rules.mjs';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,44 +15,8 @@ export async function GET(request: Request) {
     const filterType = searchParams.get('type')?.toUpperCase(); // "UNDYED" | "KORA" | "DYED" | "ALL"
     const search = searchParams.get('search');
 
-    // 1. Fetch all Inward entries
-    const inwardEntries = await (prisma as any).fabricInward.findMany({
-      orderBy: { receivingDate: 'desc' },
-    });
-
-    // 2. Fetch all Outward Challans (dispatches from Fabric Store to Dyeing, Embroidery, or other units)
-    // NOTE: We exclude challans where toDepartment = STORE (those are incoming to store, not outward dispatches)
-    const storeChallans = (await prisma.challan.findMany({
-      where: {
-        NOT: { toDepartment: { equals: 'STORE', mode: 'insensitive' } },
-        OR: [
-          { fromDepartment: { contains: 'STORE', mode: 'insensitive' } },
-          { fromDepartment: { equals: 'FABRIC', mode: 'insensitive' } },
-        ],
-        status: { notIn: ['DRAFT', 'CANCELLED'] },
-      },
-      include: {
-        program: {
-          select: {
-            id: true,
-            fabricName: true,
-            designNumber: true,
-            programSerialNo: true,
-            programNumber: true,
-            fabricDyeingRequired: true,
-            fabricAverage: true,
-            targetQuantity: true,
-          },
-        },
-        items: true,
-      },
-      orderBy: { createdAt: 'desc' },
-    }));
-
-    // 3. Fetch all manual Outward records
-    const manualOutwards = await (prisma as any).fabricOutward.findMany({
-      orderBy: { date: 'desc' },
-    });
+    // 1. Stock per fabric, type, colour and unit (meters and pieces are separate buckets).
+    const { book, storeChallans, manualOutwards } = await loadStockBook(prisma);
 
     // 4. Fetch Store shelf defect records and defective-return challans.
     const defectiveRecords = await prisma.defectRecord.findMany({
@@ -94,216 +56,64 @@ export async function GET(request: Request) {
     }
     const defectiveTotal = defectiveStockByUnit.PCS || 0;
 
-    // Build item-wise aggregates
-    // Key format: `${cleanName.toLowerCase()}___${fabricType}___${unit}`
-    const map = new Map<string, {
-      itemName: string;
-      fabricType: 'UNDYED' | 'DYED';
-      unit: string;
-      totalInward: number;
-      totalOutward: number;
-      balance: number;
-      inwardCount: number;
-      outwardCount: number;
-      lastActivity: Date;
-    }>();
-
-    // 1. Accumulate Inward entries (establishes inward stock)
-    for (const inw of inwardEntries) {
-      const type = normalizeFabricStockType(inw.entryType);
-      const unit = String(inw.unit || 'MTR').toUpperCase();
-      const cleanName = cleanFabricName(inw.itemName) || inw.itemName.trim();
-      const key = `${cleanName.toLowerCase()}___${type}___${unit}`;
-
-      const existing = map.get(key) || {
-        itemName: cleanName,
-        fabricType: type,
-        unit,
-        totalInward: 0,
-        totalOutward: 0,
-        balance: 0,
-        inwardCount: 0,
-        outwardCount: 0,
-        lastActivity: inw.receivingDate || inw.createdAt,
-      };
-
-      existing.totalInward += Number(inw.billQty) || 0;
-      existing.inwardCount += 1;
-      if (new Date(inw.receivingDate).getTime() > new Date(existing.lastActivity).getTime()) {
-        existing.lastActivity = inw.receivingDate;
-      }
-      map.set(key, existing);
-    }
-
-    // Matcher function to map any outgoing item back to the exact inward inventory row
-    const resolveMatchingKey = (rawName: string, targetType: 'UNDYED' | 'DYED', targetUnit: string) => {
-      const clean = cleanFabricName(rawName).toLowerCase();
-      if (!clean) return null;
-
-      // 1. Exact key match
-      const exactKey = `${clean}___${targetType}___${targetUnit}`;
-      if (map.has(exactKey)) return exactKey;
-
-      const candidates = Array.from(map.keys()).filter((key) => key.endsWith(`___${targetUnit}`));
-      const exactNameCandidates = candidates.filter((key) => key.split('___')[0] === clean);
-      const exactTypeCandidate = exactNameCandidates.find((key) => key.split('___')[1] === targetType);
-      if (exactTypeCandidate) return exactTypeCandidate;
-      if (exactNameCandidates.length === 1) return exactNameCandidates[0];
-
-      const similarCandidates = candidates.filter((key) => {
-        const candidateName = key.split('___')[0];
-        return candidateName.includes(clean) || clean.includes(candidateName);
-      });
-      const similarTypeCandidates = similarCandidates.filter((key) => key.split('___')[1] === targetType);
-      if (similarTypeCandidates.length === 1) return similarTypeCandidates[0];
-      if (similarCandidates.length === 1) return similarCandidates[0];
-
-      // 6. If no match in existing inward, return new exactKey
-      return exactKey;
-    };
-
-    // 2. Accumulate outward from every issued challan and retain rows for the dated register.
+    // 2. Dated outward register: active Fabric Store challans and manual outward rows.
     const outwardHistory: Array<Record<string, any>> = [];
-    const challanNumbers = new Set(storeChallans.map((challan) => String(challan.challanNumber || '').trim().toLowerCase()).filter(Boolean));
+    const challanNumbers = new Set(storeChallans.map((challan) => challan.challanNumber.trim().toLowerCase()));
     for (const ch of storeChallans) {
-      const isDyeing = ch.toDepartment.toUpperCase().includes('DYE');
-      const challanType: 'UNDYED' | 'DYED' = isDyeing ? 'UNDYED' : 'DYED';
-      const challanDate = ch.issuedDate || ch.createdAt;
-
-      if (Array.isArray(ch.items) && ch.items.length > 0) {
-        const challanUnit = String(ch.fabricUnit || ch.items[0]?.uom || 'MTR').toUpperCase();
-        for (const it of ch.items) {
-          const itemType = getChallanItemFabricType(it, ch.toDepartment);
-
-          const rawName = it.fabricCode || cleanFabricName(it.itemDescription) || ch.program?.fabricName || 'Fabric Material';
-          const itemUnit = String(it.uom || challanUnit).toUpperCase();
-          const itemQuantity = Number(it.quantity) || 0;
-          const qty = itemQuantity;
-
-          if (qty <= 0) continue;
-
-          const matchedKey = resolveMatchingKey(rawName, itemType, itemUnit) || `${cleanFabricName(rawName).toLowerCase()}___${itemType}___${itemUnit}`;
-          outwardHistory.push({
-            id: `challan-${ch.id}-${it.id || outwardHistory.length}`,
-            date: challanDate,
-            challanNumber: ch.challanNumber,
-            sourceDepartment: ch.fromDepartment,
-            destination: ch.toDepartment,
-            itemName: cleanFabricName(it.itemDescription) || rawName,
-            quantity: qty,
-            unit: itemUnit,
-            fabricType: itemType,
-          });
-          const existing = map.get(matchedKey) || {
-            itemName: cleanFabricName(rawName) || rawName.trim(),
-            fabricType: itemType,
-            unit: itemUnit,
-            totalInward: 0,
-            totalOutward: 0,
-            balance: 0,
-            inwardCount: 0,
-            outwardCount: 0,
-            lastActivity: challanDate,
-          };
-
-          existing.totalOutward += qty;
-          existing.outwardCount += 1;
-          if (new Date(challanDate).getTime() > new Date(existing.lastActivity).getTime()) {
-            existing.lastActivity = challanDate;
-          }
-          map.set(matchedKey, existing);
-        }
-      } else {
-        const rawName = ch.program?.fabricName || (isDyeing ? 'Grey / Undyed Fabric' : 'Processed Fabric');
-        const unit = String(ch.fabricUnit || 'MTR').toUpperCase();
-        const issueQty = Number(ch.fabricOut ?? ch.fabricIn ?? 0);
-
-        if (issueQty > 0) {
-          outwardHistory.push({
-            id: `challan-${ch.id}`,
-            date: challanDate,
-            challanNumber: ch.challanNumber,
-            sourceDepartment: ch.fromDepartment,
-            destination: ch.toDepartment,
-            itemName: cleanFabricName(rawName) || rawName,
-            quantity: issueQty,
-            unit,
-            fabricType: challanType,
-          });
-          const matchedKey = resolveMatchingKey(rawName, challanType, unit) || `${cleanFabricName(rawName).toLowerCase()}___${challanType}___${unit}`;
-          const existing = map.get(matchedKey) || {
-            itemName: cleanFabricName(rawName) || rawName.trim(),
-            fabricType: challanType,
-            unit,
-            totalInward: 0,
-            totalOutward: 0,
-            balance: 0,
-            inwardCount: 0,
-            outwardCount: 0,
-            lastActivity: challanDate,
-          };
-
-          existing.totalOutward += issueQty;
-          existing.outwardCount += 1;
-          if (new Date(challanDate).getTime() > new Date(existing.lastActivity).getTime()) {
-            existing.lastActivity = challanDate;
-          }
-          map.set(matchedKey, existing);
-        }
+      if (['DRAFT', 'CANCELLED'].includes(ch.status)) continue;
+      for (const line of challanStockLines(ch)) {
+        outwardHistory.push({
+          id: `challan-${ch.id}-${line.itemId || outwardHistory.length}`,
+          date: ch.issuedDate || ch.createdAt,
+          challanNumber: ch.challanNumber,
+          sourceDepartment: ch.fromDepartment,
+          destination: ch.toDepartment,
+          itemName: cleanFabricName(line.fabric) || line.fabric,
+          colour: line.colour,
+          quantity: line.quantity,
+          unit: String(line.unit).toUpperCase(),
+          fabricType: line.type,
+        });
       }
     }
-
-    // 3. Accumulate Outward from Manual records
     for (const outw of manualOutwards) {
-      if (outw.challanId || (outw.challanNumber && challanNumbers.has(String(outw.challanNumber).trim().toLowerCase()))) continue;
-      const type = normalizeFabricStockType(outw.fabricType);
-      const unit = String(outw.unit || 'MTR').toUpperCase();
-      const rawName = outw.itemName || 'Fabric Material';
-      const issueQty = Number(outw.issueQty) || 0;
-      const actDate = outw.date || outw.createdAt;
-
-      if (issueQty <= 0) continue;
-
+      if (isChallanMirror(outw, challanNumbers) || !(Number(outw.issueQty) > 0)) continue;
       outwardHistory.push({
         id: `manual-${outw.id}`,
-        date: actDate,
+        date: outw.date || outw.createdAt,
         challanNumber: outw.challanNumber || '—',
         sourceDepartment: 'STORE',
         destination: outw.destination || '—',
-        itemName: cleanFabricName(rawName) || rawName,
-        quantity: issueQty,
-        unit,
-        fabricType: type,
+        itemName: cleanFabricName(outw.itemName) || outw.itemName,
+        colour: outw.colour,
+        quantity: Number(outw.issueQty),
+        unit: String(outw.unit || 'MTR').toUpperCase(),
+        fabricType: normalizeFabricStockType(outw.fabricType),
       });
-
-      const matchedKey = resolveMatchingKey(rawName, type, unit) || `${cleanFabricName(rawName).toLowerCase()}___${type}___${unit}`;
-      const existing = map.get(matchedKey) || {
-        itemName: cleanFabricName(rawName) || rawName.trim(),
-        fabricType: type,
-        unit,
-        totalInward: 0,
-        totalOutward: 0,
-        balance: 0,
-        inwardCount: 0,
-        outwardCount: 0,
-        lastActivity: actDate,
-      };
-
-      existing.totalOutward += issueQty;
-      existing.outwardCount += 1;
-      if (new Date(actDate).getTime() > new Date(existing.lastActivity).getTime()) {
-        existing.lastActivity = actDate;
-      }
-      map.set(matchedKey, existing);
     }
 
-    // 4. Calculate final balances
-    let items = Array.from(map.values()).map((it, idx) => ({
-      sNo: idx + 1,
-      ...it,
-      balance: Math.max(0, it.totalInward - it.totalOutward),
-      status: it.totalInward - it.totalOutward > 0 ? ('IN_STOCK' as const) : ('OUT_OF_STOCK' as const),
-    }));
+    // 3. Final balances, one row per bucket; never combined across units.
+    const buckets = Array.from(book.buckets.values()).sort((a, b) =>
+      a.itemName.localeCompare(b.itemName) || a.unit.localeCompare(b.unit) || String(a.colour || '').localeCompare(String(b.colour || '')),
+    );
+    let items = buckets.map((it, idx) => {
+      const balance = roundQty(it.totalInward - it.totalOutward);
+      return {
+        sNo: idx + 1,
+        itemName: it.itemName,
+        fabricType: it.fabricType,
+        colour: it.colour,
+        unit: it.unit,
+        totalInward: it.totalInward,
+        totalOutward: it.totalOutward,
+        balance: Math.max(0, balance),
+        shortfall: balance < 0 ? roundQty(-balance) : 0,
+        inwardCount: it.inwardCount,
+        outwardCount: it.outwardCount,
+        lastActivity: it.lastActivity,
+        status: balance > 0 ? ('IN_STOCK' as const) : ('OUT_OF_STOCK' as const),
+      };
+    });
 
     // Filter by type if provided (support both UNDYED and KORA)
     if (filterType && filterType !== 'ALL') {
@@ -314,29 +124,18 @@ export async function GET(request: Request) {
     // Filter by search query
     if (search) {
       const q = search.toLowerCase();
-      items = items.filter((it) => it.itemName.toLowerCase().includes(q));
+      items = items.filter((it) => it.itemName.toLowerCase().includes(q) || String(it.colour || '').toLowerCase().includes(q));
     }
 
     // High level summary
-    const allItems = Array.from(map.values());
+    const allItems = Array.from(book.buckets.values());
     const undyedItems = allItems.filter((i) => i.fabricType === 'UNDYED');
     const dyedItems = allItems.filter((i) => i.fabricType === 'DYED');
-
-    const summarizeItems = (stockItems: typeof allItems) => ({
-      totalInwardMeters: stockItems.filter((i) => i.unit === 'MTR').reduce((s, i) => s + i.totalInward, 0),
-      totalOutwardMeters: stockItems.filter((i) => i.unit === 'MTR').reduce((s, i) => s + i.totalOutward, 0),
-      availableBalanceMeters: stockItems.filter((i) => i.unit === 'MTR').reduce((s, i) => s + Math.max(0, i.totalInward - i.totalOutward), 0),
-      totalInwardPcs: stockItems.filter((i) => i.unit === 'PCS').reduce((s, i) => s + i.totalInward, 0),
-      totalOutwardPcs: stockItems.filter((i) => i.unit === 'PCS').reduce((s, i) => s + i.totalOutward, 0),
-      availableBalancePcs: stockItems.filter((i) => i.unit === 'PCS').reduce((s, i) => s + Math.max(0, i.totalInward - i.totalOutward), 0),
-      itemCount: stockItems.length,
-    });
-
     const summary = {
-      overall: summarizeItems(allItems),
-      undyed: summarizeItems(undyedItems),
-      kora: summarizeItems(undyedItems), // backwards-compatibility alias for undyed
-      dyed: summarizeItems(dyedItems),
+      overall: summarizeBuckets(allItems),
+      undyed: summarizeBuckets(undyedItems),
+      kora: summarizeBuckets(undyedItems), // backwards-compatibility alias for undyed
+      dyed: summarizeBuckets(dyedItems),
       defectiveStockPcs: defectiveTotal,
       defectiveStockByUnit,
     };
@@ -344,7 +143,7 @@ export async function GET(request: Request) {
     const normalizedSearch = search?.trim().toLowerCase();
     const filteredOutwardHistory = outwardHistory
       .filter((row) => !filterType || filterType === 'ALL' || row.fabricType === ((filterType === 'KORA') ? 'UNDYED' : filterType))
-      .filter((row) => !normalizedSearch || [row.itemName, row.challanNumber, row.destination, row.sourceDepartment]
+      .filter((row) => !normalizedSearch || [row.itemName, row.colour, row.challanNumber, row.destination, row.sourceDepartment]
         .some((value) => String(value || '').toLowerCase().includes(normalizedSearch)))
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 

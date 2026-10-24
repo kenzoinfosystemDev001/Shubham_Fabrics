@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import { getFinalCheckActor } from '@/lib/final-check-auth';
 import { validateInspectionQuantities, inspectionPassed } from '@/lib/final-check-rules.mjs';
+import {
+  assertChallanNumbersAvailable,
+  challanNumberErrorResponse,
+  requireChallanNumber,
+} from '@/lib/challan-number-server';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,6 +16,7 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  let rejectChallanNumber = '';
   try {
     const auth = await getFinalCheckActor(request);
     if (!auth.actor) return auth.response;
@@ -154,6 +160,15 @@ export async function POST(
     if (reworkQuantity > 0 && !String(body.reworkReason || '').trim()) {
       return NextResponse.json({ error: 'A rework reason is required for garments sent for rework.' }, { status: 400 });
     }
+    // Rejected garments travel to the defective shelf on a challan whose number the user types.
+    if (rejectedQuantity > 0) {
+      rejectChallanNumber = requireChallanNumber(
+        body.rejectChallanNumber,
+        'Defective shelf challan number',
+        'rejectChallanNumber',
+      );
+      await assertChallanNumbersAvailable(prisma, [{ value: rejectChallanNumber, field: 'rejectChallanNumber' }]);
+    }
     const inspectionStatus = pendingQuantity > 0
       ? 'HOLD'
       : rejectedQuantity > 0
@@ -235,13 +250,11 @@ export async function POST(
 
       let rejectReturnChallan = null;
       if (rejectedQuantity > 0) {
-        const year = new Date().getFullYear();
-        const challanNumber = `CH-REJ-FQC-${year}-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
         const reason = String(body.defectReason).trim();
 
         rejectReturnChallan = await tx.challan.create({
           data: {
-            challanNumber,
+            challanNumber: rejectChallanNumber,
             challanType: 'DEFECTIVE_RETURN',
             programId: challan.programId,
             parentChallanId: challan.id,
@@ -366,6 +379,12 @@ export async function POST(
       data: result,
     });
   } catch (error: any) {
+    const numberResponse = challanNumberErrorResponse(error, rejectChallanNumber);
+    if (numberResponse) {
+      // The only challan number this route creates is the defective-shelf one.
+      const payload = await numberResponse.json();
+      return NextResponse.json({ ...payload, field: 'rejectChallanNumber' }, { status: numberResponse.status });
+    }
     console.error('Error recording Final QC inspection:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to record Final QC inspection' },

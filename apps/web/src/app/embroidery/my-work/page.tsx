@@ -44,6 +44,8 @@ import {
   printChallan 
 } from '@/lib/download-challan';
 import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
+import { TransferDocuments } from '@/components/common/TransferDocuments';
+import { ChallanNumberField, newSubmissionKey } from '@/components/challan/ChallanNumberField';
 
 export default function EmbroideryMyWorkPage() {
   const [activeWorkflow, setActiveWorkflow] = useState<
@@ -52,6 +54,9 @@ export default function EmbroideryMyWorkPage() {
 
   // Form State: "Challan from Embroidery to Thread Cutting"
   const [challanNumber, setChallanNumber] = useState('');
+  const [challanNumberError, setChallanNumberError] = useState<string | null>(null);
+  // One key per challan form fill, so a retried or double-clicked submit cannot create two challans.
+  const [submissionKey, setSubmissionKey] = useState(newSubmissionKey);
   const [challanDate, setChallanDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [sourceDept] = useState('Embroidery Department');
   const [destinationDept] = useState('Thread Cutting Department');
@@ -98,20 +103,10 @@ export default function EmbroideryMyWorkPage() {
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [receivingId, setReceivingId] = useState<string | null>(null);
 
-  // Fetch initial next-number and active programs
+  // Fetch active programs and incoming challans
   const loadInitialData = async () => {
     try {
       setLoading(true);
-      // 1. Get next challan number
-      const numRes = await fetch('/api/challans/next-number?department=EMBROIDERY');
-      const numData = await numRes.json();
-      if (numData.nextNumber) {
-        setChallanNumber(numData.nextNumber.replace('CH-EMB-', 'CH-EMB-TC-'));
-      } else {
-        const year = new Date().getFullYear();
-        setChallanNumber(`CH-EMB-TC-${year}-${String(Date.now()).slice(-5)}`);
-      }
-
       // 2. Fetch dashboard data for programs and incoming challans
       const dashRes = await fetch('/api/embroidery/dashboard');
       const dashData = await dashRes.json();
@@ -181,9 +176,11 @@ export default function EmbroideryMyWorkPage() {
       return;
     }
     if (!challanNumber.trim()) {
-      setFormError('Please provide a Challan Number.');
+      setChallanNumberError('Challan Number is required.');
+      setFormError('Enter the Challan Number.');
       return;
     }
+    setChallanNumberError(null);
     if (items.length === 0) {
       setFormError('Please add at least one item to the Challan.');
       return;
@@ -208,6 +205,7 @@ export default function EmbroideryMyWorkPage() {
       }));
 
       const payload = {
+        idempotencyKey: submissionKey,
         challanNumber: challanNumber.trim(),
         challanType: 'INTER_DEPARTMENT',
         programId: selectedProgram.id,
@@ -237,10 +235,13 @@ export default function EmbroideryMyWorkPage() {
 
       const json = await res.json();
       if (!res.ok) {
+        if (json.field === 'challanNumber') setChallanNumberError(json.error);
         throw new Error(json.error || 'Failed to dispatch Challan to Thread Cutting');
       }
 
       setCreatedChallanModal(json);
+      setChallanNumber('');
+      setSubmissionKey(newSubmissionKey());
       setSuccessMsg(`Challan ${json.challanNumber} to Thread Cutting created successfully! Dispatched ${tracking.fabricOut} ${tracking.fabricUnit}.`);
       if (typeof window !== 'undefined') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -445,19 +446,14 @@ export default function EmbroideryMyWorkPage() {
               {/* PRIMARY FORM FIELDS CORRESPONDING EXACTLY TO HANDWRITTEN SKETCH */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
                 {/* 1. Challan Number */}
-                <div>
-                  <label className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider mb-1">
-                    Challan Number *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={challanNumber}
-                    onChange={(e) => setChallanNumber(e.target.value)}
-                    placeholder=""
-                    className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl font-mono font-bold text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
-                  />
-                </div>
+                <ChallanNumberField
+                  value={challanNumber}
+                  onChange={(value) => {
+                    setChallanNumber(value);
+                    setChallanNumberError(null);
+                  }}
+                  error={challanNumberError}
+                />
 
                 {/* 2. Challan Date */}
                 <div>
@@ -914,7 +910,7 @@ export default function EmbroideryMyWorkPage() {
                                 </div>
 
                                 {/* COMPLETE DOCUMENT ACTIONS: PRODUCTION SHEET, CHALLAN & WILCOM */}
-                                <DocumentActionButtons program={ch.program} challan={ch} size="xs" />
+                                <TransferDocuments challan={ch} size="xs" />
                               </div>
                             </td>
                           </tr>

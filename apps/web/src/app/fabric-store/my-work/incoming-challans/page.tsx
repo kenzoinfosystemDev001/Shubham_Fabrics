@@ -20,7 +20,7 @@ import {
   AlertTriangle,
   PackagePlus,
 } from 'lucide-react';
-import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
+import { TransferDocuments } from '@/components/common/TransferDocuments';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 
 export default function IncomingChallansPage() {
@@ -338,11 +338,7 @@ export default function IncomingChallansPage() {
                               </span>
                             )}
 
-                            <DocumentActionButtons
-                              challan={ch}
-                              program={ch.program}
-                              size="xs"
-                            />
+                            <TransferDocuments challan={ch} size="xs" />
                           </div>
                         </td>
                       </tr>

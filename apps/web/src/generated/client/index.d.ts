@@ -45661,12 +45661,14 @@ export namespace Prisma {
   }
 
   export type ChallanItemAvgAggregateOutputType = {
+    requiredQuantity: number | null
     quantity: number | null
     grossWeightKg: number | null
     netWeightKg: number | null
   }
 
   export type ChallanItemSumAggregateOutputType = {
+    requiredQuantity: number | null
     quantity: number | null
     grossWeightKg: number | null
     netWeightKg: number | null
@@ -45679,6 +45681,8 @@ export namespace Prisma {
     fabricCode: string | null
     colour: string | null
     shade: string | null
+    requiredColour: string | null
+    requiredQuantity: number | null
     size: string | null
     unitType: string | null
     rollNumber: string | null
@@ -45703,6 +45707,8 @@ export namespace Prisma {
     fabricCode: string | null
     colour: string | null
     shade: string | null
+    requiredColour: string | null
+    requiredQuantity: number | null
     size: string | null
     unitType: string | null
     rollNumber: string | null
@@ -45727,6 +45733,8 @@ export namespace Prisma {
     fabricCode: number
     colour: number
     shade: number
+    requiredColour: number
+    requiredQuantity: number
     size: number
     unitType: number
     rollNumber: number
@@ -45747,12 +45755,14 @@ export namespace Prisma {
 
 
   export type ChallanItemAvgAggregateInputType = {
+    requiredQuantity?: true
     quantity?: true
     grossWeightKg?: true
     netWeightKg?: true
   }
 
   export type ChallanItemSumAggregateInputType = {
+    requiredQuantity?: true
     quantity?: true
     grossWeightKg?: true
     netWeightKg?: true
@@ -45765,6 +45775,8 @@ export namespace Prisma {
     fabricCode?: true
     colour?: true
     shade?: true
+    requiredColour?: true
+    requiredQuantity?: true
     size?: true
     unitType?: true
     rollNumber?: true
@@ -45789,6 +45801,8 @@ export namespace Prisma {
     fabricCode?: true
     colour?: true
     shade?: true
+    requiredColour?: true
+    requiredQuantity?: true
     size?: true
     unitType?: true
     rollNumber?: true
@@ -45813,6 +45827,8 @@ export namespace Prisma {
     fabricCode?: true
     colour?: true
     shade?: true
+    requiredColour?: true
+    requiredQuantity?: true
     size?: true
     unitType?: true
     rollNumber?: true
@@ -45924,6 +45940,8 @@ export namespace Prisma {
     fabricCode: string | null
     colour: string | null
     shade: string | null
+    requiredColour: string | null
+    requiredQuantity: number | null
     size: string | null
     unitType: string
     rollNumber: string | null
@@ -45967,6 +45985,8 @@ export namespace Prisma {
     fabricCode?: boolean
     colour?: boolean
     shade?: boolean
+    requiredColour?: boolean
+    requiredQuantity?: boolean
     size?: boolean
     unitType?: boolean
     rollNumber?: boolean
@@ -45992,6 +46012,8 @@ export namespace Prisma {
     fabricCode?: boolean
     colour?: boolean
     shade?: boolean
+    requiredColour?: boolean
+    requiredQuantity?: boolean
     size?: boolean
     unitType?: boolean
     rollNumber?: boolean
@@ -46017,6 +46039,8 @@ export namespace Prisma {
     fabricCode?: boolean
     colour?: boolean
     shade?: boolean
+    requiredColour?: boolean
+    requiredQuantity?: boolean
     size?: boolean
     unitType?: boolean
     rollNumber?: boolean
@@ -46042,6 +46066,8 @@ export namespace Prisma {
     fabricCode?: boolean
     colour?: boolean
     shade?: boolean
+    requiredColour?: boolean
+    requiredQuantity?: boolean
     size?: boolean
     unitType?: boolean
     rollNumber?: boolean
@@ -46059,7 +46085,7 @@ export namespace Prisma {
     createdAt?: boolean
   }
 
-  export type ChallanItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "challanId" | "itemDescription" | "fabricCode" | "colour" | "shade" | "size" | "unitType" | "rollNumber" | "lotNumber" | "bundleNumber" | "barcode" | "quantity" | "grossWeightKg" | "netWeightKg" | "uom" | "remarks" | "sourceLotId" | "sourceRollId" | "sourceBundleId" | "createdAt", ExtArgs["result"]["challanItem"]>
+  export type ChallanItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "challanId" | "itemDescription" | "fabricCode" | "colour" | "shade" | "requiredColour" | "requiredQuantity" | "size" | "unitType" | "rollNumber" | "lotNumber" | "bundleNumber" | "barcode" | "quantity" | "grossWeightKg" | "netWeightKg" | "uom" | "remarks" | "sourceLotId" | "sourceRollId" | "sourceBundleId" | "createdAt", ExtArgs["result"]["challanItem"]>
   export type ChallanItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     challan?: boolean | ChallanDefaultArgs<ExtArgs>
   }
@@ -46082,6 +46108,8 @@ export namespace Prisma {
       fabricCode: string | null
       colour: string | null
       shade: string | null
+      requiredColour: string | null
+      requiredQuantity: number | null
       size: string | null
       unitType: string
       rollNumber: string | null
@@ -46527,6 +46555,8 @@ export namespace Prisma {
     readonly fabricCode: FieldRef<"ChallanItem", 'String'>
     readonly colour: FieldRef<"ChallanItem", 'String'>
     readonly shade: FieldRef<"ChallanItem", 'String'>
+    readonly requiredColour: FieldRef<"ChallanItem", 'String'>
+    readonly requiredQuantity: FieldRef<"ChallanItem", 'Float'>
     readonly size: FieldRef<"ChallanItem", 'String'>
     readonly unitType: FieldRef<"ChallanItem", 'String'>
     readonly rollNumber: FieldRef<"ChallanItem", 'String'>
@@ -52877,6 +52907,7 @@ export namespace Prisma {
     actorId: string | null
     balanceAfter: number | null
     notes: string | null
+    idempotencyKey: string | null
     createdAt: Date | null
   }
 
@@ -52901,6 +52932,7 @@ export namespace Prisma {
     actorId: string | null
     balanceAfter: number | null
     notes: string | null
+    idempotencyKey: string | null
     createdAt: Date | null
   }
 
@@ -52925,6 +52957,7 @@ export namespace Prisma {
     actorId: number
     balanceAfter: number
     notes: number
+    idempotencyKey: number
     createdAt: number
     _all: number
   }
@@ -52963,6 +52996,7 @@ export namespace Prisma {
     actorId?: true
     balanceAfter?: true
     notes?: true
+    idempotencyKey?: true
     createdAt?: true
   }
 
@@ -52987,6 +53021,7 @@ export namespace Prisma {
     actorId?: true
     balanceAfter?: true
     notes?: true
+    idempotencyKey?: true
     createdAt?: true
   }
 
@@ -53011,6 +53046,7 @@ export namespace Prisma {
     actorId?: true
     balanceAfter?: true
     notes?: true
+    idempotencyKey?: true
     createdAt?: true
     _all?: true
   }
@@ -53122,6 +53158,7 @@ export namespace Prisma {
     actorId: string
     balanceAfter: number
     notes: string | null
+    idempotencyKey: string | null
     createdAt: Date
     _count: StockLedgerEntryCountAggregateOutputType | null
     _avg: StockLedgerEntryAvgAggregateOutputType | null
@@ -53165,6 +53202,7 @@ export namespace Prisma {
     actorId?: boolean
     balanceAfter?: boolean
     notes?: boolean
+    idempotencyKey?: boolean
     createdAt?: boolean
     program?: boolean | StockLedgerEntry$programArgs<ExtArgs>
     actor?: boolean | UserDefaultArgs<ExtArgs>
@@ -53191,6 +53229,7 @@ export namespace Prisma {
     actorId?: boolean
     balanceAfter?: boolean
     notes?: boolean
+    idempotencyKey?: boolean
     createdAt?: boolean
     program?: boolean | StockLedgerEntry$programArgs<ExtArgs>
     actor?: boolean | UserDefaultArgs<ExtArgs>
@@ -53217,6 +53256,7 @@ export namespace Prisma {
     actorId?: boolean
     balanceAfter?: boolean
     notes?: boolean
+    idempotencyKey?: boolean
     createdAt?: boolean
     program?: boolean | StockLedgerEntry$programArgs<ExtArgs>
     actor?: boolean | UserDefaultArgs<ExtArgs>
@@ -53243,10 +53283,11 @@ export namespace Prisma {
     actorId?: boolean
     balanceAfter?: boolean
     notes?: boolean
+    idempotencyKey?: boolean
     createdAt?: boolean
   }
 
-  export type StockLedgerEntryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "entryType" | "departmentCode" | "itemCode" | "itemName" | "batchNumber" | "lotNumber" | "rollNumber" | "colour" | "shade" | "location" | "quantity" | "weightKg" | "uom" | "referenceType" | "referenceId" | "programId" | "actorId" | "balanceAfter" | "notes" | "createdAt", ExtArgs["result"]["stockLedgerEntry"]>
+  export type StockLedgerEntryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "entryType" | "departmentCode" | "itemCode" | "itemName" | "batchNumber" | "lotNumber" | "rollNumber" | "colour" | "shade" | "location" | "quantity" | "weightKg" | "uom" | "referenceType" | "referenceId" | "programId" | "actorId" | "balanceAfter" | "notes" | "idempotencyKey" | "createdAt", ExtArgs["result"]["stockLedgerEntry"]>
   export type StockLedgerEntryInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     program?: boolean | StockLedgerEntry$programArgs<ExtArgs>
     actor?: boolean | UserDefaultArgs<ExtArgs>
@@ -53287,6 +53328,7 @@ export namespace Prisma {
       actorId: string
       balanceAfter: number
       notes: string | null
+      idempotencyKey: string | null
       createdAt: Date
     }, ExtArgs["result"]["stockLedgerEntry"]>
     composites: {}
@@ -53733,6 +53775,7 @@ export namespace Prisma {
     readonly actorId: FieldRef<"StockLedgerEntry", 'String'>
     readonly balanceAfter: FieldRef<"StockLedgerEntry", 'Float'>
     readonly notes: FieldRef<"StockLedgerEntry", 'String'>
+    readonly idempotencyKey: FieldRef<"StockLedgerEntry", 'String'>
     readonly createdAt: FieldRef<"StockLedgerEntry", 'DateTime'>
   }
     
@@ -80196,6 +80239,7 @@ export namespace Prisma {
     receivingDate: Date | null
     billQty: number | null
     unit: string | null
+    colour: string | null
     supplierName: string | null
     remarks: string | null
     createdAt: Date | null
@@ -80212,6 +80256,7 @@ export namespace Prisma {
     receivingDate: Date | null
     billQty: number | null
     unit: string | null
+    colour: string | null
     supplierName: string | null
     remarks: string | null
     createdAt: Date | null
@@ -80228,6 +80273,7 @@ export namespace Prisma {
     receivingDate: number
     billQty: number
     unit: number
+    colour: number
     supplierName: number
     remarks: number
     createdAt: number
@@ -80256,6 +80302,7 @@ export namespace Prisma {
     receivingDate?: true
     billQty?: true
     unit?: true
+    colour?: true
     supplierName?: true
     remarks?: true
     createdAt?: true
@@ -80272,6 +80319,7 @@ export namespace Prisma {
     receivingDate?: true
     billQty?: true
     unit?: true
+    colour?: true
     supplierName?: true
     remarks?: true
     createdAt?: true
@@ -80288,6 +80336,7 @@ export namespace Prisma {
     receivingDate?: true
     billQty?: true
     unit?: true
+    colour?: true
     supplierName?: true
     remarks?: true
     createdAt?: true
@@ -80391,6 +80440,7 @@ export namespace Prisma {
     receivingDate: Date
     billQty: number
     unit: string
+    colour: string | null
     supplierName: string | null
     remarks: string | null
     createdAt: Date
@@ -80426,6 +80476,7 @@ export namespace Prisma {
     receivingDate?: boolean
     billQty?: boolean
     unit?: boolean
+    colour?: boolean
     supplierName?: boolean
     remarks?: boolean
     createdAt?: boolean
@@ -80442,6 +80493,7 @@ export namespace Prisma {
     receivingDate?: boolean
     billQty?: boolean
     unit?: boolean
+    colour?: boolean
     supplierName?: boolean
     remarks?: boolean
     createdAt?: boolean
@@ -80458,6 +80510,7 @@ export namespace Prisma {
     receivingDate?: boolean
     billQty?: boolean
     unit?: boolean
+    colour?: boolean
     supplierName?: boolean
     remarks?: boolean
     createdAt?: boolean
@@ -80474,13 +80527,14 @@ export namespace Prisma {
     receivingDate?: boolean
     billQty?: boolean
     unit?: boolean
+    colour?: boolean
     supplierName?: boolean
     remarks?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type FabricInwardOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sNo" | "entryType" | "itemName" | "billNo" | "billDate" | "receivingDate" | "billQty" | "unit" | "supplierName" | "remarks" | "createdAt" | "updatedAt", ExtArgs["result"]["fabricInward"]>
+  export type FabricInwardOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sNo" | "entryType" | "itemName" | "billNo" | "billDate" | "receivingDate" | "billQty" | "unit" | "colour" | "supplierName" | "remarks" | "createdAt" | "updatedAt", ExtArgs["result"]["fabricInward"]>
 
   export type $FabricInwardPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "FabricInward"
@@ -80495,6 +80549,7 @@ export namespace Prisma {
       receivingDate: Date
       billQty: number
       unit: string
+      colour: string | null
       supplierName: string | null
       remarks: string | null
       createdAt: Date
@@ -80931,6 +80986,7 @@ export namespace Prisma {
     readonly receivingDate: FieldRef<"FabricInward", 'DateTime'>
     readonly billQty: FieldRef<"FabricInward", 'Float'>
     readonly unit: FieldRef<"FabricInward", 'String'>
+    readonly colour: FieldRef<"FabricInward", 'String'>
     readonly supplierName: FieldRef<"FabricInward", 'String'>
     readonly remarks: FieldRef<"FabricInward", 'String'>
     readonly createdAt: FieldRef<"FabricInward", 'DateTime'>
@@ -81337,6 +81393,7 @@ export namespace Prisma {
     itemName: string | null
     issueQty: number | null
     unit: string | null
+    colour: string | null
     avgPerPcs: number | null
     issuePcsQty: number | null
     byOrderName: string | null
@@ -81357,6 +81414,7 @@ export namespace Prisma {
     itemName: string | null
     issueQty: number | null
     unit: string | null
+    colour: string | null
     avgPerPcs: number | null
     issuePcsQty: number | null
     byOrderName: string | null
@@ -81377,6 +81435,7 @@ export namespace Prisma {
     itemName: number
     issueQty: number
     unit: number
+    colour: number
     avgPerPcs: number
     issuePcsQty: number
     byOrderName: number
@@ -81413,6 +81472,7 @@ export namespace Prisma {
     itemName?: true
     issueQty?: true
     unit?: true
+    colour?: true
     avgPerPcs?: true
     issuePcsQty?: true
     byOrderName?: true
@@ -81433,6 +81493,7 @@ export namespace Prisma {
     itemName?: true
     issueQty?: true
     unit?: true
+    colour?: true
     avgPerPcs?: true
     issuePcsQty?: true
     byOrderName?: true
@@ -81453,6 +81514,7 @@ export namespace Prisma {
     itemName?: true
     issueQty?: true
     unit?: true
+    colour?: true
     avgPerPcs?: true
     issuePcsQty?: true
     byOrderName?: true
@@ -81560,6 +81622,7 @@ export namespace Prisma {
     itemName: string
     issueQty: number
     unit: string
+    colour: string | null
     avgPerPcs: number | null
     issuePcsQty: number | null
     byOrderName: string | null
@@ -81599,6 +81662,7 @@ export namespace Prisma {
     itemName?: boolean
     issueQty?: boolean
     unit?: boolean
+    colour?: boolean
     avgPerPcs?: boolean
     issuePcsQty?: boolean
     byOrderName?: boolean
@@ -81619,6 +81683,7 @@ export namespace Prisma {
     itemName?: boolean
     issueQty?: boolean
     unit?: boolean
+    colour?: boolean
     avgPerPcs?: boolean
     issuePcsQty?: boolean
     byOrderName?: boolean
@@ -81639,6 +81704,7 @@ export namespace Prisma {
     itemName?: boolean
     issueQty?: boolean
     unit?: boolean
+    colour?: boolean
     avgPerPcs?: boolean
     issuePcsQty?: boolean
     byOrderName?: boolean
@@ -81659,6 +81725,7 @@ export namespace Prisma {
     itemName?: boolean
     issueQty?: boolean
     unit?: boolean
+    colour?: boolean
     avgPerPcs?: boolean
     issuePcsQty?: boolean
     byOrderName?: boolean
@@ -81669,7 +81736,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type FabricOutwardOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sNo" | "date" | "challanNumber" | "challanId" | "designNumber" | "itemName" | "issueQty" | "unit" | "avgPerPcs" | "issuePcsQty" | "byOrderName" | "remarks" | "destination" | "fabricType" | "createdAt" | "updatedAt", ExtArgs["result"]["fabricOutward"]>
+  export type FabricOutwardOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sNo" | "date" | "challanNumber" | "challanId" | "designNumber" | "itemName" | "issueQty" | "unit" | "colour" | "avgPerPcs" | "issuePcsQty" | "byOrderName" | "remarks" | "destination" | "fabricType" | "createdAt" | "updatedAt", ExtArgs["result"]["fabricOutward"]>
 
   export type $FabricOutwardPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "FabricOutward"
@@ -81684,6 +81751,7 @@ export namespace Prisma {
       itemName: string
       issueQty: number
       unit: string
+      colour: string | null
       avgPerPcs: number | null
       issuePcsQty: number | null
       byOrderName: string | null
@@ -82124,6 +82192,7 @@ export namespace Prisma {
     readonly itemName: FieldRef<"FabricOutward", 'String'>
     readonly issueQty: FieldRef<"FabricOutward", 'Float'>
     readonly unit: FieldRef<"FabricOutward", 'String'>
+    readonly colour: FieldRef<"FabricOutward", 'String'>
     readonly avgPerPcs: FieldRef<"FabricOutward", 'Float'>
     readonly issuePcsQty: FieldRef<"FabricOutward", 'Float'>
     readonly byOrderName: FieldRef<"FabricOutward", 'String'>
@@ -85539,6 +85608,8 @@ export namespace Prisma {
     fabricCode: 'fabricCode',
     colour: 'colour',
     shade: 'shade',
+    requiredColour: 'requiredColour',
+    requiredQuantity: 'requiredQuantity',
     size: 'size',
     unitType: 'unitType',
     rollNumber: 'rollNumber',
@@ -85666,6 +85737,7 @@ export namespace Prisma {
     actorId: 'actorId',
     balanceAfter: 'balanceAfter',
     notes: 'notes',
+    idempotencyKey: 'idempotencyKey',
     createdAt: 'createdAt'
   };
 
@@ -86078,6 +86150,7 @@ export namespace Prisma {
     receivingDate: 'receivingDate',
     billQty: 'billQty',
     unit: 'unit',
+    colour: 'colour',
     supplierName: 'supplierName',
     remarks: 'remarks',
     createdAt: 'createdAt',
@@ -86097,6 +86170,7 @@ export namespace Prisma {
     itemName: 'itemName',
     issueQty: 'issueQty',
     unit: 'unit',
+    colour: 'colour',
     avgPerPcs: 'avgPerPcs',
     issuePcsQty: 'issuePcsQty',
     byOrderName: 'byOrderName',
@@ -89372,6 +89446,8 @@ export namespace Prisma {
     fabricCode?: StringNullableFilter<"ChallanItem"> | string | null
     colour?: StringNullableFilter<"ChallanItem"> | string | null
     shade?: StringNullableFilter<"ChallanItem"> | string | null
+    requiredColour?: StringNullableFilter<"ChallanItem"> | string | null
+    requiredQuantity?: FloatNullableFilter<"ChallanItem"> | number | null
     size?: StringNullableFilter<"ChallanItem"> | string | null
     unitType?: StringFilter<"ChallanItem"> | string
     rollNumber?: StringNullableFilter<"ChallanItem"> | string | null
@@ -89397,6 +89473,8 @@ export namespace Prisma {
     fabricCode?: SortOrderInput | SortOrder
     colour?: SortOrderInput | SortOrder
     shade?: SortOrderInput | SortOrder
+    requiredColour?: SortOrderInput | SortOrder
+    requiredQuantity?: SortOrderInput | SortOrder
     size?: SortOrderInput | SortOrder
     unitType?: SortOrder
     rollNumber?: SortOrderInput | SortOrder
@@ -89425,6 +89503,8 @@ export namespace Prisma {
     fabricCode?: StringNullableFilter<"ChallanItem"> | string | null
     colour?: StringNullableFilter<"ChallanItem"> | string | null
     shade?: StringNullableFilter<"ChallanItem"> | string | null
+    requiredColour?: StringNullableFilter<"ChallanItem"> | string | null
+    requiredQuantity?: FloatNullableFilter<"ChallanItem"> | number | null
     size?: StringNullableFilter<"ChallanItem"> | string | null
     unitType?: StringFilter<"ChallanItem"> | string
     rollNumber?: StringNullableFilter<"ChallanItem"> | string | null
@@ -89450,6 +89530,8 @@ export namespace Prisma {
     fabricCode?: SortOrderInput | SortOrder
     colour?: SortOrderInput | SortOrder
     shade?: SortOrderInput | SortOrder
+    requiredColour?: SortOrderInput | SortOrder
+    requiredQuantity?: SortOrderInput | SortOrder
     size?: SortOrderInput | SortOrder
     unitType?: SortOrder
     rollNumber?: SortOrderInput | SortOrder
@@ -89482,6 +89564,8 @@ export namespace Prisma {
     fabricCode?: StringNullableWithAggregatesFilter<"ChallanItem"> | string | null
     colour?: StringNullableWithAggregatesFilter<"ChallanItem"> | string | null
     shade?: StringNullableWithAggregatesFilter<"ChallanItem"> | string | null
+    requiredColour?: StringNullableWithAggregatesFilter<"ChallanItem"> | string | null
+    requiredQuantity?: FloatNullableWithAggregatesFilter<"ChallanItem"> | number | null
     size?: StringNullableWithAggregatesFilter<"ChallanItem"> | string | null
     unitType?: StringWithAggregatesFilter<"ChallanItem"> | string
     rollNumber?: StringNullableWithAggregatesFilter<"ChallanItem"> | string | null
@@ -89977,6 +90061,7 @@ export namespace Prisma {
     actorId?: StringFilter<"StockLedgerEntry"> | string
     balanceAfter?: FloatFilter<"StockLedgerEntry"> | number
     notes?: StringNullableFilter<"StockLedgerEntry"> | string | null
+    idempotencyKey?: StringNullableFilter<"StockLedgerEntry"> | string | null
     createdAt?: DateTimeFilter<"StockLedgerEntry"> | Date | string
     program?: XOR<ProgramNullableScalarRelationFilter, ProgramWhereInput> | null
     actor?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -90003,6 +90088,7 @@ export namespace Prisma {
     actorId?: SortOrder
     balanceAfter?: SortOrder
     notes?: SortOrderInput | SortOrder
+    idempotencyKey?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     program?: ProgramOrderByWithRelationInput
     actor?: UserOrderByWithRelationInput
@@ -90010,6 +90096,7 @@ export namespace Prisma {
 
   export type StockLedgerEntryWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    idempotencyKey?: string
     AND?: StockLedgerEntryWhereInput | StockLedgerEntryWhereInput[]
     OR?: StockLedgerEntryWhereInput[]
     NOT?: StockLedgerEntryWhereInput | StockLedgerEntryWhereInput[]
@@ -90035,7 +90122,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"StockLedgerEntry"> | Date | string
     program?: XOR<ProgramNullableScalarRelationFilter, ProgramWhereInput> | null
     actor?: XOR<UserScalarRelationFilter, UserWhereInput>
-  }, "id">
+  }, "id" | "idempotencyKey">
 
   export type StockLedgerEntryOrderByWithAggregationInput = {
     id?: SortOrder
@@ -90058,6 +90145,7 @@ export namespace Prisma {
     actorId?: SortOrder
     balanceAfter?: SortOrder
     notes?: SortOrderInput | SortOrder
+    idempotencyKey?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     _count?: StockLedgerEntryCountOrderByAggregateInput
     _avg?: StockLedgerEntryAvgOrderByAggregateInput
@@ -90090,6 +90178,7 @@ export namespace Prisma {
     actorId?: StringWithAggregatesFilter<"StockLedgerEntry"> | string
     balanceAfter?: FloatWithAggregatesFilter<"StockLedgerEntry"> | number
     notes?: StringNullableWithAggregatesFilter<"StockLedgerEntry"> | string | null
+    idempotencyKey?: StringNullableWithAggregatesFilter<"StockLedgerEntry"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"StockLedgerEntry"> | Date | string
   }
 
@@ -92261,6 +92350,7 @@ export namespace Prisma {
     receivingDate?: DateTimeFilter<"FabricInward"> | Date | string
     billQty?: FloatFilter<"FabricInward"> | number
     unit?: StringFilter<"FabricInward"> | string
+    colour?: StringNullableFilter<"FabricInward"> | string | null
     supplierName?: StringNullableFilter<"FabricInward"> | string | null
     remarks?: StringNullableFilter<"FabricInward"> | string | null
     createdAt?: DateTimeFilter<"FabricInward"> | Date | string
@@ -92277,6 +92367,7 @@ export namespace Prisma {
     receivingDate?: SortOrder
     billQty?: SortOrder
     unit?: SortOrder
+    colour?: SortOrderInput | SortOrder
     supplierName?: SortOrderInput | SortOrder
     remarks?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -92296,6 +92387,7 @@ export namespace Prisma {
     receivingDate?: DateTimeFilter<"FabricInward"> | Date | string
     billQty?: FloatFilter<"FabricInward"> | number
     unit?: StringFilter<"FabricInward"> | string
+    colour?: StringNullableFilter<"FabricInward"> | string | null
     supplierName?: StringNullableFilter<"FabricInward"> | string | null
     remarks?: StringNullableFilter<"FabricInward"> | string | null
     createdAt?: DateTimeFilter<"FabricInward"> | Date | string
@@ -92312,6 +92404,7 @@ export namespace Prisma {
     receivingDate?: SortOrder
     billQty?: SortOrder
     unit?: SortOrder
+    colour?: SortOrderInput | SortOrder
     supplierName?: SortOrderInput | SortOrder
     remarks?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -92336,6 +92429,7 @@ export namespace Prisma {
     receivingDate?: DateTimeWithAggregatesFilter<"FabricInward"> | Date | string
     billQty?: FloatWithAggregatesFilter<"FabricInward"> | number
     unit?: StringWithAggregatesFilter<"FabricInward"> | string
+    colour?: StringNullableWithAggregatesFilter<"FabricInward"> | string | null
     supplierName?: StringNullableWithAggregatesFilter<"FabricInward"> | string | null
     remarks?: StringNullableWithAggregatesFilter<"FabricInward"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"FabricInward"> | Date | string
@@ -92355,6 +92449,7 @@ export namespace Prisma {
     itemName?: StringFilter<"FabricOutward"> | string
     issueQty?: FloatFilter<"FabricOutward"> | number
     unit?: StringFilter<"FabricOutward"> | string
+    colour?: StringNullableFilter<"FabricOutward"> | string | null
     avgPerPcs?: FloatNullableFilter<"FabricOutward"> | number | null
     issuePcsQty?: FloatNullableFilter<"FabricOutward"> | number | null
     byOrderName?: StringNullableFilter<"FabricOutward"> | string | null
@@ -92375,6 +92470,7 @@ export namespace Prisma {
     itemName?: SortOrder
     issueQty?: SortOrder
     unit?: SortOrder
+    colour?: SortOrderInput | SortOrder
     avgPerPcs?: SortOrderInput | SortOrder
     issuePcsQty?: SortOrderInput | SortOrder
     byOrderName?: SortOrderInput | SortOrder
@@ -92398,6 +92494,7 @@ export namespace Prisma {
     itemName?: StringFilter<"FabricOutward"> | string
     issueQty?: FloatFilter<"FabricOutward"> | number
     unit?: StringFilter<"FabricOutward"> | string
+    colour?: StringNullableFilter<"FabricOutward"> | string | null
     avgPerPcs?: FloatNullableFilter<"FabricOutward"> | number | null
     issuePcsQty?: FloatNullableFilter<"FabricOutward"> | number | null
     byOrderName?: StringNullableFilter<"FabricOutward"> | string | null
@@ -92418,6 +92515,7 @@ export namespace Prisma {
     itemName?: SortOrder
     issueQty?: SortOrder
     unit?: SortOrder
+    colour?: SortOrderInput | SortOrder
     avgPerPcs?: SortOrderInput | SortOrder
     issuePcsQty?: SortOrderInput | SortOrder
     byOrderName?: SortOrderInput | SortOrder
@@ -92446,6 +92544,7 @@ export namespace Prisma {
     itemName?: StringWithAggregatesFilter<"FabricOutward"> | string
     issueQty?: FloatWithAggregatesFilter<"FabricOutward"> | number
     unit?: StringWithAggregatesFilter<"FabricOutward"> | string
+    colour?: StringNullableWithAggregatesFilter<"FabricOutward"> | string | null
     avgPerPcs?: FloatNullableWithAggregatesFilter<"FabricOutward"> | number | null
     issuePcsQty?: FloatNullableWithAggregatesFilter<"FabricOutward"> | number | null
     byOrderName?: StringNullableWithAggregatesFilter<"FabricOutward"> | string | null
@@ -96043,6 +96142,8 @@ export namespace Prisma {
     fabricCode?: string | null
     colour?: string | null
     shade?: string | null
+    requiredColour?: string | null
+    requiredQuantity?: number | null
     size?: string | null
     unitType: string
     rollNumber?: string | null
@@ -96068,6 +96169,8 @@ export namespace Prisma {
     fabricCode?: string | null
     colour?: string | null
     shade?: string | null
+    requiredColour?: string | null
+    requiredQuantity?: number | null
     size?: string | null
     unitType: string
     rollNumber?: string | null
@@ -96091,6 +96194,8 @@ export namespace Prisma {
     fabricCode?: NullableStringFieldUpdateOperationsInput | string | null
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     shade?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     size?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: StringFieldUpdateOperationsInput | string
     rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
@@ -96116,6 +96221,8 @@ export namespace Prisma {
     fabricCode?: NullableStringFieldUpdateOperationsInput | string | null
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     shade?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     size?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: StringFieldUpdateOperationsInput | string
     rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
@@ -96140,6 +96247,8 @@ export namespace Prisma {
     fabricCode?: string | null
     colour?: string | null
     shade?: string | null
+    requiredColour?: string | null
+    requiredQuantity?: number | null
     size?: string | null
     unitType: string
     rollNumber?: string | null
@@ -96163,6 +96272,8 @@ export namespace Prisma {
     fabricCode?: NullableStringFieldUpdateOperationsInput | string | null
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     shade?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     size?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: StringFieldUpdateOperationsInput | string
     rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
@@ -96187,6 +96298,8 @@ export namespace Prisma {
     fabricCode?: NullableStringFieldUpdateOperationsInput | string | null
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     shade?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     size?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: StringFieldUpdateOperationsInput | string
     rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
@@ -96720,6 +96833,7 @@ export namespace Prisma {
     referenceId?: string | null
     balanceAfter: number
     notes?: string | null
+    idempotencyKey?: string | null
     createdAt?: Date | string
     program?: ProgramCreateNestedOneWithoutStockLedgerEntriesInput
     actor: UserCreateNestedOneWithoutStockLedgerEntriesInput
@@ -96746,6 +96860,7 @@ export namespace Prisma {
     actorId: string
     balanceAfter: number
     notes?: string | null
+    idempotencyKey?: string | null
     createdAt?: Date | string
   }
 
@@ -96768,6 +96883,7 @@ export namespace Prisma {
     referenceId?: NullableStringFieldUpdateOperationsInput | string | null
     balanceAfter?: FloatFieldUpdateOperationsInput | number
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     program?: ProgramUpdateOneWithoutStockLedgerEntriesNestedInput
     actor?: UserUpdateOneRequiredWithoutStockLedgerEntriesNestedInput
@@ -96794,6 +96910,7 @@ export namespace Prisma {
     actorId?: StringFieldUpdateOperationsInput | string
     balanceAfter?: FloatFieldUpdateOperationsInput | number
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -96818,6 +96935,7 @@ export namespace Prisma {
     actorId: string
     balanceAfter: number
     notes?: string | null
+    idempotencyKey?: string | null
     createdAt?: Date | string
   }
 
@@ -96840,6 +96958,7 @@ export namespace Prisma {
     referenceId?: NullableStringFieldUpdateOperationsInput | string | null
     balanceAfter?: FloatFieldUpdateOperationsInput | number
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -96864,6 +96983,7 @@ export namespace Prisma {
     actorId?: StringFieldUpdateOperationsInput | string
     balanceAfter?: FloatFieldUpdateOperationsInput | number
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -99240,6 +99360,7 @@ export namespace Prisma {
     receivingDate: Date | string
     billQty: number
     unit?: string
+    colour?: string | null
     supplierName?: string | null
     remarks?: string | null
     createdAt?: Date | string
@@ -99256,6 +99377,7 @@ export namespace Prisma {
     receivingDate: Date | string
     billQty: number
     unit?: string
+    colour?: string | null
     supplierName?: string | null
     remarks?: string | null
     createdAt?: Date | string
@@ -99272,6 +99394,7 @@ export namespace Prisma {
     receivingDate?: DateTimeFieldUpdateOperationsInput | Date | string
     billQty?: FloatFieldUpdateOperationsInput | number
     unit?: StringFieldUpdateOperationsInput | string
+    colour?: NullableStringFieldUpdateOperationsInput | string | null
     supplierName?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -99288,6 +99411,7 @@ export namespace Prisma {
     receivingDate?: DateTimeFieldUpdateOperationsInput | Date | string
     billQty?: FloatFieldUpdateOperationsInput | number
     unit?: StringFieldUpdateOperationsInput | string
+    colour?: NullableStringFieldUpdateOperationsInput | string | null
     supplierName?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -99304,6 +99428,7 @@ export namespace Prisma {
     receivingDate: Date | string
     billQty: number
     unit?: string
+    colour?: string | null
     supplierName?: string | null
     remarks?: string | null
     createdAt?: Date | string
@@ -99320,6 +99445,7 @@ export namespace Prisma {
     receivingDate?: DateTimeFieldUpdateOperationsInput | Date | string
     billQty?: FloatFieldUpdateOperationsInput | number
     unit?: StringFieldUpdateOperationsInput | string
+    colour?: NullableStringFieldUpdateOperationsInput | string | null
     supplierName?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -99336,6 +99462,7 @@ export namespace Prisma {
     receivingDate?: DateTimeFieldUpdateOperationsInput | Date | string
     billQty?: FloatFieldUpdateOperationsInput | number
     unit?: StringFieldUpdateOperationsInput | string
+    colour?: NullableStringFieldUpdateOperationsInput | string | null
     supplierName?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -99352,6 +99479,7 @@ export namespace Prisma {
     itemName: string
     issueQty: number
     unit?: string
+    colour?: string | null
     avgPerPcs?: number | null
     issuePcsQty?: number | null
     byOrderName?: string | null
@@ -99372,6 +99500,7 @@ export namespace Prisma {
     itemName: string
     issueQty: number
     unit?: string
+    colour?: string | null
     avgPerPcs?: number | null
     issuePcsQty?: number | null
     byOrderName?: string | null
@@ -99392,6 +99521,7 @@ export namespace Prisma {
     itemName?: StringFieldUpdateOperationsInput | string
     issueQty?: FloatFieldUpdateOperationsInput | number
     unit?: StringFieldUpdateOperationsInput | string
+    colour?: NullableStringFieldUpdateOperationsInput | string | null
     avgPerPcs?: NullableFloatFieldUpdateOperationsInput | number | null
     issuePcsQty?: NullableFloatFieldUpdateOperationsInput | number | null
     byOrderName?: NullableStringFieldUpdateOperationsInput | string | null
@@ -99412,6 +99542,7 @@ export namespace Prisma {
     itemName?: StringFieldUpdateOperationsInput | string
     issueQty?: FloatFieldUpdateOperationsInput | number
     unit?: StringFieldUpdateOperationsInput | string
+    colour?: NullableStringFieldUpdateOperationsInput | string | null
     avgPerPcs?: NullableFloatFieldUpdateOperationsInput | number | null
     issuePcsQty?: NullableFloatFieldUpdateOperationsInput | number | null
     byOrderName?: NullableStringFieldUpdateOperationsInput | string | null
@@ -99432,6 +99563,7 @@ export namespace Prisma {
     itemName: string
     issueQty: number
     unit?: string
+    colour?: string | null
     avgPerPcs?: number | null
     issuePcsQty?: number | null
     byOrderName?: string | null
@@ -99452,6 +99584,7 @@ export namespace Prisma {
     itemName?: StringFieldUpdateOperationsInput | string
     issueQty?: FloatFieldUpdateOperationsInput | number
     unit?: StringFieldUpdateOperationsInput | string
+    colour?: NullableStringFieldUpdateOperationsInput | string | null
     avgPerPcs?: NullableFloatFieldUpdateOperationsInput | number | null
     issuePcsQty?: NullableFloatFieldUpdateOperationsInput | number | null
     byOrderName?: NullableStringFieldUpdateOperationsInput | string | null
@@ -99472,6 +99605,7 @@ export namespace Prisma {
     itemName?: StringFieldUpdateOperationsInput | string
     issueQty?: FloatFieldUpdateOperationsInput | number
     unit?: StringFieldUpdateOperationsInput | string
+    colour?: NullableStringFieldUpdateOperationsInput | string | null
     avgPerPcs?: NullableFloatFieldUpdateOperationsInput | number | null
     issuePcsQty?: NullableFloatFieldUpdateOperationsInput | number | null
     byOrderName?: NullableStringFieldUpdateOperationsInput | string | null
@@ -102007,6 +102141,8 @@ export namespace Prisma {
     fabricCode?: SortOrder
     colour?: SortOrder
     shade?: SortOrder
+    requiredColour?: SortOrder
+    requiredQuantity?: SortOrder
     size?: SortOrder
     unitType?: SortOrder
     rollNumber?: SortOrder
@@ -102025,6 +102161,7 @@ export namespace Prisma {
   }
 
   export type ChallanItemAvgOrderByAggregateInput = {
+    requiredQuantity?: SortOrder
     quantity?: SortOrder
     grossWeightKg?: SortOrder
     netWeightKg?: SortOrder
@@ -102037,6 +102174,8 @@ export namespace Prisma {
     fabricCode?: SortOrder
     colour?: SortOrder
     shade?: SortOrder
+    requiredColour?: SortOrder
+    requiredQuantity?: SortOrder
     size?: SortOrder
     unitType?: SortOrder
     rollNumber?: SortOrder
@@ -102061,6 +102200,8 @@ export namespace Prisma {
     fabricCode?: SortOrder
     colour?: SortOrder
     shade?: SortOrder
+    requiredColour?: SortOrder
+    requiredQuantity?: SortOrder
     size?: SortOrder
     unitType?: SortOrder
     rollNumber?: SortOrder
@@ -102079,6 +102220,7 @@ export namespace Prisma {
   }
 
   export type ChallanItemSumOrderByAggregateInput = {
+    requiredQuantity?: SortOrder
     quantity?: SortOrder
     grossWeightKg?: SortOrder
     netWeightKg?: SortOrder
@@ -102395,6 +102537,7 @@ export namespace Prisma {
     actorId?: SortOrder
     balanceAfter?: SortOrder
     notes?: SortOrder
+    idempotencyKey?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -102425,6 +102568,7 @@ export namespace Prisma {
     actorId?: SortOrder
     balanceAfter?: SortOrder
     notes?: SortOrder
+    idempotencyKey?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -102449,6 +102593,7 @@ export namespace Prisma {
     actorId?: SortOrder
     balanceAfter?: SortOrder
     notes?: SortOrder
+    idempotencyKey?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -103960,6 +104105,7 @@ export namespace Prisma {
     receivingDate?: SortOrder
     billQty?: SortOrder
     unit?: SortOrder
+    colour?: SortOrder
     supplierName?: SortOrder
     remarks?: SortOrder
     createdAt?: SortOrder
@@ -103981,6 +104127,7 @@ export namespace Prisma {
     receivingDate?: SortOrder
     billQty?: SortOrder
     unit?: SortOrder
+    colour?: SortOrder
     supplierName?: SortOrder
     remarks?: SortOrder
     createdAt?: SortOrder
@@ -103997,6 +104144,7 @@ export namespace Prisma {
     receivingDate?: SortOrder
     billQty?: SortOrder
     unit?: SortOrder
+    colour?: SortOrder
     supplierName?: SortOrder
     remarks?: SortOrder
     createdAt?: SortOrder
@@ -104018,6 +104166,7 @@ export namespace Prisma {
     itemName?: SortOrder
     issueQty?: SortOrder
     unit?: SortOrder
+    colour?: SortOrder
     avgPerPcs?: SortOrder
     issuePcsQty?: SortOrder
     byOrderName?: SortOrder
@@ -104045,6 +104194,7 @@ export namespace Prisma {
     itemName?: SortOrder
     issueQty?: SortOrder
     unit?: SortOrder
+    colour?: SortOrder
     avgPerPcs?: SortOrder
     issuePcsQty?: SortOrder
     byOrderName?: SortOrder
@@ -104065,6 +104215,7 @@ export namespace Prisma {
     itemName?: SortOrder
     issueQty?: SortOrder
     unit?: SortOrder
+    colour?: SortOrder
     avgPerPcs?: SortOrder
     issuePcsQty?: SortOrder
     byOrderName?: SortOrder
@@ -111529,6 +111680,7 @@ export namespace Prisma {
     referenceId?: string | null
     balanceAfter: number
     notes?: string | null
+    idempotencyKey?: string | null
     createdAt?: Date | string
     program?: ProgramCreateNestedOneWithoutStockLedgerEntriesInput
   }
@@ -111553,6 +111705,7 @@ export namespace Prisma {
     programId?: string | null
     balanceAfter: number
     notes?: string | null
+    idempotencyKey?: string | null
     createdAt?: Date | string
   }
 
@@ -112597,6 +112750,7 @@ export namespace Prisma {
     actorId?: StringFilter<"StockLedgerEntry"> | string
     balanceAfter?: FloatFilter<"StockLedgerEntry"> | number
     notes?: StringNullableFilter<"StockLedgerEntry"> | string | null
+    idempotencyKey?: StringNullableFilter<"StockLedgerEntry"> | string | null
     createdAt?: DateTimeFilter<"StockLedgerEntry"> | Date | string
   }
 
@@ -116622,6 +116776,7 @@ export namespace Prisma {
     referenceId?: string | null
     balanceAfter: number
     notes?: string | null
+    idempotencyKey?: string | null
     createdAt?: Date | string
     actor: UserCreateNestedOneWithoutStockLedgerEntriesInput
   }
@@ -116646,6 +116801,7 @@ export namespace Prisma {
     actorId: string
     balanceAfter: number
     notes?: string | null
+    idempotencyKey?: string | null
     createdAt?: Date | string
   }
 
@@ -121308,6 +121464,8 @@ export namespace Prisma {
     fabricCode?: string | null
     colour?: string | null
     shade?: string | null
+    requiredColour?: string | null
+    requiredQuantity?: number | null
     size?: string | null
     unitType: string
     rollNumber?: string | null
@@ -121331,6 +121489,8 @@ export namespace Prisma {
     fabricCode?: string | null
     colour?: string | null
     shade?: string | null
+    requiredColour?: string | null
+    requiredQuantity?: number | null
     size?: string | null
     unitType: string
     rollNumber?: string | null
@@ -122518,6 +122678,8 @@ export namespace Prisma {
     fabricCode?: StringNullableFilter<"ChallanItem"> | string | null
     colour?: StringNullableFilter<"ChallanItem"> | string | null
     shade?: StringNullableFilter<"ChallanItem"> | string | null
+    requiredColour?: StringNullableFilter<"ChallanItem"> | string | null
+    requiredQuantity?: FloatNullableFilter<"ChallanItem"> | number | null
     size?: StringNullableFilter<"ChallanItem"> | string | null
     unitType?: StringFilter<"ChallanItem"> | string
     rollNumber?: StringNullableFilter<"ChallanItem"> | string | null
@@ -134865,6 +135027,7 @@ export namespace Prisma {
     programId?: string | null
     balanceAfter: number
     notes?: string | null
+    idempotencyKey?: string | null
     createdAt?: Date | string
   }
 
@@ -136192,6 +136355,7 @@ export namespace Prisma {
     referenceId?: NullableStringFieldUpdateOperationsInput | string | null
     balanceAfter?: FloatFieldUpdateOperationsInput | number
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     program?: ProgramUpdateOneWithoutStockLedgerEntriesNestedInput
   }
@@ -136216,6 +136380,7 @@ export namespace Prisma {
     programId?: NullableStringFieldUpdateOperationsInput | string | null
     balanceAfter?: FloatFieldUpdateOperationsInput | number
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -136239,6 +136404,7 @@ export namespace Prisma {
     programId?: NullableStringFieldUpdateOperationsInput | string | null
     balanceAfter?: FloatFieldUpdateOperationsInput | number
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -139023,6 +139189,7 @@ export namespace Prisma {
     actorId: string
     balanceAfter: number
     notes?: string | null
+    idempotencyKey?: string | null
     createdAt?: Date | string
   }
 
@@ -139818,6 +139985,7 @@ export namespace Prisma {
     referenceId?: NullableStringFieldUpdateOperationsInput | string | null
     balanceAfter?: FloatFieldUpdateOperationsInput | number
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     actor?: UserUpdateOneRequiredWithoutStockLedgerEntriesNestedInput
   }
@@ -139842,6 +140010,7 @@ export namespace Prisma {
     actorId?: StringFieldUpdateOperationsInput | string
     balanceAfter?: FloatFieldUpdateOperationsInput | number
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -139865,6 +140034,7 @@ export namespace Prisma {
     actorId?: StringFieldUpdateOperationsInput | string
     balanceAfter?: FloatFieldUpdateOperationsInput | number
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -140362,6 +140532,8 @@ export namespace Prisma {
     fabricCode?: string | null
     colour?: string | null
     shade?: string | null
+    requiredColour?: string | null
+    requiredQuantity?: number | null
     size?: string | null
     unitType: string
     rollNumber?: string | null
@@ -140664,6 +140836,8 @@ export namespace Prisma {
     fabricCode?: NullableStringFieldUpdateOperationsInput | string | null
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     shade?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     size?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: StringFieldUpdateOperationsInput | string
     rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
@@ -140687,6 +140861,8 @@ export namespace Prisma {
     fabricCode?: NullableStringFieldUpdateOperationsInput | string | null
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     shade?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     size?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: StringFieldUpdateOperationsInput | string
     rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
@@ -140710,6 +140886,8 @@ export namespace Prisma {
     fabricCode?: NullableStringFieldUpdateOperationsInput | string | null
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     shade?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredColour?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     size?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: StringFieldUpdateOperationsInput | string
     rollNumber?: NullableStringFieldUpdateOperationsInput | string | null

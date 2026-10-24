@@ -218,10 +218,6 @@ class ApiClient {
     return this.request<any>(`/challans/${id}`);
   }
 
-  async getNextChallanNumber(department: string) {
-    return this.request<{ nextNumber: string }>(`/challans/next-number?department=${department}`);
-  }
-
   async createChallan(data: any) {
     return this.request<any>('/challans', {
       method: 'POST',

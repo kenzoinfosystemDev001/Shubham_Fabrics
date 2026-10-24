@@ -22,7 +22,7 @@ import {
   Download,
   Printer,
 } from 'lucide-react';
-import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
+import { TransferDocuments } from '@/components/common/TransferDocuments';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { 
   downloadProductionSheetHtml, 
@@ -359,11 +359,7 @@ export default function RecuttingIncomingPage() {
                   {/* Actions toolbar */}
                   <div className="p-3 bg-neutral-50/80 border-t border-neutral-100 space-y-2">
                     <div className="flex items-center justify-between gap-1 flex-wrap">
-                      <DocumentActionButtons
-                        challan={ch}
-                        program={ch.program}
-                        size="xs"
-                      />
+                      <TransferDocuments challan={ch} size="xs" />
                     </div>
 
                     <div className="pt-1 border-t border-neutral-200/60">
@@ -416,6 +412,7 @@ export default function RecuttingIncomingPage() {
 
             {/* Modal Body */}
             <form onSubmit={handleReceiveSubmit} className="p-5 space-y-4">
+              <TransferDocuments challan={selectedChallan} size="xs" autoLoad />
               {receiveError && (
                 <div className="p-3 bg-danger-50 border border-danger-200 text-danger-700 text-xs rounded-lg flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 shrink-0" />

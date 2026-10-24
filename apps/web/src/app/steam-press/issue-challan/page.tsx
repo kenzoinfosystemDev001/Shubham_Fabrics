@@ -22,6 +22,7 @@ import {
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import BarcodeStickerCard from '@/components/BarcodeStickerCard';
 import { ColorFabricMeasurementTable, createDepartmentInOutTracking } from '@/components/ColorFabricMeasurementTable';
+import { ChallanNumberField, challanNumberClientError } from '@/components/challan/ChallanNumberField';
 
 function SteamPressIssueChallanContent() {
   const router = useRouter();
@@ -35,6 +36,8 @@ function SteamPressIssueChallanContent() {
   const [selectedSheetForView, setSelectedSheetForView] = useState<any | null>(null);
   const [generatedChallan, setGeneratedChallan] = useState<any | null>(null);
 
+  const [challanNumber, setChallanNumber] = useState('');
+  const [challanNumberError, setChallanNumberError] = useState<string | null>(null);
   const [targetDepartment, setTargetDepartment] = useState('FINAL_CHECK');
   const [priority, setPriority] = useState('NORMAL');
   const [remarks, setRemarks] = useState(
@@ -152,6 +155,13 @@ function SteamPressIssueChallanContent() {
       return;
     }
 
+    const numberError = challanNumberClientError(challanNumber);
+    setChallanNumberError(numberError);
+    if (numberError) {
+      document.getElementById('issue-challan-number')?.focus();
+      return;
+    }
+
     if (new Set(items.map((item) => item.uom)).size > 1) {
       alert('Use the same unit for every quantity in one challan.');
       return;
@@ -176,6 +186,7 @@ function SteamPressIssueChallanContent() {
     try {
       setLoading(true);
       const payload = {
+        challanNumber: challanNumber.trim(),
         parentChallanId: selectedJob.id,
         programId: selectedJob.programId,
         toDepartment: targetDepartment,
@@ -202,9 +213,17 @@ function SteamPressIssueChallanContent() {
       });
 
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error || 'Failed to issue challan');
+      if (!res.ok) {
+        if (json.field === 'challanNumber') {
+          setChallanNumberError(json.error || 'Challan Number is not valid.');
+          document.getElementById('issue-challan-number')?.focus();
+          return;
+        }
+        throw new Error(json.error || 'Failed to issue challan');
+      }
 
       setGeneratedChallan(json.data);
+      setChallanNumber('');
     } catch (err: any) {
       alert(err.message || 'Error issuing challan');
     } finally {
@@ -388,6 +407,17 @@ function SteamPressIssueChallanContent() {
                 <span className="text-xs font-bold uppercase tracking-wider text-brand-600 block">
                   2. Handover Routing & Parameters
                 </span>
+
+                <ChallanNumberField
+                  id="issue-challan-number"
+                  className="max-w-xs"
+                  value={challanNumber}
+                  onChange={(value) => {
+                    setChallanNumber(value);
+                    if (challanNumberError) setChallanNumberError(null);
+                  }}
+                  error={challanNumberError}
+                />
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>

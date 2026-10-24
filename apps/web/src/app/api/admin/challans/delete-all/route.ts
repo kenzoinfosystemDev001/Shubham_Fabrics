@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import { destructiveAdminActionsDisabled, requireUser } from '@/lib/auth/require-user';
 
+import { STOCK_REFERENCE, STORE_STOCK_DEPARTMENT } from '@/lib/fabric-stock-ledger';
+
 export const dynamic = 'force-dynamic';
 
 export async function DELETE(request: Request) {
@@ -40,6 +42,11 @@ export async function DELETE(request: Request) {
         // 6. Delete challan audit logs
         await tx.auditLog.deleteMany({
           where: { entity: 'Challan' },
+        });
+
+        // Fabric Store ledger postings of the deleted challans; their stock returns to the store.
+        await tx.stockLedgerEntry.deleteMany({
+          where: { departmentCode: STORE_STOCK_DEPARTMENT, referenceType: STOCK_REFERENCE.CHALLAN },
         });
 
         // 7. Permanently delete ALL Challans from PostgreSQL

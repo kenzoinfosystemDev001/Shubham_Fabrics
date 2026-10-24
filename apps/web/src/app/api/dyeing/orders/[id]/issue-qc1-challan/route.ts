@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
+import {
+  assertChallanNumbersAvailable,
+  challanNumberErrorResponse,
+  requireChallanNumber,
+} from '@/lib/challan-number-server';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,9 +15,11 @@ export async function POST(
 ) {
   const { user: authUser, response: authResponse } = await requireDepartment(request, 'DYEING');
   if (!authUser) return authResponse;
+  let challanNumber = '';
   try {
     const { id } = await params;
     const body = await request.json();
+    challanNumber = requireChallanNumber(body?.challanNumber);
 
     const order = await prisma.dyeingOrder.findUnique({
       where: { id },
@@ -99,24 +106,14 @@ export async function POST(
       },
     });
 
-    // 4. Generate Unique Sequential Challan Number
-    const year = new Date().getFullYear();
-    const prefix = `CH-DYE-${year}-`;
-    const count = await prisma.challan.count({
-      where: { challanNumber: { startsWith: prefix } },
-    });
-    let challanNumber = `${prefix}${String(count + 1).padStart(5, '0')}`;
+    // 4. Challan number is typed by the user; reject numbers already in use.
+    await assertChallanNumbersAvailable(prisma, [{ value: challanNumber }]);
 
-    // Collision check
-    const existingChallan = await prisma.challan.findUnique({
-      where: { challanNumber },
-      select: { id: true },
-    });
-    if (existingChallan) {
-      challanNumber = `${prefix}${Date.now().toString().slice(-5)}`;
-    }
-
-    const effectiveColor = color || order.dyedColor || order.targetColor || 'Standard';
+    // Colour printed on the challan item. The actual dyed shade (dyedColor) is only taken from
+    // what was recorded on the order or explicitly sent by the user, never from the target colour.
+    const explicitColor = typeof color === 'string' && color.trim() ? color.trim() : null;
+    const effectiveColor = explicitColor || order.dyedColor || order.targetColor || 'Standard';
+    const actualDyedColor = order.dyedColor || explicitColor;
 
     // 5. Database Transaction
     const result = await prisma.$transaction(async (tx) => {
@@ -171,7 +168,7 @@ export async function POST(
           qc1ChallanId: challan.id,
           sentToQc1At: new Date(),
           status: 'SENT_TO_QC1',
-          dyedColor: order.dyedColor || effectiveColor,
+          ...(actualDyedColor ? { dyedColor: actualDyedColor } : {}),
         },
         include: {
           program: true,
@@ -230,6 +227,8 @@ export async function POST(
       data: result,
     });
   } catch (error: any) {
+    const numberResponse = challanNumberErrorResponse(error, challanNumber);
+    if (numberResponse) return numberResponse;
     console.error('Error issuing Dyeing → QC1 Challan:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to issue Challan to QC1.' },
