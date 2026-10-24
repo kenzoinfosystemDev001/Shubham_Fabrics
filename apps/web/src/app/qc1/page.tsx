@@ -23,6 +23,7 @@ import {
   PackageCheck
 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { DeadlineAlertsPanel } from '@/components/alerts/DeadlineAlertsPanel';
 
 export default function QC1Dashboard() {
   const router = useRouter();
@@ -145,6 +146,9 @@ export default function QC1Dashboard() {
       )}
 
       <main className="p-4 sm:p-8 space-y-6 max-w-7xl mx-auto">
+        {/* DEADLINE ALERTS (shown once enabled in lib/deadline-alerts/config.ts) */}
+        <DeadlineAlertsPanel department="QC1" />
+
         {/* OPERATIONAL SUMMARY CARDS: 7 PRIMARY STAGES */}
         <div>
           <div className="flex items-center justify-between mb-3">

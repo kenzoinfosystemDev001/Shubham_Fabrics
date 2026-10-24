@@ -228,6 +228,8 @@ export async function POST(request: Request) {
         Object.assign(metadataObj, data.metadataJson);
       }
     } catch {}
+    // Deadline alerts never treat the server's 14-day fallback as a real delivery date.
+    metadataObj.deliveryDateDefaulted = !parseSafeDate(data.deliveryDate, null);
 
     const rawSubStyles: string[] = rawSubStylesWithAverages.length > 0
       ? rawSubStylesWithAverages.map((s: any) => String(s.name).trim()).filter(Boolean)

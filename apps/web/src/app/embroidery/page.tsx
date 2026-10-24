@@ -17,6 +17,7 @@ import {
   FileText,
   PackageCheck
 } from 'lucide-react';
+import { DeadlineAlertsPanel } from '@/components/alerts/DeadlineAlertsPanel';
 
 export default function EmbroideryDashboard() {
   const [loading, setLoading] = useState(true);
@@ -107,6 +108,9 @@ export default function EmbroideryDashboard() {
 
       {/* DASHBOARD CONTENT */}
       <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
+        {/* DEADLINE ALERTS (shown once enabled in lib/deadline-alerts/config.ts) */}
+        <DeadlineAlertsPanel department="EMBROIDERY" />
+
         {/* KPI CARDS */}
         <section className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div className="bg-white border border-neutral-200/90 rounded-xl p-4 shadow-xs">

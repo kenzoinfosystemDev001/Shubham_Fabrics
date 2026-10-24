@@ -20,6 +20,7 @@ import {
   FileText
 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { DeadlineAlertsPanel } from '@/components/alerts/DeadlineAlertsPanel';
 
 export default function DyeingDashboard() {
   const router = useRouter();
@@ -27,6 +28,7 @@ export default function DyeingDashboard() {
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState('');
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [alertsRefreshKey, setAlertsRefreshKey] = useState(0);
 
   const loadData = async () => {
     try {
@@ -103,7 +105,10 @@ export default function DyeingDashboard() {
 
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <button
-            onClick={loadData}
+            onClick={() => {
+              setAlertsRefreshKey((k) => k + 1);
+              loadData();
+            }}
             disabled={loading}
             className="p-2 text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg border border-neutral-200 transition"
             title="Refresh Dashboard"
@@ -138,6 +143,11 @@ export default function DyeingDashboard() {
           </div>
         </div>
       )}
+
+      {/* DEADLINE ALERTS */}
+      <div className="px-4 sm:px-8 pt-6 max-w-7xl mx-auto">
+        <DeadlineAlertsPanel department="DYEING" refreshKey={alertsRefreshKey} />
+      </div>
 
       {/* RESPONSIBLE INCHARGE BANNER */}
       <div className="px-4 sm:px-8 pt-6 max-w-7xl mx-auto">

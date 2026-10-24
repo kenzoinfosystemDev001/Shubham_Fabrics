@@ -1049,6 +1049,42 @@ exports.Prisma.FabricOutwardScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.DeadlineAlertScalarFieldEnum = {
+  id: 'id',
+  dedupKey: 'dedupKey',
+  departmentCode: 'departmentCode',
+  entityType: 'entityType',
+  entityId: 'entityId',
+  programId: 'programId',
+  challanId: 'challanId',
+  alertType: 'alertType',
+  thresholdDays: 'thresholdDays',
+  severity: 'severity',
+  deadlineAt: 'deadlineAt',
+  deadlineDay: 'deadlineDay',
+  timeZone: 'timeZone',
+  workStatus: 'workStatus',
+  taskLabel: 'taskLabel',
+  productionSheetId: 'productionSheetId',
+  designNumber: 'designNumber',
+  challanNumber: 'challanNumber',
+  recipientDepartments: 'recipientDepartments',
+  status: 'status',
+  resolvedReason: 'resolvedReason',
+  activatedAt: 'activatedAt',
+  lastEvaluatedAt: 'lastEvaluatedAt',
+  resolvedAt: 'resolvedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DeadlineAlertDismissalScalarFieldEnum = {
+  id: 'id',
+  alertId: 'alertId',
+  userId: 'userId',
+  dismissedAt: 'dismissedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1199,7 +1235,9 @@ exports.Prisma.ModelName = {
   FabricStockLedger: 'FabricStockLedger',
   DyeingOrder: 'DyeingOrder',
   FabricInward: 'FabricInward',
-  FabricOutward: 'FabricOutward'
+  FabricOutward: 'FabricOutward',
+  DeadlineAlert: 'DeadlineAlert',
+  DeadlineAlertDismissal: 'DeadlineAlertDismissal'
 };
 
 /**
