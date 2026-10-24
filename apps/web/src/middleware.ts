@@ -9,7 +9,8 @@ import {
   type SessionClaims,
 } from '@/lib/auth/session-token';
 
-const PUBLIC_API_PATHS = new Set(['/api/auth/login', '/api/auth/logout', '/api/health']);
+// The cron route authenticates itself (CRON_SECRET bearer or an administrator session).
+const PUBLIC_API_PATHS = new Set(['/api/auth/login', '/api/auth/logout', '/api/health', '/api/cron/deadline-alerts']);
 const PUBLIC_PAGE_PATHS = new Set(['/login']);
 
 function forwardWithIdentity(request: NextRequest, claims: SessionClaims | null) {
