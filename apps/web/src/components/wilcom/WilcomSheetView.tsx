@@ -212,7 +212,7 @@ export function WilcomSheetView({
             <button
               type="button"
               onClick={handlePrint}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#163767] hover:bg-[#0F264A] text-white text-xs font-semibold rounded-lg shadow-2xs transition cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-lavender-800 hover:bg-lavender-900 text-white text-xs font-semibold rounded-lg shadow-2xs transition cursor-pointer"
             >
               <Printer className="w-3.5 h-3.5" />
               <span>Print Wilcom Sheet</span>
@@ -303,7 +303,7 @@ export function WilcomSheetView({
                         <span className="text-[10px] text-slate-400 font-semibold">
                           No Artwork Photo
                         </span>
-                        <label className="inline-flex items-center gap-1 px-2 py-0.5 bg-white hover:bg-slate-100 text-[#163767] border border-slate-300 rounded text-[10px] font-bold shadow-2xs cursor-pointer transition">
+                        <label className="inline-flex items-center gap-1 px-2 py-0.5 bg-white hover:bg-slate-100 text-lavender-800 border border-slate-300 rounded text-[10px] font-bold shadow-2xs cursor-pointer transition">
                           <Upload className="w-3 h-3" />
                           <span>{uploading ? '...' : 'Upload'}</span>
                           <input
@@ -340,7 +340,7 @@ export function WilcomSheetView({
                         <button
                           type="button"
                           onClick={() => setViewingPhoto(photo)}
-                          className="text-[11px] font-semibold text-[#163767] hover:underline flex items-center gap-1 cursor-pointer"
+                          className="text-[11px] font-semibold text-lavender-800 hover:underline flex items-center gap-1 cursor-pointer"
                         >
                           <Eye className="w-3.5 h-3.5" />
                           <span>View Full Photo</span>

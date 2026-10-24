@@ -84,11 +84,11 @@ export default function WashingFloorBoard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] pb-16">
+    <div className="min-h-screen bg-ink-50 pb-16">
       {/* HEADER */}
       <header
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundImage: `linear-gradient(to right, rgba(37, 35, 42, 0.88), rgba(37, 35, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -117,7 +117,7 @@ export default function WashingFloorBoard() {
             </button>
             <Link
               href="/washing/my-work"
-              className="px-3 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-lg text-xs font-semibold shadow-xs transition flex items-center gap-1.5"
+              className="px-3 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-semibold shadow-xs transition flex items-center gap-1.5"
             >
               <Waves className="w-4 h-4" />
               <span>Washing Terminal</span>
@@ -137,7 +137,7 @@ export default function WashingFloorBoard() {
               placeholder="Search by challan, sheet #, client or style..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-hidden focus:ring-2 focus:ring-cyan-500 shadow-2xs"
+              className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-hidden focus:ring-2 focus:ring-lavender-500 shadow-2xs"
             />
           </div>
           <div className="text-xs text-slate-500 font-mono">
@@ -343,7 +343,7 @@ export default function WashingFloorBoard() {
                           )}
                           <Link
                             href={`/washing/my-work?challanId=${c.id}`}
-                            className="px-2 py-0.5 bg-amber-600 hover:bg-amber-700 text-white rounded text-[10px] font-semibold"
+                            className="px-2 py-0.5 bg-lavender-600 hover:bg-lavender-700 text-white rounded text-[10px] font-semibold"
                           >
                             Details
                           </Link>
@@ -410,7 +410,7 @@ export default function WashingFloorBoard() {
                           )}
                           <Link
                             href={`/washing/my-work?challanId=${c.id}&action=handover`}
-                            className="px-2 py-0.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[10px] font-semibold"
+                            className="px-2 py-0.5 bg-lavender-600 hover:bg-lavender-700 text-white rounded text-[10px] font-semibold"
                           >
                             Handover →
                           </Link>

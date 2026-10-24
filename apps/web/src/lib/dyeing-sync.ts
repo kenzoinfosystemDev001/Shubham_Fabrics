@@ -1,5 +1,6 @@
 
 import { prisma } from '@subham/database';
+import { dyeingOrderLine } from '@/lib/dyeing-instructions';
 
 /**
  * Automatically sync incoming Fabric Store challans to DyeingOrders.
@@ -7,14 +8,10 @@ import { prisma } from '@subham/database';
  */
 export async function syncInboundChallansToDyeingOrders() {
   try {
-    // 1. Fetch challans addressed to the Dyeing Department.
+    // 1. Fetch challans addressed to the Dyeing Department (not Dyeing QC).
     const inboundChallans = await prisma.challan.findMany({
       where: {
-        OR: [
-          { toDepartment: 'DYEING' },
-          { toDepartment: { equals: 'DYEING', mode: 'insensitive' } },
-          { toDepartment: { contains: 'DYE', mode: 'insensitive' } },
-        ],
+        toDepartment: { equals: 'DYEING', mode: 'insensitive' },
         status: {
           in: [
             'ISSUED',
@@ -73,143 +70,132 @@ export async function syncInboundChallansToDyeingOrders() {
 
     const year = new Date().getFullYear();
 
-    // 3. Process each inbound challan.
+    const nextOrderNumber = async () => {
+      const latestOrder = await prisma.dyeingOrder.findFirst({
+        where: { orderNumber: { startsWith: `DYE-${year}-` } },
+        orderBy: { orderNumber: 'desc' },
+        select: { orderNumber: true },
+      });
+      let nextSeq = 1;
+      if (latestOrder?.orderNumber) {
+        const parsed = parseInt(latestOrder.orderNumber.split('-').pop() || '', 10);
+        if (!Number.isNaN(parsed) && parsed >= nextSeq) nextSeq = parsed + 1;
+      }
+      let orderNumber = `DYE-${year}-${String(nextSeq).padStart(4, '0')}`;
+      while (await prisma.dyeingOrder.findUnique({ where: { orderNumber } })) {
+        nextSeq++;
+        orderNumber = `DYE-${year}-${String(nextSeq).padStart(4, '0')}`;
+      }
+      return orderNumber;
+    };
+
+    // 3. Process each inbound challan. Every challan line becomes its own Dyeing Order so
+    // each required colour keeps its own quantity and unit (never merged into one total).
     for (const challan of inboundChallans) {
       if (!challan.programId) continue;
 
       try {
-        // Prevent creating another order for the same inbound challan.
-        const existing = await prisma.dyeingOrder.findFirst({
+        const existingOrders = await prisma.dyeingOrder.findMany({
           where: { inboundChallanId: challan.id },
+          select: { inboundChallanItemId: true },
         });
+        // Orders created before per-line sync are left exactly as they were.
+        if (existingOrders.some((order) => !order.inboundChallanItemId)) continue;
+        const syncedItemIds = new Set(existingOrders.map((order) => order.inboundChallanItemId));
 
-        if (existing) continue;
+        // Rework returns from Dyeing QC carry the colour the fabric was originally meant to be.
+        let reworkTargetColor: string | null = null;
+        if (challan.challanType === 'REWORK_RETURN' && challan.parentChallanId) {
+          const originalOrder = await prisma.dyeingOrder.findFirst({
+            where: { dyeingQcChallanId: challan.parentChallanId },
+            select: { targetColor: true },
+          });
+          reworkTargetColor = originalOrder?.targetColor || null;
+        }
 
-        // 4. Calculate the required quantity.
-        const totalItemsQty = challan.items.reduce(
-          (sum, item) => sum + (Number(item.quantity) || 0),
-          0,
-        );
+        const lines: Array<(typeof challan.items)[number] | null> = challan.items.length > 0
+          ? challan.items
+          : [null];
+        let createdForChallan = 0;
 
-        const requiredQty =
-          totalItemsQty > 0
-            ? totalItemsQty
-            : Number(
-              challan.program?.fabricIssuedToDyeing ||
-              challan.program?.fabricSentToDyeing ||
-              challan.program?.targetQuantity ||
-              100,
-            );
+        for (const [lineIndex, item] of lines.entries()) {
+          if (item && syncedItemIds.has(item.id)) continue;
+          if (!item && existingOrders.length > 0) continue;
 
-        const primaryItem = challan.items[0];
+          const line = dyeingOrderLine(item, challan, reworkTargetColor);
 
-        const uom =
-          primaryItem?.uom ||
-          challan.program?.quantityMeasurement ||
-          'MTR';
+          // Retry on an order-number collision; a line that already has an order is skipped.
+          let createdOrder = null;
+          for (let attempt = 0; attempt < 3 && !createdOrder; attempt++) {
+            try {
+              createdOrder = await prisma.dyeingOrder.create({
+                data: {
+                  orderNumber: await nextOrderNumber(),
+                  programId: challan.programId,
+                  inboundChallanId: challan.id,
+                  inboundChallanItemId: line.inboundChallanItemId,
+                  status: 'RECEIVED',
+                  priority:
+                    challan.priority ||
+                    challan.program?.priority ||
+                    'NORMAL',
+                  fabricName: line.fabricName,
+                  fabricType: challan.program?.fabricType || null,
+                  currentColor: line.currentColor,
+                  targetColor: line.targetColor,
+                  requiredQuantity: line.requiredQuantity,
+                  dyedQuantity: 0,
+                  undyedQuantity: line.requiredQuantity,
+                  readyForDyeingQcQuantity: 0,
+                  sentToDyeingQcQuantity: 0,
+                  uom: line.uom,
+                  inchargeId: dyeingUser?.id || null,
+                  inchargeName:
+                    dyeingUser?.fullName ||
+                    dyeingUser?.username ||
+                    'Dyeing Incharge',
+                  processRemarks:
+                    challan.challanType === 'REWORK_RETURN'
+                      ? `Dyeing QC Rework Return: ${challan.challanNumber} (${challan.remarks ||
+                      'Shade/Dyeing correction required'
+                      })`
+                      : `Received from ${challan.fromDepartment || 'Fabric Store'
+                      } on Challan ${challan.challanNumber}${lines.length > 1 ? ` (line ${lineIndex + 1} of ${lines.length})` : ''}`,
+                },
+              });
+            } catch (createErr: any) {
+              if (createErr?.code !== 'P2002') throw createErr;
+              const target = String(createErr?.meta?.target ?? '');
+              if (target.includes('inboundChallanItemId')) break;
+            }
+          }
 
-        const fabricName =
-          primaryItem?.fabricCode ||
-          primaryItem?.itemDescription ||
-          challan.program?.fabricName ||
-          'Cotton Fabric';
-
-        const fabricType = challan.program?.fabricType || null;
-
-        const targetColor =
-          primaryItem?.colour ||
-          primaryItem?.shade ||
-          challan.program?.fabricColor ||
-          'Standard';
-
-        // 5. Generate the next available dyeing order number.
-        const latestOrder = await prisma.dyeingOrder.findFirst({
-          where: {
-            orderNumber: {
-              startsWith: `DYE-${year}-`,
-            },
-          },
-          orderBy: { orderNumber: 'desc' },
-          select: { orderNumber: true },
-        });
-
-        let nextSeq = 1;
-
-        if (latestOrder?.orderNumber) {
-          const parts = latestOrder.orderNumber.split('-');
-          const lastPart = parts[parts.length - 1];
-          const parsed = parseInt(lastPart, 10);
-
-          if (!Number.isNaN(parsed) && parsed >= nextSeq) {
-            nextSeq = parsed + 1;
+          if (createdOrder) {
+            createdForChallan++;
+            syncedOrders.push(createdOrder);
           }
         }
 
-        let orderNumber = `DYE-${year}-${String(nextSeq).padStart(4, '0')}`;
-
-        // Check for an existing order number before using it.
-        while (
-          await prisma.dyeingOrder.findUnique({
-            where: { orderNumber },
-          })
-        ) {
-          nextSeq++;
-          orderNumber = `DYE-${year}-${String(nextSeq).padStart(4, '0')}`;
+        // 4. Update the related production program once per challan.
+        if (createdForChallan > 0) {
+          const units = new Set(challan.items.map((item) => item.uom));
+          const sentQty = challan.items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
+          try {
+            await prisma.program.update({
+              where: { id: challan.programId },
+              data: {
+                // A single total is only meaningful when every line uses the same unit.
+                ...(units.size === 1 && sentQty > 0 ? { fabricSentToDyeing: sentQty } : {}),
+                status: 'IN_PRODUCTION',
+              },
+            });
+          } catch (programErr) {
+            console.error(
+              `Could not update program ${challan.programId} after syncing challan ${challan.challanNumber} to Dyeing:`,
+              programErr,
+            );
+          }
         }
-
-        // 6. Create the Dyeing Order.
-        const createdOrder = await prisma.dyeingOrder.create({
-          data: {
-            orderNumber,
-            programId: challan.programId,
-            inboundChallanId: challan.id,
-            status: 'RECEIVED',
-            priority:
-              challan.priority ||
-              challan.program?.priority ||
-              'NORMAL',
-            fabricName,
-            fabricType,
-            targetColor,
-            requiredQuantity: requiredQty,
-            dyedQuantity: 0,
-            undyedQuantity: requiredQty,
-            readyForQc1Quantity: 0,
-            sentToQc1Quantity: 0,
-            uom,
-            inchargeId: dyeingUser?.id || null,
-            inchargeName:
-              dyeingUser?.fullName ||
-              dyeingUser?.username ||
-              'Dyeing Incharge',
-            processRemarks:
-              challan.challanType === 'REWORK_RETURN'
-                ? `QC1 Rework Return: ${challan.challanNumber} (${challan.remarks ||
-                'Shade/Dyeing correction required'
-                })`
-                : `Received from ${challan.fromDepartment || 'Fabric Store'
-                } on Challan ${challan.challanNumber}`,
-          },
-        });
-
-        // 7. Update the related production program.
-        try {
-          await prisma.program.update({
-            where: { id: challan.programId },
-            data: {
-              fabricSentToDyeing: requiredQty,
-              status: 'IN_PRODUCTION',
-            },
-          });
-        } catch (programErr) {
-          console.error(
-            `Could not update program ${challan.programId} after creating Dyeing Order ${createdOrder.orderNumber}:`,
-            programErr,
-          );
-        }
-
-        // 8. Record the newly created order.
-        syncedOrders.push(createdOrder);
       } catch (challanErr) {
         console.error(
           `Error syncing challan ${challan.challanNumber} (${challan.id}) to Dyeing:`,

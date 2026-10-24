@@ -26,7 +26,7 @@ erDiagram
 - `id`: UUID (Primary Key)
 - `challanId`: References `Challan(id)`
 - `programId`: References `Program(id)`
-- `departmentCode`: `'FINAL_CHECK'`
+- `departmentCode`: `'FINAL_QC'`
 - `inspectorId`: References `User(id)`
 - `sampleSize`: Total pieces inspected in this audit session
 - `status`: workflow values such as `'PASS'`, `'REWORK'`, `'REJECT'`, or `'HOLD'`
@@ -51,7 +51,7 @@ erDiagram
 ### `ProductionTransaction` (Quantitative Audit)
 - `challanId`: References `Challan(id)`
 - `programId`: References `Program(id)`
-- `departmentCode`: `'FINAL_CHECK'`
+- `departmentCode`: `'FINAL_QC'`
 - `operationName`: `'FINAL_QUALITY_INSPECTION'`
 - `operatorId`: References `User(id)`
 - `inputQuantity`: Total pieces presented for inspection
@@ -63,7 +63,7 @@ erDiagram
 
 ### `DefectRecord` (Rejected or Rework Tracking)
 - `defectCode`: Unique code e.g. `DEF-FQC-YYYY-XXXX`
-- `departmentCode`: `'FINAL_CHECK'`
+- `departmentCode`: `'FINAL_QC'`
 - `itemDescription`: Garment description
 - `severity`: `'CRITICAL'`
 - `quantity`: Number of rejected pieces
@@ -72,7 +72,7 @@ erDiagram
 
 ### `Challan` & Outgoing Transfer
 - Unique outgoing identifier: `CH-FQC-<timestamp>-<random suffix>`
-- `fromDepartment`: `'FINAL_CHECK'`
+- `fromDepartment`: `'FINAL_QC'`
 - `toDepartment`: Dynamically resolved (`'PACKING'` by default)
 - `parentChallanId`: Direct reference to the incoming Steam Press / Finishing Challan. Child items preserve transferred quantities and genealogy.
 

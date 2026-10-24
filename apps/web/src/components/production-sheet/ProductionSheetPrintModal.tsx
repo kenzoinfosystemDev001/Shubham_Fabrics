@@ -13,6 +13,7 @@ import {
   extractSubStylesAndGrid,
   calculateProductionMeasurementTotal,
   formatSizeExpressionTotal,
+  getForwardedSheetCategories,
   SWATCH_CLIP_PATH,
   GarmentCategory
 } from '@/lib/download-production-sheet';
@@ -38,7 +39,7 @@ export function ProductionSheetPrintModal({
 }: ProductionSheetPrintModalProps) {
   const sourceProgram = propProgram || sheetData;
   const { program, loading, error } = useProgramDocument(sourceProgram, isOpen);
-  const [activeTab, setActiveTab] = useState<GarmentCategory>(initialTab);
+  const [selectedTab, setActiveTab] = useState<GarmentCategory>(initialTab);
 
   React.useEffect(() => {
     if (initialTab) {
@@ -59,11 +60,11 @@ export function ProductionSheetPrintModal({
   }
 
   const components = meta?.components || null;
-  const componentCategories: GarmentCategory[] = components
-    ? Object.keys(components)
-    : ['TOP', 'BOTTOM', 'DUPATTA', 'OTHER'];
+  // Only the sheets Programming forwarded with this production are shown (TOP / BOTTOM / DUPATTA ...).
+  const componentCategories: GarmentCategory[] = getForwardedSheetCategories(program);
+  const activeTab: GarmentCategory = componentCategories.includes(selectedTab) ? selectedTab : componentCategories[0];
   const activeTabName = components?.[activeTab]?.styleName || (activeTab === 'OTHER' ? 'INPUT' : activeTab);
-  const forwardedComponents: string[] = Array.isArray(meta?.forwardedComponents) ? meta.forwardedComponents : ['TOP'];
+  const forwardedComponents: string[] = componentCategories;
 
   const serialNo = program.programSerialNo || program.programNumber || '';
   const designNo = program.designNumber || program.designName || '';
@@ -183,7 +184,7 @@ export function ProductionSheetPrintModal({
               type="button"
               onClick={handleDownload}
               disabled={loading}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#163767] hover:bg-[#0F264A] disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer disabled:cursor-wait"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-lavender-800 hover:bg-lavender-900 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer disabled:cursor-wait"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Download {activeTab} Sheet</span>
@@ -218,7 +219,7 @@ export function ProductionSheetPrintModal({
                   onClick={() => setActiveTab(cat)}
                   className={`px-3 py-1.5 rounded-md text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
                     activeTab === cat
-                      ? 'bg-[#163767] text-white shadow-xs'
+                      ? 'bg-lavender-800 text-white shadow-xs'
                       : isEnabled
                         ? 'bg-white text-slate-700 hover:bg-slate-200/70 border border-slate-200'
                         : 'bg-slate-100 text-slate-400 border border-slate-200'
@@ -241,6 +242,15 @@ export function ProductionSheetPrintModal({
             >
               Print All Forwarded
             </button>
+            {componentCategories.length > 1 && (
+              <button
+                type="button"
+                onClick={() => void downloadProductionSheetHtml(program, 'ALL')}
+                className="text-[11px] font-semibold text-blue-700 hover:underline px-2 py-1 rounded hover:bg-blue-50 cursor-pointer"
+              >
+                Download All Forwarded
+              </button>
+            )}
           </div>
         </div>
 
@@ -426,7 +436,7 @@ export function ProductionSheetPrintModal({
                     <tr className="bg-slate-100 font-black border-t-2 border-black">
                       <td className="border-[1.5px] border-black p-1 text-left uppercase">{activeTabName} TOTALS:</td>
                       <td className="border-[1.5px] border-black p-1 text-center text-emerald-800">{totalMtr > 0 ? totalMtr.toFixed(2) : '—'}</td>
-                      <td className="border-[1.5px] border-black p-1 text-center text-[#163767]">{totalPcs > 0 ? totalPcs : '—'}</td>
+                      <td className="border-[1.5px] border-black p-1 text-center text-lavender-800">{totalPcs > 0 ? totalPcs : '—'}</td>
                       <td colSpan={2} className="border-[1.5px] border-black p-1 text-right text-[10px]">
                         TOTAL MEASUREMENT: {totalMeasurement !== null ? formatSizeExpressionTotal(totalMeasurement) : '—'}
                         {totalMtrAverage > 0 && <span className="ml-3 text-slate-500 italic">Fabric consumption @ {totalMtrAverage.toFixed(2)} Mtr/Pc</span>}

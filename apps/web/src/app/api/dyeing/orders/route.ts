@@ -27,6 +27,7 @@ export async function GET(request: Request) {
         { orderNumber: { contains: search, mode: 'insensitive' } },
         { fabricName: { contains: search, mode: 'insensitive' } },
         { targetColor: { contains: search, mode: 'insensitive' } },
+        { currentColor: { contains: search, mode: 'insensitive' } },
         { dyedColor: { contains: search, mode: 'insensitive' } },
         { inchargeName: { contains: search, mode: 'insensitive' } },
         {
@@ -70,7 +71,11 @@ export async function GET(request: Request) {
         inboundChallan: {
           select: {
             id: true,
+            programId: true,
             challanNumber: true,
+            challanType: true,
+            fabricUnit: true,
+            createdAt: true,
             fromDepartment: true,
             toDepartment: true,
             status: true,
@@ -80,9 +85,10 @@ export async function GET(request: Request) {
             items: true,
           },
         },
-        qc1Challan: {
+        dyeingQcChallan: {
           select: {
             id: true,
+            programId: true,
             challanNumber: true,
             fromDepartment: true,
             toDepartment: true,

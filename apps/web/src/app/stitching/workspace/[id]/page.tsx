@@ -43,7 +43,7 @@ export default function StitchingFocusWorkspacePage({
   const [reworkCount, setReworkCount] = useState(0);
   const [rejectCount, setRejectCount] = useState(0);
   const [operatorNotes, setOperatorNotes] = useState('');
-  const [defectReason, setDefectReason] = useState('Needle cut / seam slip');
+  const [defectReason, setDefectReason] = useState('');
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState('');
 
@@ -179,7 +179,7 @@ export default function StitchingFocusWorkspacePage({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0B0F19] text-slate-100 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-ink-950 text-slate-100 flex items-center justify-center p-4">
         <RefreshCw className="w-8 h-8 animate-spin text-indigo-400" />
       </div>
     );
@@ -187,7 +187,7 @@ export default function StitchingFocusWorkspacePage({
 
   if (error || !job) {
     return (
-      <div className="min-h-screen bg-[#0B0F19] text-slate-100 p-8 flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-ink-950 text-slate-100 p-8 flex flex-col items-center justify-center">
         <AlertCircle className="w-12 h-12 text-rose-400 mb-4" />
         <h2 className="text-xl font-bold text-white mb-2">Job Not Found</h2>
         <p className="text-sm text-slate-400 mb-6">{error || 'Could not load job'}</p>
@@ -205,11 +205,11 @@ export default function StitchingFocusWorkspacePage({
   const isOnHold = job.status === 'ON_HOLD';
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-ink-950 text-slate-100 flex flex-col">
       {/* HEADER */}
       <div
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.85)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundImage: `linear-gradient(to right, rgba(37, 35, 42, 0.95), rgba(37, 35, 42, 0.85)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -317,7 +317,7 @@ export default function StitchingFocusWorkspacePage({
               </button>
               <button
                 onClick={() => setGoodCount((c) => Math.min(totalInput, c + 1))}
-                className="w-14 h-10 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center font-bold text-lg shadow-md"
+                className="w-14 h-10 rounded-xl bg-lavender-600 hover:bg-emerald-500 text-white flex items-center justify-center font-bold text-lg shadow-md"
               >
                 +1
               </button>
@@ -352,7 +352,7 @@ export default function StitchingFocusWorkspacePage({
               </button>
               <button
                 onClick={() => setReworkCount((c) => c + 1)}
-                className="w-14 h-10 rounded-xl bg-amber-600 hover:bg-amber-500 text-white flex items-center justify-center font-bold text-lg shadow-md"
+                className="w-14 h-10 rounded-xl bg-lavender-600 hover:bg-amber-500 text-white flex items-center justify-center font-bold text-lg shadow-md"
               >
                 +1
               </button>
@@ -404,6 +404,7 @@ export default function StitchingFocusWorkspacePage({
                   type="text"
                   value={defectReason}
                   onChange={(e) => setDefectReason(e.target.value)}
+                  required={rejectCount > 0}
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white"
                 />
               </div>
@@ -449,7 +450,7 @@ export default function StitchingFocusWorkspacePage({
             <button
               onClick={handleCompleteSubmit}
               disabled={saving || !isBalanced}
-              className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition shadow-lg flex items-center gap-2 disabled:opacity-50"
+              className="px-6 py-2.5 rounded-xl bg-lavender-600 hover:bg-emerald-500 text-white text-xs font-bold transition shadow-lg flex items-center gap-2 disabled:opacity-50"
             >
               <CheckCircle2 className="w-4 h-4" />
               <span>{saving ? 'Reconciling...' : 'Confirm Output & Complete'}</span>

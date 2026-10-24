@@ -103,11 +103,11 @@ export default function RecuttingDashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] pb-16">
+    <div className="min-h-screen bg-ink-50 pb-16">
       {/* TOP HEADER */}
       <header
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundImage: `linear-gradient(to right, rgba(37, 35, 42, 0.88), rgba(37, 35, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -116,7 +116,7 @@ export default function RecuttingDashboard() {
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">
+              <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-lavender-500/20 text-lavender-300 border border-lavender-500/30">
                 RECUTTING TERMINAL
               </span>
               <span className="flex items-center gap-1.5 text-[11px] text-emerald-400 font-medium">
@@ -125,7 +125,7 @@ export default function RecuttingDashboard() {
               </span>
             </div>
             <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight mt-1 flex items-center gap-2">
-              <Scissors className="w-6 h-6 text-rose-400" />
+              <Scissors className="w-6 h-6 text-lavender-400" />
               <span>Embroidery Recutting & Separation Control Tower</span>
             </h1>
             <p className="text-xs text-slate-300 mt-0.5">
@@ -146,7 +146,7 @@ export default function RecuttingDashboard() {
 
             <Link
               href="/recutting/issue-challan"
-              className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-sm transition"
+              className="px-3 py-1.5 bg-lavender-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-sm transition"
             >
               <Send className="w-3.5 h-3.5" />
               <span>Handover to Stitching</span>
@@ -181,7 +181,7 @@ export default function RecuttingDashboard() {
             <div className="mt-2">
               <div className="text-2xl font-black text-slate-800">{summary.awaitingReceiptCount}</div>
               <div className="text-[11px] font-medium text-amber-600 mt-0.5">
-                {summary.awaitingReceiptPcs.toLocaleString()} pcs from QC3
+                {summary.awaitingReceiptPcs.toLocaleString()} pcs from Washing QC
               </div>
             </div>
             <Link
@@ -194,20 +194,20 @@ export default function RecuttingDashboard() {
           </div>
 
           {/* Card 2: In Cutting Queue */}
-          <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs flex flex-col justify-between hover:border-rose-400 transition">
+          <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs flex flex-col justify-between hover:border-lavender-400 transition">
             <div className="flex items-center justify-between text-slate-500">
               <span className="text-[11px] font-bold uppercase tracking-wider">Cutting Queue</span>
-              <Briefcase className="w-4 h-4 text-rose-500" />
+              <Briefcase className="w-4 h-4 text-lavender-500" />
             </div>
             <div className="mt-2">
               <div className="text-2xl font-black text-slate-800">{summary.inCuttingQueueCount}</div>
-              <div className="text-[11px] font-medium text-rose-600 mt-0.5">
+              <div className="text-[11px] font-medium text-lavender-600 mt-0.5">
                 {summary.inCuttingQueuePcs.toLocaleString()} pcs queued
               </div>
             </div>
             <Link
               href="/recutting/my-work"
-              className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] font-semibold text-rose-700 hover:text-rose-800"
+              className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] font-semibold text-lavender-700 hover:text-lavender-800"
             >
               <span>Open queue</span>
               <ArrowRight className="w-3 h-3" />
@@ -278,7 +278,7 @@ export default function RecuttingDashboard() {
           </div>
 
           {/* Card 6: Cut Accuracy */}
-          <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs flex flex-col justify-between hover:border-rose-400 transition">
+          <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs flex flex-col justify-between hover:border-lavender-400 transition">
             <div className="flex items-center justify-between text-slate-500">
               <span className="text-[11px] font-bold uppercase tracking-wider">Cut Accuracy</span>
               <TrendingUp className="w-4 h-4 text-emerald-500" />
@@ -307,7 +307,7 @@ export default function RecuttingDashboard() {
               <div className="flex items-center gap-2">
                 <ArrowDownLeft className="w-4 h-4 text-amber-600" />
                 <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wide">
-                  Incoming from QC Washing (Pending Physical Receipt)
+                  Incoming from Washing QC (Pending Physical Receipt)
                 </h2>
               </div>
               <Link
@@ -324,7 +324,7 @@ export default function RecuttingDashboard() {
                 <div className="p-8 text-center text-slate-400">
                   <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto mb-2 opacity-60" />
                   <p className="text-sm font-semibold text-slate-600">All incoming challans have been received</p>
-                  <p className="text-xs text-slate-400 mt-0.5">New transfers from QC Washing will appear here in real time.</p>
+                  <p className="text-xs text-slate-400 mt-0.5">New transfers from Washing QC will appear here in real time.</p>
                 </div>
               ) : (
                 pendingReceipt.slice(0, 5).map((ch: any) => {
@@ -368,7 +368,7 @@ export default function RecuttingDashboard() {
                         </div>
                         <Link
                           href="/recutting/incoming"
-                          className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold transition shadow-xs"
+                          className="px-3 py-1.5 bg-lavender-600 hover:bg-lavender-700 text-white rounded-lg text-xs font-bold transition shadow-xs"
                         >
                           Receive
                         </Link>
@@ -383,12 +383,12 @@ export default function RecuttingDashboard() {
           {/* Quick Operations Guide & Status */}
           <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-5 flex flex-col justify-between">
             <div>
-              <div className="flex items-center gap-2 text-rose-700 mb-3">
+              <div className="flex items-center gap-2 text-lavender-700 mb-3">
                 <Scissors className="w-5 h-5" />
                 <h3 className="text-sm font-bold uppercase tracking-wide">Recutting Workflow</h3>
               </div>
               <p className="text-xs text-slate-600 leading-relaxed">
-                The Recutting Department receives washed embroidered goods from QC Washing, checks piece counts against the Challan, and cuts/separates motifs according to the approved Production Sheet.
+                The Recutting Department receives washed embroidered goods from Washing QC, checks piece counts against the Challan, and cuts/separates motifs according to the approved Production Sheet.
               </p>
 
               <div className="mt-4 space-y-2.5">
@@ -410,7 +410,7 @@ export default function RecuttingDashboard() {
             <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between">
               <Link
                 href="/recutting/my-work"
-                className="w-full py-2 bg-rose-600 hover:bg-rose-500 text-white text-center rounded-lg text-xs font-bold transition shadow-xs flex items-center justify-center gap-1.5"
+                className="w-full py-2 bg-lavender-600 hover:bg-lavender-500 text-white text-center rounded-lg text-xs font-bold transition shadow-xs flex items-center justify-center gap-1.5"
               >
                 <Scissors className="w-3.5 h-3.5" />
                 <span>Open Cutting Station</span>
@@ -423,14 +423,14 @@ export default function RecuttingDashboard() {
         <section className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
           <div className="px-5 py-4 border-b border-slate-200 bg-slate-50/50 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Briefcase className="w-4 h-4 text-rose-600" />
+              <Briefcase className="w-4 h-4 text-lavender-600" />
               <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wide">
                 Active Cutting Work Queue
               </h2>
             </div>
             <Link
               href="/recutting/my-work"
-              className="text-xs font-bold text-rose-700 hover:text-rose-800 flex items-center gap-1"
+              className="text-xs font-bold text-lavender-700 hover:text-lavender-800 flex items-center gap-1"
             >
               <span>Full Workstation ({inWorkQueue.length})</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -503,7 +503,7 @@ export default function RecuttingDashboard() {
                           {pcs.toLocaleString()} PCS
                         </td>
                         <td className="px-4 py-3 text-slate-500">
-                          {ch.issuedBy?.fullName || ch.issuedBy?.username || 'QC Washing'}
+                          {ch.issuedBy?.fullName || ch.issuedBy?.username || 'Washing QC'}
                         </td>
                         <td className="px-4 py-3 text-right">
                           <Link

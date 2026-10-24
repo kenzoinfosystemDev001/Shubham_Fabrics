@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { ChallanNumberInput, getChallanNumberError } from '@/components/challan/ChallanNumberInput';
 import {
   Waves,
   Search,
@@ -33,6 +34,7 @@ import { DocumentActionButtons } from '@/components/common/DocumentActionButtons
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { downloadProductionSheetHtml, printProductionSheet } from '@/lib/download-production-sheet';
 import BarcodeStickerCard from '@/components/BarcodeStickerCard';
+import { DepartmentDefectiveShelfWidget } from '@/components/DepartmentDefectiveShelfWidget';
 
 interface WashingChallan {
   id: string;
@@ -119,6 +121,11 @@ export default function WashingWorkCenter() {
   const [selectedChallanForView, setSelectedChallanForView] = useState<WashingChallan | null>(null);
   const [selectedSheetForView, setSelectedSheetForView] = useState<any | null>(null);
   const [handoverChallanModal, setHandoverChallanModal] = useState<any | null>(null);
+  // Hand-over to Washing QC asks for the challan number, which is entered manually.
+  const [issueTarget, setIssueTarget] = useState<WashingChallan | null>(null);
+  const [issueChallanNumber, setIssueChallanNumber] = useState('');
+  const [issueNumberError, setIssueNumberError] = useState<string | null>(null);
+  const [issuingHandover, setIssuingHandover] = useState(false);
   const [submittingWash, setSubmittingWash] = useState(false);
 
   // Washing Processing Terminal Form State (All Mandatory Fields)
@@ -315,15 +322,24 @@ export default function WashingWorkCenter() {
     }
   };
 
-  // Issue Handover Challan to QC Washing
-  const handleIssueToFinishing = async (challan: WashingChallan) => {
+  // Issue Handover Challan to Washing QC
+  const openIssueToWashingQc = (challan: WashingChallan) => {
+    setIssueTarget(challan);
+    setIssueChallanNumber('');
+    setIssueNumberError(null);
+  };
+
+  const handleIssueToFinishing = async (challan: WashingChallan, enteredChallanNumber: string) => {
+    const numberError = getChallanNumberError(enteredChallanNumber);
+    if (numberError) {
+      setIssueNumberError(numberError);
+      return;
+    }
     try {
+      setIssuingHandover(true);
       const goodQty = challan.fabricOut ?? challan.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
       const barcode = challan.items?.[0]?.barcode || `WB-${new Date().getFullYear()}-0001`;
-
-      const numRes = await fetch('/api/challans/next-number?department=WASHING');
-      const numData = await numRes.json();
-      const challanNumber = numData.nextNumber || `CH-WSH-${new Date().getFullYear()}-00001`;
+      const challanNumber = enteredChallanNumber.trim();
 
       const res = await fetch('/api/challans', {
         method: 'POST',
@@ -333,7 +349,7 @@ export default function WashingWorkCenter() {
           challanType: 'REGULAR',
           programId: challan.programId,
           fromDepartment: 'WASHING',
-          toDepartment: 'QC3',
+          toDepartment: 'WASHING_QC',
           fabricIn: challan.fabricIn ?? goodQty + (challan.defectivePieces || 0),
           fabricOut: goodQty,
           fabricUnit: challan.fabricUnit || 'PCS',
@@ -343,7 +359,7 @@ export default function WashingWorkCenter() {
           detectedFromDepartment: challan.fromDepartment,
           detectedFromChallanId: challan.id,
           priority: challan.priority || 'NORMAL',
-          remarks: `Washed pieces handover to QC Washing Department for inspection & verification. Barcode: ${barcode}`,
+          remarks: `Washed pieces handover to Washing QC Department for inspection & verification. Barcode: ${barcode}`,
           items: [
             {
               itemDescription: `${challan.program?.fabricName || 'Garment Pieces'} - Washed & Dried`,
@@ -352,14 +368,16 @@ export default function WashingWorkCenter() {
               quantity: goodQty,
               uom: 'PCS',
               barcode: barcode,
-              remarks: `Washing completed. Ready for QC Washing inspection & verification.`,
+              remarks: `Washing completed. Ready for Washing QC inspection & verification.`,
             },
           ],
         }),
       });
 
       const data = await res.json();
-      if (res.ok && data.success) {
+      if (res.ok) {
+        // POST /api/challans returns the created challan itself.
+        const created = data.data || data;
         // Also update original challan status to COMPLETED
         await fetch(`/api/challans/${challan.id}`, {
           method: 'PATCH',
@@ -367,14 +385,19 @@ export default function WashingWorkCenter() {
           body: JSON.stringify({ status: 'COMPLETED' }),
         }).catch(() => {});
 
-        setHandoverChallanModal(data.data);
-        setToastHandover(`Challan ${data.data.challanNumber} issued to QC Washing Department successfully!`);
+        setIssueTarget(null);
+        setHandoverChallanModal(created);
+        setToastHandover(`Challan ${created.challanNumber} issued to Washing QC Department successfully!`);
         loadData();
+      } else if (data.field === 'challanNumber') {
+        setIssueNumberError(data.error);
       } else {
-        throw new Error(data.error || 'Failed to issue challan to QC Washing');
+        throw new Error(data.error || 'Failed to issue challan to Washing QC');
       }
     } catch (err: any) {
-      alert(`Error issuing to QC Washing: ${err.message}`);
+      alert(`Error issuing to Washing QC: ${err.message}`);
+    } finally {
+      setIssuingHandover(false);
     }
   };
 
@@ -411,11 +434,11 @@ export default function WashingWorkCenter() {
   }, [challans]);
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] pb-16">
+    <div className="min-h-screen bg-ink-50 pb-16">
       {/* HEADER */}
       <header
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundImage: `linear-gradient(to right, rgba(37, 35, 42, 0.88), rgba(37, 35, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -453,7 +476,7 @@ export default function WashingWorkCenter() {
 
             <Link
               href="/programs"
-              className="px-3 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-lg text-xs font-semibold shadow-sm transition flex items-center gap-1.5"
+              className="px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold shadow-sm transition flex items-center gap-1.5"
             >
               <FileText className="w-4 h-4" />
               <span>All Production Sheets</span>
@@ -504,15 +527,15 @@ export default function WashingWorkCenter() {
             onClick={() => setActiveTab('ISSUE_HANDOVER')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 ${
               activeTab === 'ISSUE_HANDOVER'
-                ? 'bg-emerald-600 text-white shadow-xs'
+                ? 'bg-lavender-600 text-white shadow-xs'
                 : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
             }`}
           >
             <PackageCheck className="w-4 h-4" />
-            <span>Handover to QC Washing</span>
+            <span>Handover to Washing QC</span>
             <span
               className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                activeTab === 'ISSUE_HANDOVER' ? 'bg-emerald-700 text-white' : 'bg-slate-100 text-slate-700'
+                activeTab === 'ISSUE_HANDOVER' ? 'bg-lavender-700 text-white' : 'bg-slate-100 text-slate-700'
               }`}
             >
               {dispatchedChallans.length}
@@ -528,7 +551,7 @@ export default function WashingWorkCenter() {
             }`}
           >
             <Archive className="w-4 h-4" />
-            <span>Defected / Quarantine Log</span>
+            <span>Defective Shelf (DEF-SHELF-WASHING)</span>
           </button>
 
           <button
@@ -563,7 +586,7 @@ export default function WashingWorkCenter() {
                   placeholder="Search by challan, sheet #, client, or style..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-hidden focus:ring-2 focus:ring-cyan-500"
+                  className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-hidden focus:ring-2 focus:ring-lavender-500"
                 />
               </div>
 
@@ -688,16 +711,16 @@ export default function WashingWorkCenter() {
                                     <span>Wash Run</span>
                                   </button>
 
-                                  {/* HANDOVER TO QC WASHING BUTTON (if approved) */}
+                                  {/* HANDOVER TO WASHING QC BUTTON (if approved) */}
                                   {isApproved && (
                                     <button
                                       type="button"
-                                      onClick={() => handleIssueToFinishing(c)}
-                                      className="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[11px] font-semibold flex items-center gap-1 transition shadow-2xs"
-                                      title="Issue Handover Challan to QC Washing"
+                                      onClick={() => openIssueToWashingQc(c)}
+                                      className="px-2 py-1 bg-lavender-600 hover:bg-lavender-700 text-white rounded text-[11px] font-semibold flex items-center gap-1 transition shadow-2xs"
+                                      title="Issue Handover Challan to Washing QC"
                                     >
                                       <PackageCheck className="w-3 h-3" />
-                                      <span>To QC Washing</span>
+                                      <span>To Washing QC</span>
                                     </button>
                                   )}
                                 </div>
@@ -723,10 +746,10 @@ export default function WashingWorkCenter() {
                   <PackageCheck className="w-5 h-5 text-emerald-600" />
                   <div>
                     <h3 className="text-sm font-bold text-slate-900">
-                      Dispatched Challans to QC Washing Department
+                      Dispatched Challans to Washing QC Department
                     </h3>
                     <p className="text-xs text-slate-500">
-                      Washed and barcode-tagged lots transferred to QC Washing for verification & quality check
+                      Washed and barcode-tagged lots transferred to Washing QC for verification & quality check
                     </p>
                   </div>
                 </div>
@@ -785,61 +808,14 @@ export default function WashingWorkCenter() {
           </div>
         )}
 
-        {/* TAB 3: DEFECTED / QUARANTINE LOG */}
+        {/* TAB 3: DEFECTED SHELF */}
         {activeTab === 'DEFECTED_SHELF' && (
           <div className="space-y-4">
-            <div className="bg-white rounded-2xl border border-rose-200 p-5 shadow-xs">
-              <div className="flex items-center justify-between pb-3 border-b border-rose-100">
-                <div className="flex items-center gap-2">
-                  <Archive className="w-5 h-5 text-rose-600" />
-                  <div>
-                    <h3 className="text-sm font-bold text-rose-900">
-                      Washing Defected Pieces & Quarantine Log (DEF-SHELF-01)
-                    </h3>
-                    <p className="text-xs text-slate-500">
-                      Track shrinkage deviations, color bleeding, torn pieces, or fabric damage during wash
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="divide-y divide-slate-100 pt-2">
-                {challans.filter((c) => (c.defectivePieces || 0) > 0).length === 0 ? (
-                  <div className="py-12 text-center text-slate-400">
-                    <CheckCircle2 className="w-8 h-8 mx-auto text-emerald-400 mb-2" />
-                    <p className="text-xs font-medium">Zero defective pieces quarantined from washing.</p>
-                  </div>
-                ) : (
-                  challans
-                    .filter((c) => (c.defectivePieces || 0) > 0)
-                    .map((c) => (
-                      <div key={c.id} className="py-3 flex items-center justify-between gap-3 text-xs">
-                        <div className="space-y-0.5">
-                          <div className="flex items-center gap-2">
-                            <span className="font-mono font-bold text-slate-900">{c.challanNumber}</span>
-                            <span className="font-mono font-bold text-rose-700 bg-rose-50 px-1.5 py-0.2 rounded text-[10px]">
-                              DEF-SHELF-01
-                            </span>
-                          </div>
-                          <p className="text-slate-600 font-medium">
-                            {c.defectReason || 'Shrinkage & Wash Defect'}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <span className="font-mono font-bold text-rose-700 text-sm">
-                            {c.defectivePieces} PCS Defective
-                          </span>
-                          <DocumentActionButtons
-                            challan={c}
-                            program={c.program}
-                            size="xs"
-                          />
-                        </div>
-                      </div>
-                    ))
-                )}
-              </div>
-            </div>
+            <DepartmentDefectiveShelfWidget
+              department="WASHING"
+              shelfCode="DEF-SHELF-WASHING"
+              accentColor="cyan"
+            />
           </div>
         )}
 
@@ -980,7 +956,7 @@ export default function WashingWorkCenter() {
                     required
                     value={washForm.pieceIn}
                     onChange={(e) => setWashForm({ ...washForm, pieceIn: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold focus:ring-2 focus:ring-cyan-500"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold focus:ring-2 focus:ring-lavender-500"
                     placeholder="e.g. 500"
                   />
                   <span className="text-[10px] text-slate-500 mt-0.5 block">Received into washer</span>
@@ -1005,7 +981,7 @@ export default function WashingWorkCenter() {
                         defectivePieces: String(diff),
                       });
                     }}
-                    className="w-full px-3 py-2 bg-white border border-emerald-300 rounded-lg text-xs font-mono font-bold text-emerald-700 focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-3 py-2 bg-white border border-emerald-300 rounded-lg text-xs font-mono font-bold text-emerald-700 focus:ring-2 focus:ring-lavender-500"
                     placeholder="e.g. 490"
                   />
                   <span className="text-[10px] text-emerald-600 mt-0.5 block">Good pieces washed</span>
@@ -1043,7 +1019,7 @@ export default function WashingWorkCenter() {
                       required
                       value={washForm.washingBarcode}
                       onChange={(e) => setWashForm({ ...washForm, washingBarcode: e.target.value })}
-                      className="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold focus:ring-2 focus:ring-cyan-500"
+                      className="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold focus:ring-2 focus:ring-lavender-500"
                       placeholder="e.g. WB-2026-0042"
                     />
                   </div>
@@ -1057,7 +1033,7 @@ export default function WashingWorkCenter() {
                   <select
                     value={washForm.machineId}
                     onChange={(e) => setWashForm({ ...washForm, machineId: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium focus:ring-2 focus:ring-cyan-500"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium focus:ring-2 focus:ring-lavender-500"
                   >
                     <option value="WASH-DRUM-01">WASH-DRUM-01 (100 KG Capacity)</option>
                     <option value="WASH-DRUM-02">WASH-DRUM-02 (150 KG Capacity)</option>
@@ -1076,7 +1052,7 @@ export default function WashingWorkCenter() {
                   <select
                     value={washForm.washRecipe}
                     onChange={(e) => setWashForm({ ...washForm, washRecipe: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium focus:ring-2 focus:ring-cyan-500"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium focus:ring-2 focus:ring-lavender-500"
                   >
                     <option value="BIO_POLISH_SOFT_WASH">Bio-Polish & Enzyme Soft Wash</option>
                     <option value="SILICON_SOFTENER_WASH">Silicon Softener Premium Wash</option>
@@ -1094,7 +1070,7 @@ export default function WashingWorkCenter() {
                   <select
                     value={washForm.dryingMethod}
                     onChange={(e) => setWashForm({ ...washForm, dryingMethod: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium focus:ring-2 focus:ring-cyan-500"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium focus:ring-2 focus:ring-lavender-500"
                   >
                     <option value="Tumble Dry (60°C)">Tumble Dry (60°C Medium Heat)</option>
                     <option value="Tumble Dry (80°C High)">Tumble Dry (80°C High Shrinkage Lock)</option>
@@ -1178,6 +1154,7 @@ export default function WashingWorkCenter() {
                     type="text"
                     value={washForm.defectReason}
                     onChange={(e) => setWashForm({ ...washForm, defectReason: e.target.value })}
+                    required={Number(washForm.defectivePieces) > 0}
                     className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs"
                     placeholder="e.g. Color bleeding, fraying, shrinkage deviation"
                   />
@@ -1208,7 +1185,7 @@ export default function WashingWorkCenter() {
                       challanNumber: selectedChallanForWash.challanNumber,
                       designNumber: washForm.washingBarcode,
                       departmentName: 'Washing Department Lot Tag',
-                      fromDepartment: selectedChallanForWash.fromDepartment || 'QC2',
+                      fromDepartment: selectedChallanForWash.fromDepartment || 'THREADCUT_QC',
                       toDepartment: 'WASHING',
                       programSerialNo:
                         selectedChallanForWash.program?.programSerialNo ||
@@ -1254,6 +1231,52 @@ export default function WashingWorkCenter() {
               </div>
             </form>
           </div>
+        </div>
+      )}
+
+      {/* ISSUE TO WASHING QC: MANUAL CHALLAN NUMBER */}
+      {issueTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs" role="dialog" aria-modal="true">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!issuingHandover) void handleIssueToFinishing(issueTarget, issueChallanNumber);
+            }}
+            className="w-full max-w-md bg-white rounded-2xl p-6 shadow-2xl border border-slate-200 text-slate-800 space-y-4"
+          >
+            <div>
+              <h3 className="text-base font-bold text-slate-900">Issue Challan to Washing QC</h3>
+              <p className="text-xs text-slate-500 font-mono">
+                Incoming {issueTarget.challanNumber} &middot; {issueTarget.program?.programSerialNo || issueTarget.program?.programNumber || ''}
+              </p>
+            </div>
+            <ChallanNumberInput
+              value={issueChallanNumber}
+              onChange={(value) => {
+                setIssueChallanNumber(value);
+                setIssueNumberError(null);
+              }}
+              error={issueNumberError}
+              disabled={issuingHandover}
+            />
+            <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setIssueTarget(null)}
+                disabled={issuingHandover}
+                className="px-3 py-1.5 border border-slate-300 rounded-lg text-xs font-semibold hover:bg-slate-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={issuingHandover}
+                className="px-4 py-1.5 bg-lavender-600 hover:bg-lavender-700 disabled:opacity-50 text-white rounded-lg text-xs font-bold transition"
+              >
+                {issuingHandover ? 'Issuing…' : 'Issue to Washing QC'}
+              </button>
+            </div>
+          </form>
         </div>
       )}
 

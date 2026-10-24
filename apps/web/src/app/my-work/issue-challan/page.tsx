@@ -83,7 +83,7 @@ function IssueChallanContent() {
     fabricUnit: 'MTR',
     defectivePieces: 0,
     defectiveShelfLocation: 'DEF-SHELF-STORE (Fabric Store Quarantined Shelf)',
-    defectReason: 'Weaving Slub / Fabric Tear',
+    defectReason: '',
     detectedFromDept: 'PROGRAMMING',
     detectedFromChallanId: null,
     detectedFromChallanNumber: null,
@@ -105,18 +105,10 @@ function IssueChallanContent() {
     const init = async () => {
       try {
         setFetchingChallanNo(true);
-        const [programsList, nextNoRes] = await Promise.all([
-          api.getPrograms().catch(() => []),
-          fetch('/api/challans/next-number?department=PROGRAMMING').then(r => r.json()).catch(() => ({})),
-        ]);
+        // The challan number is entered manually; only the programs are loaded.
+        const programsList = await api.getPrograms().catch(() => []);
 
         setPrograms(programsList || []);
-        if (nextNoRes.nextNumber) {
-          setChallanNumber(nextNoRes.nextNumber);
-        } else {
-          const year = new Date().getFullYear();
-          setChallanNumber(`CH-PRG-${year}-${String(Date.now()).slice(-5)}`);
-        }
 
         // If preselected program provided via query param
         if (preselectedProgramId && programsList.length > 0) {
@@ -282,7 +274,7 @@ function IssueChallanContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pl-0 md:pl-64 pb-20">
+    <div className="min-h-screen bg-ink-50 pl-0 md:pl-64 pb-20">
       {/* TOP HEADER */}
       <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div className="flex items-center gap-4">
@@ -293,7 +285,7 @@ function IssueChallanContent() {
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A66E22] block">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-lavender-700 block">
               PROGRAMMING DEPARTMENT · CHALLAN ISSUANCE
             </span>
             <h1 className="text-xl font-bold text-slate-900">
@@ -406,11 +398,12 @@ function IssueChallanContent() {
                   type="button"
                   onClick={() => {
                     setIssuedChallan(null);
+                    setChallanNumber('');
                     setSelectedProgram(null);
                     setItems([createBlankChallanItem('PROGRAMMING_STORE')]);
                     router.push('/my-work/issue-challan');
                   }}
-                  className="px-4 py-2 bg-[#163767] hover:bg-[#0F264A] text-white text-xs font-semibold rounded-md shadow-xs transition cursor-pointer"
+                  className="px-4 py-2 bg-lavender-800 hover:bg-lavender-900 text-white text-xs font-semibold rounded-md shadow-xs transition cursor-pointer"
                 >
                   Issue Another Challan
                 </button>
@@ -448,7 +441,7 @@ function IssueChallanContent() {
                     const found = programs.find((p) => p.id === e.target.value);
                     if (found) handleSelectProgram(found);
                   }}
-                  className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-xs text-slate-800 font-medium focus:outline-none focus:ring-1 focus:ring-slate-900 bg-white"
+                  className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-xs text-slate-800 font-medium focus:outline-none focus:ring-1 focus:ring-lavender-500 bg-white"
                 >
                   <option value="">-- Choose a Production Sheet --</option>
                   {programs.map((p) => (
@@ -525,7 +518,10 @@ function IssueChallanContent() {
                     required
                     value={challanNumber}
                     onChange={(e) => setChallanNumber(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg font-mono font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-1 focus:ring-slate-900"
+                    maxLength={64}
+                    autoComplete="off"
+                    placeholder="Enter challan number"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg font-mono font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-1 focus:ring-lavender-500"
                   />
                 </div>
 
@@ -539,7 +535,7 @@ function IssueChallanContent() {
                     required
                     value={challanDate}
                     onChange={(e) => setChallanDate(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg font-medium text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg font-medium text-slate-900 focus:outline-none focus:ring-1 focus:ring-lavender-500"
                   />
                 </div>
 
@@ -577,7 +573,7 @@ function IssueChallanContent() {
                   <select
                     value={priority}
                     onChange={(e: any) => setPriority(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-lavender-500"
                   >
                     <option value="NORMAL">Normal</option>
                     <option value="URGENT">Urgent</option>
@@ -595,7 +591,7 @@ function IssueChallanContent() {
                     value={designNumber}
                     onChange={(e) => setDesignNumber(e.target.value)}
                     placeholder=""
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg font-semibold text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg font-semibold text-slate-900 focus:outline-none focus:ring-1 focus:ring-lavender-500"
                   />
                 </div>
 
@@ -609,7 +605,7 @@ function IssueChallanContent() {
                     value={serialNumber}
                     onChange={(e) => setSerialNumber(e.target.value)}
                     placeholder=""
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg font-semibold text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg font-semibold text-slate-900 focus:outline-none focus:ring-1 focus:ring-lavender-500"
                   />
                 </div>
 
@@ -622,7 +618,7 @@ function IssueChallanContent() {
                     type="date"
                     value={deliveryDate}
                     onChange={(e) => setDeliveryDate(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-1 focus:ring-lavender-500"
                   />
                 </div>
               </div>
@@ -638,7 +634,7 @@ function IssueChallanContent() {
                     value={inchargeName}
                     onChange={(e) => setInchargeName(e.target.value)}
                     placeholder=""
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-1 focus:ring-lavender-500"
                   />
                 </div>
                 <div>
@@ -650,7 +646,7 @@ function IssueChallanContent() {
                     value={remarks}
                     onChange={(e) => setRemarks(e.target.value)}
                     placeholder=""
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-1 focus:ring-lavender-500"
                   />
                 </div>
               </div>

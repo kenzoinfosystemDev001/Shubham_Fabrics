@@ -28,9 +28,12 @@ import {
   Scissors,
   Pause,
   Play,
+  Archive,
 } from 'lucide-react';
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
+import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
+import { DepartmentDefectiveShelfWidget } from '@/components/DepartmentDefectiveShelfWidget';
 
 function FinishingWorkstationContent() {
   const searchParams = useSearchParams();
@@ -45,6 +48,7 @@ function FinishingWorkstationContent() {
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<string>(initialTab);
+  const [activeView, setActiveView] = useState<'WORKBENCH' | 'DEFECTIVE_SHELF'>('WORKBENCH');
 
   // Modals
   const [showTechSheet, setShowTechSheet] = useState(false);
@@ -67,7 +71,7 @@ function FinishingWorkstationContent() {
   const [completeRejectQty, setCompleteRejectQty] = useState(0);
   const [completeBalanceQty, setCompleteBalanceQty] = useState(0);
   const [completeNotes, setCompleteNotes] = useState('');
-  const [completeDefectReason, setCompleteDefectReason] = useState('Fabric cut / scissor nip');
+  const [completeDefectReason, setCompleteDefectReason] = useState('');
   const [autoInspect, setAutoInspect] = useState(false);
 
   // Quality Inspection Modal
@@ -163,7 +167,7 @@ function FinishingWorkstationContent() {
     setCompleteRejectQty(0);
     setCompleteBalanceQty(0);
     setCompleteNotes('All garments thread trimmed, spot cleaned, pressed and inspected.');
-    setCompleteDefectReason('Fabric cut / scissor nip');
+    setCompleteDefectReason('');
     setAutoInspect(true);
     setCompleteError('');
     setShowCompleteModal(true);
@@ -321,7 +325,7 @@ function FinishingWorkstationContent() {
     <div
       className="min-h-screen text-slate-100 flex flex-col"
       style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.94), rgba(10, 15, 29, 0.98)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+        backgroundImage: `linear-gradient(to bottom, rgba(37, 35, 42, 0.94), rgba(24, 22, 28, 0.98)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',
@@ -345,6 +349,18 @@ function FinishingWorkstationContent() {
           </div>
 
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => setActiveView(activeView === 'DEFECTIVE_SHELF' ? 'WORKBENCH' : 'DEFECTIVE_SHELF')}
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition border ${
+                activeView === 'DEFECTIVE_SHELF'
+                  ? 'bg-rose-600 text-white border-rose-500 shadow-md'
+                  : 'bg-slate-900 text-rose-300 hover:text-white hover:bg-slate-800 border-slate-700/80'
+              }`}
+            >
+              <Archive className="w-3.5 h-3.5" />
+              <span>{activeView === 'DEFECTIVE_SHELF' ? 'Back to Workstation' : 'Defective Shelf (DEF-SHELF-FINISHING)'}</span>
+            </button>
+
             <button
               onClick={() => loadJobs()}
               disabled={loading}
@@ -374,9 +390,17 @@ function FinishingWorkstationContent() {
         </div>
       )}
 
-      {/* MAIN DUAL-PANE CONTAINER */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-6 flex flex-col lg:flex-row gap-6">
-        {/* LEFT PANE: JOBS LIST */}
+      {/* MAIN CONTAINER */}
+      <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-6">
+        {activeView === 'DEFECTIVE_SHELF' ? (
+          <DepartmentDefectiveShelfWidget
+            department="FINISHING"
+            shelfCode="DEF-SHELF-FINISHING"
+            accentColor="rose"
+          />
+        ) : (
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* LEFT PANE: JOBS LIST */}
         <div className="w-full lg:w-5/12 flex flex-col space-y-4">
           {/* SEARCH & FILTER TABS */}
           <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-3.5 space-y-3 backdrop-blur-xs">
@@ -388,7 +412,7 @@ function FinishingWorkstationContent() {
                 placeholder="Search style, program, challan..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-slate-950/80 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-teal-400"
+                className="w-full pl-9 pr-4 py-2 bg-slate-950/80 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-lavender-400"
               />
             </div>
 
@@ -566,18 +590,8 @@ function FinishingWorkstationContent() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  {selectedJob.program && (
-                    <button
-                      onClick={() => {
-                        setTechSheetProgram(selectedJob.program);
-                        setShowTechSheet(true);
-                      }}
-                      className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition"
-                    >
-                      <FileText className="w-3.5 h-3.5 text-teal-400" />
-                      <span>Production Sheet</span>
-                    </button>
-                  )}
+                  {/* Production Sheet + the challan received from the previous department */}
+                  <DocumentActionButtons program={selectedJob.program} challan={selectedJob} size="sm" />
 
                   <Link
                     href={`/finishing/workspace/${selectedJob.id}`}
@@ -708,7 +722,7 @@ function FinishingWorkstationContent() {
                   {selectedJob.status === 'READY_FOR_HANDOVER' && (
                     <Link
                       href={`/finishing/issue-challan?jobId=${selectedJob.id}`}
-                      className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-900/30 transition flex items-center gap-2"
+                      className="px-4 py-2 rounded-lg bg-lavender-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-900/30 transition flex items-center gap-2"
                     >
                       <Send className="w-4 h-4" />
                       <span>Issue Outgoing Challan</span>
@@ -743,6 +757,8 @@ function FinishingWorkstationContent() {
             </div>
           )}
         </div>
+      </div>
+      )}
 
         {/* START FINISHING MODAL */}
         {showStartModal && (
@@ -916,16 +932,21 @@ function FinishingWorkstationContent() {
                     <label className="block font-semibold text-rose-400 mb-1">
                       Reject Reason / Defect Classification
                     </label>
-                    <select
+                    <input
+                      type="text"
+                      list="finishing-defect-reasons"
                       value={completeDefectReason}
                       onChange={(e) => setCompleteDefectReason(e.target.value)}
+                      required={Number(completeRejectQty) > 0}
+                      placeholder="Enter the actual defect reason"
                       className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white"
-                    >
-                      <option value="Fabric cut / scissor nip">Fabric cut / scissor nip</option>
-                      <option value="Permanent chemical/oil stain">Permanent chemical/oil stain</option>
-                      <option value="Iron scorch burn / glazed fabric">Iron scorch burn / glazed fabric</option>
-                      <option value="Severe embroidery thread unravel">Severe embroidery thread unravel</option>
-                    </select>
+                    />
+                    <datalist id="finishing-defect-reasons">
+                      <option value="Fabric cut / scissor nip" />
+                      <option value="Permanent chemical/oil stain" />
+                      <option value="Iron scorch burn / glazed fabric" />
+                      <option value="Severe embroidery thread unravel" />
+                    </datalist>
                   </div>
                 )}
 

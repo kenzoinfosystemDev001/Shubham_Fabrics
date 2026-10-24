@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { auditAdminAction, readReason, reasonRequiredResponse, requireAdmin } from '@/lib/admin-auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -124,6 +125,11 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Permanent deletion is an Admin-only, audited action with a stated reason.
+  const auth = await requireAdmin(request);
+  if (!auth.actor) return auth.response;
+  const reason = readReason(await request.json().catch(() => ({})));
+  if (!reason) return reasonRequiredResponse();
   try {
     const { id } = await params;
 
@@ -135,6 +141,23 @@ export async function DELETE(
 
     if (!program) {
       return NextResponse.json({ error: 'Program not found' }, { status: 404 });
+    }
+
+    // Fabric Store issues still counted against stock must be cancelled first, so the stock
+    // reversal is recorded instead of disappearing with the sheet.
+    const countedStoreIssues = await prisma.challan.count({
+      where: {
+        programId: id,
+        fromDepartment: { in: ['STORE', 'FABRIC_STORE'] },
+        NOT: { toDepartment: 'STORE' },
+        status: { notIn: ['DRAFT', 'CANCELLED'] },
+      },
+    });
+    if (countedStoreIssues > 0) {
+      return NextResponse.json(
+        { error: `This Production Sheet has ${countedStoreIssues} Fabric Store challan(s) counted against stock. Cancel them first so the stock reversal is recorded.` },
+        { status: 409 }
+      );
     }
 
     // Cascade deletion safely inside a transaction to resolve all foreign key constraints
@@ -165,10 +188,10 @@ export async function DELETE(
             where: {
               OR: [
                 { inboundChallanId: { in: challanIds } },
-                { qc1ChallanId: { in: challanIds } },
+                { dyeingQcChallanId: { in: challanIds } },
               ],
             },
-            data: { inboundChallanId: null, qc1ChallanId: null },
+            data: { inboundChallanId: null, dyeingQcChallanId: null },
           });
 
           // Delete production transactions linked to these challans
@@ -310,18 +333,13 @@ export async function DELETE(
         await tx.programColour.deleteMany({ where: { programId: id } });
         await tx.programFabric.deleteMany({ where: { programId: id } });
 
-        // 10. Delete audit logs associated with this program
-        await tx.auditLog.deleteMany({
-          where: {
-            OR: [
-              { entityId: id },
-              { entity: 'Program', entityId: id },
-            ],
-          },
-        });
 
         // 11. Finally, permanently delete the program itself
         await tx.program.delete({ where: { id } });
+        await auditAdminAction(request, auth.actor.id, 'PRODUCTION_SHEET_DELETED', 'Program', id, {
+          before: { programNumber: program.programNumber, programSerialNo: program.programSerialNo },
+          after: { reason },
+        }, tx);
       },
       { maxWait: 15000, timeout: 30000 }
     );

@@ -69,7 +69,7 @@ export default function BarcodeStickerCard({
       {/* CARD HEADER */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-[#163767] text-amber-300 flex items-center justify-center shrink-0 shadow-2xs">
+          <div className="w-8 h-8 rounded-lg bg-lavender-800 text-amber-300 flex items-center justify-center shrink-0 shadow-2xs">
             <BarcodeIcon className="w-5 h-5" />
           </div>
           <div>
@@ -93,7 +93,7 @@ export default function BarcodeStickerCard({
             type="button"
             onClick={handleDownloadPng}
             disabled={downloading}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#163767] hover:bg-[#0F264A] text-white rounded-lg text-xs font-bold shadow-2xs transition cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-lavender-800 hover:bg-lavender-900 text-white rounded-lg text-xs font-bold shadow-2xs transition cursor-pointer"
             title="Download standalone high-resolution barcode sticker as PNG"
           >
             {downloadSuccess === 'PNG Downloaded' ? (
@@ -117,7 +117,7 @@ export default function BarcodeStickerCard({
           <button
             type="button"
             onClick={handlePrint}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-bold shadow-2xs transition cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-lavender-700 hover:bg-lavender-800 text-white rounded-lg text-xs font-bold shadow-2xs transition cursor-pointer"
             title="Print 4x2.5 thermal sticker label directly"
           >
             <Printer className="w-3.5 h-3.5" />

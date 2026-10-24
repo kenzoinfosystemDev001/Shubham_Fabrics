@@ -18,7 +18,7 @@
 
 ### 3. Handover to Final Quality Check
 1. Click **Issue Outgoing Challan** (`/steam-press/issue-challan`).
-2. Verify target department is **Final Quality Check** (`FINAL_CHECK`).
+2. Verify target department is **Final Quality Check** (`FINAL_QC`).
 3. Verify quantity to dispatch.
 4. Click **Issue Handover Challan**.
 5. Print the Code-128 barcode sticker card and affix to the bundle crate before handing over to Final QC.

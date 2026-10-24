@@ -16,7 +16,7 @@ export default function FabricStoreIssueChallanPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#F0FAF9] flex items-center justify-center text-xs text-slate-500">
+        <div className="min-h-screen bg-ink-50 flex items-center justify-center text-xs text-slate-500">
           Loading Fabric Store Issue Challan...
         </div>
       }

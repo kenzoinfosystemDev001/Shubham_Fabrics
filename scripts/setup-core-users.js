@@ -113,23 +113,17 @@ async function setup() {
     console.log('✓ Programmer alias PIN updated to 1234');
   }
 
-  // 5. QC Washing Department & Role & User
+  // 5. Washing QC Department & Role & User
   await prisma.department.upsert({
-    where: { code: 'QC3' },
-    update: { name: 'QC Washing', sequenceOrder: 8 },
-    create: { code: 'QC3', name: 'QC Washing', sequenceOrder: 8, description: 'QC Washing Inspection Department' },
+    where: { code: 'WASHING_QC' },
+    update: { name: 'Washing QC', sequenceOrder: 8 },
+    create: { code: 'WASHING_QC', name: 'Washing QC', sequenceOrder: 8, description: 'Washing QC Inspection Department' },
   });
 
-  await prisma.department.upsert({
-    where: { code: 'QCWASHING' },
-    update: { name: 'QC Washing', sequenceOrder: 8 },
-    create: { code: 'QCWASHING', name: 'QC Washing', sequenceOrder: 8, description: 'QC Washing Inspection Department' },
-  });
-
-  let qcWashingRole = await prisma.role.findFirst({ where: { code: 'QC3_INSPECTOR' } });
-  if (!qcWashingRole) {
-    qcWashingRole = await prisma.role.create({
-      data: { code: 'QC3_INSPECTOR', name: 'QC Washing Inspector', description: 'QC Washing inspection & verification', isSystem: true },
+  let washingQcRole = await prisma.role.findFirst({ where: { code: 'WASHING_QC_INSPECTOR' } });
+  if (!washingQcRole) {
+    washingQcRole = await prisma.role.create({
+      data: { code: 'WASHING_QC_INSPECTOR', name: 'Washing QC Inspector', description: 'Washing QC inspection & verification', isSystem: true },
     });
   }
 
@@ -140,37 +134,37 @@ async function setup() {
     });
   }
 
-  const qcwashingUser = await prisma.user.upsert({
+  const washingQcUser = await prisma.user.upsert({
     where: { username: 'qcwashing' },
-    update: { passwordHash: hash, departmentCode: 'QC3', fullName: 'QC Washing Inspector' },
+    update: { passwordHash: hash, departmentCode: 'WASHING_QC', fullName: 'Washing QC Inspector' },
     create: {
       username: 'qcwashing',
       email: 'qcwashing@subhamfabrics.com',
-      fullName: 'QC Washing Inspector',
+      fullName: 'Washing QC Inspector',
       passwordHash: hash,
-      departmentCode: 'QC3',
+      departmentCode: 'WASHING_QC',
     },
   });
-  await prisma.userRole.deleteMany({ where: { userId: qcwashingUser.id } });
-  await prisma.userRole.create({ data: { userId: qcwashingUser.id, roleId: qcWashingRole.id } });
-  await prisma.userRole.create({ data: { userId: qcwashingUser.id, roleId: qcInspectorRole.id } });
-  console.log('✓ QC Washing user ready: qcwashing / 1234 (QC3_INSPECTOR)');
+  await prisma.userRole.deleteMany({ where: { userId: washingQcUser.id } });
+  await prisma.userRole.create({ data: { userId: washingQcUser.id, roleId: washingQcRole.id } });
+  await prisma.userRole.create({ data: { userId: washingQcUser.id, roleId: qcInspectorRole.id } });
+  console.log('✓ Washing QC user ready: qcwashing / 1234 (WASHING_QC_INSPECTOR)');
 
   // Also support alias 'qc3'
-  const qc3User = await prisma.user.upsert({
+  const washingQcAliasUser = await prisma.user.upsert({
     where: { username: 'qc3' },
-    update: { passwordHash: hash, departmentCode: 'QC3', fullName: 'QC Washing Inspector' },
+    update: { passwordHash: hash, departmentCode: 'WASHING_QC', fullName: 'Washing QC Inspector' },
     create: {
       username: 'qc3',
       email: 'qc3@subhamfabrics.com',
-      fullName: 'QC Washing Inspector',
+      fullName: 'Washing QC Inspector',
       passwordHash: hash,
-      departmentCode: 'QC3',
+      departmentCode: 'WASHING_QC',
     },
   });
-  await prisma.userRole.deleteMany({ where: { userId: qc3User.id } });
-  await prisma.userRole.create({ data: { userId: qc3User.id, roleId: qcWashingRole.id } });
-  console.log('✓ QC Washing alias ready: qc3 / 1234');
+  await prisma.userRole.deleteMany({ where: { userId: washingQcAliasUser.id } });
+  await prisma.userRole.create({ data: { userId: washingQcAliasUser.id, roleId: washingQcRole.id } });
+  console.log('✓ Washing QC alias ready: qc3 / 1234');
 
   // 6. Recutting & Stitching Departments, Roles, and User
   await prisma.department.upsert({
@@ -302,27 +296,27 @@ async function setup() {
   console.log('✓ Steam Press user ready: steampress / 1234 (STEAM_PRESS_SUPERVISOR)');
 
   // 11. Final QC Department & User
-  let finalCheckRole = await prisma.role.findFirst({ where: { code: 'FINAL_CHECK_INSPECTOR' } });
-  if (!finalCheckRole) {
-    finalCheckRole = await prisma.role.create({
-      data: { code: 'FINAL_CHECK_INSPECTOR', name: 'Final QC Inspector', description: 'Final garment inspection and quality verification', isSystem: true },
+  let finalQcRole = await prisma.role.findFirst({ where: { code: 'FINAL_QC_INSPECTOR' } });
+  if (!finalQcRole) {
+    finalQcRole = await prisma.role.create({
+      data: { code: 'FINAL_QC_INSPECTOR', name: 'Final QC Inspector', description: 'Final garment inspection and quality verification', isSystem: true },
     });
   }
 
-  const finalCheckUser = await prisma.user.upsert({
+  const finalQcUser = await prisma.user.upsert({
     where: { username: 'finalcheck' },
-    update: { passwordHash: hash, departmentCode: 'FINAL_CHECK', fullName: 'Final QC Inspector' },
+    update: { passwordHash: hash, departmentCode: 'FINAL_QC', fullName: 'Final QC Inspector' },
     create: {
       username: 'finalcheck',
       email: 'finalcheck@subhamfabrics.com',
       fullName: 'Final QC Inspector',
       passwordHash: hash,
-      departmentCode: 'FINAL_CHECK',
+      departmentCode: 'FINAL_QC',
     },
   });
-  await prisma.userRole.deleteMany({ where: { userId: finalCheckUser.id } });
-  await prisma.userRole.create({ data: { userId: finalCheckUser.id, roleId: finalCheckRole.id } });
-  console.log('✓ Final QC user ready: finalcheck / 1234 (FINAL_CHECK_INSPECTOR)');
+  await prisma.userRole.deleteMany({ where: { userId: finalQcUser.id } });
+  await prisma.userRole.create({ data: { userId: finalQcUser.id, roleId: finalQcRole.id } });
+  console.log('✓ Final QC user ready: finalcheck / 1234 (FINAL_QC_INSPECTOR)');
 
   console.log('✓ Downstream factory route departments verified');
 

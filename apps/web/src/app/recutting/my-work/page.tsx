@@ -40,6 +40,7 @@ import {
   downloadChallanHtml, 
   printChallan 
 } from '@/lib/download-challan';
+import { DepartmentDefectiveShelfWidget } from '@/components/DepartmentDefectiveShelfWidget';
 
 function RecuttingWorkstationContent() {
   const searchParams = useSearchParams();
@@ -70,6 +71,7 @@ function RecuttingWorkstationContent() {
   const [completeBalanceQty, setCompleteBalanceQty] = useState(0);
   const [completeNotes, setCompleteNotes] = useState('');
   const [completeDefectCode, setCompleteDefectCode] = useState('CUT_OFF_SPEC');
+  const [completeDefectReason, setCompleteDefectReason] = useState('');
   const [components, setComponents] = useState<{ component: string; quantity: number }[]>([
     { component: 'FRONT PANEL', quantity: 0 },
     { component: 'BACK PANEL', quantity: 0 },
@@ -177,6 +179,7 @@ function RecuttingWorkstationContent() {
     setCompleteReworkQty(0);
     setCompleteRejectQty(0);
     setCompleteBalanceQty(0);
+    setCompleteDefectReason('');
     setCompleteNotes('Precision cutting completed according to Wilcom pattern and seam allowances.');
     setComponents([
       { component: 'FRONT PANEL', quantity: Math.floor(input / 2) || input },
@@ -218,6 +221,7 @@ function RecuttingWorkstationContent() {
           balanceQuantity: completeBalanceQty,
           operatorNotes: completeNotes,
           defectCode: completeRejectQty > 0 ? completeDefectCode : undefined,
+          defectReason: completeRejectQty > 0 ? completeDefectReason : undefined,
           componentBreakdown: components,
         }),
       });
@@ -313,11 +317,11 @@ function RecuttingWorkstationContent() {
   });
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] pb-16">
+    <div className="min-h-screen bg-ink-50 pb-16">
       {/* HEADER */}
       <header
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundImage: `linear-gradient(to right, rgba(37, 35, 42, 0.88), rgba(37, 35, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -326,10 +330,10 @@ function RecuttingWorkstationContent() {
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">
+              <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-lavender-500/20 text-lavender-300 border border-lavender-500/30">
                 RECUTTING WORKSTATION
               </span>
-              <span className="flex items-center gap-1.5 text-xs text-rose-300 font-medium">
+              <span className="flex items-center gap-1.5 text-xs text-lavender-300 font-medium">
                 <Scissors className="w-3.5 h-3.5" />
                 Precision Panel Cutting & Output Reconciliation
               </span>
@@ -357,7 +361,7 @@ function RecuttingWorkstationContent() {
             </Link>
             <Link
               href="/recutting/issue-challan"
-              className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-sm transition"
+              className="px-3 py-1.5 bg-lavender-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-sm transition"
             >
               <Send className="w-3.5 h-3.5" />
               <span>Stitching Handover</span>
@@ -403,7 +407,7 @@ function RecuttingWorkstationContent() {
             <button
               onClick={() => setActiveTab('IN_PROCESS')}
               className={`px-3 py-1.5 text-xs font-bold rounded-md whitespace-nowrap transition ${
-                activeTab === 'IN_PROCESS' ? 'bg-amber-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                activeTab === 'IN_PROCESS' ? 'bg-lavender-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               In Cutting ({jobs.filter((j) => j.status === 'IN_PROCESS').length})
@@ -419,10 +423,18 @@ function RecuttingWorkstationContent() {
             <button
               onClick={() => setActiveTab('READY_FOR_STITCHING')}
               className={`px-3 py-1.5 text-xs font-bold rounded-md whitespace-nowrap transition ${
-                activeTab === 'READY_FOR_STITCHING' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                activeTab === 'READY_FOR_STITCHING' ? 'bg-lavender-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Ready for Stitching ({jobs.filter((j) => j.status === 'READY_FOR_STITCHING').length})
+            </button>
+            <button
+              onClick={() => setActiveTab('DEFECTIVE_SHELF')}
+              className={`px-3 py-1.5 text-xs font-bold rounded-md whitespace-nowrap transition ${
+                activeTab === 'DEFECTIVE_SHELF' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Defective Shelf (DEF-SHELF-RECUTTING)
             </button>
             <button
               onClick={() => setActiveTab('PRODUCTION_SHEETS')}
@@ -441,13 +453,19 @@ function RecuttingWorkstationContent() {
               placeholder="Search challan, program, buyer, design..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
+              className="w-full pl-9 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender-500"
             />
           </div>
         </div>
 
-        {/* IF TAB IS PRODUCTION SHEETS */}
-        {activeTab === 'PRODUCTION_SHEETS' ? (
+        {/* IF TAB IS DEFECTIVE SHELF */}
+        {activeTab === 'DEFECTIVE_SHELF' ? (
+          <DepartmentDefectiveShelfWidget
+            department="RECUTTING"
+            shelfCode="DEF-SHELF-RECUTTING"
+            accentColor="rose"
+          />
+        ) : activeTab === 'PRODUCTION_SHEETS' ? (
           <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
@@ -514,7 +532,7 @@ function RecuttingWorkstationContent() {
                 <div className="divide-y divide-slate-100 max-h-[750px] overflow-y-auto">
                   {filteredJobs.length === 0 ? (
                     <div className="p-8 text-center text-slate-400">
-                      <Scissors className="w-8 h-8 mx-auto mb-2 opacity-40 text-rose-400" />
+                      <Scissors className="w-8 h-8 mx-auto mb-2 opacity-40 text-lavender-400" />
                       <p className="text-xs font-semibold text-slate-600">No jobs match this filter</p>
                       <p className="text-[11px] text-slate-400 mt-0.5">
                         Receive incoming challans or change status filter tab above.
@@ -534,7 +552,7 @@ function RecuttingWorkstationContent() {
                           onClick={() => setSelectedJob(job)}
                           className={`p-4 cursor-pointer transition flex items-center justify-between gap-3 ${
                             isSelected
-                              ? 'bg-rose-50/70 border-l-4 border-rose-500 pl-3'
+                              ? 'bg-lavender-50/70 border-l-4 border-lavender-500 pl-3'
                               : 'hover:bg-slate-50'
                           }`}
                         >
@@ -591,7 +609,7 @@ function RecuttingWorkstationContent() {
                             <div className="text-xs font-black text-slate-900">{pcs.toLocaleString()} PCS</div>
                             <ChevronRight
                               className={`w-4 h-4 ml-auto mt-1 ${
-                                isSelected ? 'text-rose-600' : 'text-slate-300'
+                                isSelected ? 'text-lavender-600' : 'text-slate-300'
                               }`}
                             />
                           </div>
@@ -607,7 +625,7 @@ function RecuttingWorkstationContent() {
             <div className="lg:col-span-7">
               {!selectedJob ? (
                 <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-12 text-center text-slate-400">
-                  <Scissors className="w-12 h-12 mx-auto mb-3 opacity-30 text-rose-500" />
+                  <Scissors className="w-12 h-12 mx-auto mb-3 opacity-30 text-lavender-500" />
                   <h3 className="text-sm font-bold text-slate-700">Select a Job to Open Cutting Workstation</h3>
                   <p className="text-xs text-slate-500 mt-1">
                     Choose any job from the queue on the left to start cutting or reconcile output.
@@ -662,7 +680,7 @@ function RecuttingWorkstationContent() {
                       />
                       <Link
                         href={`/recutting/workspace/${selectedJob.id}`}
-                        className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 border border-rose-200"
+                        className="px-3 py-1.5 bg-lavender-50 hover:bg-lavender-100 text-lavender-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 border border-lavender-200"
                       >
                         <Scissors className="w-3.5 h-3.5" />
                         <span>Focus Mode</span>
@@ -673,7 +691,7 @@ function RecuttingWorkstationContent() {
                   {/* Production Sheet Specifications Card */}
                   <div className="p-4 bg-slate-50/80 rounded-xl border border-slate-200 text-xs">
                     <div className="font-bold text-slate-800 uppercase tracking-wide text-[11px] mb-2 flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-rose-600" />
+                      <Sparkles className="w-3.5 h-3.5 text-lavender-600" />
                       <span>Production Sheet & Embroidery Specifications</span>
                     </div>
 
@@ -688,7 +706,7 @@ function RecuttingWorkstationContent() {
                       </div>
                       <div>
                         <span className="text-slate-400 block text-[10px]">Wilcom File #</span>
-                        <strong className="text-rose-700 font-mono font-bold">
+                        <strong className="text-lavender-700 font-mono font-bold">
                           {selectedJob.program?.wilcomDesignNumber || 'N/A'}
                         </strong>
                       </div>
@@ -702,9 +720,9 @@ function RecuttingWorkstationContent() {
                   </div>
 
                   {/* Precision Cutting Guidelines */}
-                  <div className="p-4 bg-rose-50/50 rounded-xl border border-rose-200 text-xs space-y-2">
-                    <div className="font-bold text-rose-900 uppercase tracking-wide text-[11px] flex items-center gap-1.5">
-                      <Scissors className="w-3.5 h-3.5 text-rose-600" />
+                  <div className="p-4 bg-lavender-50/50 rounded-xl border border-lavender-200 text-xs space-y-2">
+                    <div className="font-bold text-lavender-900 uppercase tracking-wide text-[11px] flex items-center gap-1.5">
+                      <Scissors className="w-3.5 h-3.5 text-lavender-600" />
                       <span>Operator Precision Guidelines</span>
                     </div>
                     <ul className="list-disc pl-4 space-y-1 text-slate-700 text-[11px]">
@@ -743,7 +761,7 @@ function RecuttingWorkstationContent() {
                         <tfoot className="bg-slate-50 font-bold border-t border-slate-200">
                           <tr>
                             <td colSpan={2} className="px-3 py-2 text-slate-700">Total Material In</td>
-                            <td className="px-3 py-2 text-right text-rose-700 font-black">
+                            <td className="px-3 py-2 text-right text-lavender-700 font-black">
                               {totalInputOfSelected.toLocaleString()}
                             </td>
                             <td className="px-3 py-2 text-slate-600">PCS</td>
@@ -764,7 +782,7 @@ function RecuttingWorkstationContent() {
                         <button
                           onClick={handleStartCutting}
                           disabled={submittingStart}
-                          className="w-full sm:w-auto px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold transition shadow-sm flex items-center justify-center gap-2"
+                          className="w-full sm:w-auto px-5 py-2.5 bg-lavender-600 hover:bg-lavender-500 text-white rounded-xl text-xs font-bold transition shadow-sm flex items-center justify-center gap-2"
                         >
                           <Scissors className="w-4 h-4" />
                           <span>{submittingStart ? 'Starting...' : 'Start Precision Cutting'}</span>
@@ -774,7 +792,7 @@ function RecuttingWorkstationContent() {
                       {selectedJob.status === 'IN_PROCESS' && (
                         <button
                           onClick={openCompleteModal}
-                          className="w-full sm:w-auto px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold transition shadow-sm flex items-center justify-center gap-2"
+                          className="w-full sm:w-auto px-5 py-2.5 bg-lavender-600 hover:bg-lavender-500 text-white rounded-xl text-xs font-bold transition shadow-sm flex items-center justify-center gap-2"
                         >
                           <CheckCircle2 className="w-4 h-4" />
                           <span>Log Output & Reconcile Cut Pieces</span>
@@ -794,7 +812,7 @@ function RecuttingWorkstationContent() {
                       {selectedJob.status === 'READY_FOR_STITCHING' && (
                         <Link
                           href={`/recutting/issue-challan?sourceChallanId=${selectedJob.id}`}
-                          className="w-full sm:w-auto px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition shadow-sm flex items-center justify-center gap-2"
+                          className="w-full sm:w-auto px-5 py-2.5 bg-lavender-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition shadow-sm flex items-center justify-center gap-2"
                         >
                           <Send className="w-4 h-4" />
                           <span>Issue Challan to Stitching Department</span>
@@ -821,7 +839,7 @@ function RecuttingWorkstationContent() {
           <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-xl w-full overflow-hidden max-h-[90vh] flex flex-col">
             <div className="p-4 bg-slate-900 text-white flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Scissors className="w-5 h-5 text-rose-400" />
+                <Scissors className="w-5 h-5 text-lavender-400" />
                 <h3 className="text-sm font-bold">
                   Output Reconciliation & Accounting
                 </h3>
@@ -848,7 +866,7 @@ function RecuttingWorkstationContent() {
                 className={`p-3.5 rounded-xl border text-xs ${
                   isBalanced
                     ? 'bg-emerald-50 border-emerald-300 text-emerald-900'
-                    : 'bg-rose-50 border-rose-300 text-rose-900'
+                    : 'bg-lavender-50 border-lavender-300 text-lavender-900'
                 }`}
               >
                 <div className="flex items-center justify-between font-bold">
@@ -858,7 +876,7 @@ function RecuttingWorkstationContent() {
                       <Check className="w-4 h-4" /> Balanced (0 Diff)
                     </span>
                   ) : (
-                    <span className="text-rose-700 font-extrabold">
+                    <span className="text-lavender-700 font-extrabold">
                       Imbalance: {reconciliationDiff > 0 ? `+${reconciliationDiff}` : reconciliationDiff} PCS
                     </span>
                   )}
@@ -881,7 +899,7 @@ function RecuttingWorkstationContent() {
                     value={completeGoodQty}
                     onChange={(e) => setCompleteGoodQty(Number(e.target.value) || 0)}
                     required
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg font-bold text-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg font-bold text-emerald-700 focus:outline-none focus:ring-2 focus:ring-lavender-500"
                   />
                 </div>
 
@@ -895,7 +913,7 @@ function RecuttingWorkstationContent() {
                     max={completeInputQty}
                     value={completeReworkQty}
                     onChange={(e) => setCompleteReworkQty(Number(e.target.value) || 0)}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg font-bold text-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg font-bold text-amber-700 focus:outline-none focus:ring-2 focus:ring-lavender-500"
                   />
                 </div>
 
@@ -909,7 +927,7 @@ function RecuttingWorkstationContent() {
                     max={completeInputQty}
                     value={completeRejectQty}
                     onChange={(e) => setCompleteRejectQty(Number(e.target.value) || 0)}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg font-bold text-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-500"
+                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg font-bold text-rose-700 focus:outline-none focus:ring-2 focus:ring-lavender-500"
                   />
                 </div>
 
@@ -923,7 +941,7 @@ function RecuttingWorkstationContent() {
                     max={completeInputQty}
                     value={completeBalanceQty}
                     onChange={(e) => setCompleteBalanceQty(Number(e.target.value) || 0)}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500"
+                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-lavender-500"
                   />
                 </div>
               </div>
@@ -937,7 +955,7 @@ function RecuttingWorkstationContent() {
                   <select
                     value={completeDefectCode}
                     onChange={(e) => setCompleteDefectCode(e.target.value)}
-                    className="w-full px-3 py-2 text-xs border border-rose-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 bg-white"
+                    className="w-full px-3 py-2 text-xs border border-rose-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender-500 bg-white"
                   >
                     <option value="CUT_OFF_SPEC">Cut Off Specification / Under Seam Allowance</option>
                     <option value="PATTERN_DISTORTION">Wilcom Motif Distortion / Uneven Border</option>
@@ -945,6 +963,14 @@ function RecuttingWorkstationContent() {
                     <option value="ASYMMETRIC_CUT">Asymmetric Panel Alignment</option>
                     <option value="PULL_DEFECT">Thread Pull / Embroidery unraveling</option>
                   </select>
+                  <input
+                    type="text"
+                    value={completeDefectReason}
+                    onChange={(e) => setCompleteDefectReason(e.target.value)}
+                    required={completeRejectQty > 0}
+                    placeholder="Enter the actual defect reason"
+                    className="mt-2 w-full px-3 py-2 text-xs border border-rose-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender-500 bg-white"
+                  />
                 </div>
               )}
 
@@ -991,7 +1017,7 @@ function RecuttingWorkstationContent() {
                   <button
                     type="button"
                     onClick={() => setComponents([...components, { component: 'MOTIF PIECE', quantity: 0 }])}
-                    className="text-xs text-rose-600 hover:text-rose-700 font-semibold flex items-center gap-1"
+                    className="text-xs text-lavender-600 hover:text-lavender-700 font-semibold flex items-center gap-1"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Add Component</span>
@@ -1008,7 +1034,7 @@ function RecuttingWorkstationContent() {
                   rows={2}
                   value={completeNotes}
                   onChange={(e) => setCompleteNotes(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
+                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender-500"
                 />
               </div>
 
@@ -1025,7 +1051,7 @@ function RecuttingWorkstationContent() {
                 <button
                   type="submit"
                   disabled={submittingComplete || !isBalanced}
-                  className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-bold shadow-xs transition flex items-center gap-1.5 disabled:opacity-50"
+                  className="px-4 py-2 bg-lavender-600 hover:bg-lavender-500 text-white rounded-lg text-xs font-bold shadow-xs transition flex items-center gap-1.5 disabled:opacity-50"
                 >
                   {submittingComplete ? (
                     <>
@@ -1126,7 +1152,7 @@ function RecuttingWorkstationContent() {
                     onClick={() => setVerifyOutcome('APPROVED')}
                     className={`py-2 text-xs font-bold rounded-lg border transition ${
                       verifyOutcome === 'APPROVED'
-                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                        ? 'bg-lavender-600 text-white border-emerald-600 shadow-xs'
                         : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
                     }`}
                   >
@@ -1155,7 +1181,7 @@ function RecuttingWorkstationContent() {
                   rows={2}
                   value={verifyNotes}
                   onChange={(e) => setVerifyNotes(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender-500"
                 />
               </div>
 
@@ -1211,9 +1237,9 @@ export default function RecuttingWorkstationPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center p-8">
+        <div className="min-h-screen bg-ink-50 flex items-center justify-center p-8">
           <div className="text-center text-slate-500">
-            <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-rose-600" />
+            <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-lavender-600" />
             <p className="text-xs font-semibold">Loading Recutting Workstation...</p>
           </div>
         </div>

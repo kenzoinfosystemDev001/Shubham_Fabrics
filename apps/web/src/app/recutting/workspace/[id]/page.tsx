@@ -42,6 +42,7 @@ export default function RecuttingFocusWorkspacePage({
   const [rejectCount, setRejectCount] = useState(0);
   const [operatorNotes, setOperatorNotes] = useState('');
   const [defectCode, setDefectCode] = useState('CUT_OFF_SPEC');
+  const [defectReason, setDefectReason] = useState('');
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState('');
 
@@ -120,6 +121,7 @@ export default function RecuttingFocusWorkspacePage({
           balanceQuantity: balanceRemaining,
           operatorNotes,
           defectCode: rejectCount > 0 ? defectCode : undefined,
+          defectReason: rejectCount > 0 ? defectReason : undefined,
         }),
       });
 
@@ -138,9 +140,9 @@ export default function RecuttingFocusWorkspacePage({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center p-8">
+      <div className="min-h-screen bg-ink-50 flex items-center justify-center p-8">
         <div className="text-center text-slate-500">
-          <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-2 text-rose-600" />
+          <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-2 text-lavender-600" />
           <p className="text-sm font-semibold">Loading Cutting Station Focus Mode...</p>
         </div>
       </div>
@@ -149,7 +151,7 @@ export default function RecuttingFocusWorkspacePage({
 
   if (!job) {
     return (
-      <div className="min-h-screen bg-[#FDFBF7] p-8 max-w-xl mx-auto text-center">
+      <div className="min-h-screen bg-ink-50 p-8 max-w-xl mx-auto text-center">
         <AlertCircle className="w-10 h-10 text-rose-500 mx-auto mb-2" />
         <h2 className="text-base font-bold text-slate-800">Job Not Found</h2>
         <p className="text-xs text-slate-500 mt-1">The requested challan could not be located.</p>
@@ -165,7 +167,7 @@ export default function RecuttingFocusWorkspacePage({
   }
 
   return (
-    <div className="min-h-screen bg-[#0F172A] text-slate-100 pb-16">
+    <div className="min-h-screen bg-ink-900 text-slate-100 pb-16">
       {/* TOP FOCUS BAR */}
       <header className="border-b border-slate-800 bg-slate-950/80 sticky top-0 z-30 px-4 sm:px-8 py-3.5 flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -178,7 +180,7 @@ export default function RecuttingFocusWorkspacePage({
           </Link>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30">
+              <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-lavender-500/20 text-lavender-400 border border-lavender-500/30">
                 FOCUS WORKSPACE
               </span>
               <span className="text-xs font-mono font-bold text-white">{job.challanNumber}</span>
@@ -202,7 +204,7 @@ export default function RecuttingFocusWorkspacePage({
           )}
           <Link
             href="/recutting/issue-challan"
-            className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5"
+            className="px-3 py-1.5 bg-lavender-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5"
           >
             <Send className="w-3.5 h-3.5" />
             <span>Handover</span>
@@ -236,7 +238,7 @@ export default function RecuttingFocusWorkspacePage({
           </div>
           <div>
             <span className="text-[10px] uppercase font-bold text-slate-400 block">Wilcom Design #</span>
-            <div className="text-base font-mono font-black text-rose-400 mt-0.5">
+            <div className="text-base font-mono font-black text-lavender-400 mt-0.5">
               {job.program?.wilcomDesignNumber || job.program?.designNumber || 'N/A'}
             </div>
           </div>
@@ -284,7 +286,7 @@ export default function RecuttingFocusWorkspacePage({
               <button
                 type="button"
                 onClick={() => setGoodCount(goodCount + 1)}
-                className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold flex items-center justify-center"
+                className="flex-1 py-2.5 bg-lavender-600 hover:bg-emerald-500 text-white rounded-xl font-bold flex items-center justify-center"
               >
                 <Plus className="w-4 h-4" />
               </button>
@@ -319,7 +321,7 @@ export default function RecuttingFocusWorkspacePage({
               <button
                 type="button"
                 onClick={() => setReworkCount(reworkCount + 1)}
-                className="flex-1 py-2.5 bg-amber-600 hover:bg-amber-500 text-white rounded-xl font-bold flex items-center justify-center"
+                className="flex-1 py-2.5 bg-lavender-600 hover:bg-amber-500 text-white rounded-xl font-bold flex items-center justify-center"
               >
                 <Plus className="w-4 h-4" />
               </button>
@@ -362,6 +364,13 @@ export default function RecuttingFocusWorkspacePage({
           </div>
         </section>
 
+        {rejectCount > 0 && (
+          <section className="rounded-2xl border border-rose-500/30 bg-slate-900/80 p-4">
+            <label className="mb-1 block text-xs font-semibold text-rose-300">Reason for defect *</label>
+            <input type="text" value={defectReason} onChange={(event) => setDefectReason(event.target.value)} required className="w-full rounded-lg border border-rose-500/40 bg-slate-950 p-2 text-xs text-white" placeholder="Describe the actual defect" />
+          </section>
+        )}
+
         {/* SUMMARY BAR & ACTION BUTTONS */}
         <section className="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="text-xs space-y-1">
@@ -371,7 +380,7 @@ export default function RecuttingFocusWorkspacePage({
               <strong className="text-amber-400">{balanceRemaining} PCS</strong>
             </div>
             <div className="text-[11px] text-slate-500">
-              Current Status: <strong className="text-rose-400">{job.status}</strong>
+              Current Status: <strong className="text-lavender-400">{job.status}</strong>
             </div>
           </div>
 
@@ -381,7 +390,7 @@ export default function RecuttingFocusWorkspacePage({
                 type="button"
                 onClick={handleStartCutting}
                 disabled={saving}
-                className="px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold shadow-md transition"
+                className="px-5 py-2.5 bg-lavender-600 hover:bg-lavender-500 text-white rounded-xl text-xs font-bold shadow-md transition"
               >
                 Start Precision Cutting
               </button>
@@ -391,7 +400,7 @@ export default function RecuttingFocusWorkspacePage({
               type="button"
               onClick={handleSaveOutput}
               disabled={saving}
-              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2"
+              className="px-5 py-2.5 bg-lavender-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2"
             >
               {saving ? (
                 <>

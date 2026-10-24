@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { getCurrentUser, isAdminUser, isFabricStoreUser } from '@/lib/rbac';
 import {
   AlertTriangle,
   RefreshCw,
@@ -35,13 +37,6 @@ interface DepartmentShelfInfo {
 
 const DEPARTMENT_SHELVES: DepartmentShelfInfo[] = [
   {
-    code: 'DEF-SHELF-STORE',
-    name: 'Raw Fabric Store Quarantined Shelf',
-    deptKey: 'STORE',
-    badgeColor: 'bg-emerald-100 text-emerald-900 border-emerald-300',
-    borderLight: 'border-emerald-200',
-  },
-  {
     code: 'DEF-SHELF-DYEING',
     name: 'Dyeing Station Defective Shelf',
     deptKey: 'DYEING',
@@ -49,9 +44,9 @@ const DEPARTMENT_SHELVES: DepartmentShelfInfo[] = [
     borderLight: 'border-blue-200',
   },
   {
-    code: 'DEF-SHELF-QC1',
+    code: 'DEF-SHELF-DYEING-QC',
     name: 'Dyeing QC Defective Shelf',
-    deptKey: 'QC1',
+    deptKey: 'DYEING_QC',
     badgeColor: 'bg-indigo-100 text-indigo-900 border-indigo-300',
     borderLight: 'border-indigo-200',
   },
@@ -70,36 +65,78 @@ const DEPARTMENT_SHELVES: DepartmentShelfInfo[] = [
     borderLight: 'border-amber-200',
   },
   {
-    code: 'DEF-SHELF-QC2',
-    name: 'Thread Cut QC Defective Shelf',
-    deptKey: 'QC2',
+    code: 'DEF-SHELF-THREADCUT-QC',
+    name: 'Threadcut QC Defective Shelf',
+    deptKey: 'THREADCUT_QC',
     badgeColor: 'bg-rose-100 text-rose-900 border-rose-300',
     borderLight: 'border-rose-200',
   },
   {
-    code: 'DEF-SHELF-QC3',
-    name: 'Washing QC Defective Shelf',
-    deptKey: 'QC3',
+    code: 'DEF-SHELF-WASHING',
+    name: 'Washing Station Defective Shelf',
+    deptKey: 'WASHING',
     badgeColor: 'bg-sky-100 text-sky-900 border-sky-300',
     borderLight: 'border-sky-200',
   },
   {
-    code: 'DEF-SHELF-FINAL-CHECK',
-    name: 'Final check Defective Shelf',
-    deptKey: 'FINAL_CHECK',
+    code: 'DEF-SHELF-WASHING-QC',
+    name: 'Washing QC Defective Shelf',
+    deptKey: 'WASHING_QC',
+    badgeColor: 'bg-teal-100 text-teal-900 border-teal-300',
+    borderLight: 'border-teal-200',
+  },
+  {
+    code: 'DEF-SHELF-RECUTTING',
+    name: 'Recutting Defective Shelf',
+    deptKey: 'RECUTTING',
+    badgeColor: 'bg-rose-100 text-rose-900 border-rose-300',
+    borderLight: 'border-rose-200',
+  },
+  {
+    code: 'DEF-SHELF-STITCHING',
+    name: 'Stitching Defective Shelf',
+    deptKey: 'STITCHING',
+    badgeColor: 'bg-indigo-100 text-indigo-900 border-indigo-300',
+    borderLight: 'border-indigo-200',
+  },
+  {
+    code: 'DEF-SHELF-FINISHING',
+    name: 'Finishing Defective Shelf',
+    deptKey: 'FINISHING',
+    badgeColor: 'bg-teal-100 text-teal-900 border-teal-300',
+    borderLight: 'border-teal-200',
+  },
+  {
+    code: 'DEF-SHELF-STEAM-PRESS',
+    name: 'Steam Press Defective Shelf',
+    deptKey: 'STEAM_PRESS',
+    badgeColor: 'bg-cyan-100 text-cyan-900 border-cyan-300',
+    borderLight: 'border-cyan-200',
+  },
+  {
+    code: 'DEF-SHELF-FINAL-QC',
+    name: 'Final QC Defective Shelf',
+    deptKey: 'FINAL_QC',
     badgeColor: 'bg-orange-100 text-orange-900 border-orange-300',
     borderLight: 'border-orange-200',
+  },
+  {
+    code: 'DEF-SHELF-PACKING',
+    name: 'Packing Defective Shelf',
+    deptKey: 'PACKING',
+    badgeColor: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+    borderLight: 'border-emerald-200',
   },
 ];
 
 export default function DefectedShelfPage() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [shelfSection, setShelfSection] = useState<'MASTER_CENTRAL' | 'ROLLS' | 'DEPARTMENT_RETURNS'>('MASTER_CENTRAL');
   
   // Master Central Defective Data from API
   const [masterData, setMasterData] = useState<any>(null);
   const [allChallans, setAllChallans] = useState<any[]>([]);
-  const [allDefectRecords, setAllDefectRecords] = useState<any[]>([]);
   const [selectedDeptFilter, setSelectedDeptFilter] = useState<string>('ALL');
 
   // Fabric Store Rolls State
@@ -123,8 +160,7 @@ export default function DefectedShelfPage() {
       const masterJson = await masterRes.json();
       if (masterJson.success && masterJson.data) {
         setMasterData(masterJson.data);
-        setAllChallans(masterJson.data.challans || []);
-        setAllDefectRecords(masterJson.data.defectRecords || []);
+        setAllChallans(masterJson.data.defectRecords || []);
         setRolls(masterJson.data.defectedRolls || []);
       }
 
@@ -150,29 +186,36 @@ export default function DefectedShelfPage() {
   };
 
   useEffect(() => {
+    const user = getCurrentUser();
+    if (!user || (!isFabricStoreUser(user) && !isAdminUser(user))) {
+      router.replace('/login');
+      return;
+    }
     loadData();
-  }, []);
+  }, [router]);
 
   // Filter Master Department Defect Items
   const filteredMasterChallans = useMemo(() => {
     return allChallans.filter((ch) => {
+      const departmentCode = String(ch.departmentCode || ch.fromDepartment || '').toUpperCase();
       const matchDept =
         selectedDeptFilter === 'ALL' ||
-        (ch.fromDepartment && ch.fromDepartment.toUpperCase().includes(selectedDeptFilter)) ||
-        (ch.defectiveShelfLocation && ch.defectiveShelfLocation.toUpperCase().includes(selectedDeptFilter));
+        departmentCode === selectedDeptFilter;
 
       const s = search.toLowerCase();
       const matchSearch =
         !search ||
-        ch.challanNumber?.toLowerCase().includes(s) ||
-        ch.fromDepartment?.toLowerCase().includes(s) ||
+        ch.defectCode?.toLowerCase().includes(s) ||
+        ch.challan?.challanNumber?.toLowerCase().includes(s) ||
+        departmentCode.toLowerCase().includes(s) ||
+        ch.productionSheetNumber?.toLowerCase().includes(s) ||
         ch.program?.programNumber?.toLowerCase().includes(s) ||
         ch.program?.programSerialNo?.toLowerCase().includes(s) ||
-        ch.program?.clientName?.toLowerCase().includes(s) ||
         ch.program?.mainStyle?.toLowerCase().includes(s) ||
-        ch.defectReason?.toLowerCase().includes(s) ||
-        ch.defectiveShelfLocation?.toLowerCase().includes(s) ||
-        ch.remarks?.toLowerCase().includes(s);
+        ch.reason?.toLowerCase().includes(s) ||
+        ch.color?.toLowerCase().includes(s) ||
+        ch.fabricType?.toLowerCase().includes(s) ||
+        ch.itemDescription?.toLowerCase().includes(s);
 
       return matchDept && matchSearch;
     });
@@ -278,7 +321,7 @@ export default function DefectedShelfPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F0FAF9] pb-16">
+    <div className="min-h-screen bg-ink-50 pb-16">
       {/* HEADER */}
       <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div>
@@ -383,10 +426,10 @@ export default function DefectedShelfPage() {
               <Building2 className="w-4 h-4" />
             </div>
             <p className="text-2xl font-bold text-amber-700 mt-1">
-              6 Stations
+              13 Stations
             </p>
             <span className="text-[10px] text-slate-500">
-              Store · Dyeing · QC1 · Emb · THC · QC2
+              Dyeing · Dyeing QC · Embroidery · Thread Cutting · Threadcut QC · Washing · Washing QC · Recutting · Stitching · Finishing · Steam Press · Final QC · Packing
             </span>
           </div>
 
@@ -472,7 +515,7 @@ export default function DefectedShelfPage() {
               onClick={() => setShelfSection('MASTER_CENTRAL')}
               className={`p-3 rounded-xl border font-bold text-xs flex items-center justify-between transition cursor-pointer ${
                 shelfSection === 'MASTER_CENTRAL'
-                  ? 'bg-gradient-to-r from-rose-900 to-indigo-950 text-white border-rose-800 shadow-sm'
+                  ? 'bg-rose-900 text-white border-rose-800 shadow-sm'
                   : 'bg-slate-50/60 border-slate-200 text-slate-700 hover:bg-slate-100'
               }`}
             >
@@ -562,7 +605,7 @@ export default function DefectedShelfPage() {
                     placeholder="Search Challan #, dept, style, reason..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="w-full pl-9 pr-4 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
+                    className="w-full pl-9 pr-4 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender-500"
                   />
                 </div>
               </div>
@@ -575,14 +618,7 @@ export default function DefectedShelfPage() {
                 </span>
                 {[
                   { key: 'ALL', label: 'All Departments' },
-                  { key: 'STORE', label: 'Store (DEF-SHELF-STORE)' },
-                  { key: 'DYEING', label: 'Dyeing (DEF-SHELF-DYEING)' },
-                  { key: 'QC1', label: 'Dyeing QC (DEF-SHELF-QC1)' },
-                  { key: 'EMBROIDERY', label: 'Embroidery (DEF-SHELF-EMBROIDERY)' },
-                  { key: 'THREAD_CUTTING', label: 'Thread Cutting (DEF-SHELF-THREAD-CUTTING)' },
-                  { key: 'QC2', label: 'Thread Cut QC (DEF-SHELF-QC2)' },
-                  { key: 'QC3', label: 'Washing QC (DEF-SHELF-QC3)' },
-                  { key: 'FINAL_CHECK', label: 'Final check (DEF-SHELF-FINAL-CHECK)' },
+                  ...DEPARTMENT_SHELVES.map((shelf) => ({ key: shelf.deptKey, label: `${shelf.name.replace(' Defective Shelf', '')} (${shelf.code})` })),
                 ].map((tab) => (
                   <button
                     key={tab.key}
@@ -632,6 +668,7 @@ export default function DefectedShelfPage() {
                         <th className="py-3 px-3.5">Challan / Ref #</th>
                         <th className="py-3 px-3.5">Origin Department</th>
                         <th className="py-3 px-3.5">Program / Style</th>
+                        <th className="py-3 px-3.5">Color / Fabric Type</th>
                         <th className="py-3 px-3.5 text-center">Defective Cut</th>
                         <th className="py-3 px-3.5">Department Local Shelf</th>
                         <th className="py-3 px-3.5">Central Store Log</th>
@@ -642,18 +679,24 @@ export default function DefectedShelfPage() {
                     </thead>
                     <tbody className="divide-y divide-slate-100 text-slate-700">
                       {filteredMasterChallans.map((ch) => {
-                        const defectPcs = ch.defectivePieces || ch.items?.reduce((s: number, it: any) => s + (Number(it.quantity) || 0), 0) || 0;
-                        const unit = ch.fabricUnit || ch.items?.[0]?.uom || 'PCS';
+                        const defectPcs = Number(ch.quantity) || 0;
+                        const unit = ch.challan?.fabricUnit || ch.challan?.items?.[0]?.uom || ch.quantityUnit || 'PCS';
+                        const departmentCode = ch.departmentCode || ch.fromDepartment;
+                        const departmentName = DEPARTMENT_SHELVES.find((shelf) => shelf.deptKey === departmentCode)?.name.replace(' Defective Shelf', '') || departmentCode;
+                        const shelfCode = ch.shelfCode || DEPARTMENT_SHELVES.find((shelf) => shelf.deptKey === departmentCode)?.code;
+                        const productionSheetNumber = ch.productionSheetNumber || ch.program?.programSerialNo || ch.program?.programNumber;
+                        const color = ch.color || ch.challan?.items?.[0]?.colour || ch.program?.fabricColor;
+                        const fabricType = ch.fabricType || ch.program?.fabricType || ch.program?.fabricName;
 
                         return (
                           <tr key={ch.id} className="hover:bg-rose-50/30 transition">
                             <td className="py-3.5 px-3.5 font-mono font-bold text-slate-900">
-                              {ch.challanNumber}
+                              {ch.challan?.challanNumber || ch.defectCode}
                             </td>
 
                             <td className="py-3.5 px-3.5">
                               <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-800 border border-slate-200">
-                                {ch.fromDepartment}
+                                {departmentName}
                               </span>
                             </td>
 
@@ -662,8 +705,13 @@ export default function DefectedShelfPage() {
                                 {ch.program?.mainStyle || ch.program?.clientName || 'General Style'}
                               </span>
                               <span className="text-[10px] text-slate-500 font-mono">
-                                Sheet: {ch.program?.programSerialNo || ch.program?.programNumber || '—'}
+                                Sheet: {productionSheetNumber || '—'}
                               </span>
+                            </td>
+
+                            <td className="py-3.5 px-3.5">
+                              <span className="font-semibold text-slate-900 block">{color || '—'}</span>
+                              <span className="text-[10px] text-slate-500">{fabricType || ch.itemDescription || 'Fabric / garment'}</span>
                             </td>
 
                             <td className="py-3.5 px-3.5 text-center font-mono font-bold text-rose-700">
@@ -673,7 +721,7 @@ export default function DefectedShelfPage() {
                             <td className="py-3.5 px-3.5">
                               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-rose-50 text-rose-800 border border-rose-200">
                                 <Archive className="w-3 h-3 text-rose-600" />
-                                {ch.defectiveShelfLocation ? ch.defectiveShelfLocation.split(' ')[0] : 'DEF-SHELF-DEPT'}
+                                {shelfCode || 'Department shelf'}
                               </span>
                             </td>
 
@@ -686,20 +734,22 @@ export default function DefectedShelfPage() {
 
                             <td className="py-3.5 px-3.5 max-w-xs text-slate-600">
                               <div className="font-medium text-slate-900 text-[11px]">
-                                {ch.defectReason || 'Process Defect'}
+                                {ch.reason || '—'}
                               </div>
                               <p className="truncate text-[10px] text-slate-500 mt-0.5">
-                                {ch.remarks || 'Recorded during department cut'}
+                                {ch.responsibleIncharge || ch.detectedBy?.fullName || 'Department incharge'}
                               </p>
                             </td>
 
                             <td className="py-3.5 px-3.5 font-mono text-[11px] text-slate-600">
-                              {new Date(ch.createdAt).toLocaleDateString('en-GB')}
+                              {new Date(ch.createdAt).toLocaleString('en-GB')}
                             </td>
 
                             <td className="py-3.5 px-3.5 text-right">
                               <Link
-                                href={`/challans/${ch.id}`}
+                                href={ch.challan?.id ? `/challans/${ch.challan.id}` : '#'}
+                                aria-disabled={!ch.challan?.id}
+                                onClick={(event) => { if (!ch.challan?.id) event.preventDefault(); }}
                                 className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-semibold transition"
                               >
                                 <Eye className="w-3.5 h-3.5 text-slate-600" />
@@ -751,7 +801,7 @@ export default function DefectedShelfPage() {
                   placeholder="Search roll #, batch, fabric, defect..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-9 pr-4 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
+                  className="w-full pl-9 pr-4 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender-500"
                 />
               </div>
             </div>
@@ -1146,7 +1196,7 @@ export default function DefectedShelfPage() {
                     disabled={submitting}
                     className={`px-4 py-1.5 text-white rounded text-xs font-bold shadow-xs transition cursor-pointer ${
                       actionType === 'RELEASE'
-                        ? 'bg-emerald-700 hover:bg-emerald-800'
+                        ? 'bg-lavender-700 hover:bg-lavender-800'
                         : actionType === 'SCRAP'
                         ? 'bg-rose-700 hover:bg-rose-800'
                         : 'bg-teal-700 hover:bg-teal-800'

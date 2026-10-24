@@ -43,7 +43,7 @@ export default function FinishingFocusWorkspacePage({
   const [reworkCount, setReworkCount] = useState(0);
   const [rejectCount, setRejectCount] = useState(0);
   const [operatorNotes, setOperatorNotes] = useState('');
-  const [defectReason, setDefectReason] = useState('Fabric cut / scissor nip');
+  const [defectReason, setDefectReason] = useState('');
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState('');
 
@@ -198,7 +198,7 @@ export default function FinishingFocusWorkspacePage({
     <div
       className="min-h-screen text-slate-100 flex flex-col"
       style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.94), rgba(10, 15, 29, 0.98)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+        backgroundImage: `linear-gradient(to bottom, rgba(37, 35, 42, 0.94), rgba(24, 22, 28, 0.98)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',
@@ -257,7 +257,7 @@ export default function FinishingFocusWorkspacePage({
             {isReady && (
               <Link
                 href={`/finishing/issue-challan?jobId=${job.id}`}
-                className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-900/30 flex items-center gap-1.5 transition"
+                className="px-4 py-2 rounded-lg bg-lavender-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-900/30 flex items-center gap-1.5 transition"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>Issue Challan</span>
@@ -363,7 +363,7 @@ export default function FinishingFocusWorkspacePage({
               </button>
               <button
                 onClick={() => setGoodCount(totalInput - reworkCount - rejectCount)}
-                className="py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition"
+                className="py-2.5 rounded-lg bg-lavender-600 hover:bg-emerald-500 text-white font-bold text-xs transition"
                 title="Fill all remaining balance"
               >
                 ALL
@@ -443,6 +443,13 @@ export default function FinishingFocusWorkspacePage({
             </div>
           </div>
         </div>
+
+        {rejectCount > 0 && (
+          <div className="rounded-2xl border border-rose-500/30 bg-slate-900/80 p-4">
+            <label className="mb-1 block text-xs font-semibold text-rose-300">Reason for defect *</label>
+            <input type="text" value={defectReason} onChange={(event) => setDefectReason(event.target.value)} required className="w-full rounded-lg border border-rose-500/40 bg-slate-950 p-2 text-xs text-white" placeholder="Describe the actual defect" />
+          </div>
+        )}
 
         {/* QUANTITY RECONCILIATION SUMMARY */}
         <div className="p-4 bg-slate-900/70 border border-slate-800 rounded-2xl flex flex-wrap items-center justify-between gap-4 backdrop-blur-xs">

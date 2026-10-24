@@ -39,7 +39,7 @@ export async function GET() {
             issuedDate: true,
           },
         },
-        qc1Challan: {
+        dyeingQcChallan: {
           select: {
             id: true,
             challanNumber: true,
@@ -64,14 +64,14 @@ export async function GET() {
     const inDyeing = orders.filter((o) => o.status === 'IN_DYEING').length;
     const partiallyDyed = orders.filter((o) => o.status === 'PARTIALLY_DYED').length;
     const dyed = orders.filter((o) => o.status === 'DYED').length;
-    const readyForQc1 = orders.filter((o) => o.status === 'READY_FOR_QC1' || (o.readyForQc1Quantity > 0 && o.status !== 'SENT_TO_QC1')).length;
-    const sentToQc1 = orders.filter((o) => o.status === 'SENT_TO_QC1').length;
+    const readyForDyeingQc = orders.filter((o) => o.status === 'READY_FOR_DYEING_QC' || (o.readyForDyeingQcQuantity > 0 && o.status !== 'SENT_TO_DYEING_QC')).length;
+    const sentToDyeingQc = orders.filter((o) => o.status === 'SENT_TO_DYEING_QC').length;
 
     // 2. Quantity Aggregations
     const totalRequiredQuantity = orders.reduce((sum, o) => sum + (o.requiredQuantity || 0), 0);
     const totalDyedQuantity = orders.reduce((sum, o) => sum + (o.dyedQuantity || 0), 0);
     const totalUndyedQuantity = orders.reduce((sum, o) => sum + (o.undyedQuantity || 0), 0);
-    const totalSentToQc1Quantity = orders.reduce((sum, o) => sum + (o.sentToQc1Quantity || 0), 0);
+    const totalSentToDyeingQcQuantity = orders.reduce((sum, o) => sum + (o.sentToDyeingQcQuantity || 0), 0);
 
     // 3. Color Visibility Breakdown
     const colorMap = new Map<string, {
@@ -81,7 +81,7 @@ export async function GET() {
       required: number;
       dyed: number;
       undyed: number;
-      sentToQc1: number;
+      sentToDyeingQc: number;
       uom: string;
     }>();
 
@@ -94,7 +94,7 @@ export async function GET() {
         required: 0,
         dyed: 0,
         undyed: 0,
-        sentToQc1: 0,
+        sentToDyeingQc: 0,
         uom: order.uom || 'MTR',
       };
 
@@ -102,7 +102,7 @@ export async function GET() {
       existing.required += order.requiredQuantity || 0;
       existing.dyed += order.dyedQuantity || 0;
       existing.undyed += order.undyedQuantity || 0;
-      existing.sentToQc1 += order.sentToQc1Quantity || 0;
+      existing.sentToDyeingQc += order.sentToDyeingQcQuantity || 0;
 
       colorMap.set(colorKey, existing);
     }
@@ -129,13 +129,13 @@ export async function GET() {
 
     // 5. Priority Work
     const priorityWork = orders
-      .filter((o) => (o.priority === 'URGENT' || o.priority === 'HIGH') && o.status !== 'SENT_TO_QC1')
+      .filter((o) => (o.priority === 'URGENT' || o.priority === 'HIGH') && o.status !== 'SENT_TO_DYEING_QC')
       .slice(0, 5);
 
     // 6. Upcoming Delivery
     const now = new Date();
     const upcomingDelivery = orders
-      .filter((o) => o.program?.deliveryDate && o.status !== 'SENT_TO_QC1')
+      .filter((o) => o.program?.deliveryDate && o.status !== 'SENT_TO_DYEING_QC')
       .sort((a, b) => new Date(a.program.deliveryDate).getTime() - new Date(b.program.deliveryDate).getTime())
       .slice(0, 5);
 
@@ -158,12 +158,12 @@ export async function GET() {
           inDyeing,
           partiallyDyed,
           dyed,
-          readyForQc1,
-          sentToQc1,
+          readyForDyeingQc,
+          sentToDyeingQc,
           totalRequiredQuantity,
           totalDyedQuantity,
           totalUndyedQuantity,
-          totalSentToQc1Quantity,
+          totalSentToDyeingQcQuantity,
         },
         colorBreakdown,
         dyeingIncharges,

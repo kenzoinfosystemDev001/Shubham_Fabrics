@@ -69,6 +69,7 @@ export default function OutwardStockPage() {
     challanNumber: '',
     designNumber: '',
     itemName: '',
+    color: '',
     issueQty: '',
     unit: 'MTR',
     avgPerPcs: '',
@@ -136,6 +137,7 @@ export default function OutwardStockPage() {
         challanNumber: '',
         designNumber: '',
         itemName: '',
+        color: '',
         issueQty: '',
         unit: 'MTR',
         avgPerPcs: '',
@@ -170,7 +172,7 @@ export default function OutwardStockPage() {
   const undyedMetersTotal = summary.undyedMeters || summary.koraMeters || 0;
 
   return (
-    <div className="min-h-screen bg-[#F0FAF9] pb-16">
+    <div className="min-h-screen bg-ink-50 pb-16">
       {/* HEADER */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 sm:px-8 py-3.5 shadow-2xs">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -203,7 +205,7 @@ export default function OutwardStockPage() {
             </Link>
             <Link
               href="/fabric-store/my-work/challan-to-embroidery"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-bold shadow-xs transition"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-lavender-700 hover:bg-lavender-800 text-white rounded-lg text-xs font-bold shadow-xs transition"
             >
               <Send className="w-3.5 h-3.5" />
               <span>Issue to Embroidery</span>
@@ -327,7 +329,7 @@ export default function OutwardStockPage() {
               onClick={() => setTypeFilter('UNDYED')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
                 typeFilter === 'UNDYED'
-                  ? 'bg-amber-700 text-white'
+                  ? 'bg-lavender-700 text-white'
                   : 'bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200'
               }`}
             >
@@ -354,7 +356,7 @@ export default function OutwardStockPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search Challan, Design, Inward Bill..."
-                className="pl-8 pr-3 py-1.5 border border-slate-300 rounded-lg text-xs w-48 sm:w-64 focus:outline-none focus:ring-1 focus:ring-teal-600 bg-white"
+                className="pl-8 pr-3 py-1.5 border border-slate-300 rounded-lg text-xs w-48 sm:w-64 focus:outline-none focus:ring-1 focus:ring-lavender-600 bg-white"
               />
             </div>
             <button
@@ -557,7 +559,7 @@ export default function OutwardStockPage() {
                     required
                     value={formData.date}
                     onChange={(e) => setFormData((prev) => ({ ...prev, date: e.target.value }))}
-                    className="w-full h-10 px-3 border-[1.5px] border-black rounded-lg text-xs font-bold text-black focus:outline-none focus:ring-1 focus:ring-teal-600 bg-white"
+                    className="w-full h-10 px-3 border-[1.5px] border-black rounded-lg text-xs font-bold text-black focus:outline-none focus:ring-1 focus:ring-lavender-600 bg-white"
                   />
                 </div>
                 <div>
@@ -569,7 +571,7 @@ export default function OutwardStockPage() {
                     value={formData.challanNumber}
                     onChange={(e) => setFormData((prev) => ({ ...prev, challanNumber: e.target.value }))}
                     placeholder="e.g. CH-STR-2026-0001"
-                    className="w-full h-10 px-3 border-[1.5px] border-black rounded-lg text-xs font-bold text-black focus:outline-none focus:ring-1 focus:ring-teal-600 bg-white"
+                    className="w-full h-10 px-3 border-[1.5px] border-black rounded-lg text-xs font-bold text-black focus:outline-none focus:ring-1 focus:ring-lavender-600 bg-white"
                   />
                 </div>
               </div>
@@ -585,7 +587,7 @@ export default function OutwardStockPage() {
                     value={formData.designNumber}
                     onChange={(e) => setFormData((prev) => ({ ...prev, designNumber: e.target.value }))}
                     placeholder="e.g. DES-9021"
-                    className="w-full h-10 px-3 border-[1.5px] border-black rounded-lg text-xs font-bold text-black focus:outline-none focus:ring-1 focus:ring-teal-600 bg-white"
+                    className="w-full h-10 px-3 border-[1.5px] border-black rounded-lg text-xs font-bold text-black focus:outline-none focus:ring-1 focus:ring-lavender-600 bg-white"
                   />
                 </div>
                 <div>
@@ -598,9 +600,23 @@ export default function OutwardStockPage() {
                     value={formData.itemName}
                     onChange={(e) => setFormData((prev) => ({ ...prev, itemName: e.target.value }))}
                     placeholder="e.g. Cotton 60x60 Cambric"
-                    className="w-full h-10 px-3 border-[1.5px] border-black rounded-lg text-xs font-bold text-black focus:outline-none focus:ring-1 focus:ring-teal-600 bg-white"
+                    className="w-full h-10 px-3 border-[1.5px] border-black rounded-lg text-xs font-bold text-black focus:outline-none focus:ring-1 focus:ring-lavender-600 bg-white"
                   />
                 </div>
+              </div>
+
+              {/* Colour: deducted from that colour's stock (leave blank only for stock recorded without colour) */}
+              <div>
+                <label className="block text-xs font-black uppercase text-slate-700 mb-1">
+                  COLOUR
+                </label>
+                <input
+                  type="text"
+                  value={formData.color}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, color: e.target.value }))}
+                  placeholder="e.g. White"
+                  className="w-full h-10 px-3 border-[1.5px] border-black rounded-lg text-xs font-bold text-black focus:outline-none focus:ring-1 focus:ring-lavender-600 bg-white"
+                />
               </div>
 
               {/* Issue Qty & Avg Per Pcs */}
@@ -618,7 +634,7 @@ export default function OutwardStockPage() {
                       value={formData.issueQty}
                       onChange={(e) => setFormData((prev) => ({ ...prev, issueQty: e.target.value }))}
                       placeholder="0.00"
-                      className="w-full h-10 px-3 border-[1.5px] border-black rounded-lg text-xs font-black text-black focus:outline-none focus:ring-1 focus:ring-teal-600 bg-white"
+                      className="w-full h-10 px-3 border-[1.5px] border-black rounded-lg text-xs font-black text-black focus:outline-none focus:ring-1 focus:ring-lavender-600 bg-white"
                     />
                     <select
                       value={formData.unit}
@@ -641,7 +657,7 @@ export default function OutwardStockPage() {
                     value={formData.avgPerPcs}
                     onChange={(e) => setFormData((prev) => ({ ...prev, avgPerPcs: e.target.value }))}
                     placeholder="e.g. 2.45"
-                    className="w-full h-10 px-3 border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-teal-600 bg-white"
+                    className="w-full h-10 px-3 border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-lavender-600 bg-white"
                   />
                 </div>
               </div>
@@ -657,7 +673,7 @@ export default function OutwardStockPage() {
                     value={formData.issuePcsQty}
                     onChange={(e) => setFormData((prev) => ({ ...prev, issuePcsQty: e.target.value }))}
                     placeholder="e.g. 400"
-                    className="w-full h-10 px-3 border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-teal-600 bg-white"
+                    className="w-full h-10 px-3 border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-lavender-600 bg-white"
                   />
                 </div>
                 <div>
@@ -669,7 +685,7 @@ export default function OutwardStockPage() {
                     value={formData.byOrderName}
                     onChange={(e) => setFormData((prev) => ({ ...prev, byOrderName: e.target.value }))}
                     placeholder="e.g. Global Haute Couture"
-                    className="w-full h-10 px-3 border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-teal-600 bg-white"
+                    className="w-full h-10 px-3 border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-lavender-600 bg-white"
                   />
                 </div>
               </div>
@@ -716,7 +732,7 @@ export default function OutwardStockPage() {
                   value={formData.remarks}
                   onChange={(e) => setFormData((prev) => ({ ...prev, remarks: e.target.value }))}
                   placeholder="Optional outward notes..."
-                  className="w-full p-2.5 border border-slate-300 rounded-lg text-xs font-sans text-slate-800 focus:outline-none focus:ring-1 focus:ring-teal-600 bg-white resize-none"
+                  className="w-full p-2.5 border border-slate-300 rounded-lg text-xs font-sans text-slate-800 focus:outline-none focus:ring-1 focus:ring-lavender-600 bg-white resize-none"
                 />
               </div>
 
@@ -732,7 +748,7 @@ export default function OutwardStockPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg shadow-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  className="px-5 py-2 bg-lavender-600 hover:bg-lavender-700 text-white text-xs font-bold rounded-lg shadow-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                 >
                   {submitting ? 'Recording...' : 'Record Outward Issue'}
                 </button>

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import bcrypt from 'bcryptjs';
+import { normalizeDepartmentCode, normalizeRoleCode } from '@subham/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,18 +25,18 @@ export async function POST(request: Request) {
       programmer: { role: 'PROGRAMMING_INCHARGE', dept: 'PROGRAMMING', name: 'Programming Department' },
       store: { role: 'FABRIC_STORE', dept: 'STORE', name: 'Fabric Store Department' },
       dyeing: { role: 'DYEING_INCHARGE', dept: 'DYEING', name: 'Dyeing Incharge' },
-      qc1: { role: 'QC_INSPECTOR', dept: 'QC1', name: 'Dyeing QC Inspector' },
-      qc_insp: { role: 'QC_INSPECTOR', dept: 'QC1', name: 'Dyeing QC Inspector' },
+      qc1: { role: 'QC_INSPECTOR', dept: 'DYEING_QC', name: 'Dyeing QC Inspector' },
+      qc_insp: { role: 'QC_INSPECTOR', dept: 'DYEING_QC', name: 'Dyeing QC Inspector' },
       embroidery: { role: 'EMBROIDERY_INCHARGE', dept: 'EMBROIDERY', name: 'Embroidery Department' },
       'thread-cutting': { role: 'THREAD_CUTTING_INCHARGE', dept: 'THREAD_CUTTING', name: 'Thread Cutting Department' },
       cutting: { role: 'THREAD_CUTTING_INCHARGE', dept: 'THREAD_CUTTING', name: 'Thread Cutting Department' },
-      qc2: { role: 'QC2_INSPECTOR', dept: 'QC2', name: 'QC2 Quality Inspector' },
-      qc2_insp: { role: 'QC2_INSPECTOR', dept: 'QC2', name: 'QC2 Quality Inspector' },
-      qcwashing: { role: 'QC3_INSPECTOR', dept: 'QC3', name: 'QC Washing Inspector' },
-      qc_washing: { role: 'QC3_INSPECTOR', dept: 'QC3', name: 'QC Washing Inspector' },
-      qc3: { role: 'QC3_INSPECTOR', dept: 'QC3', name: 'QC Washing Inspector' },
-      qc3_insp: { role: 'QC3_INSPECTOR', dept: 'QC3', name: 'QC Washing Inspector' },
-      final_check: { role: 'QC_INSPECTOR', dept: 'FINAL_CHECK', name: 'Final check Inspector' },
+      qc2: { role: 'THREADCUT_QC_INSPECTOR', dept: 'THREADCUT_QC', name: 'Threadcut QC Quality Inspector' },
+      qc2_insp: { role: 'THREADCUT_QC_INSPECTOR', dept: 'THREADCUT_QC', name: 'Threadcut QC Quality Inspector' },
+      qcwashing: { role: 'WASHING_QC_INSPECTOR', dept: 'WASHING_QC', name: 'Washing QC Inspector' },
+      qc_washing: { role: 'WASHING_QC_INSPECTOR', dept: 'WASHING_QC', name: 'Washing QC Inspector' },
+      qc3: { role: 'WASHING_QC_INSPECTOR', dept: 'WASHING_QC', name: 'Washing QC Inspector' },
+      qc3_insp: { role: 'WASHING_QC_INSPECTOR', dept: 'WASHING_QC', name: 'Washing QC Inspector' },
+      final_check: { role: 'QC_INSPECTOR', dept: 'FINAL_QC', name: 'Final QC Inspector' },
       washing: { role: 'WASHING_INCHARGE', dept: 'WASHING', name: 'Washing Department' },
       washing_incharge: { role: 'WASHING_INCHARGE', dept: 'WASHING', name: 'Washing Department' },
       recutting: { role: 'RECUTTING_SUPERVISOR', dept: 'RECUTTING', name: 'Recutting Department' },
@@ -43,7 +44,7 @@ export async function POST(request: Request) {
       finishing: { role: 'FINISHING_SUPERVISOR', dept: 'FINISHING', name: 'Finishing Department' },
       steampress: { role: 'STEAM_PRESS_SUPERVISOR', dept: 'STEAM_PRESS', name: 'Steam Press Department' },
       steam_press: { role: 'STEAM_PRESS_SUPERVISOR', dept: 'STEAM_PRESS', name: 'Steam Press Department' },
-      finalcheck: { role: 'FINAL_CHECK_INSPECTOR', dept: 'FINAL_CHECK', name: 'Final Quality Check' },
+      finalcheck: { role: 'FINAL_QC_INSPECTOR', dept: 'FINAL_QC', name: 'Final Quality Check' },
     };
 
     // 2. Query user from Neon DB
@@ -131,17 +132,18 @@ export async function POST(request: Request) {
     }
 
     // 4. Compute RBAC Role, Department, and Default Redirect
-    const roleCodes = user.userRoles?.map((ur) => ur.role.code) || [];
+    const roleCodes = user.userRoles?.map((ur) => normalizeRoleCode(ur.role.code)) || [];
+    const userDepartment = normalizeDepartmentCode(user.departmentCode);
     const isAdmin =
       user.username.toLowerCase() === 'admin' ||
-      user.departmentCode === 'ADMIN' ||
+      userDepartment === 'ADMIN' ||
       roleCodes.includes('ADMIN') ||
       roleCodes.includes('SUPER_ADMIN');
 
     const isStore =
       !isAdmin &&
       (user.username.toLowerCase() === 'store' ||
-        user.departmentCode === 'STORE' ||
+        userDepartment === 'STORE' ||
         roleCodes.includes('FABRIC_STORE') ||
         roleCodes.includes('STORE_MANAGER') ||
         roleCodes.includes('STORE_OPERATOR'));
@@ -151,7 +153,7 @@ export async function POST(request: Request) {
       !isStore &&
       (user.username.toLowerCase() === 'program' ||
         user.username.toLowerCase() === 'programmer' ||
-        user.departmentCode === 'PROGRAMMING' ||
+        userDepartment === 'PROGRAMMING' ||
         roleCodes.includes('PROGRAMMING_INCHARGE') ||
         roleCodes.includes('PROGRAMMER') ||
         roleCodes.includes('PRODUCTION_MANAGER'));
@@ -161,11 +163,11 @@ export async function POST(request: Request) {
       !isStore &&
       !isProgramming &&
       (user.username.toLowerCase() === 'dyeing' ||
-        user.departmentCode === 'DYEING' ||
+        userDepartment === 'DYEING' ||
         roleCodes.includes('DYEING_INCHARGE') ||
         roleCodes.includes('DYEING_OPERATOR'));
 
-    const isQCWashing =
+    const isWashingQC =
       !isAdmin &&
       !isStore &&
       !isProgramming &&
@@ -173,37 +175,32 @@ export async function POST(request: Request) {
         user.username.toLowerCase() === 'qc_washing' ||
         user.username.toLowerCase() === 'qc3' ||
         user.username.toLowerCase() === 'qc3_insp' ||
-        user.departmentCode === 'QC3' ||
-        user.departmentCode === 'QCWASHING' ||
-        user.departmentCode === 'QC_WASHING' ||
-        roleCodes.includes('QC3_INSPECTOR') ||
-        roleCodes.includes('QCWASHING_INSPECTOR'));
+        userDepartment === 'WASHING_QC' ||
+        roleCodes.includes('WASHING_QC_INSPECTOR'));
 
-    const isQC1 =
+    const isDyeingQC =
       !isAdmin &&
       !isStore &&
       !isProgramming &&
       !isDyeing &&
-      !isQCWashing &&
+      !isWashingQC &&
       (user.username.toLowerCase() === 'qc1' ||
         user.username.toLowerCase() === 'qc_insp' ||
-        user.departmentCode === 'QC1' ||
-        roleCodes.includes('QC1_INSPECTOR') ||
+        userDepartment === 'DYEING_QC' ||
+        roleCodes.includes('DYEING_QC_INSPECTOR') ||
         (roleCodes.includes('QC_INSPECTOR') &&
-          user.departmentCode !== 'QC2' &&
-          user.departmentCode !== 'QC3' &&
-          user.departmentCode !== 'QCWASHING' &&
-          user.departmentCode !== 'QC_WASHING'));
+          userDepartment !== 'THREADCUT_QC' &&
+          userDepartment !== 'WASHING_QC'));
 
     const isEmbroidery =
       !isAdmin &&
       !isStore &&
       !isProgramming &&
       !isDyeing &&
-      !isQCWashing &&
-      !isQC1 &&
+      !isWashingQC &&
+      !isDyeingQC &&
       (user.username.toLowerCase() === 'embroidery' ||
-        user.departmentCode === 'EMBROIDERY' ||
+        userDepartment === 'EMBROIDERY' ||
         roleCodes.includes('EMBROIDERY_INCHARGE') ||
         roleCodes.includes('EMBROIDERY_OPERATOR'));
 
@@ -212,48 +209,46 @@ export async function POST(request: Request) {
       !isStore &&
       !isProgramming &&
       !isDyeing &&
-      !isQCWashing &&
-      !isQC1 &&
+      !isWashingQC &&
+      !isDyeingQC &&
       !isEmbroidery &&
       (user.username.toLowerCase() === 'thread-cutting' ||
         user.username.toLowerCase() === 'cutting' ||
-        user.departmentCode === 'THREAD_CUTTING' ||
+        userDepartment === 'THREAD_CUTTING' ||
         roleCodes.includes('THREAD_CUTTING_INCHARGE') ||
         roleCodes.includes('THREAD_CUTTER') ||
         roleCodes.includes('CUTTING_INCHARGE'));
 
-    const isQC2 =
+    const isThreadcutQC =
       !isAdmin &&
       !isStore &&
       !isProgramming &&
       !isDyeing &&
-      !isQCWashing &&
-      !isQC1 &&
+      !isWashingQC &&
+      !isDyeingQC &&
       !isEmbroidery &&
       !isThreadCutting &&
       (user.username.toLowerCase() === 'qc2' ||
         user.username.toLowerCase() === 'qc2_insp' ||
-        user.departmentCode === 'QC2' ||
-        roleCodes.includes('QC2_INSPECTOR') ||
+        userDepartment === 'THREADCUT_QC' ||
+        roleCodes.includes('THREADCUT_QC_INSPECTOR') ||
         (roleCodes.includes('QC_INSPECTOR') &&
-          user.departmentCode !== 'QC1' &&
-          user.departmentCode !== 'QC3' &&
-          user.departmentCode !== 'QCWASHING' &&
-          user.departmentCode !== 'QC_WASHING'));
+          userDepartment !== 'DYEING_QC' &&
+          userDepartment !== 'WASHING_QC'));
 
     const isWashing =
       !isAdmin &&
       !isStore &&
       !isProgramming &&
       !isDyeing &&
-      !isQCWashing &&
-      !isQC1 &&
+      !isWashingQC &&
+      !isDyeingQC &&
       !isEmbroidery &&
       !isThreadCutting &&
-      !isQC2 &&
+      !isThreadcutQC &&
       (user.username.toLowerCase() === 'washing' ||
         user.username.toLowerCase() === 'washing_incharge' ||
-        user.departmentCode === 'WASHING' ||
+        userDepartment === 'WASHING' ||
         roleCodes.includes('WASHING_INCHARGE') ||
         roleCodes.includes('WASHING_OPERATOR'));
 
@@ -262,14 +257,14 @@ export async function POST(request: Request) {
       !isStore &&
       !isProgramming &&
       !isDyeing &&
-      !isQCWashing &&
-      !isQC1 &&
+      !isWashingQC &&
+      !isDyeingQC &&
       !isEmbroidery &&
       !isThreadCutting &&
-      !isQC2 &&
+      !isThreadcutQC &&
       !isWashing &&
       (user.username.toLowerCase() === 'recutting' ||
-        user.departmentCode === 'RECUTTING' ||
+        userDepartment === 'RECUTTING' ||
         roleCodes.includes('RECUTTING_SUPERVISOR') ||
         roleCodes.includes('RECUTTING_OPERATOR') ||
         roleCodes.includes('RECUTTING_INCHARGE'));
@@ -279,15 +274,15 @@ export async function POST(request: Request) {
       !isStore &&
       !isProgramming &&
       !isDyeing &&
-      !isQCWashing &&
-      !isQC1 &&
+      !isWashingQC &&
+      !isDyeingQC &&
       !isEmbroidery &&
       !isThreadCutting &&
-      !isQC2 &&
+      !isThreadcutQC &&
       !isWashing &&
       !isRecutting &&
       (user.username.toLowerCase() === 'stitching' ||
-        user.departmentCode === 'STITCHING' ||
+        userDepartment === 'STITCHING' ||
         roleCodes.includes('STITCHING_SUPERVISOR') ||
         roleCodes.includes('STITCHING_OPERATOR') ||
         roleCodes.includes('STITCHING_INCHARGE'));
@@ -297,16 +292,16 @@ export async function POST(request: Request) {
       !isStore &&
       !isProgramming &&
       !isDyeing &&
-      !isQCWashing &&
-      !isQC1 &&
+      !isWashingQC &&
+      !isDyeingQC &&
       !isEmbroidery &&
       !isThreadCutting &&
-      !isQC2 &&
+      !isThreadcutQC &&
       !isWashing &&
       !isRecutting &&
       !isStitching &&
       (user.username.toLowerCase() === 'finishing' ||
-        user.departmentCode === 'FINISHING' ||
+        userDepartment === 'FINISHING' ||
         roleCodes.includes('FINISHING_SUPERVISOR') ||
         roleCodes.includes('FINISHING_OPERATOR') ||
         roleCodes.includes('FINISHING_INCHARGE'));
@@ -317,37 +312,82 @@ export async function POST(request: Request) {
       !isProgramming &&
       !isEmbroidery &&
       !isDyeing &&
-      !isQC1 &&
+      !isDyeingQC &&
       !isThreadCutting &&
-      !isQC2 &&
+      !isThreadcutQC &&
       !isWashing &&
       !isRecutting &&
       !isStitching &&
       !isFinishing &&
       (user.username.toLowerCase() === 'steampress' ||
         user.username.toLowerCase() === 'steam_press' ||
-        user.departmentCode === 'STEAM_PRESS' ||
+        userDepartment === 'STEAM_PRESS' ||
         roleCodes.includes('STEAM_PRESS_SUPERVISOR') ||
         roleCodes.includes('STEAM_PRESS_OPERATOR') ||
         roleCodes.includes('STEAM_PRESS_INCHARGE'));
 
+    const isFinalQC =
+      !isAdmin &&
+      !isStore &&
+      !isProgramming &&
+      !isDyeing &&
+      !isWashingQC &&
+      !isDyeingQC &&
+      !isEmbroidery &&
+      !isThreadCutting &&
+      !isThreadcutQC &&
+      !isWashing &&
+      !isRecutting &&
+      !isStitching &&
+      !isFinishing &&
+      !isSteamPress &&
+      (user.username.toLowerCase() === 'finalcheck' ||
+        user.username.toLowerCase() === 'final_check' ||
+        userDepartment === 'FINAL_QC' ||
+        roleCodes.includes('FINAL_QC_INSPECTOR'));
+
+    const isPacking =
+      !isAdmin &&
+      !isStore &&
+      !isProgramming &&
+      !isDyeing &&
+      !isWashingQC &&
+      !isDyeingQC &&
+      !isEmbroidery &&
+      !isThreadCutting &&
+      !isThreadcutQC &&
+      !isWashing &&
+      !isRecutting &&
+      !isStitching &&
+      !isFinishing &&
+      !isSteamPress &&
+      !isFinalQC &&
+      (user.username.toLowerCase() === 'packing' ||
+        userDepartment === 'PACKING' ||
+        roleCodes.includes('PACKING_INCHARGE') ||
+        roleCodes.includes('PACKING_OPERATOR'));
+
     const normalizedRole = isAdmin
       ? 'ADMIN'
+      : isPacking
+      ? 'PACKING_INCHARGE'
+      : isFinalQC
+      ? 'FINAL_QC_INSPECTOR'
       : isFinishing
       ? 'FINISHING_SUPERVISOR'
       : isStitching
       ? 'STITCHING_SUPERVISOR'
       : isRecutting
       ? 'RECUTTING_SUPERVISOR'
-      : isQCWashing
-      ? 'QC3_INSPECTOR'
+      : isWashingQC
+      ? 'WASHING_QC_INSPECTOR'
       : isWashing
       ? 'WASHING_INCHARGE'
-      : isQC2
-      ? 'QC2_INSPECTOR'
+      : isThreadcutQC
+      ? 'THREADCUT_QC_INSPECTOR'
       : isThreadCutting
       ? 'THREAD_CUTTING_INCHARGE'
-      : isQC1
+      : isDyeingQC
       ? 'QC_INSPECTOR'
       : isDyeing
       ? 'DYEING_INCHARGE'
@@ -361,22 +401,26 @@ export async function POST(request: Request) {
 
     const normalizedDept = isAdmin
       ? 'ADMIN'
+      : isPacking
+      ? 'PACKING'
+      : isFinalQC
+      ? 'FINAL_QC'
       : isFinishing
       ? 'FINISHING'
       : isStitching
       ? 'STITCHING'
       : isRecutting
       ? 'RECUTTING'
-      : isQCWashing
-      ? 'QC3'
+      : isWashingQC
+      ? 'WASHING_QC'
       : isWashing
       ? 'WASHING'
-      : isQC2
-      ? 'QC2'
+      : isThreadcutQC
+      ? 'THREADCUT_QC'
       : isThreadCutting
       ? 'THREAD_CUTTING'
-      : isQC1
-      ? 'QC1'
+      : isDyeingQC
+      ? 'DYEING_QC'
       : isDyeing
       ? 'DYEING'
       : isStore
@@ -385,26 +429,30 @@ export async function POST(request: Request) {
       ? 'EMBROIDERY'
       : isProgramming
       ? 'PROGRAMMING'
-      : user.departmentCode || 'FINISHING';
+      : userDepartment || 'FINISHING';
 
     const defaultRedirect = isAdmin
       ? '/admin'
+      : isPacking
+      ? '/department-defective-shelf'
+      : isFinalQC
+      ? '/final-qc'
       : isFinishing
       ? '/finishing'
       : isStitching
       ? '/stitching'
       : isRecutting
       ? '/recutting'
-      : isQCWashing
-      ? '/qcwashing'
+      : isWashingQC
+      ? '/washing-qc'
       : isWashing
       ? '/washing'
-      : isQC2
-      ? '/qc2'
+      : isThreadcutQC
+      ? '/threadcut-qc'
       : isThreadCutting
       ? '/thread-cutting'
-      : isQC1
-      ? '/qc1'
+      : isDyeingQC
+      ? '/dyeing-qc'
       : isDyeing
       ? '/dyeing'
       : isStore

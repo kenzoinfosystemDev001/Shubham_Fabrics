@@ -8,7 +8,7 @@
    - `challanNumber`: Unique sequential identifier (`CH-SP-XXXX-XXXX`)
    - `parentChallanId`: Direct reference to upstream Finishing Challan (`parentChallan`)
    - `fromDepartment`: `'STEAM_PRESS'`
-   - `toDepartment`: `'FINAL_CHECK'` (or configurable downstream department)
+   - `toDepartment`: `'FINAL_QC'` (or configurable downstream department)
    - `programId`: Foreign key to `Program`
    - `fabricIn`: Total pieces physically inwarded
    - `fabricOut`: Total good pieces pressed & issued

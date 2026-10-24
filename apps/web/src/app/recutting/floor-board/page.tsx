@@ -116,7 +116,7 @@ export default function RecuttingFloorBoard() {
     return (
       <div
         key={c.id}
-        className="bg-white rounded-xl border border-slate-200 p-3.5 shadow-xs hover:border-rose-400 hover:shadow-md transition space-y-2.5"
+        className="bg-white rounded-xl border border-slate-200 p-3.5 shadow-xs hover:border-lavender-400 hover:shadow-md transition space-y-2.5"
       >
         <div className="flex items-center justify-between">
           <span className="font-mono font-bold text-xs text-slate-900 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
@@ -141,7 +141,7 @@ export default function RecuttingFloorBoard() {
           </div>
           <div className="text-[11px] text-slate-500 font-mono">
             Sheet #{c.program?.programNumber || '—'} · Wilcom:{' '}
-            <strong className="text-rose-700">{c.program?.wilcomDesignNumber || c.program?.designNumber || 'Std'}</strong>
+            <strong className="text-lavender-700">{c.program?.wilcomDesignNumber || c.program?.designNumber || 'Std'}</strong>
           </div>
         </div>
 
@@ -161,7 +161,7 @@ export default function RecuttingFloorBoard() {
 
             <Link
               href={`/recutting/my-work?jobId=${c.id}`}
-              className="p-1 hover:bg-rose-50 text-slate-500 hover:text-rose-600 rounded transition"
+              className="p-1 hover:bg-lavender-50 text-slate-500 hover:text-lavender-600 rounded transition"
               title="Open Workstation"
             >
               <Scissors className="w-3.5 h-3.5" />
@@ -173,11 +173,11 @@ export default function RecuttingFloorBoard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] pb-16 flex flex-col">
+    <div className="min-h-screen bg-ink-50 pb-16 flex flex-col">
       {/* HEADER */}
       <header
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundImage: `linear-gradient(to right, rgba(37, 35, 42, 0.88), rgba(37, 35, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -211,7 +211,7 @@ export default function RecuttingFloorBoard() {
             </button>
             <Link
               href="/recutting/my-work"
-              className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-bold transition shadow-xs flex items-center gap-1.5"
+              className="px-3 py-1.5 bg-lavender-600 hover:bg-lavender-500 text-white rounded-lg text-xs font-bold transition shadow-xs flex items-center gap-1.5"
             >
               <Scissors className="w-3.5 h-3.5" />
               <span>Cutting Queue</span>
@@ -230,7 +230,7 @@ export default function RecuttingFloorBoard() {
               placeholder="Search challan, buyer, sheet, design, wilcom #..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
+              className="w-full pl-9 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender-500"
             />
           </div>
           <div className="text-xs text-slate-500">
@@ -271,12 +271,12 @@ export default function RecuttingFloorBoard() {
           <div className="bg-slate-100/80 rounded-2xl p-3 border border-slate-200 flex flex-col max-h-[80vh]">
             <div className="flex items-center justify-between mb-3 px-1">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
+                <span className="w-2.5 h-2.5 rounded-full bg-lavender-500" />
                 <h3 className="text-xs font-bold uppercase text-slate-800 tracking-wide">
                   In Precision Cutting
                 </h3>
               </div>
-              <span className="text-xs font-mono font-bold bg-white px-2 py-0.5 rounded-full border border-slate-200 text-rose-700">
+              <span className="text-xs font-mono font-bold bg-white px-2 py-0.5 rounded-full border border-slate-200 text-lavender-700">
                 {counts.inProcess}
               </span>
             </div>

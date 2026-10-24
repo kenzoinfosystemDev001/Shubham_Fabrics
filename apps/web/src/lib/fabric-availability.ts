@@ -1,5 +1,6 @@
 import { prisma } from '@subham/database';
-import { isFabricStoreDepartment } from '@/lib/fabric-stock';
+import { cleanFabricName } from '@/lib/fabric-stock';
+import { loadFabricStockLedger } from '@/lib/fabric-stock-ledger';
 
 export interface FabricAvailabilityStatus {
   programId: string;
@@ -139,87 +140,26 @@ export async function checkFabricStoreAvailability(
     0
   );
 
-  // 2. Check FabricInward stock entries
+  // 2. Fabric Store inward balance from the shared stock ledger (all programs' issues deducted).
   let inwardStockMeters = 0;
   let inwardStockPcs = 0;
   let inwardEntriesCount = 0;
   let matchingInwardEntryCount = 0;
 
   try {
-    const inwardEntries = await (prisma as any).fabricInward.findMany({
-      where: fabricName
-        ? {
-            OR: [
-              { itemName: { contains: fabricName, mode: 'insensitive' } },
-              { itemName: { equals: fabricName, mode: 'insensitive' } },
-            ],
-          }
-        : undefined,
+    const ledger = await loadFabricStockLedger();
+    const wanted = cleanFabricName(fabricName).toLowerCase();
+    const matchingRows = Array.from(ledger.rows.values()).filter((row) => {
+      if (!wanted) return true;
+      const name = row.itemName.toLowerCase();
+      return name.includes(wanted) || wanted.includes(name);
     });
-
-    const meterInwardEntries = inwardEntries.filter((it: any) => (it.unit || 'MTR').toUpperCase() === 'MTR');
-    const pieceInwardEntries = inwardEntries.filter((it: any) => (it.unit || 'MTR').toUpperCase() === 'PCS');
-    inwardEntriesCount = inwardEntries.length;
-    matchingInwardEntryCount = requiredUnit === 'PCS' ? pieceInwardEntries.length : meterInwardEntries.length;
-    const totalInwardMeters = meterInwardEntries.reduce(
-      (sum: number, it: any) => sum + (Number(it.billQty) || 0),
-      0
-    );
-    const totalInwardPcs = pieceInwardEntries.reduce(
-      (sum: number, it: any) => sum + (Number(it.billQty) || 0),
-      0
-    );
-
-    // Subtract any manual outward or dispatched challans for this fabric
-    const outwardEntries = await (prisma as any).fabricOutward.findMany({
-      where: {
-        ...(fabricName ? { itemName: { contains: fabricName, mode: 'insensitive' } } : {}),
-      },
-    });
-    const totalManualOutwardMeters = outwardEntries
-      .filter((it: any) => (it.unit || 'MTR').toUpperCase() === 'MTR')
-      .reduce(
-      (sum: number, it: any) => sum + (Number(it.issueQty) || 0),
-      0
-    );
-    const totalManualOutwardPcs = outwardEntries
-      .filter((it: any) => (it.unit || 'MTR').toUpperCase() === 'PCS')
-      .reduce(
-        (sum: number, it: any) => sum + (Number(it.issueQty) || 0),
-        0
-      );
-
-    const issuedChallans = (await prisma.challan.findMany({
-      where: {
-        programId: program.id,
-        status: { notIn: ['DRAFT', 'CANCELLED'] },
-        NOT: { toDepartment: { equals: 'STORE', mode: 'insensitive' } },
-        OR: [
-          { fromDepartment: { contains: 'STORE', mode: 'insensitive' } },
-          { fromDepartment: { equals: 'FABRIC', mode: 'insensitive' } },
-        ],
-      },
-      include: { items: true },
-    })).filter((challan) => isFabricStoreDepartment(challan.fromDepartment));
-
-    const challanOutwardByUnit = issuedChallans.reduce((totals, challan) => {
-      if (challan.items.length > 0) {
-        for (const item of challan.items) {
-          const unit = String(item.uom || challan.fabricUnit || 'MTR').toUpperCase();
-          if (unit === 'PCS') totals.pcs += Number(item.quantity) || 0;
-          else if (unit === 'MTR') totals.meters += Number(item.quantity) || 0;
-        }
-        return totals;
-      }
-      const unit = String(challan.fabricUnit || 'MTR').toUpperCase();
-      const quantity = Number(challan.fabricOut ?? challan.fabricIn) || 0;
-      if (unit === 'PCS') totals.pcs += quantity;
-      else if (unit === 'MTR') totals.meters += quantity;
-      return totals;
-    }, { meters: 0, pcs: 0 });
-
-    inwardStockMeters = Math.max(0, totalInwardMeters - totalManualOutwardMeters - challanOutwardByUnit.meters);
-    inwardStockPcs = Math.max(0, totalInwardPcs - totalManualOutwardPcs - challanOutwardByUnit.pcs);
+    for (const row of matchingRows) {
+      inwardEntriesCount += row.inwardCount;
+      if (row.unit === requiredUnit) matchingInwardEntryCount += row.inwardCount;
+      if (row.unit === 'MTR') inwardStockMeters += Math.max(0, row.rawBalance);
+      else if (row.unit === 'PCS') inwardStockPcs += Math.max(0, row.rawBalance);
+    }
   } catch (err) {
     console.warn('Error reading FabricInward balance:', err);
   }

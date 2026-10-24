@@ -32,6 +32,8 @@ export async function GET() {
             wilcomDesignNumber: true,
             embroideryDesign: true,
             fabricColor: true,
+            fabricType: true,
+            fabricName: true,
             targetQuantity: true,
             priority: true,
           },
@@ -42,7 +44,7 @@ export async function GET() {
       take: 25,
     });
 
-    // 2. Fetch outgoing challans from Thread Cutting (towards QC2)
+    // 2. Fetch outgoing challans from Thread Cutting (towards Threadcut QC)
     const outgoingChallans = await prisma.challan.findMany({
       where: {
         fromDepartment: 'THREAD_CUTTING',
@@ -57,6 +59,9 @@ export async function GET() {
             buyerName: true,
             mainStyle: true,
             wilcomDesignNumber: true,
+            fabricColor: true,
+            fabricType: true,
+            fabricName: true,
           },
         },
         items: true,
@@ -76,6 +81,8 @@ export async function GET() {
         mainStyle: true,
         wilcomDesignNumber: true,
         fabricColor: true,
+        fabricType: true,
+        fabricName: true,
         targetQuantity: true,
         status: true,
       },
@@ -89,7 +96,7 @@ export async function GET() {
     const inProcessCount = incomingChallans.filter(
       (c) => c.status === 'RECEIVED' || c.status === 'IN_PROGRESS'
     ).length;
-    const readyForQc2 = incomingChallans.filter(
+    const readyForThreadcutQc = incomingChallans.filter(
       (c) => c.status === 'COMPLETED'
     ).length;
 
@@ -101,14 +108,14 @@ export async function GET() {
       return acc + p;
     }, 0);
 
-    const outgoingQc2Challans = outgoingChallans.filter(
-      (c) => c.toDepartment === 'QC2'
+    const outgoingThreadcutQcChallans = outgoingChallans.filter(
+      (c) => c.toDepartment === 'THREADCUT_QC'
     );
     const defectReturnChallans = outgoingChallans.filter(
       (c) => c.toDepartment === 'STORE' || c.challanType === 'DEFECT_RETURN'
     );
 
-    const totalPiecesOut = outgoingQc2Challans.reduce((acc, c) => {
+    const totalPiecesOut = outgoingThreadcutQcChallans.reduce((acc, c) => {
       const p = (c.items || []).reduce(
         (sub, it) => sub + (Number(it.quantity) || 0),
         0
@@ -131,15 +138,15 @@ export async function GET() {
           totalIncoming: incomingChallans.length,
           pendingAcceptance: pendingCount,
           inProgressTrimming: inProcessCount,
-          readyForQc2,
-          totalOutgoingQc2: outgoingQc2Challans.length,
+          readyForThreadcutQc,
+          totalOutgoingThreadcutQc: outgoingThreadcutQcChallans.length,
           totalDefectReturns: defectReturnChallans.length,
           totalPiecesIn,
           totalPiecesOut,
           totalDefectivePieces,
         },
         incomingChallans,
-        outgoingChallans: outgoingQc2Challans,
+        outgoingChallans: outgoingThreadcutQcChallans,
         defectReturnChallans,
         programs: activePrograms,
       },

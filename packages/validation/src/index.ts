@@ -340,7 +340,8 @@ export const ChallanItemSchema = z.object({
 });
 
 export const CreateChallanSchema = z.object({
-  challanNumber: z.string().regex(/^CH-[A-Z0-9]+-\d{4}-\d{4,}$/, 'Format: CH-<DEPT>-YYYY-NNNN'),
+  // Entered manually by the issuing department; uniqueness is enforced by the database.
+  challanNumber: z.string().trim().min(1, 'Challan Number is required').max(64, 'Challan Number must be 64 characters or fewer'),
   challanType: z.nativeEnum(ChallanType),
   programId: z.string().uuid(),
   parentChallanId: z.string().uuid().optional(),
@@ -472,6 +473,12 @@ export const ChallanActionSchema = z.object({
   metadata: z.record(z.any()).optional(),
 });
 export type ChallanActionInput = z.infer<typeof ChallanActionSchema>;
+
+export const ChallanStatusUpdateSchema = z.object({
+  status: z.nativeEnum(ChallanStatus),
+  notes: z.string().optional(),
+});
+export type ChallanStatusUpdateInput = z.infer<typeof ChallanStatusUpdateSchema>;
 
 // Bundle Generation
 export const CreateBundleSchema = z.object({

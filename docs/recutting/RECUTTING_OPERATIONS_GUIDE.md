@@ -10,7 +10,7 @@
 1. **Sign In**: Navigate to `/login`, click the **Recutting** station tile (or type username `recutting`, PIN `1234`).
 2. **Review Incoming Work**:
    - Go to **Incoming Challans** (`/recutting/incoming`).
-   - Locate the Challan issued by QC Washing (`QC3`).
+   - Locate the Challan issued by Washing QC (`WASHING_QC`).
    - Verify piece count against physical lot on the trolley.
    - Click **Receive Lot**.
 3. **Open Cutting Workspace**:

@@ -196,20 +196,20 @@ class ApiClient {
           role: 'QC_INSPECTOR',
           roles: ['QC_INSPECTOR', 'USER'],
           permissions: ['quality.inspect', 'defects.create', 'defects.review'],
-          departmentCode: 'QC1',
-          defaultRedirect: '/qc1',
+          departmentCode: 'DYEING_QC',
+          defaultRedirect: '/dyeing-qc',
           validPins: ['Admin@12345', 'admin@12345', '1234'],
         },
         qc1: {
           id: 'usr-qc-002',
           username: 'qc1',
-          fullName: 'QC1 Quality Inspector',
+          fullName: 'Dyeing QC Inspector',
           email: 'qc1@subhamfabrics.com',
           role: 'QC_INSPECTOR',
           roles: ['QC_INSPECTOR', 'USER'],
           permissions: ['quality.inspect', 'defects.create', 'defects.review'],
-          departmentCode: 'QC1',
-          defaultRedirect: '/qc1',
+          departmentCode: 'DYEING_QC',
+          defaultRedirect: '/dyeing-qc',
           validPins: ['Admin@12345', 'admin@12345', '1234', '1111', '0000'],
         },
         dyeing: {
@@ -251,13 +251,13 @@ class ApiClient {
         qc2: {
           id: 'usr-qc2-001',
           username: 'qc2',
-          fullName: 'QC2 Quality Inspector',
+          fullName: 'Threadcut QC Inspector',
           email: 'qc2@subhamfabrics.com',
-          role: 'QC2_INSPECTOR',
-          roles: ['QC2_INSPECTOR', 'QC_INSPECTOR', 'USER'],
+          role: 'THREADCUT_QC_INSPECTOR',
+          roles: ['THREADCUT_QC_INSPECTOR', 'QC_INSPECTOR', 'USER'],
           permissions: ['quality.inspect', 'defects.create', 'defects.review', 'challans.receive', 'challans.issue'],
-          departmentCode: 'QC2',
-          defaultRedirect: '/qc2',
+          departmentCode: 'THREADCUT_QC',
+          defaultRedirect: '/threadcut-qc',
           validPins: ['Admin@12345', 'admin@12345', '1234', '1111', '0000'],
         },
         washing: {
@@ -275,37 +275,37 @@ class ApiClient {
         qcwashing: {
           id: 'usr-qcw-001',
           username: 'qcwashing',
-          fullName: 'QC Washing Inspector',
+          fullName: 'Washing QC Inspector',
           email: 'qcwashing@subhamfabrics.com',
-          role: 'QC3_INSPECTOR',
-          roles: ['QC3_INSPECTOR', 'QC_INSPECTOR', 'USER'],
+          role: 'WASHING_QC_INSPECTOR',
+          roles: ['WASHING_QC_INSPECTOR', 'QC_INSPECTOR', 'USER'],
           permissions: ['quality.inspect', 'defects.create', 'defects.review', 'challans.receive', 'challans.issue'],
-          departmentCode: 'QC3',
-          defaultRedirect: '/qcwashing',
+          departmentCode: 'WASHING_QC',
+          defaultRedirect: '/washing-qc',
           validPins: ['Admin@12345', 'admin@12345', '1234', '1111', '0000'],
         },
         qc3: {
           id: 'usr-qcw-002',
           username: 'qc3',
-          fullName: 'QC Washing Inspector',
+          fullName: 'Washing QC Inspector',
           email: 'qc3@subhamfabrics.com',
-          role: 'QC3_INSPECTOR',
-          roles: ['QC3_INSPECTOR', 'QC_INSPECTOR', 'USER'],
+          role: 'WASHING_QC_INSPECTOR',
+          roles: ['WASHING_QC_INSPECTOR', 'QC_INSPECTOR', 'USER'],
           permissions: ['quality.inspect', 'defects.create', 'defects.review', 'challans.receive', 'challans.issue'],
-          departmentCode: 'QC3',
-          defaultRedirect: '/qcwashing',
+          departmentCode: 'WASHING_QC',
+          defaultRedirect: '/washing-qc',
           validPins: ['Admin@12345', 'admin@12345', '1234', '1111', '0000'],
         },
         qc_washing: {
           id: 'usr-qcw-003',
           username: 'qc_washing',
-          fullName: 'QC Washing Inspector',
+          fullName: 'Washing QC Inspector',
           email: 'qc_washing@subhamfabrics.com',
-          role: 'QC3_INSPECTOR',
-          roles: ['QC3_INSPECTOR', 'QC_INSPECTOR', 'USER'],
+          role: 'WASHING_QC_INSPECTOR',
+          roles: ['WASHING_QC_INSPECTOR', 'QC_INSPECTOR', 'USER'],
           permissions: ['quality.inspect', 'defects.create', 'defects.review', 'challans.receive', 'challans.issue'],
-          departmentCode: 'QC3',
-          defaultRedirect: '/qcwashing',
+          departmentCode: 'WASHING_QC',
+          defaultRedirect: '/washing-qc',
           validPins: ['Admin@12345', 'admin@12345', '1234', '1111', '0000'],
         },
         recutting: {
@@ -372,7 +372,7 @@ class ApiClient {
         { id: '1', username: 'admin', fullName: 'System Administrator', role: 'SUPER_ADMIN', departmentCode: 'CENTRAL', isActive: true },
         { id: '2', username: 'jitender', fullName: 'jitender saini', role: 'STORE_MANAGER', departmentCode: 'STORE', isActive: true },
         { id: '3', username: 'prod_manager', fullName: 'Production Manager', role: 'PRODUCTION_MANAGER', departmentCode: 'CUTTING', isActive: true },
-        { id: '4', username: 'qc_insp', fullName: 'Quality Inspector', role: 'QC_INSPECTOR', departmentCode: 'QC1', isActive: true },
+        { id: '4', username: 'qc_insp', fullName: 'Quality Inspector', role: 'QC_INSPECTOR', departmentCode: 'DYEING_QC', isActive: true },
       ];
     }
   }
@@ -488,10 +488,6 @@ class ApiClient {
 
   async getChallan(id: string) {
     return this.request<any>(`/challans/${id}`);
-  }
-
-  async getNextChallanNumber(department: string) {
-    return this.request<{ nextNumber: string }>(`/challans/next-number?department=${department}`);
   }
 
   async createChallan(data: any) {

@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    // 1. Incoming Challans from QC Washing (QC3)
+    // 1. Incoming Challans from Washing QC
     const incomingChallans = await prisma.challan.findMany({
       where: {
         toDepartment: { in: ['RECUTTING', 'RE-CUTTING', 'CUTTING_RECUT'] },

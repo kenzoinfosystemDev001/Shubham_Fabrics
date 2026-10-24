@@ -329,9 +329,9 @@ export default function AdminConsolePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-800 flex flex-col">
+    <div className="min-h-screen bg-ink-50 text-slate-800 flex flex-col">
       {/* TOP HEADER */}
-      <header className="bg-[#0F172A] text-white border-b border-slate-800 px-4 md:px-6 py-3.5 sticky top-0 z-40 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <header className="bg-ink-900 text-white border-b border-slate-800 px-4 md:px-6 py-3.5 sticky top-0 z-40 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 md:w-10 md:h-10 rounded-lg bg-white p-0.5 border border-indigo-500/40 flex items-center justify-center overflow-hidden shrink-0 shadow-xs">
@@ -394,7 +394,7 @@ export default function AdminConsolePage() {
           </Link>
 
           <Link
-            href="/qc1"
+            href="/dyeing-qc"
             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/20 transition shrink-0"
             title="Open Dyeing QC Department"
           >
@@ -421,12 +421,21 @@ export default function AdminConsolePage() {
           </Link>
 
           <Link
-            href="/qc2"
+            href="/threadcut-qc"
             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/20 transition shrink-0"
-            title="Open QC2 Department"
+            title="Open Threadcut QC Department"
           >
             <Building2 className="w-3.5 h-3.5" />
-            <span>QC2</span>
+            <span>Threadcut QC</span>
+          </Link>
+
+          <Link
+            href="/washing-qc"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-teal-500/10 text-teal-300 border border-teal-500/30 hover:bg-teal-500/20 transition shrink-0"
+            title="Open Washing QC Department"
+          >
+            <Building2 className="w-3.5 h-3.5" />
+            <span>Washing QC</span>
           </Link>
 
           <button
@@ -490,14 +499,14 @@ export default function AdminConsolePage() {
             </button>
             <Link
               href="/my-work/create-production-sheet"
-              className="flex items-center gap-1.5 px-3 py-2 bg-[#163767] hover:bg-[#0F264A] text-white rounded-lg text-xs font-semibold shadow-xs transition"
+              className="flex items-center gap-1.5 px-3 py-2 bg-lavender-800 hover:bg-lavender-900 text-white rounded-lg text-xs font-semibold shadow-xs transition"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Add Program Sheet</span>
             </Link>
             <Link
               href="/my-work/issue-challan"
-              className="flex items-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs transition"
+              className="flex items-center gap-1.5 px-3 py-2 bg-lavender-600 hover:bg-lavender-700 text-white rounded-lg text-xs font-semibold shadow-xs transition"
             >
               <Truck className="w-3.5 h-3.5" />
               <span>Issue Challan</span>
@@ -671,7 +680,7 @@ export default function AdminConsolePage() {
                     </button>
                     <Link
                       href="/my-work/create-production-sheet"
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-[#163767] hover:bg-[#0F264A] text-white rounded-lg text-xs font-semibold shadow-xs"
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-lavender-800 hover:bg-lavender-900 text-white rounded-lg text-xs font-semibold shadow-xs"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       <span>+ Add Production Sheet</span>
@@ -702,7 +711,7 @@ export default function AdminConsolePage() {
                       ) : (
                         programs.map((p) => (
                           <tr key={p.id} className="hover:bg-slate-50/70 transition">
-                            <td className="py-3 px-4 font-mono font-bold text-[#163767]">
+                            <td className="py-3 px-4 font-mono font-bold text-lavender-800">
                               {p.programSerialNo || p.programNumber}
                             </td>
                             <td className="py-3 px-4 text-slate-800 font-medium">
@@ -773,7 +782,7 @@ export default function AdminConsolePage() {
                     </button>
                     <Link
                       href="/my-work/issue-challan"
-                      className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-semibold shadow-xs"
+                      className="px-3 py-1.5 bg-lavender-600 hover:bg-lavender-700 text-white rounded-lg text-xs font-semibold shadow-xs"
                     >
                       + Programming Challan
                     </Link>
@@ -1091,7 +1100,7 @@ export default function AdminConsolePage() {
                   placeholder=""
                   value={newUser.username}
                   onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono focus:ring-2 focus:ring-lavender-600 focus:outline-none"
                 />
               </div>
 
@@ -1105,7 +1114,7 @@ export default function AdminConsolePage() {
                   placeholder=""
                   value={newUser.fullName}
                   onChange={(e) => setNewUser({ ...newUser, fullName: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-lavender-600 focus:outline-none"
                 />
               </div>
 
@@ -1120,7 +1129,7 @@ export default function AdminConsolePage() {
                     placeholder=""
                     value={newUser.pin}
                     onChange={(e) => setNewUser({ ...newUser, pin: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono tracking-widest focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono tracking-widest focus:ring-2 focus:ring-lavender-600 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -1130,15 +1139,15 @@ export default function AdminConsolePage() {
                   <select
                     value={newUser.departmentCode}
                     onChange={(e) => setNewUser({ ...newUser, departmentCode: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-lavender-600 focus:outline-none"
                   >
                     <option value="PROGRAMMING">PROGRAMMING</option>
                     <option value="STORE">FABRIC STORE</option>
                     <option value="DYEING">DYEING</option>
-                    <option value="QC1">QC1</option>
+                    <option value="DYEING_QC">DYEING QC</option>
                     <option value="EMBROIDERY">EMBROIDERY</option>
                     <option value="THREAD_CUTTING">THREAD CUTTING</option>
-                    <option value="QC2">QC2</option>
+                    <option value="THREADCUT_QC">THREADCUT QC</option>
                     <option value="ADMIN">ADMIN</option>
                   </select>
                 </div>
@@ -1151,16 +1160,16 @@ export default function AdminConsolePage() {
                 <select
                   value={newUser.roleCode}
                   onChange={(e) => setNewUser({ ...newUser, roleCode: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-lavender-600 focus:outline-none"
                 >
                   <option value="PROGRAMMING_INCHARGE">PROGRAMMING_INCHARGE</option>
                   <option value="FABRIC_STORE">FABRIC_STORE</option>
                   <option value="ADMIN">ADMIN (Full Access)</option>
                   <option value="DYEING_OPERATOR">DYEING_OPERATOR</option>
-                  <option value="QC_INSPECTOR">QC1_INSPECTOR</option>
+                  <option value="QC_INSPECTOR">DYEING_QC_INSPECTOR</option>
                   <option value="EMBROIDERY_OPERATOR">EMBROIDERY_OPERATOR</option>
                   <option value="THREAD_CUTTING_INCHARGE">THREAD_CUTTING_INCHARGE</option>
-                  <option value="QC2_INSPECTOR">QC2_INSPECTOR</option>
+                  <option value="THREADCUT_QC_INSPECTOR">THREADCUT_QC_INSPECTOR</option>
                 </select>
               </div>
 
@@ -1205,7 +1214,7 @@ export default function AdminConsolePage() {
                   placeholder=""
                   value={newSupplier.name}
                   onChange={(e) => setNewSupplier({ ...newSupplier, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-lavender-600 focus:outline-none"
                 />
               </div>
 
@@ -1219,7 +1228,7 @@ export default function AdminConsolePage() {
                     placeholder=""
                     value={newSupplier.code}
                     onChange={(e) => setNewSupplier({ ...newSupplier, code: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono focus:ring-2 focus:ring-lavender-600 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -1231,7 +1240,7 @@ export default function AdminConsolePage() {
                     placeholder=""
                     value={newSupplier.contactPerson}
                     onChange={(e) => setNewSupplier({ ...newSupplier, contactPerson: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-lavender-600 focus:outline-none"
                   />
                 </div>
               </div>
@@ -1246,7 +1255,7 @@ export default function AdminConsolePage() {
                     placeholder=""
                     value={newSupplier.phone}
                     onChange={(e) => setNewSupplier({ ...newSupplier, phone: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono focus:ring-2 focus:ring-lavender-600 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -1258,7 +1267,7 @@ export default function AdminConsolePage() {
                     placeholder=""
                     value={newSupplier.taxNumber}
                     onChange={(e) => setNewSupplier({ ...newSupplier, taxNumber: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono uppercase focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono uppercase focus:ring-2 focus:ring-lavender-600 focus:outline-none"
                   />
                 </div>
               </div>
@@ -1304,7 +1313,7 @@ export default function AdminConsolePage() {
                   placeholder=""
                   value={newFabric.name}
                   onChange={(e) => setNewFabric({ ...newFabric, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-lavender-600 focus:outline-none"
                 />
               </div>
 
@@ -1318,7 +1327,7 @@ export default function AdminConsolePage() {
                     placeholder=""
                     value={newFabric.composition}
                     onChange={(e) => setNewFabric({ ...newFabric, composition: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-lavender-600 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -1328,7 +1337,7 @@ export default function AdminConsolePage() {
                   <select
                     value={newFabric.fabricType}
                     onChange={(e) => setNewFabric({ ...newFabric, fabricType: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-lavender-600 focus:outline-none"
                   >
                     <option value="KNIT_PIQUE">KNIT_PIQUE</option>
                     <option value="SINGLE_JERSEY">SINGLE_JERSEY</option>
@@ -1349,7 +1358,7 @@ export default function AdminConsolePage() {
                     placeholder=""
                     value={newFabric.gsm}
                     onChange={(e) => setNewFabric({ ...newFabric, gsm: parseFloat(e.target.value) || 220 })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono focus:ring-2 focus:ring-lavender-600 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -1361,7 +1370,7 @@ export default function AdminConsolePage() {
                     placeholder=""
                     value={newFabric.widthInInches}
                     onChange={(e) => setNewFabric({ ...newFabric, widthInInches: parseFloat(e.target.value) || 60 })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono focus:ring-2 focus:ring-lavender-600 focus:outline-none"
                   />
                 </div>
               </div>

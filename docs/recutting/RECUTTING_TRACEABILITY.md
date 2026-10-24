@@ -16,19 +16,19 @@ Every garment component processed in Recutting retains its full lineage through 
    [Dyeing]
       │ (CH-DYE-...)
       ▼
-  [Dyeing QC1]
-      │ (CH-QC1-...)
+  [Dyeing QC]
+      │ (CH-EMB-DQC-...)
       ▼
 [Thread Cutting]
       │ (CH-TC-...)
       ▼
-[Thread Cut QC2]
-      │ (CH-QC2-...)
+[Thread Cut Threadcut QC]
+      │ (CH-WASH-TQC-...)
       ▼
    [Washing]
       │ (CH-WSH-...)
       ▼
- [QC Washing (QC3)]
+ [Washing QC (WASHING_QC)]
       │ (CH-QCW-...)  ◄─── Incoming Challan to Recutting
       ▼
 ┌──────────────────────────────────────────────┐
@@ -47,6 +47,6 @@ Every garment component processed in Recutting retains its full lineage through 
 
 ## 2. Traceability Query Pattern
 Given any outgoing Stitching Challan (`CH-RC-XXXXXX`):
-1. Its `parentChallanId` retrieves the exact QC Washing batch (`CH-QCW-XXXXXX`), its inspection parameters, wash date, and defect log.
+1. Its `parentChallanId` retrieves the exact Washing QC batch (`CH-QCW-XXXXXX`), its inspection parameters, wash date, and defect log.
 2. Its `programId` retrieves the original client order, design number, Wilcom embroidery design, colorway, and sizing grid.
 3. Its `productionLogs` retrieve the exact operator, machine/table, timestamps, and cut balance.

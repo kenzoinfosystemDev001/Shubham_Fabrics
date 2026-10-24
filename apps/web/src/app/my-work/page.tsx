@@ -39,11 +39,11 @@ export default function MyWorkRootPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pl-0 md:pl-64">
+    <div className="min-h-screen bg-ink-50 pl-0 md:pl-64">
       {/* HEADER */}
       <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 sm:py-5 shadow-xs">
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A66E22] block">
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-lavender-700 block">
             PROGRAMMING DEPARTMENT WORKSPACE
           </span>
           <h1 className="text-2xl font-bold text-slate-900 mt-1">
@@ -60,9 +60,9 @@ export default function MyWorkRootPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
           {/* OPTION 1: CREATE PRODUCTION SHEET */}
-          <div className="bg-white border-2 border-slate-200 hover:border-[#163767] rounded-xl p-8 shadow-xs hover:shadow-md transition flex flex-col justify-between group">
+          <div className="bg-white border-2 border-slate-200 hover:border-lavender-800 rounded-xl p-8 shadow-xs hover:shadow-md transition flex flex-col justify-between group">
             <div>
-              <div className="w-14 h-14 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-[#163767] mb-6 group-hover:scale-105 transition">
+              <div className="w-14 h-14 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-lavender-800 mb-6 group-hover:scale-105 transition">
                 <FilePlus className="w-7 h-7" />
               </div>
 
@@ -87,7 +87,7 @@ export default function MyWorkRootPage() {
 
             <Link
               href="/my-work/create-production-sheet"
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-[#163767] hover:bg-[#0F264A] text-white text-xs font-semibold rounded-lg shadow-sm transition"
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-lavender-800 hover:bg-lavender-900 text-white text-xs font-semibold rounded-lg shadow-sm transition"
             >
               <span>Open Production Sheet Form</span>
               <ArrowRight className="w-4 h-4" />
@@ -122,7 +122,7 @@ export default function MyWorkRootPage() {
 
             <Link
               href="/my-work/issue-challan"
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-lg shadow-sm transition"
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-lavender-700 hover:bg-lavender-800 text-white text-xs font-semibold rounded-lg shadow-sm transition"
             >
               <span>Proceed to Issue Challan</span>
               <ArrowRight className="w-4 h-4" />

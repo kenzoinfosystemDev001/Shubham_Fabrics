@@ -82,7 +82,7 @@ export function RecuttingNavigation() {
     const active = exact ? pathname === href : pathname === href || pathname.startsWith(href + '/');
     return `flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition ${
       active
-        ? 'bg-[#1E293B] text-white border-l-2 border-rose-400 pl-2.5 shadow-xs'
+        ? 'bg-ink-800 text-white border-l-2 border-lavender-400 pl-2.5 shadow-xs'
         : 'text-slate-300 hover:bg-slate-800/60 hover:text-white'
     }`;
   };
@@ -90,7 +90,7 @@ export function RecuttingNavigation() {
   return (
     <>
       {/* MOBILE TOP BAR (visible on screens < md) */}
-      <div className="md:hidden sticky top-0 z-40 bg-[#0F172A] border-b border-slate-800 px-4 py-3 flex items-center justify-between shadow-sm">
+      <div className="md:hidden sticky top-0 z-40 bg-ink-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setMobileOpen(true)}
@@ -101,7 +101,7 @@ export function RecuttingNavigation() {
           </button>
 
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-white p-0.5 border border-rose-500/40 flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-white p-0.5 border border-lavender-500/40 flex items-center justify-center shrink-0">
               <img
                 src="/shubham-logo.jpg"
                 alt="Shubham Fabrics Logo"
@@ -110,7 +110,7 @@ export function RecuttingNavigation() {
             </div>
             <div>
               <span className="text-xs font-bold text-white tracking-wide block leading-none">SHUBHAM FABRICS</span>
-              <span className="text-[9px] font-bold text-rose-400 tracking-wider uppercase block">RECUTTING DEPT</span>
+              <span className="text-[9px] font-bold text-lavender-400 tracking-wider uppercase block">RECUTTING DEPT</span>
             </div>
           </div>
         </div>
@@ -138,7 +138,7 @@ export function RecuttingNavigation() {
       {/* SIDEBAR ASIDE */}
       <aside
         style={{
-          backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.40), rgba(10, 15, 29, 0.60)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundImage: `linear-gradient(to bottom, rgba(37, 35, 42, 0.40), rgba(24, 22, 28, 0.60)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -150,7 +150,7 @@ export function RecuttingNavigation() {
         {/* BRANDING */}
         <div className="p-4 border-b border-slate-700/60 bg-slate-950/40 backdrop-blur-sm flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-white p-0.5 border border-rose-500/40 flex items-center justify-center shadow-sm overflow-hidden shrink-0">
+            <div className="w-10 h-10 rounded-lg bg-white p-0.5 border border-lavender-500/40 flex items-center justify-center shadow-sm overflow-hidden shrink-0">
               <img
                 src="/shubham-logo.jpg"
                 alt="Shubham Fabrics Logo"
@@ -159,7 +159,7 @@ export function RecuttingNavigation() {
             </div>
             <div className="min-w-0">
               <span className="text-xs font-bold tracking-[0.14em] text-white truncate block">SHUBHAM FABRICS</span>
-              <span className="text-[10px] font-medium tracking-[0.18em] text-rose-400 block truncate">RECUTTING DEPT</span>
+              <span className="text-[10px] font-medium tracking-[0.18em] text-lavender-400 block truncate">RECUTTING DEPT</span>
             </div>
           </div>
 
@@ -190,7 +190,7 @@ export function RecuttingNavigation() {
             onClick={() => setMobileOpen(false)}
             className={linkClass('/recutting', true)}
           >
-            <LayoutDashboard className="w-4 h-4 text-rose-400" />
+            <LayoutDashboard className="w-4 h-4 text-lavender-400" />
             <span>Dashboard</span>
           </Link>
 
@@ -201,7 +201,7 @@ export function RecuttingNavigation() {
             className={linkClass('/recutting/incoming', false)}
           >
             <ArrowDownLeft className="w-4 h-4 text-amber-400" />
-            <span>Incoming (QC3)</span>
+            <span>Incoming (Washing QC)</span>
           </Link>
 
           {/* 3. My Work / Work Queue */}
@@ -210,7 +210,7 @@ export function RecuttingNavigation() {
             onClick={() => setMobileOpen(false)}
             className={linkClass('/recutting/my-work', false)}
           >
-            <Scissors className="w-4 h-4 text-rose-400" />
+            <Scissors className="w-4 h-4 text-lavender-400" />
             <span>Cutting Queue</span>
           </Link>
 
@@ -258,12 +258,12 @@ export function RecuttingNavigation() {
         {/* USER & SIGN OUT FOOTER */}
         <div className="p-4 border-t border-slate-700/60 bg-slate-950/50 backdrop-blur-md">
           <div className="flex items-center gap-3 mb-3">
-            <UserCircle className="w-8 h-8 text-rose-400/90" />
+            <UserCircle className="w-8 h-8 text-lavender-400/90" />
             <div className="flex-1 min-w-0">
               <span className="text-xs font-semibold text-white truncate block drop-shadow-xs">
                 {currentUser.fullName || (isAdmin ? 'System Administrator' : 'Recutting Supervisor')}
               </span>
-              <span className="text-[10px] text-rose-400 font-bold tracking-wide block truncate drop-shadow-xs">
+              <span className="text-[10px] text-lavender-400 font-bold tracking-wide block truncate drop-shadow-xs">
                 Recutting Department
               </span>
             </div>

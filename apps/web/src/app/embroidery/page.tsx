@@ -55,11 +55,11 @@ export default function EmbroideryDashboard() {
   const programs = data?.programs || [];
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-ink-50">
       {/* TOP HEADER (REAL DB BACKGROUND) */}
       <header
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.70)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundImage: `linear-gradient(to right, rgba(37, 35, 42, 0.85), rgba(37, 35, 42, 0.70)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -95,7 +95,7 @@ export default function EmbroideryDashboard() {
 
           <Link
             href="/embroidery/incoming-challans"
-            className="flex items-center gap-2 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow-xs transition"
+            className="flex items-center gap-2 px-3.5 py-2 bg-lavender-600 hover:bg-lavender-700 text-white text-xs font-semibold rounded-lg shadow-xs transition"
           >
             <Layers className="w-4 h-4" />
             <span>Incoming Challans (Store &amp; Dyeing)</span>
@@ -120,7 +120,7 @@ export default function EmbroideryDashboard() {
               Incoming Challans
             </span>
             <p className="text-2xl font-bold text-slate-900 mt-1">{stats.totalChallans}</p>
-            <span className="text-[10px] text-slate-500 mt-0.5 block">Store (Undyed) &amp; Dyeing QC1</span>
+            <span className="text-[10px] text-slate-500 mt-0.5 block">Store (Undyed) &amp; Dyeing QC</span>
           </div>
 
           <div className="bg-white border border-slate-200/90 rounded-xl p-4 shadow-xs">
@@ -154,7 +154,7 @@ export default function EmbroideryDashboard() {
             <div className="flex items-center gap-2.5">
               <PackageCheck className="w-4 h-4 text-fuchsia-600" />
               <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
-                Incoming Challans from Fabric Store &amp; QC 1 Departments
+                Incoming Challans from Fabric Store &amp; Dyeing QC Departments
               </h2>
             </div>
             <Link
@@ -170,7 +170,7 @@ export default function EmbroideryDashboard() {
             <div className="p-8 text-center text-slate-500 text-xs">
               <Scissors className="w-8 h-8 mx-auto text-slate-300 mb-2" />
               <p className="font-semibold text-slate-700">No incoming challans currently staged for Embroidery</p>
-              <p className="text-slate-400 mt-1">Challans issued from Fabric Store (Pre-Dyed) or QC 1 (Post-Dyeing Passed) will appear here automatically with their Production Sheet.</p>
+              <p className="text-slate-400 mt-1">Challans issued from Fabric Store (Pre-Dyed) or Dyeing QC (Post-Dyeing Passed) will appear here automatically with their Production Sheet.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">

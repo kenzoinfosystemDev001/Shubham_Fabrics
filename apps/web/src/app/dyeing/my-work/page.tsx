@@ -32,6 +32,7 @@ import {
   Boxes,
 } from 'lucide-react';
 import { DepartmentStockView } from '@/components/DepartmentStockView';
+import { DepartmentDefectiveShelfWidget } from '@/components/DepartmentDefectiveShelfWidget';
 import {
   downloadProductionSheetHtml,
   printProductionSheet,
@@ -42,6 +43,8 @@ import {
 } from '@/lib/download-challan';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
+import { DyeingInstructions } from '@/components/dyeing/DyeingInstructions';
+import { getChallanNumberError } from '@/components/challan/ChallanNumberInput';
 import {
   ColorFabricMeasurementTable,
   ChallanItemData,
@@ -54,19 +57,21 @@ interface DyeingOrder {
   orderNumber: string;
   programId: string;
   inboundChallanId: string | null;
-  qc1ChallanId: string | null;
-  status: 'RECEIVED' | 'IN_DYEING' | 'PARTIALLY_DYED' | 'DYED' | 'READY_FOR_QC1' | 'SENT_TO_QC1';
+  inboundChallanItemId?: string | null;
+  dyeingQcChallanId: string | null;
+  status: 'RECEIVED' | 'IN_DYEING' | 'PARTIALLY_DYED' | 'DYED' | 'READY_FOR_DYEING_QC' | 'SENT_TO_DYEING_QC';
   priority: string;
   fabricName: string;
   fabricType: string | null;
+  currentColor?: string | null;
   targetColor: string;
   dyedColor: string | null;
   colorCode: string | null;
   requiredQuantity: number;
   dyedQuantity: number;
   undyedQuantity: number;
-  readyForQc1Quantity: number;
-  sentToQc1Quantity: number;
+  readyForDyeingQcQuantity: number;
+  sentToDyeingQcQuantity: number;
   uom: string;
   inchargeId: string | null;
   inchargeName: string | null;
@@ -104,14 +109,27 @@ interface DyeingOrder {
   };
   inboundChallan?: {
     id: string;
+    programId?: string;
     challanNumber: string;
+    challanType?: string;
     fromDepartment: string;
     toDepartment: string;
     status: string;
     issuedDate: string;
     remarks?: string | null;
+    items?: Array<{
+      id: string;
+      itemDescription?: string | null;
+      fabricCode?: string | null;
+      colour?: string | null;
+      shade?: string | null;
+      requiredDyeColor?: string | null;
+      requiredDyeQuantity?: number | null;
+      quantity: number;
+      uom: string;
+    }>;
   };
-  qc1Challan?: {
+  dyeingQcChallan?: {
     id: string;
     challanNumber: string;
     fromDepartment: string;
@@ -125,6 +143,9 @@ export default function DyeingMyWorkPage() {
   const searchParams = useSearchParams();
   const initialTab = searchParams.get('tab') === 'create-challan' ? 'create-challan' : 'incoming';
   const preselectedProgramId = searchParams.get('programId');
+  // Opened from a deadline alert: show that order's instructions and documents.
+  const focusOrderId = searchParams.get('order');
+  const focusHandledRef = React.useRef(false);
 
   // Navigation Tabs: 'incoming' | 'create-challan' | 'stock' | 'defective-shelf'
   const [activeTab, setActiveTab] = useState<'incoming' | 'create-challan' | 'stock' | 'defective-shelf'>(initialTab);
@@ -140,21 +161,22 @@ export default function DyeingMyWorkPage() {
   // Modal state
   const [selectedOrderForSheet, setSelectedOrderForSheet] = useState<DyeingOrder | null>(null);
   const [selectedOrderForUpdate, setSelectedOrderForUpdate] = useState<DyeingOrder | null>(null);
+  const [instructionsOrder, setInstructionsOrder] = useState<DyeingOrder | null>(null);
 
   // ==============================================================
-  // FORM STATE: Dyeing Dept -> QC1 (as specified in handwritten sketch)
+  // FORM STATE: Dyeing Dept -> Dyeing QC (as specified in handwritten sketch)
   // ==============================================================
   const [challanNumber, setChallanNumber] = useState('');
   const [challanDate, setChallanDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [sourceDept] = useState('Dyeing Department');
-  const [destDept] = useState('QC1');
+  const [destDept] = useState('DYEING_QC');
   const [priority, setPriority] = useState('NORMAL');
   const [deliveryDate, setDeliveryDate] = useState('');
   const [designNumber, setDesignNumber] = useState('');
   const [selectedOrderId, setSelectedOrderId] = useState<string>('');
   
   // Reusable Color / Fabric / Measurement table items (Blank by default)
-  const [items, setItems] = useState<ChallanItemData[]>(() => [createBlankChallanItem('DYEING_QC1')]);
+  const [items, setItems] = useState<ChallanItemData[]>(() => [createBlankChallanItem('DYEING_TO_DYEING_QC')]);
 
   // In / Out Tracking across departments
   const [dyeingTracking, setDyeingTracking] = useState<DepartmentInOutTracking>({
@@ -163,7 +185,7 @@ export default function DyeingMyWorkPage() {
     fabricUnit: 'MTR',
     defectivePieces: 0,
     defectiveShelfLocation: 'DEF-SHELF-DYEING (Dyeing Station Defective Shelf)',
-    defectReason: 'Shade Variation / Uneven Dyeing',
+    defectReason: '',
     detectedFromDept: 'STORE',
     detectedFromChallanId: null,
     detectedFromChallanNumber: null,
@@ -176,6 +198,7 @@ export default function DyeingMyWorkPage() {
   // Submit states
   const [submittingChallan, setSubmittingChallan] = useState(false);
   const [formError, setFormError] = useState('');
+  const [challanNumberError, setChallanNumberError] = useState<string | null>(null);
   const [createdChallanSuccess, setCreatedChallanSuccess] = useState<any>(null);
 
   // Update Dyeing progress modal form state
@@ -207,8 +230,8 @@ export default function DyeingMyWorkPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           status: 'RECEIVED',
+          // fabricIn is left as recorded on the challan; one challan can carry several colour lines.
           notes: `Material accepted at Dyeing department from Fabric Store. Floor stock updated.`,
-          fabricIn: order.requiredQuantity,
         }),
       });
       const json = await res.json();
@@ -225,17 +248,10 @@ export default function DyeingMyWorkPage() {
     }
   };
 
-  // Fetch Next Challan Number for Dyeing -> QC1
-  const loadNextChallanNumber = async () => {
-    try {
-      const res = await fetch('/api/challans/next-number?department=DYEING');
-      const data = await res.json();
-      if (data?.nextNumber) {
-        setChallanNumber(data.nextNumber);
-      }
-    } catch (e) {
-      console.warn('Failed to fetch next dyeing challan number', e);
-    }
+  // Challan numbers are entered manually; start every new challan with a blank number.
+  const resetChallanNumber = () => {
+    setChallanNumber('');
+    setChallanNumberError(null);
   };
 
   // Fetch Orders
@@ -255,6 +271,11 @@ export default function DyeingMyWorkPage() {
       const json = await res.json();
       const list: DyeingOrder[] = json.data || [];
       setOrders(list);
+      if (focusOrderId && !focusHandledRef.current) {
+        focusHandledRef.current = true;
+        const focused = list.find((o) => o.id === focusOrderId);
+        if (focused?.inboundChallan) setInstructionsOrder(focused);
+      }
 
       // Read current logged in user
       if (typeof window !== 'undefined') {
@@ -282,7 +303,7 @@ export default function DyeingMyWorkPage() {
       const defRes = await fetch('/api/defective-shelves?department=DYEING');
       const defJson = await defRes.json();
       if (defJson.success && defJson.data?.challans) {
-        setDyeingDefects(defJson.data.challans);
+        setDyeingDefects(defJson.data.defectRecords || []);
       }
     } catch (err: any) {
       console.error('Error fetching dyeing orders:', err);
@@ -294,7 +315,6 @@ export default function DyeingMyWorkPage() {
 
   useEffect(() => {
     fetchOrders();
-    loadNextChallanNumber();
   }, [statusFilter, priorityFilter]);
 
   // Synchronize form reference fields when an order / production sheet is selected
@@ -305,11 +325,8 @@ export default function DyeingMyWorkPage() {
     setDesignNumber(prog?.designNumber || prog?.wilcomDesignNumber || prog?.styleCode || '');
     setPriority(order.priority || prog?.priority || 'NORMAL');
 
-    if (prog?.deliveryDate) {
-      setDeliveryDate(new Date(prog.deliveryDate).toISOString().split('T')[0]);
-    } else {
-      setDeliveryDate('');
-    }
+    // Entered by the Dyeing Incharge; not copied from the sheet, whose date may be a system default.
+    setDeliveryDate('');
 
     const inQty = Number(order.dyedQuantity || order.requiredQuantity || 0);
     setDyeingTracking((prev) => ({
@@ -327,14 +344,14 @@ export default function DyeingMyWorkPage() {
   // Switch to Create Challan tab with a specific order pre-loaded
   const handleStartCreateChallan = (order: DyeingOrder) => {
     selectOrderForForm(order);
-    loadNextChallanNumber();
+    resetChallanNumber();
     setActiveTab('create-challan');
     setFormError('');
     setCreatedChallanSuccess(null);
   };
 
-  // Submit Challan to QC1
-  const handleSubmitQC1Challan = async (e: React.FormEvent) => {
+  // Submit Challan to Dyeing QC
+  const handleSubmitDyeingQCChallan = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!selectedOrder) {
@@ -342,10 +359,13 @@ export default function DyeingMyWorkPage() {
       return;
     }
 
-    if (!challanNumber.trim()) {
-      setFormError('Please provide a Challan Number.');
+    const numberError = getChallanNumberError(challanNumber);
+    if (numberError) {
+      setChallanNumberError(numberError);
+      setFormError(numberError);
       return;
     }
+    setChallanNumberError(null);
 
     // Validate ColorFabricMeasurementTable items
     const validItems = items.filter(
@@ -380,7 +400,8 @@ export default function DyeingMyWorkPage() {
         uom: item.unit || selectedOrder.uom || 'MTR',
         fabricCode: item.fabric || selectedOrder.fabricName || 'FABRIC',
         colour: item.color || null,
-        shade: item.requiredDyeColor || null,
+        // Instruction and result stay separate: required colour in its own field, actual shade in `shade`.
+        requiredDyeColor: item.requiredDyeColor || null,
         actualDyedColor: item.actualDyedColor || null,
         rollNumber: item.rollNumber || null,
         remarks: item.remarks || null,
@@ -388,13 +409,14 @@ export default function DyeingMyWorkPage() {
 
       const payload = {
         challanNumber: challanNumber.trim(),
-        challanType: 'DYEING_TO_QC1',
+        challanType: 'DYEING_TO_DYEING_QC',
         programId: selectedOrder.programId,
         parentChallanId: selectedOrder.inboundChallanId || dyeingTracking.detectedFromChallanId || null,
         fromDepartment: 'DYEING',
-        toDepartment: 'QC1',
+        toDepartment: 'DYEING_QC',
         priority: priority || 'NORMAL',
         issuedDate: challanDate,
+        deliveryDate: deliveryDate || null,
         fabricIn: dyeingTracking.fabricIn,
         defectivePieces: dyeingTracking.defectivePieces,
         defectiveShelfLocation: dyeingTracking.defectiveShelfLocation,
@@ -415,7 +437,8 @@ export default function DyeingMyWorkPage() {
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to dispatch Challan to QC1');
+        if (data.field === 'challanNumber') setChallanNumberError(data.error);
+        throw new Error(data.error || 'Failed to dispatch Challan to Dyeing QC');
       }
 
       setCreatedChallanSuccess({
@@ -432,7 +455,7 @@ export default function DyeingMyWorkPage() {
       // Refresh orders list
       fetchOrders();
     } catch (err: any) {
-      setFormError(err.message || 'Error dispatching challan to QC1');
+      setFormError(err.message || 'Error dispatching challan to Dyeing QC');
       if (typeof window !== 'undefined') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
@@ -446,7 +469,8 @@ export default function DyeingMyWorkPage() {
     setSelectedOrderForUpdate(order);
     setUpdateForm({
       dyedQuantity: order.dyedQuantity,
-      dyedColor: order.dyedColor || order.targetColor,
+      // The actual result is recorded by Dyeing; it is never pre-filled from the required colour.
+      dyedColor: order.dyedColor || '',
       colorCode: order.colorCode || '',
       status: order.status,
       machineNumber: order.machineNumber || '',
@@ -486,7 +510,7 @@ export default function DyeingMyWorkPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] pb-24">
+    <div className="min-h-screen bg-ink-50 pb-24">
       {/* TOP HEADER */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 sm:px-8 py-3.5 shadow-2xs">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -510,7 +534,6 @@ export default function DyeingMyWorkPage() {
             <button
               onClick={() => {
                 fetchOrders();
-                loadNextChallanNumber();
               }}
               disabled={loading}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition"
@@ -531,8 +554,8 @@ export default function DyeingMyWorkPage() {
 
       <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
         {/* ============================================================== */}
-        {/* NAVIGATION TABS: Incoming Challans | Create Challan to QC1    */}
-        {/* Matches Image 1 layout: My Work -> Incoming Challans / QC1     */}
+        {/* NAVIGATION TABS: Incoming Challans | Create Challan to Dyeing QC    */}
+        {/* Matches Image 1 layout: My Work -> Incoming Challans / Dyeing QC     */}
         {/* ============================================================== */}
         <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
           <button
@@ -552,7 +575,6 @@ export default function DyeingMyWorkPage() {
             type="button"
             onClick={() => {
               setActiveTab('create-challan');
-              loadNextChallanNumber();
             }}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer ${
               activeTab === 'create-challan'
@@ -561,7 +583,7 @@ export default function DyeingMyWorkPage() {
             }`}
           >
             <Send className="w-4 h-4" />
-            <span>Create challan to QC1 (Quality Check 1)</span>
+            <span>Create challan to Dyeing QC (Quality Check 1)</span>
           </button>
 
           <button
@@ -619,7 +641,7 @@ export default function DyeingMyWorkPage() {
                   placeholder="Search by Serial #, Program #, Fabric, Color, Client..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-xs focus:outline-hidden focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+                  className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-xs focus:outline-hidden focus:ring-2 focus:ring-lavender-600 focus:border-transparent"
                 />
               </div>
 
@@ -637,8 +659,8 @@ export default function DyeingMyWorkPage() {
                     <option value="IN_DYEING">In Dyeing</option>
                     <option value="PARTIALLY_DYED">Partially Dyed</option>
                     <option value="DYED">Dyed</option>
-                    <option value="READY_FOR_QC1">Ready for QC1</option>
-                    <option value="SENT_TO_QC1">Sent to QC1</option>
+                    <option value="READY_FOR_DYEING_QC">Ready for Dyeing QC</option>
+                    <option value="SENT_TO_DYEING_QC">Sent to Dyeing QC</option>
                   </select>
                 </div>
 
@@ -747,9 +769,19 @@ export default function DyeingMyWorkPage() {
                             )}
                           </td>
 
-                          {/* COLOR */}
+                          {/* COLOR: current shade -> required dyeing colour (kept separate) */}
                           <td className="py-3.5 px-4">
-                            <div className="font-medium text-slate-800">{order.targetColor}</div>
+                            {order.inboundChallanItemId ? (
+                              <>
+                                <div className="text-[10px] text-slate-500">Current: {order.currentColor || '—'}</div>
+                                <div className="font-bold text-purple-900">Dye to: {order.targetColor}</div>
+                              </>
+                            ) : (
+                              <>
+                                <div className="font-medium text-slate-800">{order.targetColor}</div>
+                                <div className="text-[10px] text-amber-700">Older order — see Instructions</div>
+                              </>
+                            )}
                             {order.dyedColor && (
                               <div className="text-[10px] text-purple-700 font-semibold">Dyed: {order.dyedColor}</div>
                             )}
@@ -795,7 +827,7 @@ export default function DyeingMyWorkPage() {
                                   disabled={receivingOrderId === order.id}
                                   onClick={() => handleReceiveInboundMaterial(order)}
                                   title="Receive Material into Dyeing Floor Stock"
-                                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-bold transition shadow-xs cursor-pointer"
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-lavender-600 hover:bg-lavender-700 text-white rounded text-xs font-bold transition shadow-xs cursor-pointer"
                                 >
                                   {receivingOrderId === order.id ? (
                                     <>
@@ -811,10 +843,23 @@ export default function DyeingMyWorkPage() {
                                 </button>
                               )}
 
+                              {/* DYEING INSTRUCTIONS FROM THE INCOMING CHALLAN */}
+                              {order.inboundChallan && (
+                                <button
+                                  type="button"
+                                  onClick={() => setInstructionsOrder(order)}
+                                  title="View Dyeing Instructions (required colour and quantity per line)"
+                                  className="inline-flex items-center gap-1 px-2 py-1 bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-200 rounded text-[10px] font-bold transition cursor-pointer"
+                                >
+                                  <Droplet className="w-3 h-3 text-purple-700" />
+                                  <span>Instructions</span>
+                                </button>
+                              )}
+
                               {/* COMPLETE DOCUMENT ACTIONS: PRODUCTION SHEET, CHALLAN & WILCOM */}
                               <DocumentActionButtons
                                 program={order.program}
-                                challan={order.inboundChallan || (order.qc1Challan ? { ...order.qc1Challan, program: order.program } : null)}
+                                challan={order.inboundChallan ? { ...order.inboundChallan, programId: order.programId } : null}
                                 size="xs"
                               />
 
@@ -828,15 +873,15 @@ export default function DyeingMyWorkPage() {
                                 <Edit3 className="w-4 h-4" />
                               </button>
 
-                              {/* ISSUE TO QC1 */}
+                              {/* ISSUE TO Dyeing QC */}
                               <button
                                 type="button"
                                 onClick={() => handleStartCreateChallan(order)}
-                                title="Create Challan to QC1 (Quality Check 1)"
+                                title="Create Challan to Dyeing QC (Quality Check 1)"
                                 className="inline-flex items-center gap-1 px-2.5 py-1 bg-purple-700 hover:bg-purple-800 text-white rounded text-xs font-bold transition shadow-2xs cursor-pointer"
                               >
                                 <Send className="w-3 h-3" />
-                                <span>To QC1</span>
+                                <span>To Dyeing QC</span>
                               </button>
                             </div>
                           </td>
@@ -851,8 +896,8 @@ export default function DyeingMyWorkPage() {
         )}
 
         {/* ============================================================== */}
-        {/* TAB 2: CREATE CHALLAN TO QC1 (QUALITY CHECK 1)                 */}
-        {/* Form: Dyeing Dept -> QC1 (as specified in handwritten sketch)   */}
+        {/* TAB 2: CREATE CHALLAN TO Dyeing QC (QUALITY CHECK 1)                 */}
+        {/* Form: Dyeing Dept -> Dyeing QC (as specified in handwritten sketch)   */}
         {/* ============================================================== */}
         {activeTab === 'create-challan' && (
           <div className="space-y-6">
@@ -890,7 +935,7 @@ export default function DyeingMyWorkPage() {
                   </div>
                   <div>
                     <span className="text-slate-500 block text-[10px] uppercase font-semibold">Destination</span>
-                    <strong className="text-slate-900">QC1 (Quality Check 1)</strong>
+                    <strong className="text-slate-900">Dyeing QC (Quality Check 1)</strong>
                   </div>
                   <div>
                     <span className="text-slate-500 block text-[10px] uppercase font-semibold">State</span>
@@ -898,7 +943,9 @@ export default function DyeingMyWorkPage() {
                   </div>
                   <div>
                     <span className="text-slate-500 block text-[10px] uppercase font-semibold">Quantity</span>
-                    <strong className="font-mono text-slate-900 text-sm">{createdChallanSuccess.qty} MTR</strong>
+                    <strong className="font-mono text-slate-900 text-sm">
+                      {createdChallanSuccess.fabricOut ?? createdChallanSuccess.fabricIn ?? '—'} {createdChallanSuccess.fabricUnit || ''}
+                    </strong>
                   </div>
                 </div>
 
@@ -927,36 +974,36 @@ export default function DyeingMyWorkPage() {
                     <span>Download HTML</span>
                   </button>
                   <Link
-                    href="/qc1/my-work"
+                    href="/dyeing-qc/my-work"
                     className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-900 text-xs font-bold rounded-lg transition"
                   >
                     <Eye className="w-3.5 h-3.5 text-emerald-700" />
-                    <span>View in QC1 Worklist →</span>
+                    <span>View in Dyeing QC Worklist →</span>
                   </Link>
                   <button
                     type="button"
                     onClick={() => {
                       setCreatedChallanSuccess(null);
-                      loadNextChallanNumber();
+                      resetChallanNumber();
                     }}
                     className="flex items-center gap-1.5 px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold rounded-lg shadow-xs transition ml-auto"
                   >
                     <Plus className="w-3.5 h-3.5" />
-                    <span>Create Another QC1 Challan</span>
+                    <span>Create Another Dyeing QC Challan</span>
                   </button>
                 </div>
               </div>
             ) : (
-              /* THE DYEING DEPT -> QC1 FORM */
+              /* THE DYEING DEPT -> Dyeing QC FORM */
               <form
-                onSubmit={handleSubmitQC1Challan}
+                onSubmit={handleSubmitDyeingQCChallan}
                 className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6"
               >
                 {/* FORM TITLE & "Show production sheet" BUTTON */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
                   <div>
                     <h2 className="text-xl font-bold font-serif text-slate-900">
-                      Dyeing Dept &rarr; QC1
+                      Dyeing Dept &rarr; Dyeing QC
                     </h2>
                     <span className="text-xs text-slate-500">
                       Dispatch processed fabric lot from Dyeing to Quality Check 1
@@ -991,10 +1038,20 @@ export default function DyeingMyWorkPage() {
                       <input
                         type="text"
                         value={challanNumber}
-                        onChange={(e) => setChallanNumber(e.target.value)}
+                        onChange={(e) => {
+                          setChallanNumber(e.target.value);
+                          setChallanNumberError(null);
+                        }}
                         required
-                        className="w-full text-xs font-mono font-bold text-slate-900 border border-slate-300 rounded-lg px-3 py-2 bg-slate-50 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-purple-600 focus:border-transparent transition"
+                        maxLength={64}
+                        autoComplete="off"
+                        placeholder="Enter challan number"
+                        aria-invalid={Boolean(challanNumberError)}
+                        className={`w-full text-xs font-mono font-bold text-slate-900 border rounded-lg px-3 py-2 bg-slate-50 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-lavender-600 focus:border-transparent transition placeholder:font-normal placeholder:text-slate-400 ${challanNumberError ? 'border-rose-500' : 'border-slate-300'}`}
                       />
+                      {challanNumberError && (
+                        <p role="alert" className="mt-1 text-[11px] font-semibold text-rose-600">{challanNumberError}</p>
+                      )}
                     </div>
                   </div>
 
@@ -1009,7 +1066,7 @@ export default function DyeingMyWorkPage() {
                         value={challanDate}
                         onChange={(e) => setChallanDate(e.target.value)}
                         required
-                        className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-purple-600 focus:border-transparent transition"
+                        className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-lavender-600 focus:border-transparent transition"
                       />
                     </div>
                   </div>
@@ -1029,16 +1086,16 @@ export default function DyeingMyWorkPage() {
                     </div>
                   </div>
 
-                  {/* 4. DESTINATION (QC1) */}
+                  {/* 4. DESTINATION (Dyeing QC) */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
                     <label className="text-xs font-bold text-slate-700 sm:text-right sm:pr-4">
-                      Destination (QC1)
+                      Destination (Dyeing QC)
                     </label>
                     <div className="sm:col-span-2 max-w-lg">
                       <div className="w-full text-xs font-semibold text-slate-800 border border-slate-200 rounded-lg px-3 py-2 bg-slate-100 flex items-center justify-between">
                         <span>{destDept} (Quality Check 1)</span>
                         <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded uppercase">
-                          QC1
+                          Dyeing QC
                         </span>
                       </div>
                     </div>
@@ -1053,7 +1110,7 @@ export default function DyeingMyWorkPage() {
                       <select
                         value={priority}
                         onChange={(e) => setPriority(e.target.value)}
-                        className="w-full text-xs font-semibold border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-purple-600 focus:border-transparent transition cursor-pointer"
+                        className="w-full text-xs font-semibold border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-lavender-600 focus:border-transparent transition cursor-pointer"
                       >
                         <option value="NORMAL">NORMAL</option>
                         <option value="HIGH">HIGH</option>
@@ -1073,7 +1130,7 @@ export default function DyeingMyWorkPage() {
                         type="date"
                         value={deliveryDate}
                         onChange={(e) => setDeliveryDate(e.target.value)}
-                        className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-purple-600 focus:border-transparent transition"
+                        className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-lavender-600 focus:border-transparent transition"
                       />
                     </div>
                   </div>
@@ -1088,7 +1145,7 @@ export default function DyeingMyWorkPage() {
                         type="text"
                         value={designNumber}
                         onChange={(e) => setDesignNumber(e.target.value)}
-                        className="w-full text-xs font-mono font-medium text-slate-900 border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-purple-600 focus:border-transparent transition"
+                        className="w-full text-xs font-mono font-medium text-slate-900 border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-lavender-600 focus:border-transparent transition"
                       />
                     </div>
                   </div>
@@ -1106,7 +1163,7 @@ export default function DyeingMyWorkPage() {
                           if (ord) selectOrderForForm(ord);
                         }}
                         required
-                        className="w-full text-xs font-mono font-bold text-slate-900 border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-purple-600 focus:border-transparent transition cursor-pointer"
+                        className="w-full text-xs font-mono font-bold text-slate-900 border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-lavender-600 focus:border-transparent transition cursor-pointer"
                       >
                         <option value="">Select Serial Number / Production Sheet</option>
                         {orders.map((ord) => (
@@ -1118,12 +1175,22 @@ export default function DyeingMyWorkPage() {
                     </div>
                   </div>
 
+                  {selectedOrder?.inboundChallan && (
+                    <DyeingInstructions
+                      challanNumber={selectedOrder.inboundChallan.challanNumber}
+                      productionSheetNumber={selectedOrder.program?.programSerialNo || selectedOrder.program?.programNumber}
+                      fabricType={selectedOrder.fabricType || selectedOrder.program?.fabricType}
+                      lines={selectedOrder.inboundChallan.items || []}
+                      highlightLineId={selectedOrder.inboundChallanItemId}
+                    />
+                  )}
+
                   {/* 9. COLOR / FABRIC / MEASUREMENT (Universal Item Component with In/Cut/Out Tracking) */}
                   <div className="pt-3 border-t border-slate-200">
                     <ColorFabricMeasurementTable
                       items={items}
                       onChange={setItems}
-                      context="DYEING_QC1"
+                      context="DYEING_TO_DYEING_QC"
                       programId={selectedOrder?.programId}
                       currentDepartment="DYEING"
                       tracking={dyeingTracking}
@@ -1143,14 +1210,14 @@ export default function DyeingMyWorkPage() {
                         value={dyeingInchargeName}
                         onChange={(e) => setDyeingInchargeName(e.target.value)}
                         placeholder=""
-                        className="w-full text-xs font-medium border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-purple-600 focus:border-transparent transition"
+                        className="w-full text-xs font-medium border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-lavender-600 focus:border-transparent transition"
                       />
                       <input
                         type="text"
                         value={dyeingInchargeContact}
                         onChange={(e) => setDyeingInchargeContact(e.target.value)}
                         placeholder=""
-                        className="w-full text-xs font-mono border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-purple-600 focus:border-transparent transition"
+                        className="w-full text-xs font-mono border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-lavender-600 focus:border-transparent transition"
                       />
                     </div>
                   </div>
@@ -1168,7 +1235,7 @@ export default function DyeingMyWorkPage() {
                     ) : (
                       <Send className="w-4 h-4" />
                     )}
-                    <span>{submittingChallan ? 'Dispatching to QC1...' : 'Submit Challan to QC1'}</span>
+                    <span>{submittingChallan ? 'Dispatching to Dyeing QC...' : 'Submit Challan to Dyeing QC'}</span>
                   </button>
                 </div>
               </form>
@@ -1180,130 +1247,11 @@ export default function DyeingMyWorkPage() {
         {/* TAB 3: DYEING DEFECTIVE SHELF (DEF-SHELF-DYEING)               */}
         {/* ============================================================== */}
         {activeTab === 'defective-shelf' && (
-          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 gap-3">
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-rose-600 block">
-                  DEPARTMENT ISOLATION SHELF
-                </span>
-                <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                  <Archive className="w-5 h-5 text-rose-600" />
-                  <span>Dyeing Defective Shelf (DEF-SHELF-DYEING)</span>
-                </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Segregated rolls, cuts, and patches rejected during dyeing. Automatically recorded in the Fabric Store Master Defective Shelf (DEF-SHELF-CENTRAL).
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-500 font-mono">
-                  Shelf Code: <strong className="text-rose-700 bg-rose-50 px-2.5 py-1 rounded border border-rose-200">DEF-SHELF-DYEING</strong>
-                </span>
-              </div>
-            </div>
-
-            {/* STAT CARDS */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="p-4 bg-rose-50/70 border border-rose-200 rounded-xl space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-rose-800">
-                  Total Dyeing Defective Cut
-                </span>
-                <div className="text-2xl font-mono font-bold text-rose-900">
-                  {dyeingDefects.reduce((acc, c) => acc + (Number(c.defectivePieces) || 0), 0)} MTR / PCS
-                </div>
-                <span className="text-[10px] text-rose-600">
-                  Quarantined from QC1 handover
-                </span>
-              </div>
-
-              <div className="p-4 bg-purple-50/70 border border-purple-200 rounded-xl space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-purple-800">
-                  Fabric Store Master Sync
-                </span>
-                <div className="text-base font-bold text-purple-900 flex items-center gap-1.5 mt-1">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <span>Auto-Synced with Central Store</span>
-                </div>
-                <span className="text-[10px] text-purple-700">
-                  Visible in Fabric Store DEF-SHELF-CENTRAL
-                </span>
-              </div>
-
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600">
-                  Logged Incidents
-                </span>
-                <div className="text-2xl font-mono font-bold text-slate-900">
-                  {dyeingDefects.length} Incidents
-                </div>
-                <span className="text-[10px] text-slate-500">
-                  Audited zero-loss accounting
-                </span>
-              </div>
-            </div>
-
-            {/* DEFECT LIST TABLE */}
-            {dyeingDefects.length === 0 ? (
-              <div className="p-16 text-center space-y-3 border border-dashed border-slate-200 rounded-xl">
-                <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />
-                <p className="text-sm font-semibold text-slate-800">Dyeing Defective Shelf is Clean</p>
-                <p className="text-xs text-slate-500 max-w-md mx-auto">
-                  No defective fabric cuts or dyeing rejections are currently logged on DEF-SHELF-DYEING.
-                </p>
-              </div>
-            ) : (
-              <div className="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200 uppercase text-[10px]">
-                    <tr>
-                      <th className="py-2.5 px-3">Challan #</th>
-                      <th className="py-2.5 px-3">Sheet / Style</th>
-                      <th className="py-2.5 px-3 text-center">Defective Volume</th>
-                      <th className="py-2.5 px-3">Station Defective Shelf</th>
-                      <th className="py-2.5 px-3">Defect Reason</th>
-                      <th className="py-2.5 px-3">Date</th>
-                      <th className="py-2.5 px-3 text-right">Audit</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {dyeingDefects.map((ch) => (
-                      <tr key={ch.id} className="hover:bg-rose-50/30 transition">
-                        <td className="py-3 px-3 font-mono font-bold text-slate-900">
-                          {ch.challanNumber}
-                        </td>
-                        <td className="py-3 px-3">
-                          <span className="font-semibold text-slate-800 block">
-                            {ch.program?.mainStyle || ch.program?.clientName || 'General Style'}
-                          </span>
-                          <span className="text-[10px] font-mono text-purple-700">
-                            Sheet: {ch.program?.programSerialNo || ch.program?.programNumber || '—'}
-                          </span>
-                        </td>
-                        <td className="py-3 px-3 text-center font-mono font-bold text-rose-700 text-sm">
-                          {ch.defectivePieces || 0} {ch.fabricUnit || 'MTR'}
-                        </td>
-                        <td className="py-3 px-3">
-                          <span className="px-2 py-0.5 rounded font-mono text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
-                            {ch.defectiveShelfLocation || 'DEF-SHELF-DYEING'}
-                          </span>
-                        </td>
-                        <td className="py-3 px-3 text-slate-700 max-w-xs">
-                          <div className="font-semibold text-[11px]">{ch.defectReason || 'Shade Variation'}</div>
-                          <p className="truncate text-[10px] text-slate-500">{ch.remarks || '—'}</p>
-                        </td>
-                        <td className="py-3 px-3 text-slate-600 font-mono text-[11px]">
-                          {new Date(ch.createdAt).toLocaleDateString('en-GB')}
-                        </td>
-                        <td className="py-3 px-3 text-right">
-                          <DocumentActionButtons program={ch.program} challan={ch} size="xs" />
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
+          <DepartmentDefectiveShelfWidget
+            department="DYEING"
+            shelfCode="DEF-SHELF-DYEING"
+            accentColor="purple"
+          />
         )}
 
         {/* ============================================================== */}
@@ -1403,7 +1351,7 @@ export default function DyeingMyWorkPage() {
                     <option value="IN_DYEING">IN_DYEING</option>
                     <option value="PARTIALLY_DYED">PARTIALLY_DYED</option>
                     <option value="DYED">DYED</option>
-                    <option value="READY_FOR_QC1">READY_FOR_QC1</option>
+                    <option value="READY_FOR_DYEING_QC">READY_FOR_DYEING_QC</option>
                   </select>
                 </div>
 
@@ -1436,6 +1384,44 @@ export default function DyeingMyWorkPage() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL 3: DYEING INSTRUCTIONS FOR AN INCOMING CHALLAN */}
+        {instructionsOrder?.inboundChallan && (
+          <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-2xs flex items-center justify-center p-4" role="dialog" aria-modal="true">
+            <div className="bg-white rounded-2xl max-w-4xl w-full p-5 shadow-2xl border border-slate-200 space-y-4 max-h-[92vh] overflow-y-auto">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                <div>
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-purple-700">Incoming challan from {instructionsOrder.inboundChallan.fromDepartment}</div>
+                  <h3 className="text-sm font-bold text-slate-900">
+                    {instructionsOrder.inboundChallan.challanNumber} &middot; {instructionsOrder.program?.programSerialNo || instructionsOrder.program?.programNumber}
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setInstructionsOrder(null)}
+                  className="p-1 text-slate-400 hover:text-slate-700 rounded-md"
+                  aria-label="Close"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <DyeingInstructions
+                challanNumber={instructionsOrder.inboundChallan.challanNumber}
+                productionSheetNumber={instructionsOrder.program?.programSerialNo || instructionsOrder.program?.programNumber}
+                fabricType={instructionsOrder.fabricType || instructionsOrder.program?.fabricType}
+                lines={instructionsOrder.inboundChallan.items || []}
+                highlightLineId={instructionsOrder.inboundChallanItemId}
+              />
+              <div className="flex justify-end">
+                <DocumentActionButtons
+                  program={instructionsOrder.program}
+                  challan={{ ...instructionsOrder.inboundChallan, programId: instructionsOrder.programId }}
+                  size="sm"
+                />
+              </div>
             </div>
           </div>
         )}

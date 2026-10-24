@@ -67,11 +67,11 @@ export default function RecuttingReportsPage() {
   const defectRecords = data?.defectRecords || [];
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] pb-16">
+    <div className="min-h-screen bg-ink-50 pb-16">
       {/* HEADER */}
       <header
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundImage: `linear-gradient(to right, rgba(37, 35, 42, 0.88), rgba(37, 35, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -104,7 +104,7 @@ export default function RecuttingReportsPage() {
             </button>
             <Link
               href="/recutting/my-work"
-              className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-bold transition shadow-xs flex items-center gap-1.5"
+              className="px-3 py-1.5 bg-lavender-600 hover:bg-lavender-500 text-white rounded-lg text-xs font-bold transition shadow-xs flex items-center gap-1.5"
             >
               <Scissors className="w-3.5 h-3.5" />
               <span>Cutting Queue</span>
@@ -127,14 +127,14 @@ export default function RecuttingReportsPage() {
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender-500"
             />
             <span className="text-xs text-slate-400">to</span>
             <input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender-500"
             />
             {(startDate || endDate) && (
               <button
@@ -239,7 +239,7 @@ export default function RecuttingReportsPage() {
                     return (
                       <tr key={idx} className="hover:bg-slate-50/60 transition">
                         <td className="px-4 py-3 font-semibold text-slate-900">{d.designNumber}</td>
-                        <td className="px-4 py-3 font-mono font-bold text-rose-700">{d.wilcomDesignNumber}</td>
+                        <td className="px-4 py-3 font-mono font-bold text-lavender-700">{d.wilcomDesignNumber}</td>
                         <td className="px-4 py-3">{d.clientName}</td>
                         <td className="px-4 py-3 text-right font-medium">{d.totalInput}</td>
                         <td className="px-4 py-3 text-right font-bold text-emerald-700">{d.totalGood}</td>
@@ -258,7 +258,7 @@ export default function RecuttingReportsPage() {
         <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
           <div className="px-5 py-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <User className="w-4 h-4 text-rose-600" />
+              <User className="w-4 h-4 text-lavender-600" />
               <h2 className="text-xs font-bold text-slate-800 uppercase tracking-wide">
                 Operator Throughput & Accuracy
               </h2>

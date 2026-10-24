@@ -3,8 +3,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronDown, Building2, Check, ExternalLink, ShieldCheck } from 'lucide-react';
-import { isAdminUser, getCurrentUser } from '@/lib/rbac';
+import { ChevronDown, Building2, Check, ExternalLink, ShieldCheck, Archive } from 'lucide-react';
+import { isAdminUser, getCurrentUser, isFabricStoreUser } from '@/lib/rbac';
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 
 export interface DepartmentSwitcherProps {
@@ -18,21 +18,21 @@ const DEPARTMENTS = [
     name: 'Programming Department',
     code: 'PROGRAMMING',
     href: '/programming',
-    color: 'amber',
+    color: 'purple',
     badge: 'PRG',
-    dotClass: 'bg-amber-400',
-    hoverClass: 'hover:bg-amber-500/10 hover:text-amber-300',
-    activeBg: 'bg-amber-500/15 text-amber-300 font-bold',
+    dotClass: 'bg-lavender-400',
+    hoverClass: 'hover:bg-lavender-500/10 hover:text-lavender-300',
+    activeBg: 'bg-lavender-500/15 text-lavender-300 font-bold',
   },
   {
     name: 'Store Department',
     code: 'STORE',
     href: '/fabric-store',
-    color: 'teal',
+    color: 'purple',
     badge: 'STR',
-    dotClass: 'bg-teal-400',
-    hoverClass: 'hover:bg-teal-500/10 hover:text-teal-300',
-    activeBg: 'bg-teal-500/15 text-teal-300 font-bold',
+    dotClass: 'bg-lavender-400',
+    hoverClass: 'hover:bg-lavender-500/10 hover:text-lavender-300',
+    activeBg: 'bg-lavender-500/15 text-lavender-300 font-bold',
   },
   {
     name: 'Dyeing Department',
@@ -40,119 +40,129 @@ const DEPARTMENTS = [
     href: '/dyeing',
     color: 'purple',
     badge: 'DYE',
-    dotClass: 'bg-purple-400',
-    hoverClass: 'hover:bg-purple-500/10 hover:text-purple-300',
-    activeBg: 'bg-purple-500/15 text-purple-300 font-bold',
+    dotClass: 'bg-lavender-400',
+    hoverClass: 'hover:bg-lavender-500/10 hover:text-lavender-300',
+    activeBg: 'bg-lavender-500/15 text-lavender-300 font-bold',
   },
   {
     name: 'Dyeing QC',
-    code: 'QC1',
-    href: '/qc1',
-    color: 'emerald',
-    badge: 'QC1',
-    dotClass: 'bg-emerald-400',
-    hoverClass: 'hover:bg-emerald-500/10 hover:text-emerald-300',
-    activeBg: 'bg-emerald-500/15 text-emerald-300 font-bold',
+    code: 'DYEING_QC',
+    href: '/dyeing-qc',
+    color: 'purple',
+    badge: 'DYEING_QC',
+    dotClass: 'bg-lavender-400',
+    hoverClass: 'hover:bg-lavender-500/10 hover:text-lavender-300',
+    activeBg: 'bg-lavender-500/15 text-lavender-300 font-bold',
   },
   {
     name: 'Embroidery Department',
     code: 'EMBROIDERY',
     href: '/embroidery',
-    color: 'fuchsia',
+    color: 'purple',
     badge: 'EMB',
-    dotClass: 'bg-fuchsia-400',
-    hoverClass: 'hover:bg-fuchsia-500/10 hover:text-fuchsia-300',
-    activeBg: 'bg-fuchsia-500/15 text-fuchsia-300 font-bold',
+    dotClass: 'bg-lavender-400',
+    hoverClass: 'hover:bg-lavender-500/10 hover:text-lavender-300',
+    activeBg: 'bg-lavender-500/15 text-lavender-300 font-bold',
   },
   {
     name: 'Thread Cutting Department',
     code: 'THREAD_CUTTING',
     href: '/thread-cutting',
-    color: 'cyan',
+    color: 'purple',
     badge: 'THC',
-    dotClass: 'bg-cyan-400',
-    hoverClass: 'hover:bg-cyan-500/10 hover:text-cyan-300',
-    activeBg: 'bg-cyan-500/15 text-cyan-300 font-bold',
+    dotClass: 'bg-lavender-400',
+    hoverClass: 'hover:bg-lavender-500/10 hover:text-lavender-300',
+    activeBg: 'bg-lavender-500/15 text-lavender-300 font-bold',
   },
   {
-    name: 'QC2 Department',
-    code: 'QC2',
-    href: '/qc2',
-    color: 'emerald',
-    badge: 'QC2',
-    dotClass: 'bg-emerald-400',
-    hoverClass: 'hover:bg-emerald-500/10 hover:text-emerald-300',
-    activeBg: 'bg-emerald-500/15 text-emerald-300 font-bold',
+    name: 'Threadcut QC',
+    code: 'THREADCUT_QC',
+    href: '/threadcut-qc',
+    color: 'purple',
+    badge: 'THREADCUT_QC',
+    dotClass: 'bg-lavender-400',
+    hoverClass: 'hover:bg-lavender-500/10 hover:text-lavender-300',
+    activeBg: 'bg-lavender-500/15 text-lavender-300 font-bold',
   },
   {
     name: 'Washing Department',
     code: 'WASHING',
     href: '/washing',
-    color: 'teal',
+    color: 'purple',
     badge: 'WSH',
-    dotClass: 'bg-sky-400',
-    hoverClass: 'hover:bg-sky-500/10 hover:text-sky-300',
-    activeBg: 'bg-sky-500/15 text-sky-300 font-bold',
+    dotClass: 'bg-lavender-400',
+    hoverClass: 'hover:bg-lavender-500/10 hover:text-lavender-300',
+    activeBg: 'bg-lavender-500/15 text-lavender-300 font-bold',
   },
   {
-    name: 'QC Washing',
-    code: 'QC3',
-    href: '/qcwashing',
-    color: 'emerald',
+    name: 'Washing QC',
+    code: 'WASHING_QC',
+    href: '/washing-qc',
+    color: 'purple',
     badge: 'QCW',
-    dotClass: 'bg-emerald-400',
-    hoverClass: 'hover:bg-emerald-500/10 hover:text-emerald-300',
-    activeBg: 'bg-emerald-500/15 text-emerald-300 font-bold',
+    dotClass: 'bg-lavender-400',
+    hoverClass: 'hover:bg-lavender-500/10 hover:text-lavender-300',
+    activeBg: 'bg-lavender-500/15 text-lavender-300 font-bold',
   },
   {
     name: 'Recutting Department',
     code: 'RECUTTING',
     href: '/recutting',
-    color: 'emerald',
+    color: 'purple',
     badge: 'REC',
-    dotClass: 'bg-rose-400',
-    hoverClass: 'hover:bg-rose-500/10 hover:text-rose-300',
-    activeBg: 'bg-rose-500/15 text-rose-300 font-bold',
+    dotClass: 'bg-lavender-400',
+    hoverClass: 'hover:bg-lavender-500/10 hover:text-lavender-300',
+    activeBg: 'bg-lavender-500/15 text-lavender-300 font-bold',
   },
   {
     name: 'Stitching & Assembly',
     code: 'STITCHING',
     href: '/stitching',
-    color: 'indigo',
+    color: 'purple',
     badge: 'STC',
-    dotClass: 'bg-indigo-400',
-    hoverClass: 'hover:bg-indigo-500/10 hover:text-indigo-300',
-    activeBg: 'bg-indigo-500/15 text-indigo-300 font-bold',
+    dotClass: 'bg-lavender-400',
+    hoverClass: 'hover:bg-lavender-500/10 hover:text-lavender-300',
+    activeBg: 'bg-lavender-500/15 text-lavender-300 font-bold',
   },
   {
     name: 'Finishing Department',
     code: 'FINISHING',
     href: '/finishing',
-    color: 'teal',
+    color: 'purple',
     badge: 'FIN',
-    dotClass: 'bg-teal-400',
-    hoverClass: 'hover:bg-teal-500/10 hover:text-teal-300',
-    activeBg: 'bg-teal-500/15 text-teal-300 font-bold',
+    dotClass: 'bg-lavender-400',
+    hoverClass: 'hover:bg-lavender-500/10 hover:text-lavender-300',
+    activeBg: 'bg-lavender-500/15 text-lavender-300 font-bold',
   },
   {
     name: 'Steam Press Department',
     code: 'STEAM_PRESS',
     href: '/steam-press',
-    color: 'cyan',
+    color: 'purple',
     badge: 'STP',
-    dotClass: 'bg-cyan-400',
-    hoverClass: 'hover:bg-cyan-500/10 hover:text-cyan-300',
-    activeBg: 'bg-cyan-500/15 text-cyan-300 font-bold',
+    dotClass: 'bg-lavender-400',
+    hoverClass: 'hover:bg-lavender-500/10 hover:text-lavender-300',
+    activeBg: 'bg-lavender-500/15 text-lavender-300 font-bold',
   },
   {
     name: 'Final QC Department',
-    code: 'FINAL_CHECK',
-    href: '/final-check',
-    color: 'emerald',
+    code: 'FINAL_QC',
+    href: '/final-qc',
+    color: 'purple',
     badge: 'FQC',
-    dotClass: 'bg-emerald-400',
-    hoverClass: 'hover:bg-emerald-500/10 hover:text-emerald-300',
-    activeBg: 'bg-emerald-500/15 text-emerald-300 font-bold',
+    dotClass: 'bg-lavender-400',
+    hoverClass: 'hover:bg-lavender-500/10 hover:text-lavender-300',
+    activeBg: 'bg-lavender-500/15 text-lavender-300 font-bold',
+  },
+  {
+    name: 'Packing Department',
+    code: 'PACKING',
+    href: '/packing',
+    color: 'purple',
+    badge: 'PCK',
+    dotClass: 'bg-lavender-400',
+    hoverClass: 'hover:bg-lavender-500/10 hover:text-lavender-300',
+    activeBg: 'bg-lavender-500/15 text-lavender-300 font-bold',
   },
 ];
 
@@ -198,37 +208,22 @@ export function DepartmentSwitcher({
 
   const activeUser = currentUser || (typeof window !== 'undefined' ? getCurrentUser() : null);
   const isAdmin = isAdminUser(activeUser);
+  const departmentCode = String(activeUser?.departmentCode || '').toUpperCase();
+  const hasDepartmentShelf = [
+    'DYEING', 'DYEING_QC', 'EMBROIDERY', 'THREAD_CUTTING', 'THREADCUT_QC', 'WASHING', 'WASHING_QC', 'RECUTTING', 'STITCHING', 'FINISHING', 'STEAM_PRESS', 'FINAL_QC', 'PACKING',
+  ].includes(departmentCode);
 
-  const getAccentText = () => {
-    switch (accentColor) {
-      case 'teal':
-        return 'text-teal-400';
-      case 'purple':
-        return 'text-purple-400';
-      case 'emerald':
-        return 'text-emerald-400';
-      case 'fuchsia':
-        return 'text-fuchsia-400';
-      case 'indigo':
-        return 'text-indigo-400';
-      case 'cyan':
-        return 'text-cyan-400';
-      case 'rose':
-        return 'text-rose-400';
-      case 'amber':
-      default:
-        return 'text-amber-400';
-    }
-  };
+  // Every department shares the MES theme, so the active station is always shown in brand lavender.
+  const getAccentText = () => 'text-lavender-300';
 
   // If user is NOT an Admin: Department incharge can ONLY see their assigned department.
   // No other departments can be seen or opened.
   if (!isAdmin) {
     return (
-      <div className="relative w-full">
+      <div className="relative w-full space-y-1.5">
         <div
           style={{
-            backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.40), rgba(15, 23, 42, 0.45)), url('${bgImage}')`,
+            backgroundImage: `linear-gradient(to right, rgba(37, 35, 42, 0.40), rgba(37, 35, 42, 0.45)), url('${bgImage}')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}
@@ -247,6 +242,30 @@ export function DepartmentSwitcher({
             <span className="tracking-wide">ASSIGNED</span>
           </div>
         </div>
+        {hasDepartmentShelf && (
+          <Link
+            href="/department-defective-shelf"
+            onClick={() => onNavigate?.()}
+            className={`flex items-center gap-2.5 rounded-lg border px-3 py-2 text-[11px] font-semibold transition ${
+              typeof window !== 'undefined' && window.location.pathname === '/department-defective-shelf'
+                ? 'border-rose-500/50 bg-rose-500/15 text-rose-200'
+                : 'border-slate-700/70 text-slate-300 hover:bg-slate-800/70 hover:text-white'
+            }`}
+          >
+            <Archive className="h-3.5 w-3.5 text-rose-300" />
+            <span>My Department Defective Shelf</span>
+          </Link>
+        )}
+        {isFabricStoreUser(activeUser) && (
+          <Link
+            href="/fabric-store/inventory/defected-shelf"
+            onClick={() => onNavigate?.()}
+            className="flex items-center gap-2.5 rounded-lg border border-purple-500/30 bg-purple-500/10 px-3 py-2 text-[11px] font-semibold text-purple-200 transition hover:bg-purple-500/20"
+          >
+            <Archive className="h-3.5 w-3.5" />
+            <span>Central Defective Shelf Dashboard</span>
+          </Link>
+        )}
       </div>
     );
   }
@@ -258,7 +277,7 @@ export function DepartmentSwitcher({
         type="button"
         onClick={() => setOpen(!open)}
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.40), rgba(15, 23, 42, 0.45)), url('${bgImage}')`,
+          backgroundImage: `linear-gradient(to right, rgba(37, 35, 42, 0.40), rgba(37, 35, 42, 0.45)), url('${bgImage}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -272,7 +291,7 @@ export function DepartmentSwitcher({
             <span className="text-[9px] font-bold text-slate-200 uppercase tracking-widest block leading-tight drop-shadow-sm">
               Active Station
             </span>
-            <span className="text-[8px] font-bold uppercase tracking-widest px-1 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">
+            <span className="text-[8px] font-bold uppercase tracking-widest px-1 py-0.2 rounded bg-lavender-500/20 text-lavender-300 border border-lavender-500/40">
               Admin
             </span>
           </div>
@@ -288,7 +307,7 @@ export function DepartmentSwitcher({
       {open && (
         <div
           style={{
-            backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.70), rgba(15, 23, 42, 0.85)), url('${bgImage}')`,
+            backgroundImage: `linear-gradient(to bottom, rgba(37, 35, 42, 0.70), rgba(37, 35, 42, 0.85)), url('${bgImage}')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}
@@ -296,12 +315,12 @@ export function DepartmentSwitcher({
         >
           <div className="px-3 py-1.5 flex items-center justify-between border-b border-slate-800">
             <div className="flex items-center gap-1.5">
-              <ShieldCheck className="w-3 h-3 text-amber-400" />
+              <ShieldCheck className="w-3 h-3 text-lavender-400" />
               <span className="text-[9px] font-bold uppercase tracking-widest text-slate-300">
                 MES Departments
               </span>
             </div>
-            <span className="text-[9px] text-amber-400/90 font-mono font-semibold">ALL ACCESS</span>
+            <span className="text-[9px] text-lavender-400/90 font-mono font-semibold">ALL ACCESS</span>
           </div>
 
           <div className="p-1 space-y-0.5 max-h-[300px] overflow-y-auto">

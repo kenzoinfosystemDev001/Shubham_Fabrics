@@ -138,11 +138,11 @@ export default function ProductionHistoryPage() {
   const dyeingCount = programs.filter((p) => p.fabricDyeingRequired).length;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pl-0 md:pl-64 pb-16">
+    <div className="min-h-screen bg-ink-50 pl-0 md:pl-64 pb-16">
       {/* HEADER BAR */}
       <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A66E22] block">
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-lavender-700 block">
             PROGRAMMING DEPARTMENT · ARCHIVE &amp; TRACEABILITY
           </span>
           <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
@@ -164,7 +164,7 @@ export default function ProductionHistoryPage() {
 
           <Link
             href="/my-work/create-production-sheet"
-            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#163767] hover:bg-[#0F264A] text-white text-xs font-semibold rounded-md shadow-xs transition"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-lavender-800 hover:bg-lavender-900 text-white text-xs font-semibold rounded-md shadow-xs transition"
           >
             <span>+ New Sheet</span>
           </Link>
@@ -189,7 +189,7 @@ export default function ProductionHistoryPage() {
               Active In Plant
             </span>
             <p className="text-2xl font-bold text-blue-600 mt-1">{inProductionCount}</p>
-            <span className="text-[10px] text-slate-400 mt-0.5 block">Store / Dyeing / QC1</span>
+            <span className="text-[10px] text-slate-400 mt-0.5 block">Store / Dyeing / Dyeing QC</span>
           </div>
 
           <div className="bg-white border border-slate-200/90 rounded-lg p-3.5 shadow-xs">
@@ -219,7 +219,7 @@ export default function ProductionHistoryPage() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-9 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#163767]"
+                className="w-full pl-9 pr-9 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-lavender-800"
               />
               {searchQuery && (
                 <button
@@ -474,7 +474,7 @@ export default function ProductionHistoryPage() {
                             <span>Challans Lifecycle Trail for {prog.programSerialNo || prog.programNumber}</span>
                           </span>
                           <span className="text-[11px] text-slate-500">
-                            Flow: Programming $\rightarrow$ Fabric Store $\rightarrow$ Dyeing $\rightarrow$ QC1
+                            Flow: Programming $\rightarrow$ Fabric Store $\rightarrow$ Dyeing $\rightarrow$ Dyeing QC
                           </span>
                         </div>
 

@@ -29,10 +29,12 @@ import {
   Scissors,
   Pause,
   Play,
+  Archive,
 } from 'lucide-react';
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
+import { DepartmentDefectiveShelfWidget } from '@/components/DepartmentDefectiveShelfWidget';
 
 function StitchingWorkstationContent() {
   const searchParams = useSearchParams();
@@ -47,6 +49,7 @@ function StitchingWorkstationContent() {
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<string>(initialTab);
+  const [activeView, setActiveView] = useState<'WORKSTATION' | 'DEFECTIVE_SHELF'>('WORKSTATION');
 
   // Modals
   const [showTechSheet, setShowTechSheet] = useState(false);
@@ -69,7 +72,7 @@ function StitchingWorkstationContent() {
   const [completeRejectQty, setCompleteRejectQty] = useState(0);
   const [completeBalanceQty, setCompleteBalanceQty] = useState(0);
   const [completeNotes, setCompleteNotes] = useState('');
-  const [completeDefectReason, setCompleteDefectReason] = useState('Sewing needle cut / seam slippage');
+  const [completeDefectReason, setCompleteDefectReason] = useState('');
   const [autoInspect, setAutoInspect] = useState(false);
 
   // Quality Inspection Modal
@@ -228,6 +231,7 @@ function StitchingWorkstationContent() {
     setCompleteReworkQty(0);
     setCompleteRejectQty(0);
     setCompleteBalanceQty(0);
+    setCompleteDefectReason('');
     setCompleteNotes('Assembly completed according to technical specifications and size chart.');
     setAutoInspect(false);
     setCompleteError('');
@@ -353,11 +357,11 @@ function StitchingWorkstationContent() {
   }, [jobs, activeTab, searchQuery]);
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-ink-950 text-slate-100 flex flex-col">
       {/* HEADER HERO */}
       <div
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.85)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundImage: `linear-gradient(to right, rgba(37, 35, 42, 0.95), rgba(37, 35, 42, 0.85)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -378,6 +382,18 @@ function StitchingWorkstationContent() {
 
           <div className="flex items-center gap-3">
             <button
+              onClick={() => setActiveView(activeView === 'DEFECTIVE_SHELF' ? 'WORKSTATION' : 'DEFECTIVE_SHELF')}
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition border ${
+                activeView === 'DEFECTIVE_SHELF'
+                  ? 'bg-rose-600 text-white border-rose-500 shadow-md'
+                  : 'bg-slate-800 text-rose-300 hover:text-white hover:bg-slate-700 border-slate-700'
+              }`}
+            >
+              <Archive className="w-3.5 h-3.5" />
+              <span>{activeView === 'DEFECTIVE_SHELF' ? 'Back to Workstation' : 'Defective Shelf (DEF-SHELF-STITCHING)'}</span>
+            </button>
+
+            <button
               onClick={() => loadJobs(selectedJob?.id)}
               disabled={loading}
               className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition border border-slate-700 disabled:opacity-50"
@@ -388,7 +404,7 @@ function StitchingWorkstationContent() {
 
             <Link
               href="/stitching/issue-challan"
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition shadow-md"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-lavender-600 hover:bg-emerald-500 text-white font-semibold text-xs transition shadow-md"
             >
               <Send className="w-3.5 h-3.5" />
               <span>Issue Handover Challan</span>
@@ -397,8 +413,18 @@ function StitchingWorkstationContent() {
         </div>
       </div>
 
-      {/* WORKSTATION DUAL PANEL */}
-      <div className="max-w-7xl mx-auto w-full p-4 md:p-6 flex-1 flex flex-col lg:flex-row gap-6">
+      {/* WORKSTATION CONTENT OR DEFECTIVE SHELF */}
+      {activeView === 'DEFECTIVE_SHELF' ? (
+        <div className="max-w-7xl mx-auto w-full p-4 md:p-6 flex-1">
+          <DepartmentDefectiveShelfWidget
+            department="STITCHING"
+            shelfCode="DEF-SHELF-STITCHING"
+            accentColor="rose"
+          />
+        </div>
+      ) : (
+        /* WORKSTATION DUAL PANEL */
+        <div className="max-w-7xl mx-auto w-full p-4 md:p-6 flex-1 flex flex-col lg:flex-row gap-6">
         {/* LEFT COLUMN: JOB QUEUE */}
         <div className="w-full lg:w-96 flex flex-col gap-3 shrink-0">
           {/* SEARCH & STATUS TABS */}
@@ -410,7 +436,7 @@ function StitchingWorkstationContent() {
                 placeholder="Search style, program, challan..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-slate-950/80 border border-slate-800 rounded-lg pl-9 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                className="w-full bg-slate-950/80 border border-slate-800 rounded-lg pl-9 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-lavender-500"
               />
             </div>
 
@@ -449,7 +475,7 @@ function StitchingWorkstationContent() {
                     onClick={() => setSelectedJob(j)}
                     className={`p-3.5 rounded-xl border transition cursor-pointer flex flex-col justify-between gap-2.5 ${
                       isSelected
-                        ? 'bg-indigo-950/30 border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.15)]'
+                        ? 'bg-indigo-950/30 border-indigo-500 shadow-[0_0_15px_rgba(181,126,220,0.15)]'
                         : 'bg-slate-900/60 border-slate-800 hover:border-slate-700'
                     }`}
                   >
@@ -658,7 +684,7 @@ function StitchingWorkstationContent() {
                   {selectedJob.status === 'IN_PROCESS' && (
                     <button
                       onClick={openCompleteModal}
-                      className="px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow-md flex items-center gap-1.5"
+                      className="px-5 py-2 rounded-lg bg-lavender-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow-md flex items-center gap-1.5"
                     >
                       <CheckCircle2 className="w-4 h-4" />
                       <span>Record Production Output</span>
@@ -680,7 +706,7 @@ function StitchingWorkstationContent() {
                   {(selectedJob.status === 'READY_FOR_HANDOVER' || selectedJob.status === 'READY_FOR_FINISHING') && (
                     <Link
                       href={`/stitching/issue-challan?jobId=${selectedJob.id}`}
-                      className="px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow-md flex items-center gap-1.5"
+                      className="px-5 py-2 rounded-lg bg-lavender-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow-md flex items-center gap-1.5"
                     >
                       <Send className="w-4 h-4" />
                       <span>Issue Finishing Handover Challan</span>
@@ -696,11 +722,12 @@ function StitchingWorkstationContent() {
           )}
         </div>
       </div>
+      )}
 
       {/* START / ALLOCATION MODAL */}
       {showStartModal && selectedJob && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#0F172A] border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+          <div className="bg-ink-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div className="flex items-center gap-2">
                 <Shirt className="w-5 h-5 text-indigo-400" />
@@ -775,7 +802,7 @@ function StitchingWorkstationContent() {
       {/* OUTPUT RECONCILIATION MODAL */}
       {showCompleteModal && selectedJob && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#0F172A] border border-slate-700 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+          <div className="bg-ink-900 border border-slate-700 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-emerald-400" />
@@ -874,9 +901,9 @@ function StitchingWorkstationContent() {
                     type="text"
                     value={completeDefectReason}
                     onChange={(e) => setCompleteDefectReason(e.target.value)}
+                    required={completeRejectQty > 0}
                     className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white"
                     placeholder="e.g. Needle cut / Oil stain / Seam burst"
-                    required
                   />
                 </div>
               )}
@@ -915,7 +942,7 @@ function StitchingWorkstationContent() {
                 <button
                   type="submit"
                   disabled={!isBalanced || submittingComplete}
-                  className="px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold disabled:opacity-50"
+                  className="px-5 py-2 rounded-lg bg-lavender-600 hover:bg-emerald-500 text-white font-bold disabled:opacity-50"
                 >
                   {submittingComplete ? 'Reconciling...' : 'Confirm Output'}
                 </button>
@@ -928,7 +955,7 @@ function StitchingWorkstationContent() {
       {/* QUALITY INSPECTION MODAL */}
       {showInspectModal && selectedJob && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#0F172A] border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+          <div className="bg-ink-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-purple-400" />

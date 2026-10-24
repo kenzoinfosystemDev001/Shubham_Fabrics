@@ -93,7 +93,7 @@ export function FabricStoreNavigation() {
     const active = exact ? pathname === href : pathname === href || pathname.startsWith(href + '/');
     return `flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition ${
       active
-        ? 'bg-[#1E293B] text-white border-l-2 border-teal-400 pl-2.5 shadow-xs'
+        ? 'bg-ink-800 text-white border-l-2 border-lavender-400 pl-2.5 shadow-xs'
         : 'text-slate-300 hover:bg-slate-800/60 hover:text-white'
     }`;
   };
@@ -102,7 +102,7 @@ export function FabricStoreNavigation() {
     const active = exact ? pathname === href : pathname === href || pathname.startsWith(href + '/');
     return `flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[11px] font-medium transition ${
       active
-        ? 'bg-[#1E293B] text-white border-l-2 border-teal-400 pl-2 shadow-xs'
+        ? 'bg-ink-800 text-white border-l-2 border-lavender-400 pl-2 shadow-xs'
         : 'text-slate-400 hover:bg-slate-800/50 hover:text-white'
     }`;
   };
@@ -126,7 +126,7 @@ export function FabricStoreNavigation() {
   return (
     <>
       {/* MOBILE TOP BAR (visible on screens < md) */}
-      <div className="md:hidden sticky top-0 z-40 bg-[#0F172A] border-b border-slate-800 px-4 py-3 flex items-center justify-between shadow-sm">
+      <div className="md:hidden sticky top-0 z-40 bg-ink-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setMobileOpen(true)}
@@ -136,7 +136,7 @@ export function FabricStoreNavigation() {
             <Menu className="w-6 h-6" />
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-white p-0.5 border border-teal-500/40 flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-white p-0.5 border border-lavender-500/40 flex items-center justify-center shrink-0">
               <img
                 src="/shubham-logo.jpg"
                 alt="Shubham Fabrics"
@@ -145,7 +145,7 @@ export function FabricStoreNavigation() {
             </div>
             <div>
               <span className="text-xs font-bold text-white tracking-wide block leading-none">SHUBHAM FABRICS</span>
-              <span className="text-[9px] font-bold text-teal-400 tracking-wider uppercase block">FABRIC STORE</span>
+              <span className="text-[9px] font-bold text-lavender-400 tracking-wider uppercase block">FABRIC STORE</span>
             </div>
           </div>
         </div>
@@ -170,7 +170,7 @@ export function FabricStoreNavigation() {
       {/* SIDEBAR ASIDE (responsive drawer on mobile, fixed w-64 on md+) */}
       <aside
         style={{
-          backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.40), rgba(10, 15, 29, 0.60)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundImage: `linear-gradient(to bottom, rgba(37, 35, 42, 0.40), rgba(24, 22, 28, 0.60)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -182,7 +182,7 @@ export function FabricStoreNavigation() {
         {/* BRANDING WITH OFFICIAL IMG 3 LOGO */}
         <div className="p-4 border-b border-slate-700/60 bg-slate-950/40 backdrop-blur-sm flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-white p-0.5 border border-teal-500/40 flex items-center justify-center shadow-sm overflow-hidden shrink-0">
+            <div className="w-10 h-10 rounded-lg bg-white p-0.5 border border-lavender-500/40 flex items-center justify-center shadow-sm overflow-hidden shrink-0">
               <img
                 src="/shubham-logo.jpg"
                 alt="Shubham Fabrics Logo"
@@ -191,7 +191,7 @@ export function FabricStoreNavigation() {
             </div>
             <div className="min-w-0">
               <span className="text-xs font-bold tracking-[0.14em] text-white truncate block">SHUBHAM FABRICS</span>
-              <span className="text-[10px] font-medium tracking-[0.18em] text-teal-400 block truncate">MES ENTERPRISE</span>
+              <span className="text-[10px] font-medium tracking-[0.18em] text-lavender-400 block truncate">MES ENTERPRISE</span>
             </div>
           </div>
 
@@ -243,7 +243,7 @@ export function FabricStoreNavigation() {
                   onClick={() => setMobileOpen(false)}
                   className={subLinkClass('/fabric-store/my-work/incoming-challans')}
                 >
-                  <PackageCheck className="w-3.5 h-3.5 text-teal-400" />
+                  <PackageCheck className="w-3.5 h-3.5 text-lavender-400" />
                   <span>Incoming Challans</span>
                 </Link>
                 <Link
@@ -319,7 +319,7 @@ export function FabricStoreNavigation() {
           {/* 6. Total Stock (UNDYED & DYED) */}
           <div>
             <div className="flex items-center gap-3 px-3 py-2">
-              <Layers className="w-4 h-4 text-teal-400" />
+              <Layers className="w-4 h-4 text-lavender-400" />
               <div className="flex-1">
                 {sectionHeader('Total Stock', totalStockOpen, () => setTotalStockOpen(!totalStockOpen), totalStockActive)}
               </div>
@@ -331,7 +331,7 @@ export function FabricStoreNavigation() {
                   onClick={() => setMobileOpen(false)}
                   className={subLinkClass('/fabric-store/inventory/total-stock', true)}
                 >
-                  <Boxes className="w-3.5 h-3.5 text-teal-300" />
+                  <Boxes className="w-3.5 h-3.5 text-lavender-300" />
                   <span>All Stock Balance</span>
                 </Link>
                 <Link
@@ -359,12 +359,12 @@ export function FabricStoreNavigation() {
         {/* USER & SIGN OUT */}
         <div className="p-4 border-t border-slate-700/60 bg-slate-950/50 backdrop-blur-md">
           <div className="flex items-center gap-3 mb-3">
-            <UserCircle className="w-8 h-8 text-teal-400/90" />
+            <UserCircle className="w-8 h-8 text-lavender-400/90" />
             <div className="flex-1 min-w-0">
               <span className="text-xs font-semibold text-white truncate block drop-shadow-xs">
                 {currentUser.fullName || (isAdmin ? 'System Administrator' : 'Store Incharge')}
               </span>
-              <span className="text-[10px] text-teal-400 font-bold tracking-wide block truncate drop-shadow-xs">
+              <span className="text-[10px] text-lavender-400 font-bold tracking-wide block truncate drop-shadow-xs">
                 Store Department
               </span>
             </div>

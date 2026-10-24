@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { inactiveDepartmentError } from '@/lib/departments';
+import { challanNumberErrorResponse, duplicateChallanNumberResponse, isDuplicateChallanNumberError, validateManualChallanNumber } from '@/lib/challan-number';
 import { buildDepartmentTrackingData } from '@/lib/challan-tracking';
 import { STANDARD_FACTORY_ROUTE } from '@subham/config';
 import { DepartmentCode } from '@subham/types';
+import { authorizeDefectReport, DEFECTIVE_SHELF_INFO } from '@/lib/defective-shelf';
 
 export const dynamic = 'force-dynamic';
 
@@ -75,6 +78,13 @@ export async function POST(request: Request) {
     if ('error' in tracking) {
       return NextResponse.json({ error: tracking.error }, { status: 400 });
     }
+    let defectReporter: { id: string; fullName: string } | null = null;
+    if (tracking.data.defectivePieces > 0) {
+      if (!String(tracking.data.defectReason || '').trim()) return NextResponse.json({ error: 'Reason for defect is required before sending material to the defective shelf.' }, { status: 400 });
+      const auth = await authorizeDefectReport(request, 'FINISHING');
+      if (!auth.actor) return auth.response;
+      defectReporter = { id: auth.actor.id, fullName: auth.actor.fullName };
+    }
 
     if (totalGoodProduced > 0 && requestingQty > availableToHandover) {
       return NextResponse.json(
@@ -98,13 +108,14 @@ export async function POST(request: Request) {
       const fallbackUser = await prisma.user.findFirst({ select: { id: true } });
       actorId = fallbackUser?.id;
     }
+    if (defectReporter) actorId = defectReporter.id;
 
-    // 5. Generate unique sequential Challan Number
-    const count = await prisma.challan.count({
-      where: { fromDepartment: 'FINISHING' },
-    });
-    const timestamp = Date.now().toString().slice(-4);
-    const challanNumber = `CH-FN-${String(count + 1).padStart(4, '0')}-${timestamp}`;
+    // Challan number is entered manually by the issuing department.
+    const numberCheck = await validateManualChallanNumber(body.challanNumber);
+    if (!numberCheck.ok) return challanNumberErrorResponse(numberCheck);
+    const challanNumber = numberCheck.challanNumber;
+    const departmentBlocked = await inactiveDepartmentError(prisma, ['FINISHING', targetDepartment]);
+    if (departmentBlocked) return NextResponse.json({ error: departmentBlocked }, { status: 409 });
 
     // 6. ATOMIC DATABASE TRANSACTION
     const newChallan = await prisma.$transaction(async (tx) => {
@@ -124,6 +135,7 @@ export async function POST(request: Request) {
           issuedById: actorId,
           remarks: remarks || `Handover from Finishing to ${targetDepartment}: Trimmed, cleaned & pressed garments.`,
           ...tracking.data,
+          defectiveShelfLocation: tracking.data.defectivePieces > 0 ? DEFECTIVE_SHELF_INFO.FINISHING.code : null,
           items: {
             create: items.map((it: any) => ({
               itemDescription: it.itemDescription || `${parentChallan.program?.styleCode || 'Finished'} Garments - Ready for ${targetDepartment}`,
@@ -146,19 +158,34 @@ export async function POST(request: Request) {
       });
 
       if (tracking.data.defectivePieces > 0 && actorId) {
-        await tx.defectRecord.create({
+        const savedDefect = await tx.defectRecord.create({
           data: {
             defectCode: `DEF-FINISHING-${Date.now().toString().slice(-4)}`,
             programId: parentChallan.programId,
             challanId: ch.id,
             departmentCode: 'FINISHING',
+            productionSheetNumber: parentChallan.program?.programSerialNo || parentChallan.program?.programNumber,
+            shelfCode: DEFECTIVE_SHELF_INFO.FINISHING.code,
+            color: items[0]?.colour || items[0]?.color || parentChallan.program?.fabricColor || null,
+            fabricType: parentChallan.program?.fabricType || parentChallan.program?.fabricName || null,
+            quantityUnit: tracking.data.fabricUnit,
+            responsibleIncharge: defectReporter?.fullName || null,
             itemDescription: `Defective pieces from Finishing — quarantined on ${tracking.data.defectiveShelfLocation || 'department shelf'}`,
             severity: 'MAJOR',
-            quantity: Math.max(1, Math.round(tracking.data.defectivePieces)),
-            reason: tracking.data.defectReason || 'Defective piece found during department processing',
+            quantity: tracking.data.defectivePieces,
+            reason: String(tracking.data.defectReason).trim(),
             detectedById: actorId,
             status: 'OPEN',
             resolutionNotes: `Defective ${tracking.data.defectivePieces} ${tracking.data.fabricUnit} segregated. ${requestingQty} ${tracking.data.fabricUnit} dispatched to ${targetDepartment}.`,
+          },
+        });
+        await tx.auditLog.create({
+          data: {
+            actorId,
+            action: 'DEFECT_SHELF_ENTRY_CREATED',
+            entity: 'DefectRecord',
+            entityId: savedDefect.id,
+            afterState: JSON.stringify({ departmentCode: savedDefect.departmentCode, shelfCode: savedDefect.shelfCode, quantity: savedDefect.quantity, quantityUnit: savedDefect.quantityUnit, reason: savedDefect.reason, challanId: savedDefect.challanId }),
           },
         });
       }
@@ -204,6 +231,9 @@ export async function POST(request: Request) {
       data: newChallan,
     });
   } catch (error: any) {
+    if (isDuplicateChallanNumberError(error)) {
+      return duplicateChallanNumberResponse();
+    }
     console.error('Error issuing Finishing Challan:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to issue Finishing Challan' },

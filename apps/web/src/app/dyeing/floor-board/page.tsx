@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { ChallanNumberInput, getChallanNumberError } from '@/components/challan/ChallanNumberInput';
 import {
   Kanban,
   RefreshCw,
@@ -23,7 +24,7 @@ interface FloorOrder {
   id: string;
   orderNumber: string;
   programId: string;
-  status: 'RECEIVED' | 'IN_DYEING' | 'PARTIALLY_DYED' | 'DYED' | 'READY_FOR_QC1' | 'SENT_TO_QC1';
+  status: 'RECEIVED' | 'IN_DYEING' | 'PARTIALLY_DYED' | 'DYED' | 'READY_FOR_DYEING_QC' | 'SENT_TO_DYEING_QC';
   priority: string;
   fabricName: string;
   fabricType: string | null;
@@ -33,8 +34,8 @@ interface FloorOrder {
   requiredQuantity: number;
   dyedQuantity: number;
   undyedQuantity: number;
-  readyForQc1Quantity: number;
-  sentToQc1Quantity: number;
+  readyForDyeingQcQuantity: number;
+  sentToDyeingQcQuantity: number;
   uom: string;
   inchargeName: string | null;
   batchNumber: string | null;
@@ -62,7 +63,7 @@ interface FloorOrder {
     status: string;
     issuedDate: string;
   };
-  qc1Challan?: {
+  dyeingQcChallan?: {
     id: string;
     challanNumber: string;
     status: string;
@@ -75,8 +76,8 @@ interface LanesData {
   IN_DYEING: FloorOrder[];
   PARTIALLY_DYED: FloorOrder[];
   DYED: FloorOrder[];
-  READY_FOR_QC1: FloorOrder[];
-  SENT_TO_QC1: FloorOrder[];
+  READY_FOR_DYEING_QC: FloorOrder[];
+  SENT_TO_DYEING_QC: FloorOrder[];
 }
 
 const LANES_CONFIG: {
@@ -120,20 +121,20 @@ const LANES_CONFIG: {
     description: 'Target dyed; drying & finishing stage',
   },
   {
-    key: 'READY_FOR_QC1',
-    label: '5. Ready for QC1',
+    key: 'READY_FOR_DYEING_QC',
+    label: '5. Ready for Dyeing QC',
     badgeBg: 'bg-indigo-100',
     badgeText: 'text-indigo-800',
     borderTop: 'border-t-indigo-600',
     description: 'Batch inspected & staged for dispatch',
   },
   {
-    key: 'SENT_TO_QC1',
-    label: '6. Sent to QC1',
+    key: 'SENT_TO_DYEING_QC',
+    label: '6. Sent to Dyeing QC',
     badgeBg: 'bg-emerald-100',
     badgeText: 'text-emerald-800',
     borderTop: 'border-t-emerald-600',
-    description: 'Dispatched with verified QC1 Challan',
+    description: 'Dispatched with verified Dyeing QC Challan',
   },
 ];
 
@@ -143,8 +144,8 @@ export default function DyeingFloorBoardPage() {
     IN_DYEING: [],
     PARTIALLY_DYED: [],
     DYED: [],
-    READY_FOR_QC1: [],
-    SENT_TO_QC1: [],
+    READY_FOR_DYEING_QC: [],
+    SENT_TO_DYEING_QC: [],
   });
   const [totalOrders, setTotalOrders] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -178,6 +179,8 @@ export default function DyeingFloorBoardPage() {
   });
   const [issuingChallan, setIssuingChallan] = useState(false);
   const [challanError, setChallanError] = useState<string | null>(null);
+  const [challanNumber, setChallanNumber] = useState('');
+  const [challanNumberError, setChallanNumberError] = useState<string | null>(null);
   const [issuedSuccessChallan, setIssuedSuccessChallan] = useState<{ id: string; challanNumber: string } | null>(null);
 
   const fetchFloorBoard = async () => {
@@ -256,7 +259,7 @@ export default function DyeingFloorBoardPage() {
 
   const openChallanModal = (order: FloorOrder) => {
     setSelectedOrderForChallan(order);
-    const available = Math.max(0, order.dyedQuantity - order.sentToQc1Quantity);
+    const available = Math.max(0, order.dyedQuantity - order.sentToDyeingQcQuantity);
     setChallanForm({
       quantityToSend: available,
       color: order.dyedColor || order.targetColor || '',
@@ -265,12 +268,17 @@ export default function DyeingFloorBoardPage() {
       driverName: '',
     });
     setChallanError(null);
+    setChallanNumber('');
+    setChallanNumberError(null);
     setIssuedSuccessChallan(null);
   };
 
   const handleChallanSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedOrderForChallan) return;
+    if (!selectedOrderForChallan || issuingChallan) return;
+    const numberError = getChallanNumberError(challanNumber);
+    setChallanNumberError(numberError);
+    if (numberError) return;
     try {
       setIssuingChallan(true);
       setChallanError(null);
@@ -280,15 +288,16 @@ export default function DyeingFloorBoardPage() {
         throw new Error('Please enter a valid positive quantity to send.');
       }
 
-      const available = Math.max(0, selectedOrderForChallan.dyedQuantity - selectedOrderForChallan.sentToQc1Quantity);
+      const available = Math.max(0, selectedOrderForChallan.dyedQuantity - selectedOrderForChallan.sentToDyeingQcQuantity);
       if (qty > available) {
         throw new Error(`Cannot dispatch ${qty} ${selectedOrderForChallan.uom}. Only ${available} ${selectedOrderForChallan.uom} available.`);
       }
 
-      const res = await fetch(`/api/dyeing/orders/${selectedOrderForChallan.id}/issue-qc1-challan`, {
+      const res = await fetch(`/api/dyeing/orders/${selectedOrderForChallan.id}/issue-dyeing-qc-challan`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          challanNumber: challanNumber.trim(),
           quantityToSend: qty,
           color: challanForm.color,
           remarks: challanForm.remarks,
@@ -299,9 +308,14 @@ export default function DyeingFloorBoardPage() {
 
       const resJson = await res.json();
       if (!res.ok) {
-        throw new Error(resJson.error || 'Failed to issue Challan to QC1');
+        if (resJson.field === 'challanNumber') {
+          setChallanNumberError(resJson.error);
+          return;
+        }
+        throw new Error(resJson.error || 'Failed to issue Challan to Dyeing QC');
       }
 
+      setChallanNumber('');
       setIssuedSuccessChallan({
         id: resJson.data.challan.id,
         challanNumber: resJson.data.challan.challanNumber,
@@ -324,17 +338,17 @@ export default function DyeingFloorBoardPage() {
             <CheckCircle2 className="w-6 h-6 text-emerald-600 flex-shrink-0" />
             <div>
               <h4 className="text-sm font-bold text-emerald-950">
-                Challan Successfully Issued to QC1!
+                Challan Successfully Issued to Dyeing QC!
               </h4>
               <p className="text-xs text-emerald-700">
-                Dispatch Challan <span className="font-mono font-bold">{issuedSuccessChallan.challanNumber}</span> has been dispatched to QC1.
+                Dispatch Challan <span className="font-mono font-bold">{issuedSuccessChallan.challanNumber}</span> has been dispatched to Dyeing QC.
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Link
               href={`/challans/${issuedSuccessChallan.id}`}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-lg shadow-xs transition"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-lavender-700 hover:bg-lavender-800 text-white text-xs font-bold rounded-lg shadow-xs transition"
             >
               <Printer className="w-3.5 h-3.5" />
               <span>View &amp; Print Slip</span>
@@ -362,7 +376,7 @@ export default function DyeingFloorBoardPage() {
             Dyeing Floor Kanban
           </h1>
           <p className="text-xs text-slate-600 mt-0.5">
-            Visualize the live flow of material lots across 6 physical stages: Received → In Dyeing → Partially Dyed → Fully Dyed → Ready for QC1 → Sent to QC1.
+            Visualize the live flow of material lots across 6 physical stages: Received → In Dyeing → Partially Dyed → Fully Dyed → Ready for Dyeing QC → Sent to Dyeing QC.
           </p>
         </div>
 
@@ -424,13 +438,13 @@ export default function DyeingFloorBoardPage() {
                   </div>
                 ) : (
                   ordersInLane.map((order) => {
-                    const availableForQc = Math.max(0, order.dyedQuantity - order.sentToQc1Quantity);
+                    const availableForQc = Math.max(0, order.dyedQuantity - order.sentToDyeingQcQuantity);
                     const canIssue = order.dyedQuantity > 0 && availableForQc > 0;
 
                     return (
                       <div
                         key={order.id}
-                        className="bg-white rounded-lg p-3 border border-slate-200 hover:border-[#163767]/50 shadow-xs hover:shadow-sm transition space-y-2"
+                        className="bg-white rounded-lg p-3 border border-slate-200 hover:border-lavender-800/50 shadow-xs hover:shadow-sm transition space-y-2"
                       >
                         {/* TOP: ORDER # & PRIORITY */}
                         <div className="flex items-start justify-between gap-1">
@@ -472,9 +486,9 @@ export default function DyeingFloorBoardPage() {
                                   order.colorCode ||
                                   (order.dyedColor?.toLowerCase() === 'black' ? '#000' :
                                    order.dyedColor?.toLowerCase() === 'white' ? '#fff' :
-                                   order.dyedColor?.toLowerCase() === 'red' ? '#DC2626' :
-                                   order.dyedColor?.toLowerCase() === 'blue' ? '#2563EB' :
-                                   order.dyedColor?.toLowerCase() === 'green' ? '#16A34A' : '#94A3B8')
+                                   order.dyedColor?.toLowerCase() === 'red' ? '#D63A1E' :
+                                   order.dyedColor?.toLowerCase() === 'blue' ? '#7D44A8' :
+                                   order.dyedColor?.toLowerCase() === 'green' ? '#677A00' : '#A19CA8')
                               }}
                             />
                             <span className="text-slate-600 font-medium truncate">
@@ -499,19 +513,19 @@ export default function DyeingFloorBoardPage() {
                           </div>
                           <div className="bg-blue-50 rounded px-1.5 py-0.5">
                             <span className="text-blue-700 block text-[8px] uppercase">Sent QC</span>
-                            <span className="font-bold text-blue-800">{order.sentToQc1Quantity}</span>
+                            <span className="font-bold text-blue-800">{order.sentToDyeingQcQuantity}</span>
                           </div>
                         </div>
 
                         {/* INBOUND / OUTBOUND CHALLAN LINKS */}
-                        {order.qc1Challan && (
+                        {order.dyeingQcChallan && (
                           <div className="text-[10px] text-emerald-700 font-mono flex items-center justify-between border-t border-slate-100 pt-1">
-                            <span>QC1 Slip:</span>
+                            <span>Dyeing QC Slip:</span>
                             <Link
-                              href={`/challans/${order.qc1Challan.id}`}
+                              href={`/challans/${order.dyeingQcChallan.id}`}
                               className="font-bold hover:underline inline-flex items-center gap-0.5"
                             >
-                              <span>{order.qc1Challan.challanNumber}</span>
+                              <span>{order.dyeingQcChallan.challanNumber}</span>
                               <ExternalLink className="w-2.5 h-2.5" />
                             </Link>
                           </div>
@@ -523,18 +537,18 @@ export default function DyeingFloorBoardPage() {
                             onClick={() => openUpdateModal(order)}
                             className="flex-1 py-1 px-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] font-bold transition flex items-center justify-center gap-1"
                           >
-                            <Edit3 className="w-3 h-3 text-[#163767]" />
+                            <Edit3 className="w-3 h-3 text-lavender-800" />
                             <span>Update</span>
                           </button>
 
                           {canIssue && (
                             <button
                               onClick={() => openChallanModal(order)}
-                              title={`Send to QC1 (${availableForQc} ${order.uom} available)`}
-                              className="py-1 px-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded text-[10px] font-bold transition flex items-center justify-center gap-1 shadow-xs"
+                              title={`Send to Dyeing QC (${availableForQc} ${order.uom} available)`}
+                              className="py-1 px-2 bg-lavender-700 hover:bg-lavender-800 text-white rounded text-[10px] font-bold transition flex items-center justify-center gap-1 shadow-xs"
                             >
                               <Send className="w-3 h-3" />
-                              <span>QC1</span>
+                              <span>Dyeing QC</span>
                             </button>
                           )}
                         </div>
@@ -555,7 +569,7 @@ export default function DyeingFloorBoardPage() {
             <form onSubmit={handleUpdateSubmit}>
               <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
                 <div className="flex items-center gap-3">
-                  <Edit3 className="w-5 h-5 text-[#163767]" />
+                  <Edit3 className="w-5 h-5 text-lavender-800" />
                   <div>
                     <h3 className="text-base font-bold text-slate-900">
                       Record Dyeing Work Progress
@@ -599,9 +613,9 @@ export default function DyeingFloorBoardPage() {
                     <span className="text-[10px] text-slate-400 block">{selectedOrderForUpdate.uom}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-blue-700 font-bold uppercase block">Ready for QC1</span>
+                    <span className="text-[10px] text-blue-700 font-bold uppercase block">Ready for Dyeing QC</span>
                     <span className="font-mono font-bold text-blue-800 text-base">
-                      {Math.max(0, Number(updateForm.dyedQuantity || 0) - selectedOrderForUpdate.sentToQc1Quantity)}
+                      {Math.max(0, Number(updateForm.dyedQuantity || 0) - selectedOrderForUpdate.sentToDyeingQcQuantity)}
                     </span>
                     <span className="text-[10px] text-slate-400 block">{selectedOrderForUpdate.uom}</span>
                   </div>
@@ -620,7 +634,7 @@ export default function DyeingFloorBoardPage() {
                       required
                       value={updateForm.dyedQuantity}
                       onChange={(e) => setUpdateForm({ ...updateForm, dyedQuantity: Number(e.target.value) })}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg font-mono font-bold text-sm text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#163767]"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg font-mono font-bold text-sm text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-lavender-800"
                     />
                   </div>
 
@@ -634,7 +648,7 @@ export default function DyeingFloorBoardPage() {
                       value={updateForm.dyedColor}
                       onChange={(e) => setUpdateForm({ ...updateForm, dyedColor: e.target.value })}
                       placeholder=""
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#163767]"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-lavender-800"
                     />
                   </div>
                 </div>
@@ -648,7 +662,7 @@ export default function DyeingFloorBoardPage() {
                       type="text"
                       value={updateForm.inchargeName}
                       onChange={(e) => setUpdateForm({ ...updateForm, inchargeName: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-medium text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#163767]"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-medium text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-lavender-800"
                     />
                   </div>
 
@@ -659,12 +673,12 @@ export default function DyeingFloorBoardPage() {
                     <select
                       value={updateForm.status}
                       onChange={(e) => setUpdateForm({ ...updateForm, status: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#163767]"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-lavender-800"
                     >
                       <option value="IN_DYEING">IN DYEING</option>
                       <option value="PARTIALLY_DYED">PARTIALLY DYED</option>
                       <option value="DYED">DYED</option>
-                      <option value="READY_FOR_QC1">READY FOR QC1</option>
+                      <option value="READY_FOR_DYEING_QC">READY FOR Dyeing QC</option>
                     </select>
                   </div>
                 </div>
@@ -679,7 +693,7 @@ export default function DyeingFloorBoardPage() {
                       value={updateForm.machineNumber}
                       onChange={(e) => setUpdateForm({ ...updateForm, machineNumber: e.target.value })}
                       placeholder=""
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#163767]"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-lavender-800"
                     />
                   </div>
 
@@ -692,7 +706,7 @@ export default function DyeingFloorBoardPage() {
                       value={updateForm.batchNumber}
                       onChange={(e) => setUpdateForm({ ...updateForm, batchNumber: e.target.value })}
                       placeholder=""
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#163767]"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-lavender-800"
                     />
                   </div>
                 </div>
@@ -706,7 +720,7 @@ export default function DyeingFloorBoardPage() {
                     value={updateForm.processRemarks}
                     onChange={(e) => setUpdateForm({ ...updateForm, processRemarks: e.target.value })}
                     placeholder=""
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#163767]"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-lavender-800"
                   />
                 </div>
               </div>
@@ -722,7 +736,7 @@ export default function DyeingFloorBoardPage() {
                 <button
                   type="submit"
                   disabled={updating}
-                  className="px-5 py-2 bg-[#163767] hover:bg-[#0F264A] text-white rounded-lg text-xs font-semibold transition disabled:opacity-50 inline-flex items-center gap-1.5"
+                  className="px-5 py-2 bg-lavender-800 hover:bg-lavender-900 text-white rounded-lg text-xs font-semibold transition disabled:opacity-50 inline-flex items-center gap-1.5"
                 >
                   {updating ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
                   <span>Save Production Progress</span>
@@ -745,7 +759,7 @@ export default function DyeingFloorBoardPage() {
                   </div>
                   <div>
                     <h3 className="text-base font-bold text-slate-900">
-                      Issue Material Challan to QC1
+                      Issue Material Challan to Dyeing QC
                     </h3>
                     <p className="text-xs text-slate-500 font-mono">
                       Order: {selectedOrderForChallan.orderNumber} · {selectedOrderForChallan.fabricName}
@@ -774,7 +788,7 @@ export default function DyeingFloorBoardPage() {
                   <div className="flex items-center justify-between text-xs">
                     <span className="font-bold text-blue-900">Transfer Route:</span>
                     <span className="font-mono font-bold text-blue-950 bg-white px-2 py-0.5 rounded border border-blue-200">
-                      DYEING → QC1
+                      DYEING → Dyeing QC
                     </span>
                   </div>
                   <div className="grid grid-cols-3 gap-2 text-center pt-2 border-t border-blue-200/60">
@@ -787,17 +801,27 @@ export default function DyeingFloorBoardPage() {
                     <div>
                       <span className="text-[10px] text-slate-500 block uppercase">Already Sent</span>
                       <span className="font-mono font-bold text-slate-600 text-sm">
-                        {selectedOrderForChallan.sentToQc1Quantity} {selectedOrderForChallan.uom}
+                        {selectedOrderForChallan.sentToDyeingQcQuantity} {selectedOrderForChallan.uom}
                       </span>
                     </div>
                     <div>
                       <span className="text-[10px] text-emerald-700 font-bold block uppercase">Available Now</span>
                       <span className="font-mono font-bold text-emerald-800 text-sm">
-                        {Math.max(0, selectedOrderForChallan.dyedQuantity - selectedOrderForChallan.sentToQc1Quantity)} {selectedOrderForChallan.uom}
+                        {Math.max(0, selectedOrderForChallan.dyedQuantity - selectedOrderForChallan.sentToDyeingQcQuantity)} {selectedOrderForChallan.uom}
                       </span>
                     </div>
                   </div>
                 </div>
+
+                <ChallanNumberInput
+                  value={challanNumber}
+                  onChange={(value) => {
+                    setChallanNumber(value);
+                    setChallanNumberError(null);
+                  }}
+                  error={challanNumberError}
+                  disabled={issuingChallan}
+                />
 
                 {/* QUANTITY TO SEND INPUT */}
                 <div>
@@ -808,23 +832,23 @@ export default function DyeingFloorBoardPage() {
                     <button
                       type="button"
                       onClick={() => {
-                        const avail = Math.max(0, selectedOrderForChallan.dyedQuantity - selectedOrderForChallan.sentToQc1Quantity);
+                        const avail = Math.max(0, selectedOrderForChallan.dyedQuantity - selectedOrderForChallan.sentToDyeingQcQuantity);
                         setChallanForm({ ...challanForm, quantityToSend: avail });
                       }}
-                      className="text-[11px] font-bold text-[#163767] hover:underline"
+                      className="text-[11px] font-bold text-lavender-800 hover:underline"
                     >
-                      Fill Max Available ({Math.max(0, selectedOrderForChallan.dyedQuantity - selectedOrderForChallan.sentToQc1Quantity)} {selectedOrderForChallan.uom})
+                      Fill Max Available ({Math.max(0, selectedOrderForChallan.dyedQuantity - selectedOrderForChallan.sentToDyeingQcQuantity)} {selectedOrderForChallan.uom})
                     </button>
                   </div>
                   <input
                     type="number"
                     step="any"
                     min="0.01"
-                    max={Math.max(0, selectedOrderForChallan.dyedQuantity - selectedOrderForChallan.sentToQc1Quantity)}
+                    max={Math.max(0, selectedOrderForChallan.dyedQuantity - selectedOrderForChallan.sentToDyeingQcQuantity)}
                     required
                     value={challanForm.quantityToSend}
                     onChange={(e) => setChallanForm({ ...challanForm, quantityToSend: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg font-mono font-bold text-base text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-emerald-600"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg font-mono font-bold text-base text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-lavender-600"
                   />
                 </div>
 
@@ -838,7 +862,7 @@ export default function DyeingFloorBoardPage() {
                       type="text"
                       value={challanForm.color}
                       onChange={(e) => setChallanForm({ ...challanForm, color: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#163767]"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-lavender-800"
                     />
                   </div>
 
@@ -851,7 +875,7 @@ export default function DyeingFloorBoardPage() {
                       value={challanForm.vehicleNumber}
                       onChange={(e) => setChallanForm({ ...challanForm, vehicleNumber: e.target.value })}
                       placeholder=""
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#163767]"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-lavender-800"
                     />
                   </div>
                 </div>
@@ -865,7 +889,7 @@ export default function DyeingFloorBoardPage() {
                     value={challanForm.remarks}
                     onChange={(e) => setChallanForm({ ...challanForm, remarks: e.target.value })}
                     placeholder=""
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-[#163767]"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-lavender-800"
                   />
                 </div>
               </div>
@@ -881,10 +905,10 @@ export default function DyeingFloorBoardPage() {
                 <button
                   type="submit"
                   disabled={issuingChallan}
-                  className="px-5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-semibold transition disabled:opacity-50 inline-flex items-center gap-1.5 shadow-xs"
+                  className="px-5 py-2 bg-lavender-700 hover:bg-lavender-800 text-white rounded-lg text-xs font-semibold transition disabled:opacity-50 inline-flex items-center gap-1.5 shadow-xs"
                 >
                   {issuingChallan ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-                  <span>Generate &amp; Issue Challan to QC1</span>
+                  <span>Generate &amp; Issue Challan to Dyeing QC</span>
                 </button>
               </div>
             </form>

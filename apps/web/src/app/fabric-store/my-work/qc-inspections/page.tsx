@@ -39,7 +39,7 @@ export default function QCInspectionsQueuePage() {
   }, [selectedBatch]);
 
   return (
-    <div className="min-h-screen bg-[#F0FAF9]">
+    <div className="min-h-screen bg-ink-50">
       <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div>
           <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-700 block">
@@ -78,7 +78,7 @@ export default function QCInspectionsQueuePage() {
             <select
               value={selectedBatch}
               onChange={(e) => setSelectedBatch(e.target.value)}
-              className="text-xs border border-slate-300 rounded-md px-3 py-1.5 bg-white text-slate-800 focus:ring-1 focus:ring-amber-500"
+              className="text-xs border border-slate-300 rounded-md px-3 py-1.5 bg-white text-slate-800 focus:ring-1 focus:ring-lavender-500"
             >
               <option value="">All Batches</option>
               {batches.map((b) => (
@@ -162,7 +162,7 @@ export default function QCInspectionsQueuePage() {
                       <td className="py-3.5 px-4 text-right">
                         <Link
                           href={`/fabric-store/my-work/qc-inspections/${roll.id}`}
-                          className="inline-flex items-center gap-1 text-[11px] font-bold text-white bg-amber-600 hover:bg-amber-700 px-3 py-1.5 rounded shadow-2xs transition"
+                          className="inline-flex items-center gap-1 text-[11px] font-bold text-white bg-lavender-600 hover:bg-lavender-700 px-3 py-1.5 rounded shadow-2xs transition"
                         >
                           <span>Conduct QC</span>
                           <ArrowRight className="w-3 h-3" />

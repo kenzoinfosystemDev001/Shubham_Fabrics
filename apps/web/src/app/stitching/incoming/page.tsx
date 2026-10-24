@@ -151,11 +151,11 @@ export default function StitchingIncomingPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-ink-950 text-slate-100 flex flex-col">
       {/* HEADER */}
       <div
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.85)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundImage: `linear-gradient(to right, rgba(37, 35, 42, 0.95), rgba(37, 35, 42, 0.85)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -222,7 +222,7 @@ export default function StitchingIncomingPage() {
               onClick={() => setActiveTab('ISSUED')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
                 activeTab === 'ISSUED'
-                  ? 'bg-amber-600 text-white shadow-sm'
+                  ? 'bg-lavender-600 text-white shadow-sm'
                   : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
               }`}
             >
@@ -232,7 +232,7 @@ export default function StitchingIncomingPage() {
               onClick={() => setActiveTab('RECEIVED')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
                 activeTab === 'RECEIVED'
-                  ? 'bg-emerald-600 text-white shadow-sm'
+                  ? 'bg-lavender-600 text-white shadow-sm'
                   : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
               }`}
             >
@@ -248,7 +248,7 @@ export default function StitchingIncomingPage() {
               placeholder="Search challan, style, program..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-950/80 border border-slate-800 rounded-lg pl-9 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+              className="w-full bg-slate-950/80 border border-slate-800 rounded-lg pl-9 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-lavender-500"
             />
           </div>
         </div>
@@ -276,7 +276,7 @@ export default function StitchingIncomingPage() {
                   key={ch.id}
                   className={`p-4 rounded-xl bg-slate-900/70 border transition flex flex-col justify-between gap-4 ${
                     isIssued
-                      ? 'border-amber-500/40 hover:border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.05)]'
+                      ? 'border-amber-500/40 hover:border-amber-400 shadow-[0_0_15px_rgba(223,255,0,0.05)]'
                       : 'border-slate-800 hover:border-slate-700'
                   }`}
                 >
@@ -348,7 +348,7 @@ export default function StitchingIncomingPage() {
                     {isIssued ? (
                       <button
                         onClick={() => openReceiveModal(ch)}
-                        className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition shadow-sm flex items-center gap-1.5"
+                        className="px-3.5 py-1.5 rounded-lg bg-lavender-600 hover:bg-emerald-500 text-white font-semibold text-xs transition shadow-sm flex items-center gap-1.5"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5" />
                         <span>Confirm Receipt</span>
@@ -373,7 +373,7 @@ export default function StitchingIncomingPage() {
       {/* PHYSICAL RECEIPT MODAL */}
       {selectedChallan && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#0F172A] border border-slate-700 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95">
+          <div className="bg-ink-900 border border-slate-700 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 rounded-lg bg-emerald-500/20 text-emerald-400">
@@ -436,7 +436,7 @@ export default function StitchingIncomingPage() {
                   max={selectedChallan.items.reduce((s: number, it: any) => s + (Number(it.quantity) || 0), 0)}
                   value={receiveQuantity}
                   onChange={(e) => setReceiveQuantity(e.target.value === '' ? '' : Number(e.target.value))}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-bold focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-bold focus:outline-none focus:border-lavender-500"
                   required
                 />
                 <p className="text-[10px] text-slate-500 mt-1">
@@ -450,7 +450,7 @@ export default function StitchingIncomingPage() {
                   rows={2}
                   value={receiveRemarks}
                   onChange={(e) => setReceiveRemarks(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-lavender-500"
                   placeholder="Notes on cut panel bundle condition, sizes, or notes..."
                 />
               </div>
@@ -480,7 +480,7 @@ export default function StitchingIncomingPage() {
                 <button
                   type="submit"
                   disabled={submittingReceive}
-                  className="px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition shadow-md flex items-center gap-1.5 disabled:opacity-50"
+                  className="px-5 py-2 rounded-lg bg-lavender-600 hover:bg-emerald-500 text-white text-xs font-semibold transition shadow-md flex items-center gap-1.5 disabled:opacity-50"
                 >
                   {submittingReceive ? (
                     <>
@@ -503,7 +503,7 @@ export default function StitchingIncomingPage() {
       {/* TECH SHEET PREVIEW MODAL */}
       {previewProgram && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#0F172A] border border-slate-700 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4">
+          <div className="bg-ink-900 border border-slate-700 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div className="flex items-center gap-2">
                 <FileText className="w-5 h-5 text-indigo-400" />

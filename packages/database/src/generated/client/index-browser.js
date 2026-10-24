@@ -173,6 +173,7 @@ exports.Prisma.DepartmentScalarFieldEnum = {
   sequenceOrder: 'sequenceOrder',
   description: 'description',
   isActive: 'isActive',
+  inchargeUserId: 'inchargeUserId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -542,6 +543,7 @@ exports.Prisma.ChallanScalarFieldEnum = {
   status: 'status',
   priority: 'priority',
   issuedDate: 'issuedDate',
+  deliveryDate: 'deliveryDate',
   receivedDate: 'receivedDate',
   completedDate: 'completedDate',
   createdById: 'createdById',
@@ -568,6 +570,8 @@ exports.Prisma.ChallanItemScalarFieldEnum = {
   fabricCode: 'fabricCode',
   colour: 'colour',
   shade: 'shade',
+  requiredDyeColor: 'requiredDyeColor',
+  requiredDyeQuantity: 'requiredDyeQuantity',
   size: 'size',
   unitType: 'unitType',
   rollNumber: 'rollNumber',
@@ -781,8 +785,14 @@ exports.Prisma.DefectRecordScalarFieldEnum = {
   id: 'id',
   defectCode: 'defectCode',
   programId: 'programId',
+  productionSheetNumber: 'productionSheetNumber',
   challanId: 'challanId',
   departmentCode: 'departmentCode',
+  shelfCode: 'shelfCode',
+  color: 'color',
+  fabricType: 'fabricType',
+  quantityUnit: 'quantityUnit',
+  responsibleIncharge: 'responsibleIncharge',
   bundleId: 'bundleId',
   itemDescription: 'itemDescription',
   severity: 'severity',
@@ -792,6 +802,8 @@ exports.Prisma.DefectRecordScalarFieldEnum = {
   status: 'status',
   resolutionNotes: 'resolutionNotes',
   resolvedAt: 'resolvedAt',
+  shelfRemovedAt: 'shelfRemovedAt',
+  shelfRemovalReason: 'shelfRemovalReason',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -987,28 +999,30 @@ exports.Prisma.DyeingOrderScalarFieldEnum = {
   orderNumber: 'orderNumber',
   programId: 'programId',
   inboundChallanId: 'inboundChallanId',
+  inboundChallanItemId: 'inboundChallanItemId',
   status: 'status',
   priority: 'priority',
   fabricName: 'fabricName',
   fabricType: 'fabricType',
+  currentColor: 'currentColor',
   targetColor: 'targetColor',
   dyedColor: 'dyedColor',
   colorCode: 'colorCode',
   requiredQuantity: 'requiredQuantity',
   dyedQuantity: 'dyedQuantity',
   undyedQuantity: 'undyedQuantity',
-  readyForQc1Quantity: 'readyForQc1Quantity',
-  sentToQc1Quantity: 'sentToQc1Quantity',
+  readyForDyeingQcQuantity: 'readyForDyeingQcQuantity',
+  sentToDyeingQcQuantity: 'sentToDyeingQcQuantity',
   uom: 'uom',
   inchargeId: 'inchargeId',
   inchargeName: 'inchargeName',
   batchNumber: 'batchNumber',
   machineNumber: 'machineNumber',
   processRemarks: 'processRemarks',
-  qc1ChallanId: 'qc1ChallanId',
+  dyeingQcChallanId: 'dyeingQcChallanId',
   startedAt: 'startedAt',
   completedAt: 'completedAt',
-  sentToQc1At: 'sentToQc1At',
+  sentToDyeingQcAt: 'sentToDyeingQcAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -1018,6 +1032,7 @@ exports.Prisma.FabricInwardScalarFieldEnum = {
   sNo: 'sNo',
   entryType: 'entryType',
   itemName: 'itemName',
+  color: 'color',
   billNo: 'billNo',
   billDate: 'billDate',
   receivingDate: 'receivingDate',
@@ -1037,6 +1052,7 @@ exports.Prisma.FabricOutwardScalarFieldEnum = {
   challanId: 'challanId',
   designNumber: 'designNumber',
   itemName: 'itemName',
+  color: 'color',
   issueQty: 'issueQty',
   unit: 'unit',
   avgPerPcs: 'avgPerPcs',
@@ -1047,6 +1063,33 @@ exports.Prisma.FabricOutwardScalarFieldEnum = {
   fabricType: 'fabricType',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DeadlineAlertScalarFieldEnum = {
+  id: 'id',
+  dedupeKey: 'dedupeKey',
+  departmentCode: 'departmentCode',
+  taskType: 'taskType',
+  taskId: 'taskId',
+  challanId: 'challanId',
+  programId: 'programId',
+  assignedUserId: 'assignedUserId',
+  stage: 'stage',
+  severity: 'severity',
+  deadlineAt: 'deadlineAt',
+  deadlineSource: 'deadlineSource',
+  status: 'status',
+  resolutionReason: 'resolutionReason',
+  createdAt: 'createdAt',
+  lastEvaluatedAt: 'lastEvaluatedAt',
+  resolvedAt: 'resolvedAt'
+};
+
+exports.Prisma.DeadlineAlertDismissalScalarFieldEnum = {
+  id: 'id',
+  alertId: 'alertId',
+  userId: 'userId',
+  dismissedAt: 'dismissedAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -1199,7 +1242,9 @@ exports.Prisma.ModelName = {
   FabricStockLedger: 'FabricStockLedger',
   DyeingOrder: 'DyeingOrder',
   FabricInward: 'FabricInward',
-  FabricOutward: 'FabricOutward'
+  FabricOutward: 'FabricOutward',
+  DeadlineAlert: 'DeadlineAlert',
+  DeadlineAlertDismissal: 'DeadlineAlertDismissal'
 };
 
 /**

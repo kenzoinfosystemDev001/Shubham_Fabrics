@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { authorizeDefectReport, DEFECTIVE_SHELF_INFO } from '@/lib/defective-shelf';
 
 export const dynamic = 'force-dynamic';
 
@@ -80,7 +81,21 @@ export async function POST(request: Request) {
 
     // 3. Loss & Shrinkage calculation
     const lossPieces = pIn - pOut;
-    const defPieces = defectivePieces !== undefined ? Number(defectivePieces) : lossPieces;
+    const requestedDefectPieces = defectivePieces !== undefined ? Number(defectivePieces) : lossPieces;
+    if (!Number.isFinite(requestedDefectPieces) || requestedDefectPieces < 0) return NextResponse.json({ error: 'Defective quantity must be zero or greater.' }, { status: 400 });
+    const defPieces = Math.max(requestedDefectPieces, Number(challan.defectivePieces) || 0);
+    const resolvedDefectReason = String(defectReason || challan.defectReason || '').trim();
+    const defectColor = challan.items[0]?.colour || challan.program?.fabricColor || null;
+    const defectFabricType = challan.program?.fabricType || challan.program?.fabricName || challan.items[0]?.fabricCode || null;
+    let defectReporter: { id: string; fullName: string } | null = null;
+    if (defPieces > 0) {
+      if (requestedDefectPieces > Number(challan.defectivePieces || 0) && !String(defectReason || '').trim()) return NextResponse.json({ error: 'Reason for defect is required before sending material to the defective shelf.' }, { status: 400 });
+      if (!resolvedDefectReason) return NextResponse.json({ error: 'Reason for defect is required before sending material to the defective shelf.' }, { status: 400 });
+      if (!defectColor || !defectFabricType) return NextResponse.json({ error: 'Color and fabric type must be recorded on the production sheet or challan before reporting a defect.' }, { status: 400 });
+      const auth = await authorizeDefectReport(request, 'WASHING');
+      if (!auth.actor) return auth.response;
+      defectReporter = { id: auth.actor.id, fullName: auth.actor.fullName };
+    }
     const shrinkageRate = (((pIn - pOut) / pIn) * 100).toFixed(2);
 
     // 4. Resolve Actor / Operator
@@ -111,10 +126,49 @@ export async function POST(request: Request) {
           fabricOut: pOut,
           fabricUnit: 'PCS',
           defectivePieces: defPieces,
-          defectiveShelfLocation: defPieces > 0 ? 'DEF-SHELF-01' : null,
-          defectReason: defectReason || (defPieces > 0 ? `Shrinkage & Wash Defect (${defPieces} pcs)` : null),
+          defectiveShelfLocation: defPieces > 0 ? DEFECTIVE_SHELF_INFO.WASHING.code : challan.defectiveShelfLocation,
+          defectReason: defPieces > 0 ? resolvedDefectReason : challan.defectReason,
         },
       });
+
+      if (defPieces > 0 && defectReporter) {
+        const previousRecord = await tx.defectRecord.findFirst({ where: { challanId: challan.id, departmentCode: 'WASHING', shelfRemovedAt: null, status: { not: 'REWORK' } } });
+        const shelfEntryData = {
+          departmentCode: 'WASHING',
+          shelfCode: DEFECTIVE_SHELF_INFO.WASHING.code,
+          color: defectColor,
+          fabricType: defectFabricType,
+          quantityUnit: 'PCS',
+          productionSheetNumber: challan.program?.programSerialNo || challan.program?.programNumber,
+          responsibleIncharge: defectReporter.fullName,
+          itemDescription: challan.items[0]?.itemDescription || `${challan.program?.styleCode || 'Garment'} - Washing defect`,
+          quantity: defPieces,
+          reason: resolvedDefectReason,
+          detectedById: defectReporter.id,
+          status: 'OPEN',
+        };
+        const record = previousRecord
+          ? await tx.defectRecord.update({ where: { id: previousRecord.id }, data: shelfEntryData })
+          : await tx.defectRecord.create({
+              data: {
+                ...shelfEntryData,
+                defectCode: `DEF-WASHING-${Date.now().toString().slice(-6)}`,
+                programId: challan.programId,
+                challanId: challan.id,
+                severity: 'MAJOR',
+              },
+            });
+        await tx.auditLog.create({
+          data: {
+            actorId: defectReporter.id,
+            action: previousRecord ? 'DEFECT_SHELF_ENTRY_UPDATED' : 'DEFECT_SHELF_ENTRY_CREATED',
+            entity: 'DefectRecord',
+            entityId: record.id,
+            beforeState: previousRecord ? JSON.stringify({ quantity: previousRecord.quantity, reason: previousRecord.reason }) : undefined,
+            afterState: JSON.stringify({ quantity: record.quantity, quantityUnit: record.quantityUnit, reason: record.reason, departmentCode: record.departmentCode }),
+          },
+        });
+      }
 
       // Update Barcode on Challan Items
       if (challan.items.length > 0) {

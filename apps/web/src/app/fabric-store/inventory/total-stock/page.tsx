@@ -64,6 +64,7 @@ interface StockItem {
   sNo: number;
   itemName: string;
   fabricType: 'UNDYED' | 'DYED' | 'KORA';
+  color?: string;
   unit: string;
   totalInward: number;
   totalOutward: number;
@@ -81,6 +82,7 @@ interface OutwardHistoryItem {
   sourceDepartment?: string;
   destination?: string;
   itemName: string;
+  color?: string;
   quantity: number;
   unit: string;
   fabricType: string;
@@ -176,7 +178,7 @@ function TotalStockContent() {
     : { PCS: summary.defectiveStockPcs };
 
   return (
-    <div className="min-h-screen bg-[#F0FAF9] pb-16">
+    <div className="min-h-screen bg-ink-50 pb-16">
       {/* HEADER */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 sm:px-8 py-3.5 shadow-2xs">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -202,14 +204,14 @@ function TotalStockContent() {
           <div className="flex flex-wrap items-center gap-2.5">
             <Link
               href="/fabric-store/inventory/inward"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-xs transition"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-lavender-600 hover:bg-lavender-700 text-white rounded-lg text-xs font-bold shadow-xs transition"
             >
               <ArrowDownToLine className="w-3.5 h-3.5" />
               <span>Inward Fabric</span>
             </Link>
             <Link
               href="/fabric-store/inventory/outward"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold shadow-xs transition"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-lavender-600 hover:bg-lavender-700 text-white rounded-lg text-xs font-bold shadow-xs transition"
             >
               <Send className="w-3.5 h-3.5" />
               <span>Outward Stock</span>
@@ -345,7 +347,7 @@ function TotalStockContent() {
               onClick={() => setTypeFilter('UNDYED')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
                 typeFilter === 'UNDYED'
-                  ? 'bg-amber-700 text-white'
+                  ? 'bg-lavender-700 text-white'
                   : 'bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200'
               }`}
             >
@@ -372,7 +374,7 @@ function TotalStockContent() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search Fabric Description..."
-                className="pl-8 pr-3 py-1.5 border border-slate-300 rounded-lg text-xs w-48 sm:w-64 focus:outline-none focus:ring-1 focus:ring-teal-600 bg-white"
+                className="pl-8 pr-3 py-1.5 border border-slate-300 rounded-lg text-xs w-48 sm:w-64 focus:outline-none focus:ring-1 focus:ring-lavender-600 bg-white"
               />
             </div>
             <button
@@ -443,12 +445,15 @@ function TotalStockContent() {
                   items.map((item, index) => {
                     const isUndyed = item.fabricType === 'UNDYED' || (item.fabricType as string) === 'KORA';
                     return (
-                      <tr key={`${item.itemName}-${item.fabricType}-${item.unit}`} className="hover:bg-slate-50 transition h-10">
+                      <tr key={`${item.itemName}-${item.fabricType}-${item.color || ''}-${item.unit}`} className="hover:bg-slate-50 transition h-10">
                         <td className="border-r-[1.5px] border-black px-3 py-2 text-center font-bold font-mono text-slate-700">
                           {item.sNo ?? index + 1}
                         </td>
                         <td className="border-r-[1.5px] border-black px-4 py-2 font-bold text-slate-900">
                           {item.itemName}
+                          <div className="text-[10px] font-semibold text-slate-500">
+                            Colour: {item.color || 'all colours (includes stock recorded without colour)'}
+                          </div>
                         </td>
                         <td className="border-r-[1.5px] border-black px-3 py-2 text-center">
                           <span
@@ -539,7 +544,10 @@ function TotalStockContent() {
                   <tr key={entry.id} className="hover:bg-slate-50">
                     <td className="px-4 py-2 whitespace-nowrap">{formatDate(entry.date)}</td>
                     <td className="px-4 py-2 font-semibold">{entry.challanNumber || '—'}</td>
-                    <td className="px-4 py-2">{entry.itemName}</td>
+                    <td className="px-4 py-2">
+                      {entry.itemName}
+                      {entry.color && <span className="text-slate-500"> / {entry.color}</span>}
+                    </td>
                     <td className="px-4 py-2">{entry.sourceDepartment || '—'}</td>
                     <td className="px-4 py-2">{entry.destination || '—'}</td>
                     <td className="px-4 py-2 text-right font-bold">{Number(entry.quantity).toLocaleString('en-IN', { maximumFractionDigits: 2 })} {entry.unit}</td>
@@ -556,7 +564,7 @@ function TotalStockContent() {
 
 export default function TotalStockPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#F0FAF9] flex items-center justify-center text-xs text-slate-500">Loading Total Stock Balance...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-ink-50 flex items-center justify-center text-xs text-slate-500">Loading Total Stock Balance...</div>}>
       <TotalStockContent />
     </Suspense>
   );

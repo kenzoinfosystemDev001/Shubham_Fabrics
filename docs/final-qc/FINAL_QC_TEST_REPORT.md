@@ -2,7 +2,7 @@
 
 ## Focused automated checks
 
-Command: `node --test scripts/test-final-check-rules.mjs`
+Command: `node --test scripts/test-final-qc-rules.mjs`
 
 | Check | Result |
 |---|---|

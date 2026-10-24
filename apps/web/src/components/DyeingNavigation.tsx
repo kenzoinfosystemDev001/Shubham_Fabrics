@@ -75,7 +75,7 @@ export function DyeingNavigation() {
     const active = exact ? pathname === href : pathname === href || pathname.startsWith(href + '/');
     return `flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition ${
       active
-        ? 'bg-[#1E293B] text-white border-l-2 border-purple-400 pl-2.5 shadow-xs'
+        ? 'bg-ink-800 text-white border-l-2 border-lavender-400 pl-2.5 shadow-xs'
         : 'text-slate-300 hover:bg-slate-800/60 hover:text-white'
     }`;
   };
@@ -83,7 +83,7 @@ export function DyeingNavigation() {
   return (
     <>
       {/* MOBILE TOP BAR (visible on screens < md) */}
-      <div className="md:hidden sticky top-0 z-40 bg-[#0F172A] border-b border-slate-800 px-4 py-3 flex items-center justify-between shadow-sm">
+      <div className="md:hidden sticky top-0 z-40 bg-ink-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setMobileOpen(true)}
@@ -93,7 +93,7 @@ export function DyeingNavigation() {
             <Menu className="w-6 h-6" />
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-white p-0.5 border border-purple-500/40 flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-white p-0.5 border border-lavender-500/40 flex items-center justify-center shrink-0">
               <img
                 src="/shubham-logo.jpg"
                 alt="Shubham Fabrics"
@@ -102,7 +102,7 @@ export function DyeingNavigation() {
             </div>
             <div>
               <span className="text-xs font-bold text-white tracking-wide block leading-none">SHUBHAM FABRICS</span>
-              <span className="text-[9px] font-bold text-purple-400 tracking-wider uppercase block">DYEING DEPT</span>
+              <span className="text-[9px] font-bold text-lavender-400 tracking-wider uppercase block">DYEING DEPT</span>
             </div>
           </div>
         </div>
@@ -127,7 +127,7 @@ export function DyeingNavigation() {
       {/* SIDEBAR ASIDE */}
       <aside
         style={{
-          backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.40), rgba(10, 15, 29, 0.60)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundImage: `linear-gradient(to bottom, rgba(37, 35, 42, 0.40), rgba(24, 22, 28, 0.60)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -139,7 +139,7 @@ export function DyeingNavigation() {
         {/* BRANDING WITH OFFICIAL IMG 3 LOGO */}
         <div className="p-4 border-b border-slate-700/60 bg-slate-950/40 backdrop-blur-sm flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-white p-0.5 border border-purple-500/40 flex items-center justify-center shadow-sm overflow-hidden shrink-0">
+            <div className="w-10 h-10 rounded-lg bg-white p-0.5 border border-lavender-500/40 flex items-center justify-center shadow-sm overflow-hidden shrink-0">
               <img
                 src="/shubham-logo.jpg"
                 alt="Shubham Fabrics Logo"
@@ -148,7 +148,7 @@ export function DyeingNavigation() {
             </div>
             <div className="min-w-0">
               <span className="text-xs font-bold tracking-[0.14em] text-white truncate block">SHUBHAM FABRICS</span>
-              <span className="text-[10px] font-medium tracking-[0.18em] text-purple-400 block truncate">MES ENTERPRISE</span>
+              <span className="text-[10px] font-medium tracking-[0.18em] text-lavender-400 block truncate">MES ENTERPRISE</span>
             </div>
           </div>
 
@@ -172,7 +172,7 @@ export function DyeingNavigation() {
           </div>
         </div>
 
-        {/* NAVIGATION ITEMS: Dashboard, My Work (Incoming Challans, Create Challan to QC1), Floor Board */}
+        {/* NAVIGATION ITEMS: Dashboard, My Work (Incoming Challans, Create Challan to Dyeing QC), Floor Board */}
         <nav className="flex-1 px-3 space-y-1 overflow-y-auto pt-2">
           {/* 1. Dashboard */}
           <Link
@@ -180,7 +180,7 @@ export function DyeingNavigation() {
             onClick={() => setMobileOpen(false)}
             className={linkClass('/dyeing', true)}
           >
-            <LayoutDashboard className="w-4 h-4 text-purple-400" />
+            <LayoutDashboard className="w-4 h-4 text-lavender-400" />
             <span>Dashboard</span>
           </Link>
 
@@ -202,7 +202,7 @@ export function DyeingNavigation() {
                 onClick={() => setMobileOpen(false)}
                 className={`flex items-center gap-2 px-2 py-1.5 rounded text-[11px] font-medium transition ${
                   pathname === '/dyeing/my-work'
-                    ? 'text-purple-300 hover:text-white hover:bg-slate-800/60'
+                    ? 'text-lavender-300 hover:text-white hover:bg-slate-800/60'
                     : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
                 }`}
               >
@@ -213,11 +213,11 @@ export function DyeingNavigation() {
                 onClick={() => setMobileOpen(false)}
                 className={`flex items-center gap-2 px-2 py-1.5 rounded text-[11px] font-medium transition ${
                   pathname === '/dyeing/my-work'
-                    ? 'text-purple-300 hover:text-white hover:bg-slate-800/60'
+                    ? 'text-lavender-300 hover:text-white hover:bg-slate-800/60'
                     : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
                 }`}
               >
-                <span>Create Challan to QC1</span>
+                <span>Create Challan to Dyeing QC</span>
               </Link>
             </div>
           </div>
@@ -236,12 +236,12 @@ export function DyeingNavigation() {
         {/* USER & SIGN OUT FOOTER */}
         <div className="p-4 border-t border-slate-700/60 bg-slate-950/50 backdrop-blur-md">
           <div className="flex items-center gap-3 mb-3">
-            <UserCircle className="w-8 h-8 text-purple-400/90" />
+            <UserCircle className="w-8 h-8 text-lavender-400/90" />
             <div className="flex-1 min-w-0">
               <span className="text-xs font-semibold text-white truncate block drop-shadow-xs">
                 {currentUser.fullName || (isAdmin ? 'System Administrator' : 'Dyeing Incharge')}
               </span>
-              <span className="text-[10px] text-purple-400 font-bold tracking-wide block truncate drop-shadow-xs">
+              <span className="text-[10px] text-lavender-400 font-bold tracking-wide block truncate drop-shadow-xs">
                 Dyeing Department
               </span>
             </div>

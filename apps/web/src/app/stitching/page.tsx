@@ -126,11 +126,11 @@ export default function StitchingDashboard() {
   const inFloorQueue = incomingChallans.filter((c: any) => c.status === 'RECEIVED' || c.status === 'IN_PROCESS');
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-ink-950 text-slate-100 flex flex-col">
       {/* HEADER HERO */}
       <div
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.85)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundImage: `linear-gradient(to right, rgba(37, 35, 42, 0.95), rgba(37, 35, 42, 0.85)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -328,7 +328,7 @@ export default function StitchingDashboard() {
         </div>
 
         {/* PRODUCTION OUTPUT & EFFICIENCY STRIP */}
-        <div className="p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900/90 to-indigo-950/40 border border-slate-800 shadow-md">
+        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-md">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 pb-3 border-b border-slate-800">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-indigo-500/20 text-indigo-400">
@@ -433,7 +433,7 @@ export default function StitchingDashboard() {
                         <button
                           onClick={() => handleQuickReceive(ch.id)}
                           disabled={quickActionLoading === ch.id}
-                          className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition shrink-0 disabled:opacity-50 flex items-center gap-1.5"
+                          className="px-3 py-1.5 rounded-lg bg-lavender-600 hover:bg-emerald-500 text-white font-semibold text-xs transition shrink-0 disabled:opacity-50 flex items-center gap-1.5"
                         >
                           <Check className="w-3.5 h-3.5" />
                           <span>{quickActionLoading === ch.id ? 'Receiving...' : 'Confirm In'}</span>

@@ -70,7 +70,7 @@ export default function MaterialReceiptListPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F0FAF9]">
+    <div className="min-h-screen bg-ink-50">
       <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div>
           <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-teal-700 block">
@@ -108,7 +108,7 @@ export default function MaterialReceiptListPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="text-xs border border-slate-300 rounded-md px-3 py-1.5 bg-white text-slate-800 focus:outline-none focus:ring-1 focus:ring-teal-500"
+              className="text-xs border border-slate-300 rounded-md px-3 py-1.5 bg-white text-slate-800 focus:outline-none focus:ring-1 focus:ring-lavender-500"
             >
               <option value="">All Statuses</option>
               <option value="DRAFT">Draft</option>

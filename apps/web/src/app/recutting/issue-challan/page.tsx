@@ -23,6 +23,7 @@ import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import BarcodeStickerCard from '@/components/BarcodeStickerCard';
 import { ColorFabricMeasurementTable, createDepartmentInOutTracking } from '@/components/ColorFabricMeasurementTable';
+import { ChallanNumberInput, getChallanNumberError } from '@/components/challan/ChallanNumberInput';
 
 function RecuttingIssueChallanContent() {
   const router = useRouter();
@@ -35,6 +36,8 @@ function RecuttingIssueChallanContent() {
   const [selectedJob, setSelectedJob] = useState<any | null>(null);
   const [selectedSheetForView, setSelectedSheetForView] = useState<any | null>(null);
   const [generatedChallan, setGeneratedChallan] = useState<any | null>(null);
+  const [challanNumber, setChallanNumber] = useState('');
+  const [challanNumberError, setChallanNumberError] = useState<string | null>(null);
 
   const [priority, setPriority] = useState('NORMAL');
   const [remarks, setRemarks] = useState(
@@ -167,10 +170,18 @@ function RecuttingIssueChallanContent() {
       return;
     }
 
+    const numberError = getChallanNumberError(challanNumber);
+    if (numberError) {
+      setChallanNumberError(numberError);
+      return;
+    }
+    setChallanNumberError(null);
+
     try {
       setLoading(true);
 
       const payload = {
+        challanNumber: challanNumber.trim(),
         parentChallanId: selectedJob.id,
         programId: selectedJob.programId,
         ...tracking,
@@ -197,10 +208,15 @@ function RecuttingIssueChallanContent() {
 
       const json = await res.json();
       if (!res.ok) {
+        if (json.field === 'challanNumber') {
+          setChallanNumberError(json.error || 'Invalid challan number.');
+          return;
+        }
         throw new Error(json.error || 'Failed to issue challan');
       }
 
       setGeneratedChallan(json.data || json);
+      setChallanNumber('');
     } catch (err: any) {
       alert(`Error issuing challan: ${err.message}`);
     } finally {
@@ -209,11 +225,11 @@ function RecuttingIssueChallanContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] pb-16">
+    <div className="min-h-screen bg-ink-50 pb-16">
       {/* HEADER */}
       <header
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundImage: `linear-gradient(to right, rgba(37, 35, 42, 0.88), rgba(37, 35, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -268,7 +284,7 @@ function RecuttingIssueChallanContent() {
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
                 <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide flex items-center gap-2">
-                  <Scissors className="w-4 h-4 text-rose-600" />
+                  <Scissors className="w-4 h-4 text-lavender-600" />
                   <span>1. Select Verified Source Job (Recutting Challan)</span>
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
@@ -290,7 +306,7 @@ function RecuttingIssueChallanContent() {
 
             {fetchingJobs ? (
               <div className="p-6 text-center text-slate-400">
-                <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-rose-500" />
+                <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-lavender-500" />
                 <span className="text-xs">Loading available jobs...</span>
               </div>
             ) : sourceJobs.length === 0 ? (
@@ -308,7 +324,7 @@ function RecuttingIssueChallanContent() {
                     const found = sourceJobs.find((j) => j.id === e.target.value);
                     if (found) selectJob(found);
                   }}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white font-medium"
+                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender-500 bg-white font-medium"
                 >
                   {sourceJobs.map((j) => {
                     const good = j.fabricOut ?? j.fabricIn ?? 0;
@@ -331,7 +347,7 @@ function RecuttingIssueChallanContent() {
                 </div>
                 <div>
                   <span className="text-slate-400 block text-[10px]">Wilcom File #</span>
-                  <strong className="text-rose-700 font-mono">{selectedJob.program?.wilcomDesignNumber || 'N/A'}</strong>
+                  <strong className="text-lavender-700 font-mono">{selectedJob.program?.wilcomDesignNumber || 'N/A'}</strong>
                 </div>
                 <div>
                   <span className="text-slate-400 block text-[10px]">Buyer / Client</span>
@@ -352,6 +368,16 @@ function RecuttingIssueChallanContent() {
               <span>2. Handover Routing & Priority</span>
             </h2>
 
+            <ChallanNumberInput
+              value={challanNumber}
+              onChange={(value) => {
+                setChallanNumber(value);
+                setChallanNumberError(null);
+              }}
+              error={challanNumberError}
+              tone="light"
+              className="max-w-sm"
+            />
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">From Department</label>
@@ -378,7 +404,7 @@ function RecuttingIssueChallanContent() {
                 <select
                   value={priority}
                   onChange={(e) => setPriority(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white font-medium"
+                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender-500 bg-white font-medium"
                 >
                   <option value="NORMAL">Normal</option>
                   <option value="HIGH">High Priority</option>
@@ -395,7 +421,7 @@ function RecuttingIssueChallanContent() {
                 rows={2}
                 value={remarks}
                 onChange={(e) => setRemarks(e.target.value)}
-                className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender-500"
               />
             </div>
           </div>
@@ -433,7 +459,7 @@ function RecuttingIssueChallanContent() {
                     <button
                       type="button"
                       onClick={() => handleRemoveItem(index)}
-                      className="absolute top-3 right-3 text-slate-400 hover:text-rose-600 p-1"
+                      className="absolute top-3 right-3 text-slate-400 hover:text-lavender-600 p-1"
                       title="Remove Item"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -530,7 +556,7 @@ function RecuttingIssueChallanContent() {
             <button
               type="submit"
               disabled={loading || totalQuantityToIssue <= 0}
-              className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-2 disabled:opacity-50"
+              className="px-6 py-2.5 bg-lavender-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-2 disabled:opacity-50"
             >
               {loading ? (
                 <>
@@ -630,9 +656,9 @@ export default function RecuttingIssueChallanPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center p-8">
+        <div className="min-h-screen bg-ink-50 flex items-center justify-center p-8">
           <div className="text-center text-slate-500">
-            <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-rose-600" />
+            <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-lavender-600" />
             <p className="text-xs font-semibold">Loading Handover Form...</p>
           </div>
         </div>

@@ -232,7 +232,7 @@ export function ProductionSheetTraveler({
             <tbody className="divide-y divide-slate-200">
               {[
                 { seq: 1, dept: 'STORE', name: 'Raw Material Store', challan: 'CHL-ST-001', qty: '1,250 KG', qa: 'Pass (Rolls)', status: 'COMPLETED', sign: 'M. Verma' },
-                { seq: 2, dept: 'DYEING', name: 'Dyeing & Processing', challan: 'CHL-DY-001', qty: '1,210 KG', qa: 'QC-1 Passed', status: 'COMPLETED', sign: 'R. Sharma' },
+                { seq: 2, dept: 'DYEING', name: 'Dyeing & Processing', challan: 'CHL-DY-001', qty: '1,210 KG', qa: 'Dyeing QC Passed', status: 'COMPLETED', sign: 'R. Sharma' },
                 { seq: 3, dept: 'CUTTING', name: 'Cutting & Bundles', challan: 'CHL-CU-001', qty: '5,000 PCS', qa: 'Lay Audit Passed', status: 'COMPLETED', sign: 'A. Patel' },
                 { seq: 4, dept: 'STITCHING', name: 'Garment Sewing Lines', challan: 'CHL-ST-002', qty: '5,000 PCS', qa: 'Inline Audit Pass', status: 'IN_PROGRESS', sign: 'S. Nair' },
                 { seq: 5, dept: 'FINISHING', name: 'Finishing & Pressing', challan: 'CHL-FN-001', qty: '5,000 PCS', qa: '100% Audit', status: 'PENDING', sign: '—' },

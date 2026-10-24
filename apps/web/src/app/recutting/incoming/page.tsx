@@ -79,7 +79,7 @@ export default function RecuttingIncomingPage() {
     setSelectedChallan(ch);
     const totalQty = ch.items.reduce((sum: number, it: any) => sum + (Number(it.quantity) || 0), 0);
     setReceiveQuantity(totalQty);
-    setReceiveRemarks('Physical count verified against QC Washing Challan. Ready for precision panel cutting.');
+    setReceiveRemarks('Physical count verified against Washing QC Challan. Ready for precision panel cutting.');
     setReceiveError('');
     setReceiveSuccess('');
   };
@@ -159,11 +159,11 @@ export default function RecuttingIncomingPage() {
   const receivedCount = challans.filter((c) => c.status === 'RECEIVED').length;
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] pb-16">
+    <div className="min-h-screen bg-ink-50 pb-16">
       {/* HEADER */}
       <header
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundImage: `linear-gradient(to right, rgba(37, 35, 42, 0.88), rgba(37, 35, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -173,7 +173,7 @@ export default function RecuttingIncomingPage() {
           <div>
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                QC WASHING INTAKE
+                WASHING QC INTAKE
               </span>
               <span className="text-xs text-slate-300 font-medium">
                 Physical Receipt & Material Intake
@@ -181,10 +181,10 @@ export default function RecuttingIncomingPage() {
             </div>
             <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight mt-1 flex items-center gap-2">
               <ArrowDownLeft className="w-6 h-6 text-amber-400" />
-              <span>Incoming Challans from QC Washing</span>
+              <span>Incoming Challans from Washing QC</span>
             </h1>
             <p className="text-xs text-slate-300 mt-0.5">
-              Verify incoming pieces from QC Washing before opening cutting workstations.
+              Verify incoming pieces from Washing QC before opening cutting workstations.
             </p>
           </div>
 
@@ -199,7 +199,7 @@ export default function RecuttingIncomingPage() {
             </button>
             <Link
               href="/recutting/my-work"
-              className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition shadow-xs"
+              className="px-3 py-1.5 bg-lavender-600 hover:bg-lavender-500 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition shadow-xs"
             >
               <Scissors className="w-3.5 h-3.5" />
               <span>Open Cutting Queue</span>
@@ -240,7 +240,7 @@ export default function RecuttingIncomingPage() {
               onClick={() => setActiveTab('ISSUED')}
               className={`px-3 py-1.5 text-xs font-bold rounded-md transition ${
                 activeTab === 'ISSUED'
-                  ? 'bg-amber-600 text-white shadow-xs'
+                  ? 'bg-lavender-600 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -250,7 +250,7 @@ export default function RecuttingIncomingPage() {
               onClick={() => setActiveTab('RECEIVED')}
               className={`px-3 py-1.5 text-xs font-bold rounded-md transition ${
                 activeTab === 'RECEIVED'
-                  ? 'bg-rose-600 text-white shadow-xs'
+                  ? 'bg-lavender-600 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -265,7 +265,7 @@ export default function RecuttingIncomingPage() {
               placeholder="Search challan, program, buyer, design..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
+              className="w-full pl-9 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender-500"
             />
           </div>
         </div>
@@ -278,7 +278,7 @@ export default function RecuttingIncomingPage() {
               <p className="text-sm font-semibold text-slate-600">No incoming challans found</p>
               <p className="text-xs text-slate-400 mt-1">
                 {activeTab === 'ISSUED'
-                  ? 'No pending transfers awaiting receipt from QC Washing.'
+                  ? 'No pending transfers awaiting receipt from Washing QC.'
                   : 'Adjust filters or check again when new challans are issued.'}
               </p>
             </div>
@@ -297,7 +297,7 @@ export default function RecuttingIncomingPage() {
                   className={`bg-white rounded-xl border transition shadow-xs flex flex-col justify-between overflow-hidden ${
                     isIssued
                       ? 'border-amber-300 hover:border-amber-400'
-                      : 'border-slate-200 hover:border-rose-400'
+                      : 'border-slate-200 hover:border-lavender-400'
                   }`}
                 >
                   <div className="p-4">
@@ -349,7 +349,7 @@ export default function RecuttingIncomingPage() {
                       </div>
                       <div className="flex justify-between">
                         <span>Issued From:</span>
-                        <strong className="text-slate-800">{ch.fromDepartment || 'QC WASHING'}</strong>
+                        <strong className="text-slate-800">{ch.fromDepartment || 'Washing QC'}</strong>
                       </div>
                     </div>
 
@@ -376,7 +376,7 @@ export default function RecuttingIncomingPage() {
                       {isIssued ? (
                         <button
                           onClick={() => openReceiveModal(ch)}
-                          className="w-full py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-bold transition shadow-xs flex items-center justify-center gap-1.5"
+                          className="w-full py-2 bg-lavender-600 hover:bg-amber-500 text-white rounded-lg text-xs font-bold transition shadow-xs flex items-center justify-center gap-1.5"
                         >
                           <ArrowDownLeft className="w-3.5 h-3.5" />
                           <span>Perform Physical Check & Receive</span>
@@ -384,7 +384,7 @@ export default function RecuttingIncomingPage() {
                       ) : (
                         <Link
                           href={`/recutting/my-work?jobId=${ch.id}`}
-                          className="w-full py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-bold transition shadow-xs flex items-center justify-center gap-1.5"
+                          className="w-full py-2 bg-lavender-600 hover:bg-lavender-500 text-white rounded-lg text-xs font-bold transition shadow-xs flex items-center justify-center gap-1.5"
                         >
                           <Scissors className="w-3.5 h-3.5" />
                           <span>Open Cutting Workstation</span>
@@ -472,7 +472,7 @@ export default function RecuttingIncomingPage() {
                   value={receiveQuantity}
                   onChange={(e) => setReceiveQuantity(e.target.value === '' ? '' : Number(e.target.value))}
                   required
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 font-semibold"
+                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender-500 font-semibold"
                 />
                 <span className="text-[11px] text-slate-500 mt-1 block">
                   Must match the count of washed embroidered panels/pieces physically counted.
@@ -489,7 +489,7 @@ export default function RecuttingIncomingPage() {
                   value={receiveRemarks}
                   onChange={(e) => setReceiveRemarks(e.target.value)}
                   placeholder="Note condition, cleanliness, or bundle tag checks..."
-                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
+                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender-500"
                 />
               </div>
 
@@ -506,7 +506,7 @@ export default function RecuttingIncomingPage() {
                 <button
                   type="submit"
                   disabled={submittingReceive}
-                  className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-bold shadow-xs transition flex items-center gap-1.5 disabled:opacity-50"
+                  className="px-4 py-2 bg-lavender-600 hover:bg-amber-500 text-white rounded-lg text-xs font-bold shadow-xs transition flex items-center gap-1.5 disabled:opacity-50"
                 >
                   {submittingReceive ? (
                     <>

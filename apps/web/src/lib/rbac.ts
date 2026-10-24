@@ -1,3 +1,5 @@
+import { normalizeDepartmentCode, normalizeRoleCode } from '@subham/types';
+
 export type MESRole = 'ADMIN' | 'PROGRAMMER' | 'FABRIC_STORE' | 'SUPER_ADMIN' | 'STORE_MANAGER' | 'USER';
 export type MESDepartment = 'ADMIN' | 'PROGRAMMING' | 'STORE' | 'DYEING' | 'EMBROIDERY' | 'CENTRAL';
 
@@ -19,7 +21,7 @@ export function getCurrentUser(): MESUser | null {
     try {
       const parsed = JSON.parse(raw);
       if (parsed && (parsed.departmentCode || parsed.role || parsed.username)) {
-        return parsed;
+        return withCurrentCodes(parsed);
       }
     } catch {}
   }
@@ -39,15 +41,25 @@ export function getCurrentUser(): MESUser | null {
         username: dept.toLowerCase(),
         fullName: `${dept} Incharge`,
         email: `${dept.toLowerCase()}@subhamfabrics.com`,
-        role: role,
-        roles: [role],
-        departmentCode: dept,
+        role: normalizeRoleCode(role),
+        roles: [normalizeRoleCode(role)],
+        departmentCode: normalizeDepartmentCode(dept),
       };
       localStorage.setItem('subham_mes_user', JSON.stringify(userObj));
       return userObj;
     }
   } catch {}
   return null;
+}
+
+/** Maps department and role codes saved by sessions created before the QC department rename. */
+function withCurrentCodes(user: MESUser): MESUser {
+  return {
+    ...user,
+    departmentCode: normalizeDepartmentCode(user.departmentCode),
+    role: normalizeRoleCode(user.role),
+    roles: (user.roles || []).map(normalizeRoleCode),
+  };
 }
 
 export function isAdminUser(user: MESUser | null): boolean {
@@ -89,7 +101,7 @@ export function isProgrammingUser(user: MESUser | null): boolean {
 
 /**
  * Only Programming and Admin departments are authorized to view the Client Code.
- * All other departments (Fabric Store, Dyeing, QC1, Embroidery, Thread Cutting, etc.)
+ * All other departments (Fabric Store, Dyeing, Dyeing QC, Embroidery, Thread Cutting, etc.)
  * are strictly restricted from seeing client code.
  */
 export function canViewClientCode(user: MESUser | null): boolean {
@@ -142,7 +154,7 @@ export function isDyeingUser(user: MESUser | null): boolean {
   );
 }
 
-export function isQc1User(user: MESUser | null): boolean {
+export function isDyeingQcUser(user: MESUser | null): boolean {
   if (!user) return false;
   if (isAdminUser(user)) return true; // Admins have all access
 
@@ -151,21 +163,21 @@ export function isQc1User(user: MESUser | null): boolean {
   const role = (user.role || '').toUpperCase();
   const roles = (user.roles || []).map((r) => r.toUpperCase());
 
-  if (dept === 'QC2' || dept === 'QC3' || dept === 'QCWASHING' || dept === 'QC_WASHING') return false;
+  if (dept === 'THREADCUT_QC' || dept === 'WASHING_QC') return false;
   if (username === 'qc2' || username === 'qc2_insp' || username === 'qc3' || username === 'qcwashing' || username === 'qc_washing') return false;
 
   return (
     username === 'qc1' ||
     username === 'qc_insp' ||
-    dept === 'QC1' ||
+    dept === 'DYEING_QC' ||
     role === 'QC_INSPECTOR' ||
-    role === 'QC1_INSPECTOR' ||
+    role === 'DYEING_QC_INSPECTOR' ||
     roles.includes('QC_INSPECTOR') ||
-    roles.includes('QC1_INSPECTOR')
+    roles.includes('DYEING_QC_INSPECTOR')
   );
 }
 
-export function isQc2User(user: MESUser | null): boolean {
+export function isThreadcutQcUser(user: MESUser | null): boolean {
   if (!user) return false;
   if (isAdminUser(user)) return true; // Admins have all access
 
@@ -174,16 +186,16 @@ export function isQc2User(user: MESUser | null): boolean {
   const role = (user.role || '').toUpperCase();
   const roles = (user.roles || []).map((r) => r.toUpperCase());
 
-  if (dept === 'QC1' || dept === 'QC3' || dept === 'QCWASHING' || dept === 'QC_WASHING') return false;
+  if (dept === 'DYEING_QC' || dept === 'WASHING_QC') return false;
   if (username === 'qc1' || username === 'qc_insp' || username === 'qc3' || username === 'qcwashing' || username === 'qc_washing') return false;
 
   return (
     username === 'qc2' ||
     username === 'qc2_insp' ||
-    dept === 'QC2' ||
-    role === 'QC2_INSPECTOR' ||
+    dept === 'THREADCUT_QC' ||
+    role === 'THREADCUT_QC_INSPECTOR' ||
     role === 'QC_INSPECTOR' ||
-    roles.includes('QC2_INSPECTOR')
+    roles.includes('THREADCUT_QC_INSPECTOR')
   );
 }
 
@@ -247,7 +259,7 @@ export function isWashingUser(user: MESUser | null): boolean {
   );
 }
 
-export function isQcWashingUser(user: MESUser | null): boolean {
+export function isWashingQcUser(user: MESUser | null): boolean {
   if (!user) return false;
   if (isAdminUser(user)) return true; // Admins have all access
 
@@ -256,7 +268,7 @@ export function isQcWashingUser(user: MESUser | null): boolean {
   const role = (user.role || '').toUpperCase();
   const roles = (user.roles || []).map((r) => r.toUpperCase());
 
-  if (dept === 'QC1' || dept === 'QC2') return false;
+  if (dept === 'DYEING_QC' || dept === 'THREADCUT_QC') return false;
   if (username === 'qc1' || username === 'qc_insp' || username === 'qc2' || username === 'qc2_insp') return false;
 
   return (
@@ -264,15 +276,9 @@ export function isQcWashingUser(user: MESUser | null): boolean {
     username === 'qc_washing' ||
     username === 'qc3' ||
     username === 'qc3_insp' ||
-    dept === 'QC3' ||
-    dept === 'QCWASHING' ||
-    dept === 'QC_WASHING' ||
     dept === 'WASHING_QC' ||
-    role === 'QCWASHING_INSPECTOR' ||
-    role === 'QC3_INSPECTOR' ||
-    roles.includes('QCWASHING_INSPECTOR') ||
-    roles.includes('QC3_INSPECTOR') ||
-    (roles.includes('QC_INSPECTOR') && (dept === 'QC3' || dept === 'QCWASHING' || dept === 'QC_WASHING'))
+    role === 'WASHING_QC_INSPECTOR' ||
+    roles.includes('WASHING_QC_INSPECTOR')
   );
 }
 
@@ -340,7 +346,7 @@ export function isSteamPressUser(user: MESUser | null): boolean {
   );
 }
 
-export function isFinalCheckUser(user: MESUser | null): boolean {
+export function isFinalQCUser(user: MESUser | null): boolean {
   if (!user) return false;
   if (isAdminUser(user)) return true; // Admins have all access
 
@@ -353,12 +359,11 @@ export function isFinalCheckUser(user: MESUser | null): boolean {
     username === 'finalcheck' ||
     username === 'final_check' ||
     username === 'finalqc' ||
-    dept === 'FINAL_CHECK' ||
     dept === 'FINAL_QC' ||
-    role === 'FINAL_CHECK_INSPECTOR' ||
-    role === 'FINAL_CHECK_SUPERVISOR' ||
-    roles.includes('FINAL_CHECK_INSPECTOR') ||
-    roles.includes('FINAL_CHECK_SUPERVISOR')
+    role === 'FINAL_QC_INSPECTOR' ||
+    role === 'FINAL_QC_SUPERVISOR' ||
+    roles.includes('FINAL_QC_INSPECTOR') ||
+    roles.includes('FINAL_QC_SUPERVISOR')
   );
 }
 
@@ -386,20 +391,27 @@ export function isFinishingUser(user: MESUser | null): boolean {
 export function getUserStationHome(user: MESUser | null): string {
   if (!user) return '/login';
   if (isAdminUser(user)) return '/admin';
-  if (isFinalCheckUser(user)) return '/final-check';
+  if (isFinalQCUser(user)) return '/final-qc';
   if (isSteamPressUser(user)) return '/steam-press';
   if (isFinishingUser(user)) return '/finishing';
   if (isStitchingUser(user)) return '/stitching';
   if (isRecuttingUser(user)) return '/recutting';
-  if (isQcWashingUser(user)) return '/qcwashing';
+  if (isWashingQcUser(user)) return '/washing-qc';
   if (isWashingUser(user)) return '/washing';
-  if (isQc1User(user)) return '/qc1';
-  if (isQc2User(user)) return '/qc2';
+  if (isDyeingQcUser(user)) return '/dyeing-qc';
+  if (isThreadcutQcUser(user)) return '/threadcut-qc';
   if (isDyeingUser(user)) return '/dyeing';
   if (isFabricStoreUser(user)) return '/fabric-store';
   if (isEmbroideryUser(user)) return '/embroidery';
   if (isThreadCuttingUser(user)) return '/thread-cutting';
   return '/programming';
+}
+
+/**
+ * True when pathname is `root` or a page beneath it, so '/washing' does not match '/washing-qc'.
+ */
+export function isRouteWithin(pathname: string, root: string): boolean {
+  return pathname === root || pathname.startsWith(`${root}/`);
 }
 
 /**
@@ -444,13 +456,13 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
     };
   }
 
-  // Shared Production Sheets access: QC2, Washing, and all authenticated stations must be able to view Production Sheets
+  // Shared Production Sheets access: Threadcut QC, Washing, and all authenticated stations must be able to view Production Sheets
   if (pathname.startsWith('/programs')) {
     return { allowed: true, redirectTarget: pathname };
   }
 
   // Washing Department routes protection
-  if (pathname.startsWith('/washing')) {
+  if (isRouteWithin(pathname, '/washing')) {
     if (isWashingUser(user)) {
       return { allowed: true, redirectTarget: pathname };
     }
@@ -485,9 +497,9 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
     };
   }
 
-  // QC1 Department routes protection
-  if (pathname.startsWith('/qc1')) {
-    if (isQc1User(user)) {
+  // Dyeing QC Department routes protection
+  if (pathname.startsWith('/dyeing-qc')) {
+    if (isDyeingQcUser(user)) {
       return { allowed: true, redirectTarget: pathname };
     }
     return {
@@ -497,27 +509,27 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
     };
   }
 
-  // QC2 Department routes protection
-  if (pathname.startsWith('/qc2')) {
-    if (isQc2User(user)) {
+  // Threadcut QC Department routes protection
+  if (pathname.startsWith('/threadcut-qc')) {
+    if (isThreadcutQcUser(user)) {
       return { allowed: true, redirectTarget: pathname };
     }
     return {
       allowed: false,
       redirectTarget: defaultUserHome,
-      reason: 'Access Restricted: You are not authorized for the QC2 Department. Access is restricted to QC2 Quality personnel and Admins.',
+      reason: 'Access Restricted: You are not authorized for the Threadcut QC Department. Access is restricted to Threadcut QC Quality personnel and Admins.',
     };
   }
 
-  // QC Washing Department routes protection
-  if (pathname.startsWith('/qcwashing') || pathname.startsWith('/qc-washing') || pathname.startsWith('/qc3')) {
-    if (isQcWashingUser(user)) {
+  // Washing QC Department routes protection
+  if (pathname.startsWith('/washing-qc')) {
+    if (isWashingQcUser(user)) {
       return { allowed: true, redirectTarget: pathname };
     }
     return {
       allowed: false,
       redirectTarget: defaultUserHome,
-      reason: 'Access Restricted: You are not authorized for the QC Washing Department. Access is restricted to QC Washing personnel and Admins.',
+      reason: 'Access Restricted: You are not authorized for the Washing QC Department. Access is restricted to Washing QC personnel and Admins.',
     };
   }
 
@@ -534,7 +546,7 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
   }
 
   // Dyeing Department routes protection
-  if (pathname.startsWith('/dyeing')) {
+  if (isRouteWithin(pathname, '/dyeing')) {
     if (isDyeingUser(user)) {
       return { allowed: true, redirectTarget: pathname };
     }
@@ -582,8 +594,8 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
   }
 
   // Final QC Department routes protection
-  if (pathname.startsWith('/final-check')) {
-    if (isFinalCheckUser(user)) {
+  if (pathname.startsWith('/final-qc')) {
+    if (isFinalQCUser(user)) {
       return { allowed: true, redirectTarget: pathname };
     }
     return {
@@ -602,15 +614,15 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
     (pathname.startsWith('/floor-board') &&
       !pathname.startsWith('/fabric-store/floor-board') &&
       !pathname.startsWith('/dyeing/floor-board') &&
-      !pathname.startsWith('/qc1/floor-board') &&
-      !pathname.startsWith('/qc2/floor-board') &&
+      !pathname.startsWith('/dyeing-qc/floor-board') &&
+      !pathname.startsWith('/threadcut-qc/floor-board') &&
       !pathname.startsWith('/washing/floor-board') &&
       !pathname.startsWith('/embroidery/floor-board') &&
       !pathname.startsWith('/recutting/floor-board') &&
       !pathname.startsWith('/stitching/floor-board') &&
       !pathname.startsWith('/finishing/floor-board') &&
       !pathname.startsWith('/steam-press/floor-board') &&
-      !pathname.startsWith('/final-check/floor-board') &&
+      !pathname.startsWith('/final-qc/floor-board') &&
       !pathname.startsWith('/thread-cutting/floor-board'));
 
   if (isProgrammingRoute) {

@@ -133,7 +133,7 @@ function MaterialIssueContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F0FAF9] pb-24">
+    <div className="min-h-screen bg-ink-50 pb-24">
       <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div>
           <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-700 block">
@@ -182,7 +182,7 @@ function MaterialIssueContent() {
                 required
                 value={targetProgramId}
                 onChange={(e) => setTargetProgramId(e.target.value)}
-                className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 font-semibold focus:ring-1 focus:ring-blue-500"
+                className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 font-semibold focus:ring-1 focus:ring-lavender-500"
               >
                 <option value="">-- Choose Target Program --</option>
                 {programs.map((p) => (
@@ -201,7 +201,7 @@ function MaterialIssueContent() {
                 placeholder=""
                 value={issueRemarks}
                 onChange={(e) => setIssueRemarks(e.target.value)}
-                className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 focus:ring-1 focus:ring-blue-500"
+                className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 focus:ring-1 focus:ring-lavender-500"
               />
             </div>
           </div>
@@ -368,7 +368,7 @@ function MaterialIssueContent() {
 
 export default function MaterialIssuePage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#F0FAF9] flex items-center justify-center text-xs text-slate-500">Loading Material Issue...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-ink-50 flex items-center justify-center text-xs text-slate-500">Loading Material Issue...</div>}>
       <MaterialIssueContent />
     </Suspense>
   );

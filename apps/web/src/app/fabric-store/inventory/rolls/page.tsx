@@ -100,7 +100,7 @@ function InventoryRollsContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F0FAF9] pb-16">
+    <div className="min-h-screen bg-ink-50 pb-16">
       <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div>
           <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-teal-700 block">
@@ -283,7 +283,7 @@ function InventoryRollsContent() {
                 <select
                   value={newLocationId}
                   onChange={(e) => setNewLocationId(e.target.value)}
-                  className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 font-semibold focus:ring-1 focus:ring-teal-500"
+                  className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 font-semibold focus:ring-1 focus:ring-lavender-500"
                 >
                   <option value="">-- No Location (Unassigned) --</option>
                   {locations.map((loc) => (
@@ -321,7 +321,7 @@ function InventoryRollsContent() {
 
 export default function InventoryRollsPage() {
   return (
-    <React.Suspense fallback={<div className="min-h-screen bg-[#F0FAF9] p-8 text-xs text-slate-400">Loading rolls inventory...</div>}>
+    <React.Suspense fallback={<div className="min-h-screen bg-ink-50 p-8 text-xs text-slate-400">Loading rolls inventory...</div>}>
       <InventoryRollsContent />
     </React.Suspense>
   );

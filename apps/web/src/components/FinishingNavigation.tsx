@@ -80,7 +80,7 @@ export function FinishingNavigation() {
     const active = exact ? pathname === href : pathname === href || pathname.startsWith(href + '/');
     return `flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition ${
       active
-        ? 'bg-[#1E293B] text-white border-l-2 border-teal-400 pl-2.5 shadow-xs'
+        ? 'bg-ink-800 text-white border-l-2 border-lavender-400 pl-2.5 shadow-xs'
         : 'text-slate-300 hover:bg-slate-800/60 hover:text-white'
     }`;
   };
@@ -88,7 +88,7 @@ export function FinishingNavigation() {
   return (
     <>
       {/* MOBILE TOP BAR (visible on screens < md) */}
-      <div className="md:hidden sticky top-0 z-40 bg-[#0F172A] border-b border-slate-800 px-4 py-3 flex items-center justify-between shadow-sm">
+      <div className="md:hidden sticky top-0 z-40 bg-ink-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setMobileOpen(true)}
@@ -99,7 +99,7 @@ export function FinishingNavigation() {
           </button>
 
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-white p-0.5 border border-teal-500/40 flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-white p-0.5 border border-lavender-500/40 flex items-center justify-center shrink-0">
               <img
                 src="/shubham-logo.jpg"
                 alt="Shubham Fabrics Logo"
@@ -108,7 +108,7 @@ export function FinishingNavigation() {
             </div>
             <div>
               <span className="text-xs font-bold text-white tracking-wide block leading-none">SHUBHAM FABRICS</span>
-              <span className="text-[9px] font-bold text-teal-400 tracking-wider uppercase block">FINISHING & TRIMMING</span>
+              <span className="text-[9px] font-bold text-lavender-400 tracking-wider uppercase block">FINISHING & TRIMMING</span>
             </div>
           </div>
         </div>
@@ -136,7 +136,7 @@ export function FinishingNavigation() {
       {/* SIDEBAR ASIDE */}
       <aside
         style={{
-          backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.40), rgba(10, 15, 29, 0.60)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundImage: `linear-gradient(to bottom, rgba(37, 35, 42, 0.40), rgba(24, 22, 28, 0.60)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -148,7 +148,7 @@ export function FinishingNavigation() {
         {/* BRANDING */}
         <div className="p-4 border-b border-slate-700/60 bg-slate-950/40 backdrop-blur-sm flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-white p-0.5 border border-teal-500/40 flex items-center justify-center shadow-sm overflow-hidden shrink-0">
+            <div className="w-10 h-10 rounded-lg bg-white p-0.5 border border-lavender-500/40 flex items-center justify-center shadow-sm overflow-hidden shrink-0">
               <img
                 src="/shubham-logo.jpg"
                 alt="Shubham Fabrics Logo"
@@ -157,7 +157,7 @@ export function FinishingNavigation() {
             </div>
             <div className="min-w-0">
               <span className="text-xs font-bold tracking-[0.14em] text-white truncate block">SHUBHAM FABRICS</span>
-              <span className="text-[10px] font-medium tracking-[0.18em] text-teal-400 block truncate">FINISHING & TRIMMING</span>
+              <span className="text-[10px] font-medium tracking-[0.18em] text-lavender-400 block truncate">FINISHING & TRIMMING</span>
             </div>
           </div>
 
@@ -188,7 +188,7 @@ export function FinishingNavigation() {
             onClick={() => setMobileOpen(false)}
             className={linkClass('/finishing', true)}
           >
-            <LayoutDashboard className="w-4 h-4 text-teal-400" />
+            <LayoutDashboard className="w-4 h-4 text-lavender-400" />
             <span>Dashboard</span>
           </Link>
 
@@ -208,7 +208,7 @@ export function FinishingNavigation() {
             onClick={() => setMobileOpen(false)}
             className={linkClass('/finishing/my-work', false)}
           >
-            <Sparkles className="w-4 h-4 text-teal-400" />
+            <Sparkles className="w-4 h-4 text-lavender-400" />
             <span>Finishing Floor</span>
           </Link>
 
@@ -247,14 +247,14 @@ export function FinishingNavigation() {
         <div className="p-3 border-t border-slate-700/60 bg-slate-950/40 backdrop-blur-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-full bg-teal-500/20 border border-teal-400/40 flex items-center justify-center shrink-0">
-                <Sparkles className="w-4 h-4 text-teal-300" />
+              <div className="w-8 h-8 rounded-full bg-lavender-500/20 border border-lavender-400/40 flex items-center justify-center shrink-0">
+                <Sparkles className="w-4 h-4 text-lavender-300" />
               </div>
               <div className="min-w-0">
                 <p className="text-xs font-semibold text-white truncate">
                   {currentUser?.fullName || 'Finishing Supervisor'}
                 </p>
-                <p className="text-[10px] text-teal-400 font-mono tracking-tight truncate">
+                <p className="text-[10px] text-lavender-400 font-mono tracking-tight truncate">
                   {currentUser?.role || 'FINISHING_SUPERVISOR'}
                 </p>
               </div>

@@ -10,27 +10,27 @@ A real, database-backed, secure, traceable, enterprise Manufacturing Execution S
 PROGRAM FILE (PRG-YYYY-NNNN)
    │
    ▼
-[ STORE ] ──(CH-STR)──► [ DYEING ] ──(CH-DYE)──► [ QC1 (4-Point) ]
-                                                        │
-   ┌────────────────────────────────────────────────────┘
+[ STORE ] ──(CH-STR)──► [ DYEING ] ──(CH-DYE)──► [ DYEING QC ] ──(CH-EMB-DQC)──► [ EMBROIDERY ]
+                                                                                      │
+   ┌──────────────────────────────────────────────────────────────────────────────────┘
    ▼
-[ CUTTING ] ──(CH-CUT)──► [ EMBROIDERY ] ──(CH-EMB)──► [ THREAD CUTTING ]
-                                                              │
-   ┌──────────────────────────────────────────────────────────┘
-   ▼
-[ WASHING ] ──(CH-WSH)──► [ QC2 (Wash/Shrinkage) ] ──(CH-QC2)──► [ RECUTTING (if defect) ]
-                                                                        │
-   ┌────────────────────────────────────────────────────────────────────┘
-   ▼
-[ STITCHING ] ──(CH-STC)──► [ QC3 (Inline/End-Line) ] ──(CH-QC3)──► [ FINISHING ]
+[ THREAD CUTTING ] ──(CH-THC)──► [ THREADCUT QC ] ──(CH-WASH-TQC)──► [ WASHING ]
                                                                          │
    ┌─────────────────────────────────────────────────────────────────────┘
    ▼
-[ BUTTON & ATTACHMENTS ] ──(CH-BTN)──► [ STEAM PRESS ] ──(CH-PRS)──► [ PACKING ]
-                                                                         │
-   ┌─────────────────────────────────────────────────────────────────────┘
+[ WASHING QC ] ──(CH-RECUT-WQC)──► [ RECUTTING ] ──► [ STITCHING ] ──(CH-STC)──► [ FINISHING ]
+                                                                                      │
+   ┌──────────────────────────────────────────────────────────────────────────────────┘
+   ▼
+[ BUTTON & ATTACHMENTS ] ──(CH-BTN)──► [ STEAM PRESS ] ──(CH-PRS)──► [ FINAL QC ] ──► [ PACKING ]
+                                                                                         │
+   ┌─────────────────────────────────────────────────────────────────────────────────────┘
    ▼
 [ FINISHED GOODS WAREHOUSE ] ──(CH-FG)──► [ DISPATCH GATE ]
+
+Every QC gate (Dyeing QC, Threadcut QC, Washing QC, Final QC) decides PASS (forward to the next
+configured department), REJECT (department defective shelf, reason required) or REWORK (return to
+the department on the incoming challan, reason required).
 ```
 
 ---
@@ -102,6 +102,12 @@ npm run db:push
 
 # Seed factory departments, users, sample order (PRG-2026-0001), rolls, challans & logs
 npm run db:seed
+
+# Existing databases only: rename the legacy QC1/QC2/QC3/QCWASHING/FINAL_CHECK department
+# and role codes to DYEING_QC/THREADCUT_QC/WASHING_QC/FINAL_QC. Run before deploying a build
+# that uses the new codes. Safe to re-run.
+npm run db:migrate-qc -- --dry-run   # preview, then roll back
+npm run db:migrate-qc
 ```
 
 ### 3. Run Test Suite

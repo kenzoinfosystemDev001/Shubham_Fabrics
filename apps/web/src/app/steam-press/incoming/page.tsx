@@ -22,6 +22,7 @@ import {
   Flame,
 } from 'lucide-react';
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
+import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
 
 export default function SteamPressIncomingPage() {
   const router = useRouter();
@@ -143,7 +144,7 @@ export default function SteamPressIncomingPage() {
     <div
       className="min-h-screen text-slate-100 flex flex-col"
       style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.94), rgba(10, 15, 29, 0.98)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+        backgroundImage: `linear-gradient(to bottom, rgba(37, 35, 42, 0.94), rgba(24, 22, 28, 0.98)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',
@@ -232,7 +233,7 @@ export default function SteamPressIncomingPage() {
               placeholder="Search by Challan, Program, Style, Client..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-slate-950/80 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400/60 transition"
+              className="w-full pl-9 pr-4 py-2 bg-slate-950/80 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-lavender-400/60 transition"
             />
             {searchQuery && (
               <button
@@ -379,6 +380,9 @@ export default function SteamPressIncomingPage() {
                     </div>
                   </div>
 
+                  {/* Production Sheet + received challan: view / print / download */}
+                  <DocumentActionButtons challan={ch} program={ch.program} size="xs" />
+
                   {/* Footer Action */}
                   <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between gap-2">
                     <span className="text-[10px] text-slate-500 flex items-center gap-1">
@@ -476,7 +480,7 @@ export default function SteamPressIncomingPage() {
                       onChange={(e) =>
                         setReceiveQuantity(e.target.value === '' ? '' : Number(e.target.value))
                       }
-                      className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-sm text-white font-mono font-bold focus:outline-none focus:border-cyan-400"
+                      className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-sm text-white font-mono font-bold focus:outline-none focus:border-lavender-400"
                     />
                     {Number(receiveQuantity) <
                       selectedChallan.items.reduce(
@@ -517,7 +521,7 @@ export default function SteamPressIncomingPage() {
                       value={receiveRemarks}
                       onChange={(e) => setReceiveRemarks(e.target.value)}
                       placeholder="e.g., Bundle count verified, tags intact, ready for steam pressing"
-                      className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-400 resize-none"
+                      className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-lavender-400 resize-none"
                     />
                   </div>
 

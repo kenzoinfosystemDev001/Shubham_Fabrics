@@ -40,11 +40,11 @@ export default function EmbroideryFloorBoardPage() {
   const done = challans.filter((c: any) => c.status === 'COMPLETED');
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-ink-50">
       {/* HEADER */}
       <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#C026D3] block">
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-lavender-700 block">
             SHUBHAM FABRICS MES · FLOOR OPERATIONS
           </span>
           <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">

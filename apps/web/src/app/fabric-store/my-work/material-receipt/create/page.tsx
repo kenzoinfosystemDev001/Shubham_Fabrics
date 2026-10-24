@@ -178,7 +178,7 @@ function CreateGRNContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F0FAF9] pb-16">
+    <div className="min-h-screen bg-ink-50 pb-16">
       <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div className="flex items-center gap-3">
           <Link
@@ -228,7 +228,7 @@ function CreateGRNContent() {
                   placeholder=""
                   value={supplierName}
                   onChange={(e) => setSupplierName(e.target.value)}
-                  className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                  className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-lavender-500"
                 />
               </div>
               <div>
@@ -240,7 +240,7 @@ function CreateGRNContent() {
                   placeholder=""
                   value={vehicleNumber}
                   onChange={(e) => setVehicleNumber(e.target.value)}
-                  className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-teal-500 font-mono"
+                  className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-lavender-500 font-mono"
                 />
               </div>
               <div>
@@ -250,7 +250,7 @@ function CreateGRNContent() {
                 <select
                   value={programId}
                   onChange={(e) => setProgramId(e.target.value)}
-                  className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                  className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-lavender-500"
                 >
                   <option value="">-- No Direct Program Link --</option>
                   {programs.map((p) => (
@@ -270,7 +270,7 @@ function CreateGRNContent() {
                 placeholder=""
                 value={remarks}
                 onChange={(e) => setRemarks(e.target.value)}
-                className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-lavender-500"
               />
             </div>
           </div>
@@ -289,7 +289,7 @@ function CreateGRNContent() {
                 <select
                   value={fabricType}
                   onChange={(e) => setFabricType(e.target.value)}
-                  className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-teal-500 font-semibold"
+                  className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-lavender-500 font-semibold"
                 >
                   <option value="KORA">KORA (Undyed / Greige)</option>
                   <option value="DYED">DYED</option>
@@ -307,7 +307,7 @@ function CreateGRNContent() {
                   placeholder=""
                   value={fabricDescription}
                   onChange={(e) => setFabricDescription(e.target.value)}
-                  className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                  className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-lavender-500"
                 />
               </div>
               <div>
@@ -319,7 +319,7 @@ function CreateGRNContent() {
                   placeholder=""
                   value={colorName}
                   onChange={(e) => setColorName(e.target.value)}
-                  className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                  className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-lavender-500"
                 />
               </div>
             </div>
@@ -367,7 +367,7 @@ function CreateGRNContent() {
                           placeholder=""
                           value={roll.length}
                           onChange={(e) => updateRoll(idx, 'length', e.target.value)}
-                          className="w-36 text-xs border border-slate-300 rounded px-2.5 py-1.5 font-mono focus:ring-1 focus:ring-teal-500"
+                          className="w-36 text-xs border border-slate-300 rounded px-2.5 py-1.5 font-mono focus:ring-1 focus:ring-lavender-500"
                         />
                       </td>
                       <td className="py-2.5 px-3">
@@ -377,7 +377,7 @@ function CreateGRNContent() {
                           placeholder=""
                           value={roll.width}
                           onChange={(e) => updateRoll(idx, 'width', e.target.value)}
-                          className="w-28 text-xs border border-slate-300 rounded px-2.5 py-1.5 font-mono focus:ring-1 focus:ring-teal-500"
+                          className="w-28 text-xs border border-slate-300 rounded px-2.5 py-1.5 font-mono focus:ring-1 focus:ring-lavender-500"
                         />
                       </td>
                       <td className="py-2.5 px-3">
@@ -387,7 +387,7 @@ function CreateGRNContent() {
                           placeholder=""
                           value={roll.weight}
                           onChange={(e) => updateRoll(idx, 'weight', e.target.value)}
-                          className="w-28 text-xs border border-slate-300 rounded px-2.5 py-1.5 font-mono focus:ring-1 focus:ring-teal-500"
+                          className="w-28 text-xs border border-slate-300 rounded px-2.5 py-1.5 font-mono focus:ring-1 focus:ring-lavender-500"
                         />
                       </td>
                       <td className="py-2.5 px-3">
@@ -396,7 +396,7 @@ function CreateGRNContent() {
                           placeholder=""
                           value={roll.remarks}
                           onChange={(e) => updateRoll(idx, 'remarks', e.target.value)}
-                          className="w-full text-xs border border-slate-300 rounded px-2.5 py-1.5 focus:ring-1 focus:ring-teal-500"
+                          className="w-full text-xs border border-slate-300 rounded px-2.5 py-1.5 focus:ring-1 focus:ring-lavender-500"
                         />
                       </td>
                       <td className="py-2.5 px-3 text-right">
@@ -460,7 +460,7 @@ function CreateGRNContent() {
 
 export default function CreateGRNPage() {
   return (
-    <React.Suspense fallback={<div className="min-h-screen bg-[#F0FAF9] p-8 text-xs text-slate-400">Loading GRN form...</div>}>
+    <React.Suspense fallback={<div className="min-h-screen bg-ink-50 p-8 text-xs text-slate-400">Loading GRN form...</div>}>
       <CreateGRNContent />
     </React.Suspense>
   );

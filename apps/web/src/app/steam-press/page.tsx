@@ -126,7 +126,7 @@ export default function SteamPressDashboard() {
     <div
       className="min-h-screen text-slate-100 flex flex-col"
       style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.94), rgba(10, 15, 29, 0.98)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+        backgroundImage: `linear-gradient(to bottom, rgba(37, 35, 42, 0.94), rgba(24, 22, 28, 0.98)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',
@@ -447,7 +447,7 @@ export default function SteamPressDashboard() {
                         {isReady ? (
                           <Link
                             href={`/steam-press/issue-challan?jobId=${ch.id}`}
-                            className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition flex items-center gap-1.5 shadow-sm"
+                            className="px-3 py-1.5 rounded-lg bg-lavender-600 hover:bg-emerald-500 text-white text-xs font-semibold transition flex items-center gap-1.5 shadow-sm"
                           >
                             <Send className="w-3.5 h-3.5" />
                             <span>Issue to Final QC</span>

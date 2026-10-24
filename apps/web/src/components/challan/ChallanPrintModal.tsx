@@ -11,12 +11,14 @@ import {
 import { 
   downloadChallanHtml, 
   printChallan,
-  ChallanItem
+  ChallanItem,
+  formatQuantitiesByUnit,
+  getChallanColorColumns,
 } from '@/lib/download-challan';
 import { generateCode128SvgBars } from '@/lib/barcode';
 import { getCurrentUser, canViewClientCode } from '@/lib/rbac';
 import { extractRootWilcomPhoto } from '@/lib/download-wilcom';
-import { useProgramDocument } from '@/hooks/useProgramDocument';
+import { useChallanDocument } from '@/hooks/useChallanDocument';
 
 interface ChallanPrintModalProps {
   challan: any;
@@ -33,9 +35,9 @@ export function ChallanPrintModal({
   onViewSheet,
   onViewWilcom,
 }: ChallanPrintModalProps) {
-  const sourceProgram = sourceChallan?.program || (sourceChallan?.programId ? { id: sourceChallan.programId } : undefined);
-  const { program, loading, error } = useProgramDocument(sourceProgram, isOpen);
-  const challan = sourceChallan ? { ...sourceChallan, program: program || sourceProgram } : null;
+  // Always render the actual challan record (items + its own production sheet), even when
+  // the dashboard only passed a trimmed challan object.
+  const { challan, loading, error } = useChallanDocument(sourceChallan, isOpen);
   if (!isOpen || !challan) return null;
 
   const currentUser = typeof window !== 'undefined' ? getCurrentUser() : null;
@@ -73,15 +75,14 @@ export function ChallanPrintModal({
     STORE: 'FABRIC STORE',
     FABRIC_STORE: 'FABRIC STORE',
     DYEING: 'DYEING DEPARTMENT',
-    QC1: 'QC1 (QUALITY CHECK 1)',
+    DYEING_QC: 'DYEING QC',
     EMBROIDERY: 'EMBROIDERY DEPARTMENT',
     THREAD_CUTTING: 'THREAD CUTTING DEPARTMENT',
     CUTTING: 'CUTTING DEPARTMENT',
     RECUTTING: 'RECUTTING WORKSTATION',
-    QC2: 'QC2 (QUALITY CHECK 2)',
+    THREADCUT_QC: 'THREADCUT QC',
     WASHING: 'WASHING DEPARTMENT',
-    QCWASHING: 'QC WASHING (QUALITY CHECK 3)',
-    QC3: 'QC3 (QUALITY CHECK 3)',
+    WASHING_QC: 'WASHING QC',
     FINISHING: 'FINISHING DEPARTMENT',
     PACKING: 'PACKING & DISPATCH',
     PROGRAMMING: 'PROGRAMMING & PLANNING'
@@ -91,8 +92,10 @@ export function ChallanPrintModal({
   const toLabel = deptLabels[toDept] || toDept;
 
   const items: ChallanItem[] = Array.isArray(challan.items) ? challan.items : [];
-  const totalQuantity = items.reduce((sum, it) => sum + (Number(it.quantity) || 0), 0);
   const uom = items[0]?.uom || 'PCS';
+  const quantityTotalsLabel = formatQuantitiesByUnit(items, challan);
+  const { hasRequiredDyeColor, hasResultShade } = getChallanColorColumns(items);
+  const itemColumnCount = 4 + (hasRequiredDyeColor ? 2 : 0) + (hasResultShade ? 1 : 0);
 
   const defectivePieces = challan.defectivePieces ?? 0;
   const fabricUnit = challan.fabricUnit || uom;
@@ -157,7 +160,7 @@ export function ChallanPrintModal({
               type="button"
               onClick={handlePrint}
               disabled={loading}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer disabled:cursor-wait"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-lavender-700 hover:bg-lavender-800 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer disabled:cursor-wait"
             >
               <Printer className="w-3.5 h-3.5" />
               <span>Print Challan</span>
@@ -183,7 +186,7 @@ export function ChallanPrintModal({
 
         {(loading || error) && (
           <div className={`px-5 py-2 text-xs ${error ? 'bg-rose-50 text-rose-800' : 'bg-blue-50 text-blue-800'}`}>
-            {error || 'Loading complete production and artwork details…'}
+            {error || 'Loading complete challan, production and artwork details…'}
           </div>
         )}
 
@@ -303,7 +306,7 @@ export function ChallanPrintModal({
               <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-slate-700">
                 <span>ITEMS / MATERIALS</span>
                 <span className="font-mono text-xs text-slate-900">
-                  Total: {totalQuantity || challan.fabricOut || challan.fabricIn || 0} {uom}
+                  Total: {quantityTotalsLabel}
                 </span>
               </div>
               <div className="overflow-x-auto">
@@ -312,7 +315,10 @@ export function ChallanPrintModal({
                     <tr className="bg-slate-100">
                       <th className="border-[1.5px] border-black p-1.5 font-black text-center w-8">#</th>
                       <th className="border-[1.5px] border-black p-1.5 font-black">ITEM DESCRIPTION</th>
-                      <th className="border-[1.5px] border-black p-1.5 font-black w-28">COLOR / SHADE</th>
+                      <th className="border-[1.5px] border-black p-1.5 font-black w-28">{hasRequiredDyeColor ? 'CURRENT COLOR / SHADE' : 'COLOR / SHADE'}</th>
+                      {hasRequiredDyeColor && <th className="border-[1.5px] border-black p-1.5 font-black w-28">REQUIRED DYEING COLOR</th>}
+                      {hasRequiredDyeColor && <th className="border-[1.5px] border-black p-1.5 font-black text-right w-20">QTY TO DYE</th>}
+                      {hasResultShade && <th className="border-[1.5px] border-black p-1.5 font-black w-24">RESULT SHADE</th>}
                       <th className="border-[1.5px] border-black p-1.5 font-black w-24">ROLL / LOT #</th>
                       <th className="border-[1.5px] border-black p-1.5 font-black text-right w-20">QUANTITY</th>
                       <th className="border-[1.5px] border-black p-1.5 font-black text-center w-14">UOM</th>
@@ -323,8 +329,15 @@ export function ChallanPrintModal({
                       items.map((it, idx) => (
                         <tr key={it.id || idx}>
                           <td className="border-[1.5px] border-black p-1 text-center font-bold font-mono">{idx + 1}</td>
-                          <td className="border-[1.5px] border-black p-1 font-bold">{it.itemDescription || fabricName || styleCode || 'Fabric Lot'}</td>
-                          <td className="border-[1.5px] border-black p-1">{it.colour || prog.fabricColor || 'Standard'}</td>
+                          <td className="border-[1.5px] border-black p-1 font-bold">{it.itemDescription || it.fabricCode || fabricName || 'Fabric Lot'}</td>
+                          <td className="border-[1.5px] border-black p-1">{it.colour || '—'}</td>
+                          {hasRequiredDyeColor && <td className="border-[1.5px] border-black p-1 font-black">{it.requiredDyeColor || '—'}</td>}
+                          {hasRequiredDyeColor && (
+                            <td className="border-[1.5px] border-black p-1 text-right font-mono">
+                              {it.requiredDyeColor ? `${it.requiredDyeQuantity ?? it.quantity ?? 0} ${it.uom || uom}` : '—'}
+                            </td>
+                          )}
+                          {hasResultShade && <td className="border-[1.5px] border-black p-1">{it.shade || '—'}</td>}
                           <td className="border-[1.5px] border-black p-1 font-mono">{it.rollNumber || it.lotNumber || '—'}</td>
                           <td className="border-[1.5px] border-black p-1 text-right font-mono font-bold">{it.quantity || 0}</td>
                           <td className="border-[1.5px] border-black p-1 text-center">{it.uom || uom}</td>
@@ -332,22 +345,18 @@ export function ChallanPrintModal({
                       ))
                     ) : (
                       <tr>
-                        <td className="border-[1.5px] border-black p-1 text-center font-mono">1</td>
-                        <td className="border-[1.5px] border-black p-1 font-bold">{fabricName || styleCode || 'Production Material'}</td>
-                        <td className="border-[1.5px] border-black p-1">{prog.fabricColor || 'Standard'}</td>
-                        <td className="border-[1.5px] border-black p-1 font-mono">—</td>
-                        <td className="border-[1.5px] border-black p-1 text-right font-mono font-bold">{totalQuantity || challan.fabricOut || challan.fabricIn || 0}</td>
-                        <td className="border-[1.5px] border-black p-1 text-center">{uom}</td>
+                        <td colSpan={itemColumnCount + 2} className="border-[1.5px] border-black p-2 text-center italic text-slate-600">
+                          {loading ? 'Loading challan items…' : 'No line items were recorded on this challan.'}
+                        </td>
                       </tr>
                     )}
                     <tr className="bg-slate-50 font-black">
-                      <td colSpan={4} className="border-[1.5px] border-black p-1 text-right text-[10px] uppercase font-black">
+                      <td colSpan={itemColumnCount} className="border-[1.5px] border-black p-1 text-right text-[10px] uppercase font-black">
                         TOTAL QUANTITY:
                       </td>
-                      <td className="border-[1.5px] border-black p-1 text-right font-mono text-sm font-black">
-                        {totalQuantity || challan.fabricOut || challan.fabricIn || 0}
+                      <td colSpan={2} className="border-[1.5px] border-black p-1 text-right font-mono text-sm font-black">
+                        {quantityTotalsLabel}
                       </td>
-                      <td className="border-[1.5px] border-black p-1 text-center font-black">{uom}</td>
                     </tr>
                   </tbody>
                 </table>

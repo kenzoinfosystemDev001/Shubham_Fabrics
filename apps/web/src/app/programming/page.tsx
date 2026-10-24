@@ -77,8 +77,8 @@ export default function ProgrammingDashboardPage() {
                 ? '/fabric-store'
                 : parsed.departmentCode === 'DYEING'
                 ? '/dyeing'
-                : parsed.departmentCode === 'QC1'
-                ? '/qc1'
+                : parsed.departmentCode === 'DYEING_QC'
+                ? '/dyeing-qc'
                 : parsed.departmentCode === 'EMBROIDERY'
                 ? '/embroidery'
                 : '/login';
@@ -142,11 +142,11 @@ export default function ProgrammingDashboardPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pl-0 md:pl-64">
+    <div className="min-h-screen bg-ink-50 pl-0 md:pl-64">
       {/* TOP HEADER BAR (REAL DB BACKGROUND) */}
       <header
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.70)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundImage: `linear-gradient(to right, rgba(37, 35, 42, 0.85), rgba(37, 35, 42, 0.70)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -173,7 +173,7 @@ export default function ProgrammingDashboardPage() {
           
           <Link
             href="/my-work/create-production-sheet"
-            className="flex items-center gap-2 px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs rounded-lg shadow-md transition"
+            className="flex items-center gap-2 px-3.5 py-2 bg-amber-500 hover:bg-lavender-600 text-slate-950 font-bold text-xs rounded-lg shadow-md transition"
           >
             <FilePlus className="w-4 h-4" />
             <span>Create Production Sheet</span>
@@ -285,7 +285,7 @@ export default function ProgrammingDashboardPage() {
                   </Link>
                   <Link
                     href="/my-work/create-production-sheet"
-                    className="text-xs font-semibold text-white bg-[#163767] hover:bg-[#0F264A] px-2.5 py-1.5 rounded-md flex items-center gap-1 transition shadow-xs"
+                    className="text-xs font-semibold text-white bg-lavender-800 hover:bg-lavender-900 px-2.5 py-1.5 rounded-md flex items-center gap-1 transition shadow-xs"
                   >
                     <span>+ New Sheet</span>
                   </Link>
@@ -300,7 +300,7 @@ export default function ProgrammingDashboardPage() {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-8 pr-8 py-1.5 bg-white border border-slate-200 rounded-md text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-[#163767]"
+                    className="w-full pl-8 pr-8 py-1.5 bg-white border border-slate-200 rounded-md text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-lavender-800"
                   />
                   {searchQuery && (
                     <button
@@ -340,7 +340,7 @@ export default function ProgrammingDashboardPage() {
                   </p>
                   <Link
                     href="/my-work/create-production-sheet"
-                    className="inline-flex items-center gap-2 px-3.5 py-2 bg-[#163767] text-white text-xs font-semibold rounded-md shadow-xs"
+                    className="inline-flex items-center gap-2 px-3.5 py-2 bg-lavender-800 text-white text-xs font-semibold rounded-md shadow-xs"
                   >
                     <FilePlus className="w-3.5 h-3.5" />
                     <span>Create Production Sheet</span>
@@ -518,7 +518,7 @@ export default function ProgrammingDashboardPage() {
                     <tbody className="divide-y divide-slate-100 text-slate-700">
                       {challans.slice(0, 10).map((ch) => (
                         <tr key={ch.id} className="hover:bg-slate-50/60 transition">
-                          <td className="py-3 px-4 font-mono font-bold text-[#163767]">
+                          <td className="py-3 px-4 font-mono font-bold text-lavender-800">
                             <Link href={`/challans/${ch.id}`} className="hover:underline flex items-center gap-1">
                               <span>{ch.challanNumber}</span>
                             </Link>
@@ -575,7 +575,7 @@ export default function ProgrammingDashboardPage() {
             
             {/* QUICK ACTIONS CARD */}
             <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-3">
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A66E22] block">
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-lavender-700 block">
                 PRIMARY WORKSPACE ACTIONS
               </span>
               <h3 className="text-sm font-bold text-slate-900">

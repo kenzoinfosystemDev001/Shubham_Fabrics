@@ -31,7 +31,7 @@ export async function GET(
             issuedBy: { select: { fullName: true, username: true } },
           },
         },
-        qc1Challan: {
+        dyeingQcChallan: {
           include: {
             items: true,
             issuedBy: { select: { fullName: true, username: true } },
@@ -106,15 +106,15 @@ export async function PATCH(
       newDyedQty = parsed;
     }
 
-    // Calculate undyed remaining and ready for QC1
+    // Calculate undyed remaining and ready for Dyeing QC
     const newUndyedQty = Math.max(0, existingOrder.requiredQuantity - newDyedQty);
-    const newReadyForQc1Qty = Math.max(0, newDyedQty - existingOrder.sentToQc1Quantity);
+    const newReadyForDyeingQcQty = Math.max(0, newDyedQty - existingOrder.sentToDyeingQcQuantity);
 
     // Compute automatic status if not explicitly requested
     let finalStatus = requestedStatus;
     if (!finalStatus) {
-      if (existingOrder.status === 'SENT_TO_QC1' && newReadyForQc1Qty === 0) {
-        finalStatus = 'SENT_TO_QC1';
+      if (existingOrder.status === 'SENT_TO_DYEING_QC' && newReadyForDyeingQcQty === 0) {
+        finalStatus = 'SENT_TO_DYEING_QC';
       } else if (newDyedQty >= existingOrder.requiredQuantity) {
         finalStatus = 'DYED';
       } else if (newDyedQty > 0) {
@@ -170,7 +170,7 @@ export async function PATCH(
           data: {
             dyedQuantity: newDyedQty,
             undyedQuantity: newUndyedQty,
-            readyForQc1Quantity: newReadyForQc1Qty,
+            readyForDyeingQcQuantity: newReadyForDyeingQcQty,
             status: finalStatus,
             dyedColor: dyedColor !== undefined ? dyedColor : existingOrder.dyedColor,
             colorCode: colorCode !== undefined ? colorCode : existingOrder.colorCode,
@@ -180,14 +180,14 @@ export async function PATCH(
             machineNumber: machineNumber !== undefined ? machineNumber : existingOrder.machineNumber,
             processRemarks: processRemarks !== undefined ? processRemarks : existingOrder.processRemarks,
             startedAt: existingOrder.startedAt || new Date(),
-            completedAt: ['DYED', 'READY_FOR_QC1', 'SENT_TO_QC1'].includes(finalStatus)
+            completedAt: ['DYED', 'READY_FOR_DYEING_QC', 'SENT_TO_DYEING_QC'].includes(finalStatus)
               ? (existingOrder.completedAt || new Date())
               : null,
           },
           include: {
             program: true,
             inboundChallan: true,
-            qc1Challan: true,
+            dyeingQcChallan: true,
             incharge: true,
           },
         });

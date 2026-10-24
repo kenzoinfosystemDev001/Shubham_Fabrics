@@ -223,6 +223,28 @@ export const DEFAULT_DUPATTA_SUB_STYLES: SubStyleAverage[] = [
   { name: 'TASSEL', average: '' },
 ];
 
+/**
+ * The component sheets (TOP / BOTTOM / DUPATTA / ...) that Programming forwarded with
+ * this production. Only these are shown to downstream departments; a legacy sheet
+ * without component metadata is a single TOP sheet.
+ */
+export function getForwardedSheetCategories(program: any): GarmentCategory[] {
+  let meta: any = null;
+  if (program?.metadataJson) {
+    try {
+      meta = typeof program.metadataJson === 'string' ? JSON.parse(program.metadataJson) : program.metadataJson;
+    } catch {}
+  }
+  if (Array.isArray(meta?.forwardedComponents) && meta.forwardedComponents.length > 0) {
+    return Array.from(new Set<GarmentCategory>(meta.forwardedComponents.map((c: unknown) => String(c))));
+  }
+  if (meta?.components && typeof meta.components === 'object') {
+    const enabled = Object.keys(meta.components).filter((c) => meta.components[c]?.enabled !== false);
+    if (enabled.length > 0) return enabled;
+  }
+  return ['TOP'];
+}
+
 export function getDefaultSubStylesForCategory(category: GarmentCategory): SubStyleAverage[] {
   if (category === 'BOTTOM') return DEFAULT_BOTTOM_SUB_STYLES.map(s => ({ ...s }));
   if (category === 'DUPATTA') return DEFAULT_DUPATTA_SUB_STYLES.map(s => ({ ...s }));
@@ -419,7 +441,7 @@ export function extractSubStylesAndGrid(program: any, category: GarmentCategory 
   };
 }
 
-export function generateProductionSheetHtml(program: any, category: GarmentCategory | 'ALL' = 'TOP'): string {
+export function generateProductionSheetHtml(program: any, category: GarmentCategory | 'ALL' = 'ALL'): string {
   const currentUser = typeof window !== 'undefined' ? getCurrentUser() : null;
   const canSeeClientCode = canViewClientCode(currentUser) && Boolean(program.clientCode);
 
@@ -429,28 +451,9 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
     ? new Date(program.startDate || program.programDate).toLocaleDateString('en-GB') 
     : new Date().toLocaleDateString('en-GB');
 
-  let meta: any = null;
-  if (program.metadataJson) {
-    try {
-      meta = typeof program.metadataJson === 'string' ? JSON.parse(program.metadataJson) : program.metadataJson;
-    } catch {}
-  }
-
-  let targetCategories: GarmentCategory[] = [];
-  if (category === 'ALL') {
-    if (Array.isArray(meta?.forwardedComponents) && meta.forwardedComponents.length > 0) {
-      targetCategories = meta.forwardedComponents;
-    } else if (meta?.components) {
-      targetCategories = Object.keys(meta.components).filter(
-        (c) => meta.components[c]?.enabled !== false
-      );
-    }
-    if (targetCategories.length === 0) {
-      targetCategories = ['TOP'];
-    }
-  } else {
-    targetCategories = [category];
-  }
+  const targetCategories: GarmentCategory[] = category === 'ALL'
+    ? getForwardedSheetCategories(program)
+    : [category];
 
   const categoryName = category === 'TOP' || category === 'BOTTOM' || category === 'DUPATTA'
     ? category
@@ -680,7 +683,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
               ${swatches.length > 0
                 ? swatches.map((s) => `
                   <div class="swatch-card">
-                    <div class="fabric-swatch" style="background-color: ${s.color || '#e2e8f0'};">
+                    <div class="fabric-swatch" style="background-color: ${s.color || '#E5E1E8'};">
                       <span class="swatch-staple"></span>
                     </div>
                     ${s.name ? `<span class="swatch-name" title="${s.name}">${s.name}</span>` : ''}
@@ -740,7 +743,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       print-color-adjust: exact !important;
     }
     body {
-      background-color: #f1f5f9;
+      background-color: #F1EFF4;
       color: #000000;
       font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
       font-size: 11px;
@@ -753,7 +756,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #111827;
+      background: #25232A;
       color: #ffffff;
       padding: 8px 16px;
       border-radius: 6px;
@@ -772,11 +775,11 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       transition: opacity 0.15s;
     }
     .btn-primary {
-      background: #2563eb;
+      background: #7D44A8;
       color: #ffffff;
     }
     .btn-outline {
-      background: #374151;
+      background: #423F48;
       color: #ffffff;
     }
     .btn:hover {
@@ -1030,7 +1033,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       font-size: 11px;
     }
     .size-total {
-      color: #047857;
+      color: #465300;
       font-size: 9px;
       font-weight: 900;
       margin-top: 2px;
@@ -1039,7 +1042,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       height: 28px;
       border: 1.5px solid #000000;
       padding: 3.5px 3px;
-      background: #f1f5f9;
+      background: #F1EFF4;
       font-weight: 900;
     }
     .grid-total-details {
@@ -1047,7 +1050,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
     }
     .grid-total-details span + span {
       margin-left: 12px;
-      color: #475569;
+      color: #57545E;
       font-size: 9px;
       font-style: italic;
     }
@@ -1071,7 +1074,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
     }
     .note-content {
       font-size: 11px;
-      color: #1f2937;
+      color: #302D35;
       margin-bottom: 10px;
       min-height: 18px;
     }
@@ -1084,7 +1087,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       font-size: 11px;
       font-weight: 900;
       letter-spacing: 0.04em;
-      color: #1e3a8a;
+      color: #4F2C6B;
       text-transform: uppercase;
       margin-bottom: 6px;
     }
@@ -1114,24 +1117,24 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       transform: translate(-50%, -50%);
       width: 14px;
       height: 2px;
-      background-color: #334155;
+      background-color: #423F48;
       border-radius: 1px;
       box-shadow: 0 1px 1px rgba(0,0,0,0.4);
     }
     .swatch-empty-box {
       width: 44px;
       height: 44px;
-      border: 1.5px dashed #64748b;
+      border: 1.5px dashed #6B6872;
       position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: #f8fafc;
+      background-color: #F8F7FA;
     }
     .swatch-name {
       font-size: 8.5px;
       font-weight: 700;
-      color: #334155;
+      color: #423F48;
       text-align: center;
       max-width: 55px;
       white-space: nowrap;
@@ -1193,7 +1196,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       <button class="btn btn-primary" onclick="window.print()">
         🖨️ Print ${safeCategoryLabel} Sheet (A4)
       </button>
-      <button class="btn btn-primary" style="background: #059669;" onclick="window.downloadSelf()">
+      <button class="btn btn-primary" style="background: #423F48;" onclick="window.downloadSelf()">
         💾 Download ${safeCategoryLabel} Sheet
       </button>
       <button class="btn btn-outline" onclick="window.close()">
@@ -1224,7 +1227,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
 /**
  * Download Production Sheet as an offline HTML file
  */
-export async function downloadProductionSheetHtml(program: any, category: GarmentCategory | 'ALL' = 'TOP') {
+export async function downloadProductionSheetHtml(program: any, category: GarmentCategory | 'ALL' = 'ALL') {
   try {
     const completeProgram = await loadProgramDocument(program);
     const html = generateProductionSheetHtml(completeProgram, category);
@@ -1247,7 +1250,7 @@ export async function downloadProductionSheetHtml(program: any, category: Garmen
 /**
  * Open print window for the Production Sheet
  */
-export function printProductionSheet(program: any, category: GarmentCategory | 'ALL' = 'TOP') {
+export function printProductionSheet(program: any, category: GarmentCategory | 'ALL' = 'ALL') {
   const printWindow = window.open('', '_blank');
   if (printWindow) {
     void (async () => {

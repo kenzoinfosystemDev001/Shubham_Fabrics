@@ -33,6 +33,7 @@ import {
   Boxes,
 } from 'lucide-react';
 import { DepartmentStockView } from '@/components/DepartmentStockView';
+import { DepartmentDefectiveShelfWidget } from '@/components/DepartmentDefectiveShelfWidget';
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import BarcodeStickerCard from '@/components/BarcodeStickerCard';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
@@ -55,7 +56,7 @@ interface ItemRow {
 
 export default function ThreadCuttingMyWorkPage() {
   const [activeTab, setActiveTab] = useState<
-    'INCOMING_EMBROIDERY' | 'CREATE_QC2_CHALLAN' | 'STOCK' | 'DEFECT_RETURNS'
+    'INCOMING_EMBROIDERY' | 'CREATE_THREADCUT_QC_CHALLAN' | 'STOCK' | 'DEFECT_RETURNS'
   >('INCOMING_EMBROIDERY');
 
   // Incoming Tracking State ("Incoming Challan from Embroidery -> Pieces in, Pieces out, Remarks")
@@ -65,7 +66,7 @@ export default function ThreadCuttingMyWorkPage() {
   const [piecesIn, setPiecesIn] = useState<number>(0);
   const [piecesOut, setPiecesOut] = useState<number>(0);
   const [piecesDefected, setPiecesDefected] = useState<number>(0);
-  const [defectReason, setDefectReason] = useState<string>('Broken Stitch / Needle Holes');
+  const [defectReason, setDefectReason] = useState<string>('');
   const [customDefectReason, setCustomDefectReason] = useState<string>('');
   const [defectComments, setDefectComments] = useState<string>('');
   const [defectiveShelfLocation, setDefectiveShelfLocation] = useState<string>(
@@ -76,11 +77,11 @@ export default function ThreadCuttingMyWorkPage() {
   const [submittingDefectReturn, setSubmittingDefectReturn] = useState(false);
   const [createdDefectModal, setCreatedDefectModal] = useState<any | null>(null);
 
-  // Form State: "Challan from Thread Cutting to QC2 (Quality check 2)"
+  // Form State: "Challan from Thread Cutting to Threadcut QC (Quality check 2)"
   const [challanNumber, setChallanNumber] = useState('');
   const [challanDate, setChallanDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [sourceDept] = useState('Thread Cutting Department');
-  const [destinationDept] = useState('Thread Cut QC');
+  const [destinationDept] = useState('Threadcut QC');
   const [priority, setPriority] = useState<'NORMAL' | 'URGENT' | 'HIGH'>('NORMAL');
   const [deliveryDate, setDeliveryDate] = useState(() => {
     const d = new Date();
@@ -91,13 +92,13 @@ export default function ThreadCuttingMyWorkPage() {
   const [serialNumber, setSerialNumber] = useState('');
   const [inchargeName, setInchargeName] = useState('Thread Cutting Incharge');
 
-  // Dynamic Table Items for QC2 Challan
+  // Dynamic Table Items for Threadcut QC Challan
   const [items, setItems] = useState<ItemRow[]>([
     {
       fabricMeasurementPcs: 'Dyed Cotton / Embroidered Front Panel / 120 PCS',
       colorCodeWidth: 'CC-NV-01 / 58 INCH',
       quantity: 120,
-      remarks: 'Threads trimmed & cleaned. Ready for QC2 inspection.',
+      remarks: 'Threads trimmed & cleaned. Ready for Threadcut QC inspection.',
     },
   ]);
 
@@ -127,15 +128,7 @@ export default function ThreadCuttingMyWorkPage() {
         }
       }
 
-      // 2. Next Challan Number for QC2
-      const numRes = await fetch('/api/challans/next-number?department=THREAD_CUTTING');
-      const numData = await numRes.json();
-      if (numData.nextNumber) {
-        setChallanNumber(numData.nextNumber.replace('CH-THREAD_CUTTING-', 'CH-THC-QC2-'));
-      } else {
-        const year = new Date().getFullYear();
-        setChallanNumber(`CH-THC-QC2-${year}-${String(Date.now()).slice(-5)}`);
-      }
+      // The challan number to Threadcut QC is entered manually.
     } catch (err) {
       console.error('Error loading Thread Cutting work data:', err);
     } finally {
@@ -164,12 +157,12 @@ export default function ThreadCuttingMyWorkPage() {
     // Pieces out defaults to pieces in unless defected
     setPiecesOut(effectiveIn);
     setPiecesDefected(0);
-    setDefectReason('Broken Stitch / Needle Holes');
+    setDefectReason('');
     setCustomDefectReason('');
     setDefectComments('');
     setIncomingRemarks(ch.remarks || 'Received from Embroidery. Thread trimming underway.');
 
-    // Pre-populate QC2 challan fields from this incoming assignment
+    // Pre-populate Threadcut QC challan fields from this incoming assignment
     setSerialNumber(ch.program?.programSerialNo || ch.program?.programNumber || '');
     setDesignNumber(ch.program?.wilcomDesignNumber || 'WILCOM-DES-01');
     if (ch.program) {
@@ -182,7 +175,7 @@ export default function ThreadCuttingMyWorkPage() {
           fabricMeasurementPcs: `${it.itemDescription || 'Embroidered Panel'} / ${it.quantity} PCS`,
           colorCodeWidth: `${it.fabricCode || 'STD-WIDTH'} / 58"`,
           quantity: Number(it.quantity) || 1,
-          remarks: 'Thread cutting completed, ready for QC2',
+          remarks: 'Thread cutting completed, ready for Threadcut QC',
         }))
       );
     }
@@ -272,6 +265,11 @@ export default function ThreadCuttingMyWorkPage() {
   // Handle incoming challan piece tracking update
   const handleSaveIncomingTracking = async () => {
     if (!selectedIncoming) return;
+    const resolvedReason = defectReason === 'Other' ? customDefectReason.trim() : defectReason.trim();
+    if (piecesDefected > 0 && !resolvedReason) {
+      alert('Please enter a specific reason for the defect.');
+      return;
+    }
     try {
       setUpdatingPieceCount(true);
       const res = await fetch(`/api/challans/${selectedIncoming.id}/status`, {
@@ -284,18 +282,18 @@ export default function ThreadCuttingMyWorkPage() {
           fabricUnit: 'PCS',
           defectivePieces: piecesDefected,
           defectiveShelfLocation: 'DEF-SHELF-THREAD-CUTTING',
-          defectReason: defectReason === 'Other' ? customDefectReason : defectReason,
+          defectReason: piecesDefected > 0 ? resolvedReason : null,
           notes: `Thread Cutting Progress: Pieces In: ${piecesIn} PCS | Pieces Out: ${piecesOut} PCS | Defective: ${piecesDefected} PCS | Remarks: ${incomingRemarks}`,
         }),
       });
+      const responseBody = await res.json();
+      if (!res.ok) throw new Error(responseBody.error || 'Failed to save Thread Cutting progress.');
 
-      if (res.ok) {
-        setToastMsg(
-          `Saved piece tracking for Challan ${selectedIncoming.challanNumber}: In ${piecesIn} PCS, Out ${piecesOut} PCS, Defective ${piecesDefected} PCS! Stock updated.`
-        );
-        setTimeout(() => setToastMsg(null), 4500);
-        await loadData();
-      }
+      setToastMsg(
+        `Saved piece tracking for Challan ${selectedIncoming.challanNumber}: In ${piecesIn} PCS, Out ${piecesOut} PCS, Defective ${piecesDefected} PCS quarantined on the local shelf.`
+      );
+      setTimeout(() => setToastMsg(null), 4500);
+      await loadData();
     } catch (err: any) {
       console.error(err);
       alert('Failed to update tracking: ' + err.message);
@@ -304,9 +302,9 @@ export default function ThreadCuttingMyWorkPage() {
     }
   };
 
-  // Switch to QC2 tab with verified good pieces
-  const handleProceedToQC2 = () => {
-    setActiveTab('CREATE_QC2_CHALLAN');
+  // Switch to Threadcut QC tab with verified good pieces
+  const handleProceedToThreadcutQC = () => {
+    setActiveTab('CREATE_THREADCUT_QC_CHALLAN');
     if (items.length > 0 && piecesOut > 0) {
       setItems((prev) =>
         prev.map((it, idx) => (idx === 0 ? { ...it, quantity: piecesOut } : it))
@@ -314,14 +312,14 @@ export default function ThreadCuttingMyWorkPage() {
     }
   };
 
-  // Handover defective pieces to Fabric Store Defective Shelf
+  // Record defective pieces on the incoming challan's Thread Cutting shelf entry.
   const handleSendToDefectiveShelf = async () => {
     if (!selectedIncoming) {
       alert('Please select an incoming Embroidery challan first.');
       return;
     }
     if (piecesDefected <= 0) {
-      alert('Please specify the count of defective pieces (> 0) to return.');
+      alert('Please specify the count of defective pieces (> 0).');
       return;
     }
 
@@ -330,83 +328,49 @@ export default function ThreadCuttingMyWorkPage() {
         ? customDefectReason.trim() || 'Custom Defect'
         : defectReason;
 
-    if (!defectComments.trim()) {
-      alert('Please provide defect comments and reasons before returning to the Fabric Store defective shelf.');
+    if (!resolvedReason.trim() || (defectReason === 'Other' && !customDefectReason.trim())) {
+      alert('Please enter a specific reason for the defect.');
       return;
     }
 
     try {
       setSubmittingDefectReturn(true);
-      const year = new Date().getFullYear();
-      const returnChallanNumber = `CH-THC-DEF-${year}-${String(Date.now()).slice(-5)}`;
-
-      const payload = {
-        challanNumber: returnChallanNumber,
-        challanType: 'DEFECT_RETURN',
-        fromDepartment: 'THREAD_CUTTING',
-        toDepartment: 'STORE',
-        parentChallanId: selectedIncoming.id,
-        priority: 'URGENT',
-        issuedDate: new Date().toISOString().split('T')[0],
-        programId: selectedIncoming.program?.id || selectedIncoming.programId,
-        fabricIn: Number(piecesDefected),
-        defectivePieces: Number(piecesDefected),
-        fabricOut: 0,
-        fabricUnit: 'PCS',
-        defectiveShelfLocation: defectiveShelfLocation,
-        defectReason: resolvedReason,
-        detectedFromDepartment: selectedIncoming.fromDepartment || 'EMBROIDERY',
-        detectedFromChallanId: selectedIncoming.id,
-        remarks: `Defective Return to Fabric Store Defective Shelf | Reason: ${resolvedReason} | Shelf: ${defectiveShelfLocation} | Comments: ${defectComments.trim()}`,
-        items: [
-          {
-            itemDescription: `Defective Embroidered Panel (${resolvedReason}) - Returned from Thread Cutting`,
-            colour: 'Dyed',
-            fabricCode: selectedIncoming.program?.wilcomDesignNumber || 'STD-PANEL',
-            quantity: Number(piecesDefected),
-            uom: 'PCS',
-            remarks: `Defect Reason: ${resolvedReason} | Comments: ${defectComments.trim()} | Shelf: ${defectiveShelfLocation}`,
-          },
-        ],
-      };
-
-      const res = await fetch('/api/challans', {
-        method: 'POST',
+      const res = await fetch(`/api/challans/${selectedIncoming.id}/status`, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          status: 'RECEIVED',
+          fabricIn: Number(piecesIn),
+          fabricOut: Number(piecesOut),
+          fabricUnit: 'PCS',
+          defectivePieces: Number(piecesDefected),
+          defectiveShelfLocation: defectiveShelfLocation,
+          defectReason: resolvedReason,
+          notes: `Thread Cutting defect recorded on local shelf: ${piecesDefected} PCS | Reason: ${resolvedReason}${defectComments.trim() ? ` | Comments: ${defectComments.trim()}` : ''}`,
+        }),
       });
 
       const json = await res.json();
       if (!res.ok) {
-        throw new Error(json.error || 'Failed to dispatch defect return to Fabric Store');
+        throw new Error(json.error || 'Failed to record defect on the Thread Cutting shelf');
       }
-
-      // Update incoming Embroidery challan progress notes
-      await fetch(`/api/challans/${selectedIncoming.id}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          status: 'IN_PROGRESS',
-          notes: `Thread Cutting Progress: In: ${piecesIn} PCS | Out: ${piecesOut} PCS | Returned ${piecesDefected} PCS to Fabric Store Defective Shelf (${json.challanNumber}) | Reason: ${resolvedReason} | Comments: ${defectComments.trim()}`,
-        }),
-      }).catch((e) => console.warn('Status patch warning:', e));
 
       setCreatedDefectModal(json);
       setToastMsg(
-        `Defect Challan ${json.challanNumber} (${piecesDefected} PCS) dispatched to Fabric Store Defective Shelf successfully!`
+        `${piecesDefected} PCS recorded on the Thread Cutting Defective Shelf. Fabric Store can view the same entry centrally.`
       );
       setTimeout(() => setToastMsg(null), 6000);
       loadData();
     } catch (err: any) {
-      console.error('Error dispatching to defective shelf:', err);
+      console.error('Error recording Thread Cutting defect:', err);
       alert('Error: ' + err.message);
     } finally {
       setSubmittingDefectReturn(false);
     }
   };
 
-  // Submit Challan from Thread Cutting to QC2
-  const handleSubmitQC2Challan = async (e: React.FormEvent) => {
+  // Submit Challan from Thread Cutting to Threadcut QC
+  const handleSubmitThreadcutQCChallan = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!challanNumber.trim()) {
       alert('Please enter a valid Challan Number.');
@@ -419,37 +383,58 @@ export default function ThreadCuttingMyWorkPage() {
 
     try {
       setSubmitting(true);
-      const totalPcsToQc2 = items.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
+      const totalPcsToThreadcutQc = items.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
       const resolvedDefectReason =
         defectReason === 'Other'
           ? customDefectReason.trim() || 'Custom Defect'
           : defectReason;
 
+      if (piecesDefected > 0 && selectedIncoming) {
+        if (!resolvedDefectReason.trim()) throw new Error('Please enter a specific reason for the defect.');
+        const defectRes = await fetch(`/api/challans/${selectedIncoming?.id}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            status: 'RECEIVED',
+            fabricIn: piecesIn,
+            fabricOut: piecesOut,
+            fabricUnit: 'PCS',
+            defectivePieces: piecesDefected,
+            defectiveShelfLocation,
+            defectReason: resolvedDefectReason,
+            notes: `Thread Cutting defect recorded on local shelf: ${piecesDefected} PCS | Reason: ${resolvedDefectReason}`,
+          }),
+        });
+        const defectJson = await defectRes.json();
+        if (!defectRes.ok) throw new Error(defectJson.error || 'Failed to record defects on the Thread Cutting shelf.');
+      }
+
       const payload = {
         challanNumber: challanNumber.trim(),
         challanType: 'INTER_DEPARTMENT',
         fromDepartment: 'THREAD_CUTTING',
-        toDepartment: 'QC2',
+        toDepartment: 'THREADCUT_QC',
         parentChallanId: selectedIncoming?.id || null,
         priority: priority,
         issuedDate: challanDate,
         programId: selectedProgram?.id || serialNumber,
         fabricIn: piecesIn,
-        defectivePieces: piecesDefected,
-        defectiveShelfLocation: defectiveShelfLocation,
-        defectReason: piecesDefected > 0 ? resolvedDefectReason : null,
-        fabricOut: totalPcsToQc2,
+        defectivePieces: selectedIncoming ? 0 : piecesDefected,
+        defectiveShelfLocation: selectedIncoming ? null : defectiveShelfLocation,
+        defectReason: selectedIncoming || piecesDefected <= 0 ? null : resolvedDefectReason,
+        fabricOut: totalPcsToThreadcutQc,
         fabricUnit: 'PCS',
         detectedFromDepartment: selectedIncoming?.fromDepartment || 'EMBROIDERY',
         detectedFromChallanId: selectedIncoming?.id || null,
-        remarks: `Thread Cutting Handover to QC2 | Dispatched for Checking: ${totalPcsToQc2} PCS (Inspection Basis: ${totalPcsToQc2} PCS) | Design: ${designNumber} | Sheet: ${serialNumber} | Incharge: ${inchargeName} | Lot Accounting: In: ${piecesIn} PCS, Defective Cut to Shelf: ${piecesDefected} PCS (${defectiveShelfLocation}), Dispatched to QC2: ${totalPcsToQc2} PCS`,
+        remarks: `Thread Cutting Handover to Threadcut QC | Dispatched for Checking: ${totalPcsToThreadcutQc} PCS (Inspection Basis: ${totalPcsToThreadcutQc} PCS) | Design: ${designNumber} | Sheet: ${serialNumber} | Incharge: ${inchargeName} | Defective pieces recorded on the Thread Cutting shelf: ${piecesDefected} PCS${piecesDefected > 0 ? ` (${resolvedDefectReason})` : ''}`,
+        fabricType: selectedProgram?.fabricType || selectedProgram?.fabricName || selectedIncoming?.program?.fabricType || selectedIncoming?.program?.fabricName || undefined,
         items: items.map((it) => ({
           itemDescription: it.fabricMeasurementPcs,
-          colour: 'Dyed',
+          colour: selectedProgram?.fabricColor || selectedIncoming?.items?.[0]?.colour || selectedIncoming?.program?.fabricColor || 'Dyed',
           fabricCode: it.colorCodeWidth,
           quantity: Number(it.quantity) || 1,
           uom: 'PCS', // Strictly PCS as circled in diagram
-          remarks: it.remarks || `QC2 Inspection Lot: ${it.quantity} PCS`,
+          remarks: it.remarks || `Threadcut QC Inspection Lot: ${it.quantity} PCS`,
         })),
       };
 
@@ -461,11 +446,12 @@ export default function ThreadCuttingMyWorkPage() {
 
       const json = await res.json();
       if (!res.ok) {
-        throw new Error(json.error || 'Failed to issue challan to QC2');
+        throw new Error(json.error || 'Failed to issue challan to Threadcut QC');
       }
 
       setCreatedChallanModal(json);
-      setToastMsg(`Challan ${json.challanNumber} to QC2 created successfully!`);
+      setChallanNumber('');
+      setToastMsg(`Challan ${json.challanNumber} to Threadcut QC created successfully!`);
       if (typeof window !== 'undefined') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
@@ -480,11 +466,11 @@ export default function ThreadCuttingMyWorkPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-ink-50">
       {/* HEADER WITH REAL DB BACKGROUND */}
       <header
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundImage: `linear-gradient(to right, rgba(37, 35, 42, 0.88), rgba(37, 35, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -534,9 +520,9 @@ export default function ThreadCuttingMyWorkPage() {
       {/* MAIN CONTENT */}
       <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
         {/* TABS:
-            1. Incoming Challan from Embroidery (Pieces In, Pieces Out, Defective Return)
-            2. Challan from Thread Cutting to QC2 (Quality check 2)
-            3. Defective Returns to Fabric Store Defective Shelf */}
+            1. Incoming Challan from Embroidery (Pieces In, Pieces Out, Local Defective Shelf)
+            2. Challan from Thread Cutting to Threadcut QC (Quality check 2)
+            3. Record Defects on Thread Cutting Shelf */}
         <div className="bg-white border border-slate-200 rounded-2xl p-2 shadow-xs">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
             <button
@@ -559,16 +545,16 @@ export default function ThreadCuttingMyWorkPage() {
 
             <button
               type="button"
-              onClick={() => setActiveTab('CREATE_QC2_CHALLAN')}
+              onClick={() => setActiveTab('CREATE_THREADCUT_QC_CHALLAN')}
               className={`p-3.5 rounded-xl border font-bold text-xs flex items-center justify-between transition cursor-pointer ${
-                activeTab === 'CREATE_QC2_CHALLAN'
+                activeTab === 'CREATE_THREADCUT_QC_CHALLAN'
                   ? 'bg-emerald-50/90 border-emerald-400 text-emerald-950 shadow-xs'
                   : 'bg-slate-50/60 border-slate-200 text-slate-600 hover:bg-slate-100'
               }`}
             >
               <div className="flex items-center gap-2.5">
                 <Send className="w-4 h-4 text-emerald-600" />
-                <span className="uppercase tracking-wide">Challan to Thread Cut QC</span>
+                <span className="uppercase tracking-wide">Challan to Threadcut QC</span>
               </div>
               <span className="text-[10px] uppercase px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">
                 Handover Gate
@@ -607,7 +593,7 @@ export default function ThreadCuttingMyWorkPage() {
                 <span className="uppercase tracking-wide">Defective Shelf</span>
               </div>
               <span className="font-mono text-xs px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 font-bold">
-                {defectReturnChallans.length} Returns
+                DEF-SHELF-THREAD-CUTTING
               </span>
             </button>
           </div>
@@ -669,7 +655,7 @@ export default function ThreadCuttingMyWorkPage() {
                                   e.stopPropagation();
                                   handleQuickReceive(ch);
                                 }}
-                                className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xs transition cursor-pointer"
+                                className="px-2 py-0.5 rounded text-[10px] font-bold bg-lavender-600 hover:bg-lavender-700 text-white shadow-2xs transition cursor-pointer"
                                 title="Click to receive material into Thread Cutting floor stock"
                               >
                                 {receivingId === ch.id ? 'Receiving...' : 'Receive'}
@@ -867,8 +853,8 @@ export default function ThreadCuttingMyWorkPage() {
 
                   {/* USER SKETCH HIGHLIGHT:
                       - Pieces in (From Embroidery)
-                      - Pieces out (Ready for QC2)
-                      - Defective Pieces (To Fabric Store Defective Shelf with comments & reason)
+                      - Pieces out (Ready for Threadcut QC)
+                      - Defective Pieces (Thread Cutting shelf with reason)
                       - Remarks */}
                   <div className="p-5 bg-cyan-50/50 border border-cyan-200 rounded-2xl space-y-5">
                     <div className="flex items-center justify-between">
@@ -894,7 +880,7 @@ export default function ThreadCuttingMyWorkPage() {
                             min="0"
                             value={piecesIn}
                             onChange={(e) => setPiecesIn(Number(e.target.value))}
-                            className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl font-mono text-base font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-cyan-600"
+                            className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl font-mono text-base font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-lavender-600"
                           />
                           <span className="absolute right-3.5 top-2.5 text-xs font-bold text-slate-400">
                             PCS
@@ -905,10 +891,10 @@ export default function ThreadCuttingMyWorkPage() {
                         </span>
                       </div>
 
-                      {/* 2. Pieces out (Ready for QC2) */}
+                      {/* 2. Pieces out (Ready for Threadcut QC) */}
                       <div>
                         <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
-                          2. Pieces out (Good to QC2) *
+                          2. Pieces out (Good to Threadcut QC) *
                         </label>
                         <div className="relative">
                           <input
@@ -916,23 +902,23 @@ export default function ThreadCuttingMyWorkPage() {
                             min="0"
                             value={piecesOut}
                             onChange={(e) => setPiecesOut(Number(e.target.value))}
-                            className="w-full px-3.5 py-2.5 bg-white border border-emerald-300 rounded-xl font-mono text-base font-bold text-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                            className="w-full px-3.5 py-2.5 bg-white border border-emerald-300 rounded-xl font-mono text-base font-bold text-emerald-700 focus:outline-none focus:ring-2 focus:ring-lavender-600"
                           />
                           <span className="absolute right-3.5 top-2.5 text-xs font-bold text-slate-400">
                             PCS
                           </span>
                         </div>
                         <span className="text-[10px] text-slate-500 mt-0.5 block">
-                          Clean trimmed pieces ready for QC2.
+                          Clean trimmed pieces ready for Threadcut QC.
                         </span>
                       </div>
 
-                      {/* 3. Defective Pieces (To Fabric Store Defective Shelf) */}
+                      {/* 3. Defective Pieces (Thread Cutting local shelf) */}
                       <div>
-                        <label className="block text-[11px] font-bold text-rose-700 uppercase tracking-wider mb-1 flex items-center justify-between">
+                        <label className="text-[11px] font-bold text-rose-700 uppercase tracking-wider mb-1 flex items-center justify-between">
                           <span>3. Defective Pieces *</span>
                           <span className="text-[9px] px-1.5 py-0.5 bg-rose-100 text-rose-800 rounded font-bold">
-                            STORE RETURN
+                            THREAD CUTTING SHELF
                           </span>
                         </label>
                         <div className="relative">
@@ -948,14 +934,14 @@ export default function ThreadCuttingMyWorkPage() {
                                 setPiecesOut(piecesIn - val);
                               }
                             }}
-                            className="w-full px-3.5 py-2.5 bg-rose-50/60 border border-rose-300 rounded-xl font-mono text-base font-bold text-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-600"
+                            className="w-full px-3.5 py-2.5 bg-rose-50/60 border border-rose-300 rounded-xl font-mono text-base font-bold text-rose-700 focus:outline-none focus:ring-2 focus:ring-lavender-600"
                           />
                           <span className="absolute right-3.5 top-2.5 text-xs font-bold text-rose-400">
                             PCS
                           </span>
                         </div>
                         <span className="text-[10px] text-rose-600 font-semibold mt-0.5 block">
-                          Goes to Fabric Store Defective Shelf.
+                          Stays quarantined on the local shelf and appears in the Fabric Store central dashboard.
                         </span>
                       </div>
                     </div>
@@ -1008,7 +994,7 @@ export default function ThreadCuttingMyWorkPage() {
                         value={incomingRemarks}
                         onChange={(e) => setIncomingRemarks(e.target.value)}
                         placeholder=""
-                        className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-cyan-600"
+                        className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-lavender-600"
                       />
                     </div>
 
@@ -1024,9 +1010,9 @@ export default function ThreadCuttingMyWorkPage() {
                     </div>
 
                     {/* ============================================================== */}
-                    {/* OPTION: RETURN TO FABRIC STORE DEFECTIVE SHELF (WITH COMMENTS & REASON) */}
+                    {/* OPTION: RECORD DEFECT ON THREAD CUTTING SHELF */}
                     {/* ============================================================== */}
-                    <div className="p-4 bg-gradient-to-br from-rose-50/90 via-red-50/70 to-amber-50/60 border-2 border-rose-300 rounded-2xl space-y-4 shadow-xs">
+                    <div className="p-4 bg-rose-50/90 border-2 border-rose-300 rounded-2xl space-y-4 shadow-xs">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-rose-200 pb-3">
                         <div className="flex items-center gap-2">
                           <div className="w-8 h-8 rounded-lg bg-rose-600 text-white flex items-center justify-center shrink-0">
@@ -1034,19 +1020,19 @@ export default function ThreadCuttingMyWorkPage() {
                           </div>
                           <div>
                             <h4 className="text-xs font-bold uppercase tracking-wider text-rose-950 flex items-center gap-2">
-                              <span>Return to Fabric Store Defective Shelf</span>
+                              <span>Record on Thread Cutting Defective Shelf</span>
                               <span className="text-[10px] px-2 py-0.5 rounded-full bg-rose-200 text-rose-900 font-mono">
                                 WITH COMMENTS &amp; REASON
                               </span>
                             </h4>
                             <p className="text-[11px] text-slate-600">
-                              Isolate damaged or defective panels and dispatch back to Fabric Store quarantined shelf.
+                              Isolate damaged or defective panels on this department's shelf. No stock transfer is created.
                             </p>
                           </div>
                         </div>
 
                         <span className="text-[10px] font-mono font-bold bg-white text-rose-800 border border-rose-200 px-2.5 py-1 rounded-lg self-start sm:self-auto">
-                          DESTINATION: FABRIC STORE
+                          LOCAL SHELF: THREAD CUTTING - VISIBLE TO FABRIC STORE
                         </span>
                       </div>
 
@@ -1059,8 +1045,10 @@ export default function ThreadCuttingMyWorkPage() {
                           <select
                             value={defectReason}
                             onChange={(e) => setDefectReason(e.target.value)}
-                            className="w-full px-3 py-2 bg-white border border-rose-300 rounded-xl font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-rose-500"
+                            required={piecesDefected > 0}
+                            className="w-full px-3 py-2 bg-white border border-rose-300 rounded-xl font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-lavender-500"
                           >
+                            <option value="">Select a reason</option>
                             <option value="Broken Stitch / Needle Holes">Broken Stitch / Needle Holes</option>
                             <option value="Embroidery Distortion / Misalignment">Embroidery Distortion / Misalignment</option>
                             <option value="Fabric Tear / Blade Cut Damage">Fabric Tear / Blade Cut Damage</option>
@@ -1076,21 +1064,9 @@ export default function ThreadCuttingMyWorkPage() {
                           <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
                             Defective Shelf Target Location
                           </label>
-                          <select
-                            value={defectiveShelfLocation}
-                            onChange={(e) => setDefectiveShelfLocation(e.target.value)}
-                            className="w-full px-3 py-2 bg-white border border-rose-300 rounded-xl text-slate-800 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-rose-500 cursor-pointer"
-                          >
-                            <option value="DEF-SHELF-THREAD-CUTTING (Thread Cutting Trimming Shelf)">
-                              DEF-SHELF-THREAD-CUTTING (Thread Cutting Station Shelf)
-                            </option>
-                            <option value="DEF-SHELF-CENTRAL (Fabric Store Master Defective Shelf)">
-                              DEF-SHELF-CENTRAL (Fabric Store Master Defective Shelf)
-                            </option>
-                            <option value="DEF-SHELF-STORE (Fabric Store Quarantined Shelf)">
-                              DEF-SHELF-STORE (Fabric Store Quarantined Shelf)
-                            </option>
-                          </select>
+                          <div className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-mono text-rose-800">
+                            DEF-SHELF-THREAD-CUTTING · Central Store can view this entry
+                          </div>
                         </div>
                       </div>
 
@@ -1103,8 +1079,9 @@ export default function ThreadCuttingMyWorkPage() {
                             type="text"
                             value={customDefectReason}
                             onChange={(e) => setCustomDefectReason(e.target.value)}
+                            required={piecesDefected > 0 && defectReason === 'Other'}
                             placeholder=""
-                            className="w-full px-3 py-2 bg-white border border-rose-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-rose-500"
+                            className="w-full px-3 py-2 bg-white border border-rose-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-lavender-500"
                           />
                         </div>
                       )}
@@ -1112,30 +1089,30 @@ export default function ThreadCuttingMyWorkPage() {
                       {/* Defect Comments & Reason Explanation */}
                       <div>
                         <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
-                          Defect Comments &amp; Detailed Explanation *
+                          Defect Comments &amp; Detailed Explanation (optional)
                         </label>
                         <textarea
                           rows={2}
                           value={defectComments}
                           onChange={(e) => setDefectComments(e.target.value)}
                           placeholder=""
-                          className="w-full px-3 py-2 bg-white border border-rose-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-rose-500"
+                          className="w-full px-3 py-2 bg-white border border-rose-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-lavender-500"
                         />
                       </div>
 
-                      {/* ACTION BUTTON TO RETURN TO FABRIC STORE DEFECTIVE SHELF */}
+                      {/* ACTION BUTTON TO RECORD ON THE LOCAL SHELF */}
                       <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-rose-200">
                         <div className="text-[11px] font-medium text-slate-600">
                           {piecesDefected > 0 ? (
                             <span className="text-rose-800 font-bold flex items-center gap-1.5">
                               <ShieldAlert className="w-4 h-4 text-rose-600" />
                               <span>
-                                {piecesDefected} Defective Pieces ready to return to Fabric Store Defective Shelf.
+                                {piecesDefected} defective pieces ready to record on the local shelf.
                               </span>
                             </span>
                           ) : (
                             <span className="text-slate-500">
-                              Specify defective pieces count in Input #3 above to dispatch return.
+                              Specify defective pieces count in Input #3 above to record them on this shelf.
                             </span>
                           )}
                         </div>
@@ -1157,25 +1134,25 @@ export default function ThreadCuttingMyWorkPage() {
                           )}
                           <span>
                             {submittingDefectReturn
-                              ? 'Dispatching to Defective Shelf...'
-                              : `Return ${piecesDefected > 0 ? piecesDefected : ''} Defective Pieces to Fabric Store Shelf`}
+                              ? 'Recording on Defective Shelf...'
+                              : `Record ${piecesDefected > 0 ? piecesDefected : ''} Defective Pieces`}
                           </span>
                         </button>
                       </div>
                     </div>
                   </div>
 
-                  {/* QUICK BUTTON TO ISSUE TO QC2 */}
+                  {/* QUICK BUTTON TO ISSUE TO Threadcut QC */}
                   <div className="pt-2 flex items-center justify-between border-t border-slate-100">
                     <span className="text-xs text-slate-500">
-                      Finished thread cutting and resolved defects? Proceed to generate handover Challan for QC2.
+                      Finished thread cutting and resolved defects? Proceed to generate handover Challan for Threadcut QC.
                     </span>
                     <button
                       type="button"
-                      onClick={handleProceedToQC2}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs transition"
+                      onClick={handleProceedToThreadcutQC}
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-lavender-600 hover:bg-lavender-700 text-white rounded-xl text-xs font-bold shadow-xs transition"
                     >
-                      <span>Proceed to Challan to QC2 ({piecesOut} Good PCS)</span>
+                      <span>Proceed to Challan to Threadcut QC ({piecesOut} Good PCS)</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -1190,11 +1167,11 @@ export default function ThreadCuttingMyWorkPage() {
         )}
 
         {/* ========================================================================= */}
-        {/* SECTION 2: CHALLAN FROM THREAD CUTTING TO QC2 (EXACT USER DIAGRAM BOX) */}
+        {/* SECTION 2: CHALLAN FROM THREAD CUTTING TO Threadcut QC (EXACT USER DIAGRAM BOX) */}
         {/* ========================================================================= */}
-        {activeTab === 'CREATE_QC2_CHALLAN' && (
+        {activeTab === 'CREATE_THREADCUT_QC_CHALLAN' && (
           <div className="bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden">
-            <form onSubmit={handleSubmitQC2Challan} className="p-6 sm:p-8 space-y-6">
+            <form onSubmit={handleSubmitThreadcutQCChallan} className="p-6 sm:p-8 space-y-6">
               {/* TOP HEADER: TITLE & [Show production sheet] BUTTON */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-slate-200 gap-3">
                 <div>
@@ -1202,7 +1179,7 @@ export default function ThreadCuttingMyWorkPage() {
                     QUALITY GATE HANDOVER
                   </span>
                   <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2 mt-0.5">
-                    <span>Challan from Thread Cutting to Thread Cut QC</span>
+                    <span>Challan from Thread Cutting to Threadcut QC</span>
                   </h2>
                 </div>
 
@@ -1210,7 +1187,7 @@ export default function ThreadCuttingMyWorkPage() {
                 <button
                   type="button"
                   onClick={() => setShowSheetPickerModal(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs transition"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold shadow-xs transition"
                 >
                   <Eye className="w-4 h-4" />
                   <span>(Show production sheet)</span>
@@ -1226,7 +1203,7 @@ export default function ThreadCuttingMyWorkPage() {
                     </div>
                     <div>
                       <span className="text-[10px] uppercase font-bold text-teal-800 tracking-wider block">
-                        Accompanying Production Sheet (Travels With This Challan to QC2)
+                        Accompanying Production Sheet (Travels With This Challan to Threadcut QC)
                       </span>
                       <strong className="text-slate-900 text-sm font-mono">
                         {selectedProgram.programSerialNo || selectedProgram.programNumber}
@@ -1256,27 +1233,27 @@ export default function ThreadCuttingMyWorkPage() {
                 </div>
               )}
 
-              {/* QC2 CHECKING HANDOVER PIECE ACCOUNTING BANNER */}
-              <div className="p-4 bg-gradient-to-r from-emerald-50 via-teal-50 to-cyan-50 border-2 border-emerald-300 rounded-2xl space-y-3">
+              {/* Threadcut QC CHECKING HANDOVER PIECE ACCOUNTING BANNER */}
+              <div className="p-4 bg-emerald-50 border-2 border-emerald-300 rounded-2xl space-y-3">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-emerald-200/80 pb-3">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0">
+                    <div className="w-8 h-8 rounded-lg bg-lavender-600 text-white flex items-center justify-center shrink-0">
                       <ShieldCheck className="w-5 h-5" />
                     </div>
                     <div>
                       <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-950 flex items-center gap-2">
-                        <span>Pieces Dispatched for QC2 Quality Checking</span>
+                        <span>Pieces Dispatched for Threadcut QC Quality Checking</span>
                         <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-200 text-emerald-900">
                           CHECKING BASIS
                         </span>
                       </h4>
                       <p className="text-[11px] text-slate-600">
-                        This Challan explicitly specifies how many pieces are going to QC2. QC2 will conduct checking according to this exact piece count.
+                        This Challan explicitly specifies how many pieces are going to Threadcut QC. Threadcut QC will conduct checking according to this exact piece count.
                       </p>
                     </div>
                   </div>
                   <div className="text-left sm:text-right bg-white px-3.5 py-1.5 rounded-xl border border-emerald-200 self-start sm:self-auto">
-                    <span className="text-[10px] uppercase font-bold text-slate-500 block">Total Pieces Going to QC2</span>
+                    <span className="text-[10px] uppercase font-bold text-slate-500 block">Total Pieces Going to Threadcut QC</span>
                     <strong className="text-lg font-mono font-black text-emerald-700">
                       {items.reduce((s, it) => s + (Number(it.quantity) || 0), 0)} PCS
                     </strong>
@@ -1290,16 +1267,16 @@ export default function ThreadCuttingMyWorkPage() {
                     <span className="text-[10px] text-slate-500 block mt-0.5">Total received from Embroidery</span>
                   </div>
                   <div className="p-2.5 bg-white rounded-xl border border-rose-200">
-                    <span className="text-[10px] uppercase text-rose-600 font-bold block">2. Defective Segregated (To Store)</span>
+                    <span className="text-[10px] uppercase text-rose-600 font-bold block">2. Defective Segregated (Local Shelf)</span>
                     <span className="font-mono font-bold text-rose-700 text-sm">{piecesDefected} PCS</span>
-                    <span className="text-[10px] text-rose-600 block mt-0.5">Sent to Fabric Store Defective Shelf</span>
+                    <span className="text-[10px] text-rose-600 block mt-0.5">Quarantined on Thread Cutting Shelf</span>
                   </div>
                   <div className="p-2.5 bg-emerald-100/70 rounded-xl border border-emerald-300">
-                    <span className="text-[10px] uppercase text-emerald-800 font-bold block">3. Dispatched to QC2 for Checking</span>
+                    <span className="text-[10px] uppercase text-emerald-800 font-bold block">3. Dispatched to Threadcut QC for Checking</span>
                     <span className="font-mono font-bold text-emerald-900 text-sm">
                       {items.reduce((s, it) => s + (Number(it.quantity) || 0), 0)} PCS
                     </span>
-                    <span className="text-[10px] text-emerald-800 block mt-0.5 font-medium">Mandatory QC2 Checking Basis</span>
+                    <span className="text-[10px] text-emerald-800 block mt-0.5 font-medium">Mandatory Threadcut QC Checking Basis</span>
                   </div>
                 </div>
               </div>
@@ -1308,7 +1285,7 @@ export default function ThreadCuttingMyWorkPage() {
                   - Challan Number
                   - Challan Date
                   - Source (Thread Cutting)
-                  - Destination (QC2)
+                  - Destination (Threadcut QC)
                   - priority
                   - Delivery Date
                   - Design Number
@@ -1324,8 +1301,10 @@ export default function ThreadCuttingMyWorkPage() {
                     required
                     value={challanNumber}
                     onChange={(e) => setChallanNumber(e.target.value)}
-                    placeholder=""
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 transition"
+                    maxLength={64}
+                    autoComplete="off"
+                    placeholder="Enter challan number"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-lavender-600 transition"
                   />
                 </div>
 
@@ -1339,7 +1318,7 @@ export default function ThreadCuttingMyWorkPage() {
                     required
                     value={challanDate}
                     onChange={(e) => setChallanDate(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 transition"
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-lavender-600 transition"
                   />
                 </div>
 
@@ -1356,10 +1335,10 @@ export default function ThreadCuttingMyWorkPage() {
                   />
                 </div>
 
-                {/* 4. Destination (QC2) */}
+                {/* 4. Destination (Threadcut QC) */}
                 <div>
                   <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    Destination (QC2)
+                    Destination (Threadcut QC)
                   </label>
                   <input
                     type="text"
@@ -1377,7 +1356,7 @@ export default function ThreadCuttingMyWorkPage() {
                   <select
                     value={priority}
                     onChange={(e: any) => setPriority(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 transition"
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-lavender-600 transition"
                   >
                     <option value="NORMAL">Normal Priority</option>
                     <option value="URGENT">Urgent (Express QC)</option>
@@ -1394,7 +1373,7 @@ export default function ThreadCuttingMyWorkPage() {
                     type="date"
                     value={deliveryDate}
                     onChange={(e) => setDeliveryDate(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 transition"
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-lavender-600 transition"
                   />
                 </div>
 
@@ -1409,7 +1388,7 @@ export default function ThreadCuttingMyWorkPage() {
                     value={designNumber}
                     onChange={(e) => setDesignNumber(e.target.value)}
                     placeholder=""
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl font-mono font-bold text-fuchsia-800 focus:outline-none focus:ring-2 focus:ring-emerald-600 transition"
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl font-mono font-bold text-fuchsia-800 focus:outline-none focus:ring-2 focus:ring-lavender-600 transition"
                   />
                 </div>
 
@@ -1424,7 +1403,7 @@ export default function ThreadCuttingMyWorkPage() {
                     value={serialNumber}
                     onChange={(e) => setSerialNumber(e.target.value)}
                     placeholder=""
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600 transition"
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-lavender-600 transition"
                   />
                 </div>
               </div>
@@ -1437,13 +1416,13 @@ export default function ThreadCuttingMyWorkPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2">
-                      <span>Panels for QC2 Inspection (Table Form)</span>
+                      <span>Panels for Threadcut QC Inspection (Table Form)</span>
                       <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">
                         Unit: PCS (Pieces)
                       </span>
                     </h3>
                     <p className="text-[11px] text-slate-500">
-                      Specify panel measurements, color code, and pieces to be inspected by QC2 Quality Incharge.
+                      Specify panel measurements, color code, and pieces to be inspected by Threadcut QC Quality Incharge.
                     </p>
                   </div>
 
@@ -1488,7 +1467,7 @@ export default function ThreadCuttingMyWorkPage() {
                               onChange={(e) => updateItemRow(idx, 'fabricMeasurementPcs', e.target.value)}
                               onFocus={(e) => e.target.select()}
                               placeholder=""
-                              className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-emerald-600"
+                              className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-lavender-600"
                             />
                           </td>
                           <td className="py-2.5 px-3">
@@ -1499,7 +1478,7 @@ export default function ThreadCuttingMyWorkPage() {
                               onChange={(e) => updateItemRow(idx, 'colorCodeWidth', e.target.value)}
                               onFocus={(e) => e.target.select()}
                               placeholder=""
-                              className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-mono text-slate-900 focus:outline-none focus:ring-1 focus:ring-emerald-600"
+                              className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-mono text-slate-900 focus:outline-none focus:ring-1 focus:ring-lavender-600"
                             />
                           </td>
                           <td className="py-2.5 px-3">
@@ -1511,7 +1490,7 @@ export default function ThreadCuttingMyWorkPage() {
                                 value={row.quantity}
                                 onChange={(e) => updateItemRow(idx, 'quantity', e.target.value)}
                                 onFocus={(e) => e.target.select()}
-                                className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-emerald-600 pr-10"
+                                className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-lavender-600 pr-10"
                               />
                               <span className="absolute right-2 top-1.5 text-[10px] font-bold text-slate-400">
                                 PCS
@@ -1525,7 +1504,7 @@ export default function ThreadCuttingMyWorkPage() {
                               onChange={(e) => updateItemRow(idx, 'remarks', e.target.value)}
                               onFocus={(e) => e.target.select()}
                               placeholder=""
-                              className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-emerald-600"
+                              className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-lavender-600"
                             />
                           </td>
                           <td className="py-2.5 px-3 text-center">
@@ -1544,7 +1523,7 @@ export default function ThreadCuttingMyWorkPage() {
                     <tfoot className="bg-emerald-50/80 border-t-2 border-emerald-300 font-bold text-xs text-slate-800">
                       <tr>
                         <td colSpan={3} className="py-2.5 px-3 text-right uppercase text-[11px] text-emerald-950 font-bold tracking-wider">
-                          Total Dispatched Pieces for QC2 Checking:
+                          Total Dispatched Pieces for Threadcut QC Checking:
                         </td>
                         <td className="py-2.5 px-3">
                           <span className="font-mono text-sm font-black text-emerald-800 bg-white px-2 py-0.5 rounded border border-emerald-300 block text-right pr-6">
@@ -1572,7 +1551,7 @@ export default function ThreadCuttingMyWorkPage() {
                     value={inchargeName}
                     onChange={(e) => setInchargeName(e.target.value)}
                     placeholder=""
-                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 transition"
+                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-lavender-600 transition"
                   />
                 </div>
 
@@ -1580,14 +1559,14 @@ export default function ThreadCuttingMyWorkPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full sm:w-auto px-8 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-sm rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full sm:w-auto px-8 py-3 bg-lavender-600 hover:bg-lavender-700 disabled:opacity-50 text-white font-bold text-sm rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 cursor-pointer"
                 >
                   {submitting ? (
                     <RefreshCw className="w-4 h-4 animate-spin text-emerald-200" />
                   ) : (
                     <Send className="w-4 h-4" />
                   )}
-                  <span>{submitting ? 'Issuing to QC2...' : 'Submit Challan to QC2'}</span>
+                  <span>{submitting ? 'Issuing to Threadcut QC...' : 'Submit Challan to Threadcut QC'}</span>
                 </button>
               </div>
             </form>
@@ -1595,111 +1574,14 @@ export default function ThreadCuttingMyWorkPage() {
         )}
 
         {/* ========================================================================= */}
-        {/* SECTION 3: DEFECTIVE RETURNS TO FABRIC STORE DEFECTIVE SHELF */}
+        {/* SECTION 3: THREAD CUTTING DEFECTIVE SHELF (DEF-SHELF-THREAD-CUTTING)       */}
         {/* ========================================================================= */}
         {activeTab === 'DEFECT_RETURNS' && (
-          <div className="bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden p-6 sm:p-8 space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 gap-3">
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-rose-600 block">
-                  FABRIC STORE DEFECTIVE SHELF DISPATCH AUDIT
-                </span>
-                <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2 mt-0.5">
-                  <AlertTriangle className="w-5 h-5 text-rose-600" />
-                  <span>Defective Panel Returns to Fabric Store</span>
-                </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Complete audit log of all defective pieces returned from Thread Cutting to the Fabric Store defective shelf with reasons and comments.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Link
-                  href="/fabric-store/inventory/defected-shelf"
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 rounded-xl text-xs font-bold transition"
-                >
-                  <Archive className="w-3.5 h-3.5 text-rose-600" />
-                  <span>View Fabric Store Defective Shelf</span>
-                  <ExternalLink className="w-3 h-3 text-rose-400" />
-                </Link>
-              </div>
-            </div>
-
-            {defectReturnChallans.length === 0 ? (
-              <div className="p-12 text-center border border-dashed border-slate-200 rounded-2xl text-slate-400 text-xs space-y-2">
-                <ShieldCheck className="w-8 h-8 mx-auto text-emerald-400" />
-                <p className="font-semibold text-slate-700">No defective returns recorded yet</p>
-                <p className="text-slate-400">
-                  When defective pieces are returned from the Embroidery incoming lot, their return challans, reasons, and comments will be archived here.
-                </p>
-              </div>
-            ) : (
-              <div className="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-100/80 border-b border-slate-200 text-slate-600 font-bold text-[10px] uppercase">
-                    <tr>
-                      <th className="py-2.5 px-3">Return Challan #</th>
-                      <th className="py-2.5 px-3">Date</th>
-                      <th className="py-2.5 px-3">Program / Style</th>
-                      <th className="py-2.5 px-3 text-center">Defective Pcs</th>
-                      <th className="py-2.5 px-3">Target Shelf Location</th>
-                      <th className="py-2.5 px-3">Defect Reason &amp; Comments</th>
-                      <th className="py-2.5 px-3 text-center">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {defectReturnChallans.map((ch: any) => {
-                      const totalPcs = (ch.items || []).reduce(
-                        (sum: number, it: any) => sum + (Number(it.quantity) || 0),
-                        0
-                      );
-
-                      return (
-                        <tr key={ch.id} className="hover:bg-rose-50/30 transition">
-                          <td className="py-3 px-3 font-mono font-bold text-slate-900">
-                            {ch.challanNumber}
-                          </td>
-                          <td className="py-3 px-3 text-slate-600 text-[11px] font-mono">
-                            {new Date(ch.createdAt).toLocaleDateString('en-GB')}
-                          </td>
-                          <td className="py-3 px-3">
-                            <span className="font-semibold text-slate-800 block">
-                              {ch.program?.mainStyle || ch.program?.clientName || 'General Embroidery'}
-                            </span>
-                            <span className="font-mono text-[10px] text-fuchsia-700">
-                              {ch.program?.wilcomDesignNumber || 'WILCOM-DES'}
-                            </span>
-                          </td>
-                          <td className="py-3 px-3 text-center font-mono font-bold text-rose-700 text-sm">
-                            {totalPcs} PCS
-                          </td>
-                          <td className="py-3 px-3">
-                            <span className="px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-700 font-mono text-[10px]">
-                              DEF-SHELF-01 (Fabric Store)
-                            </span>
-                          </td>
-                          <td className="py-3 px-3 text-slate-700 max-w-xs">
-                            <p className="line-clamp-2 text-[11px]">
-                              {ch.remarks || ch.items?.[0]?.remarks || 'Defective return to Fabric Store'}
-                            </p>
-                          </td>
-                          <td className="py-3 px-3 text-center">
-                            <Link
-                              href={`/challans/${ch.id}`}
-                              className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-semibold transition"
-                            >
-                              <FileText className="w-3 h-3 text-slate-600" />
-                              <span>View</span>
-                            </Link>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
+          <DepartmentDefectiveShelfWidget
+            department="THREAD_CUTTING"
+            shelfCode="DEF-SHELF-THREAD-CUTTING"
+            accentColor="cyan"
+          />
         )}
 
         {/* ========================================================================= */}
@@ -1843,7 +1725,7 @@ export default function ThreadCuttingMyWorkPage() {
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-emerald-600" />
                 <h3 className="text-base font-bold text-slate-900">
-                  Challan Issued to QC2 Successfully!
+                  Challan Issued to Threadcut QC Successfully!
                 </h3>
               </div>
               <button
@@ -1857,7 +1739,7 @@ export default function ThreadCuttingMyWorkPage() {
 
             <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl space-y-2 text-xs">
               <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 block">
-                QC2 Gate Handover Dispatch (Rule 2)
+                Threadcut QC Gate Handover Dispatch (Rule 2)
               </span>
               <div className="grid grid-cols-2 gap-2 text-slate-800">
                 <div>
@@ -1866,7 +1748,7 @@ export default function ThreadCuttingMyWorkPage() {
                 </div>
                 <div>
                   <span className="text-slate-500 text-[10px] block">Destination</span>
-                  <strong className="text-slate-900">QC2 (Quality Check 2)</strong>
+                  <strong className="text-slate-900">Threadcut QC (Quality Check 2)</strong>
                 </div>
                 <div>
                   <span className="text-slate-500 text-[10px] block">Design Number</span>
@@ -1888,7 +1770,7 @@ export default function ThreadCuttingMyWorkPage() {
                 designNumber: designNumber || 'STANDARD DESIGN',
                 departmentName: 'THREAD CUTTING',
                 fromDepartment: 'THREAD_CUTTING',
-                toDepartment: 'QC2',
+                toDepartment: 'THREADCUT_QC',
                 programSerialNo: selectedProgram?.programSerialNo || selectedProgram?.programNumber || '—',
                 clientName: selectedProgram?.clientName || selectedProgram?.buyerName || 'Standard Client',
                 mainStyle: selectedProgram?.mainStyle || 'Style',
@@ -1896,7 +1778,7 @@ export default function ThreadCuttingMyWorkPage() {
                 uom: 'PCS',
                 date: new Date().toLocaleDateString('en-IN')
               }}
-              title="QC2 Handover Barcode Sticker Tag"
+              title="Threadcut QC Handover Barcode Sticker Tag"
             />
 
             <div className="pt-2 flex flex-wrap items-center justify-end gap-2 border-t border-slate-200">
@@ -1946,10 +1828,10 @@ export default function ThreadCuttingMyWorkPage() {
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-slate-900">
-                    Defective Pieces Dispatched to Fabric Store!
+                    Defect Entry Saved
                   </h3>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-rose-600">
-                    FABRIC STORE DEFECTIVE SHELF ISOLATION
+                    THREAD CUTTING SHELF - VISIBLE TO FABRIC STORE
                   </span>
                 </div>
               </div>
@@ -1966,7 +1848,7 @@ export default function ThreadCuttingMyWorkPage() {
               <div className="grid grid-cols-2 gap-3 text-slate-800">
                 <div>
                   <span className="text-slate-500 text-[10px] uppercase font-bold block">
-                    Defect Return Challan #
+                    Source Production Challan #
                   </span>
                   <strong className="font-mono text-sm text-slate-900">
                     {createdDefectModal.challanNumber}
@@ -1974,10 +1856,10 @@ export default function ThreadCuttingMyWorkPage() {
                 </div>
                 <div>
                   <span className="text-slate-500 text-[10px] uppercase font-bold block">
-                    Destination Department
+                    Reporting Department
                   </span>
                   <strong className="text-slate-900">
-                    Raw Material &amp; Fabric Store
+                    Thread Cutting
                   </strong>
                 </div>
                 <div>
@@ -2011,13 +1893,13 @@ export default function ThreadCuttingMyWorkPage() {
             {/* BARCODE PREVIEW */}
             <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-center space-y-1">
               <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 block">
-                Quarantine Identification Barcode
+                  Source Challan Barcode
               </span>
               <div className="font-mono font-bold tracking-[0.25em] text-base text-slate-800 py-1.5 border-y border-dashed border-slate-300">
                 *{createdDefectModal.challanNumber}*
               </div>
               <span className="text-[10px] text-slate-500">
-                Fabric Store Incharge can scan this upon receiving to verify defective piece count.
+                The defective quantity remains quarantined on the Thread Cutting shelf.
               </span>
             </div>
 
@@ -2030,11 +1912,11 @@ export default function ThreadCuttingMyWorkPage() {
                 Done
               </button>
               <Link
-                href="/fabric-store/inventory/defected-shelf"
+                href="/department-defective-shelf"
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 rounded-lg text-xs font-bold transition"
               >
                 <Archive className="w-3.5 h-3.5 text-rose-600" />
-                <span>Go to Fabric Store Defective Shelf</span>
+                <span>Go to My Department Defective Shelf</span>
               </Link>
               <button
                 type="button"
@@ -2042,7 +1924,7 @@ export default function ThreadCuttingMyWorkPage() {
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 rounded-lg text-xs font-bold transition"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>Download Return Challan</span>
+                <span>Download Source Challan</span>
               </button>
               <button
                 type="button"
@@ -2050,7 +1932,7 @@ export default function ThreadCuttingMyWorkPage() {
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition"
               >
                 <Printer className="w-3.5 h-3.5" />
-                <span>Print Return Challan</span>
+                <span>Print Source Challan</span>
               </button>
               <Link
                 href={`/challans/${createdDefectModal.id}`}

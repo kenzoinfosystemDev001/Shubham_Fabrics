@@ -227,8 +227,8 @@ export function WilcomDesignModal({
         {/* MODAL HEADER */}
         <div className="px-7 py-4 border-b border-slate-200 flex items-center justify-between bg-white shrink-0">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-[#163767] shadow-2xs">
-              <Sparkles className="w-7 h-7 text-[#163767]" />
+            <div className="w-14 h-14 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-lavender-800 shadow-2xs">
+              <Sparkles className="w-7 h-7 text-lavender-800" />
             </div>
             <div>
               <h2 className="text-xl font-bold text-slate-900 tracking-tight">
@@ -259,7 +259,7 @@ export function WilcomDesignModal({
           <div className="bg-white border border-slate-200 rounded-2xl p-7 shadow-xs space-y-6">
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <h3 className="text-base font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2">
-                <Plus className="w-5 h-5 text-[#163767]" />
+                <Plus className="w-5 h-5 text-lavender-800" />
                 <span>{editingId ? 'Edit Design' : 'Add Design'}</span>
               </h3>
               {editingId && (
@@ -308,7 +308,7 @@ export function WilcomDesignModal({
                       setCustomCategory('');
                     }
                   }}
-                  className="w-full h-12 px-4 rounded-xl border border-slate-300 bg-white font-medium text-base text-slate-900 focus:border-[#163767] focus:ring-2 focus:ring-[#163767]/20 focus:outline-none"
+                  className="w-full h-12 px-4 rounded-xl border border-slate-300 bg-white font-medium text-base text-slate-900 focus:border-lavender-800 focus:ring-2 focus:ring-lavender-800/20 focus:outline-none"
                 >
                   <option value="TOP">Top</option>
                   <option value="BOTTOM">Bottom</option>
@@ -326,7 +326,7 @@ export function WilcomDesignModal({
                       value={customCategory}
                       onChange={(e) => setCustomCategory(e.target.value)}
                       placeholder="ENTER CATEGORY NAME (E.G. KOTI, JACKET, BELT, SLEEVE)"
-                      className="w-full h-12 px-4 rounded-xl border border-slate-300 bg-white font-medium text-base text-slate-900 placeholder:text-slate-400 focus:border-[#163767] focus:outline-none focus:ring-2 focus:ring-[#163767]/30 shadow-2xs"
+                      className="w-full h-12 px-4 rounded-xl border border-slate-300 bg-white font-medium text-base text-slate-900 placeholder:text-slate-400 focus:border-lavender-800 focus:outline-none focus:ring-2 focus:ring-lavender-800/30 shadow-2xs"
                       autoFocus
                     />
                   </div>
@@ -343,7 +343,7 @@ export function WilcomDesignModal({
                   value={styleName}
                   onChange={(e) => setStyleName(e.target.value)}
                   placeholder=""
-                  className="w-full h-12 px-4 rounded-xl border border-slate-300 bg-white text-base font-medium text-slate-900 focus:border-[#163767] focus:ring-2 focus:ring-[#163767]/20 focus:outline-none"
+                  className="w-full h-12 px-4 rounded-xl border border-slate-300 bg-white text-base font-medium text-slate-900 focus:border-lavender-800 focus:ring-2 focus:ring-lavender-800/20 focus:outline-none"
                 />
               </div>
 
@@ -357,7 +357,7 @@ export function WilcomDesignModal({
                   value={designNumber}
                   onChange={(e) => setDesignNumber(e.target.value)}
                   placeholder=""
-                  className="w-full h-12 px-4 rounded-xl border border-slate-300 bg-white font-mono font-bold text-base uppercase text-slate-900 focus:border-[#163767] focus:ring-2 focus:ring-[#163767]/20 focus:outline-none"
+                  className="w-full h-12 px-4 rounded-xl border border-slate-300 bg-white font-mono font-bold text-base uppercase text-slate-900 focus:border-lavender-800 focus:ring-2 focus:ring-lavender-800/20 focus:outline-none"
                 />
               </div>
 
@@ -413,7 +413,7 @@ export function WilcomDesignModal({
                   value={remarks}
                   onChange={(e) => setRemarks(e.target.value)}
                   placeholder=""
-                  className="w-full h-12 px-4 rounded-xl border border-slate-300 bg-white text-base text-slate-900 focus:border-[#163767] focus:ring-2 focus:ring-[#163767]/20 focus:outline-none"
+                  className="w-full h-12 px-4 rounded-xl border border-slate-300 bg-white text-base text-slate-900 focus:border-lavender-800 focus:ring-2 focus:ring-lavender-800/20 focus:outline-none"
                 />
               </div>
             </div>
@@ -422,7 +422,7 @@ export function WilcomDesignModal({
               <button
                 type="button"
                 onClick={handleSaveCurrent}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-[#163767] hover:bg-[#0F264A] text-white rounded-xl text-base font-bold shadow-xs transition cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-lavender-800 hover:bg-lavender-900 text-white rounded-xl text-base font-bold shadow-xs transition cursor-pointer"
               >
                 <Check className="w-5 h-5" />
                 <span>{editingId ? 'Update Design' : 'Add Design'}</span>
@@ -460,11 +460,11 @@ export function WilcomDesignModal({
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase text-white ${
                             entry.category === 'TOP'
-                              ? 'bg-[#163767]'
+                              ? 'bg-lavender-800'
                               : entry.category === 'BOTTOM'
-                                ? 'bg-emerald-700'
+                                ? 'bg-lavender-700'
                                 : entry.category === 'DUPATTA'
-                                  ? 'bg-amber-700'
+                                  ? 'bg-lavender-700'
                                   : 'bg-slate-700'
                           }`}>
                             {entry.category}
@@ -490,7 +490,7 @@ export function WilcomDesignModal({
                       <button
                         type="button"
                         onClick={() => handleEdit(entry)}
-                        className="p-1.5 text-slate-400 hover:text-[#163767] hover:bg-slate-100 rounded-lg cursor-pointer transition"
+                        className="p-1.5 text-slate-400 hover:text-lavender-800 hover:bg-slate-100 rounded-lg cursor-pointer transition"
                         title="Edit design"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
@@ -523,7 +523,7 @@ export function WilcomDesignModal({
           <button
             type="button"
             onClick={onClose}
-            className="px-6 py-3 bg-[#163767] hover:bg-[#0F264A] text-white rounded-xl text-base font-bold transition shadow-xs cursor-pointer"
+            className="px-6 py-3 bg-lavender-800 hover:bg-lavender-900 text-white rounded-xl text-base font-bold transition shadow-xs cursor-pointer"
           >
             Done
           </button>

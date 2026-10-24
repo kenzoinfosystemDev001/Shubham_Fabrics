@@ -54,6 +54,11 @@ model User {
   fabricLedgerEntries  FabricStockLedger[]  @relation("FabricLedgerTransactor")
   dyeingOrdersIncharge DyeingOrder[]        @relation("DyeingInchargeUser")
 
+  // Smart deadline alerts
+  deadlineAlertsAssigned  DeadlineAlert[]          @relation("DeadlineAlertAssignee")
+  deadlineAlertDismissals DeadlineAlertDismissal[]
+  departmentsInCharge     Department[]             @relation("DepartmentIncharge")
+
   @@index([username])
   @@index([email])
 }
@@ -115,11 +120,13 @@ model UserRole {
 
 model Department {
   id            String       @id @default(uuid())
-  code          String       @unique // STORE, DYEING, QC1, CUTTING, etc.
+  code          String       @unique // STORE, DYEING, DYEING_QC, THREADCUT_QC, WASHING_QC, FINAL_QC, etc.
   name          String
   sequenceOrder Int
   description   String?
   isActive      Boolean      @default(true)
+  inchargeUserId String?     // Department incharge, assigned by Admin
+  incharge      User?        @relation("DepartmentIncharge", fields: [inchargeUserId], references: [id], onDelete: SetNull)
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
 
@@ -461,6 +468,7 @@ model Program {
   fabricBatches   FabricBatch[]
   fabricStoreRolls FabricStoreRoll[] @relation("FabricRollIssuedToProgram")
   dyeingOrders     DyeingOrder[]
+  deadlineAlerts   DeadlineAlert[]
 
   @@index([programNumber])
   @@index([status])
@@ -642,6 +650,7 @@ model Challan {
   priority        String    @default("NORMAL")
 
   issuedDate      DateTime?
+  deliveryDate    DateTime? // Delivery deadline entered on the challan by the issuing department
   receivedDate    DateTime?
   completedDate   DateTime?
 
@@ -677,7 +686,8 @@ model Challan {
 
   // Dyeing back-relations
   dyeingInboundOrders DyeingOrder[] @relation("DyeingInboundChallan")
-  dyeingQc1Orders     DyeingOrder[] @relation("DyeingQc1Challan")
+  dyeingQcOrders      DyeingOrder[] @relation("DyeingQcChallan")
+  deadlineAlerts      DeadlineAlert[]
 }
 
 model ChallanItem {
@@ -686,8 +696,10 @@ model ChallanItem {
   challan         Challan  @relation(fields: [challanId], references: [id], onDelete: Cascade)
   itemDescription String
   fabricCode      String?
-  colour          String?
-  shade           String?
+  colour          String?  // Current fabric colour / shade as it leaves the issuing department
+  shade           String?  // Resulting / observed shade (e.g. actual dyed shade). Never the dyeing instruction.
+  requiredDyeColor    String? // Colour the fabric must be dyed to (Fabric Store -> Dyeing instruction)
+  requiredDyeQuantity Float?  // Quantity of this line that must be dyed, in `uom`
   size            String?
   unitType        String
   rollNumber      String?
@@ -975,26 +987,34 @@ model DispatchCarton {
 }
 
 model DefectRecord {
-  id              String              @id @default(uuid())
-  defectCode      String              // e.g. DEF-ST-01
-  programId       String
-  program         Program             @relation(fields: [programId], references: [id])
-  challanId       String?
-  challan         Challan?            @relation(fields: [challanId], references: [id])
-  departmentCode  String
-  bundleId        String?
-  bundle          Bundle?             @relation(fields: [bundleId], references: [id])
-  itemDescription String
-  severity        String              // MINOR, MAJOR, CRITICAL
-  quantity        Int
-  reason          String
-  detectedById    String
-  detectedBy      User                @relation("DefectDetector", fields: [detectedById], references: [id])
-  status          String              @default("OPEN") // OPEN, UNDER_REVIEW, REWORK, RE-CUT, SCRAP, RELEASED, CLOSED
-  resolutionNotes String?
-  resolvedAt      DateTime?
-  createdAt       DateTime            @default(now())
-  updatedAt       DateTime            @updatedAt
+  id                    String              @id @default(uuid())
+  defectCode            String              // e.g. DEF-ST-01
+  programId             String
+  program               Program             @relation(fields: [programId], references: [id])
+  productionSheetNumber String?
+  challanId             String?
+  challan               Challan?            @relation(fields: [challanId], references: [id])
+  departmentCode        String
+  shelfCode             String?
+  color                 String?
+  fabricType            String?
+  quantityUnit          String              @default("PCS")
+  responsibleIncharge   String?
+  bundleId              String?
+  bundle                Bundle?             @relation(fields: [bundleId], references: [id])
+  itemDescription       String
+  severity              String              // MINOR, MAJOR, CRITICAL
+  quantity              Float
+  reason                String
+  detectedById          String
+  detectedBy            User                @relation("DefectDetector", fields: [detectedById], references: [id])
+  status                String              @default("OPEN") // OPEN, UNDER_REVIEW, REWORK, RE-CUT, SCRAP, RELEASED, CLOSED
+  resolutionNotes       String?
+  resolvedAt            DateTime?
+  shelfRemovedAt        DateTime?
+  shelfRemovalReason    String?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
 
   reworks         ReworkTransaction[]
   recutRequests   RecutRequest[]
@@ -1003,6 +1023,7 @@ model DefectRecord {
   @@index([programId])
   @@index([departmentCode])
   @@index([status])
+  @@index([shelfCode, shelfRemovedAt, createdAt])
 }
 
 model ReworkTransaction {
@@ -1364,21 +1385,23 @@ model DyeingOrder {
   program              Program    @relation(fields: [programId], references: [id])
   inboundChallanId     String?
   inboundChallan       Challan?   @relation("DyeingInboundChallan", fields: [inboundChallanId], references: [id])
+  inboundChallanItemId String?    @unique // One dyeing order per inbound challan line (required colour + quantity)
 
-  status               String     @default("RECEIVED") // RECEIVED, IN_DYEING, PARTIALLY_DYED, DYED, READY_FOR_QC1, SENT_TO_QC1
+  status               String     @default("RECEIVED") // RECEIVED, IN_DYEING, PARTIALLY_DYED, DYED, READY_FOR_DYEING_QC, SENT_TO_DYEING_QC
   priority             String     @default("NORMAL")   // LOW, NORMAL, HIGH, URGENT
 
   fabricName           String
   fabricType           String?
-  targetColor          String
-  dyedColor            String?
+  currentColor         String?    // Fabric colour / shade before dyeing
+  targetColor          String     // Required dyeing colour (instruction from Fabric Store)
+  dyedColor            String?    // Actual resulting shade recorded by Dyeing
   colorCode            String?
 
   requiredQuantity     Float
   dyedQuantity         Float      @default(0)
   undyedQuantity       Float      @default(0)
-  readyForQc1Quantity  Float      @default(0)
-  sentToQc1Quantity    Float      @default(0)
+  readyForDyeingQcQuantity Float  @default(0) @map("readyForQc1Quantity")
+  sentToDyeingQcQuantity Float    @default(0) @map("sentToQc1Quantity")
   uom                  String     @default("MTR")
 
   inchargeId           String?
@@ -1389,12 +1412,12 @@ model DyeingOrder {
   machineNumber        String?
   processRemarks       String?
 
-  qc1ChallanId         String?
-  qc1Challan           Challan?   @relation("DyeingQc1Challan", fields: [qc1ChallanId], references: [id])
+  dyeingQcChallanId    String?    @map("qc1ChallanId")
+  dyeingQcChallan      Challan?   @relation("DyeingQcChallan", fields: [dyeingQcChallanId], references: [id])
 
   startedAt            DateTime?
   completedAt          DateTime?
-  sentToQc1At          DateTime?
+  sentToDyeingQcAt     DateTime?  @map("sentToQc1At")
 
   createdAt            DateTime   @default(now())
   updatedAt            DateTime   @updatedAt
@@ -1402,6 +1425,7 @@ model DyeingOrder {
   @@index([programId])
   @@index([status])
   @@index([orderNumber])
+  @@index([inboundChallanId])
 }
 
 // ==========================================
@@ -1413,6 +1437,7 @@ model FabricInward {
   sNo           Int       @default(autoincrement())
   entryType     String    // "KORA" or "DYED"
   itemName      String    // e.g. "Cotton 60x60 Cambric"
+  color         String?   // Fabric colour / shade received (null on entries recorded before colour tracking)
   billNo        String    // Supplier bill / invoice number
   billDate      DateTime  // Bill Date
   receivingDate DateTime  // Date received in store
@@ -1436,6 +1461,7 @@ model FabricOutward {
   challanId     String?
   designNumber  String?
   itemName      String
+  color         String?   // Fabric colour issued (null on records made before colour tracking)
   issueQty      Float     // meters or units issued
   unit          String    @default("MTR")
   avgPerPcs     Float?    // avg fabric per pcs
@@ -1452,4 +1478,50 @@ model FabricOutward {
   @@index([date])
 }
 
+// ==========================================
+// 19. SMART DEADLINE ALERTS
+// ==========================================
 
+// One row per task, deadline day and threshold stage (dedupeKey), so the same condition is
+// never raised twice. Alerts are resolved or superseded, never deleted.
+model DeadlineAlert {
+  id               String    @id @default(uuid())
+  dedupeKey        String    @unique // <dept>:<taskType>:<taskId>:<deadline YYYY-MM-DD>:<stage>
+  departmentCode   String
+  taskType         String    // e.g. DYEING_ORDER
+  taskId           String
+  challanId        String?
+  challan          Challan?  @relation(fields: [challanId], references: [id], onDelete: SetNull)
+  programId        String?
+  program          Program?  @relation(fields: [programId], references: [id], onDelete: SetNull)
+  assignedUserId   String?
+  assignedUser     User?     @relation("DeadlineAlertAssignee", fields: [assignedUserId], references: [id], onDelete: SetNull)
+  stage            String    // D7, D3, D1, DUE_TODAY, OVERDUE
+  severity         String    // UPCOMING, HIGH, CRITICAL
+  deadlineAt       DateTime  // snapshot of the delivery date the alert was raised for
+  deadlineSource   String    // e.g. CHALLAN_DELIVERY_DATE
+  status           String    @default("ACTIVE") // ACTIVE, SUPERSEDED, RESOLVED
+  resolutionReason String?   // TASK_CLOSED, STAGE_ADVANCED, DEADLINE_CHANGED, NOT_DUE
+  createdAt        DateTime  @default(now())
+  lastEvaluatedAt  DateTime  @default(now())
+  resolvedAt       DateTime?
+
+  dismissals       DeadlineAlertDismissal[]
+
+  @@index([departmentCode, status])
+  @@index([taskType, taskId, status])
+  @@index([challanId])
+}
+
+// Per-user dismissal: hides an alert from that user's active list only.
+model DeadlineAlertDismissal {
+  id          String        @id @default(uuid())
+  alertId     String
+  alert       DeadlineAlert @relation(fields: [alertId], references: [id], onDelete: Restrict)
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dismissedAt DateTime      @default(now())
+
+  @@unique([alertId, userId])
+  @@index([userId, dismissedAt])
+}

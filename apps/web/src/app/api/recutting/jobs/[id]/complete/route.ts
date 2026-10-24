@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { authorizeDefectReport, DEFECTIVE_SHELF_INFO } from '@/lib/defective-shelf';
 
 export const dynamic = 'force-dynamic';
 
@@ -53,6 +54,14 @@ export async function POST(
     const rejectQuantity = Number(body.rejectQuantity ?? 0);
     const wasteQuantity = Number(body.wasteQuantity ?? 0);
     const balanceQuantity = Number(body.balanceQuantity ?? 0);
+    let defectReporter: { id: string; fullName: string } | null = null;
+    if (rejectQuantity > 0) {
+      if (!String(body.defectReason || '').trim()) return NextResponse.json({ error: 'Reason for defect is required for rejected recutting panels.' }, { status: 400 });
+      const auth = await authorizeDefectReport(request, 'RECUTTING');
+      if (!auth.actor) return auth.response;
+      defectReporter = { id: auth.actor.id, fullName: auth.actor.fullName };
+      actorId = auth.actor.id;
+    }
 
     // Validation Rules
     if (isNaN(inputQuantity) || inputQuantity <= 0) {
@@ -109,19 +118,34 @@ export async function POST(
 
       // B. If rejected panels exist, record in DefectRecord for scrap traceability
       if (rejectQuantity > 0) {
-        await tx.defectRecord.create({
+        const savedDefect = await tx.defectRecord.create({
           data: {
             defectCode: `DEF-RC-${Date.now().toString().slice(-4)}`,
             programId: challan.programId,
             challanId: challan.id,
             departmentCode: 'RECUTTING',
+            productionSheetNumber: challan.program?.programSerialNo || challan.program?.programNumber,
+            shelfCode: DEFECTIVE_SHELF_INFO.RECUTTING.code,
+            color: challan.items[0]?.colour || challan.program?.fabricColor || null,
+            fabricType: challan.program?.fabricType || challan.program?.fabricName || challan.items[0]?.fabricCode || null,
+            quantityUnit: uom,
+            responsibleIncharge: defectReporter?.fullName || null,
             itemDescription: `Damaged / miss-cut embroidered panels in Recutting`,
             severity: 'MAJOR',
-            quantity: Math.round(rejectQuantity),
-            reason: body.defectReason || 'Precision cutting blade deviation / fabric tear',
+            quantity: rejectQuantity,
+            reason: String(body.defectReason).trim(),
             detectedById: actorId,
             status: 'OPEN',
             resolutionNotes: 'Quarantined scrap panels. Logged during precision recutting.',
+          },
+        });
+        await tx.auditLog.create({
+          data: {
+            actorId,
+            action: 'DEFECT_SHELF_ENTRY_CREATED',
+            entity: 'DefectRecord',
+            entityId: savedDefect.id,
+            afterState: JSON.stringify({ departmentCode: savedDefect.departmentCode, shelfCode: savedDefect.shelfCode, quantity: savedDefect.quantity, quantityUnit: savedDefect.quantityUnit, reason: savedDefect.reason, challanId: savedDefect.challanId }),
           },
         });
       }
@@ -134,7 +158,10 @@ export async function POST(
           completedDate: new Date(),
           fabricIn: inputQuantity,
           fabricOut: goodQuantity,
-          defectivePieces: rejectQuantity,
+          defectivePieces: (Number(challan.defectivePieces) || 0) + rejectQuantity,
+          defectiveShelfLocation: rejectQuantity > 0 ? DEFECTIVE_SHELF_INFO.RECUTTING.code : challan.defectiveShelfLocation,
+          defectReason: rejectQuantity > 0 ? String(body.defectReason).trim() : challan.defectReason,
+          fabricUnit: uom,
           remarks: body.operatorNotes
             ? `${challan.remarks ? challan.remarks + ' | ' : ''}Recutting: ${body.operatorNotes}`
             : challan.remarks,

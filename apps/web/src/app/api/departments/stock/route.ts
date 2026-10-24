@@ -19,10 +19,10 @@ const DEPT_CONFIG: Record<
     shelfCode: 'DEF-SHELF-DYEING',
     shelfName: 'Dyeing Station Defective Shelf',
   },
-  QC1: {
+  DYEING_QC: {
     name: 'Dyeing QC',
     defaultUnit: 'MTR',
-    shelfCode: 'DEF-SHELF-QC1',
+    shelfCode: 'DEF-SHELF-DYEING-QC',
     shelfName: 'Dyeing QC Defective Shelf',
   },
   EMBROIDERY: {
@@ -37,11 +37,11 @@ const DEPT_CONFIG: Record<
     shelfCode: 'DEF-SHELF-THREAD-CUTTING',
     shelfName: 'Thread Cutting Trimming & Snip Shelf',
   },
-  QC2: {
-    name: 'Thread Cut QC',
+  THREADCUT_QC: {
+    name: 'Threadcut QC',
     defaultUnit: 'PCS',
-    shelfCode: 'DEF-SHELF-QC2',
-    shelfName: 'Thread Cut QC Defective Shelf',
+    shelfCode: 'DEF-SHELF-THREADCUT-QC',
+    shelfName: 'Threadcut QC Defective Shelf',
   },
   WASHING: {
     name: 'Washing Department',
@@ -49,17 +49,17 @@ const DEPT_CONFIG: Record<
     shelfCode: 'DEF-SHELF-WASHING',
     shelfName: 'Washing Station Defective Shelf',
   },
-  QC3: {
+  WASHING_QC: {
     name: 'Washing QC',
     defaultUnit: 'PCS',
-    shelfCode: 'DEF-SHELF-QC3',
+    shelfCode: 'DEF-SHELF-WASHING-QC',
     shelfName: 'Washing QC Defective Shelf',
   },
-  FINAL_CHECK: {
-    name: 'Final check',
+  FINAL_QC: {
+    name: 'Final QC',
     defaultUnit: 'PCS',
-    shelfCode: 'DEF-SHELF-FINAL-CHECK',
-    shelfName: 'Final check Defective Shelf',
+    shelfCode: 'DEF-SHELF-FINAL-QC',
+    shelfName: 'Final QC Defective Shelf',
   },
   PROGRAMMING: {
     name: 'Programming Department',
@@ -74,14 +74,14 @@ const normalizeDept = (dept?: string | null): string => {
   const up = dept.toUpperCase().trim();
   if (up.includes('PROG')) return 'PROGRAMMING';
   if (up.includes('STORE') || up.includes('STR')) return 'STORE';
-  if (up.includes('QC1') || up.includes('DYEING QC') || up.includes('DYE QC')) return 'QC1';
+  if (up.includes('DYEING_QC') || up.includes('DYEING QC') || up.includes('DYE QC')) return 'DYEING_QC';
   if (up.includes('DYE')) return 'DYEING';
   if (up.includes('EMB')) return 'EMBROIDERY';
-  if (up.includes('QC2') || up.includes('THREAD CUT QC') || up.includes('THREAD CUTTING QC')) return 'QC2';
+  if (up.includes('THREADCUT_QC') || up.includes('THREAD CUT QC') || up.includes('THREADCUT QC') || up.includes('THREAD CUTTING QC')) return 'THREADCUT_QC';
   if (up.includes('THREAD') || up.includes('CUTTING') || up.includes('THC')) return 'THREAD_CUTTING';
-  if (up.includes('QC3') || up.includes('WASHING QC') || up.includes('WASH QC')) return 'QC3';
+  if (up.includes('WASHING_QC') || up.includes('WASHING QC') || up.includes('WASH QC')) return 'WASHING_QC';
   if (up.includes('WASH')) return 'WASHING';
-  if (up.includes('FINAL') || up.includes('FINAL_CHECK') || up.includes('FINAL CHECK')) return 'FINAL_CHECK';
+  if (up.includes('FINAL')) return 'FINAL_QC';
   return up;
 };
 
@@ -106,7 +106,7 @@ export async function GET(request: Request) {
             'IN_DYEING',
             'PARTIALLY_DYED',
             'DYED',
-            'READY_FOR_QC1',
+            'READY_FOR_DYEING_QC',
             'QC_APPROVED',
             'COMPLETED',
           ],
@@ -197,7 +197,7 @@ export async function GET(request: Request) {
         activeBatches: 0,
         inventoryItems: [],
       },
-      QC1: {
+      DYEING_QC: {
         totalReceived: 0,
         pendingInTransit: 0,
         pendingBatches: 0,
@@ -233,7 +233,7 @@ export async function GET(request: Request) {
         activeBatches: 0,
         inventoryItems: [],
       },
-      QC2: {
+      THREADCUT_QC: {
         totalReceived: 0,
         pendingInTransit: 0,
         pendingBatches: 0,
@@ -257,7 +257,7 @@ export async function GET(request: Request) {
         activeBatches: 0,
         inventoryItems: [],
       },
-      QC3: {
+      WASHING_QC: {
         totalReceived: 0,
         pendingInTransit: 0,
         pendingBatches: 0,
@@ -269,7 +269,7 @@ export async function GET(request: Request) {
         activeBatches: 0,
         inventoryItems: [],
       },
-      FINAL_CHECK: {
+      FINAL_QC: {
         totalReceived: 0,
         pendingInTransit: 0,
         pendingBatches: 0,
@@ -300,71 +300,81 @@ export async function GET(request: Request) {
       const fromD = normalizeDept(ch.fromDepartment);
       const toD = normalizeDept(ch.toDepartment);
 
-      const itemsQty = ch.items.reduce(
-        (s, it) => s + (Number(it.quantity) || 0),
-        0
-      );
+      // A challan that mixes MTR and PCS lines is accounted per unit, never as one total.
+      const unitGroups: Array<{ unit: string | null; items: typeof ch.items }> = ch.fabricUnit === 'MIXED'
+        ? Array.from(new Set(ch.items.map((it) => it.uom))).map((unit) => ({ unit, items: ch.items.filter((it) => it.uom === unit) }))
+        : [{ unit: null, items: ch.items }];
+      let outQtyTotal = 0;
+      let defQtyTotal = 0;
 
-      const inQty = Number(ch.fabricIn) || itemsQty || Number(ch.program?.targetQuantity) || 0;
-      const defQty = Number(ch.defectivePieces) || 0;
-      const outQty = Number(ch.fabricOut) || Math.max(0, inQty - defQty);
+      for (const group of unitGroups) {
+        const itemsQty = group.items.reduce(
+          (s, it) => s + (Number(it.quantity) || 0),
+          0
+        );
 
-      // Determine whether destination department has officially RECEIVED the material
-      const isReceived = [
-        'RECEIVED',
-        'UNDER_INSPECTION',
-        'IN_PROCESS',
-        'IN_PROGRESS',
-        'IN_DYEING',
-        'PARTIALLY_DYED',
-        'DYED',
-        'READY_FOR_QC1',
-        'QC_APPROVED',
-        'COMPLETED',
-      ].includes(ch.status);
+        const inQty = group.unit ? itemsQty : Number(ch.fabricIn) || itemsQty || Number(ch.program?.targetQuantity) || 0;
+        const defQty = group.unit ? 0 : Number(ch.defectivePieces) || 0;
+        const outQty = group.unit ? itemsQty : Number(ch.fabricOut) || Math.max(0, inQty - defQty);
+        outQtyTotal += outQty;
+        defQtyTotal += defQty;
+        // Determine whether destination department has officially RECEIVED the material
+        const isReceived = [
+          'RECEIVED',
+          'UNDER_INSPECTION',
+          'IN_PROCESS',
+          'IN_PROGRESS',
+          'IN_DYEING',
+          'PARTIALLY_DYED',
+          'DYED',
+          'READY_FOR_DYEING_QC',
+          'QC_APPROVED',
+          'COMPLETED',
+        ].includes(ch.status);
 
-      // Inflow to destination department
-      if (deptStats[toD]) {
-        if (isReceived) {
-          deptStats[toD].totalReceived += inQty;
-          deptStats[toD].activeBatches += 1;
-        } else {
-          // Status is ISSUED / IN_TRANSIT / SUBMITTED -> awaiting receive
-          deptStats[toD].pendingInTransit += inQty;
-          deptStats[toD].pendingBatches += 1;
+        // Inflow to destination department
+        if (deptStats[toD]) {
+          if (isReceived) {
+            deptStats[toD].totalReceived += inQty;
+            deptStats[toD].activeBatches += 1;
+          } else {
+            // Status is ISSUED / IN_TRANSIT / SUBMITTED -> awaiting receive
+            deptStats[toD].pendingInTransit += inQty;
+            deptStats[toD].pendingBatches += 1;
+          }
+
+          // Add to inventory items list
+          deptStats[toD].inventoryItems.push({
+            id: group.unit ? `${ch.id}-${group.unit}` : ch.id,
+            challanNumber: ch.challanNumber,
+            programId: ch.programId,
+            programSerialNo: ch.program?.programSerialNo || ch.program?.programNumber || 'N/A',
+            clientName: ch.program?.clientName || ch.program?.buyerName || 'Standard Client',
+            style: ch.program?.mainStyle || ch.program?.wilcomDesignNumber || 'Main Style',
+            fabricDescription: ch.program?.fabricName || group.items[0]?.itemDescription || 'Fabric Lot',
+            color: ch.program?.fabricColor || group.items[0]?.colour || 'Standard',
+            quantityIn: inQty,
+            quantityOut: outQty,
+            defectiveQuantity: defQty,
+            balanceOnHand: isReceived ? Math.max(0, inQty - defQty) : 0,
+            uom: group.unit || ch.fabricUnit || (DEPT_CONFIG[toD]?.defaultUnit) || 'MTR',
+            fromDepartment: fromD,
+            toDepartment: toD,
+            status: isReceived ? ch.status : 'IN_TRANSIT',
+            originalStatus: ch.status,
+            isReceived,
+            receivedDate: ch.receivedDate,
+            date: ch.issuedDate || ch.createdAt,
+            remarks: ch.remarks,
+          });
         }
-
-        // Add to inventory items list
-        deptStats[toD].inventoryItems.push({
-          id: ch.id,
-          challanNumber: ch.challanNumber,
-          programId: ch.programId,
-          programSerialNo: ch.program?.programSerialNo || ch.program?.programNumber || 'N/A',
-          clientName: ch.program?.clientName || ch.program?.buyerName || 'Standard Client',
-          style: ch.program?.mainStyle || ch.program?.wilcomDesignNumber || 'Main Style',
-          fabricDescription: ch.program?.fabricName || ch.items[0]?.itemDescription || 'Fabric Lot',
-          color: ch.program?.fabricColor || ch.items[0]?.colour || 'Standard',
-          quantityIn: inQty,
-          quantityOut: outQty,
-          defectiveQuantity: defQty,
-          balanceOnHand: isReceived ? Math.max(0, inQty - defQty) : 0,
-          uom: ch.fabricUnit || (DEPT_CONFIG[toD]?.defaultUnit) || 'MTR',
-          fromDepartment: fromD,
-          toDepartment: toD,
-          status: isReceived ? ch.status : 'IN_TRANSIT',
-          originalStatus: ch.status,
-          isReceived,
-          receivedDate: ch.receivedDate,
-          date: ch.issuedDate || ch.createdAt,
-          remarks: ch.remarks,
-        });
       }
 
       // Outflow from source department:
       // Once issued/dispatched downstream, source department stock is reduced
       if (deptStats[fromD]) {
-        deptStats[fromD].totalDispatched += outQty;
-        deptStats[fromD].totalDefective += defQty;
+        deptStats[fromD].totalDispatched += outQtyTotal;
+        deptStats[fromD].totalDefective += defQtyTotal;
       }
     }
 

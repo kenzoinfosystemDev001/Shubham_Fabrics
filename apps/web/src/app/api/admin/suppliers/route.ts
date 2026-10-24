@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireAdmin } from '@/lib/admin-auth';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: Request) {
+  const auth = await requireAdmin(request);
+  if (!auth.actor) return auth.response;
   try {
     const suppliers = await prisma.supplier.findMany({
       include: {
@@ -27,6 +30,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const auth = await requireAdmin(request);
+  if (!auth.actor) return auth.response;
   try {
     const body = await request.json();
     const name = (body.name || '').trim();

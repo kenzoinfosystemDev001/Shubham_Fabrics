@@ -51,14 +51,14 @@ export default function ThreadCuttingFloorBoardPage() {
   const trimmingCompleted = incomingChallans.filter(
     (c) => c.status === 'COMPLETED'
   );
-  const dispatchedToQc2 = outgoingChallans;
+  const dispatchedToThreadcutQc = outgoingChallans;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-ink-50">
       {/* HEADER */}
       <header
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundImage: `linear-gradient(to right, rgba(37, 35, 42, 0.88), rgba(37, 35, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -235,39 +235,39 @@ export default function ThreadCuttingFloorBoardPage() {
             </div>
           </div>
 
-          {/* COLUMN 4: DISPATCHED TO QC2 */}
+          {/* COLUMN 4: DISPATCHED TO Threadcut QC */}
           <div className="bg-slate-100/90 border border-slate-200 rounded-2xl p-4 flex flex-col space-y-3">
             <div className="flex items-center justify-between border-b border-slate-200/80 pb-2.5">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
                 <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                  4. Dispatched to QC2
+                  4. Dispatched to Threadcut QC
                 </h3>
               </div>
               <span className="text-xs font-bold font-mono px-2 py-0.5 rounded-full bg-white text-emerald-800 border border-slate-200">
-                {dispatchedToQc2.length}
+                {dispatchedToThreadcutQc.length}
               </span>
             </div>
 
             <div className="flex-1 space-y-2.5 overflow-y-auto">
-              {dispatchedToQc2.length === 0 ? (
+              {dispatchedToThreadcutQc.length === 0 ? (
                 <div className="p-6 text-center text-slate-400 text-xs bg-white/60 rounded-xl border border-dashed border-slate-200">
-                  No challans dispatched to QC2 yet
+                  No challans dispatched to Threadcut QC yet
                 </div>
               ) : (
-                dispatchedToQc2.map((ch: any) => (
+                dispatchedToThreadcutQc.map((ch: any) => (
                   <div key={ch.id} className="p-3.5 bg-white rounded-xl border border-emerald-300 shadow-2xs space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="font-mono text-xs font-bold text-slate-900">{ch.challanNumber}</span>
                       <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
-                        AT QC2
+                        AT Threadcut QC
                       </span>
                     </div>
                     <p className="text-xs font-semibold text-slate-800 line-clamp-1">
                       {ch.program?.mainStyle || 'Trimmed Panels'}
                     </p>
                     <div className="flex justify-between items-center text-[11px] pt-1 border-t border-slate-100">
-                      <span className="font-mono text-emerald-700 font-bold">To: QC2</span>
+                      <span className="font-mono text-emerald-700 font-bold">To: Threadcut QC</span>
                       <span className="font-mono font-bold text-slate-900">
                         {(ch.items || []).reduce((s: number, it: any) => s + (Number(it.quantity) || 0), 0)} PCS
                       </span>

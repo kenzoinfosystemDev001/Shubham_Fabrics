@@ -10,18 +10,49 @@
 
 import { generateCode128SvgBars } from '@/lib/barcode';
 import { getCurrentUser, canViewClientCode } from '@/lib/rbac';
-import { loadProgramDocument } from '@/lib/program-document';
+import { loadChallanDocument } from '@/lib/program-document';
 import { extractRootWilcomPhoto, prepareWilcomImages } from '@/lib/download-wilcom';
 
 export interface ChallanItem {
   id?: string;
   itemDescription?: string;
-  colour?: string;
+  fabricCode?: string | null;
+  colour?: string | null;
+  shade?: string | null;
+  requiredDyeColor?: string | null;
+  requiredDyeQuantity?: number | null;
   quantity?: number | string;
   uom?: string;
   rollNumber?: string;
   lotNumber?: string;
   remarks?: string;
+}
+
+/** Per-unit totals ("30 MTR + 15 PCS"); meters and pieces are never added together. */
+export function summarizeQuantitiesByUnit(items: ChallanItem[]): Array<{ unit: string; quantity: number }> {
+  const totals = new Map<string, number>();
+  for (const it of items) {
+    const unit = String(it.uom || 'PCS').toUpperCase();
+    totals.set(unit, (totals.get(unit) || 0) + (Number(it.quantity) || 0));
+  }
+  return Array.from(totals.entries()).map(([unit, quantity]) => ({ unit, quantity: Math.round(quantity * 1000) / 1000 }));
+}
+
+export function formatQuantitiesByUnit(items: ChallanItem[], challan?: any): string {
+  const totals = summarizeQuantitiesByUnit(items);
+  if (totals.length > 0) return totals.map((t) => `${t.quantity} ${t.unit}`).join(' + ');
+  const headerQty = challan?.fabricOut ?? challan?.fabricIn;
+  return headerQty !== null && headerQty !== undefined && challan?.fabricUnit && challan.fabricUnit !== 'MIXED'
+    ? `${headerQty} ${challan.fabricUnit}`
+    : '—';
+}
+
+/** Which optional colour columns a challan's items actually use. */
+export function getChallanColorColumns(items: ChallanItem[]) {
+  return {
+    hasRequiredDyeColor: items.some((it) => Boolean(it.requiredDyeColor)),
+    hasResultShade: items.some((it) => Boolean(it.shade)),
+  };
 }
 
 export function generateChallanHtml(challan: any): string {
@@ -62,15 +93,14 @@ export function generateChallanHtml(challan: any): string {
     STORE: 'FABRIC STORE',
     FABRIC_STORE: 'FABRIC STORE',
     DYEING: 'DYEING DEPARTMENT',
-    QC1: 'QC1 (QUALITY CHECK 1)',
+    DYEING_QC: 'DYEING QC',
     EMBROIDERY: 'EMBROIDERY DEPARTMENT',
     THREAD_CUTTING: 'THREAD CUTTING DEPARTMENT',
     CUTTING: 'CUTTING DEPARTMENT',
     RECUTTING: 'RECUTTING WORKSTATION',
-    QC2: 'QC2 (QUALITY CHECK 2)',
+    THREADCUT_QC: 'THREADCUT QC',
     WASHING: 'WASHING DEPARTMENT',
-    QCWASHING: 'QC WASHING (QUALITY CHECK 3)',
-    QC3: 'QC3 (QUALITY CHECK 3)',
+    WASHING_QC: 'WASHING QC',
     FINISHING: 'FINISHING DEPARTMENT',
     PACKING: 'PACKING & DISPATCH',
     PROGRAMMING: 'PROGRAMMING & PLANNING'
@@ -83,20 +113,23 @@ export function generateChallanHtml(challan: any): string {
   let voucherTitle = `${fromLabel} → ${toLabel}`;
   if (fromDept === 'STORE' && (toDept === 'DYEING' || toDept.includes('DYE'))) {
     voucherTitle = 'FABRIC STORE → DYEING MATERIAL DISPATCH CHALLAN';
-  } else if (fromDept === 'DYEING' || toDept === 'QC1' || challanNo.startsWith('CH-DYE-')) {
-    voucherTitle = 'DYEING → QC1 QUALITY INSPECTION CHALLAN';
-  } else if (fromDept === 'THREAD_CUTTING' && toDept === 'QC2') {
-    voucherTitle = 'THREAD CUTTING → QC2 QUALITY CHECK CHALLAN';
-  } else if (fromDept === 'QC2' && toDept === 'WASHING') {
-    voucherTitle = 'QC2 → WASHING DEPARTMENT TRANSFER CHALLAN';
-  } else if (fromDept === 'WASHING' && (toDept === 'QCWASHING' || toDept === 'QC3')) {
-    voucherTitle = 'WASHING → QC WASHING INSPECTION CHALLAN';
+  } else if (fromDept === 'DYEING' || toDept === 'DYEING_QC' || challanNo.startsWith('CH-DYE-')) {
+    voucherTitle = 'DYEING → DYEING QC INSPECTION CHALLAN';
+  } else if (fromDept === 'THREAD_CUTTING' && toDept === 'THREADCUT_QC') {
+    voucherTitle = 'THREAD CUTTING → THREADCUT QC INSPECTION CHALLAN';
+  } else if (fromDept === 'THREADCUT_QC' && toDept === 'WASHING') {
+    voucherTitle = 'THREADCUT QC → WASHING DEPARTMENT TRANSFER CHALLAN';
+  } else if (fromDept === 'WASHING' && toDept === 'WASHING_QC') {
+    voucherTitle = 'WASHING → WASHING QC INSPECTION CHALLAN';
   }
 
   // Items
   const items: ChallanItem[] = Array.isArray(challan.items) ? challan.items : [];
   const totalQuantity = items.reduce((sum, it) => sum + (Number(it.quantity) || 0), 0);
   const uom = items[0]?.uom || 'PCS';
+  const quantityTotalsLabel = formatQuantitiesByUnit(items, challan);
+  const { hasRequiredDyeColor, hasResultShade } = getChallanColorColumns(items);
+  const itemColumnCount = 4 + (hasRequiredDyeColor ? 2 : 0) + (hasResultShade ? 1 : 0);
 
   // Ledger calculation
   const fabricIn = challan.fabricIn ?? (challan.parentChallan?.fabricOut || totalQuantity);
@@ -131,8 +164,8 @@ export function generateChallanHtml(challan: any): string {
       print-color-adjust: exact !important;
     }
     body {
-      background-color: #f1f5f9;
-      color: #0f172a;
+      background-color: #F1EFF4;
+      color: #25232A;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       padding: 16px;
       font-size: 12px;
@@ -141,7 +174,7 @@ export function generateChallanHtml(challan: any): string {
     .no-print-bar {
       max-width: 820px;
       margin: 0 auto 16px auto;
-      background: #0f172a;
+      background: #25232A;
       color: #ffffff;
       padding: 12px 20px;
       border-radius: 8px;
@@ -173,15 +206,15 @@ export function generateChallanHtml(challan: any): string {
       transition: background 0.15s;
     }
     .btn-print {
-      background: #2563eb;
+      background: #7D44A8;
       color: #ffffff;
     }
-    .btn-print:hover { background: #1d4ed8; }
+    .btn-print:hover { background: #663889; }
     .btn-download {
-      background: #059669;
+      background: #423F48;
       color: #ffffff;
     }
-    .btn-download:hover { background: #047857; }
+    .btn-download:hover { background: #302D35; }
 
     /* CHALLAN SHEET CONTAINER */
     .challan-container {
@@ -222,8 +255,8 @@ export function generateChallanHtml(challan: any): string {
       display: inline-block;
       margin-top: 4px;
       padding: 2px 6px;
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
+      background: #F1EFF4;
+      border: 1px solid #D3CED8;
       color: #000000;
       font-size: 10px;
       font-weight: 800;
@@ -241,7 +274,7 @@ export function generateChallanHtml(challan: any): string {
     .barcode-svg-wrap {
       background: #ffffff;
       padding: 4px;
-      border: 1px solid #cbd5e1;
+      border: 1px solid #D3CED8;
       border-radius: 4px;
       display: inline-block;
       margin-bottom: 4px;
@@ -251,12 +284,12 @@ export function generateChallanHtml(challan: any): string {
       font-size: 13px;
       font-weight: 800;
       letter-spacing: 1px;
-      color: #0f172a;
+      color: #25232A;
     }
     .design-tag {
       font-size: 10px;
       font-weight: 700;
-      color: #475569;
+      color: #57545E;
       margin-top: 2px;
     }
 
@@ -265,7 +298,7 @@ export function generateChallanHtml(challan: any): string {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 8px;
-      background: #f8fafc;
+      background: #F8F7FA;
       border: 1.5px solid #000000;
       padding: 8px 12px;
       margin-bottom: 8px;
@@ -278,7 +311,7 @@ export function generateChallanHtml(challan: any): string {
       font-size: 9px;
       font-weight: 900;
       text-transform: uppercase;
-      color: #475569;
+      color: #57545E;
       letter-spacing: 0.5px;
       margin-bottom: 1px;
     }
@@ -290,7 +323,7 @@ export function generateChallanHtml(challan: any): string {
 
     /* FLOW AUDIT LEDGER */
     .flow-ledger {
-      background: #0f172a;
+      background: #25232A;
       color: #ffffff;
       border-radius: 6px;
       padding: 12px 14px;
@@ -300,14 +333,14 @@ export function generateChallanHtml(challan: any): string {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid #334155;
+      border-bottom: 1px solid #423F48;
       padding-bottom: 6px;
       margin-bottom: 8px;
       font-size: 10px;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 1px;
-      color: #fcd34d;
+      color: #E6FF47;
     }
     .flow-grid {
       display: grid;
@@ -315,38 +348,38 @@ export function generateChallanHtml(challan: any): string {
       gap: 10px;
     }
     .flow-card {
-      background: #1e293b;
-      border: 1px solid #334155;
+      background: #302D35;
+      border: 1px solid #423F48;
       border-radius: 4px;
       padding: 8px 10px;
     }
     .flow-card.defect {
-      background: #450a0a;
-      border-color: #991b1b;
+      background: #3A0E07;
+      border-color: #922614;
     }
     .flow-card.out {
-      background: #064e3b;
-      border-color: #047857;
+      background: #2B3300;
+      border-color: #465300;
     }
     .flow-card-label {
       font-size: 9px;
       font-weight: 700;
       text-transform: uppercase;
-      color: #94a3b8;
+      color: #A19CA8;
     }
-    .flow-card.defect .flow-card-label { color: #fca5a5; }
-    .flow-card.out .flow-card-label { color: #86efac; }
+    .flow-card.defect .flow-card-label { color: #FFA493; }
+    .flow-card.out .flow-card-label { color: #E6FF47; }
     .flow-card-val {
       font-family: monospace;
       font-size: 16px;
       font-weight: 900;
       margin-top: 2px;
     }
-    .flow-card.defect .flow-card-val { color: #fecaca; }
-    .flow-card.out .flow-card-val { color: #a7f3d0; }
+    .flow-card.defect .flow-card-val { color: #FFCBC0; }
+    .flow-card.out .flow-card-val { color: #EEFF8A; }
     .flow-card-sub {
       font-size: 9px;
-      color: #cbd5e1;
+      color: #D3CED8;
       margin-top: 2px;
       white-space: nowrap;
       overflow: hidden;
@@ -362,7 +395,7 @@ export function generateChallanHtml(challan: any): string {
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 1px;
-      color: #334155;
+      color: #423F48;
       margin-bottom: 6px;
       display: flex;
       justify-content: space-between;
@@ -374,16 +407,16 @@ export function generateChallanHtml(challan: any): string {
       font-size: 11px;
     }
     th, td {
-      border: 1.5px solid #cbd5e1;
+      border: 1.5px solid #D3CED8;
       padding: 6px 10px;
       text-align: left;
     }
     th {
-      background: #f1f5f9;
+      background: #F1EFF4;
       font-weight: 800;
       text-transform: uppercase;
       font-size: 9px;
-      color: #475569;
+      color: #57545E;
       letter-spacing: 0.5px;
     }
     td.num {
@@ -392,16 +425,16 @@ export function generateChallanHtml(challan: any): string {
       font-weight: 700;
     }
     tr.totals-row td {
-      background: #f8fafc;
+      background: #F8F7FA;
       font-weight: 800;
       font-size: 11px;
-      border-top: 2px solid #0f172a;
+      border-top: 2px solid #25232A;
     }
 
     /* PRODUCTION SHEET ATTACHMENT CARD */
     .sheet-ref-card {
-      background: #faf5ff;
-      border: 1.5px dashed #a855f7;
+      background: #F9F5FD;
+      border: 1.5px dashed #9455C0;
       border-radius: 6px;
       padding: 10px 14px;
       margin-bottom: 14px;
@@ -412,13 +445,13 @@ export function generateChallanHtml(challan: any): string {
     .sheet-ref-title {
       font-size: 11px;
       font-weight: 800;
-      color: #6b21a8;
+      color: #663889;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
     .sheet-ref-sub {
       font-size: 10px;
-      color: #4c1d95;
+      color: #4F2C6B;
       margin-top: 2px;
     }
 
@@ -429,22 +462,22 @@ export function generateChallanHtml(challan: any): string {
       grid-template-columns: 1fr 1fr;
       gap: 32px;
       padding-top: 14px;
-      border-top: 1.5px solid #e2e8f0;
+      border-top: 1.5px solid #E5E1E8;
     }
     .sign-box {
-      border-top: 1.5px dashed #64748b;
+      border-top: 1.5px dashed #6B6872;
       padding-top: 8px;
       text-align: center;
     }
     .sign-title {
       font-weight: 800;
       font-size: 11px;
-      color: #0f172a;
+      color: #25232A;
       text-transform: uppercase;
     }
     .sign-sub {
       font-size: 9px;
-      color: #64748b;
+      color: #6B6872;
       margin-top: 2px;
     }
 
@@ -452,12 +485,12 @@ export function generateChallanHtml(challan: any): string {
     .footer-notice {
       margin-top: 14px;
       padding-top: 10px;
-      border-top: 1px solid #e2e8f0;
+      border-top: 1px solid #E5E1E8;
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-size: 9px;
-      color: #64748b;
+      color: #6B6872;
       font-family: monospace;
     }
 
@@ -485,7 +518,7 @@ export function generateChallanHtml(challan: any): string {
   <div class="no-print-bar">
     <div>
       <h3>MATERIAL DISPATCH CHALLAN · ${challanNo}</h3>
-      <span style="font-size: 10px; color: #94a3b8; font-family: monospace;">
+      <span style="font-size: 10px; color: #A19CA8; font-family: monospace;">
         Shubham Fabrics India Pvt. Ltd. · ${fromDept} → ${toDept}
       </span>
     </div>
@@ -587,7 +620,7 @@ export function generateChallanHtml(challan: any): string {
     ` : ''}
 
     ${defectivePieces > 0 ? `
-    <div style="border: 1.5px solid #991b1b; background: #fef2f2; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; font-size: 11px; font-weight: bold; color: #991b1b;">
+    <div style="border: 1.5px solid #922614; background: #FFF5F2; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; font-size: 11px; font-weight: bold; color: #922614;">
       DEFECTIVE CUT (TO SHELF): ${defectivePieces} ${fabricUnit} [Location: ${defectiveShelf}]${defectReason ? ` &middot; Reason: ${defectReason}` : ''}
     </div>
     ` : ''}
@@ -596,47 +629,47 @@ export function generateChallanHtml(challan: any): string {
     <div class="table-container">
       <div class="table-title">
         <span>ITEMS / MATERIALS</span>
-        <span style="font-family: monospace; font-size: 11px;">Total: ${totalQuantity || challan.fabricOut || challan.fabricIn || 0} ${uom}</span>
+        <span style="font-family: monospace; font-size: 11px;">Total: ${quantityTotalsLabel}</span>
       </div>
       <table>
         <thead>
           <tr>
             <th style="width: 35px; text-align: center;">#</th>
             <th>ITEM DESCRIPTION</th>
-            <th style="width: 140px;">COLOR / SHADE</th>
-            <th style="width: 120px;">ROLL / LOT #</th>
-            <th style="width: 90px; text-align: right;">QUANTITY</th>
-            <th style="width: 60px; text-align: center;">UOM</th>
+            <th style="width: 120px;">${hasRequiredDyeColor ? 'CURRENT COLOR / SHADE' : 'COLOR / SHADE'}</th>
+            ${hasRequiredDyeColor ? '<th style="width: 120px;">REQUIRED DYEING COLOR</th>' : ''}
+            ${hasRequiredDyeColor ? '<th style="width: 80px; text-align: right;">QTY TO DYE</th>' : ''}
+            ${hasResultShade ? '<th style="width: 110px;">RESULT SHADE</th>' : ''}
+            <th style="width: 110px;">ROLL / LOT #</th>
+            <th style="width: 80px; text-align: right;">QUANTITY</th>
+            <th style="width: 55px; text-align: center;">UOM</th>
           </tr>
         </thead>
         <tbody>
           ${items.length > 0 ? items.map((it, idx) => `
             <tr>
               <td style="text-align: center; font-family: monospace;">${idx + 1}</td>
-              <td style="font-weight: 700;">${it.itemDescription || fabricName || styleCode || 'Fabric Lot'}</td>
-              <td>${it.colour || prog.fabricColor || 'Standard'}</td>
+              <td style="font-weight: 700;">${it.itemDescription || it.fabricCode || fabricName || 'Fabric Lot'}</td>
+              <td>${it.colour || '—'}</td>
+              ${hasRequiredDyeColor ? `<td style="font-weight: 800;">${it.requiredDyeColor || '—'}</td>` : ''}
+              ${hasRequiredDyeColor ? `<td class="num">${it.requiredDyeColor ? `${it.requiredDyeQuantity ?? it.quantity ?? 0} ${it.uom || uom}` : '—'}</td>` : ''}
+              ${hasResultShade ? `<td>${it.shade || '—'}</td>` : ''}
               <td style="font-family: monospace;">${it.rollNumber || it.lotNumber || '—'}</td>
               <td class="num">${it.quantity || 0}</td>
               <td style="text-align: center;">${it.uom || uom}</td>
             </tr>
           `).join('') : `
             <tr>
-              <td style="text-align: center; font-family: monospace;">1</td>
-              <td style="font-weight: 700;">${fabricName || styleCode || 'Production Material'}</td>
-              <td>${prog.fabricColor || 'Standard'}</td>
-              <td style="font-family: monospace;">—</td>
-              <td class="num">${totalQuantity || challan.fabricOut || challan.fabricIn || 0}</td>
-              <td style="text-align: center;">${uom}</td>
+              <td colspan="${itemColumnCount + 2}" style="text-align: center; font-style: italic;">No line items were recorded on this challan.${challan.fabricOut ?? challan.fabricIn ? ` Header quantity: ${quantityTotalsLabel}.` : ''}</td>
             </tr>
           `}
           <tr class="totals-row">
-            <td colspan="4" style="text-align: right; text-transform: uppercase; font-size: 10px; font-weight: 900;">
+            <td colspan="${itemColumnCount}" style="text-align: right; text-transform: uppercase; font-size: 10px; font-weight: 900;">
               TOTAL QUANTITY:
             </td>
-            <td class="num" style="font-size: 13px; font-weight: 900;">
-              ${totalQuantity || challan.fabricOut || challan.fabricIn || 0}
+            <td colspan="2" class="num" style="font-size: 13px; font-weight: 900;">
+              ${quantityTotalsLabel}
             </td>
-            <td style="text-align: center; font-weight: 900;">${uom}</td>
           </tr>
         </tbody>
       </table>
@@ -688,9 +721,10 @@ export function generateChallanHtml(challan: any): string {
 export async function downloadChallanHtml(challan: any): Promise<void> {
   if (!challan) return;
   try {
+    const loaded = await loadChallanDocument(challan);
     const completeChallan = {
-      ...challan,
-      program: await prepareWilcomImages(await loadProgramDocument(challan.program || { id: challan.programId })),
+      ...loaded,
+      program: loaded.program ? await prepareWilcomImages(loaded.program) : loaded.program,
     };
     const html = generateChallanHtml(completeChallan);
     const challanNo = (completeChallan.challanNumber || 'CHALLAN').replace(/[^a-zA-Z0-9_-]/g, '_');
@@ -721,9 +755,10 @@ export function printChallan(challan: any): void {
   if (printWindow) {
     void (async () => {
       try {
+        const loaded = await loadChallanDocument(challan);
         const completeChallan = {
-          ...challan,
-          program: await prepareWilcomImages(await loadProgramDocument(challan.program || { id: challan.programId })),
+          ...loaded,
+          program: loaded.program ? await prepareWilcomImages(loaded.program) : loaded.program,
         };
         printWindow.document.open();
         printWindow.document.write(generateChallanHtml(completeChallan));

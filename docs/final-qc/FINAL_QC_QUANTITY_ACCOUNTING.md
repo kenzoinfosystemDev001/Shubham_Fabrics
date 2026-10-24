@@ -43,7 +43,7 @@ Under no circumstances may $Q_{\text{rework}}$ or $Q_{\text{rejected}}$ be added
 
 When $Q_{\text{rejected}} > 0$:
 1. A `DefectRecord` is written with status `'OPEN'` and linked to the Challan and Program.
-2. A defective-return Challan records the quantity at `DEF-SHELF-FINAL-CHECK`.
+2. A defective-return Challan records the quantity at `DEF-SHELF-FINAL-QC`.
 3. The defect reason is captured (e.g., "Permanent oil mark", "Fabric cut during trimming").
 
 When $Q_{\text{rework}} > 0$:

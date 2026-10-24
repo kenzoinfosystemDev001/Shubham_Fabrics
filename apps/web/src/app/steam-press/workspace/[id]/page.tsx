@@ -43,7 +43,7 @@ export default function SteamPressFocusWorkspacePage({
   const [reworkCount, setReworkCount] = useState(0);
   const [rejectCount, setRejectCount] = useState(0);
   const [operatorNotes, setOperatorNotes] = useState('');
-  const [defectReason, setDefectReason] = useState('Scorch mark / glaze shine');
+  const [defectReason, setDefectReason] = useState('');
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState('');
 
@@ -205,7 +205,7 @@ export default function SteamPressFocusWorkspacePage({
     <div
       className="min-h-screen text-slate-100 flex flex-col"
       style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.95), rgba(10, 15, 29, 0.98)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+        backgroundImage: `linear-gradient(to bottom, rgba(37, 35, 42, 0.95), rgba(24, 22, 28, 0.98)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',
@@ -334,7 +334,7 @@ export default function SteamPressFocusWorkspacePage({
             <button
               onClick={() => handleSaveReconciliation(true)}
               disabled={saving || !isBalanced}
-              className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-lg shadow-emerald-950/50 transition flex items-center gap-2 disabled:opacity-50"
+              className="px-5 py-2 rounded-xl bg-lavender-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-lg shadow-emerald-950/50 transition flex items-center gap-2 disabled:opacity-50"
             >
               <CheckCircle2 className="w-4 h-4" />
               <span>Complete & Authorize Release</span>
@@ -489,16 +489,21 @@ export default function SteamPressFocusWorkspacePage({
             <span className="text-xs font-semibold text-rose-300 block">
               Primary Scrap Reason (Defect Logging)
             </span>
-            <select
+            <input
+              type="text"
+              list="steam-press-defect-reasons"
               value={defectReason}
               onChange={(e) => setDefectReason(e.target.value)}
+              required={Number(rejectCount) > 0}
+              placeholder="Enter the actual defect reason"
               className="w-full max-w-md px-3 py-2 bg-slate-950 border border-rose-500/40 rounded-lg text-xs text-white focus:outline-none"
-            >
-              <option value="Scorch mark / glaze shine">Scorch mark / glaze shine</option>
-              <option value="Melted embroidery / sequin deformation">Melted embroidery / sequin deformation</option>
-              <option value="Water drip mineral stain">Water drip mineral stain</option>
-              <option value="Wrinkle set / permanent fold defect">Wrinkle set / permanent fold defect</option>
-            </select>
+            />
+            <datalist id="steam-press-defect-reasons">
+              <option value="Scorch mark / glaze shine" />
+              <option value="Melted embroidery / sequin deformation" />
+              <option value="Water drip mineral stain" />
+              <option value="Wrinkle set / permanent fold defect" />
+            </datalist>
           </div>
         )}
 
@@ -509,7 +514,7 @@ export default function SteamPressFocusWorkspacePage({
             value={operatorNotes}
             onChange={(e) => setOperatorNotes(e.target.value)}
             placeholder="Record any notes regarding boiler pressure, steam vacuum, or specific fabric observations..."
-            className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-400 resize-none"
+            className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-lavender-400 resize-none"
           />
         </div>
 

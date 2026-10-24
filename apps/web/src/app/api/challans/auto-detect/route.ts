@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { normalizeDepartmentCode } from '@subham/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,7 +9,7 @@ const DEPT_ALIASES: Record<string, string[]> = {
   STORE: ['STORE', 'FABRIC_STORE', 'FABRIC STORE', 'RAW MATERIAL STORE'],
   FABRIC_STORE: ['STORE', 'FABRIC_STORE', 'FABRIC STORE', 'RAW MATERIAL STORE'],
   DYEING: ['DYEING', 'DYE', 'DYEING DEPARTMENT', 'DYE HOUSE'],
-  QC1: ['QC1', 'QC_1', 'QC 1', 'QUALITY CHECK 1'],
+  DYEING_QC: ['DYEING_QC', 'QC_1', 'DYEING QC', 'QUALITY CHECK 1'],
   EMBROIDERY: ['EMBROIDERY', 'EMB', 'EMBROIDERY DEPARTMENT'],
   THREAD_CUTTING: [
     'THREAD_CUTTING',
@@ -17,7 +18,7 @@ const DEPT_ALIASES: Record<string, string[]> = {
     'THREAD CUTTING DEPARTMENT',
     'CUTTING',
   ],
-  QC2: ['QC2', 'QC_2', 'QC 2', 'QUALITY CHECK 2'],
+  THREADCUT_QC: ['THREADCUT_QC', 'QC_2', 'THREADCUT QC', 'QUALITY CHECK 2'],
   FINISHING: ['FINISHING', 'FINISHING DEPARTMENT'],
   PACKING: ['PACKING', 'PACKING DEPARTMENT', 'DISPATCH'],
 };
@@ -27,20 +28,21 @@ const PREDECESSORS: Record<string, string[]> = {
   STORE: ['PROGRAMMING'],
   FABRIC_STORE: ['PROGRAMMING'],
   DYEING: ['STORE', 'FABRIC_STORE'],
-  QC1: ['DYEING'],
-  EMBROIDERY: ['QC1', 'STORE', 'FABRIC_STORE'],
+  DYEING_QC: ['DYEING'],
+  EMBROIDERY: ['DYEING_QC', 'STORE', 'FABRIC_STORE'],
   THREAD_CUTTING: ['EMBROIDERY'],
-  QC2: ['THREAD_CUTTING'],
-  FINISHING: ['QC2'],
+  THREADCUT_QC: ['THREAD_CUTTING'],
+  FINISHING: ['THREADCUT_QC'],
   PACKING: ['FINISHING'],
 };
 
 function normalizeDeptCode(dept: string): string {
-  const upper = dept.toUpperCase().replace(/\s+/g, '_');
+  const upper = normalizeDepartmentCode(dept);
+  // QC codes contain their parent department's name (THREADCUT_QC, DYEING_QC), so match them first.
+  if (upper.includes('DYEING_QC') || upper.includes('QC_1')) return 'DYEING_QC';
+  if (upper.includes('THREADCUT_QC') || upper.includes('QC_2')) return 'THREADCUT_QC';
   if (upper.includes('THREAD') || upper.includes('CUTTING')) return 'THREAD_CUTTING';
   if (upper.includes('EMB')) return 'EMBROIDERY';
-  if (upper.includes('QC1') || upper.includes('QC_1')) return 'QC1';
-  if (upper.includes('QC2') || upper.includes('QC_2')) return 'QC2';
   if (upper.includes('DYE')) return 'DYEING';
   if (upper.includes('STORE')) return 'STORE';
   if (upper.includes('FINISH')) return 'FINISHING';
@@ -72,13 +74,16 @@ export async function GET(request: Request) {
           0
         );
         // The leftover pieces/fabric OUT from parent is this department's IN!
-        const detectedFabricIn =
-          parent.fabricOut !== null && parent.fabricOut !== undefined
+        // A challan mixing MTR and PCS lines has no single In quantity to carry forward.
+        const isMixedUnit = parent.fabricUnit === 'MIXED';
+        const detectedFabricIn = isMixedUnit
+          ? 0
+          : parent.fabricOut !== null && parent.fabricOut !== undefined
             ? parent.fabricOut
             : itemsTotal > 0
               ? itemsTotal
               : parent.fabricIn ?? 0;
-        const detectedUnit = parent.fabricUnit || parent.items[0]?.uom || 'MTR';
+        const detectedUnit = isMixedUnit ? null : parent.fabricUnit || parent.items[0]?.uom || 'MTR';
 
         return NextResponse.json({
           success: true,
@@ -168,14 +173,15 @@ export async function GET(request: Request) {
             0
           );
           // The pieces/fabric OUT from the prior department is the IN for this department!
-          const detectedFabricIn =
+          const isMixedUnit = inboundChallan.fabricUnit === 'MIXED';
+          const detectedFabricIn = isMixedUnit ? 0 :
             inboundChallan.fabricOut !== null && inboundChallan.fabricOut !== undefined
               ? inboundChallan.fabricOut
               : itemsTotal > 0
                 ? itemsTotal
                 : inboundChallan.fabricIn ?? 0;
           const detectedUnit =
-            inboundChallan.fabricUnit || inboundChallan.items[0]?.uom || 'MTR';
+            isMixedUnit ? null : inboundChallan.fabricUnit || inboundChallan.items[0]?.uom || 'MTR';
 
           return NextResponse.json({
             success: true,

@@ -5,19 +5,80 @@
 @tailwind utilities;
 
 :root {
-  --background: #0b0f17;
-  --foreground: #f1f5f9;
+  /*
+   * Shubham Fabrics MES design tokens — the only source of colour for the app.
+   * Brand: Lavender #B57EDC (primary), Chartreuse #DFFF00 (secondary accent),
+   * Tomato #FF6347 (critical actions and alerts). Each brand colour sits at shade 400;
+   * shades 500+ are darker variants that carry white text with WCAG AA contrast.
+   * Values are RGB channels so Tailwind opacity modifiers (e.g. /40) keep working.
+   */
+  --lavender-50: 249 245 253;
+  --lavender-100: 242 233 250;
+  --lavender-200: 230 211 244;
+  --lavender-300: 211 179 235;
+  --lavender-400: 181 126 220;
+  --lavender-500: 148 85 192;
+  --lavender-600: 125 68 168;
+  --lavender-700: 102 56 137;
+  --lavender-800: 79 44 107;
+  --lavender-900: 59 33 82;
+  --lavender-950: 38 21 58;
+
+  --chartreuse-50: 252 255 230;
+  --chartreuse-100: 246 255 194;
+  --chartreuse-200: 238 255 138;
+  --chartreuse-300: 230 255 71;
+  --chartreuse-400: 223 255 0;
+  --chartreuse-500: 103 122 0;
+  --chartreuse-600: 86 102 0;
+  --chartreuse-700: 70 83 0;
+  --chartreuse-800: 56 66 0;
+  --chartreuse-900: 43 51 0;
+  --chartreuse-950: 26 31 0;
+
+  --tomato-50: 255 245 242;
+  --tomato-100: 255 230 224;
+  --tomato-200: 255 203 192;
+  --tomato-300: 255 164 147;
+  --tomato-400: 255 99 71;
+  --tomato-500: 214 58 30;
+  --tomato-600: 179 45 21;
+  --tomato-700: 146 38 20;
+  --tomato-800: 119 33 20;
+  --tomato-900: 94 27 16;
+  --tomato-950: 58 14 7;
+
+  --ink-50: 248 247 250;
+  --ink-100: 241 239 244;
+  --ink-200: 229 225 232;
+  --ink-300: 211 206 216;
+  --ink-400: 161 156 168;
+  --ink-500: 107 104 114;
+  --ink-600: 87 84 94;
+  --ink-700: 66 63 72;
+  --ink-800: 48 45 53;
+  --ink-900: 37 35 42;
+  --ink-950: 24 22 28;
+
+  --color-white: #ffffff;
+  --color-background: #f8f7fa;
+  --color-text: #25232a;
+  --color-text-secondary: #6b6872;
+  --color-border: #e5e1e8;
+
+  --background: var(--color-background);
+  --foreground: var(--color-text);
   --font-manrope: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 html[data-theme="light"] {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: var(--color-background);
+  --foreground: var(--color-text);
 }
 
 html[data-theme="dark"] {
-  --background: #0b0f17;
-  --foreground: #f1f5f9;
+  --background: rgb(var(--ink-950));
+  --foreground: rgb(var(--ink-100));
 }
 
 html,
@@ -33,6 +94,60 @@ body {
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 
+/*
+ * Shared component classes for new screens and modules. Lavender = primary action,
+ * Chartreuse = secondary highlight (always dark text), Tomato = destructive / reject only.
+ */
+@layer components {
+  .mes-btn {
+    @apply inline-flex items-center justify-center gap-1.5 h-9 px-4 rounded-lg text-xs font-bold transition
+      disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .mes-btn-primary {
+    @apply mes-btn bg-lavender-600 text-white hover:bg-lavender-700 active:bg-lavender-800;
+  }
+  .mes-btn-secondary {
+    @apply mes-btn bg-white text-ink-800 border border-ink-200 hover:bg-ink-50 hover:border-lavender-300;
+  }
+  .mes-btn-accent {
+    @apply mes-btn bg-chartreuse-400 text-ink-900 hover:bg-chartreuse-300;
+  }
+  .mes-btn-danger {
+    @apply mes-btn bg-tomato-500 text-white hover:bg-tomato-600;
+  }
+  .mes-input {
+    @apply w-full h-9 px-3 rounded-lg bg-white border border-ink-200 text-xs text-ink-900 placeholder:text-ink-400
+      focus:outline-none focus:border-lavender-500 focus:ring-2 focus:ring-lavender-500/30
+      disabled:bg-ink-100 disabled:text-ink-500;
+  }
+  .mes-input-error {
+    @apply border-tomato-500 focus:border-tomato-500 focus:ring-tomato-500/30;
+  }
+  .mes-badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border;
+  }
+  .mes-badge-pass {
+    @apply mes-badge bg-chartreuse-100 text-chartreuse-800 border-chartreuse-300;
+  }
+  .mes-badge-rework {
+    @apply mes-badge bg-lavender-50 text-lavender-800 border-lavender-200;
+  }
+  .mes-badge-reject {
+    @apply mes-badge bg-tomato-50 text-tomato-700 border-tomato-200;
+  }
+}
+
+/* Consistent keyboard focus indicator (brand lavender) */
+:focus-visible {
+  outline: 2px solid rgb(var(--lavender-500));
+  outline-offset: 2px;
+}
+
+::selection {
+  background: rgb(var(--lavender-200));
+  color: var(--color-text);
+}
+
 /* Custom scrollbars for dense industrial grids */
 ::-webkit-scrollbar {
   width: 6px;
@@ -40,16 +155,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: rgb(var(--ink-100));
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: rgb(var(--ink-300));
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: rgb(var(--lavender-400));
 }
 
 @media print {

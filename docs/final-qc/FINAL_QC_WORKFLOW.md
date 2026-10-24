@@ -30,7 +30,7 @@ flowchart TD
 ## 2. DETAILED STAGE SPECIFICATIONS
 
 ### Stage 1: Inward Receipt & Verification
-- **Trigger**: Upstream department issues a Challan addressed to `toDepartment: 'FINAL_CHECK'`.
+- **Trigger**: Upstream department issues a Challan addressed to `toDepartment: 'FINAL_QC'`.
 - **Action**: Inspector compares physical garment count against the issued Challan quantity.
 - **Rule**: $0 < Received \le Issued$. If $Received < Issued$, a shortage discrepancy note is recorded on the `ChallanEvent`; the operator may explicitly place it on hold.
 - **Status Change**: Conditionally transitions from `ISSUED` to `RECEIVED` (or `ON_HOLD` for an explicitly held shortage).
@@ -48,7 +48,7 @@ Inspector records the implemented checkpoints against the linked Production Shee
   $$\text{Input Pieces} = \text{Accepted Pieces} + \text{Rework Pieces} + \text{Rejected Pieces} + \text{Pending Pieces}$$
 - `Accepted (Good)` $\rightarrow$ Eligible for downstream transfer.
 - `Rework (Alteration)` $\rightarrow$ Logged with specific alteration reason (e.g. "Restitch hem puckering").
-- `Rejected` $\rightarrow$ `DefectRecord` with `OPEN` disposition and a defective-return Challan to `DEF-SHELF-FINAL-CHECK`; it is not automatically classified as scrap.
+- `Rejected` $\rightarrow$ `DefectRecord` with `OPEN` disposition and a defective-return Challan to `DEF-SHELF-FINAL-QC`; it is not automatically classified as scrap.
 - `Rework` $\rightarrow$ a `REWORK` defect record; no automatic rework destination is configured.
 - Inspection statuses are `QC_APPROVED`, `QC_REJECTED`, `REWORK_REQUESTED`, or `ON_HOLD`, according to checkpoints and dispositions.
 

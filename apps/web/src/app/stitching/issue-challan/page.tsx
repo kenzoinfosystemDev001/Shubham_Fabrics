@@ -23,6 +23,7 @@ import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import BarcodeStickerCard from '@/components/BarcodeStickerCard';
 import { ColorFabricMeasurementTable, createDepartmentInOutTracking } from '@/components/ColorFabricMeasurementTable';
+import { ChallanNumberInput, getChallanNumberError } from '@/components/challan/ChallanNumberInput';
 
 function StitchingIssueChallanContent() {
   const router = useRouter();
@@ -35,6 +36,8 @@ function StitchingIssueChallanContent() {
   const [selectedJob, setSelectedJob] = useState<any | null>(null);
   const [selectedSheetForView, setSelectedSheetForView] = useState<any | null>(null);
   const [generatedChallan, setGeneratedChallan] = useState<any | null>(null);
+  const [challanNumber, setChallanNumber] = useState('');
+  const [challanNumberError, setChallanNumberError] = useState<string | null>(null);
 
   const [targetDepartment, setTargetDepartment] = useState('FINISHING');
   const [priority, setPriority] = useState('NORMAL');
@@ -173,10 +176,18 @@ function StitchingIssueChallanContent() {
       return;
     }
 
+    const numberError = getChallanNumberError(challanNumber);
+    if (numberError) {
+      setChallanNumberError(numberError);
+      return;
+    }
+    setChallanNumberError(null);
+
     try {
       setLoading(true);
 
       const payload = {
+        challanNumber: challanNumber.trim(),
         parentChallanId: selectedJob.id,
         programId: selectedJob.programId,
         toDepartment: targetDepartment,
@@ -203,10 +214,15 @@ function StitchingIssueChallanContent() {
 
       const json = await res.json();
       if (!res.ok) {
+        if (json.field === 'challanNumber') {
+          setChallanNumberError(json.error || 'Invalid challan number.');
+          return;
+        }
         throw new Error(json.error || 'Failed to issue handover challan');
       }
 
       setGeneratedChallan(json.data);
+      setChallanNumber('');
     } catch (err: any) {
       alert(err.message || 'Error creating handover challan');
     } finally {
@@ -215,11 +231,11 @@ function StitchingIssueChallanContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-ink-950 text-slate-100 flex flex-col">
       {/* HEADER HERO */}
       <div
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.85)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundImage: `linear-gradient(to right, rgba(37, 35, 42, 0.95), rgba(37, 35, 42, 0.85)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -319,6 +335,16 @@ function StitchingIssueChallanContent() {
               <span>2. Production Routing & Destination</span>
             </h3>
 
+            <ChallanNumberInput
+              value={challanNumber}
+              onChange={(value) => {
+                setChallanNumber(value);
+                setChallanNumberError(null);
+              }}
+              error={challanNumberError}
+              tone="dark"
+              className="max-w-sm"
+            />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
               <div>
                 <label className="block text-slate-300 font-semibold mb-1">Target Department *</label>
@@ -330,7 +356,7 @@ function StitchingIssueChallanContent() {
                   <option value="FINISHING">Finishing & Thread Trimming (Default Next Route)</option>
                   <option value="BUTTON_ATTACHMENT">Button & Trim Attachment</option>
                   <option value="STEAM_PRESS">Boiler Steam Pressing</option>
-                  <option value="FINAL_CHECK">Final Quality Inspection</option>
+                  <option value="FINAL_QC">Final Quality Inspection</option>
                   <option value="PACKING">Folding & Packing</option>
                   <option value="FINISHED_GOODS">Finished Goods Warehouse</option>
                 </select>
@@ -478,7 +504,7 @@ function StitchingIssueChallanContent() {
             <button
               type="submit"
               disabled={loading || totalQuantityToIssue <= 0}
-              className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow-lg flex items-center gap-2 disabled:opacity-50"
+              className="px-6 py-2.5 rounded-xl bg-lavender-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow-lg flex items-center gap-2 disabled:opacity-50"
             >
               {loading ? (
                 <>
@@ -499,7 +525,7 @@ function StitchingIssueChallanContent() {
       {/* SUCCESS MODAL WITH BARCODE CARD */}
       {generatedChallan && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#0F172A] rounded-2xl border border-slate-700 shadow-2xl max-w-lg w-full overflow-hidden p-6 space-y-4">
+          <div className="bg-ink-900 rounded-2xl border border-slate-700 shadow-2xl max-w-lg w-full overflow-hidden p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-emerald-400" />

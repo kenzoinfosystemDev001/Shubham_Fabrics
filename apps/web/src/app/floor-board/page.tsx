@@ -65,15 +65,15 @@ export default function ProgrammingFloorBoardPage() {
   const issuedLane = programs.filter(p => p.status === 'ISSUED' || p.status === 'IN_PRODUCTION' || p.status === 'COMPLETED');
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pl-0 md:pl-64 pb-16">
+    <div className="min-h-screen bg-ink-50 pl-0 md:pl-64 pb-16">
       {/* HEADER */}
       <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A66E22] block">
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-lavender-700 block">
             SHUBHAM FABRICS MES · OPERATIONS BOARD
           </span>
           <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-            <Kanban className="w-5 h-5 text-[#163767]" />
+            <Kanban className="w-5 h-5 text-lavender-800" />
             <span>Programming Department Floor Board</span>
           </h1>
         </div>
@@ -90,7 +90,7 @@ export default function ProgrammingFloorBoardPage() {
           
           <Link
             href="/my-work/create-production-sheet"
-            className="flex items-center gap-2 px-3.5 py-2 bg-[#163767] hover:bg-[#0F264A] text-white text-xs font-semibold rounded-md shadow-xs transition"
+            className="flex items-center gap-2 px-3.5 py-2 bg-lavender-800 hover:bg-lavender-900 text-white text-xs font-semibold rounded-md shadow-xs transition"
           >
             <FilePlus className="w-4 h-4" />
             <span>New Production Sheet</span>
@@ -340,7 +340,7 @@ export default function ProgrammingFloorBoardPage() {
           <div className="bg-emerald-50/40 border border-emerald-200 rounded-xl p-3 flex flex-col min-h-[400px] md:h-[calc(100vh-230px)]">
             <div className="flex items-center justify-between pb-3 px-2 border-b border-emerald-200">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                <span className="w-2.5 h-2.5 rounded-full bg-lavender-600"></span>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-950">
                   Issued &amp; Active
                 </h3>

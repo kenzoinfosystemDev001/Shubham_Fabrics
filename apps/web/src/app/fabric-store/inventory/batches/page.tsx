@@ -100,7 +100,7 @@ export default function FabricBatchesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F0FAF9] pb-16">
+    <div className="min-h-screen bg-ink-50 pb-16">
       {/* HEADER */}
       <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div>
@@ -165,7 +165,7 @@ export default function FabricBatchesPage() {
               placeholder="Search by batch #, fabric, color, or program..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-xs bg-slate-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition"
+              className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-xs bg-slate-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-lavender-500/20 focus:border-lavender-500 transition"
             />
           </div>
 
@@ -253,7 +253,7 @@ export default function FabricBatchesPage() {
                         <div className="flex items-center gap-1.5">
                           <span
                             className="w-3 h-3 rounded-full border border-slate-300 shadow-2xs shrink-0"
-                            style={{ backgroundColor: batch.colorCode || '#CBD5E1' }}
+                            style={{ backgroundColor: batch.colorCode || '#D3CED8' }}
                           />
                           <span className="font-medium text-slate-700">{batch.colorName || 'Natural/Raw'}</span>
                         </div>

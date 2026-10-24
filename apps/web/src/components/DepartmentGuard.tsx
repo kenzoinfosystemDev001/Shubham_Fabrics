@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { checkRouteAccess, getCurrentUser, isAdminUser, getUserStationHome, MESUser } from '@/lib/rbac';
+import { checkRouteAccess, getCurrentUser, isAdminUser, getUserStationHome, isRouteWithin, MESUser } from '@/lib/rbac';
 import { ShieldAlert } from 'lucide-react';
 
 interface GuardProps {
@@ -14,15 +14,15 @@ export type DepartmentScope =
   | 'THREAD_CUTTING'
   | 'DYEING'
   | 'FABRIC_STORE'
-  | 'QC1'
-  | 'QC2'
+  | 'DYEING_QC'
+  | 'THREADCUT_QC'
   | 'WASHING'
-  | 'QC3'
+  | 'WASHING_QC'
   | 'RECUTTING'
   | 'STITCHING'
   | 'FINISHING'
   | 'STEAM_PRESS'
-  | 'FINAL_CHECK'
+  | 'FINAL_QC'
   | 'PROGRAMMING'
   | 'ADMIN'
   | 'AUTH'
@@ -32,17 +32,17 @@ export function getDepartmentScope(path: string): DepartmentScope {
   if (!path || path === '/' || path === '/login' || path === '/signup') return 'AUTH';
   if (path.startsWith('/embroidery')) return 'EMBROIDERY';
   if (path.startsWith('/thread-cutting')) return 'THREAD_CUTTING';
-  if (path.startsWith('/dyeing')) return 'DYEING';
+  if (isRouteWithin(path, '/dyeing')) return 'DYEING';
   if (path.startsWith('/fabric-store')) return 'FABRIC_STORE';
-  if (path.startsWith('/qc1')) return 'QC1';
-  if (path.startsWith('/qc2')) return 'QC2';
-  if (path.startsWith('/washing')) return 'WASHING';
-  if (path.startsWith('/qcwashing') || path.startsWith('/qc3') || path.startsWith('/qc-washing')) return 'QC3';
+  if (path.startsWith('/dyeing-qc')) return 'DYEING_QC';
+  if (path.startsWith('/threadcut-qc')) return 'THREADCUT_QC';
+  if (isRouteWithin(path, '/washing')) return 'WASHING';
+  if (path.startsWith('/washing-qc')) return 'WASHING_QC';
   if (path.startsWith('/recutting')) return 'RECUTTING';
   if (path.startsWith('/stitching')) return 'STITCHING';
   if (path.startsWith('/finishing')) return 'FINISHING';
   if (path.startsWith('/steam-press')) return 'STEAM_PRESS';
-  if (path.startsWith('/final-check')) return 'FINAL_CHECK';
+  if (path.startsWith('/final-qc')) return 'FINAL_QC';
   if (path.startsWith('/programming')) return 'PROGRAMMING';
   if (path.startsWith('/admin')) return 'ADMIN';
   if (path.startsWith('/challans') || path.startsWith('/programs')) return 'SHARED';
@@ -55,15 +55,15 @@ export function getDepartmentRoot(scope: DepartmentScope): string {
     case 'THREAD_CUTTING': return '/thread-cutting';
     case 'DYEING': return '/dyeing';
     case 'FABRIC_STORE': return '/fabric-store';
-    case 'QC1': return '/qc1';
-    case 'QC2': return '/qc2';
+    case 'DYEING_QC': return '/dyeing-qc';
+    case 'THREADCUT_QC': return '/threadcut-qc';
     case 'WASHING': return '/washing';
-    case 'QC3': return '/qcwashing';
+    case 'WASHING_QC': return '/washing-qc';
     case 'RECUTTING': return '/recutting';
     case 'STITCHING': return '/stitching';
     case 'FINISHING': return '/finishing';
     case 'STEAM_PRESS': return '/steam-press';
-    case 'FINAL_CHECK': return '/final-check';
+    case 'FINAL_QC': return '/final-qc';
     case 'PROGRAMMING': return '/programming';
     case 'ADMIN': return '/admin';
     default: return '/login';

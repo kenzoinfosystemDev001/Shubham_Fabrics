@@ -35,7 +35,7 @@ export async function GET() {
             issuedDate: true,
           },
         },
-        qc1Challan: {
+        dyeingQcChallan: {
           select: {
             id: true,
             challanNumber: true,
@@ -59,8 +59,8 @@ export async function GET() {
       IN_DYEING: orders.filter((o) => o.status === 'IN_DYEING'),
       PARTIALLY_DYED: orders.filter((o) => o.status === 'PARTIALLY_DYED'),
       DYED: orders.filter((o) => o.status === 'DYED'),
-      READY_FOR_QC1: orders.filter((o) => o.status === 'READY_FOR_QC1'),
-      SENT_TO_QC1: orders.filter((o) => o.status === 'SENT_TO_QC1'),
+      READY_FOR_DYEING_QC: orders.filter((o) => o.status === 'READY_FOR_DYEING_QC'),
+      SENT_TO_DYEING_QC: orders.filter((o) => o.status === 'SENT_TO_DYEING_QC'),
     };
 
     return NextResponse.json({

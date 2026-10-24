@@ -54,7 +54,7 @@ async function runAllTests() {
   // ─────────────────────────────────────────────────────────────
   console.log('📋 Scenario 1: Dashboard API Health Check');
   await test('Final QC dashboard API responds with 200', async () => {
-    const json = await apiFetch('/api/final-check/dashboard');
+    const json = await apiFetch('/api/final-qc/dashboard');
     if (!json.success) throw new Error('Dashboard API returned success=false');
     if (!json.data?.summary) throw new Error('Dashboard missing summary field');
     console.log(`     → Awaiting: ${json.data.summary.awaitingReceiptCount} challans`);
@@ -67,7 +67,7 @@ async function runAllTests() {
   // ─────────────────────────────────────────────────────────────
   console.log('\n📋 Scenario 2: Incoming Challans from Steam Press');
   await test('Incoming challans API returns array', async () => {
-    const json = await apiFetch('/api/final-check/incoming');
+    const json = await apiFetch('/api/final-qc/incoming');
     if (!json.success) throw new Error('Incoming API returned success=false');
     if (!Array.isArray(json.data)) throw new Error('Incoming data is not an array');
     console.log(`     → Found ${json.data.length} incoming challan(s)`);
@@ -83,7 +83,7 @@ async function runAllTests() {
   // ─────────────────────────────────────────────────────────────
   console.log('\n📋 Scenario 3: Inspection Queue');
   await test('Queue API returns active jobs', async () => {
-    const json = await apiFetch('/api/final-check/queue');
+    const json = await apiFetch('/api/final-qc/queue');
     if (!json.success) throw new Error('Queue API returned success=false');
     if (!Array.isArray(json.data)) throw new Error('Queue data is not an array');
     console.log(`     → Active jobs in queue: ${json.data.length}`);
@@ -100,7 +100,7 @@ async function runAllTests() {
   console.log('\n📋 Scenario 4: Physical Receipt Verification');
   await test('Challan receipt API validates structure', async () => {
     // Test with invalid ID to check validation
-    const res = await fetch(`${BASE_URL}/api/final-check/challans/invalid-id-xyz/receive`, {
+    const res = await fetch(`${BASE_URL}/api/final-qc/challans/invalid-id-xyz/receive`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ receivedQuantity: 10 }),
@@ -118,13 +118,13 @@ async function runAllTests() {
   await test('Job detail API returns full data structure', async () => {
     if (!testChallanId) {
       console.log('     ⚠  No challan available — checking with dummy ID');
-      const res = await fetch(`${BASE_URL}/api/final-check/jobs/dummy-id`);
+      const res = await fetch(`${BASE_URL}/api/final-qc/jobs/dummy-id`);
       const json = await res.json();
       if (res.status !== 404) throw new Error(`Expected 404 for dummy ID, got ${res.status}`);
       console.log('     → Correctly returned 404 for unknown job');
       return;
     }
-    const json = await apiFetch(`/api/final-check/jobs/${testChallanId}`);
+    const json = await apiFetch(`/api/final-qc/jobs/${testChallanId}`);
     if (!json.success) throw new Error('Job detail API returned success=false');
     if (!json.data) throw new Error('Job detail missing data field');
     console.log(`     → Job: ${json.data.challanNumber} | Status: ${json.data.status}`);
@@ -140,7 +140,7 @@ async function runAllTests() {
   await test('Inspect API rejects mismatched quantity reconciliation', async () => {
     if (!testChallanId) {
       // No challan — test with dummy to verify endpoint exists
-      const res = await fetch(`${BASE_URL}/api/final-check/jobs/dummy-id/inspect`, {
+      const res = await fetch(`${BASE_URL}/api/final-qc/jobs/dummy-id/inspect`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ inputQuantity: 10, acceptedQuantity: 5, reworkQuantity: 3, rejectedQuantity: 1, pendingQuantity: 0 }),
@@ -151,7 +151,7 @@ async function runAllTests() {
       }
     }
     // Test reconciliation mismatch: 5 + 3 + 1 + 0 = 9 ≠ 10
-    const res = await fetch(`${BASE_URL}/api/final-check/jobs/${testChallanId || 'dummy-id'}/inspect`, {
+    const res = await fetch(`${BASE_URL}/api/final-qc/jobs/${testChallanId || 'dummy-id'}/inspect`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -182,7 +182,7 @@ async function runAllTests() {
       return;
     }
     // Try to receive more than could be issued
-    const res = await fetch(`${BASE_URL}/api/final-check/challans/${testChallanId}/receive`, {
+    const res = await fetch(`${BASE_URL}/api/final-qc/challans/${testChallanId}/receive`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ receivedQuantity: 999999 }),
@@ -204,7 +204,7 @@ async function runAllTests() {
   await test('Hold API validates status precondition', async () => {
     if (!testChallanId) {
       // Test endpoint structure with dummy
-      const res = await fetch(`${BASE_URL}/api/final-check/jobs/dummy-id/hold`, {
+      const res = await fetch(`${BASE_URL}/api/final-qc/jobs/dummy-id/hold`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reason: 'Test hold' }),
@@ -214,7 +214,7 @@ async function runAllTests() {
         return;
       }
     }
-    const res = await fetch(`${BASE_URL}/api/final-check/jobs/${testChallanId}/hold`, {
+    const res = await fetch(`${BASE_URL}/api/final-qc/jobs/${testChallanId}/hold`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ reason: 'Test supervisor hold' }),
@@ -235,7 +235,7 @@ async function runAllTests() {
   console.log('\n📋 Scenario 9: Outgoing Challan to Packing — Validation');
   await test('Issue challan API validates required fields', async () => {
     // Test missing parentChallanId
-    const res = await fetch(`${BASE_URL}/api/final-check/issue-challan`, {
+    const res = await fetch(`${BASE_URL}/api/final-qc/issue-challan`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({}),
@@ -249,7 +249,7 @@ async function runAllTests() {
   });
 
   await test('Issue challan requires items array', async () => {
-    const res = await fetch(`${BASE_URL}/api/final-check/issue-challan`, {
+    const res = await fetch(`${BASE_URL}/api/final-qc/issue-challan`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ parentChallanId: 'some-id', items: [] }),
@@ -267,7 +267,7 @@ async function runAllTests() {
   // ─────────────────────────────────────────────────────────────
   console.log('\n📋 Scenario 10: Floor Board / Kanban View');
   await test('Floor board API returns 4-lane structure', async () => {
-    const json = await apiFetch('/api/final-check/floor-board');
+    const json = await apiFetch('/api/final-qc/floor-board');
     if (!json.success) throw new Error('Floor board API returned success=false');
     if (!json.data?.lanes) throw new Error('Floor board missing lanes field');
     const lanes = json.data.lanes;
@@ -283,7 +283,7 @@ async function runAllTests() {
   // ─────────────────────────────────────────────────────────────
   console.log('\n📋 Scenario 11: Reports & Analytics');
   await test('Reports API returns yield analytics', async () => {
-    const json = await apiFetch('/api/final-check/reports?days=30');
+    const json = await apiFetch('/api/final-qc/reports?days=30');
     if (!json.success) throw new Error('Reports API returned success=false');
     if (!json.data?.summary) throw new Error('Reports missing summary field');
     const s = json.data.summary;

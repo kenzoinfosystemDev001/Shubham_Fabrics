@@ -29,9 +29,12 @@ import {
   Pause,
   Play,
   Maximize2,
+  Archive,
 } from 'lucide-react';
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
+import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
+import { DepartmentDefectiveShelfWidget } from '@/components/DepartmentDefectiveShelfWidget';
 
 function SteamPressWorkstationContent() {
   const searchParams = useSearchParams();
@@ -68,7 +71,7 @@ function SteamPressWorkstationContent() {
   const [completeRejectQty, setCompleteRejectQty] = useState(0);
   const [completeBalanceQty, setCompleteBalanceQty] = useState(0);
   const [completeNotes, setCompleteNotes] = useState('');
-  const [completeDefectReason, setCompleteDefectReason] = useState('Scorch mark / glaze shine');
+  const [completeDefectReason, setCompleteDefectReason] = useState('');
   const [autoInspect, setAutoInspect] = useState(false);
 
   // Quality Inspection Modal
@@ -228,7 +231,7 @@ function SteamPressWorkstationContent() {
     setCompleteRejectQty(0);
     setCompleteBalanceQty(0);
     setCompleteNotes('All pieces steam pressed to high standard and wrinkle-free.');
-    setCompleteDefectReason('Scorch mark / glaze shine');
+    setCompleteDefectReason('');
     setAutoInspect(true);
     setCompleteError('');
     setShowCompleteModal(true);
@@ -335,7 +338,7 @@ function SteamPressWorkstationContent() {
     <div
       className="min-h-screen text-slate-100 flex flex-col"
       style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.94), rgba(10, 15, 29, 0.98)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+        backgroundImage: `linear-gradient(to bottom, rgba(37, 35, 42, 0.94), rgba(24, 22, 28, 0.98)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',
@@ -359,6 +362,18 @@ function SteamPressWorkstationContent() {
           </div>
 
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => setActiveTab(activeTab === 'DEFECTIVE_SHELF' ? 'ALL' : 'DEFECTIVE_SHELF')}
+              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition border ${
+                activeTab === 'DEFECTIVE_SHELF'
+                  ? 'bg-rose-600 text-white border-rose-500 shadow-md'
+                  : 'bg-slate-900 text-rose-300 hover:text-white hover:bg-slate-800 border-slate-700/80'
+              }`}
+            >
+              <Archive className="w-4 h-4" />
+              <span>{activeTab === 'DEFECTIVE_SHELF' ? 'Back to Pressing Floor' : 'Defective Shelf (DEF-SHELF-STEAM-PRESS)'}</span>
+            </button>
+
             <button
               onClick={() => loadJobs()}
               disabled={loading}
@@ -391,6 +406,7 @@ function SteamPressWorkstationContent() {
               { id: 'COMPLETED', label: 'Done', count: jobs.filter((j) => j.status === 'COMPLETED').length },
               { id: 'READY', label: 'Ready Handover', count: jobs.filter((j) => j.status === 'READY_FOR_HANDOVER').length },
               { id: 'HOLD', label: 'Hold', count: jobs.filter((j) => j.status === 'ON_HOLD').length },
+              { id: 'DEFECTIVE_SHELF', label: 'Defective Shelf', count: undefined },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -401,7 +417,7 @@ function SteamPressWorkstationContent() {
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
-                {tab.label} ({tab.count})
+                {tab.label}{tab.count !== undefined ? ` (${tab.count})` : ''}
               </button>
             ))}
           </div>
@@ -414,7 +430,7 @@ function SteamPressWorkstationContent() {
               placeholder="Search challan, program, style, client..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-slate-950/80 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 transition"
+              className="w-full pl-9 pr-4 py-2 bg-slate-950/80 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-lavender-400 transition"
             />
           </div>
         </div>
@@ -426,8 +442,16 @@ function SteamPressWorkstationContent() {
           </div>
         )}
 
-        {/* WORKSTATION GRID: 1/3 LIST, 2/3 ACTIVE JOB DETAIL */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* WORKSTATION GRID OR DEFECTIVE SHELF */}
+        {activeTab === 'DEFECTIVE_SHELF' ? (
+          <DepartmentDefectiveShelfWidget
+            department="STEAM_PRESS"
+            shelfCode="DEF-SHELF-STEAM-PRESS"
+            accentColor="cyan"
+          />
+        ) : (
+          /* WORKSTATION GRID: 1/3 LIST, 2/3 ACTIVE JOB DETAIL */
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* LEFT: JOB QUEUE LIST (5 cols) */}
           <div className="lg:col-span-5 space-y-3">
             <div className="flex items-center justify-between px-1">
@@ -541,16 +565,8 @@ function SteamPressWorkstationContent() {
                   </div>
 
                   <div className="flex items-center gap-2 flex-wrap">
-                    {/* View Tech Sheet */}
-                    {selectedJob.program && (
-                      <button
-                        onClick={() => openTechSheet(selectedJob.program)}
-                        className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5"
-                      >
-                        <FileText className="w-3.5 h-3.5 text-cyan-400" />
-                        <span>Production Sheet</span>
-                      </button>
-                    )}
+                    {/* Production Sheet + the challan received from the previous department */}
+                    <DocumentActionButtons program={selectedJob.program} challan={selectedJob} size="sm" />
 
                     {/* Dedicated Focus Workspace Link */}
                     <Link
@@ -648,7 +664,7 @@ function SteamPressWorkstationContent() {
                       <>
                         <button
                           onClick={() => openCompleteModal(selectedJob)}
-                          className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-900/30 transition flex items-center gap-2"
+                          className="px-4 py-2 rounded-lg bg-lavender-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-900/30 transition flex items-center gap-2"
                         >
                           <CheckCircle2 className="w-4 h-4" />
                           <span>Reconcile & Complete</span>
@@ -737,6 +753,7 @@ function SteamPressWorkstationContent() {
             )}
           </div>
         </div>
+        )}
 
         {/* START / ALLOCATION MODAL */}
         {showStartModal && selectedJob && (
@@ -765,7 +782,7 @@ function SteamPressWorkstationContent() {
                     value={workstationNumber}
                     onChange={(e) => setWorkstationNumber(e.target.value)}
                     placeholder="e.g. Table 1, Table 2, Vacuum Station A"
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-400"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-lavender-400"
                   />
                 </div>
 
@@ -778,7 +795,7 @@ function SteamPressWorkstationContent() {
                     value={operatorName}
                     onChange={(e) => setOperatorName(e.target.value)}
                     placeholder="e.g. Steam Press Specialist"
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-400"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-lavender-400"
                   />
                 </div>
 
@@ -789,7 +806,7 @@ function SteamPressWorkstationContent() {
                   <select
                     value={operationType}
                     onChange={(e) => setOperationType(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-400"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-lavender-400"
                   >
                     <option value="STEAM_PRESSING_STANDARD">Standard Steam Pressing & Vacuum Extract</option>
                     <option value="STEAM_PRESSING_HEAVY">Heavy Fabric Crease Setting</option>
@@ -852,7 +869,7 @@ function SteamPressWorkstationContent() {
                       min="0"
                       value={completeGoodQty}
                       onChange={(e) => setCompleteGoodQty(Number(e.target.value))}
-                      className="w-full px-3 py-2 bg-slate-950 border border-emerald-500/40 rounded-lg text-xs text-white font-mono font-bold focus:outline-none focus:border-emerald-400"
+                      className="w-full px-3 py-2 bg-slate-950 border border-emerald-500/40 rounded-lg text-xs text-white font-mono font-bold focus:outline-none focus:border-lavender-400"
                     />
                   </div>
 
@@ -865,7 +882,7 @@ function SteamPressWorkstationContent() {
                       min="0"
                       value={completeReworkQty}
                       onChange={(e) => setCompleteReworkQty(Number(e.target.value))}
-                      className="w-full px-3 py-2 bg-slate-950 border border-amber-500/40 rounded-lg text-xs text-white font-mono font-bold focus:outline-none focus:border-amber-400"
+                      className="w-full px-3 py-2 bg-slate-950 border border-amber-500/40 rounded-lg text-xs text-white font-mono font-bold focus:outline-none focus:border-lavender-400"
                     />
                   </div>
                 </div>
@@ -880,7 +897,7 @@ function SteamPressWorkstationContent() {
                       min="0"
                       value={completeRejectQty}
                       onChange={(e) => setCompleteRejectQty(Number(e.target.value))}
-                      className="w-full px-3 py-2 bg-slate-950 border border-rose-500/40 rounded-lg text-xs text-white font-mono font-bold focus:outline-none focus:border-rose-400"
+                      className="w-full px-3 py-2 bg-slate-950 border border-rose-500/40 rounded-lg text-xs text-white font-mono font-bold focus:outline-none focus:border-lavender-400"
                     />
                   </div>
 
@@ -893,7 +910,7 @@ function SteamPressWorkstationContent() {
                       min="0"
                       value={completeBalanceQty}
                       onChange={(e) => setCompleteBalanceQty(Number(e.target.value))}
-                      className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white font-mono font-bold focus:outline-none focus:border-cyan-400"
+                      className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white font-mono font-bold focus:outline-none focus:border-lavender-400"
                     />
                   </div>
                 </div>
@@ -917,16 +934,21 @@ function SteamPressWorkstationContent() {
                     <label className="block text-xs font-semibold text-rose-300 mb-1">
                       Scrap / Defect Primary Reason
                     </label>
-                    <select
+                    <input
+                      type="text"
+                      list="steam-press-completion-defect-reasons"
                       value={completeDefectReason}
                       onChange={(e) => setCompleteDefectReason(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-950 border border-rose-500/40 rounded-lg text-xs text-white focus:outline-none focus:border-rose-400"
-                    >
-                      <option value="Scorch mark / glaze shine">Scorch mark / glaze shine</option>
-                      <option value="Melted embroidery / sequin deformation">Melted embroidery / sequin deformation</option>
-                      <option value="Water drip mineral stain">Water drip mineral stain</option>
-                      <option value="Wrinkle set / permanent fold defect">Wrinkle set / permanent fold defect</option>
-                    </select>
+                      required={Number(completeRejectQty) > 0}
+                      placeholder="Enter the actual defect reason"
+                      className="w-full px-3 py-2 bg-slate-950 border border-rose-500/40 rounded-lg text-xs text-white focus:outline-none focus:border-lavender-400"
+                    />
+                    <datalist id="steam-press-completion-defect-reasons">
+                      <option value="Scorch mark / glaze shine" />
+                      <option value="Melted embroidery / sequin deformation" />
+                      <option value="Water drip mineral stain" />
+                      <option value="Wrinkle set / permanent fold defect" />
+                    </datalist>
                   </div>
                 )}
 
@@ -938,7 +960,7 @@ function SteamPressWorkstationContent() {
                     rows={2}
                     value={completeNotes}
                     onChange={(e) => setCompleteNotes(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-400 resize-none"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-lavender-400 resize-none"
                   />
                 </div>
 
@@ -973,7 +995,7 @@ function SteamPressWorkstationContent() {
                 <button
                   onClick={handleCompleteJob}
                   disabled={submittingComplete || !isCompleteBalanced}
-                  className="px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-900/30 transition disabled:opacity-50 flex items-center gap-1.5"
+                  className="px-5 py-2 rounded-lg bg-lavender-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-900/30 transition disabled:opacity-50 flex items-center gap-1.5"
                 >
                   <CheckCircle2 className="w-4 h-4" />
                   <span>{submittingComplete ? 'Saving...' : 'Confirm Output'}</span>
@@ -1019,7 +1041,7 @@ function SteamPressWorkstationContent() {
                           onClick={() => setInspectChecks((prev) => ({ ...prev, [chk.key]: 'PASS' }))}
                           className={`px-2.5 py-1 rounded text-xs font-bold transition ${
                             (inspectChecks as any)[chk.key] === 'PASS'
-                              ? 'bg-emerald-600 text-white'
+                              ? 'bg-lavender-600 text-white'
                               : 'bg-slate-800 text-slate-400'
                           }`}
                         >
@@ -1049,7 +1071,7 @@ function SteamPressWorkstationContent() {
                     rows={2}
                     value={inspectNotes}
                     onChange={(e) => setInspectNotes(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-teal-400 resize-none"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-lavender-400 resize-none"
                   />
                 </div>
 

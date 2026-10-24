@@ -57,8 +57,8 @@ export default function ThreadCuttingDashboard() {
     totalIncoming: 0,
     pendingAcceptance: 0,
     inProgressTrimming: 0,
-    readyForQc2: 0,
-    totalOutgoingQc2: 0,
+    readyForThreadcutQc: 0,
+    totalOutgoingThreadcutQc: 0,
     totalDefectReturns: 0,
     totalPiecesIn: 0,
     totalPiecesOut: 0,
@@ -70,11 +70,11 @@ export default function ThreadCuttingDashboard() {
   const defectReturnChallans = data?.defectReturnChallans || [];
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-ink-50">
       {/* TOP HEADER WITH REAL DB BACKGROUND */}
       <header
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundImage: `linear-gradient(to right, rgba(37, 35, 42, 0.88), rgba(37, 35, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -151,13 +151,13 @@ export default function ThreadCuttingDashboard() {
           <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs">
             <div className="flex items-center justify-between mb-1">
               <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">
-                Pieces Out (To Thread Cut QC)
+                Pieces Out (To Threadcut QC)
               </span>
               <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
             </div>
             <p className="text-2xl font-bold text-emerald-600 font-mono mt-1">{stats.totalPiecesOut} PCS</p>
             <span className="text-[10px] text-slate-500 mt-0.5 block">
-              {stats.totalOutgoingQc2} Challans to Thread Cut QC
+              {stats.totalOutgoingThreadcutQc} Challans to Threadcut QC
             </span>
           </div>
 
@@ -293,29 +293,29 @@ export default function ThreadCuttingDashboard() {
           )}
         </section>
 
-        {/* SECTION 2: RECENT CHALLANS TO QC2 */}
+        {/* SECTION 2: RECENT CHALLANS TO Threadcut QC */}
         <section className="bg-white border border-slate-200/90 rounded-2xl shadow-xs overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-200/80 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
               <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
-                Recent Dispatches to Thread Cut QC
+                Recent Dispatches to Threadcut QC
               </h2>
             </div>
             <Link
               href="/thread-cutting/my-work"
               className="text-xs font-semibold text-emerald-600 hover:text-emerald-800 flex items-center gap-1 transition"
             >
-              <span>Create New Thread Cut QC Challan</span>
+              <span>Create New Threadcut QC Challan</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
           {outgoingChallans.length === 0 ? (
             <div className="p-8 text-center text-slate-500 text-xs">
-              <p className="font-semibold text-slate-700">No outgoing challans issued to Thread Cut QC yet.</p>
+              <p className="font-semibold text-slate-700">No outgoing challans issued to Threadcut QC yet.</p>
               <p className="text-slate-400 mt-1">
-                Completed trimming panels can be dispatched to Thread Cut QC using the Challan form in My Work.
+                Completed trimming panels can be dispatched to Threadcut QC using the Challan form in My Work.
               </p>
             </div>
           ) : (
@@ -345,7 +345,7 @@ export default function ThreadCuttingDashboard() {
                         </td>
                         <td className="py-3 px-4">
                           <span className="font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 text-[11px]">
-                            QC2 (Quality Check 2)
+                            Threadcut QC (Quality Check 2)
                           </span>
                         </td>
                         <td className="py-3 px-4 font-mono font-bold text-slate-900">
@@ -379,28 +379,28 @@ export default function ThreadCuttingDashboard() {
 
         {/* SECTION 3: DEFECTIVE RETURNS TO FABRIC STORE DEFECTIVE SHELF */}
         <section className="bg-white border border-rose-200/90 rounded-2xl shadow-xs overflow-hidden">
-          <div className="px-6 py-4 border-b border-rose-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-rose-50/50 to-white">
+          <div className="px-6 py-4 border-b border-rose-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-rose-50/50">
             <div className="flex items-center gap-2.5">
               <AlertTriangle className="w-4 h-4 text-rose-600" />
               <div>
                 <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide flex items-center gap-2">
-                  <span>Defective Panel Returns to Fabric Store</span>
+                  <span>Thread Cutting Defective Shelf</span>
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-rose-100 text-rose-800">
                     DEFECTIVE SHELF
                   </span>
                 </h2>
                 <p className="text-xs text-slate-500">
-                  Defective pieces segregated during thread trimming and dispatched to the raw material store defective shelf.
+                  Defective pieces stay quarantined on the Thread Cutting shelf; Fabric Store can view the same entries centrally.
                 </p>
               </div>
             </div>
 
             <Link
-              href="/fabric-store/inventory/defected-shelf"
+              href="/department-defective-shelf"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 rounded-lg text-xs font-semibold transition"
             >
               <Archive className="w-3.5 h-3.5 text-rose-600" />
-              <span>Fabric Store Defective Shelf</span>
+              <span>My Department Defective Shelf</span>
               <ExternalLink className="w-3 h-3 text-rose-400" />
             </Link>
           </div>

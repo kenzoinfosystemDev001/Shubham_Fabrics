@@ -38,7 +38,7 @@ const STATIONS: StationOption[] = [
     username: 'admin',
     icon: Shield,
     accentColor: 'text-indigo-400',
-    borderActive: 'border-indigo-500/80 shadow-[0_0_15px_rgba(99,102,241,0.25)]',
+    borderActive: 'border-indigo-500/80 shadow-[0_0_15px_rgba(181,126,220,0.25)]',
     bgActive: 'bg-indigo-500/15 text-white',
   },
   {
@@ -46,9 +46,9 @@ const STATIONS: StationOption[] = [
     name: 'Programming',
     username: 'program',
     icon: Cpu,
-    accentColor: 'text-amber-400',
-    borderActive: 'border-amber-500/80 shadow-[0_0_15px_rgba(245,158,11,0.25)]',
-    bgActive: 'bg-amber-500/15 text-white',
+    accentColor: 'text-lavender-400',
+    borderActive: 'border-lavender-500/80 shadow-[0_0_15px_rgba(223,255,0,0.25)]',
+    bgActive: 'bg-lavender-500/15 text-white',
   },
   {
     id: 'store',
@@ -56,7 +56,7 @@ const STATIONS: StationOption[] = [
     username: 'store',
     icon: Warehouse,
     accentColor: 'text-teal-400',
-    borderActive: 'border-teal-500/80 shadow-[0_0_15px_rgba(20,184,166,0.25)]',
+    borderActive: 'border-teal-500/80 shadow-[0_0_15px_rgba(181,126,220,0.25)]',
     bgActive: 'bg-teal-500/15 text-white',
   },
   {
@@ -65,7 +65,7 @@ const STATIONS: StationOption[] = [
     username: 'dyeing',
     icon: Droplet,
     accentColor: 'text-purple-400',
-    borderActive: 'border-purple-500/80 shadow-[0_0_15px_rgba(168,85,247,0.25)]',
+    borderActive: 'border-purple-500/80 shadow-[0_0_15px_rgba(181,126,220,0.25)]',
     bgActive: 'bg-purple-500/15 text-white',
   },
   {
@@ -74,7 +74,7 @@ const STATIONS: StationOption[] = [
     username: 'qc1',
     icon: CheckCircle2,
     accentColor: 'text-emerald-400',
-    borderActive: 'border-emerald-500/80 shadow-[0_0_15px_rgba(16,185,129,0.25)]',
+    borderActive: 'border-emerald-500/80 shadow-[0_0_15px_rgba(223,255,0,0.25)]',
     bgActive: 'bg-emerald-500/15 text-white',
   },
   {
@@ -83,7 +83,7 @@ const STATIONS: StationOption[] = [
     username: 'embroidery',
     icon: Scissors,
     accentColor: 'text-fuchsia-400',
-    borderActive: 'border-fuchsia-500/80 shadow-[0_0_15px_rgba(217,70,239,0.25)]',
+    borderActive: 'border-fuchsia-500/80 shadow-[0_0_15px_rgba(181,126,220,0.25)]',
     bgActive: 'bg-fuchsia-500/15 text-white',
   },
   {
@@ -92,16 +92,16 @@ const STATIONS: StationOption[] = [
     username: 'cutting',
     icon: Scissors,
     accentColor: 'text-cyan-400',
-    borderActive: 'border-cyan-500/80 shadow-[0_0_15px_rgba(6,182,212,0.25)]',
+    borderActive: 'border-cyan-500/80 shadow-[0_0_15px_rgba(181,126,220,0.25)]',
     bgActive: 'bg-cyan-500/15 text-white',
   },
   {
     id: 'qc2',
-    name: 'QC2 Dept',
+    name: 'Threadcut QC',
     username: 'qc2',
     icon: CheckCircle2,
     accentColor: 'text-emerald-400',
-    borderActive: 'border-emerald-500/80 shadow-[0_0_15px_rgba(16,185,129,0.25)]',
+    borderActive: 'border-emerald-500/80 shadow-[0_0_15px_rgba(223,255,0,0.25)]',
     bgActive: 'bg-emerald-500/15 text-white',
   },
   {
@@ -110,16 +110,16 @@ const STATIONS: StationOption[] = [
     username: 'washing',
     icon: Waves,
     accentColor: 'text-sky-400',
-    borderActive: 'border-sky-500/80 shadow-[0_0_15px_rgba(14,165,233,0.25)]',
+    borderActive: 'border-sky-500/80 shadow-[0_0_15px_rgba(181,126,220,0.25)]',
     bgActive: 'bg-sky-500/15 text-white',
   },
   {
     id: 'qcwashing',
-    name: 'QC Washing',
+    name: 'Washing QC',
     username: 'qcwashing',
     icon: CheckCircle2,
     accentColor: 'text-teal-400',
-    borderActive: 'border-teal-500/80 shadow-[0_0_15px_rgba(20,184,166,0.25)]',
+    borderActive: 'border-teal-500/80 shadow-[0_0_15px_rgba(181,126,220,0.25)]',
     bgActive: 'bg-teal-500/15 text-white',
   },
   {
@@ -128,7 +128,7 @@ const STATIONS: StationOption[] = [
     username: 'recutting',
     icon: Scissors,
     accentColor: 'text-rose-400',
-    borderActive: 'border-rose-500/80 shadow-[0_0_15px_rgba(244,63,94,0.25)]',
+    borderActive: 'border-rose-500/80 shadow-[0_0_15px_rgba(255,99,71,0.25)]',
     bgActive: 'bg-rose-500/15 text-white',
   },
   {
@@ -137,7 +137,7 @@ const STATIONS: StationOption[] = [
     username: 'stitching',
     icon: Shirt,
     accentColor: 'text-indigo-400',
-    borderActive: 'border-indigo-500/80 shadow-[0_0_15px_rgba(99,102,241,0.25)]',
+    borderActive: 'border-indigo-500/80 shadow-[0_0_15px_rgba(181,126,220,0.25)]',
     bgActive: 'bg-indigo-500/15 text-white',
   },
   {
@@ -146,7 +146,7 @@ const STATIONS: StationOption[] = [
     username: 'finishing',
     icon: Sparkles,
     accentColor: 'text-teal-400',
-    borderActive: 'border-teal-500/80 shadow-[0_0_15px_rgba(20,184,166,0.25)]',
+    borderActive: 'border-teal-500/80 shadow-[0_0_15px_rgba(181,126,220,0.25)]',
     bgActive: 'bg-teal-500/15 text-white',
   },
   {
@@ -155,7 +155,7 @@ const STATIONS: StationOption[] = [
     username: 'steampress',
     icon: Wind,
     accentColor: 'text-cyan-400',
-    borderActive: 'border-cyan-500/80 shadow-[0_0_15px_rgba(6,182,212,0.25)]',
+    borderActive: 'border-cyan-500/80 shadow-[0_0_15px_rgba(181,126,220,0.25)]',
     bgActive: 'bg-cyan-500/15 text-white',
   },
   {
@@ -164,7 +164,7 @@ const STATIONS: StationOption[] = [
     username: 'finalcheck',
     icon: CheckCircle2,
     accentColor: 'text-emerald-400',
-    borderActive: 'border-emerald-500/80 shadow-[0_0_15px_rgba(16,185,129,0.25)]',
+    borderActive: 'border-emerald-500/80 shadow-[0_0_15px_rgba(223,255,0,0.25)]',
     bgActive: 'bg-emerald-500/15 text-white',
   },
 ];
@@ -219,7 +219,7 @@ export default function LoginPage() {
   );
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-[#090D16] overflow-hidden select-none font-sans">
+    <div className="relative min-h-screen w-full flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-ink-950 overflow-hidden select-none font-sans">
       {/* BACKGROUND TEXTURE & AMBIENT GLOWS */}
       <div
         className="absolute inset-0 opacity-15 bg-center bg-cover pointer-events-none filter blur-xs"
@@ -227,23 +227,23 @@ export default function LoginPage() {
           backgroundImage: `url('${DEPARTMENT_NAV_BG_IMAGE}')`,
         }}
       />
-      <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
+      <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-lavender-500/10 blur-3xl pointer-events-none" />
       <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
-      <div className="absolute inset-0 bg-radial-gradient from-transparent via-[#090D16]/70 to-[#090D16] pointer-events-none" />
+      <div className="absolute inset-0 bg-ink-950/60 pointer-events-none" />
 
       {/* CENTERED PREMIUM GLASS CARD */}
       <div className="relative z-10 w-full max-w-[540px] bg-slate-900/80 backdrop-blur-xl border border-slate-700/60 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-black/60">
         
         {/* BRANDING HEADER */}
         <div className="flex flex-col items-center text-center mb-6">
-          <div className="w-16 h-16 rounded-2xl bg-white p-1.5 shadow-lg border border-amber-500/30 flex items-center justify-center mb-3 transition-transform hover:scale-105">
+          <div className="w-16 h-16 rounded-2xl bg-white p-1.5 shadow-lg border border-lavender-500/30 flex items-center justify-center mb-3 transition-transform hover:scale-105">
             <img
               src="/shubham-logo.jpg"
               alt="Shubham Fabrics"
               className="w-full h-full object-contain"
             />
           </div>
-          <h1 className="text-base sm:text-lg font-bold tracking-[0.18em] uppercase text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-white to-amber-100">
+          <h1 className="text-base sm:text-lg font-bold tracking-[0.18em] uppercase text-white">
             Shubham Fabrics
           </h1>
           <span className="text-[10px] font-semibold tracking-[0.25em] uppercase text-slate-400 mt-0.5">
@@ -301,7 +301,7 @@ export default function LoginPage() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Station ID"
-                className="w-full pl-10 pr-4 py-3 bg-slate-950/60 border border-slate-700/60 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400/80 focus:ring-1 focus:ring-amber-400/40 transition"
+                className="w-full pl-10 pr-4 py-3 bg-slate-950/60 border border-slate-700/60 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-lavender-400/80 focus:ring-1 focus:ring-lavender-400/40 transition"
               />
               <User className="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5" />
             </div>
@@ -316,7 +316,7 @@ export default function LoginPage() {
                 value={pin}
                 onChange={(e) => setPin(e.target.value)}
                 placeholder="Security PIN"
-                className="w-full pl-10 pr-4 py-3 bg-slate-950/60 border border-slate-700/60 rounded-xl text-sm text-white placeholder-slate-500 tracking-wider focus:outline-none focus:border-amber-400/80 focus:ring-1 focus:ring-amber-400/40 transition"
+                className="w-full pl-10 pr-4 py-3 bg-slate-950/60 border border-slate-700/60 rounded-xl text-sm text-white placeholder-slate-500 tracking-wider focus:outline-none focus:border-lavender-400/80 focus:ring-1 focus:ring-lavender-400/40 transition"
               />
               <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5" />
             </div>
@@ -325,7 +325,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-2 py-3.5 px-4 bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-400 hover:via-amber-500 hover:to-amber-600 text-slate-950 font-bold text-xs uppercase tracking-[0.14em] rounded-xl shadow-lg shadow-amber-500/20 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            className="w-full mt-2 py-3.5 px-4 bg-lavender-600 hover:bg-lavender-700 text-white font-bold text-xs uppercase tracking-[0.14em] rounded-xl shadow-lg shadow-amber-500/20 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
           >
             {loading ? (
               <>

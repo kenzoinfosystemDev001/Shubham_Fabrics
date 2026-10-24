@@ -96,28 +96,39 @@ export default function EmbroideryIncomingChallansPage() {
   };
 
   const handleRejectToDefectiveShelf = async (challan: any) => {
-    if (!confirm(`Are you sure you want to REJECT Challan ${challan.challanNumber} to Fabric Store Defective Shelf?`)) {
+    const reason = String(inspectionRemark || '').trim();
+    if (!reason) {
+      alert('Please enter a specific reason for the defect before rejecting this challan.');
       return;
     }
+    if (!confirm(`Are you sure you want to quarantine Challan ${challan.challanNumber} on the Embroidery Defective Shelf?`)) return;
     try {
       setInspecting(true);
+      const rejectedQuantity = Number(challan.fabricIn) || (challan.items || []).reduce((sum: number, item: any) => sum + (Number(item.quantity) || 0), 0);
+      const quantityUnit = challan.fabricUnit || challan.items?.[0]?.uom || 'PCS';
       const res = await fetch(`/api/challans/${challan.id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           status: 'REJECTED',
-          notes: inspectionRemark || 'REJECTED at Embroidery Incoming Gate -> Moved to Fabric Store Defective Shelf.',
+          fabricIn: rejectedQuantity,
+          fabricOut: 0,
+          defectivePieces: rejectedQuantity,
+          fabricUnit: quantityUnit,
+          defectReason: reason,
+          notes: `Rejected at Embroidery incoming inspection and quarantined on the Embroidery Defective Shelf. Reason: ${reason}`,
         }),
       });
 
       if (res.ok) {
-        setActionSuccess(`Challan ${challan.challanNumber} REJECTED and dispatched to Fabric Store Defective Shelf.`);
+        setActionSuccess(`Challan ${challan.challanNumber} rejected and quarantined on the Embroidery Defective Shelf.`);
         setInspectModalChallan(null);
         setInspectionRemark('');
         loadData();
         setTimeout(() => setActionSuccess(null), 4500);
       } else {
-        alert('Failed to update challan status. Please try again.');
+        const json = await res.json().catch(() => ({}));
+        alert(json.error || 'Failed to update challan status. Please try again.');
       }
     } catch (err: any) {
       console.error(err);
@@ -131,11 +142,11 @@ export default function EmbroideryIncomingChallansPage() {
   const storeChallans = challans.filter(
     (c) => c.fromDepartment === 'STORE' || c.fromDepartment === 'FABRIC_STORE'
   );
-  const dyeingQc1Challans = challans.filter(
-    (c) => c.fromDepartment === 'DYEING' || c.fromDepartment === 'QC1'
+  const dyeingQcChallans = challans.filter(
+    (c) => c.fromDepartment === 'DYEING' || c.fromDepartment === 'DYEING_QC'
   );
 
-  const currentList = activeTab === 'STORE' ? storeChallans : dyeingQc1Challans;
+  const currentList = activeTab === 'STORE' ? storeChallans : dyeingQcChallans;
 
   const filteredChallans = currentList.filter((c) => {
     const q = search.toLowerCase();
@@ -157,11 +168,11 @@ export default function EmbroideryIncomingChallansPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-ink-50">
       {/* HEADER WITH REAL DB BACKGROUND */}
       <header
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundImage: `linear-gradient(to right, rgba(37, 35, 42, 0.88), rgba(37, 35, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -275,15 +286,15 @@ export default function EmbroideryIncomingChallansPage() {
                 </div>
                 <div>
                   <span className="text-xs font-bold block uppercase tracking-wide">
-                    From QC 1 (Post-Dyeing Passed)
+                    From Dyeing QC (Post-Dyeing Passed)
                   </span>
                   <p className="text-[11px] text-slate-500">
-                    Dyed fabric inspected, approved, and released by QC 1 Gate
+                    Dyed fabric inspected, approved, and released by Dyeing QC Gate
                   </p>
                 </div>
               </div>
               <span className="text-xs font-bold font-mono px-2.5 py-1 rounded-full bg-purple-100 text-purple-800">
-                {dyeingQc1Challans.length} Challans
+                {dyeingQcChallans.length} Challans
               </span>
             </button>
           </div>
@@ -297,7 +308,7 @@ export default function EmbroideryIncomingChallansPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search Challan #, Serial #, Design, Style..."
-              className="w-full pl-9 pr-3.5 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-600 shadow-2xs"
+              className="w-full pl-9 pr-3.5 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-lavender-600 shadow-2xs"
             />
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
           </div>
@@ -351,7 +362,7 @@ export default function EmbroideryIncomingChallansPage() {
                       ) : (
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-900 font-bold text-xs">
                           <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
-                          <span>Route ②: Dyeing Dept (QC1 PASS Gate)</span>
+                          <span>Route ②: Dyeing Dept (Dyeing QC PASS Gate)</span>
                         </span>
                       )}
                     </div>
@@ -412,7 +423,7 @@ export default function EmbroideryIncomingChallansPage() {
                         Fabric Condition
                       </span>
                       <span className="text-slate-800 font-medium">
-                        {isStore ? 'Undyed / Greige Kora' : 'Dyed & QC1 Approved'}
+                        {isStore ? 'Undyed / Greige Kora' : 'Dyed & Dyeing QC Approved'}
                       </span>
                     </div>
 
@@ -548,7 +559,7 @@ export default function EmbroideryIncomingChallansPage() {
                   <strong className="text-slate-800">
                     {inspectModalChallan.fromDepartment === 'STORE'
                       ? 'Fabric Store (Undyed)'
-                      : 'Dyeing Dept (QC1 Gate)'}
+                      : 'Dyeing Dept (Dyeing QC Gate)'}
                   </strong>
                 </div>
                 <div>
@@ -577,15 +588,15 @@ export default function EmbroideryIncomingChallansPage() {
                   Physical Verification Points
                 </span>
                 <label className="flex items-center gap-2 cursor-pointer text-slate-700">
-                  <input type="checkbox" defaultChecked className="rounded border-slate-300 text-fuchsia-600 focus:ring-fuchsia-500" />
+                  <input type="checkbox" defaultChecked className="rounded border-slate-300 text-fuchsia-600 focus:ring-lavender-500" />
                   <span>Verified physical roll count matches Challan quantity.</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer text-slate-700">
-                  <input type="checkbox" defaultChecked className="rounded border-slate-300 text-fuchsia-600 focus:ring-fuchsia-500" />
+                  <input type="checkbox" defaultChecked className="rounded border-slate-300 text-fuchsia-600 focus:ring-lavender-500" />
                   <span>Verified fabric condition (Undyed Greige or Passed Dyed fabric intact).</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer text-slate-700">
-                  <input type="checkbox" defaultChecked className="rounded border-slate-300 text-fuchsia-600 focus:ring-fuchsia-500" />
+                  <input type="checkbox" defaultChecked className="rounded border-slate-300 text-fuchsia-600 focus:ring-lavender-500" />
                   <span>Wilcom stitching frame &amp; design parameters matched with Production Sheet.</span>
                 </label>
               </div>
@@ -599,7 +610,7 @@ export default function EmbroideryIncomingChallansPage() {
                   value={inspectionRemark}
                   onChange={(e) => setInspectionRemark(e.target.value)}
                   placeholder=""
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-fuchsia-500 focus:outline-none"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-lavender-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -625,7 +636,7 @@ export default function EmbroideryIncomingChallansPage() {
                 type="button"
                 disabled={inspecting}
                 onClick={() => handlePassAndReceive(inspectModalChallan)}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs transition"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-lavender-600 hover:bg-lavender-700 text-white rounded-lg text-xs font-semibold shadow-xs transition"
               >
                 <CheckCircle2 className="w-4 h-4" />
                 <span>{inspecting ? 'Updating...' : 'PASS & Accept into Embroidery Floor'}</span>

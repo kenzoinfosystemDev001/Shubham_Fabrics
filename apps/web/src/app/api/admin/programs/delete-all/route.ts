@@ -1,9 +1,19 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { auditAdminAction, readReason, reasonRequiredResponse, requireAdmin } from '@/lib/admin-auth';
 
 export const dynamic = 'force-dynamic';
 
-export async function DELETE() {
+export async function DELETE(request: Request) {
+  const auth = await requireAdmin(request);
+  if (!auth.actor) return auth.response;
+  const body = await request.json().catch(() => ({}));
+  // Irreversible bulk wipe: the admin must type the confirmation phrase and give a reason.
+  if (String(body?.confirm || '').trim() !== 'DELETE ALL PRODUCTION SHEETS') {
+    return NextResponse.json({ error: 'Type "DELETE ALL PRODUCTION SHEETS" to confirm.', field: 'confirm' }, { status: 400 });
+  }
+  const reason = readReason(body);
+  if (!reason) return reasonRequiredResponse();
   try {
     await prisma.$transaction(
       async (tx) => {
@@ -19,7 +29,7 @@ export async function DELETE() {
 
         // 3. Clear DyeingOrder references to challans
         await tx.dyeingOrder.updateMany({
-          data: { inboundChallanId: null, qc1ChallanId: null },
+          data: { inboundChallanId: null, dyeingQcChallanId: null },
         });
 
         // 4. Delete all production and inspection logs that reference challans or programs
@@ -39,6 +49,9 @@ export async function DELETE() {
         await tx.stockLedgerEntry.deleteMany({});
 
         // 5. Delete all Dyeing Orders
+        // Deadline alerts reference challans and programs; clear them with the data they describe.
+        await tx.deadlineAlertDismissal.deleteMany({});
+        await tx.deadlineAlert.deleteMany({});
         await tx.dyeingOrder.deleteMany({});
 
         // 6. Delete all Challan Items, Events, and Challans
@@ -55,13 +68,11 @@ export async function DELETE() {
         await tx.programColour.deleteMany({});
         await tx.programFabric.deleteMany({});
 
-        // 8. Delete program-related audit logs
-        await tx.auditLog.deleteMany({
-          where: { entity: { in: ['Program', 'DyeingOrder', 'Challan'] } },
-        });
 
         // 9. Permanently delete ALL programs from PostgreSQL
         await tx.program.deleteMany({});
+
+        await auditAdminAction(request, auth.actor.id, 'ALL_PRODUCTION_SHEETS_DELETED', 'System', 'ALL_PRODUCTION_SHEETS_DELETED', { after: { reason } }, tx);
       },
       { maxWait: 20000, timeout: 60000 }
     );

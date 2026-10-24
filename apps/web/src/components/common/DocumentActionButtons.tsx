@@ -72,17 +72,17 @@ export function DocumentActionButtons({
             </button>
             <button
               type="button"
-              onClick={() => void downloadProductionSheetHtml(activeProgram)}
+              onClick={() => void downloadProductionSheetHtml(activeProgram, 'ALL')}
               className={`p-1 text-blue-700 hover:text-blue-950 hover:bg-blue-100 border-l border-blue-200/80 transition cursor-pointer`}
-              title="Download Master Production Sheet (HTML/PDF)"
+              title="Download Production Sheet (all forwarded TOP / BOTTOM / DUPATTA sheets)"
             >
               <Download className={iconSize} />
             </button>
             <button
               type="button"
-              onClick={() => printProductionSheet(activeProgram)}
+              onClick={() => printProductionSheet(activeProgram, 'ALL')}
               className={`p-1 text-blue-700 hover:text-blue-950 hover:bg-blue-100 border-l border-blue-200/80 transition cursor-pointer`}
-              title="Print Master Production Sheet (A4 Traveler)"
+              title="Print Production Sheet (all forwarded TOP / BOTTOM / DUPATTA sheets)"
             >
               <Printer className={iconSize} />
             </button>

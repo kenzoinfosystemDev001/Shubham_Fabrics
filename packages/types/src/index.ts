@@ -19,13 +19,14 @@ export enum UserRole {
   STEAM_PRESS_SUPERVISOR = 'STEAM_PRESS_SUPERVISOR',
   STEAM_PRESS_OPERATOR = 'STEAM_PRESS_OPERATOR',
   STEAM_PRESS_INCHARGE = 'STEAM_PRESS_INCHARGE',
-  FINAL_CHECK_INSPECTOR = 'FINAL_CHECK_INSPECTOR',
-  FINAL_CHECK_SUPERVISOR = 'FINAL_CHECK_SUPERVISOR',
+  FINAL_QC_INSPECTOR = 'FINAL_QC_INSPECTOR',
+  FINAL_QC_SUPERVISOR = 'FINAL_QC_SUPERVISOR',
   PACKING_SUPERVISOR = 'PACKING_SUPERVISOR',
   DISPATCH_MANAGER = 'DISPATCH_MANAGER',
   QC_INSPECTOR = 'QC_INSPECTOR',
-  QC3_INSPECTOR = 'QC3_INSPECTOR',
-  QCWASHING_INSPECTOR = 'QCWASHING_INSPECTOR',
+  DYEING_QC_INSPECTOR = 'DYEING_QC_INSPECTOR',
+  THREADCUT_QC_INSPECTOR = 'THREADCUT_QC_INSPECTOR',
+  WASHING_QC_INSPECTOR = 'WASHING_QC_INSPECTOR',
   RECUTTING_SUPERVISOR = 'RECUTTING_SUPERVISOR',
   RECUTTING_OPERATOR = 'RECUTTING_OPERATOR',
   RECUTTING_INCHARGE = 'RECUTTING_INCHARGE',
@@ -37,24 +38,58 @@ export enum DepartmentCode {
   PRG = 'PRG',
   STORE = 'STORE',
   DYEING = 'DYEING',
-  QC1 = 'QC1',
+  DYEING_QC = 'DYEING_QC',
   CUTTING = 'CUTTING',
   EMBROIDERY = 'EMBROIDERY',
   THREAD_CUTTING = 'THREAD_CUTTING',
   WASHING = 'WASHING',
-  QC2 = 'QC2',
+  THREADCUT_QC = 'THREADCUT_QC',
   RECUTTING = 'RECUTTING',
   STITCHING = 'STITCHING',
-  QC3 = 'QC3',
-  QCWASHING = 'QCWASHING',
-  QC_WASHING = 'QC_WASHING',
+  WASHING_QC = 'WASHING_QC',
   FINISHING = 'FINISHING',
   BUTTON_ATTACHMENT = 'BUTTON_ATTACHMENT',
   STEAM_PRESS = 'STEAM_PRESS',
-  FINAL_CHECK = 'FINAL_CHECK',
+  FINAL_QC = 'FINAL_QC',
   PACKING = 'PACKING',
   FINISHED_GOODS = 'FINISHED_GOODS',
   DISPATCH = 'DISPATCH',
+}
+
+/**
+ * Department codes retired by the QC department rename. Rows written before
+ * scripts/migrate-qc-departments.js has run, and browser sessions created
+ * before the rename, may still carry these values.
+ */
+export const LEGACY_DEPARTMENT_CODES: Record<string, DepartmentCode> = {
+  QC1: DepartmentCode.DYEING_QC,
+  QC2: DepartmentCode.THREADCUT_QC,
+  QC3: DepartmentCode.WASHING_QC,
+  QCWASHING: DepartmentCode.WASHING_QC,
+  QC_WASHING: DepartmentCode.WASHING_QC,
+  FINAL_CHECK: DepartmentCode.FINAL_QC,
+};
+
+/** Role codes retired by the QC department rename. */
+export const LEGACY_ROLE_CODES: Record<string, UserRole> = {
+  QC1_INSPECTOR: UserRole.DYEING_QC_INSPECTOR,
+  QC2_INSPECTOR: UserRole.THREADCUT_QC_INSPECTOR,
+  QC3_INSPECTOR: UserRole.WASHING_QC_INSPECTOR,
+  QCWASHING_INSPECTOR: UserRole.WASHING_QC_INSPECTOR,
+  FINAL_CHECK_INSPECTOR: UserRole.FINAL_QC_INSPECTOR,
+  FINAL_CHECK_SUPERVISOR: UserRole.FINAL_QC_SUPERVISOR,
+};
+
+/** Uppercases a department code and maps retired QC codes to their current code. */
+export function normalizeDepartmentCode(code?: string | null): string {
+  const key = String(code || '').trim().toUpperCase().replace(/[\s-]+/g, '_');
+  return LEGACY_DEPARTMENT_CODES[key] || key;
+}
+
+/** Uppercases a role code and maps retired QC role codes to their current code. */
+export function normalizeRoleCode(code?: string | null): string {
+  const key = String(code || '').trim().toUpperCase();
+  return LEGACY_ROLE_CODES[key] || key;
 }
 
 export enum ProgramStatus {
@@ -431,6 +466,35 @@ export enum ChallanAction {
   HANDOVER = 'HANDOVER',
   CLOSE = 'CLOSE',
   CANCEL = 'CANCEL',
+  APPROVE = 'APPROVE',
+  REWORK = 'REWORK',
+  REJECT = 'REJECT',
+}
+
+/**
+ * Single source of truth for legal challan state transitions (SOP-02).
+ * ON_HOLD may only resume to the status it was held from (enforced by callers with event history).
+ */
+export const CHALLAN_TRANSITIONS: Record<string, string[]> = {
+  [ChallanStatus.DRAFT]: [ChallanStatus.SUBMITTED, ChallanStatus.CANCELLED],
+  [ChallanStatus.SUBMITTED]: [ChallanStatus.ISSUED, ChallanStatus.CANCELLED, ChallanStatus.DRAFT],
+  [ChallanStatus.ISSUED]: [ChallanStatus.RECEIVED, ChallanStatus.REJECTED, ChallanStatus.CANCELLED, ChallanStatus.ON_HOLD],
+  [ChallanStatus.RECEIVED]: [ChallanStatus.IN_PROCESS, ChallanStatus.ON_HOLD, ChallanStatus.REJECTED],
+  [ChallanStatus.IN_PROCESS]: [ChallanStatus.COMPLETED, ChallanStatus.QC_PENDING, ChallanStatus.REWORK, ChallanStatus.ON_HOLD],
+  [ChallanStatus.COMPLETED]: [ChallanStatus.QC_PENDING, ChallanStatus.HANDED_OVER, ChallanStatus.CLOSED],
+  [ChallanStatus.QC_PENDING]: [ChallanStatus.QC_APPROVED, ChallanStatus.REWORK, ChallanStatus.REJECTED],
+  [ChallanStatus.QC_APPROVED]: [ChallanStatus.HANDED_OVER, ChallanStatus.CLOSED],
+  [ChallanStatus.REWORK]: [ChallanStatus.IN_PROCESS, ChallanStatus.COMPLETED],
+  [ChallanStatus.HANDED_OVER]: [ChallanStatus.CLOSED],
+  [ChallanStatus.ON_HOLD]: [ChallanStatus.ISSUED, ChallanStatus.RECEIVED, ChallanStatus.IN_PROCESS, ChallanStatus.CANCELLED],
+};
+
+export function isCanonicalChallanStatus(status: string): boolean {
+  return Object.values(ChallanStatus).includes(status as ChallanStatus);
+}
+
+export function isLegalChallanTransition(from: string, to: string): boolean {
+  return (CHALLAN_TRANSITIONS[from] || []).includes(to);
 }
 
 export enum DefectStatus {

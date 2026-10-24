@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
+import { DeadlineAlertsPanel } from '@/components/alerts/DeadlineAlertsPanel';
 
 export default function DyeingDashboard() {
   const router = useRouter();
@@ -65,12 +66,12 @@ export default function DyeingDashboard() {
     inDyeing: 0,
     partiallyDyed: 0,
     dyed: 0,
-    readyForQc1: 0,
-    sentToQc1: 0,
+    readyForDyeingQc: 0,
+    sentToDyeingQc: 0,
     totalRequiredQuantity: 0,
     totalDyedQuantity: 0,
     totalUndyedQuantity: 0,
-    totalSentToQc1Quantity: 0,
+    totalSentToDyeingQcQuantity: 0,
   };
 
   const colorBreakdown = data?.colorBreakdown || [];
@@ -87,11 +88,11 @@ export default function DyeingDashboard() {
     'Dyeing Incharge';
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] pb-16">
+    <div className="min-h-screen bg-ink-50 pb-16">
       {/* TOP HEADER (REAL DB BACKGROUND) */}
       <header
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.70)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundImage: `linear-gradient(to right, rgba(37, 35, 42, 0.85), rgba(37, 35, 42, 0.70)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -157,7 +158,7 @@ export default function DyeingDashboard() {
                 Responsible Station Incharge
               </span>
               <p className="text-sm font-bold text-slate-900 leading-tight">{inchargeName}</p>
-              <span className="text-[11px] text-slate-500">Dyeing Operations &amp; QC1 Dispatch Authorization</span>
+              <span className="text-[11px] text-slate-500">Dyeing Operations &amp; Dyeing QC Dispatch Authorization</span>
             </div>
           </div>
 
@@ -168,6 +169,11 @@ export default function DyeingDashboard() {
             </span>
           </div>
         </div>
+      </div>
+
+      {/* DEADLINE ALERTS */}
+      <div className="px-4 sm:px-8 pt-6 max-w-7xl mx-auto">
+        <DeadlineAlertsPanel department="DYEING" />
       </div>
 
       {/* PRODUCTION RECEIVED FROM FABRIC STORE (VISUAL IMAGE PREVIEW AS PER HANDWRITTEN SPEC) */}
@@ -278,7 +284,7 @@ export default function DyeingDashboard() {
         </div>
       </div>
 
-      {/* MAIN QUANTITY VISIBILITY STRIP (REQUIRED, DYED, UNDYED/REMAINING, SENT TO QC1) */}
+      {/* MAIN QUANTITY VISIBILITY STRIP (REQUIRED, DYED, UNDYED/REMAINING, SENT TO Dyeing QC) */}
       <div className="px-4 sm:px-8 pt-6 max-w-7xl mx-auto">
         <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
@@ -287,7 +293,7 @@ export default function DyeingDashboard() {
                 Operational Quantity Reconciliation
               </h2>
               <p className="text-xs text-slate-500">
-                Live shop-floor balance of materials received from Fabric Store through QC1 dispatch
+                Live shop-floor balance of materials received from Fabric Store through Dyeing QC dispatch
               </p>
             </div>
             <span className="text-xs font-mono font-bold text-purple-700 bg-purple-50 px-2.5 py-1 rounded border border-purple-200">
@@ -329,13 +335,13 @@ export default function DyeingDashboard() {
               <span className="text-[11px] text-amber-600 mt-0.5 block">Awaiting process</span>
             </div>
 
-            {/* SENT TO QC1 */}
+            {/* SENT TO Dyeing QC */}
             <div className="bg-emerald-50/60 border border-emerald-200/80 rounded-xl p-4">
               <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 block">
-                4. Sent to QC1
+                4. Sent to Dyeing QC
               </span>
               <p className="text-2xl font-black font-mono text-emerald-800 mt-1">
-                {kpis.totalSentToQc1Quantity.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                {kpis.totalSentToDyeingQcQuantity.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
               </p>
               <span className="text-[11px] text-emerald-600 mt-0.5 block">Dispatched on challans</span>
             </div>
@@ -371,14 +377,14 @@ export default function DyeingDashboard() {
           </div>
 
           <div className="bg-white border border-slate-200/90 rounded-xl p-3.5 shadow-xs">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-teal-600 block">Ready for QC1</span>
-            <p className="text-2xl font-bold text-teal-700 mt-0.5">{kpis.readyForQc1}</p>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-teal-600 block">Ready for Dyeing QC</span>
+            <p className="text-2xl font-bold text-teal-700 mt-0.5">{kpis.readyForDyeingQc}</p>
             <span className="text-[10px] text-slate-400 block mt-0.5">Available to dispatch</span>
           </div>
 
           <div className="bg-white border border-slate-200/90 rounded-xl p-3.5 shadow-xs">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 block">Sent to QC1</span>
-            <p className="text-2xl font-bold text-emerald-700 mt-0.5">{kpis.sentToQc1}</p>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 block">Sent to Dyeing QC</span>
+            <p className="text-2xl font-bold text-emerald-700 mt-0.5">{kpis.sentToDyeingQc}</p>
             <span className="text-[10px] text-slate-400 block mt-0.5">Challan issued</span>
           </div>
         </div>
@@ -420,7 +426,7 @@ export default function DyeingDashboard() {
                     <th className="py-3 px-4 font-bold text-right">Required Quantity</th>
                     <th className="py-3 px-4 font-bold text-right text-purple-800">Dyed Quantity</th>
                     <th className="py-3 px-4 font-bold text-right text-amber-800">Undyed / Remaining</th>
-                    <th className="py-3 px-4 font-bold text-right text-emerald-800">Sent to QC1</th>
+                    <th className="py-3 px-4 font-bold text-right text-emerald-800">Sent to Dyeing QC</th>
                     <th className="py-3 px-4 font-bold text-center">Unit</th>
                   </tr>
                 </thead>
@@ -431,7 +437,7 @@ export default function DyeingDashboard() {
                         <div className="flex items-center gap-2">
                           <span
                             className="w-3 h-3 rounded-full border border-slate-300 shrink-0"
-                            style={{ backgroundColor: item.colorCode || '#9333EA' }}
+                            style={{ backgroundColor: item.colorCode || '#7D44A8' }}
                           />
                           <span className="font-bold text-slate-900">{item.colorName}</span>
                         </div>
@@ -449,7 +455,7 @@ export default function DyeingDashboard() {
                         {item.undyed.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                       </td>
                       <td className="py-3 px-4 text-right font-mono font-bold text-emerald-700 bg-emerald-50/30">
-                        {item.sentToQc1.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                        {item.sentToDyeingQc.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                       </td>
                       <td className="py-3 px-4 text-center font-mono text-[10px] text-slate-500 uppercase">
                         {item.uom}

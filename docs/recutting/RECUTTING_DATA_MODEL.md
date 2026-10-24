@@ -23,7 +23,7 @@ erDiagram
     USER ||--o{ PRODUCTION_TRANSACTION : "operates"
 
     DEPARTMENT {
-        string code PK "RECUTTING, QC3, STITCHING"
+        string code PK "RECUTTING, WASHING_QC, STITCHING"
         string name "Panel Re-Cutting Section"
         int sequenceOrder "10"
     }
@@ -44,7 +44,7 @@ erDiagram
         string id PK
         string challanNumber "CH-RC-XXXXXX"
         string challanType "INTER_DEPARTMENT"
-        string fromDepartment "QC3 or RECUTTING"
+        string fromDepartment "WASHING_QC or RECUTTING"
         string toDepartment "RECUTTING or STITCHING"
         string parentChallanId FK "Genealogy link"
         string status "ISSUED, RECEIVED, IN_PROCESS, COMPLETED"
@@ -96,7 +96,7 @@ When issuing material from Recutting to Stitching:
 - `challanType`: `'INTER_DEPARTMENT'`.
 - `fromDepartment`: `'RECUTTING'`.
 - `toDepartment`: `'STITCHING'`.
-- `parentChallanId`: Mandatory foreign key referencing the incoming QC Washing challan.
+- `parentChallanId`: Mandatory foreign key referencing the incoming Washing QC challan.
 - `programId`: Inherited from the incoming lot's linked Production Sheet.
 - `status`: `'ISSUED'`.
 - `priority`: Inherited or elevated (`'NORMAL'`, `'HIGH'`, `'URGENT'`).
@@ -126,7 +126,7 @@ For every batch cut:
 
 ## 3. Data Integrity & Invariants
 
-1. **Genealogy Invariant**: Every outgoing Challan from Recutting must have a non-null `parentChallanId` referencing a verified `QC3` challan.
+1. **Genealogy Invariant**: Every outgoing Challan from Recutting must have a non-null `parentChallanId` referencing a verified `WASHING_QC` challan.
 2. **Quantity Conservation Invariant**:
    $$\text{Output Good Quantity} + \text{Rework Quantity} + \text{Reject Quantity} + \text{Balance} = \text{Input Quantity}$$
 3. **No Over-Issuance**:

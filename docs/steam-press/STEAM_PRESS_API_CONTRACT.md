@@ -16,5 +16,5 @@
 | `POST` | `/api/steam-press/jobs/[id]/complete` | Reconcile pieces out ($Input = Good + Rework + Reject + Bal$) |
 | `POST` | `/api/steam-press/jobs/[id]/inspect` | Record appearance and crease audit before handover |
 | `GET` | `/api/steam-press/floor-board` | 4-lane Kanban floor board view |
-| `POST` | `/api/steam-press/issue-challan` | Issue outgoing Challan to `FINAL_CHECK` |
+| `POST` | `/api/steam-press/issue-challan` | Issue outgoing Challan to `FINAL_QC` |
 | `GET` | `/api/steam-press/reports` | Throughput, yield, and defect analytics |

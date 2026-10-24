@@ -82,11 +82,11 @@ export default function FabricStoreDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F0FAF9]">
+    <div className="min-h-screen bg-ink-50">
       {/* TOP HEADER (REAL DB BACKGROUND) */}
       <header
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.70)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundImage: `linear-gradient(to right, rgba(37, 35, 42, 0.85), rgba(37, 35, 42, 0.70)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -109,14 +109,14 @@ export default function FabricStoreDashboard() {
           </button>
           <Link
             href="/fabric-store/inventory/inward"
-            className="flex items-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-xs transition"
+            className="flex items-center gap-1.5 px-3 py-2 bg-lavender-600 hover:bg-lavender-700 text-white text-xs font-bold rounded-lg shadow-xs transition"
           >
             <ArrowDownToLine className="w-4 h-4" />
             <span>Inward Stock</span>
           </Link>
           <Link
             href="/fabric-store/inventory/outward"
-            className="flex items-center gap-1.5 px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg shadow-xs transition"
+            className="flex items-center gap-1.5 px-3 py-2 bg-lavender-600 hover:bg-lavender-700 text-white text-xs font-bold rounded-lg shadow-xs transition"
           >
             <Send className="w-4 h-4" />
             <span>Outward Stock</span>

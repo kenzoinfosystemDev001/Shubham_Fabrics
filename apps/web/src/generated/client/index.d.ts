@@ -313,6 +313,16 @@ export type FabricInward = $Result.DefaultSelection<Prisma.$FabricInwardPayload>
  * 
  */
 export type FabricOutward = $Result.DefaultSelection<Prisma.$FabricOutwardPayload>
+/**
+ * Model DeadlineAlert
+ * 
+ */
+export type DeadlineAlert = $Result.DefaultSelection<Prisma.$DeadlineAlertPayload>
+/**
+ * Model DeadlineAlertDismissal
+ * 
+ */
+export type DeadlineAlertDismissal = $Result.DefaultSelection<Prisma.$DeadlineAlertDismissalPayload>
 
 /**
  * Enums
@@ -1157,6 +1167,26 @@ export class PrismaClient<
     * ```
     */
   get fabricOutward(): Prisma.FabricOutwardDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.deadlineAlert`: Exposes CRUD operations for the **DeadlineAlert** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more DeadlineAlerts
+    * const deadlineAlerts = await prisma.deadlineAlert.findMany()
+    * ```
+    */
+  get deadlineAlert(): Prisma.DeadlineAlertDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.deadlineAlertDismissal`: Exposes CRUD operations for the **DeadlineAlertDismissal** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more DeadlineAlertDismissals
+    * const deadlineAlertDismissals = await prisma.deadlineAlertDismissal.findMany()
+    * ```
+    */
+  get deadlineAlertDismissal(): Prisma.DeadlineAlertDismissalDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1657,7 +1687,9 @@ export namespace Prisma {
     FabricStockLedger: 'FabricStockLedger',
     DyeingOrder: 'DyeingOrder',
     FabricInward: 'FabricInward',
-    FabricOutward: 'FabricOutward'
+    FabricOutward: 'FabricOutward',
+    DeadlineAlert: 'DeadlineAlert',
+    DeadlineAlertDismissal: 'DeadlineAlertDismissal'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1676,7 +1708,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "role" | "permission" | "rolePermission" | "userRole" | "department" | "workCenter" | "machine" | "shift" | "supplier" | "customer" | "item" | "fabric" | "trim" | "design" | "colour" | "size" | "operation" | "defectCode" | "program" | "programFabric" | "programColour" | "programSize" | "programSpecification" | "programBOM" | "programRoute" | "programRouteStep" | "attachment" | "auditLog" | "challan" | "challanItem" | "productionTransaction" | "qualityInspection" | "defectLog" | "inventoryStock" | "challanEvent" | "stockLedgerEntry" | "fabricRoll" | "bundle" | "carton" | "cartonBundle" | "dispatchOrder" | "dispatchCarton" | "defectRecord" | "reworkTransaction" | "recutRequest" | "qualityInspectionParameter" | "idempotencyRecord" | "notification" | "integrityScanResult" | "inventoryLocation" | "fabricBatch" | "fabricStoreRoll" | "materialReceipt" | "materialReceiptItem" | "fabricQCInspection" | "fabricStockLedger" | "dyeingOrder" | "fabricInward" | "fabricOutward"
+      modelProps: "user" | "role" | "permission" | "rolePermission" | "userRole" | "department" | "workCenter" | "machine" | "shift" | "supplier" | "customer" | "item" | "fabric" | "trim" | "design" | "colour" | "size" | "operation" | "defectCode" | "program" | "programFabric" | "programColour" | "programSize" | "programSpecification" | "programBOM" | "programRoute" | "programRouteStep" | "attachment" | "auditLog" | "challan" | "challanItem" | "productionTransaction" | "qualityInspection" | "defectLog" | "inventoryStock" | "challanEvent" | "stockLedgerEntry" | "fabricRoll" | "bundle" | "carton" | "cartonBundle" | "dispatchOrder" | "dispatchCarton" | "defectRecord" | "reworkTransaction" | "recutRequest" | "qualityInspectionParameter" | "idempotencyRecord" | "notification" | "integrityScanResult" | "inventoryLocation" | "fabricBatch" | "fabricStoreRoll" | "materialReceipt" | "materialReceiptItem" | "fabricQCInspection" | "fabricStockLedger" | "dyeingOrder" | "fabricInward" | "fabricOutward" | "deadlineAlert" | "deadlineAlertDismissal"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -6120,6 +6152,154 @@ export namespace Prisma {
           }
         }
       }
+      DeadlineAlert: {
+        payload: Prisma.$DeadlineAlertPayload<ExtArgs>
+        fields: Prisma.DeadlineAlertFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DeadlineAlertFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeadlineAlertPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DeadlineAlertFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeadlineAlertPayload>
+          }
+          findFirst: {
+            args: Prisma.DeadlineAlertFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeadlineAlertPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DeadlineAlertFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeadlineAlertPayload>
+          }
+          findMany: {
+            args: Prisma.DeadlineAlertFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeadlineAlertPayload>[]
+          }
+          create: {
+            args: Prisma.DeadlineAlertCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeadlineAlertPayload>
+          }
+          createMany: {
+            args: Prisma.DeadlineAlertCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DeadlineAlertCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeadlineAlertPayload>[]
+          }
+          delete: {
+            args: Prisma.DeadlineAlertDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeadlineAlertPayload>
+          }
+          update: {
+            args: Prisma.DeadlineAlertUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeadlineAlertPayload>
+          }
+          deleteMany: {
+            args: Prisma.DeadlineAlertDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DeadlineAlertUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.DeadlineAlertUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeadlineAlertPayload>[]
+          }
+          upsert: {
+            args: Prisma.DeadlineAlertUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeadlineAlertPayload>
+          }
+          aggregate: {
+            args: Prisma.DeadlineAlertAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDeadlineAlert>
+          }
+          groupBy: {
+            args: Prisma.DeadlineAlertGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DeadlineAlertGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DeadlineAlertCountArgs<ExtArgs>
+            result: $Utils.Optional<DeadlineAlertCountAggregateOutputType> | number
+          }
+        }
+      }
+      DeadlineAlertDismissal: {
+        payload: Prisma.$DeadlineAlertDismissalPayload<ExtArgs>
+        fields: Prisma.DeadlineAlertDismissalFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DeadlineAlertDismissalFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeadlineAlertDismissalPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DeadlineAlertDismissalFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeadlineAlertDismissalPayload>
+          }
+          findFirst: {
+            args: Prisma.DeadlineAlertDismissalFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeadlineAlertDismissalPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DeadlineAlertDismissalFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeadlineAlertDismissalPayload>
+          }
+          findMany: {
+            args: Prisma.DeadlineAlertDismissalFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeadlineAlertDismissalPayload>[]
+          }
+          create: {
+            args: Prisma.DeadlineAlertDismissalCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeadlineAlertDismissalPayload>
+          }
+          createMany: {
+            args: Prisma.DeadlineAlertDismissalCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DeadlineAlertDismissalCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeadlineAlertDismissalPayload>[]
+          }
+          delete: {
+            args: Prisma.DeadlineAlertDismissalDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeadlineAlertDismissalPayload>
+          }
+          update: {
+            args: Prisma.DeadlineAlertDismissalUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeadlineAlertDismissalPayload>
+          }
+          deleteMany: {
+            args: Prisma.DeadlineAlertDismissalDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DeadlineAlertDismissalUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.DeadlineAlertDismissalUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeadlineAlertDismissalPayload>[]
+          }
+          upsert: {
+            args: Prisma.DeadlineAlertDismissalUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DeadlineAlertDismissalPayload>
+          }
+          aggregate: {
+            args: Prisma.DeadlineAlertDismissalAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDeadlineAlertDismissal>
+          }
+          groupBy: {
+            args: Prisma.DeadlineAlertDismissalGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DeadlineAlertDismissalGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DeadlineAlertDismissalCountArgs<ExtArgs>
+            result: $Utils.Optional<DeadlineAlertDismissalCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -6276,6 +6456,8 @@ export namespace Prisma {
     dyeingOrder?: DyeingOrderOmit
     fabricInward?: FabricInwardOmit
     fabricOutward?: FabricOutwardOmit
+    deadlineAlert?: DeadlineAlertOmit
+    deadlineAlertDismissal?: DeadlineAlertDismissalOmit
   }
 
   /* Types for Logging */
@@ -6381,6 +6563,9 @@ export namespace Prisma {
     fabricQCInspections: number
     fabricLedgerEntries: number
     dyeingOrdersIncharge: number
+    deadlineAlertsAssigned: number
+    deadlineAlertDismissals: number
+    departmentsInCharge: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6409,6 +6594,9 @@ export namespace Prisma {
     fabricQCInspections?: boolean | UserCountOutputTypeCountFabricQCInspectionsArgs
     fabricLedgerEntries?: boolean | UserCountOutputTypeCountFabricLedgerEntriesArgs
     dyeingOrdersIncharge?: boolean | UserCountOutputTypeCountDyeingOrdersInchargeArgs
+    deadlineAlertsAssigned?: boolean | UserCountOutputTypeCountDeadlineAlertsAssignedArgs
+    deadlineAlertDismissals?: boolean | UserCountOutputTypeCountDeadlineAlertDismissalsArgs
+    departmentsInCharge?: boolean | UserCountOutputTypeCountDepartmentsInChargeArgs
   }
 
   // Custom InputTypes
@@ -6595,6 +6783,27 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountDyeingOrdersInchargeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: DyeingOrderWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountDeadlineAlertsAssignedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DeadlineAlertWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountDeadlineAlertDismissalsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DeadlineAlertDismissalWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountDepartmentsInChargeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DepartmentWhereInput
   }
 
 
@@ -7101,6 +7310,7 @@ export namespace Prisma {
     fabricBatches: number
     fabricStoreRolls: number
     dyeingOrders: number
+    deadlineAlerts: number
   }
 
   export type ProgramCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7122,6 +7332,7 @@ export namespace Prisma {
     fabricBatches?: boolean | ProgramCountOutputTypeCountFabricBatchesArgs
     fabricStoreRolls?: boolean | ProgramCountOutputTypeCountFabricStoreRollsArgs
     dyeingOrders?: boolean | ProgramCountOutputTypeCountDyeingOrdersArgs
+    deadlineAlerts?: boolean | ProgramCountOutputTypeCountDeadlineAlertsArgs
   }
 
   // Custom InputTypes
@@ -7261,6 +7472,13 @@ export namespace Prisma {
     where?: DyeingOrderWhereInput
   }
 
+  /**
+   * ProgramCountOutputType without action
+   */
+  export type ProgramCountOutputTypeCountDeadlineAlertsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DeadlineAlertWhereInput
+  }
+
 
   /**
    * Count Type ProgramRouteCountOutputType
@@ -7306,7 +7524,8 @@ export namespace Prisma {
     bundles: number
     defects: number
     dyeingInboundOrders: number
-    dyeingQc1Orders: number
+    dyeingQcOrders: number
+    deadlineAlerts: number
   }
 
   export type ChallanCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7318,7 +7537,8 @@ export namespace Prisma {
     bundles?: boolean | ChallanCountOutputTypeCountBundlesArgs
     defects?: boolean | ChallanCountOutputTypeCountDefectsArgs
     dyeingInboundOrders?: boolean | ChallanCountOutputTypeCountDyeingInboundOrdersArgs
-    dyeingQc1Orders?: boolean | ChallanCountOutputTypeCountDyeingQc1OrdersArgs
+    dyeingQcOrders?: boolean | ChallanCountOutputTypeCountDyeingQcOrdersArgs
+    deadlineAlerts?: boolean | ChallanCountOutputTypeCountDeadlineAlertsArgs
   }
 
   // Custom InputTypes
@@ -7391,8 +7611,15 @@ export namespace Prisma {
   /**
    * ChallanCountOutputType without action
    */
-  export type ChallanCountOutputTypeCountDyeingQc1OrdersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type ChallanCountOutputTypeCountDyeingQcOrdersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: DyeingOrderWhereInput
+  }
+
+  /**
+   * ChallanCountOutputType without action
+   */
+  export type ChallanCountOutputTypeCountDeadlineAlertsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DeadlineAlertWhereInput
   }
 
 
@@ -7815,6 +8042,37 @@ export namespace Prisma {
 
 
   /**
+   * Count Type DeadlineAlertCountOutputType
+   */
+
+  export type DeadlineAlertCountOutputType = {
+    dismissals: number
+  }
+
+  export type DeadlineAlertCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    dismissals?: boolean | DeadlineAlertCountOutputTypeCountDismissalsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * DeadlineAlertCountOutputType without action
+   */
+  export type DeadlineAlertCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlertCountOutputType
+     */
+    select?: DeadlineAlertCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * DeadlineAlertCountOutputType without action
+   */
+  export type DeadlineAlertCountOutputTypeCountDismissalsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DeadlineAlertDismissalWhereInput
+  }
+
+
+  /**
    * Models
    */
 
@@ -8039,6 +8297,9 @@ export namespace Prisma {
     fabricQCInspections?: boolean | User$fabricQCInspectionsArgs<ExtArgs>
     fabricLedgerEntries?: boolean | User$fabricLedgerEntriesArgs<ExtArgs>
     dyeingOrdersIncharge?: boolean | User$dyeingOrdersInchargeArgs<ExtArgs>
+    deadlineAlertsAssigned?: boolean | User$deadlineAlertsAssignedArgs<ExtArgs>
+    deadlineAlertDismissals?: boolean | User$deadlineAlertDismissalsArgs<ExtArgs>
+    departmentsInCharge?: boolean | User$departmentsInChargeArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -8105,6 +8366,9 @@ export namespace Prisma {
     fabricQCInspections?: boolean | User$fabricQCInspectionsArgs<ExtArgs>
     fabricLedgerEntries?: boolean | User$fabricLedgerEntriesArgs<ExtArgs>
     dyeingOrdersIncharge?: boolean | User$dyeingOrdersInchargeArgs<ExtArgs>
+    deadlineAlertsAssigned?: boolean | User$deadlineAlertsAssignedArgs<ExtArgs>
+    deadlineAlertDismissals?: boolean | User$deadlineAlertDismissalsArgs<ExtArgs>
+    departmentsInCharge?: boolean | User$departmentsInChargeArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -8138,6 +8402,9 @@ export namespace Prisma {
       fabricQCInspections: Prisma.$FabricQCInspectionPayload<ExtArgs>[]
       fabricLedgerEntries: Prisma.$FabricStockLedgerPayload<ExtArgs>[]
       dyeingOrdersIncharge: Prisma.$DyeingOrderPayload<ExtArgs>[]
+      deadlineAlertsAssigned: Prisma.$DeadlineAlertPayload<ExtArgs>[]
+      deadlineAlertDismissals: Prisma.$DeadlineAlertDismissalPayload<ExtArgs>[]
+      departmentsInCharge: Prisma.$DepartmentPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -8568,6 +8835,9 @@ export namespace Prisma {
     fabricQCInspections<T extends User$fabricQCInspectionsArgs<ExtArgs> = {}>(args?: Subset<T, User$fabricQCInspectionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricQCInspectionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     fabricLedgerEntries<T extends User$fabricLedgerEntriesArgs<ExtArgs> = {}>(args?: Subset<T, User$fabricLedgerEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStockLedgerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     dyeingOrdersIncharge<T extends User$dyeingOrdersInchargeArgs<ExtArgs> = {}>(args?: Subset<T, User$dyeingOrdersInchargeArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DyeingOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    deadlineAlertsAssigned<T extends User$deadlineAlertsAssignedArgs<ExtArgs> = {}>(args?: Subset<T, User$deadlineAlertsAssignedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeadlineAlertPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    deadlineAlertDismissals<T extends User$deadlineAlertDismissalsArgs<ExtArgs> = {}>(args?: Subset<T, User$deadlineAlertDismissalsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeadlineAlertDismissalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    departmentsInCharge<T extends User$departmentsInChargeArgs<ExtArgs> = {}>(args?: Subset<T, User$departmentsInChargeArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DepartmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -9591,6 +9861,78 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: DyeingOrderScalarFieldEnum | DyeingOrderScalarFieldEnum[]
+  }
+
+  /**
+   * User.deadlineAlertsAssigned
+   */
+  export type User$deadlineAlertsAssignedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlert
+     */
+    select?: DeadlineAlertSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlert
+     */
+    omit?: DeadlineAlertOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertInclude<ExtArgs> | null
+    where?: DeadlineAlertWhereInput
+    orderBy?: DeadlineAlertOrderByWithRelationInput | DeadlineAlertOrderByWithRelationInput[]
+    cursor?: DeadlineAlertWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DeadlineAlertScalarFieldEnum | DeadlineAlertScalarFieldEnum[]
+  }
+
+  /**
+   * User.deadlineAlertDismissals
+   */
+  export type User$deadlineAlertDismissalsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlertDismissal
+     */
+    select?: DeadlineAlertDismissalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlertDismissal
+     */
+    omit?: DeadlineAlertDismissalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertDismissalInclude<ExtArgs> | null
+    where?: DeadlineAlertDismissalWhereInput
+    orderBy?: DeadlineAlertDismissalOrderByWithRelationInput | DeadlineAlertDismissalOrderByWithRelationInput[]
+    cursor?: DeadlineAlertDismissalWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DeadlineAlertDismissalScalarFieldEnum | DeadlineAlertDismissalScalarFieldEnum[]
+  }
+
+  /**
+   * User.departmentsInCharge
+   */
+  export type User$departmentsInChargeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Department
+     */
+    select?: DepartmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Department
+     */
+    omit?: DepartmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DepartmentInclude<ExtArgs> | null
+    where?: DepartmentWhereInput
+    orderBy?: DepartmentOrderByWithRelationInput | DepartmentOrderByWithRelationInput[]
+    cursor?: DepartmentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DepartmentScalarFieldEnum | DepartmentScalarFieldEnum[]
   }
 
   /**
@@ -13952,6 +14294,7 @@ export namespace Prisma {
     sequenceOrder: number | null
     description: string | null
     isActive: boolean | null
+    inchargeUserId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -13963,6 +14306,7 @@ export namespace Prisma {
     sequenceOrder: number | null
     description: string | null
     isActive: boolean | null
+    inchargeUserId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -13974,6 +14318,7 @@ export namespace Prisma {
     sequenceOrder: number
     description: number
     isActive: number
+    inchargeUserId: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -13995,6 +14340,7 @@ export namespace Prisma {
     sequenceOrder?: true
     description?: true
     isActive?: true
+    inchargeUserId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -14006,6 +14352,7 @@ export namespace Prisma {
     sequenceOrder?: true
     description?: true
     isActive?: true
+    inchargeUserId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -14017,6 +14364,7 @@ export namespace Prisma {
     sequenceOrder?: true
     description?: true
     isActive?: true
+    inchargeUserId?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -14115,6 +14463,7 @@ export namespace Prisma {
     sequenceOrder: number
     description: string | null
     isActive: boolean
+    inchargeUserId: string | null
     createdAt: Date
     updatedAt: Date
     _count: DepartmentCountAggregateOutputType | null
@@ -14145,8 +14494,10 @@ export namespace Prisma {
     sequenceOrder?: boolean
     description?: boolean
     isActive?: boolean
+    inchargeUserId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    incharge?: boolean | Department$inchargeArgs<ExtArgs>
     workCenters?: boolean | Department$workCentersArgs<ExtArgs>
     operations?: boolean | Department$operationsArgs<ExtArgs>
     defectCodes?: boolean | Department$defectCodesArgs<ExtArgs>
@@ -14162,8 +14513,10 @@ export namespace Prisma {
     sequenceOrder?: boolean
     description?: boolean
     isActive?: boolean
+    inchargeUserId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    incharge?: boolean | Department$inchargeArgs<ExtArgs>
   }, ExtArgs["result"]["department"]>
 
   export type DepartmentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -14173,8 +14526,10 @@ export namespace Prisma {
     sequenceOrder?: boolean
     description?: boolean
     isActive?: boolean
+    inchargeUserId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    incharge?: boolean | Department$inchargeArgs<ExtArgs>
   }, ExtArgs["result"]["department"]>
 
   export type DepartmentSelectScalar = {
@@ -14184,12 +14539,14 @@ export namespace Prisma {
     sequenceOrder?: boolean
     description?: boolean
     isActive?: boolean
+    inchargeUserId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type DepartmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "code" | "name" | "sequenceOrder" | "description" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["department"]>
+  export type DepartmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "code" | "name" | "sequenceOrder" | "description" | "isActive" | "inchargeUserId" | "createdAt" | "updatedAt", ExtArgs["result"]["department"]>
   export type DepartmentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    incharge?: boolean | Department$inchargeArgs<ExtArgs>
     workCenters?: boolean | Department$workCentersArgs<ExtArgs>
     operations?: boolean | Department$operationsArgs<ExtArgs>
     defectCodes?: boolean | Department$defectCodesArgs<ExtArgs>
@@ -14197,12 +14554,17 @@ export namespace Prisma {
     toChallans?: boolean | Department$toChallansArgs<ExtArgs>
     _count?: boolean | DepartmentCountOutputTypeDefaultArgs<ExtArgs>
   }
-  export type DepartmentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
-  export type DepartmentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type DepartmentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    incharge?: boolean | Department$inchargeArgs<ExtArgs>
+  }
+  export type DepartmentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    incharge?: boolean | Department$inchargeArgs<ExtArgs>
+  }
 
   export type $DepartmentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Department"
     objects: {
+      incharge: Prisma.$UserPayload<ExtArgs> | null
       workCenters: Prisma.$WorkCenterPayload<ExtArgs>[]
       operations: Prisma.$OperationPayload<ExtArgs>[]
       defectCodes: Prisma.$DefectCodePayload<ExtArgs>[]
@@ -14216,6 +14578,7 @@ export namespace Prisma {
       sequenceOrder: number
       description: string | null
       isActive: boolean
+      inchargeUserId: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["department"]>
@@ -14612,6 +14975,7 @@ export namespace Prisma {
    */
   export interface Prisma__DepartmentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    incharge<T extends Department$inchargeArgs<ExtArgs> = {}>(args?: Subset<T, Department$inchargeArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     workCenters<T extends Department$workCentersArgs<ExtArgs> = {}>(args?: Subset<T, Department$workCentersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WorkCenterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     operations<T extends Department$operationsArgs<ExtArgs> = {}>(args?: Subset<T, Department$operationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OperationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     defectCodes<T extends Department$defectCodesArgs<ExtArgs> = {}>(args?: Subset<T, Department$defectCodesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DefectCodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -14652,6 +15016,7 @@ export namespace Prisma {
     readonly sequenceOrder: FieldRef<"Department", 'Int'>
     readonly description: FieldRef<"Department", 'String'>
     readonly isActive: FieldRef<"Department", 'Boolean'>
+    readonly inchargeUserId: FieldRef<"Department", 'String'>
     readonly createdAt: FieldRef<"Department", 'DateTime'>
     readonly updatedAt: FieldRef<"Department", 'DateTime'>
   }
@@ -14903,6 +15268,10 @@ export namespace Prisma {
      */
     data: DepartmentCreateManyInput | DepartmentCreateManyInput[]
     skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DepartmentIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -14973,6 +15342,10 @@ export namespace Prisma {
      * Limit how many Departments to update.
      */
     limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DepartmentIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -15039,6 +15412,25 @@ export namespace Prisma {
      * Limit how many Departments to delete.
      */
     limit?: number
+  }
+
+  /**
+   * Department.incharge
+   */
+  export type Department$inchargeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
   }
 
   /**
@@ -31096,6 +31488,7 @@ export namespace Prisma {
     fabricBatches?: boolean | Program$fabricBatchesArgs<ExtArgs>
     fabricStoreRolls?: boolean | Program$fabricStoreRollsArgs<ExtArgs>
     dyeingOrders?: boolean | Program$dyeingOrdersArgs<ExtArgs>
+    deadlineAlerts?: boolean | Program$deadlineAlertsArgs<ExtArgs>
     _count?: boolean | ProgramCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["program"]>
 
@@ -31308,6 +31701,7 @@ export namespace Prisma {
     fabricBatches?: boolean | Program$fabricBatchesArgs<ExtArgs>
     fabricStoreRolls?: boolean | Program$fabricStoreRollsArgs<ExtArgs>
     dyeingOrders?: boolean | Program$dyeingOrdersArgs<ExtArgs>
+    deadlineAlerts?: boolean | Program$deadlineAlertsArgs<ExtArgs>
     _count?: boolean | ProgramCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ProgramIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -31348,6 +31742,7 @@ export namespace Prisma {
       fabricBatches: Prisma.$FabricBatchPayload<ExtArgs>[]
       fabricStoreRolls: Prisma.$FabricStoreRollPayload<ExtArgs>[]
       dyeingOrders: Prisma.$DyeingOrderPayload<ExtArgs>[]
+      deadlineAlerts: Prisma.$DeadlineAlertPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -31822,6 +32217,7 @@ export namespace Prisma {
     fabricBatches<T extends Program$fabricBatchesArgs<ExtArgs> = {}>(args?: Subset<T, Program$fabricBatchesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricBatchPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     fabricStoreRolls<T extends Program$fabricStoreRollsArgs<ExtArgs> = {}>(args?: Subset<T, Program$fabricStoreRollsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStoreRollPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     dyeingOrders<T extends Program$dyeingOrdersArgs<ExtArgs> = {}>(args?: Subset<T, Program$dyeingOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DyeingOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    deadlineAlerts<T extends Program$deadlineAlertsArgs<ExtArgs> = {}>(args?: Subset<T, Program$deadlineAlertsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeadlineAlertPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -32789,6 +33185,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: DyeingOrderScalarFieldEnum | DyeingOrderScalarFieldEnum[]
+  }
+
+  /**
+   * Program.deadlineAlerts
+   */
+  export type Program$deadlineAlertsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlert
+     */
+    select?: DeadlineAlertSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlert
+     */
+    omit?: DeadlineAlertOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertInclude<ExtArgs> | null
+    where?: DeadlineAlertWhereInput
+    orderBy?: DeadlineAlertOrderByWithRelationInput | DeadlineAlertOrderByWithRelationInput[]
+    cursor?: DeadlineAlertWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DeadlineAlertScalarFieldEnum | DeadlineAlertScalarFieldEnum[]
   }
 
   /**
@@ -43587,6 +44007,7 @@ export namespace Prisma {
     status: string | null
     priority: string | null
     issuedDate: Date | null
+    deliveryDate: Date | null
     receivedDate: Date | null
     completedDate: Date | null
     createdById: string | null
@@ -43617,6 +44038,7 @@ export namespace Prisma {
     status: string | null
     priority: string | null
     issuedDate: Date | null
+    deliveryDate: Date | null
     receivedDate: Date | null
     completedDate: Date | null
     createdById: string | null
@@ -43647,6 +44069,7 @@ export namespace Prisma {
     status: number
     priority: number
     issuedDate: number
+    deliveryDate: number
     receivedDate: number
     completedDate: number
     createdById: number
@@ -43691,6 +44114,7 @@ export namespace Prisma {
     status?: true
     priority?: true
     issuedDate?: true
+    deliveryDate?: true
     receivedDate?: true
     completedDate?: true
     createdById?: true
@@ -43721,6 +44145,7 @@ export namespace Prisma {
     status?: true
     priority?: true
     issuedDate?: true
+    deliveryDate?: true
     receivedDate?: true
     completedDate?: true
     createdById?: true
@@ -43751,6 +44176,7 @@ export namespace Prisma {
     status?: true
     priority?: true
     issuedDate?: true
+    deliveryDate?: true
     receivedDate?: true
     completedDate?: true
     createdById?: true
@@ -43868,6 +44294,7 @@ export namespace Prisma {
     status: string
     priority: string
     issuedDate: Date | null
+    deliveryDate: Date | null
     receivedDate: Date | null
     completedDate: Date | null
     createdById: string
@@ -43917,6 +44344,7 @@ export namespace Prisma {
     status?: boolean
     priority?: boolean
     issuedDate?: boolean
+    deliveryDate?: boolean
     receivedDate?: boolean
     completedDate?: boolean
     createdById?: boolean
@@ -43950,7 +44378,8 @@ export namespace Prisma {
     bundles?: boolean | Challan$bundlesArgs<ExtArgs>
     defects?: boolean | Challan$defectsArgs<ExtArgs>
     dyeingInboundOrders?: boolean | Challan$dyeingInboundOrdersArgs<ExtArgs>
-    dyeingQc1Orders?: boolean | Challan$dyeingQc1OrdersArgs<ExtArgs>
+    dyeingQcOrders?: boolean | Challan$dyeingQcOrdersArgs<ExtArgs>
+    deadlineAlerts?: boolean | Challan$deadlineAlertsArgs<ExtArgs>
     _count?: boolean | ChallanCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["challan"]>
 
@@ -43965,6 +44394,7 @@ export namespace Prisma {
     status?: boolean
     priority?: boolean
     issuedDate?: boolean
+    deliveryDate?: boolean
     receivedDate?: boolean
     completedDate?: boolean
     createdById?: boolean
@@ -44003,6 +44433,7 @@ export namespace Prisma {
     status?: boolean
     priority?: boolean
     issuedDate?: boolean
+    deliveryDate?: boolean
     receivedDate?: boolean
     completedDate?: boolean
     createdById?: boolean
@@ -44041,6 +44472,7 @@ export namespace Prisma {
     status?: boolean
     priority?: boolean
     issuedDate?: boolean
+    deliveryDate?: boolean
     receivedDate?: boolean
     completedDate?: boolean
     createdById?: boolean
@@ -44060,7 +44492,7 @@ export namespace Prisma {
     detectedFromDepartment?: boolean
   }
 
-  export type ChallanOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "challanNumber" | "challanType" | "programId" | "parentChallanId" | "fromDepartment" | "toDepartment" | "status" | "priority" | "issuedDate" | "receivedDate" | "completedDate" | "createdById" | "issuedById" | "receivedById" | "approvedById" | "remarks" | "createdAt" | "updatedAt" | "fabricIn" | "fabricOut" | "fabricUnit" | "defectivePieces" | "defectiveShelfLocation" | "defectReason" | "detectedFromChallanId" | "detectedFromDepartment", ExtArgs["result"]["challan"]>
+  export type ChallanOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "challanNumber" | "challanType" | "programId" | "parentChallanId" | "fromDepartment" | "toDepartment" | "status" | "priority" | "issuedDate" | "deliveryDate" | "receivedDate" | "completedDate" | "createdById" | "issuedById" | "receivedById" | "approvedById" | "remarks" | "createdAt" | "updatedAt" | "fabricIn" | "fabricOut" | "fabricUnit" | "defectivePieces" | "defectiveShelfLocation" | "defectReason" | "detectedFromChallanId" | "detectedFromDepartment", ExtArgs["result"]["challan"]>
   export type ChallanInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     program?: boolean | ProgramDefaultArgs<ExtArgs>
     parentChallan?: boolean | Challan$parentChallanArgs<ExtArgs>
@@ -44078,7 +44510,8 @@ export namespace Prisma {
     bundles?: boolean | Challan$bundlesArgs<ExtArgs>
     defects?: boolean | Challan$defectsArgs<ExtArgs>
     dyeingInboundOrders?: boolean | Challan$dyeingInboundOrdersArgs<ExtArgs>
-    dyeingQc1Orders?: boolean | Challan$dyeingQc1OrdersArgs<ExtArgs>
+    dyeingQcOrders?: boolean | Challan$dyeingQcOrdersArgs<ExtArgs>
+    deadlineAlerts?: boolean | Challan$deadlineAlertsArgs<ExtArgs>
     _count?: boolean | ChallanCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ChallanIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -44121,7 +44554,8 @@ export namespace Prisma {
       bundles: Prisma.$BundlePayload<ExtArgs>[]
       defects: Prisma.$DefectRecordPayload<ExtArgs>[]
       dyeingInboundOrders: Prisma.$DyeingOrderPayload<ExtArgs>[]
-      dyeingQc1Orders: Prisma.$DyeingOrderPayload<ExtArgs>[]
+      dyeingQcOrders: Prisma.$DyeingOrderPayload<ExtArgs>[]
+      deadlineAlerts: Prisma.$DeadlineAlertPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -44134,6 +44568,7 @@ export namespace Prisma {
       status: string
       priority: string
       issuedDate: Date | null
+      deliveryDate: Date | null
       receivedDate: Date | null
       completedDate: Date | null
       createdById: string
@@ -44561,7 +44996,8 @@ export namespace Prisma {
     bundles<T extends Challan$bundlesArgs<ExtArgs> = {}>(args?: Subset<T, Challan$bundlesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BundlePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     defects<T extends Challan$defectsArgs<ExtArgs> = {}>(args?: Subset<T, Challan$defectsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DefectRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     dyeingInboundOrders<T extends Challan$dyeingInboundOrdersArgs<ExtArgs> = {}>(args?: Subset<T, Challan$dyeingInboundOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DyeingOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    dyeingQc1Orders<T extends Challan$dyeingQc1OrdersArgs<ExtArgs> = {}>(args?: Subset<T, Challan$dyeingQc1OrdersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DyeingOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    dyeingQcOrders<T extends Challan$dyeingQcOrdersArgs<ExtArgs> = {}>(args?: Subset<T, Challan$dyeingQcOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DyeingOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    deadlineAlerts<T extends Challan$deadlineAlertsArgs<ExtArgs> = {}>(args?: Subset<T, Challan$deadlineAlertsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeadlineAlertPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -44601,6 +45037,7 @@ export namespace Prisma {
     readonly status: FieldRef<"Challan", 'String'>
     readonly priority: FieldRef<"Challan", 'String'>
     readonly issuedDate: FieldRef<"Challan", 'DateTime'>
+    readonly deliveryDate: FieldRef<"Challan", 'DateTime'>
     readonly receivedDate: FieldRef<"Challan", 'DateTime'>
     readonly completedDate: FieldRef<"Challan", 'DateTime'>
     readonly createdById: FieldRef<"Challan", 'String'>
@@ -45282,9 +45719,9 @@ export namespace Prisma {
   }
 
   /**
-   * Challan.dyeingQc1Orders
+   * Challan.dyeingQcOrders
    */
-  export type Challan$dyeingQc1OrdersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Challan$dyeingQcOrdersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the DyeingOrder
      */
@@ -45303,6 +45740,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: DyeingOrderScalarFieldEnum | DyeingOrderScalarFieldEnum[]
+  }
+
+  /**
+   * Challan.deadlineAlerts
+   */
+  export type Challan$deadlineAlertsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlert
+     */
+    select?: DeadlineAlertSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlert
+     */
+    omit?: DeadlineAlertOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertInclude<ExtArgs> | null
+    where?: DeadlineAlertWhereInput
+    orderBy?: DeadlineAlertOrderByWithRelationInput | DeadlineAlertOrderByWithRelationInput[]
+    cursor?: DeadlineAlertWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DeadlineAlertScalarFieldEnum | DeadlineAlertScalarFieldEnum[]
   }
 
   /**
@@ -45337,12 +45798,14 @@ export namespace Prisma {
   }
 
   export type ChallanItemAvgAggregateOutputType = {
+    requiredDyeQuantity: number | null
     quantity: number | null
     grossWeightKg: number | null
     netWeightKg: number | null
   }
 
   export type ChallanItemSumAggregateOutputType = {
+    requiredDyeQuantity: number | null
     quantity: number | null
     grossWeightKg: number | null
     netWeightKg: number | null
@@ -45355,6 +45818,8 @@ export namespace Prisma {
     fabricCode: string | null
     colour: string | null
     shade: string | null
+    requiredDyeColor: string | null
+    requiredDyeQuantity: number | null
     size: string | null
     unitType: string | null
     rollNumber: string | null
@@ -45379,6 +45844,8 @@ export namespace Prisma {
     fabricCode: string | null
     colour: string | null
     shade: string | null
+    requiredDyeColor: string | null
+    requiredDyeQuantity: number | null
     size: string | null
     unitType: string | null
     rollNumber: string | null
@@ -45403,6 +45870,8 @@ export namespace Prisma {
     fabricCode: number
     colour: number
     shade: number
+    requiredDyeColor: number
+    requiredDyeQuantity: number
     size: number
     unitType: number
     rollNumber: number
@@ -45423,12 +45892,14 @@ export namespace Prisma {
 
 
   export type ChallanItemAvgAggregateInputType = {
+    requiredDyeQuantity?: true
     quantity?: true
     grossWeightKg?: true
     netWeightKg?: true
   }
 
   export type ChallanItemSumAggregateInputType = {
+    requiredDyeQuantity?: true
     quantity?: true
     grossWeightKg?: true
     netWeightKg?: true
@@ -45441,6 +45912,8 @@ export namespace Prisma {
     fabricCode?: true
     colour?: true
     shade?: true
+    requiredDyeColor?: true
+    requiredDyeQuantity?: true
     size?: true
     unitType?: true
     rollNumber?: true
@@ -45465,6 +45938,8 @@ export namespace Prisma {
     fabricCode?: true
     colour?: true
     shade?: true
+    requiredDyeColor?: true
+    requiredDyeQuantity?: true
     size?: true
     unitType?: true
     rollNumber?: true
@@ -45489,6 +45964,8 @@ export namespace Prisma {
     fabricCode?: true
     colour?: true
     shade?: true
+    requiredDyeColor?: true
+    requiredDyeQuantity?: true
     size?: true
     unitType?: true
     rollNumber?: true
@@ -45600,6 +46077,8 @@ export namespace Prisma {
     fabricCode: string | null
     colour: string | null
     shade: string | null
+    requiredDyeColor: string | null
+    requiredDyeQuantity: number | null
     size: string | null
     unitType: string
     rollNumber: string | null
@@ -45643,6 +46122,8 @@ export namespace Prisma {
     fabricCode?: boolean
     colour?: boolean
     shade?: boolean
+    requiredDyeColor?: boolean
+    requiredDyeQuantity?: boolean
     size?: boolean
     unitType?: boolean
     rollNumber?: boolean
@@ -45668,6 +46149,8 @@ export namespace Prisma {
     fabricCode?: boolean
     colour?: boolean
     shade?: boolean
+    requiredDyeColor?: boolean
+    requiredDyeQuantity?: boolean
     size?: boolean
     unitType?: boolean
     rollNumber?: boolean
@@ -45693,6 +46176,8 @@ export namespace Prisma {
     fabricCode?: boolean
     colour?: boolean
     shade?: boolean
+    requiredDyeColor?: boolean
+    requiredDyeQuantity?: boolean
     size?: boolean
     unitType?: boolean
     rollNumber?: boolean
@@ -45718,6 +46203,8 @@ export namespace Prisma {
     fabricCode?: boolean
     colour?: boolean
     shade?: boolean
+    requiredDyeColor?: boolean
+    requiredDyeQuantity?: boolean
     size?: boolean
     unitType?: boolean
     rollNumber?: boolean
@@ -45735,7 +46222,7 @@ export namespace Prisma {
     createdAt?: boolean
   }
 
-  export type ChallanItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "challanId" | "itemDescription" | "fabricCode" | "colour" | "shade" | "size" | "unitType" | "rollNumber" | "lotNumber" | "bundleNumber" | "barcode" | "quantity" | "grossWeightKg" | "netWeightKg" | "uom" | "remarks" | "sourceLotId" | "sourceRollId" | "sourceBundleId" | "createdAt", ExtArgs["result"]["challanItem"]>
+  export type ChallanItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "challanId" | "itemDescription" | "fabricCode" | "colour" | "shade" | "requiredDyeColor" | "requiredDyeQuantity" | "size" | "unitType" | "rollNumber" | "lotNumber" | "bundleNumber" | "barcode" | "quantity" | "grossWeightKg" | "netWeightKg" | "uom" | "remarks" | "sourceLotId" | "sourceRollId" | "sourceBundleId" | "createdAt", ExtArgs["result"]["challanItem"]>
   export type ChallanItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     challan?: boolean | ChallanDefaultArgs<ExtArgs>
   }
@@ -45758,6 +46245,8 @@ export namespace Prisma {
       fabricCode: string | null
       colour: string | null
       shade: string | null
+      requiredDyeColor: string | null
+      requiredDyeQuantity: number | null
       size: string | null
       unitType: string
       rollNumber: string | null
@@ -46203,6 +46692,8 @@ export namespace Prisma {
     readonly fabricCode: FieldRef<"ChallanItem", 'String'>
     readonly colour: FieldRef<"ChallanItem", 'String'>
     readonly shade: FieldRef<"ChallanItem", 'String'>
+    readonly requiredDyeColor: FieldRef<"ChallanItem", 'String'>
+    readonly requiredDyeQuantity: FieldRef<"ChallanItem", 'Float'>
     readonly size: FieldRef<"ChallanItem", 'String'>
     readonly unitType: FieldRef<"ChallanItem", 'String'>
     readonly rollNumber: FieldRef<"ChallanItem", 'String'>
@@ -61475,8 +61966,14 @@ export namespace Prisma {
     id: string | null
     defectCode: string | null
     programId: string | null
+    productionSheetNumber: string | null
     challanId: string | null
     departmentCode: string | null
+    shelfCode: string | null
+    color: string | null
+    fabricType: string | null
+    quantityUnit: string | null
+    responsibleIncharge: string | null
     bundleId: string | null
     itemDescription: string | null
     severity: string | null
@@ -61486,6 +61983,8 @@ export namespace Prisma {
     status: string | null
     resolutionNotes: string | null
     resolvedAt: Date | null
+    shelfRemovedAt: Date | null
+    shelfRemovalReason: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -61494,8 +61993,14 @@ export namespace Prisma {
     id: string | null
     defectCode: string | null
     programId: string | null
+    productionSheetNumber: string | null
     challanId: string | null
     departmentCode: string | null
+    shelfCode: string | null
+    color: string | null
+    fabricType: string | null
+    quantityUnit: string | null
+    responsibleIncharge: string | null
     bundleId: string | null
     itemDescription: string | null
     severity: string | null
@@ -61505,6 +62010,8 @@ export namespace Prisma {
     status: string | null
     resolutionNotes: string | null
     resolvedAt: Date | null
+    shelfRemovedAt: Date | null
+    shelfRemovalReason: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -61513,8 +62020,14 @@ export namespace Prisma {
     id: number
     defectCode: number
     programId: number
+    productionSheetNumber: number
     challanId: number
     departmentCode: number
+    shelfCode: number
+    color: number
+    fabricType: number
+    quantityUnit: number
+    responsibleIncharge: number
     bundleId: number
     itemDescription: number
     severity: number
@@ -61524,6 +62037,8 @@ export namespace Prisma {
     status: number
     resolutionNotes: number
     resolvedAt: number
+    shelfRemovedAt: number
+    shelfRemovalReason: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -61542,8 +62057,14 @@ export namespace Prisma {
     id?: true
     defectCode?: true
     programId?: true
+    productionSheetNumber?: true
     challanId?: true
     departmentCode?: true
+    shelfCode?: true
+    color?: true
+    fabricType?: true
+    quantityUnit?: true
+    responsibleIncharge?: true
     bundleId?: true
     itemDescription?: true
     severity?: true
@@ -61553,6 +62074,8 @@ export namespace Prisma {
     status?: true
     resolutionNotes?: true
     resolvedAt?: true
+    shelfRemovedAt?: true
+    shelfRemovalReason?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -61561,8 +62084,14 @@ export namespace Prisma {
     id?: true
     defectCode?: true
     programId?: true
+    productionSheetNumber?: true
     challanId?: true
     departmentCode?: true
+    shelfCode?: true
+    color?: true
+    fabricType?: true
+    quantityUnit?: true
+    responsibleIncharge?: true
     bundleId?: true
     itemDescription?: true
     severity?: true
@@ -61572,6 +62101,8 @@ export namespace Prisma {
     status?: true
     resolutionNotes?: true
     resolvedAt?: true
+    shelfRemovedAt?: true
+    shelfRemovalReason?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -61580,8 +62111,14 @@ export namespace Prisma {
     id?: true
     defectCode?: true
     programId?: true
+    productionSheetNumber?: true
     challanId?: true
     departmentCode?: true
+    shelfCode?: true
+    color?: true
+    fabricType?: true
+    quantityUnit?: true
+    responsibleIncharge?: true
     bundleId?: true
     itemDescription?: true
     severity?: true
@@ -61591,6 +62128,8 @@ export namespace Prisma {
     status?: true
     resolutionNotes?: true
     resolvedAt?: true
+    shelfRemovedAt?: true
+    shelfRemovalReason?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -61686,8 +62225,14 @@ export namespace Prisma {
     id: string
     defectCode: string
     programId: string
+    productionSheetNumber: string | null
     challanId: string | null
     departmentCode: string
+    shelfCode: string | null
+    color: string | null
+    fabricType: string | null
+    quantityUnit: string
+    responsibleIncharge: string | null
     bundleId: string | null
     itemDescription: string
     severity: string
@@ -61697,6 +62242,8 @@ export namespace Prisma {
     status: string
     resolutionNotes: string | null
     resolvedAt: Date | null
+    shelfRemovedAt: Date | null
+    shelfRemovalReason: string | null
     createdAt: Date
     updatedAt: Date
     _count: DefectRecordCountAggregateOutputType | null
@@ -61724,8 +62271,14 @@ export namespace Prisma {
     id?: boolean
     defectCode?: boolean
     programId?: boolean
+    productionSheetNumber?: boolean
     challanId?: boolean
     departmentCode?: boolean
+    shelfCode?: boolean
+    color?: boolean
+    fabricType?: boolean
+    quantityUnit?: boolean
+    responsibleIncharge?: boolean
     bundleId?: boolean
     itemDescription?: boolean
     severity?: boolean
@@ -61735,6 +62288,8 @@ export namespace Prisma {
     status?: boolean
     resolutionNotes?: boolean
     resolvedAt?: boolean
+    shelfRemovedAt?: boolean
+    shelfRemovalReason?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     program?: boolean | ProgramDefaultArgs<ExtArgs>
@@ -61750,8 +62305,14 @@ export namespace Prisma {
     id?: boolean
     defectCode?: boolean
     programId?: boolean
+    productionSheetNumber?: boolean
     challanId?: boolean
     departmentCode?: boolean
+    shelfCode?: boolean
+    color?: boolean
+    fabricType?: boolean
+    quantityUnit?: boolean
+    responsibleIncharge?: boolean
     bundleId?: boolean
     itemDescription?: boolean
     severity?: boolean
@@ -61761,6 +62322,8 @@ export namespace Prisma {
     status?: boolean
     resolutionNotes?: boolean
     resolvedAt?: boolean
+    shelfRemovedAt?: boolean
+    shelfRemovalReason?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     program?: boolean | ProgramDefaultArgs<ExtArgs>
@@ -61773,8 +62336,14 @@ export namespace Prisma {
     id?: boolean
     defectCode?: boolean
     programId?: boolean
+    productionSheetNumber?: boolean
     challanId?: boolean
     departmentCode?: boolean
+    shelfCode?: boolean
+    color?: boolean
+    fabricType?: boolean
+    quantityUnit?: boolean
+    responsibleIncharge?: boolean
     bundleId?: boolean
     itemDescription?: boolean
     severity?: boolean
@@ -61784,6 +62353,8 @@ export namespace Prisma {
     status?: boolean
     resolutionNotes?: boolean
     resolvedAt?: boolean
+    shelfRemovedAt?: boolean
+    shelfRemovalReason?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     program?: boolean | ProgramDefaultArgs<ExtArgs>
@@ -61796,8 +62367,14 @@ export namespace Prisma {
     id?: boolean
     defectCode?: boolean
     programId?: boolean
+    productionSheetNumber?: boolean
     challanId?: boolean
     departmentCode?: boolean
+    shelfCode?: boolean
+    color?: boolean
+    fabricType?: boolean
+    quantityUnit?: boolean
+    responsibleIncharge?: boolean
     bundleId?: boolean
     itemDescription?: boolean
     severity?: boolean
@@ -61807,11 +62384,13 @@ export namespace Prisma {
     status?: boolean
     resolutionNotes?: boolean
     resolvedAt?: boolean
+    shelfRemovedAt?: boolean
+    shelfRemovalReason?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type DefectRecordOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "defectCode" | "programId" | "challanId" | "departmentCode" | "bundleId" | "itemDescription" | "severity" | "quantity" | "reason" | "detectedById" | "status" | "resolutionNotes" | "resolvedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["defectRecord"]>
+  export type DefectRecordOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "defectCode" | "programId" | "productionSheetNumber" | "challanId" | "departmentCode" | "shelfCode" | "color" | "fabricType" | "quantityUnit" | "responsibleIncharge" | "bundleId" | "itemDescription" | "severity" | "quantity" | "reason" | "detectedById" | "status" | "resolutionNotes" | "resolvedAt" | "shelfRemovedAt" | "shelfRemovalReason" | "createdAt" | "updatedAt", ExtArgs["result"]["defectRecord"]>
   export type DefectRecordInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     program?: boolean | ProgramDefaultArgs<ExtArgs>
     challan?: boolean | DefectRecord$challanArgs<ExtArgs>
@@ -61848,8 +62427,14 @@ export namespace Prisma {
       id: string
       defectCode: string
       programId: string
+      productionSheetNumber: string | null
       challanId: string | null
       departmentCode: string
+      shelfCode: string | null
+      color: string | null
+      fabricType: string | null
+      quantityUnit: string
+      responsibleIncharge: string | null
       bundleId: string | null
       itemDescription: string
       severity: string
@@ -61859,6 +62444,8 @@ export namespace Prisma {
       status: string
       resolutionNotes: string | null
       resolvedAt: Date | null
+      shelfRemovedAt: Date | null
+      shelfRemovalReason: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["defectRecord"]>
@@ -62293,17 +62880,25 @@ export namespace Prisma {
     readonly id: FieldRef<"DefectRecord", 'String'>
     readonly defectCode: FieldRef<"DefectRecord", 'String'>
     readonly programId: FieldRef<"DefectRecord", 'String'>
+    readonly productionSheetNumber: FieldRef<"DefectRecord", 'String'>
     readonly challanId: FieldRef<"DefectRecord", 'String'>
     readonly departmentCode: FieldRef<"DefectRecord", 'String'>
+    readonly shelfCode: FieldRef<"DefectRecord", 'String'>
+    readonly color: FieldRef<"DefectRecord", 'String'>
+    readonly fabricType: FieldRef<"DefectRecord", 'String'>
+    readonly quantityUnit: FieldRef<"DefectRecord", 'String'>
+    readonly responsibleIncharge: FieldRef<"DefectRecord", 'String'>
     readonly bundleId: FieldRef<"DefectRecord", 'String'>
     readonly itemDescription: FieldRef<"DefectRecord", 'String'>
     readonly severity: FieldRef<"DefectRecord", 'String'>
-    readonly quantity: FieldRef<"DefectRecord", 'Int'>
+    readonly quantity: FieldRef<"DefectRecord", 'Float'>
     readonly reason: FieldRef<"DefectRecord", 'String'>
     readonly detectedById: FieldRef<"DefectRecord", 'String'>
     readonly status: FieldRef<"DefectRecord", 'String'>
     readonly resolutionNotes: FieldRef<"DefectRecord", 'String'>
     readonly resolvedAt: FieldRef<"DefectRecord", 'DateTime'>
+    readonly shelfRemovedAt: FieldRef<"DefectRecord", 'DateTime'>
+    readonly shelfRemovalReason: FieldRef<"DefectRecord", 'String'>
     readonly createdAt: FieldRef<"DefectRecord", 'DateTime'>
     readonly updatedAt: FieldRef<"DefectRecord", 'DateTime'>
   }
@@ -78368,16 +78963,16 @@ export namespace Prisma {
     requiredQuantity: number | null
     dyedQuantity: number | null
     undyedQuantity: number | null
-    readyForQc1Quantity: number | null
-    sentToQc1Quantity: number | null
+    readyForDyeingQcQuantity: number | null
+    sentToDyeingQcQuantity: number | null
   }
 
   export type DyeingOrderSumAggregateOutputType = {
     requiredQuantity: number | null
     dyedQuantity: number | null
     undyedQuantity: number | null
-    readyForQc1Quantity: number | null
-    sentToQc1Quantity: number | null
+    readyForDyeingQcQuantity: number | null
+    sentToDyeingQcQuantity: number | null
   }
 
   export type DyeingOrderMinAggregateOutputType = {
@@ -78385,28 +78980,30 @@ export namespace Prisma {
     orderNumber: string | null
     programId: string | null
     inboundChallanId: string | null
+    inboundChallanItemId: string | null
     status: string | null
     priority: string | null
     fabricName: string | null
     fabricType: string | null
+    currentColor: string | null
     targetColor: string | null
     dyedColor: string | null
     colorCode: string | null
     requiredQuantity: number | null
     dyedQuantity: number | null
     undyedQuantity: number | null
-    readyForQc1Quantity: number | null
-    sentToQc1Quantity: number | null
+    readyForDyeingQcQuantity: number | null
+    sentToDyeingQcQuantity: number | null
     uom: string | null
     inchargeId: string | null
     inchargeName: string | null
     batchNumber: string | null
     machineNumber: string | null
     processRemarks: string | null
-    qc1ChallanId: string | null
+    dyeingQcChallanId: string | null
     startedAt: Date | null
     completedAt: Date | null
-    sentToQc1At: Date | null
+    sentToDyeingQcAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -78416,28 +79013,30 @@ export namespace Prisma {
     orderNumber: string | null
     programId: string | null
     inboundChallanId: string | null
+    inboundChallanItemId: string | null
     status: string | null
     priority: string | null
     fabricName: string | null
     fabricType: string | null
+    currentColor: string | null
     targetColor: string | null
     dyedColor: string | null
     colorCode: string | null
     requiredQuantity: number | null
     dyedQuantity: number | null
     undyedQuantity: number | null
-    readyForQc1Quantity: number | null
-    sentToQc1Quantity: number | null
+    readyForDyeingQcQuantity: number | null
+    sentToDyeingQcQuantity: number | null
     uom: string | null
     inchargeId: string | null
     inchargeName: string | null
     batchNumber: string | null
     machineNumber: string | null
     processRemarks: string | null
-    qc1ChallanId: string | null
+    dyeingQcChallanId: string | null
     startedAt: Date | null
     completedAt: Date | null
-    sentToQc1At: Date | null
+    sentToDyeingQcAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -78447,28 +79046,30 @@ export namespace Prisma {
     orderNumber: number
     programId: number
     inboundChallanId: number
+    inboundChallanItemId: number
     status: number
     priority: number
     fabricName: number
     fabricType: number
+    currentColor: number
     targetColor: number
     dyedColor: number
     colorCode: number
     requiredQuantity: number
     dyedQuantity: number
     undyedQuantity: number
-    readyForQc1Quantity: number
-    sentToQc1Quantity: number
+    readyForDyeingQcQuantity: number
+    sentToDyeingQcQuantity: number
     uom: number
     inchargeId: number
     inchargeName: number
     batchNumber: number
     machineNumber: number
     processRemarks: number
-    qc1ChallanId: number
+    dyeingQcChallanId: number
     startedAt: number
     completedAt: number
-    sentToQc1At: number
+    sentToDyeingQcAt: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -78479,16 +79080,16 @@ export namespace Prisma {
     requiredQuantity?: true
     dyedQuantity?: true
     undyedQuantity?: true
-    readyForQc1Quantity?: true
-    sentToQc1Quantity?: true
+    readyForDyeingQcQuantity?: true
+    sentToDyeingQcQuantity?: true
   }
 
   export type DyeingOrderSumAggregateInputType = {
     requiredQuantity?: true
     dyedQuantity?: true
     undyedQuantity?: true
-    readyForQc1Quantity?: true
-    sentToQc1Quantity?: true
+    readyForDyeingQcQuantity?: true
+    sentToDyeingQcQuantity?: true
   }
 
   export type DyeingOrderMinAggregateInputType = {
@@ -78496,28 +79097,30 @@ export namespace Prisma {
     orderNumber?: true
     programId?: true
     inboundChallanId?: true
+    inboundChallanItemId?: true
     status?: true
     priority?: true
     fabricName?: true
     fabricType?: true
+    currentColor?: true
     targetColor?: true
     dyedColor?: true
     colorCode?: true
     requiredQuantity?: true
     dyedQuantity?: true
     undyedQuantity?: true
-    readyForQc1Quantity?: true
-    sentToQc1Quantity?: true
+    readyForDyeingQcQuantity?: true
+    sentToDyeingQcQuantity?: true
     uom?: true
     inchargeId?: true
     inchargeName?: true
     batchNumber?: true
     machineNumber?: true
     processRemarks?: true
-    qc1ChallanId?: true
+    dyeingQcChallanId?: true
     startedAt?: true
     completedAt?: true
-    sentToQc1At?: true
+    sentToDyeingQcAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -78527,28 +79130,30 @@ export namespace Prisma {
     orderNumber?: true
     programId?: true
     inboundChallanId?: true
+    inboundChallanItemId?: true
     status?: true
     priority?: true
     fabricName?: true
     fabricType?: true
+    currentColor?: true
     targetColor?: true
     dyedColor?: true
     colorCode?: true
     requiredQuantity?: true
     dyedQuantity?: true
     undyedQuantity?: true
-    readyForQc1Quantity?: true
-    sentToQc1Quantity?: true
+    readyForDyeingQcQuantity?: true
+    sentToDyeingQcQuantity?: true
     uom?: true
     inchargeId?: true
     inchargeName?: true
     batchNumber?: true
     machineNumber?: true
     processRemarks?: true
-    qc1ChallanId?: true
+    dyeingQcChallanId?: true
     startedAt?: true
     completedAt?: true
-    sentToQc1At?: true
+    sentToDyeingQcAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -78558,28 +79163,30 @@ export namespace Prisma {
     orderNumber?: true
     programId?: true
     inboundChallanId?: true
+    inboundChallanItemId?: true
     status?: true
     priority?: true
     fabricName?: true
     fabricType?: true
+    currentColor?: true
     targetColor?: true
     dyedColor?: true
     colorCode?: true
     requiredQuantity?: true
     dyedQuantity?: true
     undyedQuantity?: true
-    readyForQc1Quantity?: true
-    sentToQc1Quantity?: true
+    readyForDyeingQcQuantity?: true
+    sentToDyeingQcQuantity?: true
     uom?: true
     inchargeId?: true
     inchargeName?: true
     batchNumber?: true
     machineNumber?: true
     processRemarks?: true
-    qc1ChallanId?: true
+    dyeingQcChallanId?: true
     startedAt?: true
     completedAt?: true
-    sentToQc1At?: true
+    sentToDyeingQcAt?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -78676,28 +79283,30 @@ export namespace Prisma {
     orderNumber: string
     programId: string
     inboundChallanId: string | null
+    inboundChallanItemId: string | null
     status: string
     priority: string
     fabricName: string
     fabricType: string | null
+    currentColor: string | null
     targetColor: string
     dyedColor: string | null
     colorCode: string | null
     requiredQuantity: number
     dyedQuantity: number
     undyedQuantity: number
-    readyForQc1Quantity: number
-    sentToQc1Quantity: number
+    readyForDyeingQcQuantity: number
+    sentToDyeingQcQuantity: number
     uom: string
     inchargeId: string | null
     inchargeName: string | null
     batchNumber: string | null
     machineNumber: string | null
     processRemarks: string | null
-    qc1ChallanId: string | null
+    dyeingQcChallanId: string | null
     startedAt: Date | null
     completedAt: Date | null
-    sentToQc1At: Date | null
+    sentToDyeingQcAt: Date | null
     createdAt: Date
     updatedAt: Date
     _count: DyeingOrderCountAggregateOutputType | null
@@ -78726,34 +79335,36 @@ export namespace Prisma {
     orderNumber?: boolean
     programId?: boolean
     inboundChallanId?: boolean
+    inboundChallanItemId?: boolean
     status?: boolean
     priority?: boolean
     fabricName?: boolean
     fabricType?: boolean
+    currentColor?: boolean
     targetColor?: boolean
     dyedColor?: boolean
     colorCode?: boolean
     requiredQuantity?: boolean
     dyedQuantity?: boolean
     undyedQuantity?: boolean
-    readyForQc1Quantity?: boolean
-    sentToQc1Quantity?: boolean
+    readyForDyeingQcQuantity?: boolean
+    sentToDyeingQcQuantity?: boolean
     uom?: boolean
     inchargeId?: boolean
     inchargeName?: boolean
     batchNumber?: boolean
     machineNumber?: boolean
     processRemarks?: boolean
-    qc1ChallanId?: boolean
+    dyeingQcChallanId?: boolean
     startedAt?: boolean
     completedAt?: boolean
-    sentToQc1At?: boolean
+    sentToDyeingQcAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     program?: boolean | ProgramDefaultArgs<ExtArgs>
     inboundChallan?: boolean | DyeingOrder$inboundChallanArgs<ExtArgs>
     incharge?: boolean | DyeingOrder$inchargeArgs<ExtArgs>
-    qc1Challan?: boolean | DyeingOrder$qc1ChallanArgs<ExtArgs>
+    dyeingQcChallan?: boolean | DyeingOrder$dyeingQcChallanArgs<ExtArgs>
   }, ExtArgs["result"]["dyeingOrder"]>
 
   export type DyeingOrderSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -78761,34 +79372,36 @@ export namespace Prisma {
     orderNumber?: boolean
     programId?: boolean
     inboundChallanId?: boolean
+    inboundChallanItemId?: boolean
     status?: boolean
     priority?: boolean
     fabricName?: boolean
     fabricType?: boolean
+    currentColor?: boolean
     targetColor?: boolean
     dyedColor?: boolean
     colorCode?: boolean
     requiredQuantity?: boolean
     dyedQuantity?: boolean
     undyedQuantity?: boolean
-    readyForQc1Quantity?: boolean
-    sentToQc1Quantity?: boolean
+    readyForDyeingQcQuantity?: boolean
+    sentToDyeingQcQuantity?: boolean
     uom?: boolean
     inchargeId?: boolean
     inchargeName?: boolean
     batchNumber?: boolean
     machineNumber?: boolean
     processRemarks?: boolean
-    qc1ChallanId?: boolean
+    dyeingQcChallanId?: boolean
     startedAt?: boolean
     completedAt?: boolean
-    sentToQc1At?: boolean
+    sentToDyeingQcAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     program?: boolean | ProgramDefaultArgs<ExtArgs>
     inboundChallan?: boolean | DyeingOrder$inboundChallanArgs<ExtArgs>
     incharge?: boolean | DyeingOrder$inchargeArgs<ExtArgs>
-    qc1Challan?: boolean | DyeingOrder$qc1ChallanArgs<ExtArgs>
+    dyeingQcChallan?: boolean | DyeingOrder$dyeingQcChallanArgs<ExtArgs>
   }, ExtArgs["result"]["dyeingOrder"]>
 
   export type DyeingOrderSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -78796,34 +79409,36 @@ export namespace Prisma {
     orderNumber?: boolean
     programId?: boolean
     inboundChallanId?: boolean
+    inboundChallanItemId?: boolean
     status?: boolean
     priority?: boolean
     fabricName?: boolean
     fabricType?: boolean
+    currentColor?: boolean
     targetColor?: boolean
     dyedColor?: boolean
     colorCode?: boolean
     requiredQuantity?: boolean
     dyedQuantity?: boolean
     undyedQuantity?: boolean
-    readyForQc1Quantity?: boolean
-    sentToQc1Quantity?: boolean
+    readyForDyeingQcQuantity?: boolean
+    sentToDyeingQcQuantity?: boolean
     uom?: boolean
     inchargeId?: boolean
     inchargeName?: boolean
     batchNumber?: boolean
     machineNumber?: boolean
     processRemarks?: boolean
-    qc1ChallanId?: boolean
+    dyeingQcChallanId?: boolean
     startedAt?: boolean
     completedAt?: boolean
-    sentToQc1At?: boolean
+    sentToDyeingQcAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     program?: boolean | ProgramDefaultArgs<ExtArgs>
     inboundChallan?: boolean | DyeingOrder$inboundChallanArgs<ExtArgs>
     incharge?: boolean | DyeingOrder$inchargeArgs<ExtArgs>
-    qc1Challan?: boolean | DyeingOrder$qc1ChallanArgs<ExtArgs>
+    dyeingQcChallan?: boolean | DyeingOrder$dyeingQcChallanArgs<ExtArgs>
   }, ExtArgs["result"]["dyeingOrder"]>
 
   export type DyeingOrderSelectScalar = {
@@ -78831,50 +79446,52 @@ export namespace Prisma {
     orderNumber?: boolean
     programId?: boolean
     inboundChallanId?: boolean
+    inboundChallanItemId?: boolean
     status?: boolean
     priority?: boolean
     fabricName?: boolean
     fabricType?: boolean
+    currentColor?: boolean
     targetColor?: boolean
     dyedColor?: boolean
     colorCode?: boolean
     requiredQuantity?: boolean
     dyedQuantity?: boolean
     undyedQuantity?: boolean
-    readyForQc1Quantity?: boolean
-    sentToQc1Quantity?: boolean
+    readyForDyeingQcQuantity?: boolean
+    sentToDyeingQcQuantity?: boolean
     uom?: boolean
     inchargeId?: boolean
     inchargeName?: boolean
     batchNumber?: boolean
     machineNumber?: boolean
     processRemarks?: boolean
-    qc1ChallanId?: boolean
+    dyeingQcChallanId?: boolean
     startedAt?: boolean
     completedAt?: boolean
-    sentToQc1At?: boolean
+    sentToDyeingQcAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type DyeingOrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "orderNumber" | "programId" | "inboundChallanId" | "status" | "priority" | "fabricName" | "fabricType" | "targetColor" | "dyedColor" | "colorCode" | "requiredQuantity" | "dyedQuantity" | "undyedQuantity" | "readyForQc1Quantity" | "sentToQc1Quantity" | "uom" | "inchargeId" | "inchargeName" | "batchNumber" | "machineNumber" | "processRemarks" | "qc1ChallanId" | "startedAt" | "completedAt" | "sentToQc1At" | "createdAt" | "updatedAt", ExtArgs["result"]["dyeingOrder"]>
+  export type DyeingOrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "orderNumber" | "programId" | "inboundChallanId" | "inboundChallanItemId" | "status" | "priority" | "fabricName" | "fabricType" | "currentColor" | "targetColor" | "dyedColor" | "colorCode" | "requiredQuantity" | "dyedQuantity" | "undyedQuantity" | "readyForDyeingQcQuantity" | "sentToDyeingQcQuantity" | "uom" | "inchargeId" | "inchargeName" | "batchNumber" | "machineNumber" | "processRemarks" | "dyeingQcChallanId" | "startedAt" | "completedAt" | "sentToDyeingQcAt" | "createdAt" | "updatedAt", ExtArgs["result"]["dyeingOrder"]>
   export type DyeingOrderInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     program?: boolean | ProgramDefaultArgs<ExtArgs>
     inboundChallan?: boolean | DyeingOrder$inboundChallanArgs<ExtArgs>
     incharge?: boolean | DyeingOrder$inchargeArgs<ExtArgs>
-    qc1Challan?: boolean | DyeingOrder$qc1ChallanArgs<ExtArgs>
+    dyeingQcChallan?: boolean | DyeingOrder$dyeingQcChallanArgs<ExtArgs>
   }
   export type DyeingOrderIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     program?: boolean | ProgramDefaultArgs<ExtArgs>
     inboundChallan?: boolean | DyeingOrder$inboundChallanArgs<ExtArgs>
     incharge?: boolean | DyeingOrder$inchargeArgs<ExtArgs>
-    qc1Challan?: boolean | DyeingOrder$qc1ChallanArgs<ExtArgs>
+    dyeingQcChallan?: boolean | DyeingOrder$dyeingQcChallanArgs<ExtArgs>
   }
   export type DyeingOrderIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     program?: boolean | ProgramDefaultArgs<ExtArgs>
     inboundChallan?: boolean | DyeingOrder$inboundChallanArgs<ExtArgs>
     incharge?: boolean | DyeingOrder$inchargeArgs<ExtArgs>
-    qc1Challan?: boolean | DyeingOrder$qc1ChallanArgs<ExtArgs>
+    dyeingQcChallan?: boolean | DyeingOrder$dyeingQcChallanArgs<ExtArgs>
   }
 
   export type $DyeingOrderPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -78883,35 +79500,37 @@ export namespace Prisma {
       program: Prisma.$ProgramPayload<ExtArgs>
       inboundChallan: Prisma.$ChallanPayload<ExtArgs> | null
       incharge: Prisma.$UserPayload<ExtArgs> | null
-      qc1Challan: Prisma.$ChallanPayload<ExtArgs> | null
+      dyeingQcChallan: Prisma.$ChallanPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       orderNumber: string
       programId: string
       inboundChallanId: string | null
+      inboundChallanItemId: string | null
       status: string
       priority: string
       fabricName: string
       fabricType: string | null
+      currentColor: string | null
       targetColor: string
       dyedColor: string | null
       colorCode: string | null
       requiredQuantity: number
       dyedQuantity: number
       undyedQuantity: number
-      readyForQc1Quantity: number
-      sentToQc1Quantity: number
+      readyForDyeingQcQuantity: number
+      sentToDyeingQcQuantity: number
       uom: string
       inchargeId: string | null
       inchargeName: string | null
       batchNumber: string | null
       machineNumber: string | null
       processRemarks: string | null
-      qc1ChallanId: string | null
+      dyeingQcChallanId: string | null
       startedAt: Date | null
       completedAt: Date | null
-      sentToQc1At: Date | null
+      sentToDyeingQcAt: Date | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["dyeingOrder"]>
@@ -79311,7 +79930,7 @@ export namespace Prisma {
     program<T extends ProgramDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProgramDefaultArgs<ExtArgs>>): Prisma__ProgramClient<$Result.GetResult<Prisma.$ProgramPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     inboundChallan<T extends DyeingOrder$inboundChallanArgs<ExtArgs> = {}>(args?: Subset<T, DyeingOrder$inboundChallanArgs<ExtArgs>>): Prisma__ChallanClient<$Result.GetResult<Prisma.$ChallanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     incharge<T extends DyeingOrder$inchargeArgs<ExtArgs> = {}>(args?: Subset<T, DyeingOrder$inchargeArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-    qc1Challan<T extends DyeingOrder$qc1ChallanArgs<ExtArgs> = {}>(args?: Subset<T, DyeingOrder$qc1ChallanArgs<ExtArgs>>): Prisma__ChallanClient<$Result.GetResult<Prisma.$ChallanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    dyeingQcChallan<T extends DyeingOrder$dyeingQcChallanArgs<ExtArgs> = {}>(args?: Subset<T, DyeingOrder$dyeingQcChallanArgs<ExtArgs>>): Prisma__ChallanClient<$Result.GetResult<Prisma.$ChallanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -79345,28 +79964,30 @@ export namespace Prisma {
     readonly orderNumber: FieldRef<"DyeingOrder", 'String'>
     readonly programId: FieldRef<"DyeingOrder", 'String'>
     readonly inboundChallanId: FieldRef<"DyeingOrder", 'String'>
+    readonly inboundChallanItemId: FieldRef<"DyeingOrder", 'String'>
     readonly status: FieldRef<"DyeingOrder", 'String'>
     readonly priority: FieldRef<"DyeingOrder", 'String'>
     readonly fabricName: FieldRef<"DyeingOrder", 'String'>
     readonly fabricType: FieldRef<"DyeingOrder", 'String'>
+    readonly currentColor: FieldRef<"DyeingOrder", 'String'>
     readonly targetColor: FieldRef<"DyeingOrder", 'String'>
     readonly dyedColor: FieldRef<"DyeingOrder", 'String'>
     readonly colorCode: FieldRef<"DyeingOrder", 'String'>
     readonly requiredQuantity: FieldRef<"DyeingOrder", 'Float'>
     readonly dyedQuantity: FieldRef<"DyeingOrder", 'Float'>
     readonly undyedQuantity: FieldRef<"DyeingOrder", 'Float'>
-    readonly readyForQc1Quantity: FieldRef<"DyeingOrder", 'Float'>
-    readonly sentToQc1Quantity: FieldRef<"DyeingOrder", 'Float'>
+    readonly readyForDyeingQcQuantity: FieldRef<"DyeingOrder", 'Float'>
+    readonly sentToDyeingQcQuantity: FieldRef<"DyeingOrder", 'Float'>
     readonly uom: FieldRef<"DyeingOrder", 'String'>
     readonly inchargeId: FieldRef<"DyeingOrder", 'String'>
     readonly inchargeName: FieldRef<"DyeingOrder", 'String'>
     readonly batchNumber: FieldRef<"DyeingOrder", 'String'>
     readonly machineNumber: FieldRef<"DyeingOrder", 'String'>
     readonly processRemarks: FieldRef<"DyeingOrder", 'String'>
-    readonly qc1ChallanId: FieldRef<"DyeingOrder", 'String'>
+    readonly dyeingQcChallanId: FieldRef<"DyeingOrder", 'String'>
     readonly startedAt: FieldRef<"DyeingOrder", 'DateTime'>
     readonly completedAt: FieldRef<"DyeingOrder", 'DateTime'>
-    readonly sentToQc1At: FieldRef<"DyeingOrder", 'DateTime'>
+    readonly sentToDyeingQcAt: FieldRef<"DyeingOrder", 'DateTime'>
     readonly createdAt: FieldRef<"DyeingOrder", 'DateTime'>
     readonly updatedAt: FieldRef<"DyeingOrder", 'DateTime'>
   }
@@ -79803,9 +80424,9 @@ export namespace Prisma {
   }
 
   /**
-   * DyeingOrder.qc1Challan
+   * DyeingOrder.dyeingQcChallan
    */
-  export type DyeingOrder$qc1ChallanArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type DyeingOrder$dyeingQcChallanArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the Challan
      */
@@ -79867,6 +80488,7 @@ export namespace Prisma {
     sNo: number | null
     entryType: string | null
     itemName: string | null
+    color: string | null
     billNo: string | null
     billDate: Date | null
     receivingDate: Date | null
@@ -79883,6 +80505,7 @@ export namespace Prisma {
     sNo: number | null
     entryType: string | null
     itemName: string | null
+    color: string | null
     billNo: string | null
     billDate: Date | null
     receivingDate: Date | null
@@ -79899,6 +80522,7 @@ export namespace Prisma {
     sNo: number
     entryType: number
     itemName: number
+    color: number
     billNo: number
     billDate: number
     receivingDate: number
@@ -79927,6 +80551,7 @@ export namespace Prisma {
     sNo?: true
     entryType?: true
     itemName?: true
+    color?: true
     billNo?: true
     billDate?: true
     receivingDate?: true
@@ -79943,6 +80568,7 @@ export namespace Prisma {
     sNo?: true
     entryType?: true
     itemName?: true
+    color?: true
     billNo?: true
     billDate?: true
     receivingDate?: true
@@ -79959,6 +80585,7 @@ export namespace Prisma {
     sNo?: true
     entryType?: true
     itemName?: true
+    color?: true
     billNo?: true
     billDate?: true
     receivingDate?: true
@@ -80062,6 +80689,7 @@ export namespace Prisma {
     sNo: number
     entryType: string
     itemName: string
+    color: string | null
     billNo: string
     billDate: Date
     receivingDate: Date
@@ -80097,6 +80725,7 @@ export namespace Prisma {
     sNo?: boolean
     entryType?: boolean
     itemName?: boolean
+    color?: boolean
     billNo?: boolean
     billDate?: boolean
     receivingDate?: boolean
@@ -80113,6 +80742,7 @@ export namespace Prisma {
     sNo?: boolean
     entryType?: boolean
     itemName?: boolean
+    color?: boolean
     billNo?: boolean
     billDate?: boolean
     receivingDate?: boolean
@@ -80129,6 +80759,7 @@ export namespace Prisma {
     sNo?: boolean
     entryType?: boolean
     itemName?: boolean
+    color?: boolean
     billNo?: boolean
     billDate?: boolean
     receivingDate?: boolean
@@ -80145,6 +80776,7 @@ export namespace Prisma {
     sNo?: boolean
     entryType?: boolean
     itemName?: boolean
+    color?: boolean
     billNo?: boolean
     billDate?: boolean
     receivingDate?: boolean
@@ -80156,7 +80788,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type FabricInwardOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sNo" | "entryType" | "itemName" | "billNo" | "billDate" | "receivingDate" | "billQty" | "unit" | "supplierName" | "remarks" | "createdAt" | "updatedAt", ExtArgs["result"]["fabricInward"]>
+  export type FabricInwardOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sNo" | "entryType" | "itemName" | "color" | "billNo" | "billDate" | "receivingDate" | "billQty" | "unit" | "supplierName" | "remarks" | "createdAt" | "updatedAt", ExtArgs["result"]["fabricInward"]>
 
   export type $FabricInwardPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "FabricInward"
@@ -80166,6 +80798,7 @@ export namespace Prisma {
       sNo: number
       entryType: string
       itemName: string
+      color: string | null
       billNo: string
       billDate: Date
       receivingDate: Date
@@ -80602,6 +81235,7 @@ export namespace Prisma {
     readonly sNo: FieldRef<"FabricInward", 'Int'>
     readonly entryType: FieldRef<"FabricInward", 'String'>
     readonly itemName: FieldRef<"FabricInward", 'String'>
+    readonly color: FieldRef<"FabricInward", 'String'>
     readonly billNo: FieldRef<"FabricInward", 'String'>
     readonly billDate: FieldRef<"FabricInward", 'DateTime'>
     readonly receivingDate: FieldRef<"FabricInward", 'DateTime'>
@@ -81011,6 +81645,7 @@ export namespace Prisma {
     challanId: string | null
     designNumber: string | null
     itemName: string | null
+    color: string | null
     issueQty: number | null
     unit: string | null
     avgPerPcs: number | null
@@ -81031,6 +81666,7 @@ export namespace Prisma {
     challanId: string | null
     designNumber: string | null
     itemName: string | null
+    color: string | null
     issueQty: number | null
     unit: string | null
     avgPerPcs: number | null
@@ -81051,6 +81687,7 @@ export namespace Prisma {
     challanId: number
     designNumber: number
     itemName: number
+    color: number
     issueQty: number
     unit: number
     avgPerPcs: number
@@ -81087,6 +81724,7 @@ export namespace Prisma {
     challanId?: true
     designNumber?: true
     itemName?: true
+    color?: true
     issueQty?: true
     unit?: true
     avgPerPcs?: true
@@ -81107,6 +81745,7 @@ export namespace Prisma {
     challanId?: true
     designNumber?: true
     itemName?: true
+    color?: true
     issueQty?: true
     unit?: true
     avgPerPcs?: true
@@ -81127,6 +81766,7 @@ export namespace Prisma {
     challanId?: true
     designNumber?: true
     itemName?: true
+    color?: true
     issueQty?: true
     unit?: true
     avgPerPcs?: true
@@ -81234,6 +81874,7 @@ export namespace Prisma {
     challanId: string | null
     designNumber: string | null
     itemName: string
+    color: string | null
     issueQty: number
     unit: string
     avgPerPcs: number | null
@@ -81273,6 +81914,7 @@ export namespace Prisma {
     challanId?: boolean
     designNumber?: boolean
     itemName?: boolean
+    color?: boolean
     issueQty?: boolean
     unit?: boolean
     avgPerPcs?: boolean
@@ -81293,6 +81935,7 @@ export namespace Prisma {
     challanId?: boolean
     designNumber?: boolean
     itemName?: boolean
+    color?: boolean
     issueQty?: boolean
     unit?: boolean
     avgPerPcs?: boolean
@@ -81313,6 +81956,7 @@ export namespace Prisma {
     challanId?: boolean
     designNumber?: boolean
     itemName?: boolean
+    color?: boolean
     issueQty?: boolean
     unit?: boolean
     avgPerPcs?: boolean
@@ -81333,6 +81977,7 @@ export namespace Prisma {
     challanId?: boolean
     designNumber?: boolean
     itemName?: boolean
+    color?: boolean
     issueQty?: boolean
     unit?: boolean
     avgPerPcs?: boolean
@@ -81345,7 +81990,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type FabricOutwardOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sNo" | "date" | "challanNumber" | "challanId" | "designNumber" | "itemName" | "issueQty" | "unit" | "avgPerPcs" | "issuePcsQty" | "byOrderName" | "remarks" | "destination" | "fabricType" | "createdAt" | "updatedAt", ExtArgs["result"]["fabricOutward"]>
+  export type FabricOutwardOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sNo" | "date" | "challanNumber" | "challanId" | "designNumber" | "itemName" | "color" | "issueQty" | "unit" | "avgPerPcs" | "issuePcsQty" | "byOrderName" | "remarks" | "destination" | "fabricType" | "createdAt" | "updatedAt", ExtArgs["result"]["fabricOutward"]>
 
   export type $FabricOutwardPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "FabricOutward"
@@ -81358,6 +82003,7 @@ export namespace Prisma {
       challanId: string | null
       designNumber: string | null
       itemName: string
+      color: string | null
       issueQty: number
       unit: string
       avgPerPcs: number | null
@@ -81798,6 +82444,7 @@ export namespace Prisma {
     readonly challanId: FieldRef<"FabricOutward", 'String'>
     readonly designNumber: FieldRef<"FabricOutward", 'String'>
     readonly itemName: FieldRef<"FabricOutward", 'String'>
+    readonly color: FieldRef<"FabricOutward", 'String'>
     readonly issueQty: FieldRef<"FabricOutward", 'Float'>
     readonly unit: FieldRef<"FabricOutward", 'String'>
     readonly avgPerPcs: FieldRef<"FabricOutward", 'Float'>
@@ -82175,6 +82822,2376 @@ export namespace Prisma {
 
 
   /**
+   * Model DeadlineAlert
+   */
+
+  export type AggregateDeadlineAlert = {
+    _count: DeadlineAlertCountAggregateOutputType | null
+    _min: DeadlineAlertMinAggregateOutputType | null
+    _max: DeadlineAlertMaxAggregateOutputType | null
+  }
+
+  export type DeadlineAlertMinAggregateOutputType = {
+    id: string | null
+    dedupeKey: string | null
+    departmentCode: string | null
+    taskType: string | null
+    taskId: string | null
+    challanId: string | null
+    programId: string | null
+    assignedUserId: string | null
+    stage: string | null
+    severity: string | null
+    deadlineAt: Date | null
+    deadlineSource: string | null
+    status: string | null
+    resolutionReason: string | null
+    createdAt: Date | null
+    lastEvaluatedAt: Date | null
+    resolvedAt: Date | null
+  }
+
+  export type DeadlineAlertMaxAggregateOutputType = {
+    id: string | null
+    dedupeKey: string | null
+    departmentCode: string | null
+    taskType: string | null
+    taskId: string | null
+    challanId: string | null
+    programId: string | null
+    assignedUserId: string | null
+    stage: string | null
+    severity: string | null
+    deadlineAt: Date | null
+    deadlineSource: string | null
+    status: string | null
+    resolutionReason: string | null
+    createdAt: Date | null
+    lastEvaluatedAt: Date | null
+    resolvedAt: Date | null
+  }
+
+  export type DeadlineAlertCountAggregateOutputType = {
+    id: number
+    dedupeKey: number
+    departmentCode: number
+    taskType: number
+    taskId: number
+    challanId: number
+    programId: number
+    assignedUserId: number
+    stage: number
+    severity: number
+    deadlineAt: number
+    deadlineSource: number
+    status: number
+    resolutionReason: number
+    createdAt: number
+    lastEvaluatedAt: number
+    resolvedAt: number
+    _all: number
+  }
+
+
+  export type DeadlineAlertMinAggregateInputType = {
+    id?: true
+    dedupeKey?: true
+    departmentCode?: true
+    taskType?: true
+    taskId?: true
+    challanId?: true
+    programId?: true
+    assignedUserId?: true
+    stage?: true
+    severity?: true
+    deadlineAt?: true
+    deadlineSource?: true
+    status?: true
+    resolutionReason?: true
+    createdAt?: true
+    lastEvaluatedAt?: true
+    resolvedAt?: true
+  }
+
+  export type DeadlineAlertMaxAggregateInputType = {
+    id?: true
+    dedupeKey?: true
+    departmentCode?: true
+    taskType?: true
+    taskId?: true
+    challanId?: true
+    programId?: true
+    assignedUserId?: true
+    stage?: true
+    severity?: true
+    deadlineAt?: true
+    deadlineSource?: true
+    status?: true
+    resolutionReason?: true
+    createdAt?: true
+    lastEvaluatedAt?: true
+    resolvedAt?: true
+  }
+
+  export type DeadlineAlertCountAggregateInputType = {
+    id?: true
+    dedupeKey?: true
+    departmentCode?: true
+    taskType?: true
+    taskId?: true
+    challanId?: true
+    programId?: true
+    assignedUserId?: true
+    stage?: true
+    severity?: true
+    deadlineAt?: true
+    deadlineSource?: true
+    status?: true
+    resolutionReason?: true
+    createdAt?: true
+    lastEvaluatedAt?: true
+    resolvedAt?: true
+    _all?: true
+  }
+
+  export type DeadlineAlertAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DeadlineAlert to aggregate.
+     */
+    where?: DeadlineAlertWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeadlineAlerts to fetch.
+     */
+    orderBy?: DeadlineAlertOrderByWithRelationInput | DeadlineAlertOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DeadlineAlertWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeadlineAlerts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeadlineAlerts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned DeadlineAlerts
+    **/
+    _count?: true | DeadlineAlertCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DeadlineAlertMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DeadlineAlertMaxAggregateInputType
+  }
+
+  export type GetDeadlineAlertAggregateType<T extends DeadlineAlertAggregateArgs> = {
+        [P in keyof T & keyof AggregateDeadlineAlert]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDeadlineAlert[P]>
+      : GetScalarType<T[P], AggregateDeadlineAlert[P]>
+  }
+
+
+
+
+  export type DeadlineAlertGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DeadlineAlertWhereInput
+    orderBy?: DeadlineAlertOrderByWithAggregationInput | DeadlineAlertOrderByWithAggregationInput[]
+    by: DeadlineAlertScalarFieldEnum[] | DeadlineAlertScalarFieldEnum
+    having?: DeadlineAlertScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DeadlineAlertCountAggregateInputType | true
+    _min?: DeadlineAlertMinAggregateInputType
+    _max?: DeadlineAlertMaxAggregateInputType
+  }
+
+  export type DeadlineAlertGroupByOutputType = {
+    id: string
+    dedupeKey: string
+    departmentCode: string
+    taskType: string
+    taskId: string
+    challanId: string | null
+    programId: string | null
+    assignedUserId: string | null
+    stage: string
+    severity: string
+    deadlineAt: Date
+    deadlineSource: string
+    status: string
+    resolutionReason: string | null
+    createdAt: Date
+    lastEvaluatedAt: Date
+    resolvedAt: Date | null
+    _count: DeadlineAlertCountAggregateOutputType | null
+    _min: DeadlineAlertMinAggregateOutputType | null
+    _max: DeadlineAlertMaxAggregateOutputType | null
+  }
+
+  type GetDeadlineAlertGroupByPayload<T extends DeadlineAlertGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DeadlineAlertGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DeadlineAlertGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DeadlineAlertGroupByOutputType[P]>
+            : GetScalarType<T[P], DeadlineAlertGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DeadlineAlertSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    dedupeKey?: boolean
+    departmentCode?: boolean
+    taskType?: boolean
+    taskId?: boolean
+    challanId?: boolean
+    programId?: boolean
+    assignedUserId?: boolean
+    stage?: boolean
+    severity?: boolean
+    deadlineAt?: boolean
+    deadlineSource?: boolean
+    status?: boolean
+    resolutionReason?: boolean
+    createdAt?: boolean
+    lastEvaluatedAt?: boolean
+    resolvedAt?: boolean
+    challan?: boolean | DeadlineAlert$challanArgs<ExtArgs>
+    program?: boolean | DeadlineAlert$programArgs<ExtArgs>
+    assignedUser?: boolean | DeadlineAlert$assignedUserArgs<ExtArgs>
+    dismissals?: boolean | DeadlineAlert$dismissalsArgs<ExtArgs>
+    _count?: boolean | DeadlineAlertCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["deadlineAlert"]>
+
+  export type DeadlineAlertSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    dedupeKey?: boolean
+    departmentCode?: boolean
+    taskType?: boolean
+    taskId?: boolean
+    challanId?: boolean
+    programId?: boolean
+    assignedUserId?: boolean
+    stage?: boolean
+    severity?: boolean
+    deadlineAt?: boolean
+    deadlineSource?: boolean
+    status?: boolean
+    resolutionReason?: boolean
+    createdAt?: boolean
+    lastEvaluatedAt?: boolean
+    resolvedAt?: boolean
+    challan?: boolean | DeadlineAlert$challanArgs<ExtArgs>
+    program?: boolean | DeadlineAlert$programArgs<ExtArgs>
+    assignedUser?: boolean | DeadlineAlert$assignedUserArgs<ExtArgs>
+  }, ExtArgs["result"]["deadlineAlert"]>
+
+  export type DeadlineAlertSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    dedupeKey?: boolean
+    departmentCode?: boolean
+    taskType?: boolean
+    taskId?: boolean
+    challanId?: boolean
+    programId?: boolean
+    assignedUserId?: boolean
+    stage?: boolean
+    severity?: boolean
+    deadlineAt?: boolean
+    deadlineSource?: boolean
+    status?: boolean
+    resolutionReason?: boolean
+    createdAt?: boolean
+    lastEvaluatedAt?: boolean
+    resolvedAt?: boolean
+    challan?: boolean | DeadlineAlert$challanArgs<ExtArgs>
+    program?: boolean | DeadlineAlert$programArgs<ExtArgs>
+    assignedUser?: boolean | DeadlineAlert$assignedUserArgs<ExtArgs>
+  }, ExtArgs["result"]["deadlineAlert"]>
+
+  export type DeadlineAlertSelectScalar = {
+    id?: boolean
+    dedupeKey?: boolean
+    departmentCode?: boolean
+    taskType?: boolean
+    taskId?: boolean
+    challanId?: boolean
+    programId?: boolean
+    assignedUserId?: boolean
+    stage?: boolean
+    severity?: boolean
+    deadlineAt?: boolean
+    deadlineSource?: boolean
+    status?: boolean
+    resolutionReason?: boolean
+    createdAt?: boolean
+    lastEvaluatedAt?: boolean
+    resolvedAt?: boolean
+  }
+
+  export type DeadlineAlertOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "dedupeKey" | "departmentCode" | "taskType" | "taskId" | "challanId" | "programId" | "assignedUserId" | "stage" | "severity" | "deadlineAt" | "deadlineSource" | "status" | "resolutionReason" | "createdAt" | "lastEvaluatedAt" | "resolvedAt", ExtArgs["result"]["deadlineAlert"]>
+  export type DeadlineAlertInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    challan?: boolean | DeadlineAlert$challanArgs<ExtArgs>
+    program?: boolean | DeadlineAlert$programArgs<ExtArgs>
+    assignedUser?: boolean | DeadlineAlert$assignedUserArgs<ExtArgs>
+    dismissals?: boolean | DeadlineAlert$dismissalsArgs<ExtArgs>
+    _count?: boolean | DeadlineAlertCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type DeadlineAlertIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    challan?: boolean | DeadlineAlert$challanArgs<ExtArgs>
+    program?: boolean | DeadlineAlert$programArgs<ExtArgs>
+    assignedUser?: boolean | DeadlineAlert$assignedUserArgs<ExtArgs>
+  }
+  export type DeadlineAlertIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    challan?: boolean | DeadlineAlert$challanArgs<ExtArgs>
+    program?: boolean | DeadlineAlert$programArgs<ExtArgs>
+    assignedUser?: boolean | DeadlineAlert$assignedUserArgs<ExtArgs>
+  }
+
+  export type $DeadlineAlertPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "DeadlineAlert"
+    objects: {
+      challan: Prisma.$ChallanPayload<ExtArgs> | null
+      program: Prisma.$ProgramPayload<ExtArgs> | null
+      assignedUser: Prisma.$UserPayload<ExtArgs> | null
+      dismissals: Prisma.$DeadlineAlertDismissalPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      dedupeKey: string
+      departmentCode: string
+      taskType: string
+      taskId: string
+      challanId: string | null
+      programId: string | null
+      assignedUserId: string | null
+      stage: string
+      severity: string
+      deadlineAt: Date
+      deadlineSource: string
+      status: string
+      resolutionReason: string | null
+      createdAt: Date
+      lastEvaluatedAt: Date
+      resolvedAt: Date | null
+    }, ExtArgs["result"]["deadlineAlert"]>
+    composites: {}
+  }
+
+  type DeadlineAlertGetPayload<S extends boolean | null | undefined | DeadlineAlertDefaultArgs> = $Result.GetResult<Prisma.$DeadlineAlertPayload, S>
+
+  type DeadlineAlertCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<DeadlineAlertFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: DeadlineAlertCountAggregateInputType | true
+    }
+
+  export interface DeadlineAlertDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DeadlineAlert'], meta: { name: 'DeadlineAlert' } }
+    /**
+     * Find zero or one DeadlineAlert that matches the filter.
+     * @param {DeadlineAlertFindUniqueArgs} args - Arguments to find a DeadlineAlert
+     * @example
+     * // Get one DeadlineAlert
+     * const deadlineAlert = await prisma.deadlineAlert.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DeadlineAlertFindUniqueArgs>(args: SelectSubset<T, DeadlineAlertFindUniqueArgs<ExtArgs>>): Prisma__DeadlineAlertClient<$Result.GetResult<Prisma.$DeadlineAlertPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one DeadlineAlert that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {DeadlineAlertFindUniqueOrThrowArgs} args - Arguments to find a DeadlineAlert
+     * @example
+     * // Get one DeadlineAlert
+     * const deadlineAlert = await prisma.deadlineAlert.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DeadlineAlertFindUniqueOrThrowArgs>(args: SelectSubset<T, DeadlineAlertFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DeadlineAlertClient<$Result.GetResult<Prisma.$DeadlineAlertPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DeadlineAlert that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeadlineAlertFindFirstArgs} args - Arguments to find a DeadlineAlert
+     * @example
+     * // Get one DeadlineAlert
+     * const deadlineAlert = await prisma.deadlineAlert.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DeadlineAlertFindFirstArgs>(args?: SelectSubset<T, DeadlineAlertFindFirstArgs<ExtArgs>>): Prisma__DeadlineAlertClient<$Result.GetResult<Prisma.$DeadlineAlertPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DeadlineAlert that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeadlineAlertFindFirstOrThrowArgs} args - Arguments to find a DeadlineAlert
+     * @example
+     * // Get one DeadlineAlert
+     * const deadlineAlert = await prisma.deadlineAlert.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DeadlineAlertFindFirstOrThrowArgs>(args?: SelectSubset<T, DeadlineAlertFindFirstOrThrowArgs<ExtArgs>>): Prisma__DeadlineAlertClient<$Result.GetResult<Prisma.$DeadlineAlertPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more DeadlineAlerts that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeadlineAlertFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all DeadlineAlerts
+     * const deadlineAlerts = await prisma.deadlineAlert.findMany()
+     * 
+     * // Get first 10 DeadlineAlerts
+     * const deadlineAlerts = await prisma.deadlineAlert.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const deadlineAlertWithIdOnly = await prisma.deadlineAlert.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DeadlineAlertFindManyArgs>(args?: SelectSubset<T, DeadlineAlertFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeadlineAlertPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a DeadlineAlert.
+     * @param {DeadlineAlertCreateArgs} args - Arguments to create a DeadlineAlert.
+     * @example
+     * // Create one DeadlineAlert
+     * const DeadlineAlert = await prisma.deadlineAlert.create({
+     *   data: {
+     *     // ... data to create a DeadlineAlert
+     *   }
+     * })
+     * 
+     */
+    create<T extends DeadlineAlertCreateArgs>(args: SelectSubset<T, DeadlineAlertCreateArgs<ExtArgs>>): Prisma__DeadlineAlertClient<$Result.GetResult<Prisma.$DeadlineAlertPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many DeadlineAlerts.
+     * @param {DeadlineAlertCreateManyArgs} args - Arguments to create many DeadlineAlerts.
+     * @example
+     * // Create many DeadlineAlerts
+     * const deadlineAlert = await prisma.deadlineAlert.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DeadlineAlertCreateManyArgs>(args?: SelectSubset<T, DeadlineAlertCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many DeadlineAlerts and returns the data saved in the database.
+     * @param {DeadlineAlertCreateManyAndReturnArgs} args - Arguments to create many DeadlineAlerts.
+     * @example
+     * // Create many DeadlineAlerts
+     * const deadlineAlert = await prisma.deadlineAlert.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many DeadlineAlerts and only return the `id`
+     * const deadlineAlertWithIdOnly = await prisma.deadlineAlert.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DeadlineAlertCreateManyAndReturnArgs>(args?: SelectSubset<T, DeadlineAlertCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeadlineAlertPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a DeadlineAlert.
+     * @param {DeadlineAlertDeleteArgs} args - Arguments to delete one DeadlineAlert.
+     * @example
+     * // Delete one DeadlineAlert
+     * const DeadlineAlert = await prisma.deadlineAlert.delete({
+     *   where: {
+     *     // ... filter to delete one DeadlineAlert
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DeadlineAlertDeleteArgs>(args: SelectSubset<T, DeadlineAlertDeleteArgs<ExtArgs>>): Prisma__DeadlineAlertClient<$Result.GetResult<Prisma.$DeadlineAlertPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one DeadlineAlert.
+     * @param {DeadlineAlertUpdateArgs} args - Arguments to update one DeadlineAlert.
+     * @example
+     * // Update one DeadlineAlert
+     * const deadlineAlert = await prisma.deadlineAlert.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DeadlineAlertUpdateArgs>(args: SelectSubset<T, DeadlineAlertUpdateArgs<ExtArgs>>): Prisma__DeadlineAlertClient<$Result.GetResult<Prisma.$DeadlineAlertPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more DeadlineAlerts.
+     * @param {DeadlineAlertDeleteManyArgs} args - Arguments to filter DeadlineAlerts to delete.
+     * @example
+     * // Delete a few DeadlineAlerts
+     * const { count } = await prisma.deadlineAlert.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DeadlineAlertDeleteManyArgs>(args?: SelectSubset<T, DeadlineAlertDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DeadlineAlerts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeadlineAlertUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many DeadlineAlerts
+     * const deadlineAlert = await prisma.deadlineAlert.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DeadlineAlertUpdateManyArgs>(args: SelectSubset<T, DeadlineAlertUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DeadlineAlerts and returns the data updated in the database.
+     * @param {DeadlineAlertUpdateManyAndReturnArgs} args - Arguments to update many DeadlineAlerts.
+     * @example
+     * // Update many DeadlineAlerts
+     * const deadlineAlert = await prisma.deadlineAlert.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more DeadlineAlerts and only return the `id`
+     * const deadlineAlertWithIdOnly = await prisma.deadlineAlert.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends DeadlineAlertUpdateManyAndReturnArgs>(args: SelectSubset<T, DeadlineAlertUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeadlineAlertPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one DeadlineAlert.
+     * @param {DeadlineAlertUpsertArgs} args - Arguments to update or create a DeadlineAlert.
+     * @example
+     * // Update or create a DeadlineAlert
+     * const deadlineAlert = await prisma.deadlineAlert.upsert({
+     *   create: {
+     *     // ... data to create a DeadlineAlert
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the DeadlineAlert we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DeadlineAlertUpsertArgs>(args: SelectSubset<T, DeadlineAlertUpsertArgs<ExtArgs>>): Prisma__DeadlineAlertClient<$Result.GetResult<Prisma.$DeadlineAlertPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of DeadlineAlerts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeadlineAlertCountArgs} args - Arguments to filter DeadlineAlerts to count.
+     * @example
+     * // Count the number of DeadlineAlerts
+     * const count = await prisma.deadlineAlert.count({
+     *   where: {
+     *     // ... the filter for the DeadlineAlerts we want to count
+     *   }
+     * })
+    **/
+    count<T extends DeadlineAlertCountArgs>(
+      args?: Subset<T, DeadlineAlertCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DeadlineAlertCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a DeadlineAlert.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeadlineAlertAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DeadlineAlertAggregateArgs>(args: Subset<T, DeadlineAlertAggregateArgs>): Prisma.PrismaPromise<GetDeadlineAlertAggregateType<T>>
+
+    /**
+     * Group by DeadlineAlert.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeadlineAlertGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DeadlineAlertGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DeadlineAlertGroupByArgs['orderBy'] }
+        : { orderBy?: DeadlineAlertGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DeadlineAlertGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDeadlineAlertGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the DeadlineAlert model
+   */
+  readonly fields: DeadlineAlertFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for DeadlineAlert.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DeadlineAlertClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    challan<T extends DeadlineAlert$challanArgs<ExtArgs> = {}>(args?: Subset<T, DeadlineAlert$challanArgs<ExtArgs>>): Prisma__ChallanClient<$Result.GetResult<Prisma.$ChallanPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    program<T extends DeadlineAlert$programArgs<ExtArgs> = {}>(args?: Subset<T, DeadlineAlert$programArgs<ExtArgs>>): Prisma__ProgramClient<$Result.GetResult<Prisma.$ProgramPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    assignedUser<T extends DeadlineAlert$assignedUserArgs<ExtArgs> = {}>(args?: Subset<T, DeadlineAlert$assignedUserArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    dismissals<T extends DeadlineAlert$dismissalsArgs<ExtArgs> = {}>(args?: Subset<T, DeadlineAlert$dismissalsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeadlineAlertDismissalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the DeadlineAlert model
+   */
+  interface DeadlineAlertFieldRefs {
+    readonly id: FieldRef<"DeadlineAlert", 'String'>
+    readonly dedupeKey: FieldRef<"DeadlineAlert", 'String'>
+    readonly departmentCode: FieldRef<"DeadlineAlert", 'String'>
+    readonly taskType: FieldRef<"DeadlineAlert", 'String'>
+    readonly taskId: FieldRef<"DeadlineAlert", 'String'>
+    readonly challanId: FieldRef<"DeadlineAlert", 'String'>
+    readonly programId: FieldRef<"DeadlineAlert", 'String'>
+    readonly assignedUserId: FieldRef<"DeadlineAlert", 'String'>
+    readonly stage: FieldRef<"DeadlineAlert", 'String'>
+    readonly severity: FieldRef<"DeadlineAlert", 'String'>
+    readonly deadlineAt: FieldRef<"DeadlineAlert", 'DateTime'>
+    readonly deadlineSource: FieldRef<"DeadlineAlert", 'String'>
+    readonly status: FieldRef<"DeadlineAlert", 'String'>
+    readonly resolutionReason: FieldRef<"DeadlineAlert", 'String'>
+    readonly createdAt: FieldRef<"DeadlineAlert", 'DateTime'>
+    readonly lastEvaluatedAt: FieldRef<"DeadlineAlert", 'DateTime'>
+    readonly resolvedAt: FieldRef<"DeadlineAlert", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * DeadlineAlert findUnique
+   */
+  export type DeadlineAlertFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlert
+     */
+    select?: DeadlineAlertSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlert
+     */
+    omit?: DeadlineAlertOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertInclude<ExtArgs> | null
+    /**
+     * Filter, which DeadlineAlert to fetch.
+     */
+    where: DeadlineAlertWhereUniqueInput
+  }
+
+  /**
+   * DeadlineAlert findUniqueOrThrow
+   */
+  export type DeadlineAlertFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlert
+     */
+    select?: DeadlineAlertSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlert
+     */
+    omit?: DeadlineAlertOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertInclude<ExtArgs> | null
+    /**
+     * Filter, which DeadlineAlert to fetch.
+     */
+    where: DeadlineAlertWhereUniqueInput
+  }
+
+  /**
+   * DeadlineAlert findFirst
+   */
+  export type DeadlineAlertFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlert
+     */
+    select?: DeadlineAlertSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlert
+     */
+    omit?: DeadlineAlertOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertInclude<ExtArgs> | null
+    /**
+     * Filter, which DeadlineAlert to fetch.
+     */
+    where?: DeadlineAlertWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeadlineAlerts to fetch.
+     */
+    orderBy?: DeadlineAlertOrderByWithRelationInput | DeadlineAlertOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DeadlineAlerts.
+     */
+    cursor?: DeadlineAlertWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeadlineAlerts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeadlineAlerts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DeadlineAlerts.
+     */
+    distinct?: DeadlineAlertScalarFieldEnum | DeadlineAlertScalarFieldEnum[]
+  }
+
+  /**
+   * DeadlineAlert findFirstOrThrow
+   */
+  export type DeadlineAlertFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlert
+     */
+    select?: DeadlineAlertSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlert
+     */
+    omit?: DeadlineAlertOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertInclude<ExtArgs> | null
+    /**
+     * Filter, which DeadlineAlert to fetch.
+     */
+    where?: DeadlineAlertWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeadlineAlerts to fetch.
+     */
+    orderBy?: DeadlineAlertOrderByWithRelationInput | DeadlineAlertOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DeadlineAlerts.
+     */
+    cursor?: DeadlineAlertWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeadlineAlerts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeadlineAlerts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DeadlineAlerts.
+     */
+    distinct?: DeadlineAlertScalarFieldEnum | DeadlineAlertScalarFieldEnum[]
+  }
+
+  /**
+   * DeadlineAlert findMany
+   */
+  export type DeadlineAlertFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlert
+     */
+    select?: DeadlineAlertSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlert
+     */
+    omit?: DeadlineAlertOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertInclude<ExtArgs> | null
+    /**
+     * Filter, which DeadlineAlerts to fetch.
+     */
+    where?: DeadlineAlertWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeadlineAlerts to fetch.
+     */
+    orderBy?: DeadlineAlertOrderByWithRelationInput | DeadlineAlertOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing DeadlineAlerts.
+     */
+    cursor?: DeadlineAlertWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeadlineAlerts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeadlineAlerts.
+     */
+    skip?: number
+    distinct?: DeadlineAlertScalarFieldEnum | DeadlineAlertScalarFieldEnum[]
+  }
+
+  /**
+   * DeadlineAlert create
+   */
+  export type DeadlineAlertCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlert
+     */
+    select?: DeadlineAlertSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlert
+     */
+    omit?: DeadlineAlertOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertInclude<ExtArgs> | null
+    /**
+     * The data needed to create a DeadlineAlert.
+     */
+    data: XOR<DeadlineAlertCreateInput, DeadlineAlertUncheckedCreateInput>
+  }
+
+  /**
+   * DeadlineAlert createMany
+   */
+  export type DeadlineAlertCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many DeadlineAlerts.
+     */
+    data: DeadlineAlertCreateManyInput | DeadlineAlertCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DeadlineAlert createManyAndReturn
+   */
+  export type DeadlineAlertCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlert
+     */
+    select?: DeadlineAlertSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlert
+     */
+    omit?: DeadlineAlertOmit<ExtArgs> | null
+    /**
+     * The data used to create many DeadlineAlerts.
+     */
+    data: DeadlineAlertCreateManyInput | DeadlineAlertCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DeadlineAlert update
+   */
+  export type DeadlineAlertUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlert
+     */
+    select?: DeadlineAlertSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlert
+     */
+    omit?: DeadlineAlertOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertInclude<ExtArgs> | null
+    /**
+     * The data needed to update a DeadlineAlert.
+     */
+    data: XOR<DeadlineAlertUpdateInput, DeadlineAlertUncheckedUpdateInput>
+    /**
+     * Choose, which DeadlineAlert to update.
+     */
+    where: DeadlineAlertWhereUniqueInput
+  }
+
+  /**
+   * DeadlineAlert updateMany
+   */
+  export type DeadlineAlertUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update DeadlineAlerts.
+     */
+    data: XOR<DeadlineAlertUpdateManyMutationInput, DeadlineAlertUncheckedUpdateManyInput>
+    /**
+     * Filter which DeadlineAlerts to update
+     */
+    where?: DeadlineAlertWhereInput
+    /**
+     * Limit how many DeadlineAlerts to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * DeadlineAlert updateManyAndReturn
+   */
+  export type DeadlineAlertUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlert
+     */
+    select?: DeadlineAlertSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlert
+     */
+    omit?: DeadlineAlertOmit<ExtArgs> | null
+    /**
+     * The data used to update DeadlineAlerts.
+     */
+    data: XOR<DeadlineAlertUpdateManyMutationInput, DeadlineAlertUncheckedUpdateManyInput>
+    /**
+     * Filter which DeadlineAlerts to update
+     */
+    where?: DeadlineAlertWhereInput
+    /**
+     * Limit how many DeadlineAlerts to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DeadlineAlert upsert
+   */
+  export type DeadlineAlertUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlert
+     */
+    select?: DeadlineAlertSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlert
+     */
+    omit?: DeadlineAlertOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertInclude<ExtArgs> | null
+    /**
+     * The filter to search for the DeadlineAlert to update in case it exists.
+     */
+    where: DeadlineAlertWhereUniqueInput
+    /**
+     * In case the DeadlineAlert found by the `where` argument doesn't exist, create a new DeadlineAlert with this data.
+     */
+    create: XOR<DeadlineAlertCreateInput, DeadlineAlertUncheckedCreateInput>
+    /**
+     * In case the DeadlineAlert was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DeadlineAlertUpdateInput, DeadlineAlertUncheckedUpdateInput>
+  }
+
+  /**
+   * DeadlineAlert delete
+   */
+  export type DeadlineAlertDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlert
+     */
+    select?: DeadlineAlertSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlert
+     */
+    omit?: DeadlineAlertOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertInclude<ExtArgs> | null
+    /**
+     * Filter which DeadlineAlert to delete.
+     */
+    where: DeadlineAlertWhereUniqueInput
+  }
+
+  /**
+   * DeadlineAlert deleteMany
+   */
+  export type DeadlineAlertDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DeadlineAlerts to delete
+     */
+    where?: DeadlineAlertWhereInput
+    /**
+     * Limit how many DeadlineAlerts to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * DeadlineAlert.challan
+   */
+  export type DeadlineAlert$challanArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Challan
+     */
+    select?: ChallanSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Challan
+     */
+    omit?: ChallanOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChallanInclude<ExtArgs> | null
+    where?: ChallanWhereInput
+  }
+
+  /**
+   * DeadlineAlert.program
+   */
+  export type DeadlineAlert$programArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Program
+     */
+    select?: ProgramSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Program
+     */
+    omit?: ProgramOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProgramInclude<ExtArgs> | null
+    where?: ProgramWhereInput
+  }
+
+  /**
+   * DeadlineAlert.assignedUser
+   */
+  export type DeadlineAlert$assignedUserArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * DeadlineAlert.dismissals
+   */
+  export type DeadlineAlert$dismissalsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlertDismissal
+     */
+    select?: DeadlineAlertDismissalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlertDismissal
+     */
+    omit?: DeadlineAlertDismissalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertDismissalInclude<ExtArgs> | null
+    where?: DeadlineAlertDismissalWhereInput
+    orderBy?: DeadlineAlertDismissalOrderByWithRelationInput | DeadlineAlertDismissalOrderByWithRelationInput[]
+    cursor?: DeadlineAlertDismissalWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DeadlineAlertDismissalScalarFieldEnum | DeadlineAlertDismissalScalarFieldEnum[]
+  }
+
+  /**
+   * DeadlineAlert without action
+   */
+  export type DeadlineAlertDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlert
+     */
+    select?: DeadlineAlertSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlert
+     */
+    omit?: DeadlineAlertOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model DeadlineAlertDismissal
+   */
+
+  export type AggregateDeadlineAlertDismissal = {
+    _count: DeadlineAlertDismissalCountAggregateOutputType | null
+    _min: DeadlineAlertDismissalMinAggregateOutputType | null
+    _max: DeadlineAlertDismissalMaxAggregateOutputType | null
+  }
+
+  export type DeadlineAlertDismissalMinAggregateOutputType = {
+    id: string | null
+    alertId: string | null
+    userId: string | null
+    dismissedAt: Date | null
+  }
+
+  export type DeadlineAlertDismissalMaxAggregateOutputType = {
+    id: string | null
+    alertId: string | null
+    userId: string | null
+    dismissedAt: Date | null
+  }
+
+  export type DeadlineAlertDismissalCountAggregateOutputType = {
+    id: number
+    alertId: number
+    userId: number
+    dismissedAt: number
+    _all: number
+  }
+
+
+  export type DeadlineAlertDismissalMinAggregateInputType = {
+    id?: true
+    alertId?: true
+    userId?: true
+    dismissedAt?: true
+  }
+
+  export type DeadlineAlertDismissalMaxAggregateInputType = {
+    id?: true
+    alertId?: true
+    userId?: true
+    dismissedAt?: true
+  }
+
+  export type DeadlineAlertDismissalCountAggregateInputType = {
+    id?: true
+    alertId?: true
+    userId?: true
+    dismissedAt?: true
+    _all?: true
+  }
+
+  export type DeadlineAlertDismissalAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DeadlineAlertDismissal to aggregate.
+     */
+    where?: DeadlineAlertDismissalWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeadlineAlertDismissals to fetch.
+     */
+    orderBy?: DeadlineAlertDismissalOrderByWithRelationInput | DeadlineAlertDismissalOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DeadlineAlertDismissalWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeadlineAlertDismissals from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeadlineAlertDismissals.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned DeadlineAlertDismissals
+    **/
+    _count?: true | DeadlineAlertDismissalCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DeadlineAlertDismissalMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DeadlineAlertDismissalMaxAggregateInputType
+  }
+
+  export type GetDeadlineAlertDismissalAggregateType<T extends DeadlineAlertDismissalAggregateArgs> = {
+        [P in keyof T & keyof AggregateDeadlineAlertDismissal]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDeadlineAlertDismissal[P]>
+      : GetScalarType<T[P], AggregateDeadlineAlertDismissal[P]>
+  }
+
+
+
+
+  export type DeadlineAlertDismissalGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DeadlineAlertDismissalWhereInput
+    orderBy?: DeadlineAlertDismissalOrderByWithAggregationInput | DeadlineAlertDismissalOrderByWithAggregationInput[]
+    by: DeadlineAlertDismissalScalarFieldEnum[] | DeadlineAlertDismissalScalarFieldEnum
+    having?: DeadlineAlertDismissalScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DeadlineAlertDismissalCountAggregateInputType | true
+    _min?: DeadlineAlertDismissalMinAggregateInputType
+    _max?: DeadlineAlertDismissalMaxAggregateInputType
+  }
+
+  export type DeadlineAlertDismissalGroupByOutputType = {
+    id: string
+    alertId: string
+    userId: string
+    dismissedAt: Date
+    _count: DeadlineAlertDismissalCountAggregateOutputType | null
+    _min: DeadlineAlertDismissalMinAggregateOutputType | null
+    _max: DeadlineAlertDismissalMaxAggregateOutputType | null
+  }
+
+  type GetDeadlineAlertDismissalGroupByPayload<T extends DeadlineAlertDismissalGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DeadlineAlertDismissalGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DeadlineAlertDismissalGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DeadlineAlertDismissalGroupByOutputType[P]>
+            : GetScalarType<T[P], DeadlineAlertDismissalGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DeadlineAlertDismissalSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    alertId?: boolean
+    userId?: boolean
+    dismissedAt?: boolean
+    alert?: boolean | DeadlineAlertDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["deadlineAlertDismissal"]>
+
+  export type DeadlineAlertDismissalSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    alertId?: boolean
+    userId?: boolean
+    dismissedAt?: boolean
+    alert?: boolean | DeadlineAlertDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["deadlineAlertDismissal"]>
+
+  export type DeadlineAlertDismissalSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    alertId?: boolean
+    userId?: boolean
+    dismissedAt?: boolean
+    alert?: boolean | DeadlineAlertDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["deadlineAlertDismissal"]>
+
+  export type DeadlineAlertDismissalSelectScalar = {
+    id?: boolean
+    alertId?: boolean
+    userId?: boolean
+    dismissedAt?: boolean
+  }
+
+  export type DeadlineAlertDismissalOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "alertId" | "userId" | "dismissedAt", ExtArgs["result"]["deadlineAlertDismissal"]>
+  export type DeadlineAlertDismissalInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    alert?: boolean | DeadlineAlertDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type DeadlineAlertDismissalIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    alert?: boolean | DeadlineAlertDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type DeadlineAlertDismissalIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    alert?: boolean | DeadlineAlertDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $DeadlineAlertDismissalPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "DeadlineAlertDismissal"
+    objects: {
+      alert: Prisma.$DeadlineAlertPayload<ExtArgs>
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      alertId: string
+      userId: string
+      dismissedAt: Date
+    }, ExtArgs["result"]["deadlineAlertDismissal"]>
+    composites: {}
+  }
+
+  type DeadlineAlertDismissalGetPayload<S extends boolean | null | undefined | DeadlineAlertDismissalDefaultArgs> = $Result.GetResult<Prisma.$DeadlineAlertDismissalPayload, S>
+
+  type DeadlineAlertDismissalCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<DeadlineAlertDismissalFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: DeadlineAlertDismissalCountAggregateInputType | true
+    }
+
+  export interface DeadlineAlertDismissalDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DeadlineAlertDismissal'], meta: { name: 'DeadlineAlertDismissal' } }
+    /**
+     * Find zero or one DeadlineAlertDismissal that matches the filter.
+     * @param {DeadlineAlertDismissalFindUniqueArgs} args - Arguments to find a DeadlineAlertDismissal
+     * @example
+     * // Get one DeadlineAlertDismissal
+     * const deadlineAlertDismissal = await prisma.deadlineAlertDismissal.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DeadlineAlertDismissalFindUniqueArgs>(args: SelectSubset<T, DeadlineAlertDismissalFindUniqueArgs<ExtArgs>>): Prisma__DeadlineAlertDismissalClient<$Result.GetResult<Prisma.$DeadlineAlertDismissalPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one DeadlineAlertDismissal that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {DeadlineAlertDismissalFindUniqueOrThrowArgs} args - Arguments to find a DeadlineAlertDismissal
+     * @example
+     * // Get one DeadlineAlertDismissal
+     * const deadlineAlertDismissal = await prisma.deadlineAlertDismissal.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DeadlineAlertDismissalFindUniqueOrThrowArgs>(args: SelectSubset<T, DeadlineAlertDismissalFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DeadlineAlertDismissalClient<$Result.GetResult<Prisma.$DeadlineAlertDismissalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DeadlineAlertDismissal that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeadlineAlertDismissalFindFirstArgs} args - Arguments to find a DeadlineAlertDismissal
+     * @example
+     * // Get one DeadlineAlertDismissal
+     * const deadlineAlertDismissal = await prisma.deadlineAlertDismissal.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DeadlineAlertDismissalFindFirstArgs>(args?: SelectSubset<T, DeadlineAlertDismissalFindFirstArgs<ExtArgs>>): Prisma__DeadlineAlertDismissalClient<$Result.GetResult<Prisma.$DeadlineAlertDismissalPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DeadlineAlertDismissal that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeadlineAlertDismissalFindFirstOrThrowArgs} args - Arguments to find a DeadlineAlertDismissal
+     * @example
+     * // Get one DeadlineAlertDismissal
+     * const deadlineAlertDismissal = await prisma.deadlineAlertDismissal.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DeadlineAlertDismissalFindFirstOrThrowArgs>(args?: SelectSubset<T, DeadlineAlertDismissalFindFirstOrThrowArgs<ExtArgs>>): Prisma__DeadlineAlertDismissalClient<$Result.GetResult<Prisma.$DeadlineAlertDismissalPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more DeadlineAlertDismissals that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeadlineAlertDismissalFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all DeadlineAlertDismissals
+     * const deadlineAlertDismissals = await prisma.deadlineAlertDismissal.findMany()
+     * 
+     * // Get first 10 DeadlineAlertDismissals
+     * const deadlineAlertDismissals = await prisma.deadlineAlertDismissal.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const deadlineAlertDismissalWithIdOnly = await prisma.deadlineAlertDismissal.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DeadlineAlertDismissalFindManyArgs>(args?: SelectSubset<T, DeadlineAlertDismissalFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeadlineAlertDismissalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a DeadlineAlertDismissal.
+     * @param {DeadlineAlertDismissalCreateArgs} args - Arguments to create a DeadlineAlertDismissal.
+     * @example
+     * // Create one DeadlineAlertDismissal
+     * const DeadlineAlertDismissal = await prisma.deadlineAlertDismissal.create({
+     *   data: {
+     *     // ... data to create a DeadlineAlertDismissal
+     *   }
+     * })
+     * 
+     */
+    create<T extends DeadlineAlertDismissalCreateArgs>(args: SelectSubset<T, DeadlineAlertDismissalCreateArgs<ExtArgs>>): Prisma__DeadlineAlertDismissalClient<$Result.GetResult<Prisma.$DeadlineAlertDismissalPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many DeadlineAlertDismissals.
+     * @param {DeadlineAlertDismissalCreateManyArgs} args - Arguments to create many DeadlineAlertDismissals.
+     * @example
+     * // Create many DeadlineAlertDismissals
+     * const deadlineAlertDismissal = await prisma.deadlineAlertDismissal.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DeadlineAlertDismissalCreateManyArgs>(args?: SelectSubset<T, DeadlineAlertDismissalCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many DeadlineAlertDismissals and returns the data saved in the database.
+     * @param {DeadlineAlertDismissalCreateManyAndReturnArgs} args - Arguments to create many DeadlineAlertDismissals.
+     * @example
+     * // Create many DeadlineAlertDismissals
+     * const deadlineAlertDismissal = await prisma.deadlineAlertDismissal.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many DeadlineAlertDismissals and only return the `id`
+     * const deadlineAlertDismissalWithIdOnly = await prisma.deadlineAlertDismissal.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DeadlineAlertDismissalCreateManyAndReturnArgs>(args?: SelectSubset<T, DeadlineAlertDismissalCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeadlineAlertDismissalPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a DeadlineAlertDismissal.
+     * @param {DeadlineAlertDismissalDeleteArgs} args - Arguments to delete one DeadlineAlertDismissal.
+     * @example
+     * // Delete one DeadlineAlertDismissal
+     * const DeadlineAlertDismissal = await prisma.deadlineAlertDismissal.delete({
+     *   where: {
+     *     // ... filter to delete one DeadlineAlertDismissal
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DeadlineAlertDismissalDeleteArgs>(args: SelectSubset<T, DeadlineAlertDismissalDeleteArgs<ExtArgs>>): Prisma__DeadlineAlertDismissalClient<$Result.GetResult<Prisma.$DeadlineAlertDismissalPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one DeadlineAlertDismissal.
+     * @param {DeadlineAlertDismissalUpdateArgs} args - Arguments to update one DeadlineAlertDismissal.
+     * @example
+     * // Update one DeadlineAlertDismissal
+     * const deadlineAlertDismissal = await prisma.deadlineAlertDismissal.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DeadlineAlertDismissalUpdateArgs>(args: SelectSubset<T, DeadlineAlertDismissalUpdateArgs<ExtArgs>>): Prisma__DeadlineAlertDismissalClient<$Result.GetResult<Prisma.$DeadlineAlertDismissalPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more DeadlineAlertDismissals.
+     * @param {DeadlineAlertDismissalDeleteManyArgs} args - Arguments to filter DeadlineAlertDismissals to delete.
+     * @example
+     * // Delete a few DeadlineAlertDismissals
+     * const { count } = await prisma.deadlineAlertDismissal.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DeadlineAlertDismissalDeleteManyArgs>(args?: SelectSubset<T, DeadlineAlertDismissalDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DeadlineAlertDismissals.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeadlineAlertDismissalUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many DeadlineAlertDismissals
+     * const deadlineAlertDismissal = await prisma.deadlineAlertDismissal.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DeadlineAlertDismissalUpdateManyArgs>(args: SelectSubset<T, DeadlineAlertDismissalUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DeadlineAlertDismissals and returns the data updated in the database.
+     * @param {DeadlineAlertDismissalUpdateManyAndReturnArgs} args - Arguments to update many DeadlineAlertDismissals.
+     * @example
+     * // Update many DeadlineAlertDismissals
+     * const deadlineAlertDismissal = await prisma.deadlineAlertDismissal.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more DeadlineAlertDismissals and only return the `id`
+     * const deadlineAlertDismissalWithIdOnly = await prisma.deadlineAlertDismissal.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends DeadlineAlertDismissalUpdateManyAndReturnArgs>(args: SelectSubset<T, DeadlineAlertDismissalUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeadlineAlertDismissalPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one DeadlineAlertDismissal.
+     * @param {DeadlineAlertDismissalUpsertArgs} args - Arguments to update or create a DeadlineAlertDismissal.
+     * @example
+     * // Update or create a DeadlineAlertDismissal
+     * const deadlineAlertDismissal = await prisma.deadlineAlertDismissal.upsert({
+     *   create: {
+     *     // ... data to create a DeadlineAlertDismissal
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the DeadlineAlertDismissal we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DeadlineAlertDismissalUpsertArgs>(args: SelectSubset<T, DeadlineAlertDismissalUpsertArgs<ExtArgs>>): Prisma__DeadlineAlertDismissalClient<$Result.GetResult<Prisma.$DeadlineAlertDismissalPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of DeadlineAlertDismissals.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeadlineAlertDismissalCountArgs} args - Arguments to filter DeadlineAlertDismissals to count.
+     * @example
+     * // Count the number of DeadlineAlertDismissals
+     * const count = await prisma.deadlineAlertDismissal.count({
+     *   where: {
+     *     // ... the filter for the DeadlineAlertDismissals we want to count
+     *   }
+     * })
+    **/
+    count<T extends DeadlineAlertDismissalCountArgs>(
+      args?: Subset<T, DeadlineAlertDismissalCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DeadlineAlertDismissalCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a DeadlineAlertDismissal.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeadlineAlertDismissalAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DeadlineAlertDismissalAggregateArgs>(args: Subset<T, DeadlineAlertDismissalAggregateArgs>): Prisma.PrismaPromise<GetDeadlineAlertDismissalAggregateType<T>>
+
+    /**
+     * Group by DeadlineAlertDismissal.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DeadlineAlertDismissalGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DeadlineAlertDismissalGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DeadlineAlertDismissalGroupByArgs['orderBy'] }
+        : { orderBy?: DeadlineAlertDismissalGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DeadlineAlertDismissalGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDeadlineAlertDismissalGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the DeadlineAlertDismissal model
+   */
+  readonly fields: DeadlineAlertDismissalFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for DeadlineAlertDismissal.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DeadlineAlertDismissalClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    alert<T extends DeadlineAlertDefaultArgs<ExtArgs> = {}>(args?: Subset<T, DeadlineAlertDefaultArgs<ExtArgs>>): Prisma__DeadlineAlertClient<$Result.GetResult<Prisma.$DeadlineAlertPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the DeadlineAlertDismissal model
+   */
+  interface DeadlineAlertDismissalFieldRefs {
+    readonly id: FieldRef<"DeadlineAlertDismissal", 'String'>
+    readonly alertId: FieldRef<"DeadlineAlertDismissal", 'String'>
+    readonly userId: FieldRef<"DeadlineAlertDismissal", 'String'>
+    readonly dismissedAt: FieldRef<"DeadlineAlertDismissal", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * DeadlineAlertDismissal findUnique
+   */
+  export type DeadlineAlertDismissalFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlertDismissal
+     */
+    select?: DeadlineAlertDismissalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlertDismissal
+     */
+    omit?: DeadlineAlertDismissalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertDismissalInclude<ExtArgs> | null
+    /**
+     * Filter, which DeadlineAlertDismissal to fetch.
+     */
+    where: DeadlineAlertDismissalWhereUniqueInput
+  }
+
+  /**
+   * DeadlineAlertDismissal findUniqueOrThrow
+   */
+  export type DeadlineAlertDismissalFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlertDismissal
+     */
+    select?: DeadlineAlertDismissalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlertDismissal
+     */
+    omit?: DeadlineAlertDismissalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertDismissalInclude<ExtArgs> | null
+    /**
+     * Filter, which DeadlineAlertDismissal to fetch.
+     */
+    where: DeadlineAlertDismissalWhereUniqueInput
+  }
+
+  /**
+   * DeadlineAlertDismissal findFirst
+   */
+  export type DeadlineAlertDismissalFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlertDismissal
+     */
+    select?: DeadlineAlertDismissalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlertDismissal
+     */
+    omit?: DeadlineAlertDismissalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertDismissalInclude<ExtArgs> | null
+    /**
+     * Filter, which DeadlineAlertDismissal to fetch.
+     */
+    where?: DeadlineAlertDismissalWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeadlineAlertDismissals to fetch.
+     */
+    orderBy?: DeadlineAlertDismissalOrderByWithRelationInput | DeadlineAlertDismissalOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DeadlineAlertDismissals.
+     */
+    cursor?: DeadlineAlertDismissalWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeadlineAlertDismissals from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeadlineAlertDismissals.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DeadlineAlertDismissals.
+     */
+    distinct?: DeadlineAlertDismissalScalarFieldEnum | DeadlineAlertDismissalScalarFieldEnum[]
+  }
+
+  /**
+   * DeadlineAlertDismissal findFirstOrThrow
+   */
+  export type DeadlineAlertDismissalFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlertDismissal
+     */
+    select?: DeadlineAlertDismissalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlertDismissal
+     */
+    omit?: DeadlineAlertDismissalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertDismissalInclude<ExtArgs> | null
+    /**
+     * Filter, which DeadlineAlertDismissal to fetch.
+     */
+    where?: DeadlineAlertDismissalWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeadlineAlertDismissals to fetch.
+     */
+    orderBy?: DeadlineAlertDismissalOrderByWithRelationInput | DeadlineAlertDismissalOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DeadlineAlertDismissals.
+     */
+    cursor?: DeadlineAlertDismissalWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeadlineAlertDismissals from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeadlineAlertDismissals.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DeadlineAlertDismissals.
+     */
+    distinct?: DeadlineAlertDismissalScalarFieldEnum | DeadlineAlertDismissalScalarFieldEnum[]
+  }
+
+  /**
+   * DeadlineAlertDismissal findMany
+   */
+  export type DeadlineAlertDismissalFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlertDismissal
+     */
+    select?: DeadlineAlertDismissalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlertDismissal
+     */
+    omit?: DeadlineAlertDismissalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertDismissalInclude<ExtArgs> | null
+    /**
+     * Filter, which DeadlineAlertDismissals to fetch.
+     */
+    where?: DeadlineAlertDismissalWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DeadlineAlertDismissals to fetch.
+     */
+    orderBy?: DeadlineAlertDismissalOrderByWithRelationInput | DeadlineAlertDismissalOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing DeadlineAlertDismissals.
+     */
+    cursor?: DeadlineAlertDismissalWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DeadlineAlertDismissals from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DeadlineAlertDismissals.
+     */
+    skip?: number
+    distinct?: DeadlineAlertDismissalScalarFieldEnum | DeadlineAlertDismissalScalarFieldEnum[]
+  }
+
+  /**
+   * DeadlineAlertDismissal create
+   */
+  export type DeadlineAlertDismissalCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlertDismissal
+     */
+    select?: DeadlineAlertDismissalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlertDismissal
+     */
+    omit?: DeadlineAlertDismissalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertDismissalInclude<ExtArgs> | null
+    /**
+     * The data needed to create a DeadlineAlertDismissal.
+     */
+    data: XOR<DeadlineAlertDismissalCreateInput, DeadlineAlertDismissalUncheckedCreateInput>
+  }
+
+  /**
+   * DeadlineAlertDismissal createMany
+   */
+  export type DeadlineAlertDismissalCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many DeadlineAlertDismissals.
+     */
+    data: DeadlineAlertDismissalCreateManyInput | DeadlineAlertDismissalCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DeadlineAlertDismissal createManyAndReturn
+   */
+  export type DeadlineAlertDismissalCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlertDismissal
+     */
+    select?: DeadlineAlertDismissalSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlertDismissal
+     */
+    omit?: DeadlineAlertDismissalOmit<ExtArgs> | null
+    /**
+     * The data used to create many DeadlineAlertDismissals.
+     */
+    data: DeadlineAlertDismissalCreateManyInput | DeadlineAlertDismissalCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertDismissalIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DeadlineAlertDismissal update
+   */
+  export type DeadlineAlertDismissalUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlertDismissal
+     */
+    select?: DeadlineAlertDismissalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlertDismissal
+     */
+    omit?: DeadlineAlertDismissalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertDismissalInclude<ExtArgs> | null
+    /**
+     * The data needed to update a DeadlineAlertDismissal.
+     */
+    data: XOR<DeadlineAlertDismissalUpdateInput, DeadlineAlertDismissalUncheckedUpdateInput>
+    /**
+     * Choose, which DeadlineAlertDismissal to update.
+     */
+    where: DeadlineAlertDismissalWhereUniqueInput
+  }
+
+  /**
+   * DeadlineAlertDismissal updateMany
+   */
+  export type DeadlineAlertDismissalUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update DeadlineAlertDismissals.
+     */
+    data: XOR<DeadlineAlertDismissalUpdateManyMutationInput, DeadlineAlertDismissalUncheckedUpdateManyInput>
+    /**
+     * Filter which DeadlineAlertDismissals to update
+     */
+    where?: DeadlineAlertDismissalWhereInput
+    /**
+     * Limit how many DeadlineAlertDismissals to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * DeadlineAlertDismissal updateManyAndReturn
+   */
+  export type DeadlineAlertDismissalUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlertDismissal
+     */
+    select?: DeadlineAlertDismissalSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlertDismissal
+     */
+    omit?: DeadlineAlertDismissalOmit<ExtArgs> | null
+    /**
+     * The data used to update DeadlineAlertDismissals.
+     */
+    data: XOR<DeadlineAlertDismissalUpdateManyMutationInput, DeadlineAlertDismissalUncheckedUpdateManyInput>
+    /**
+     * Filter which DeadlineAlertDismissals to update
+     */
+    where?: DeadlineAlertDismissalWhereInput
+    /**
+     * Limit how many DeadlineAlertDismissals to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertDismissalIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DeadlineAlertDismissal upsert
+   */
+  export type DeadlineAlertDismissalUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlertDismissal
+     */
+    select?: DeadlineAlertDismissalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlertDismissal
+     */
+    omit?: DeadlineAlertDismissalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertDismissalInclude<ExtArgs> | null
+    /**
+     * The filter to search for the DeadlineAlertDismissal to update in case it exists.
+     */
+    where: DeadlineAlertDismissalWhereUniqueInput
+    /**
+     * In case the DeadlineAlertDismissal found by the `where` argument doesn't exist, create a new DeadlineAlertDismissal with this data.
+     */
+    create: XOR<DeadlineAlertDismissalCreateInput, DeadlineAlertDismissalUncheckedCreateInput>
+    /**
+     * In case the DeadlineAlertDismissal was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DeadlineAlertDismissalUpdateInput, DeadlineAlertDismissalUncheckedUpdateInput>
+  }
+
+  /**
+   * DeadlineAlertDismissal delete
+   */
+  export type DeadlineAlertDismissalDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlertDismissal
+     */
+    select?: DeadlineAlertDismissalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlertDismissal
+     */
+    omit?: DeadlineAlertDismissalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertDismissalInclude<ExtArgs> | null
+    /**
+     * Filter which DeadlineAlertDismissal to delete.
+     */
+    where: DeadlineAlertDismissalWhereUniqueInput
+  }
+
+  /**
+   * DeadlineAlertDismissal deleteMany
+   */
+  export type DeadlineAlertDismissalDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DeadlineAlertDismissals to delete
+     */
+    where?: DeadlineAlertDismissalWhereInput
+    /**
+     * Limit how many DeadlineAlertDismissals to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * DeadlineAlertDismissal without action
+   */
+  export type DeadlineAlertDismissalDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DeadlineAlertDismissal
+     */
+    select?: DeadlineAlertDismissalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DeadlineAlertDismissal
+     */
+    omit?: DeadlineAlertDismissalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DeadlineAlertDismissalInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -82255,6 +85272,7 @@ export namespace Prisma {
     sequenceOrder: 'sequenceOrder',
     description: 'description',
     isActive: 'isActive',
+    inchargeUserId: 'inchargeUserId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -82696,6 +85714,7 @@ export namespace Prisma {
     status: 'status',
     priority: 'priority',
     issuedDate: 'issuedDate',
+    deliveryDate: 'deliveryDate',
     receivedDate: 'receivedDate',
     completedDate: 'completedDate',
     createdById: 'createdById',
@@ -82725,6 +85744,8 @@ export namespace Prisma {
     fabricCode: 'fabricCode',
     colour: 'colour',
     shade: 'shade',
+    requiredDyeColor: 'requiredDyeColor',
+    requiredDyeQuantity: 'requiredDyeQuantity',
     size: 'size',
     unitType: 'unitType',
     rollNumber: 'rollNumber',
@@ -82977,8 +85998,14 @@ export namespace Prisma {
     id: 'id',
     defectCode: 'defectCode',
     programId: 'programId',
+    productionSheetNumber: 'productionSheetNumber',
     challanId: 'challanId',
     departmentCode: 'departmentCode',
+    shelfCode: 'shelfCode',
+    color: 'color',
+    fabricType: 'fabricType',
+    quantityUnit: 'quantityUnit',
+    responsibleIncharge: 'responsibleIncharge',
     bundleId: 'bundleId',
     itemDescription: 'itemDescription',
     severity: 'severity',
@@ -82988,6 +86015,8 @@ export namespace Prisma {
     status: 'status',
     resolutionNotes: 'resolutionNotes',
     resolvedAt: 'resolvedAt',
+    shelfRemovedAt: 'shelfRemovedAt',
+    shelfRemovalReason: 'shelfRemovalReason',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -83225,28 +86254,30 @@ export namespace Prisma {
     orderNumber: 'orderNumber',
     programId: 'programId',
     inboundChallanId: 'inboundChallanId',
+    inboundChallanItemId: 'inboundChallanItemId',
     status: 'status',
     priority: 'priority',
     fabricName: 'fabricName',
     fabricType: 'fabricType',
+    currentColor: 'currentColor',
     targetColor: 'targetColor',
     dyedColor: 'dyedColor',
     colorCode: 'colorCode',
     requiredQuantity: 'requiredQuantity',
     dyedQuantity: 'dyedQuantity',
     undyedQuantity: 'undyedQuantity',
-    readyForQc1Quantity: 'readyForQc1Quantity',
-    sentToQc1Quantity: 'sentToQc1Quantity',
+    readyForDyeingQcQuantity: 'readyForDyeingQcQuantity',
+    sentToDyeingQcQuantity: 'sentToDyeingQcQuantity',
     uom: 'uom',
     inchargeId: 'inchargeId',
     inchargeName: 'inchargeName',
     batchNumber: 'batchNumber',
     machineNumber: 'machineNumber',
     processRemarks: 'processRemarks',
-    qc1ChallanId: 'qc1ChallanId',
+    dyeingQcChallanId: 'dyeingQcChallanId',
     startedAt: 'startedAt',
     completedAt: 'completedAt',
-    sentToQc1At: 'sentToQc1At',
+    sentToDyeingQcAt: 'sentToDyeingQcAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -83259,6 +86290,7 @@ export namespace Prisma {
     sNo: 'sNo',
     entryType: 'entryType',
     itemName: 'itemName',
+    color: 'color',
     billNo: 'billNo',
     billDate: 'billDate',
     receivingDate: 'receivingDate',
@@ -83281,6 +86313,7 @@ export namespace Prisma {
     challanId: 'challanId',
     designNumber: 'designNumber',
     itemName: 'itemName',
+    color: 'color',
     issueQty: 'issueQty',
     unit: 'unit',
     avgPerPcs: 'avgPerPcs',
@@ -83294,6 +86327,39 @@ export namespace Prisma {
   };
 
   export type FabricOutwardScalarFieldEnum = (typeof FabricOutwardScalarFieldEnum)[keyof typeof FabricOutwardScalarFieldEnum]
+
+
+  export const DeadlineAlertScalarFieldEnum: {
+    id: 'id',
+    dedupeKey: 'dedupeKey',
+    departmentCode: 'departmentCode',
+    taskType: 'taskType',
+    taskId: 'taskId',
+    challanId: 'challanId',
+    programId: 'programId',
+    assignedUserId: 'assignedUserId',
+    stage: 'stage',
+    severity: 'severity',
+    deadlineAt: 'deadlineAt',
+    deadlineSource: 'deadlineSource',
+    status: 'status',
+    resolutionReason: 'resolutionReason',
+    createdAt: 'createdAt',
+    lastEvaluatedAt: 'lastEvaluatedAt',
+    resolvedAt: 'resolvedAt'
+  };
+
+  export type DeadlineAlertScalarFieldEnum = (typeof DeadlineAlertScalarFieldEnum)[keyof typeof DeadlineAlertScalarFieldEnum]
+
+
+  export const DeadlineAlertDismissalScalarFieldEnum: {
+    id: 'id',
+    alertId: 'alertId',
+    userId: 'userId',
+    dismissedAt: 'dismissedAt'
+  };
+
+  export type DeadlineAlertDismissalScalarFieldEnum = (typeof DeadlineAlertDismissalScalarFieldEnum)[keyof typeof DeadlineAlertDismissalScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -83586,6 +86652,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionListRelationFilter
     fabricLedgerEntries?: FabricStockLedgerListRelationFilter
     dyeingOrdersIncharge?: DyeingOrderListRelationFilter
+    deadlineAlertsAssigned?: DeadlineAlertListRelationFilter
+    deadlineAlertDismissals?: DeadlineAlertDismissalListRelationFilter
+    departmentsInCharge?: DepartmentListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -83623,6 +86692,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionOrderByRelationAggregateInput
     fabricLedgerEntries?: FabricStockLedgerOrderByRelationAggregateInput
     dyeingOrdersIncharge?: DyeingOrderOrderByRelationAggregateInput
+    deadlineAlertsAssigned?: DeadlineAlertOrderByRelationAggregateInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalOrderByRelationAggregateInput
+    departmentsInCharge?: DepartmentOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -83663,6 +86735,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionListRelationFilter
     fabricLedgerEntries?: FabricStockLedgerListRelationFilter
     dyeingOrdersIncharge?: DyeingOrderListRelationFilter
+    deadlineAlertsAssigned?: DeadlineAlertListRelationFilter
+    deadlineAlertDismissals?: DeadlineAlertDismissalListRelationFilter
+    departmentsInCharge?: DepartmentListRelationFilter
   }, "id" | "username" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -83942,8 +87017,10 @@ export namespace Prisma {
     sequenceOrder?: IntFilter<"Department"> | number
     description?: StringNullableFilter<"Department"> | string | null
     isActive?: BoolFilter<"Department"> | boolean
+    inchargeUserId?: StringNullableFilter<"Department"> | string | null
     createdAt?: DateTimeFilter<"Department"> | Date | string
     updatedAt?: DateTimeFilter<"Department"> | Date | string
+    incharge?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     workCenters?: WorkCenterListRelationFilter
     operations?: OperationListRelationFilter
     defectCodes?: DefectCodeListRelationFilter
@@ -83958,8 +87035,10 @@ export namespace Prisma {
     sequenceOrder?: SortOrder
     description?: SortOrderInput | SortOrder
     isActive?: SortOrder
+    inchargeUserId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    incharge?: UserOrderByWithRelationInput
     workCenters?: WorkCenterOrderByRelationAggregateInput
     operations?: OperationOrderByRelationAggregateInput
     defectCodes?: DefectCodeOrderByRelationAggregateInput
@@ -83977,8 +87056,10 @@ export namespace Prisma {
     sequenceOrder?: IntFilter<"Department"> | number
     description?: StringNullableFilter<"Department"> | string | null
     isActive?: BoolFilter<"Department"> | boolean
+    inchargeUserId?: StringNullableFilter<"Department"> | string | null
     createdAt?: DateTimeFilter<"Department"> | Date | string
     updatedAt?: DateTimeFilter<"Department"> | Date | string
+    incharge?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     workCenters?: WorkCenterListRelationFilter
     operations?: OperationListRelationFilter
     defectCodes?: DefectCodeListRelationFilter
@@ -83993,6 +87074,7 @@ export namespace Prisma {
     sequenceOrder?: SortOrder
     description?: SortOrderInput | SortOrder
     isActive?: SortOrder
+    inchargeUserId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: DepartmentCountOrderByAggregateInput
@@ -84012,6 +87094,7 @@ export namespace Prisma {
     sequenceOrder?: IntWithAggregatesFilter<"Department"> | number
     description?: StringNullableWithAggregatesFilter<"Department"> | string | null
     isActive?: BoolWithAggregatesFilter<"Department"> | boolean
+    inchargeUserId?: StringNullableWithAggregatesFilter<"Department"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Department"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Department"> | Date | string
   }
@@ -85192,6 +88275,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchListRelationFilter
     fabricStoreRolls?: FabricStoreRollListRelationFilter
     dyeingOrders?: DyeingOrderListRelationFilter
+    deadlineAlerts?: DeadlineAlertListRelationFilter
   }
 
   export type ProgramOrderByWithRelationInput = {
@@ -85273,6 +88357,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchOrderByRelationAggregateInput
     fabricStoreRolls?: FabricStoreRollOrderByRelationAggregateInput
     dyeingOrders?: DyeingOrderOrderByRelationAggregateInput
+    deadlineAlerts?: DeadlineAlertOrderByRelationAggregateInput
   }
 
   export type ProgramWhereUniqueInput = Prisma.AtLeast<{
@@ -85357,6 +88442,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchListRelationFilter
     fabricStoreRolls?: FabricStoreRollListRelationFilter
     dyeingOrders?: DyeingOrderListRelationFilter
+    deadlineAlerts?: DeadlineAlertListRelationFilter
   }, "id" | "programNumber">
 
   export type ProgramOrderByWithAggregationInput = {
@@ -86296,6 +89382,7 @@ export namespace Prisma {
     status?: StringFilter<"Challan"> | string
     priority?: StringFilter<"Challan"> | string
     issuedDate?: DateTimeNullableFilter<"Challan"> | Date | string | null
+    deliveryDate?: DateTimeNullableFilter<"Challan"> | Date | string | null
     receivedDate?: DateTimeNullableFilter<"Challan"> | Date | string | null
     completedDate?: DateTimeNullableFilter<"Challan"> | Date | string | null
     createdById?: StringFilter<"Challan"> | string
@@ -86329,7 +89416,8 @@ export namespace Prisma {
     bundles?: BundleListRelationFilter
     defects?: DefectRecordListRelationFilter
     dyeingInboundOrders?: DyeingOrderListRelationFilter
-    dyeingQc1Orders?: DyeingOrderListRelationFilter
+    dyeingQcOrders?: DyeingOrderListRelationFilter
+    deadlineAlerts?: DeadlineAlertListRelationFilter
   }
 
   export type ChallanOrderByWithRelationInput = {
@@ -86343,6 +89431,7 @@ export namespace Prisma {
     status?: SortOrder
     priority?: SortOrder
     issuedDate?: SortOrderInput | SortOrder
+    deliveryDate?: SortOrderInput | SortOrder
     receivedDate?: SortOrderInput | SortOrder
     completedDate?: SortOrderInput | SortOrder
     createdById?: SortOrder
@@ -86376,7 +89465,8 @@ export namespace Prisma {
     bundles?: BundleOrderByRelationAggregateInput
     defects?: DefectRecordOrderByRelationAggregateInput
     dyeingInboundOrders?: DyeingOrderOrderByRelationAggregateInput
-    dyeingQc1Orders?: DyeingOrderOrderByRelationAggregateInput
+    dyeingQcOrders?: DyeingOrderOrderByRelationAggregateInput
+    deadlineAlerts?: DeadlineAlertOrderByRelationAggregateInput
   }
 
   export type ChallanWhereUniqueInput = Prisma.AtLeast<{
@@ -86393,6 +89483,7 @@ export namespace Prisma {
     status?: StringFilter<"Challan"> | string
     priority?: StringFilter<"Challan"> | string
     issuedDate?: DateTimeNullableFilter<"Challan"> | Date | string | null
+    deliveryDate?: DateTimeNullableFilter<"Challan"> | Date | string | null
     receivedDate?: DateTimeNullableFilter<"Challan"> | Date | string | null
     completedDate?: DateTimeNullableFilter<"Challan"> | Date | string | null
     createdById?: StringFilter<"Challan"> | string
@@ -86426,7 +89517,8 @@ export namespace Prisma {
     bundles?: BundleListRelationFilter
     defects?: DefectRecordListRelationFilter
     dyeingInboundOrders?: DyeingOrderListRelationFilter
-    dyeingQc1Orders?: DyeingOrderListRelationFilter
+    dyeingQcOrders?: DyeingOrderListRelationFilter
+    deadlineAlerts?: DeadlineAlertListRelationFilter
   }, "id" | "challanNumber">
 
   export type ChallanOrderByWithAggregationInput = {
@@ -86440,6 +89532,7 @@ export namespace Prisma {
     status?: SortOrder
     priority?: SortOrder
     issuedDate?: SortOrderInput | SortOrder
+    deliveryDate?: SortOrderInput | SortOrder
     receivedDate?: SortOrderInput | SortOrder
     completedDate?: SortOrderInput | SortOrder
     createdById?: SortOrder
@@ -86478,6 +89571,7 @@ export namespace Prisma {
     status?: StringWithAggregatesFilter<"Challan"> | string
     priority?: StringWithAggregatesFilter<"Challan"> | string
     issuedDate?: DateTimeNullableWithAggregatesFilter<"Challan"> | Date | string | null
+    deliveryDate?: DateTimeNullableWithAggregatesFilter<"Challan"> | Date | string | null
     receivedDate?: DateTimeNullableWithAggregatesFilter<"Challan"> | Date | string | null
     completedDate?: DateTimeNullableWithAggregatesFilter<"Challan"> | Date | string | null
     createdById?: StringWithAggregatesFilter<"Challan"> | string
@@ -86507,6 +89601,8 @@ export namespace Prisma {
     fabricCode?: StringNullableFilter<"ChallanItem"> | string | null
     colour?: StringNullableFilter<"ChallanItem"> | string | null
     shade?: StringNullableFilter<"ChallanItem"> | string | null
+    requiredDyeColor?: StringNullableFilter<"ChallanItem"> | string | null
+    requiredDyeQuantity?: FloatNullableFilter<"ChallanItem"> | number | null
     size?: StringNullableFilter<"ChallanItem"> | string | null
     unitType?: StringFilter<"ChallanItem"> | string
     rollNumber?: StringNullableFilter<"ChallanItem"> | string | null
@@ -86532,6 +89628,8 @@ export namespace Prisma {
     fabricCode?: SortOrderInput | SortOrder
     colour?: SortOrderInput | SortOrder
     shade?: SortOrderInput | SortOrder
+    requiredDyeColor?: SortOrderInput | SortOrder
+    requiredDyeQuantity?: SortOrderInput | SortOrder
     size?: SortOrderInput | SortOrder
     unitType?: SortOrder
     rollNumber?: SortOrderInput | SortOrder
@@ -86560,6 +89658,8 @@ export namespace Prisma {
     fabricCode?: StringNullableFilter<"ChallanItem"> | string | null
     colour?: StringNullableFilter<"ChallanItem"> | string | null
     shade?: StringNullableFilter<"ChallanItem"> | string | null
+    requiredDyeColor?: StringNullableFilter<"ChallanItem"> | string | null
+    requiredDyeQuantity?: FloatNullableFilter<"ChallanItem"> | number | null
     size?: StringNullableFilter<"ChallanItem"> | string | null
     unitType?: StringFilter<"ChallanItem"> | string
     rollNumber?: StringNullableFilter<"ChallanItem"> | string | null
@@ -86585,6 +89685,8 @@ export namespace Prisma {
     fabricCode?: SortOrderInput | SortOrder
     colour?: SortOrderInput | SortOrder
     shade?: SortOrderInput | SortOrder
+    requiredDyeColor?: SortOrderInput | SortOrder
+    requiredDyeQuantity?: SortOrderInput | SortOrder
     size?: SortOrderInput | SortOrder
     unitType?: SortOrder
     rollNumber?: SortOrderInput | SortOrder
@@ -86617,6 +89719,8 @@ export namespace Prisma {
     fabricCode?: StringNullableWithAggregatesFilter<"ChallanItem"> | string | null
     colour?: StringNullableWithAggregatesFilter<"ChallanItem"> | string | null
     shade?: StringNullableWithAggregatesFilter<"ChallanItem"> | string | null
+    requiredDyeColor?: StringNullableWithAggregatesFilter<"ChallanItem"> | string | null
+    requiredDyeQuantity?: FloatNullableWithAggregatesFilter<"ChallanItem"> | number | null
     size?: StringNullableWithAggregatesFilter<"ChallanItem"> | string | null
     unitType?: StringWithAggregatesFilter<"ChallanItem"> | string
     rollNumber?: StringNullableWithAggregatesFilter<"ChallanItem"> | string | null
@@ -87867,17 +90971,25 @@ export namespace Prisma {
     id?: StringFilter<"DefectRecord"> | string
     defectCode?: StringFilter<"DefectRecord"> | string
     programId?: StringFilter<"DefectRecord"> | string
+    productionSheetNumber?: StringNullableFilter<"DefectRecord"> | string | null
     challanId?: StringNullableFilter<"DefectRecord"> | string | null
     departmentCode?: StringFilter<"DefectRecord"> | string
+    shelfCode?: StringNullableFilter<"DefectRecord"> | string | null
+    color?: StringNullableFilter<"DefectRecord"> | string | null
+    fabricType?: StringNullableFilter<"DefectRecord"> | string | null
+    quantityUnit?: StringFilter<"DefectRecord"> | string
+    responsibleIncharge?: StringNullableFilter<"DefectRecord"> | string | null
     bundleId?: StringNullableFilter<"DefectRecord"> | string | null
     itemDescription?: StringFilter<"DefectRecord"> | string
     severity?: StringFilter<"DefectRecord"> | string
-    quantity?: IntFilter<"DefectRecord"> | number
+    quantity?: FloatFilter<"DefectRecord"> | number
     reason?: StringFilter<"DefectRecord"> | string
     detectedById?: StringFilter<"DefectRecord"> | string
     status?: StringFilter<"DefectRecord"> | string
     resolutionNotes?: StringNullableFilter<"DefectRecord"> | string | null
     resolvedAt?: DateTimeNullableFilter<"DefectRecord"> | Date | string | null
+    shelfRemovedAt?: DateTimeNullableFilter<"DefectRecord"> | Date | string | null
+    shelfRemovalReason?: StringNullableFilter<"DefectRecord"> | string | null
     createdAt?: DateTimeFilter<"DefectRecord"> | Date | string
     updatedAt?: DateTimeFilter<"DefectRecord"> | Date | string
     program?: XOR<ProgramScalarRelationFilter, ProgramWhereInput>
@@ -87892,8 +91004,14 @@ export namespace Prisma {
     id?: SortOrder
     defectCode?: SortOrder
     programId?: SortOrder
+    productionSheetNumber?: SortOrderInput | SortOrder
     challanId?: SortOrderInput | SortOrder
     departmentCode?: SortOrder
+    shelfCode?: SortOrderInput | SortOrder
+    color?: SortOrderInput | SortOrder
+    fabricType?: SortOrderInput | SortOrder
+    quantityUnit?: SortOrder
+    responsibleIncharge?: SortOrderInput | SortOrder
     bundleId?: SortOrderInput | SortOrder
     itemDescription?: SortOrder
     severity?: SortOrder
@@ -87903,6 +91021,8 @@ export namespace Prisma {
     status?: SortOrder
     resolutionNotes?: SortOrderInput | SortOrder
     resolvedAt?: SortOrderInput | SortOrder
+    shelfRemovedAt?: SortOrderInput | SortOrder
+    shelfRemovalReason?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     program?: ProgramOrderByWithRelationInput
@@ -87920,17 +91040,25 @@ export namespace Prisma {
     NOT?: DefectRecordWhereInput | DefectRecordWhereInput[]
     defectCode?: StringFilter<"DefectRecord"> | string
     programId?: StringFilter<"DefectRecord"> | string
+    productionSheetNumber?: StringNullableFilter<"DefectRecord"> | string | null
     challanId?: StringNullableFilter<"DefectRecord"> | string | null
     departmentCode?: StringFilter<"DefectRecord"> | string
+    shelfCode?: StringNullableFilter<"DefectRecord"> | string | null
+    color?: StringNullableFilter<"DefectRecord"> | string | null
+    fabricType?: StringNullableFilter<"DefectRecord"> | string | null
+    quantityUnit?: StringFilter<"DefectRecord"> | string
+    responsibleIncharge?: StringNullableFilter<"DefectRecord"> | string | null
     bundleId?: StringNullableFilter<"DefectRecord"> | string | null
     itemDescription?: StringFilter<"DefectRecord"> | string
     severity?: StringFilter<"DefectRecord"> | string
-    quantity?: IntFilter<"DefectRecord"> | number
+    quantity?: FloatFilter<"DefectRecord"> | number
     reason?: StringFilter<"DefectRecord"> | string
     detectedById?: StringFilter<"DefectRecord"> | string
     status?: StringFilter<"DefectRecord"> | string
     resolutionNotes?: StringNullableFilter<"DefectRecord"> | string | null
     resolvedAt?: DateTimeNullableFilter<"DefectRecord"> | Date | string | null
+    shelfRemovedAt?: DateTimeNullableFilter<"DefectRecord"> | Date | string | null
+    shelfRemovalReason?: StringNullableFilter<"DefectRecord"> | string | null
     createdAt?: DateTimeFilter<"DefectRecord"> | Date | string
     updatedAt?: DateTimeFilter<"DefectRecord"> | Date | string
     program?: XOR<ProgramScalarRelationFilter, ProgramWhereInput>
@@ -87945,8 +91073,14 @@ export namespace Prisma {
     id?: SortOrder
     defectCode?: SortOrder
     programId?: SortOrder
+    productionSheetNumber?: SortOrderInput | SortOrder
     challanId?: SortOrderInput | SortOrder
     departmentCode?: SortOrder
+    shelfCode?: SortOrderInput | SortOrder
+    color?: SortOrderInput | SortOrder
+    fabricType?: SortOrderInput | SortOrder
+    quantityUnit?: SortOrder
+    responsibleIncharge?: SortOrderInput | SortOrder
     bundleId?: SortOrderInput | SortOrder
     itemDescription?: SortOrder
     severity?: SortOrder
@@ -87956,6 +91090,8 @@ export namespace Prisma {
     status?: SortOrder
     resolutionNotes?: SortOrderInput | SortOrder
     resolvedAt?: SortOrderInput | SortOrder
+    shelfRemovedAt?: SortOrderInput | SortOrder
+    shelfRemovalReason?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: DefectRecordCountOrderByAggregateInput
@@ -87972,17 +91108,25 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"DefectRecord"> | string
     defectCode?: StringWithAggregatesFilter<"DefectRecord"> | string
     programId?: StringWithAggregatesFilter<"DefectRecord"> | string
+    productionSheetNumber?: StringNullableWithAggregatesFilter<"DefectRecord"> | string | null
     challanId?: StringNullableWithAggregatesFilter<"DefectRecord"> | string | null
     departmentCode?: StringWithAggregatesFilter<"DefectRecord"> | string
+    shelfCode?: StringNullableWithAggregatesFilter<"DefectRecord"> | string | null
+    color?: StringNullableWithAggregatesFilter<"DefectRecord"> | string | null
+    fabricType?: StringNullableWithAggregatesFilter<"DefectRecord"> | string | null
+    quantityUnit?: StringWithAggregatesFilter<"DefectRecord"> | string
+    responsibleIncharge?: StringNullableWithAggregatesFilter<"DefectRecord"> | string | null
     bundleId?: StringNullableWithAggregatesFilter<"DefectRecord"> | string | null
     itemDescription?: StringWithAggregatesFilter<"DefectRecord"> | string
     severity?: StringWithAggregatesFilter<"DefectRecord"> | string
-    quantity?: IntWithAggregatesFilter<"DefectRecord"> | number
+    quantity?: FloatWithAggregatesFilter<"DefectRecord"> | number
     reason?: StringWithAggregatesFilter<"DefectRecord"> | string
     detectedById?: StringWithAggregatesFilter<"DefectRecord"> | string
     status?: StringWithAggregatesFilter<"DefectRecord"> | string
     resolutionNotes?: StringNullableWithAggregatesFilter<"DefectRecord"> | string | null
     resolvedAt?: DateTimeNullableWithAggregatesFilter<"DefectRecord"> | Date | string | null
+    shelfRemovedAt?: DateTimeNullableWithAggregatesFilter<"DefectRecord"> | Date | string | null
+    shelfRemovalReason?: StringNullableWithAggregatesFilter<"DefectRecord"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"DefectRecord"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"DefectRecord"> | Date | string
   }
@@ -89210,34 +92354,36 @@ export namespace Prisma {
     orderNumber?: StringFilter<"DyeingOrder"> | string
     programId?: StringFilter<"DyeingOrder"> | string
     inboundChallanId?: StringNullableFilter<"DyeingOrder"> | string | null
+    inboundChallanItemId?: StringNullableFilter<"DyeingOrder"> | string | null
     status?: StringFilter<"DyeingOrder"> | string
     priority?: StringFilter<"DyeingOrder"> | string
     fabricName?: StringFilter<"DyeingOrder"> | string
     fabricType?: StringNullableFilter<"DyeingOrder"> | string | null
+    currentColor?: StringNullableFilter<"DyeingOrder"> | string | null
     targetColor?: StringFilter<"DyeingOrder"> | string
     dyedColor?: StringNullableFilter<"DyeingOrder"> | string | null
     colorCode?: StringNullableFilter<"DyeingOrder"> | string | null
     requiredQuantity?: FloatFilter<"DyeingOrder"> | number
     dyedQuantity?: FloatFilter<"DyeingOrder"> | number
     undyedQuantity?: FloatFilter<"DyeingOrder"> | number
-    readyForQc1Quantity?: FloatFilter<"DyeingOrder"> | number
-    sentToQc1Quantity?: FloatFilter<"DyeingOrder"> | number
+    readyForDyeingQcQuantity?: FloatFilter<"DyeingOrder"> | number
+    sentToDyeingQcQuantity?: FloatFilter<"DyeingOrder"> | number
     uom?: StringFilter<"DyeingOrder"> | string
     inchargeId?: StringNullableFilter<"DyeingOrder"> | string | null
     inchargeName?: StringNullableFilter<"DyeingOrder"> | string | null
     batchNumber?: StringNullableFilter<"DyeingOrder"> | string | null
     machineNumber?: StringNullableFilter<"DyeingOrder"> | string | null
     processRemarks?: StringNullableFilter<"DyeingOrder"> | string | null
-    qc1ChallanId?: StringNullableFilter<"DyeingOrder"> | string | null
+    dyeingQcChallanId?: StringNullableFilter<"DyeingOrder"> | string | null
     startedAt?: DateTimeNullableFilter<"DyeingOrder"> | Date | string | null
     completedAt?: DateTimeNullableFilter<"DyeingOrder"> | Date | string | null
-    sentToQc1At?: DateTimeNullableFilter<"DyeingOrder"> | Date | string | null
+    sentToDyeingQcAt?: DateTimeNullableFilter<"DyeingOrder"> | Date | string | null
     createdAt?: DateTimeFilter<"DyeingOrder"> | Date | string
     updatedAt?: DateTimeFilter<"DyeingOrder"> | Date | string
     program?: XOR<ProgramScalarRelationFilter, ProgramWhereInput>
     inboundChallan?: XOR<ChallanNullableScalarRelationFilter, ChallanWhereInput> | null
     incharge?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
-    qc1Challan?: XOR<ChallanNullableScalarRelationFilter, ChallanWhereInput> | null
+    dyeingQcChallan?: XOR<ChallanNullableScalarRelationFilter, ChallanWhereInput> | null
   }
 
   export type DyeingOrderOrderByWithRelationInput = {
@@ -89245,39 +92391,42 @@ export namespace Prisma {
     orderNumber?: SortOrder
     programId?: SortOrder
     inboundChallanId?: SortOrderInput | SortOrder
+    inboundChallanItemId?: SortOrderInput | SortOrder
     status?: SortOrder
     priority?: SortOrder
     fabricName?: SortOrder
     fabricType?: SortOrderInput | SortOrder
+    currentColor?: SortOrderInput | SortOrder
     targetColor?: SortOrder
     dyedColor?: SortOrderInput | SortOrder
     colorCode?: SortOrderInput | SortOrder
     requiredQuantity?: SortOrder
     dyedQuantity?: SortOrder
     undyedQuantity?: SortOrder
-    readyForQc1Quantity?: SortOrder
-    sentToQc1Quantity?: SortOrder
+    readyForDyeingQcQuantity?: SortOrder
+    sentToDyeingQcQuantity?: SortOrder
     uom?: SortOrder
     inchargeId?: SortOrderInput | SortOrder
     inchargeName?: SortOrderInput | SortOrder
     batchNumber?: SortOrderInput | SortOrder
     machineNumber?: SortOrderInput | SortOrder
     processRemarks?: SortOrderInput | SortOrder
-    qc1ChallanId?: SortOrderInput | SortOrder
+    dyeingQcChallanId?: SortOrderInput | SortOrder
     startedAt?: SortOrderInput | SortOrder
     completedAt?: SortOrderInput | SortOrder
-    sentToQc1At?: SortOrderInput | SortOrder
+    sentToDyeingQcAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     program?: ProgramOrderByWithRelationInput
     inboundChallan?: ChallanOrderByWithRelationInput
     incharge?: UserOrderByWithRelationInput
-    qc1Challan?: ChallanOrderByWithRelationInput
+    dyeingQcChallan?: ChallanOrderByWithRelationInput
   }
 
   export type DyeingOrderWhereUniqueInput = Prisma.AtLeast<{
     id?: string
     orderNumber?: string
+    inboundChallanItemId?: string
     AND?: DyeingOrderWhereInput | DyeingOrderWhereInput[]
     OR?: DyeingOrderWhereInput[]
     NOT?: DyeingOrderWhereInput | DyeingOrderWhereInput[]
@@ -89287,59 +92436,62 @@ export namespace Prisma {
     priority?: StringFilter<"DyeingOrder"> | string
     fabricName?: StringFilter<"DyeingOrder"> | string
     fabricType?: StringNullableFilter<"DyeingOrder"> | string | null
+    currentColor?: StringNullableFilter<"DyeingOrder"> | string | null
     targetColor?: StringFilter<"DyeingOrder"> | string
     dyedColor?: StringNullableFilter<"DyeingOrder"> | string | null
     colorCode?: StringNullableFilter<"DyeingOrder"> | string | null
     requiredQuantity?: FloatFilter<"DyeingOrder"> | number
     dyedQuantity?: FloatFilter<"DyeingOrder"> | number
     undyedQuantity?: FloatFilter<"DyeingOrder"> | number
-    readyForQc1Quantity?: FloatFilter<"DyeingOrder"> | number
-    sentToQc1Quantity?: FloatFilter<"DyeingOrder"> | number
+    readyForDyeingQcQuantity?: FloatFilter<"DyeingOrder"> | number
+    sentToDyeingQcQuantity?: FloatFilter<"DyeingOrder"> | number
     uom?: StringFilter<"DyeingOrder"> | string
     inchargeId?: StringNullableFilter<"DyeingOrder"> | string | null
     inchargeName?: StringNullableFilter<"DyeingOrder"> | string | null
     batchNumber?: StringNullableFilter<"DyeingOrder"> | string | null
     machineNumber?: StringNullableFilter<"DyeingOrder"> | string | null
     processRemarks?: StringNullableFilter<"DyeingOrder"> | string | null
-    qc1ChallanId?: StringNullableFilter<"DyeingOrder"> | string | null
+    dyeingQcChallanId?: StringNullableFilter<"DyeingOrder"> | string | null
     startedAt?: DateTimeNullableFilter<"DyeingOrder"> | Date | string | null
     completedAt?: DateTimeNullableFilter<"DyeingOrder"> | Date | string | null
-    sentToQc1At?: DateTimeNullableFilter<"DyeingOrder"> | Date | string | null
+    sentToDyeingQcAt?: DateTimeNullableFilter<"DyeingOrder"> | Date | string | null
     createdAt?: DateTimeFilter<"DyeingOrder"> | Date | string
     updatedAt?: DateTimeFilter<"DyeingOrder"> | Date | string
     program?: XOR<ProgramScalarRelationFilter, ProgramWhereInput>
     inboundChallan?: XOR<ChallanNullableScalarRelationFilter, ChallanWhereInput> | null
     incharge?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
-    qc1Challan?: XOR<ChallanNullableScalarRelationFilter, ChallanWhereInput> | null
-  }, "id" | "orderNumber">
+    dyeingQcChallan?: XOR<ChallanNullableScalarRelationFilter, ChallanWhereInput> | null
+  }, "id" | "orderNumber" | "inboundChallanItemId">
 
   export type DyeingOrderOrderByWithAggregationInput = {
     id?: SortOrder
     orderNumber?: SortOrder
     programId?: SortOrder
     inboundChallanId?: SortOrderInput | SortOrder
+    inboundChallanItemId?: SortOrderInput | SortOrder
     status?: SortOrder
     priority?: SortOrder
     fabricName?: SortOrder
     fabricType?: SortOrderInput | SortOrder
+    currentColor?: SortOrderInput | SortOrder
     targetColor?: SortOrder
     dyedColor?: SortOrderInput | SortOrder
     colorCode?: SortOrderInput | SortOrder
     requiredQuantity?: SortOrder
     dyedQuantity?: SortOrder
     undyedQuantity?: SortOrder
-    readyForQc1Quantity?: SortOrder
-    sentToQc1Quantity?: SortOrder
+    readyForDyeingQcQuantity?: SortOrder
+    sentToDyeingQcQuantity?: SortOrder
     uom?: SortOrder
     inchargeId?: SortOrderInput | SortOrder
     inchargeName?: SortOrderInput | SortOrder
     batchNumber?: SortOrderInput | SortOrder
     machineNumber?: SortOrderInput | SortOrder
     processRemarks?: SortOrderInput | SortOrder
-    qc1ChallanId?: SortOrderInput | SortOrder
+    dyeingQcChallanId?: SortOrderInput | SortOrder
     startedAt?: SortOrderInput | SortOrder
     completedAt?: SortOrderInput | SortOrder
-    sentToQc1At?: SortOrderInput | SortOrder
+    sentToDyeingQcAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: DyeingOrderCountOrderByAggregateInput
@@ -89357,28 +92509,30 @@ export namespace Prisma {
     orderNumber?: StringWithAggregatesFilter<"DyeingOrder"> | string
     programId?: StringWithAggregatesFilter<"DyeingOrder"> | string
     inboundChallanId?: StringNullableWithAggregatesFilter<"DyeingOrder"> | string | null
+    inboundChallanItemId?: StringNullableWithAggregatesFilter<"DyeingOrder"> | string | null
     status?: StringWithAggregatesFilter<"DyeingOrder"> | string
     priority?: StringWithAggregatesFilter<"DyeingOrder"> | string
     fabricName?: StringWithAggregatesFilter<"DyeingOrder"> | string
     fabricType?: StringNullableWithAggregatesFilter<"DyeingOrder"> | string | null
+    currentColor?: StringNullableWithAggregatesFilter<"DyeingOrder"> | string | null
     targetColor?: StringWithAggregatesFilter<"DyeingOrder"> | string
     dyedColor?: StringNullableWithAggregatesFilter<"DyeingOrder"> | string | null
     colorCode?: StringNullableWithAggregatesFilter<"DyeingOrder"> | string | null
     requiredQuantity?: FloatWithAggregatesFilter<"DyeingOrder"> | number
     dyedQuantity?: FloatWithAggregatesFilter<"DyeingOrder"> | number
     undyedQuantity?: FloatWithAggregatesFilter<"DyeingOrder"> | number
-    readyForQc1Quantity?: FloatWithAggregatesFilter<"DyeingOrder"> | number
-    sentToQc1Quantity?: FloatWithAggregatesFilter<"DyeingOrder"> | number
+    readyForDyeingQcQuantity?: FloatWithAggregatesFilter<"DyeingOrder"> | number
+    sentToDyeingQcQuantity?: FloatWithAggregatesFilter<"DyeingOrder"> | number
     uom?: StringWithAggregatesFilter<"DyeingOrder"> | string
     inchargeId?: StringNullableWithAggregatesFilter<"DyeingOrder"> | string | null
     inchargeName?: StringNullableWithAggregatesFilter<"DyeingOrder"> | string | null
     batchNumber?: StringNullableWithAggregatesFilter<"DyeingOrder"> | string | null
     machineNumber?: StringNullableWithAggregatesFilter<"DyeingOrder"> | string | null
     processRemarks?: StringNullableWithAggregatesFilter<"DyeingOrder"> | string | null
-    qc1ChallanId?: StringNullableWithAggregatesFilter<"DyeingOrder"> | string | null
+    dyeingQcChallanId?: StringNullableWithAggregatesFilter<"DyeingOrder"> | string | null
     startedAt?: DateTimeNullableWithAggregatesFilter<"DyeingOrder"> | Date | string | null
     completedAt?: DateTimeNullableWithAggregatesFilter<"DyeingOrder"> | Date | string | null
-    sentToQc1At?: DateTimeNullableWithAggregatesFilter<"DyeingOrder"> | Date | string | null
+    sentToDyeingQcAt?: DateTimeNullableWithAggregatesFilter<"DyeingOrder"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"DyeingOrder"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"DyeingOrder"> | Date | string
   }
@@ -89391,6 +92545,7 @@ export namespace Prisma {
     sNo?: IntFilter<"FabricInward"> | number
     entryType?: StringFilter<"FabricInward"> | string
     itemName?: StringFilter<"FabricInward"> | string
+    color?: StringNullableFilter<"FabricInward"> | string | null
     billNo?: StringFilter<"FabricInward"> | string
     billDate?: DateTimeFilter<"FabricInward"> | Date | string
     receivingDate?: DateTimeFilter<"FabricInward"> | Date | string
@@ -89407,6 +92562,7 @@ export namespace Prisma {
     sNo?: SortOrder
     entryType?: SortOrder
     itemName?: SortOrder
+    color?: SortOrderInput | SortOrder
     billNo?: SortOrder
     billDate?: SortOrder
     receivingDate?: SortOrder
@@ -89426,6 +92582,7 @@ export namespace Prisma {
     sNo?: IntFilter<"FabricInward"> | number
     entryType?: StringFilter<"FabricInward"> | string
     itemName?: StringFilter<"FabricInward"> | string
+    color?: StringNullableFilter<"FabricInward"> | string | null
     billNo?: StringFilter<"FabricInward"> | string
     billDate?: DateTimeFilter<"FabricInward"> | Date | string
     receivingDate?: DateTimeFilter<"FabricInward"> | Date | string
@@ -89442,6 +92599,7 @@ export namespace Prisma {
     sNo?: SortOrder
     entryType?: SortOrder
     itemName?: SortOrder
+    color?: SortOrderInput | SortOrder
     billNo?: SortOrder
     billDate?: SortOrder
     receivingDate?: SortOrder
@@ -89466,6 +92624,7 @@ export namespace Prisma {
     sNo?: IntWithAggregatesFilter<"FabricInward"> | number
     entryType?: StringWithAggregatesFilter<"FabricInward"> | string
     itemName?: StringWithAggregatesFilter<"FabricInward"> | string
+    color?: StringNullableWithAggregatesFilter<"FabricInward"> | string | null
     billNo?: StringWithAggregatesFilter<"FabricInward"> | string
     billDate?: DateTimeWithAggregatesFilter<"FabricInward"> | Date | string
     receivingDate?: DateTimeWithAggregatesFilter<"FabricInward"> | Date | string
@@ -89488,6 +92647,7 @@ export namespace Prisma {
     challanId?: StringNullableFilter<"FabricOutward"> | string | null
     designNumber?: StringNullableFilter<"FabricOutward"> | string | null
     itemName?: StringFilter<"FabricOutward"> | string
+    color?: StringNullableFilter<"FabricOutward"> | string | null
     issueQty?: FloatFilter<"FabricOutward"> | number
     unit?: StringFilter<"FabricOutward"> | string
     avgPerPcs?: FloatNullableFilter<"FabricOutward"> | number | null
@@ -89508,6 +92668,7 @@ export namespace Prisma {
     challanId?: SortOrderInput | SortOrder
     designNumber?: SortOrderInput | SortOrder
     itemName?: SortOrder
+    color?: SortOrderInput | SortOrder
     issueQty?: SortOrder
     unit?: SortOrder
     avgPerPcs?: SortOrderInput | SortOrder
@@ -89531,6 +92692,7 @@ export namespace Prisma {
     challanId?: StringNullableFilter<"FabricOutward"> | string | null
     designNumber?: StringNullableFilter<"FabricOutward"> | string | null
     itemName?: StringFilter<"FabricOutward"> | string
+    color?: StringNullableFilter<"FabricOutward"> | string | null
     issueQty?: FloatFilter<"FabricOutward"> | number
     unit?: StringFilter<"FabricOutward"> | string
     avgPerPcs?: FloatNullableFilter<"FabricOutward"> | number | null
@@ -89551,6 +92713,7 @@ export namespace Prisma {
     challanId?: SortOrderInput | SortOrder
     designNumber?: SortOrderInput | SortOrder
     itemName?: SortOrder
+    color?: SortOrderInput | SortOrder
     issueQty?: SortOrder
     unit?: SortOrder
     avgPerPcs?: SortOrderInput | SortOrder
@@ -89579,6 +92742,7 @@ export namespace Prisma {
     challanId?: StringNullableWithAggregatesFilter<"FabricOutward"> | string | null
     designNumber?: StringNullableWithAggregatesFilter<"FabricOutward"> | string | null
     itemName?: StringWithAggregatesFilter<"FabricOutward"> | string
+    color?: StringNullableWithAggregatesFilter<"FabricOutward"> | string | null
     issueQty?: FloatWithAggregatesFilter<"FabricOutward"> | number
     unit?: StringWithAggregatesFilter<"FabricOutward"> | string
     avgPerPcs?: FloatNullableWithAggregatesFilter<"FabricOutward"> | number | null
@@ -89589,6 +92753,184 @@ export namespace Prisma {
     fabricType?: StringNullableWithAggregatesFilter<"FabricOutward"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"FabricOutward"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"FabricOutward"> | Date | string
+  }
+
+  export type DeadlineAlertWhereInput = {
+    AND?: DeadlineAlertWhereInput | DeadlineAlertWhereInput[]
+    OR?: DeadlineAlertWhereInput[]
+    NOT?: DeadlineAlertWhereInput | DeadlineAlertWhereInput[]
+    id?: StringFilter<"DeadlineAlert"> | string
+    dedupeKey?: StringFilter<"DeadlineAlert"> | string
+    departmentCode?: StringFilter<"DeadlineAlert"> | string
+    taskType?: StringFilter<"DeadlineAlert"> | string
+    taskId?: StringFilter<"DeadlineAlert"> | string
+    challanId?: StringNullableFilter<"DeadlineAlert"> | string | null
+    programId?: StringNullableFilter<"DeadlineAlert"> | string | null
+    assignedUserId?: StringNullableFilter<"DeadlineAlert"> | string | null
+    stage?: StringFilter<"DeadlineAlert"> | string
+    severity?: StringFilter<"DeadlineAlert"> | string
+    deadlineAt?: DateTimeFilter<"DeadlineAlert"> | Date | string
+    deadlineSource?: StringFilter<"DeadlineAlert"> | string
+    status?: StringFilter<"DeadlineAlert"> | string
+    resolutionReason?: StringNullableFilter<"DeadlineAlert"> | string | null
+    createdAt?: DateTimeFilter<"DeadlineAlert"> | Date | string
+    lastEvaluatedAt?: DateTimeFilter<"DeadlineAlert"> | Date | string
+    resolvedAt?: DateTimeNullableFilter<"DeadlineAlert"> | Date | string | null
+    challan?: XOR<ChallanNullableScalarRelationFilter, ChallanWhereInput> | null
+    program?: XOR<ProgramNullableScalarRelationFilter, ProgramWhereInput> | null
+    assignedUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    dismissals?: DeadlineAlertDismissalListRelationFilter
+  }
+
+  export type DeadlineAlertOrderByWithRelationInput = {
+    id?: SortOrder
+    dedupeKey?: SortOrder
+    departmentCode?: SortOrder
+    taskType?: SortOrder
+    taskId?: SortOrder
+    challanId?: SortOrderInput | SortOrder
+    programId?: SortOrderInput | SortOrder
+    assignedUserId?: SortOrderInput | SortOrder
+    stage?: SortOrder
+    severity?: SortOrder
+    deadlineAt?: SortOrder
+    deadlineSource?: SortOrder
+    status?: SortOrder
+    resolutionReason?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    lastEvaluatedAt?: SortOrder
+    resolvedAt?: SortOrderInput | SortOrder
+    challan?: ChallanOrderByWithRelationInput
+    program?: ProgramOrderByWithRelationInput
+    assignedUser?: UserOrderByWithRelationInput
+    dismissals?: DeadlineAlertDismissalOrderByRelationAggregateInput
+  }
+
+  export type DeadlineAlertWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    dedupeKey?: string
+    AND?: DeadlineAlertWhereInput | DeadlineAlertWhereInput[]
+    OR?: DeadlineAlertWhereInput[]
+    NOT?: DeadlineAlertWhereInput | DeadlineAlertWhereInput[]
+    departmentCode?: StringFilter<"DeadlineAlert"> | string
+    taskType?: StringFilter<"DeadlineAlert"> | string
+    taskId?: StringFilter<"DeadlineAlert"> | string
+    challanId?: StringNullableFilter<"DeadlineAlert"> | string | null
+    programId?: StringNullableFilter<"DeadlineAlert"> | string | null
+    assignedUserId?: StringNullableFilter<"DeadlineAlert"> | string | null
+    stage?: StringFilter<"DeadlineAlert"> | string
+    severity?: StringFilter<"DeadlineAlert"> | string
+    deadlineAt?: DateTimeFilter<"DeadlineAlert"> | Date | string
+    deadlineSource?: StringFilter<"DeadlineAlert"> | string
+    status?: StringFilter<"DeadlineAlert"> | string
+    resolutionReason?: StringNullableFilter<"DeadlineAlert"> | string | null
+    createdAt?: DateTimeFilter<"DeadlineAlert"> | Date | string
+    lastEvaluatedAt?: DateTimeFilter<"DeadlineAlert"> | Date | string
+    resolvedAt?: DateTimeNullableFilter<"DeadlineAlert"> | Date | string | null
+    challan?: XOR<ChallanNullableScalarRelationFilter, ChallanWhereInput> | null
+    program?: XOR<ProgramNullableScalarRelationFilter, ProgramWhereInput> | null
+    assignedUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    dismissals?: DeadlineAlertDismissalListRelationFilter
+  }, "id" | "dedupeKey">
+
+  export type DeadlineAlertOrderByWithAggregationInput = {
+    id?: SortOrder
+    dedupeKey?: SortOrder
+    departmentCode?: SortOrder
+    taskType?: SortOrder
+    taskId?: SortOrder
+    challanId?: SortOrderInput | SortOrder
+    programId?: SortOrderInput | SortOrder
+    assignedUserId?: SortOrderInput | SortOrder
+    stage?: SortOrder
+    severity?: SortOrder
+    deadlineAt?: SortOrder
+    deadlineSource?: SortOrder
+    status?: SortOrder
+    resolutionReason?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    lastEvaluatedAt?: SortOrder
+    resolvedAt?: SortOrderInput | SortOrder
+    _count?: DeadlineAlertCountOrderByAggregateInput
+    _max?: DeadlineAlertMaxOrderByAggregateInput
+    _min?: DeadlineAlertMinOrderByAggregateInput
+  }
+
+  export type DeadlineAlertScalarWhereWithAggregatesInput = {
+    AND?: DeadlineAlertScalarWhereWithAggregatesInput | DeadlineAlertScalarWhereWithAggregatesInput[]
+    OR?: DeadlineAlertScalarWhereWithAggregatesInput[]
+    NOT?: DeadlineAlertScalarWhereWithAggregatesInput | DeadlineAlertScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"DeadlineAlert"> | string
+    dedupeKey?: StringWithAggregatesFilter<"DeadlineAlert"> | string
+    departmentCode?: StringWithAggregatesFilter<"DeadlineAlert"> | string
+    taskType?: StringWithAggregatesFilter<"DeadlineAlert"> | string
+    taskId?: StringWithAggregatesFilter<"DeadlineAlert"> | string
+    challanId?: StringNullableWithAggregatesFilter<"DeadlineAlert"> | string | null
+    programId?: StringNullableWithAggregatesFilter<"DeadlineAlert"> | string | null
+    assignedUserId?: StringNullableWithAggregatesFilter<"DeadlineAlert"> | string | null
+    stage?: StringWithAggregatesFilter<"DeadlineAlert"> | string
+    severity?: StringWithAggregatesFilter<"DeadlineAlert"> | string
+    deadlineAt?: DateTimeWithAggregatesFilter<"DeadlineAlert"> | Date | string
+    deadlineSource?: StringWithAggregatesFilter<"DeadlineAlert"> | string
+    status?: StringWithAggregatesFilter<"DeadlineAlert"> | string
+    resolutionReason?: StringNullableWithAggregatesFilter<"DeadlineAlert"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"DeadlineAlert"> | Date | string
+    lastEvaluatedAt?: DateTimeWithAggregatesFilter<"DeadlineAlert"> | Date | string
+    resolvedAt?: DateTimeNullableWithAggregatesFilter<"DeadlineAlert"> | Date | string | null
+  }
+
+  export type DeadlineAlertDismissalWhereInput = {
+    AND?: DeadlineAlertDismissalWhereInput | DeadlineAlertDismissalWhereInput[]
+    OR?: DeadlineAlertDismissalWhereInput[]
+    NOT?: DeadlineAlertDismissalWhereInput | DeadlineAlertDismissalWhereInput[]
+    id?: StringFilter<"DeadlineAlertDismissal"> | string
+    alertId?: StringFilter<"DeadlineAlertDismissal"> | string
+    userId?: StringFilter<"DeadlineAlertDismissal"> | string
+    dismissedAt?: DateTimeFilter<"DeadlineAlertDismissal"> | Date | string
+    alert?: XOR<DeadlineAlertScalarRelationFilter, DeadlineAlertWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type DeadlineAlertDismissalOrderByWithRelationInput = {
+    id?: SortOrder
+    alertId?: SortOrder
+    userId?: SortOrder
+    dismissedAt?: SortOrder
+    alert?: DeadlineAlertOrderByWithRelationInput
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type DeadlineAlertDismissalWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    alertId_userId?: DeadlineAlertDismissalAlertIdUserIdCompoundUniqueInput
+    AND?: DeadlineAlertDismissalWhereInput | DeadlineAlertDismissalWhereInput[]
+    OR?: DeadlineAlertDismissalWhereInput[]
+    NOT?: DeadlineAlertDismissalWhereInput | DeadlineAlertDismissalWhereInput[]
+    alertId?: StringFilter<"DeadlineAlertDismissal"> | string
+    userId?: StringFilter<"DeadlineAlertDismissal"> | string
+    dismissedAt?: DateTimeFilter<"DeadlineAlertDismissal"> | Date | string
+    alert?: XOR<DeadlineAlertScalarRelationFilter, DeadlineAlertWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "alertId_userId">
+
+  export type DeadlineAlertDismissalOrderByWithAggregationInput = {
+    id?: SortOrder
+    alertId?: SortOrder
+    userId?: SortOrder
+    dismissedAt?: SortOrder
+    _count?: DeadlineAlertDismissalCountOrderByAggregateInput
+    _max?: DeadlineAlertDismissalMaxOrderByAggregateInput
+    _min?: DeadlineAlertDismissalMinOrderByAggregateInput
+  }
+
+  export type DeadlineAlertDismissalScalarWhereWithAggregatesInput = {
+    AND?: DeadlineAlertDismissalScalarWhereWithAggregatesInput | DeadlineAlertDismissalScalarWhereWithAggregatesInput[]
+    OR?: DeadlineAlertDismissalScalarWhereWithAggregatesInput[]
+    NOT?: DeadlineAlertDismissalScalarWhereWithAggregatesInput | DeadlineAlertDismissalScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"DeadlineAlertDismissal"> | string
+    alertId?: StringWithAggregatesFilter<"DeadlineAlertDismissal"> | string
+    userId?: StringWithAggregatesFilter<"DeadlineAlertDismissal"> | string
+    dismissedAt?: DateTimeWithAggregatesFilter<"DeadlineAlertDismissal"> | Date | string
   }
 
   export type UserCreateInput = {
@@ -89626,6 +92968,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -89663,6 +93008,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUpdateInput = {
@@ -89700,6 +93048,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -89737,6 +93088,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -90023,6 +93377,7 @@ export namespace Prisma {
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    incharge?: UserCreateNestedOneWithoutDepartmentsInChargeInput
     workCenters?: WorkCenterCreateNestedManyWithoutDepartmentInput
     operations?: OperationCreateNestedManyWithoutDepartmentInput
     defectCodes?: DefectCodeCreateNestedManyWithoutDepartmentInput
@@ -90037,6 +93392,7 @@ export namespace Prisma {
     sequenceOrder: number
     description?: string | null
     isActive?: boolean
+    inchargeUserId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     workCenters?: WorkCenterUncheckedCreateNestedManyWithoutDepartmentInput
@@ -90055,6 +93411,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    incharge?: UserUpdateOneWithoutDepartmentsInChargeNestedInput
     workCenters?: WorkCenterUpdateManyWithoutDepartmentNestedInput
     operations?: OperationUpdateManyWithoutDepartmentNestedInput
     defectCodes?: DefectCodeUpdateManyWithoutDepartmentNestedInput
@@ -90069,6 +93426,7 @@ export namespace Prisma {
     sequenceOrder?: IntFieldUpdateOperationsInput | number
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    inchargeUserId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     workCenters?: WorkCenterUncheckedUpdateManyWithoutDepartmentNestedInput
@@ -90085,6 +93443,7 @@ export namespace Prisma {
     sequenceOrder: number
     description?: string | null
     isActive?: boolean
+    inchargeUserId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -90107,6 +93466,7 @@ export namespace Prisma {
     sequenceOrder?: IntFieldUpdateOperationsInput | number
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    inchargeUserId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -91440,6 +94800,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateInput = {
@@ -91517,6 +94878,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUpdateInput = {
@@ -91594,6 +94956,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateInput = {
@@ -91671,6 +95034,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramCreateManyInput = {
@@ -92708,6 +96072,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
@@ -92737,7 +96102,8 @@ export namespace Prisma {
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanUncheckedCreateInput = {
@@ -92751,6 +96117,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     createdById: string
@@ -92776,7 +96143,8 @@ export namespace Prisma {
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderUncheckedCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanUpdateInput = {
@@ -92786,6 +96154,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -92815,7 +96184,8 @@ export namespace Prisma {
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateInput = {
@@ -92829,6 +96199,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -92854,7 +96225,8 @@ export namespace Prisma {
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUncheckedUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
   }
 
   export type ChallanCreateManyInput = {
@@ -92868,6 +96240,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     createdById: string
@@ -92894,6 +96267,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -92920,6 +96294,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -92945,6 +96320,8 @@ export namespace Prisma {
     fabricCode?: string | null
     colour?: string | null
     shade?: string | null
+    requiredDyeColor?: string | null
+    requiredDyeQuantity?: number | null
     size?: string | null
     unitType: string
     rollNumber?: string | null
@@ -92970,6 +96347,8 @@ export namespace Prisma {
     fabricCode?: string | null
     colour?: string | null
     shade?: string | null
+    requiredDyeColor?: string | null
+    requiredDyeQuantity?: number | null
     size?: string | null
     unitType: string
     rollNumber?: string | null
@@ -92993,6 +96372,8 @@ export namespace Prisma {
     fabricCode?: NullableStringFieldUpdateOperationsInput | string | null
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     shade?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredDyeColor?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredDyeQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     size?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: StringFieldUpdateOperationsInput | string
     rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
@@ -93018,6 +96399,8 @@ export namespace Prisma {
     fabricCode?: NullableStringFieldUpdateOperationsInput | string | null
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     shade?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredDyeColor?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredDyeQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     size?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: StringFieldUpdateOperationsInput | string
     rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
@@ -93042,6 +96425,8 @@ export namespace Prisma {
     fabricCode?: string | null
     colour?: string | null
     shade?: string | null
+    requiredDyeColor?: string | null
+    requiredDyeQuantity?: number | null
     size?: string | null
     unitType: string
     rollNumber?: string | null
@@ -93065,6 +96450,8 @@ export namespace Prisma {
     fabricCode?: NullableStringFieldUpdateOperationsInput | string | null
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     shade?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredDyeColor?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredDyeQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     size?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: StringFieldUpdateOperationsInput | string
     rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
@@ -93089,6 +96476,8 @@ export namespace Prisma {
     fabricCode?: NullableStringFieldUpdateOperationsInput | string | null
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     shade?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredDyeColor?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredDyeQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     size?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: StringFieldUpdateOperationsInput | string
     rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
@@ -94470,7 +97859,13 @@ export namespace Prisma {
   export type DefectRecordCreateInput = {
     id?: string
     defectCode: string
+    productionSheetNumber?: string | null
     departmentCode: string
+    shelfCode?: string | null
+    color?: string | null
+    fabricType?: string | null
+    quantityUnit?: string
+    responsibleIncharge?: string | null
     itemDescription: string
     severity: string
     quantity: number
@@ -94478,6 +97873,8 @@ export namespace Prisma {
     status?: string
     resolutionNotes?: string | null
     resolvedAt?: Date | string | null
+    shelfRemovedAt?: Date | string | null
+    shelfRemovalReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     program: ProgramCreateNestedOneWithoutDefectsInput
@@ -94492,8 +97889,14 @@ export namespace Prisma {
     id?: string
     defectCode: string
     programId: string
+    productionSheetNumber?: string | null
     challanId?: string | null
     departmentCode: string
+    shelfCode?: string | null
+    color?: string | null
+    fabricType?: string | null
+    quantityUnit?: string
+    responsibleIncharge?: string | null
     bundleId?: string | null
     itemDescription: string
     severity: string
@@ -94503,6 +97906,8 @@ export namespace Prisma {
     status?: string
     resolutionNotes?: string | null
     resolvedAt?: Date | string | null
+    shelfRemovedAt?: Date | string | null
+    shelfRemovalReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     reworks?: ReworkTransactionUncheckedCreateNestedManyWithoutDefectInput
@@ -94512,14 +97917,22 @@ export namespace Prisma {
   export type DefectRecordUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     defectCode?: StringFieldUpdateOperationsInput | string
+    productionSheetNumber?: NullableStringFieldUpdateOperationsInput | string | null
     departmentCode?: StringFieldUpdateOperationsInput | string
+    shelfCode?: NullableStringFieldUpdateOperationsInput | string | null
+    color?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    quantityUnit?: StringFieldUpdateOperationsInput | string
+    responsibleIncharge?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovalReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     program?: ProgramUpdateOneRequiredWithoutDefectsNestedInput
@@ -94534,17 +97947,25 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     defectCode?: StringFieldUpdateOperationsInput | string
     programId?: StringFieldUpdateOperationsInput | string
+    productionSheetNumber?: NullableStringFieldUpdateOperationsInput | string | null
     challanId?: NullableStringFieldUpdateOperationsInput | string | null
     departmentCode?: StringFieldUpdateOperationsInput | string
+    shelfCode?: NullableStringFieldUpdateOperationsInput | string | null
+    color?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    quantityUnit?: StringFieldUpdateOperationsInput | string
+    responsibleIncharge?: NullableStringFieldUpdateOperationsInput | string | null
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovalReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reworks?: ReworkTransactionUncheckedUpdateManyWithoutDefectNestedInput
@@ -94555,8 +97976,14 @@ export namespace Prisma {
     id?: string
     defectCode: string
     programId: string
+    productionSheetNumber?: string | null
     challanId?: string | null
     departmentCode: string
+    shelfCode?: string | null
+    color?: string | null
+    fabricType?: string | null
+    quantityUnit?: string
+    responsibleIncharge?: string | null
     bundleId?: string | null
     itemDescription: string
     severity: string
@@ -94566,6 +97993,8 @@ export namespace Prisma {
     status?: string
     resolutionNotes?: string | null
     resolvedAt?: Date | string | null
+    shelfRemovedAt?: Date | string | null
+    shelfRemovalReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -94573,14 +98002,22 @@ export namespace Prisma {
   export type DefectRecordUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     defectCode?: StringFieldUpdateOperationsInput | string
+    productionSheetNumber?: NullableStringFieldUpdateOperationsInput | string | null
     departmentCode?: StringFieldUpdateOperationsInput | string
+    shelfCode?: NullableStringFieldUpdateOperationsInput | string | null
+    color?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    quantityUnit?: StringFieldUpdateOperationsInput | string
+    responsibleIncharge?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovalReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -94589,17 +98026,25 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     defectCode?: StringFieldUpdateOperationsInput | string
     programId?: StringFieldUpdateOperationsInput | string
+    productionSheetNumber?: NullableStringFieldUpdateOperationsInput | string | null
     challanId?: NullableStringFieldUpdateOperationsInput | string | null
     departmentCode?: StringFieldUpdateOperationsInput | string
+    shelfCode?: NullableStringFieldUpdateOperationsInput | string | null
+    color?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    quantityUnit?: StringFieldUpdateOperationsInput | string
+    responsibleIncharge?: NullableStringFieldUpdateOperationsInput | string | null
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovalReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -95922,18 +99367,20 @@ export namespace Prisma {
   export type DyeingOrderCreateInput = {
     id?: string
     orderNumber: string
+    inboundChallanItemId?: string | null
     status?: string
     priority?: string
     fabricName: string
     fabricType?: string | null
+    currentColor?: string | null
     targetColor: string
     dyedColor?: string | null
     colorCode?: string | null
     requiredQuantity: number
     dyedQuantity?: number
     undyedQuantity?: number
-    readyForQc1Quantity?: number
-    sentToQc1Quantity?: number
+    readyForDyeingQcQuantity?: number
+    sentToDyeingQcQuantity?: number
     uom?: string
     inchargeName?: string | null
     batchNumber?: string | null
@@ -95941,13 +99388,13 @@ export namespace Prisma {
     processRemarks?: string | null
     startedAt?: Date | string | null
     completedAt?: Date | string | null
-    sentToQc1At?: Date | string | null
+    sentToDyeingQcAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     program: ProgramCreateNestedOneWithoutDyeingOrdersInput
     inboundChallan?: ChallanCreateNestedOneWithoutDyeingInboundOrdersInput
     incharge?: UserCreateNestedOneWithoutDyeingOrdersInchargeInput
-    qc1Challan?: ChallanCreateNestedOneWithoutDyeingQc1OrdersInput
+    dyeingQcChallan?: ChallanCreateNestedOneWithoutDyeingQcOrdersInput
   }
 
   export type DyeingOrderUncheckedCreateInput = {
@@ -95955,28 +99402,30 @@ export namespace Prisma {
     orderNumber: string
     programId: string
     inboundChallanId?: string | null
+    inboundChallanItemId?: string | null
     status?: string
     priority?: string
     fabricName: string
     fabricType?: string | null
+    currentColor?: string | null
     targetColor: string
     dyedColor?: string | null
     colorCode?: string | null
     requiredQuantity: number
     dyedQuantity?: number
     undyedQuantity?: number
-    readyForQc1Quantity?: number
-    sentToQc1Quantity?: number
+    readyForDyeingQcQuantity?: number
+    sentToDyeingQcQuantity?: number
     uom?: string
     inchargeId?: string | null
     inchargeName?: string | null
     batchNumber?: string | null
     machineNumber?: string | null
     processRemarks?: string | null
-    qc1ChallanId?: string | null
+    dyeingQcChallanId?: string | null
     startedAt?: Date | string | null
     completedAt?: Date | string | null
-    sentToQc1At?: Date | string | null
+    sentToDyeingQcAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -95984,18 +99433,20 @@ export namespace Prisma {
   export type DyeingOrderUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     orderNumber?: StringFieldUpdateOperationsInput | string
+    inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
     fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    currentColor?: NullableStringFieldUpdateOperationsInput | string | null
     targetColor?: StringFieldUpdateOperationsInput | string
     dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
     colorCode?: NullableStringFieldUpdateOperationsInput | string | null
     requiredQuantity?: FloatFieldUpdateOperationsInput | number
     dyedQuantity?: FloatFieldUpdateOperationsInput | number
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
-    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
-    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    readyForDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
+    sentToDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
@@ -96003,13 +99454,13 @@ export namespace Prisma {
     processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToDyeingQcAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     program?: ProgramUpdateOneRequiredWithoutDyeingOrdersNestedInput
     inboundChallan?: ChallanUpdateOneWithoutDyeingInboundOrdersNestedInput
     incharge?: UserUpdateOneWithoutDyeingOrdersInchargeNestedInput
-    qc1Challan?: ChallanUpdateOneWithoutDyeingQc1OrdersNestedInput
+    dyeingQcChallan?: ChallanUpdateOneWithoutDyeingQcOrdersNestedInput
   }
 
   export type DyeingOrderUncheckedUpdateInput = {
@@ -96017,28 +99468,30 @@ export namespace Prisma {
     orderNumber?: StringFieldUpdateOperationsInput | string
     programId?: StringFieldUpdateOperationsInput | string
     inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
     fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    currentColor?: NullableStringFieldUpdateOperationsInput | string | null
     targetColor?: StringFieldUpdateOperationsInput | string
     dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
     colorCode?: NullableStringFieldUpdateOperationsInput | string | null
     requiredQuantity?: FloatFieldUpdateOperationsInput | number
     dyedQuantity?: FloatFieldUpdateOperationsInput | number
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
-    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
-    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    readyForDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
+    sentToDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     inchargeId?: NullableStringFieldUpdateOperationsInput | string | null
     inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
     machineNumber?: NullableStringFieldUpdateOperationsInput | string | null
     processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
-    qc1ChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    dyeingQcChallanId?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToDyeingQcAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -96048,28 +99501,30 @@ export namespace Prisma {
     orderNumber: string
     programId: string
     inboundChallanId?: string | null
+    inboundChallanItemId?: string | null
     status?: string
     priority?: string
     fabricName: string
     fabricType?: string | null
+    currentColor?: string | null
     targetColor: string
     dyedColor?: string | null
     colorCode?: string | null
     requiredQuantity: number
     dyedQuantity?: number
     undyedQuantity?: number
-    readyForQc1Quantity?: number
-    sentToQc1Quantity?: number
+    readyForDyeingQcQuantity?: number
+    sentToDyeingQcQuantity?: number
     uom?: string
     inchargeId?: string | null
     inchargeName?: string | null
     batchNumber?: string | null
     machineNumber?: string | null
     processRemarks?: string | null
-    qc1ChallanId?: string | null
+    dyeingQcChallanId?: string | null
     startedAt?: Date | string | null
     completedAt?: Date | string | null
-    sentToQc1At?: Date | string | null
+    sentToDyeingQcAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -96077,18 +99532,20 @@ export namespace Prisma {
   export type DyeingOrderUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     orderNumber?: StringFieldUpdateOperationsInput | string
+    inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
     fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    currentColor?: NullableStringFieldUpdateOperationsInput | string | null
     targetColor?: StringFieldUpdateOperationsInput | string
     dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
     colorCode?: NullableStringFieldUpdateOperationsInput | string | null
     requiredQuantity?: FloatFieldUpdateOperationsInput | number
     dyedQuantity?: FloatFieldUpdateOperationsInput | number
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
-    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
-    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    readyForDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
+    sentToDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
@@ -96096,7 +99553,7 @@ export namespace Prisma {
     processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToDyeingQcAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -96106,28 +99563,30 @@ export namespace Prisma {
     orderNumber?: StringFieldUpdateOperationsInput | string
     programId?: StringFieldUpdateOperationsInput | string
     inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
     fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    currentColor?: NullableStringFieldUpdateOperationsInput | string | null
     targetColor?: StringFieldUpdateOperationsInput | string
     dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
     colorCode?: NullableStringFieldUpdateOperationsInput | string | null
     requiredQuantity?: FloatFieldUpdateOperationsInput | number
     dyedQuantity?: FloatFieldUpdateOperationsInput | number
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
-    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
-    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    readyForDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
+    sentToDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     inchargeId?: NullableStringFieldUpdateOperationsInput | string | null
     inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
     machineNumber?: NullableStringFieldUpdateOperationsInput | string | null
     processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
-    qc1ChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    dyeingQcChallanId?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToDyeingQcAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -96137,6 +99596,7 @@ export namespace Prisma {
     sNo?: number
     entryType: string
     itemName: string
+    color?: string | null
     billNo: string
     billDate: Date | string
     receivingDate: Date | string
@@ -96153,6 +99613,7 @@ export namespace Prisma {
     sNo?: number
     entryType: string
     itemName: string
+    color?: string | null
     billNo: string
     billDate: Date | string
     receivingDate: Date | string
@@ -96169,6 +99630,7 @@ export namespace Prisma {
     sNo?: IntFieldUpdateOperationsInput | number
     entryType?: StringFieldUpdateOperationsInput | string
     itemName?: StringFieldUpdateOperationsInput | string
+    color?: NullableStringFieldUpdateOperationsInput | string | null
     billNo?: StringFieldUpdateOperationsInput | string
     billDate?: DateTimeFieldUpdateOperationsInput | Date | string
     receivingDate?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -96185,6 +99647,7 @@ export namespace Prisma {
     sNo?: IntFieldUpdateOperationsInput | number
     entryType?: StringFieldUpdateOperationsInput | string
     itemName?: StringFieldUpdateOperationsInput | string
+    color?: NullableStringFieldUpdateOperationsInput | string | null
     billNo?: StringFieldUpdateOperationsInput | string
     billDate?: DateTimeFieldUpdateOperationsInput | Date | string
     receivingDate?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -96201,6 +99664,7 @@ export namespace Prisma {
     sNo?: number
     entryType: string
     itemName: string
+    color?: string | null
     billNo: string
     billDate: Date | string
     receivingDate: Date | string
@@ -96217,6 +99681,7 @@ export namespace Prisma {
     sNo?: IntFieldUpdateOperationsInput | number
     entryType?: StringFieldUpdateOperationsInput | string
     itemName?: StringFieldUpdateOperationsInput | string
+    color?: NullableStringFieldUpdateOperationsInput | string | null
     billNo?: StringFieldUpdateOperationsInput | string
     billDate?: DateTimeFieldUpdateOperationsInput | Date | string
     receivingDate?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -96233,6 +99698,7 @@ export namespace Prisma {
     sNo?: IntFieldUpdateOperationsInput | number
     entryType?: StringFieldUpdateOperationsInput | string
     itemName?: StringFieldUpdateOperationsInput | string
+    color?: NullableStringFieldUpdateOperationsInput | string | null
     billNo?: StringFieldUpdateOperationsInput | string
     billDate?: DateTimeFieldUpdateOperationsInput | Date | string
     receivingDate?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -96252,6 +99718,7 @@ export namespace Prisma {
     challanId?: string | null
     designNumber?: string | null
     itemName: string
+    color?: string | null
     issueQty: number
     unit?: string
     avgPerPcs?: number | null
@@ -96272,6 +99739,7 @@ export namespace Prisma {
     challanId?: string | null
     designNumber?: string | null
     itemName: string
+    color?: string | null
     issueQty: number
     unit?: string
     avgPerPcs?: number | null
@@ -96292,6 +99760,7 @@ export namespace Prisma {
     challanId?: NullableStringFieldUpdateOperationsInput | string | null
     designNumber?: NullableStringFieldUpdateOperationsInput | string | null
     itemName?: StringFieldUpdateOperationsInput | string
+    color?: NullableStringFieldUpdateOperationsInput | string | null
     issueQty?: FloatFieldUpdateOperationsInput | number
     unit?: StringFieldUpdateOperationsInput | string
     avgPerPcs?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -96312,6 +99781,7 @@ export namespace Prisma {
     challanId?: NullableStringFieldUpdateOperationsInput | string | null
     designNumber?: NullableStringFieldUpdateOperationsInput | string | null
     itemName?: StringFieldUpdateOperationsInput | string
+    color?: NullableStringFieldUpdateOperationsInput | string | null
     issueQty?: FloatFieldUpdateOperationsInput | number
     unit?: StringFieldUpdateOperationsInput | string
     avgPerPcs?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -96332,6 +99802,7 @@ export namespace Prisma {
     challanId?: string | null
     designNumber?: string | null
     itemName: string
+    color?: string | null
     issueQty: number
     unit?: string
     avgPerPcs?: number | null
@@ -96352,6 +99823,7 @@ export namespace Prisma {
     challanId?: NullableStringFieldUpdateOperationsInput | string | null
     designNumber?: NullableStringFieldUpdateOperationsInput | string | null
     itemName?: StringFieldUpdateOperationsInput | string
+    color?: NullableStringFieldUpdateOperationsInput | string | null
     issueQty?: FloatFieldUpdateOperationsInput | number
     unit?: StringFieldUpdateOperationsInput | string
     avgPerPcs?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -96372,6 +99844,7 @@ export namespace Prisma {
     challanId?: NullableStringFieldUpdateOperationsInput | string | null
     designNumber?: NullableStringFieldUpdateOperationsInput | string | null
     itemName?: StringFieldUpdateOperationsInput | string
+    color?: NullableStringFieldUpdateOperationsInput | string | null
     issueQty?: FloatFieldUpdateOperationsInput | number
     unit?: StringFieldUpdateOperationsInput | string
     avgPerPcs?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -96382,6 +99855,194 @@ export namespace Prisma {
     fabricType?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeadlineAlertCreateInput = {
+    id?: string
+    dedupeKey: string
+    departmentCode: string
+    taskType: string
+    taskId: string
+    stage: string
+    severity: string
+    deadlineAt: Date | string
+    deadlineSource: string
+    status?: string
+    resolutionReason?: string | null
+    createdAt?: Date | string
+    lastEvaluatedAt?: Date | string
+    resolvedAt?: Date | string | null
+    challan?: ChallanCreateNestedOneWithoutDeadlineAlertsInput
+    program?: ProgramCreateNestedOneWithoutDeadlineAlertsInput
+    assignedUser?: UserCreateNestedOneWithoutDeadlineAlertsAssignedInput
+    dismissals?: DeadlineAlertDismissalCreateNestedManyWithoutAlertInput
+  }
+
+  export type DeadlineAlertUncheckedCreateInput = {
+    id?: string
+    dedupeKey: string
+    departmentCode: string
+    taskType: string
+    taskId: string
+    challanId?: string | null
+    programId?: string | null
+    assignedUserId?: string | null
+    stage: string
+    severity: string
+    deadlineAt: Date | string
+    deadlineSource: string
+    status?: string
+    resolutionReason?: string | null
+    createdAt?: Date | string
+    lastEvaluatedAt?: Date | string
+    resolvedAt?: Date | string | null
+    dismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutAlertInput
+  }
+
+  export type DeadlineAlertUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    departmentCode?: StringFieldUpdateOperationsInput | string
+    taskType?: StringFieldUpdateOperationsInput | string
+    taskId?: StringFieldUpdateOperationsInput | string
+    stage?: StringFieldUpdateOperationsInput | string
+    severity?: StringFieldUpdateOperationsInput | string
+    deadlineAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deadlineSource?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    resolutionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastEvaluatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    challan?: ChallanUpdateOneWithoutDeadlineAlertsNestedInput
+    program?: ProgramUpdateOneWithoutDeadlineAlertsNestedInput
+    assignedUser?: UserUpdateOneWithoutDeadlineAlertsAssignedNestedInput
+    dismissals?: DeadlineAlertDismissalUpdateManyWithoutAlertNestedInput
+  }
+
+  export type DeadlineAlertUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    departmentCode?: StringFieldUpdateOperationsInput | string
+    taskType?: StringFieldUpdateOperationsInput | string
+    taskId?: StringFieldUpdateOperationsInput | string
+    challanId?: NullableStringFieldUpdateOperationsInput | string | null
+    programId?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    stage?: StringFieldUpdateOperationsInput | string
+    severity?: StringFieldUpdateOperationsInput | string
+    deadlineAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deadlineSource?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    resolutionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastEvaluatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutAlertNestedInput
+  }
+
+  export type DeadlineAlertCreateManyInput = {
+    id?: string
+    dedupeKey: string
+    departmentCode: string
+    taskType: string
+    taskId: string
+    challanId?: string | null
+    programId?: string | null
+    assignedUserId?: string | null
+    stage: string
+    severity: string
+    deadlineAt: Date | string
+    deadlineSource: string
+    status?: string
+    resolutionReason?: string | null
+    createdAt?: Date | string
+    lastEvaluatedAt?: Date | string
+    resolvedAt?: Date | string | null
+  }
+
+  export type DeadlineAlertUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    departmentCode?: StringFieldUpdateOperationsInput | string
+    taskType?: StringFieldUpdateOperationsInput | string
+    taskId?: StringFieldUpdateOperationsInput | string
+    stage?: StringFieldUpdateOperationsInput | string
+    severity?: StringFieldUpdateOperationsInput | string
+    deadlineAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deadlineSource?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    resolutionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastEvaluatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type DeadlineAlertUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    departmentCode?: StringFieldUpdateOperationsInput | string
+    taskType?: StringFieldUpdateOperationsInput | string
+    taskId?: StringFieldUpdateOperationsInput | string
+    challanId?: NullableStringFieldUpdateOperationsInput | string | null
+    programId?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    stage?: StringFieldUpdateOperationsInput | string
+    severity?: StringFieldUpdateOperationsInput | string
+    deadlineAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deadlineSource?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    resolutionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastEvaluatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type DeadlineAlertDismissalCreateInput = {
+    id?: string
+    dismissedAt?: Date | string
+    alert: DeadlineAlertCreateNestedOneWithoutDismissalsInput
+    user: UserCreateNestedOneWithoutDeadlineAlertDismissalsInput
+  }
+
+  export type DeadlineAlertDismissalUncheckedCreateInput = {
+    id?: string
+    alertId: string
+    userId: string
+    dismissedAt?: Date | string
+  }
+
+  export type DeadlineAlertDismissalUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dismissedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    alert?: DeadlineAlertUpdateOneRequiredWithoutDismissalsNestedInput
+    user?: UserUpdateOneRequiredWithoutDeadlineAlertDismissalsNestedInput
+  }
+
+  export type DeadlineAlertDismissalUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    alertId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    dismissedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeadlineAlertDismissalCreateManyInput = {
+    id?: string
+    alertId: string
+    userId: string
+    dismissedAt?: Date | string
+  }
+
+  export type DeadlineAlertDismissalUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dismissedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeadlineAlertDismissalUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    alertId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    dismissedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -96544,6 +100205,24 @@ export namespace Prisma {
     none?: DyeingOrderWhereInput
   }
 
+  export type DeadlineAlertListRelationFilter = {
+    every?: DeadlineAlertWhereInput
+    some?: DeadlineAlertWhereInput
+    none?: DeadlineAlertWhereInput
+  }
+
+  export type DeadlineAlertDismissalListRelationFilter = {
+    every?: DeadlineAlertDismissalWhereInput
+    some?: DeadlineAlertDismissalWhereInput
+    none?: DeadlineAlertDismissalWhereInput
+  }
+
+  export type DepartmentListRelationFilter = {
+    every?: DepartmentWhereInput
+    some?: DepartmentWhereInput
+    none?: DepartmentWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -96622,6 +100301,18 @@ export namespace Prisma {
   }
 
   export type DyeingOrderOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type DeadlineAlertOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type DeadlineAlertDismissalOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type DepartmentOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -96870,6 +100561,11 @@ export namespace Prisma {
     not?: NestedIntFilter<$PrismaModel> | number
   }
 
+  export type UserNullableScalarRelationFilter = {
+    is?: UserWhereInput | null
+    isNot?: UserWhereInput | null
+  }
+
   export type WorkCenterListRelationFilter = {
     every?: WorkCenterWhereInput
     some?: WorkCenterWhereInput
@@ -96907,6 +100603,7 @@ export namespace Prisma {
     sequenceOrder?: SortOrder
     description?: SortOrder
     isActive?: SortOrder
+    inchargeUserId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -96922,6 +100619,7 @@ export namespace Prisma {
     sequenceOrder?: SortOrder
     description?: SortOrder
     isActive?: SortOrder
+    inchargeUserId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -96933,6 +100631,7 @@ export namespace Prisma {
     sequenceOrder?: SortOrder
     description?: SortOrder
     isActive?: SortOrder
+    inchargeUserId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -97748,11 +101447,6 @@ export namespace Prisma {
     isNot?: DesignWhereInput | null
   }
 
-  export type UserNullableScalarRelationFilter = {
-    is?: UserWhereInput | null
-    isNot?: UserWhereInput | null
-  }
-
   export type ProgramRouteListRelationFilter = {
     every?: ProgramRouteWhereInput
     some?: ProgramRouteWhereInput
@@ -98534,6 +102228,7 @@ export namespace Prisma {
     status?: SortOrder
     priority?: SortOrder
     issuedDate?: SortOrder
+    deliveryDate?: SortOrder
     receivedDate?: SortOrder
     completedDate?: SortOrder
     createdById?: SortOrder
@@ -98570,6 +102265,7 @@ export namespace Prisma {
     status?: SortOrder
     priority?: SortOrder
     issuedDate?: SortOrder
+    deliveryDate?: SortOrder
     receivedDate?: SortOrder
     completedDate?: SortOrder
     createdById?: SortOrder
@@ -98600,6 +102296,7 @@ export namespace Prisma {
     status?: SortOrder
     priority?: SortOrder
     issuedDate?: SortOrder
+    deliveryDate?: SortOrder
     receivedDate?: SortOrder
     completedDate?: SortOrder
     createdById?: SortOrder
@@ -98637,6 +102334,8 @@ export namespace Prisma {
     fabricCode?: SortOrder
     colour?: SortOrder
     shade?: SortOrder
+    requiredDyeColor?: SortOrder
+    requiredDyeQuantity?: SortOrder
     size?: SortOrder
     unitType?: SortOrder
     rollNumber?: SortOrder
@@ -98655,6 +102354,7 @@ export namespace Prisma {
   }
 
   export type ChallanItemAvgOrderByAggregateInput = {
+    requiredDyeQuantity?: SortOrder
     quantity?: SortOrder
     grossWeightKg?: SortOrder
     netWeightKg?: SortOrder
@@ -98667,6 +102367,8 @@ export namespace Prisma {
     fabricCode?: SortOrder
     colour?: SortOrder
     shade?: SortOrder
+    requiredDyeColor?: SortOrder
+    requiredDyeQuantity?: SortOrder
     size?: SortOrder
     unitType?: SortOrder
     rollNumber?: SortOrder
@@ -98691,6 +102393,8 @@ export namespace Prisma {
     fabricCode?: SortOrder
     colour?: SortOrder
     shade?: SortOrder
+    requiredDyeColor?: SortOrder
+    requiredDyeQuantity?: SortOrder
     size?: SortOrder
     unitType?: SortOrder
     rollNumber?: SortOrder
@@ -98709,6 +102413,7 @@ export namespace Prisma {
   }
 
   export type ChallanItemSumOrderByAggregateInput = {
+    requiredDyeQuantity?: SortOrder
     quantity?: SortOrder
     grossWeightKg?: SortOrder
     netWeightKg?: SortOrder
@@ -99494,8 +103199,14 @@ export namespace Prisma {
     id?: SortOrder
     defectCode?: SortOrder
     programId?: SortOrder
+    productionSheetNumber?: SortOrder
     challanId?: SortOrder
     departmentCode?: SortOrder
+    shelfCode?: SortOrder
+    color?: SortOrder
+    fabricType?: SortOrder
+    quantityUnit?: SortOrder
+    responsibleIncharge?: SortOrder
     bundleId?: SortOrder
     itemDescription?: SortOrder
     severity?: SortOrder
@@ -99505,6 +103216,8 @@ export namespace Prisma {
     status?: SortOrder
     resolutionNotes?: SortOrder
     resolvedAt?: SortOrder
+    shelfRemovedAt?: SortOrder
+    shelfRemovalReason?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -99517,8 +103230,14 @@ export namespace Prisma {
     id?: SortOrder
     defectCode?: SortOrder
     programId?: SortOrder
+    productionSheetNumber?: SortOrder
     challanId?: SortOrder
     departmentCode?: SortOrder
+    shelfCode?: SortOrder
+    color?: SortOrder
+    fabricType?: SortOrder
+    quantityUnit?: SortOrder
+    responsibleIncharge?: SortOrder
     bundleId?: SortOrder
     itemDescription?: SortOrder
     severity?: SortOrder
@@ -99528,6 +103247,8 @@ export namespace Prisma {
     status?: SortOrder
     resolutionNotes?: SortOrder
     resolvedAt?: SortOrder
+    shelfRemovedAt?: SortOrder
+    shelfRemovalReason?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -99536,8 +103257,14 @@ export namespace Prisma {
     id?: SortOrder
     defectCode?: SortOrder
     programId?: SortOrder
+    productionSheetNumber?: SortOrder
     challanId?: SortOrder
     departmentCode?: SortOrder
+    shelfCode?: SortOrder
+    color?: SortOrder
+    fabricType?: SortOrder
+    quantityUnit?: SortOrder
+    responsibleIncharge?: SortOrder
     bundleId?: SortOrder
     itemDescription?: SortOrder
     severity?: SortOrder
@@ -99547,6 +103274,8 @@ export namespace Prisma {
     status?: SortOrder
     resolutionNotes?: SortOrder
     resolvedAt?: SortOrder
+    shelfRemovedAt?: SortOrder
+    shelfRemovalReason?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -100476,28 +104205,30 @@ export namespace Prisma {
     orderNumber?: SortOrder
     programId?: SortOrder
     inboundChallanId?: SortOrder
+    inboundChallanItemId?: SortOrder
     status?: SortOrder
     priority?: SortOrder
     fabricName?: SortOrder
     fabricType?: SortOrder
+    currentColor?: SortOrder
     targetColor?: SortOrder
     dyedColor?: SortOrder
     colorCode?: SortOrder
     requiredQuantity?: SortOrder
     dyedQuantity?: SortOrder
     undyedQuantity?: SortOrder
-    readyForQc1Quantity?: SortOrder
-    sentToQc1Quantity?: SortOrder
+    readyForDyeingQcQuantity?: SortOrder
+    sentToDyeingQcQuantity?: SortOrder
     uom?: SortOrder
     inchargeId?: SortOrder
     inchargeName?: SortOrder
     batchNumber?: SortOrder
     machineNumber?: SortOrder
     processRemarks?: SortOrder
-    qc1ChallanId?: SortOrder
+    dyeingQcChallanId?: SortOrder
     startedAt?: SortOrder
     completedAt?: SortOrder
-    sentToQc1At?: SortOrder
+    sentToDyeingQcAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -100506,8 +104237,8 @@ export namespace Prisma {
     requiredQuantity?: SortOrder
     dyedQuantity?: SortOrder
     undyedQuantity?: SortOrder
-    readyForQc1Quantity?: SortOrder
-    sentToQc1Quantity?: SortOrder
+    readyForDyeingQcQuantity?: SortOrder
+    sentToDyeingQcQuantity?: SortOrder
   }
 
   export type DyeingOrderMaxOrderByAggregateInput = {
@@ -100515,28 +104246,30 @@ export namespace Prisma {
     orderNumber?: SortOrder
     programId?: SortOrder
     inboundChallanId?: SortOrder
+    inboundChallanItemId?: SortOrder
     status?: SortOrder
     priority?: SortOrder
     fabricName?: SortOrder
     fabricType?: SortOrder
+    currentColor?: SortOrder
     targetColor?: SortOrder
     dyedColor?: SortOrder
     colorCode?: SortOrder
     requiredQuantity?: SortOrder
     dyedQuantity?: SortOrder
     undyedQuantity?: SortOrder
-    readyForQc1Quantity?: SortOrder
-    sentToQc1Quantity?: SortOrder
+    readyForDyeingQcQuantity?: SortOrder
+    sentToDyeingQcQuantity?: SortOrder
     uom?: SortOrder
     inchargeId?: SortOrder
     inchargeName?: SortOrder
     batchNumber?: SortOrder
     machineNumber?: SortOrder
     processRemarks?: SortOrder
-    qc1ChallanId?: SortOrder
+    dyeingQcChallanId?: SortOrder
     startedAt?: SortOrder
     completedAt?: SortOrder
-    sentToQc1At?: SortOrder
+    sentToDyeingQcAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -100546,28 +104279,30 @@ export namespace Prisma {
     orderNumber?: SortOrder
     programId?: SortOrder
     inboundChallanId?: SortOrder
+    inboundChallanItemId?: SortOrder
     status?: SortOrder
     priority?: SortOrder
     fabricName?: SortOrder
     fabricType?: SortOrder
+    currentColor?: SortOrder
     targetColor?: SortOrder
     dyedColor?: SortOrder
     colorCode?: SortOrder
     requiredQuantity?: SortOrder
     dyedQuantity?: SortOrder
     undyedQuantity?: SortOrder
-    readyForQc1Quantity?: SortOrder
-    sentToQc1Quantity?: SortOrder
+    readyForDyeingQcQuantity?: SortOrder
+    sentToDyeingQcQuantity?: SortOrder
     uom?: SortOrder
     inchargeId?: SortOrder
     inchargeName?: SortOrder
     batchNumber?: SortOrder
     machineNumber?: SortOrder
     processRemarks?: SortOrder
-    qc1ChallanId?: SortOrder
+    dyeingQcChallanId?: SortOrder
     startedAt?: SortOrder
     completedAt?: SortOrder
-    sentToQc1At?: SortOrder
+    sentToDyeingQcAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -100576,8 +104311,8 @@ export namespace Prisma {
     requiredQuantity?: SortOrder
     dyedQuantity?: SortOrder
     undyedQuantity?: SortOrder
-    readyForQc1Quantity?: SortOrder
-    sentToQc1Quantity?: SortOrder
+    readyForDyeingQcQuantity?: SortOrder
+    sentToDyeingQcQuantity?: SortOrder
   }
 
   export type FabricInwardCountOrderByAggregateInput = {
@@ -100585,6 +104320,7 @@ export namespace Prisma {
     sNo?: SortOrder
     entryType?: SortOrder
     itemName?: SortOrder
+    color?: SortOrder
     billNo?: SortOrder
     billDate?: SortOrder
     receivingDate?: SortOrder
@@ -100606,6 +104342,7 @@ export namespace Prisma {
     sNo?: SortOrder
     entryType?: SortOrder
     itemName?: SortOrder
+    color?: SortOrder
     billNo?: SortOrder
     billDate?: SortOrder
     receivingDate?: SortOrder
@@ -100622,6 +104359,7 @@ export namespace Prisma {
     sNo?: SortOrder
     entryType?: SortOrder
     itemName?: SortOrder
+    color?: SortOrder
     billNo?: SortOrder
     billDate?: SortOrder
     receivingDate?: SortOrder
@@ -100646,6 +104384,7 @@ export namespace Prisma {
     challanId?: SortOrder
     designNumber?: SortOrder
     itemName?: SortOrder
+    color?: SortOrder
     issueQty?: SortOrder
     unit?: SortOrder
     avgPerPcs?: SortOrder
@@ -100673,6 +104412,7 @@ export namespace Prisma {
     challanId?: SortOrder
     designNumber?: SortOrder
     itemName?: SortOrder
+    color?: SortOrder
     issueQty?: SortOrder
     unit?: SortOrder
     avgPerPcs?: SortOrder
@@ -100693,6 +104433,7 @@ export namespace Prisma {
     challanId?: SortOrder
     designNumber?: SortOrder
     itemName?: SortOrder
+    color?: SortOrder
     issueQty?: SortOrder
     unit?: SortOrder
     avgPerPcs?: SortOrder
@@ -100710,6 +104451,97 @@ export namespace Prisma {
     issueQty?: SortOrder
     avgPerPcs?: SortOrder
     issuePcsQty?: SortOrder
+  }
+
+  export type DeadlineAlertCountOrderByAggregateInput = {
+    id?: SortOrder
+    dedupeKey?: SortOrder
+    departmentCode?: SortOrder
+    taskType?: SortOrder
+    taskId?: SortOrder
+    challanId?: SortOrder
+    programId?: SortOrder
+    assignedUserId?: SortOrder
+    stage?: SortOrder
+    severity?: SortOrder
+    deadlineAt?: SortOrder
+    deadlineSource?: SortOrder
+    status?: SortOrder
+    resolutionReason?: SortOrder
+    createdAt?: SortOrder
+    lastEvaluatedAt?: SortOrder
+    resolvedAt?: SortOrder
+  }
+
+  export type DeadlineAlertMaxOrderByAggregateInput = {
+    id?: SortOrder
+    dedupeKey?: SortOrder
+    departmentCode?: SortOrder
+    taskType?: SortOrder
+    taskId?: SortOrder
+    challanId?: SortOrder
+    programId?: SortOrder
+    assignedUserId?: SortOrder
+    stage?: SortOrder
+    severity?: SortOrder
+    deadlineAt?: SortOrder
+    deadlineSource?: SortOrder
+    status?: SortOrder
+    resolutionReason?: SortOrder
+    createdAt?: SortOrder
+    lastEvaluatedAt?: SortOrder
+    resolvedAt?: SortOrder
+  }
+
+  export type DeadlineAlertMinOrderByAggregateInput = {
+    id?: SortOrder
+    dedupeKey?: SortOrder
+    departmentCode?: SortOrder
+    taskType?: SortOrder
+    taskId?: SortOrder
+    challanId?: SortOrder
+    programId?: SortOrder
+    assignedUserId?: SortOrder
+    stage?: SortOrder
+    severity?: SortOrder
+    deadlineAt?: SortOrder
+    deadlineSource?: SortOrder
+    status?: SortOrder
+    resolutionReason?: SortOrder
+    createdAt?: SortOrder
+    lastEvaluatedAt?: SortOrder
+    resolvedAt?: SortOrder
+  }
+
+  export type DeadlineAlertScalarRelationFilter = {
+    is?: DeadlineAlertWhereInput
+    isNot?: DeadlineAlertWhereInput
+  }
+
+  export type DeadlineAlertDismissalAlertIdUserIdCompoundUniqueInput = {
+    alertId: string
+    userId: string
+  }
+
+  export type DeadlineAlertDismissalCountOrderByAggregateInput = {
+    id?: SortOrder
+    alertId?: SortOrder
+    userId?: SortOrder
+    dismissedAt?: SortOrder
+  }
+
+  export type DeadlineAlertDismissalMaxOrderByAggregateInput = {
+    id?: SortOrder
+    alertId?: SortOrder
+    userId?: SortOrder
+    dismissedAt?: SortOrder
+  }
+
+  export type DeadlineAlertDismissalMinOrderByAggregateInput = {
+    id?: SortOrder
+    alertId?: SortOrder
+    userId?: SortOrder
+    dismissedAt?: SortOrder
   }
 
   export type UserRoleCreateNestedManyWithoutUserInput = {
@@ -100887,6 +104719,27 @@ export namespace Prisma {
     connect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
   }
 
+  export type DeadlineAlertCreateNestedManyWithoutAssignedUserInput = {
+    create?: XOR<DeadlineAlertCreateWithoutAssignedUserInput, DeadlineAlertUncheckedCreateWithoutAssignedUserInput> | DeadlineAlertCreateWithoutAssignedUserInput[] | DeadlineAlertUncheckedCreateWithoutAssignedUserInput[]
+    connectOrCreate?: DeadlineAlertCreateOrConnectWithoutAssignedUserInput | DeadlineAlertCreateOrConnectWithoutAssignedUserInput[]
+    createMany?: DeadlineAlertCreateManyAssignedUserInputEnvelope
+    connect?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
+  }
+
+  export type DeadlineAlertDismissalCreateNestedManyWithoutUserInput = {
+    create?: XOR<DeadlineAlertDismissalCreateWithoutUserInput, DeadlineAlertDismissalUncheckedCreateWithoutUserInput> | DeadlineAlertDismissalCreateWithoutUserInput[] | DeadlineAlertDismissalUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: DeadlineAlertDismissalCreateOrConnectWithoutUserInput | DeadlineAlertDismissalCreateOrConnectWithoutUserInput[]
+    createMany?: DeadlineAlertDismissalCreateManyUserInputEnvelope
+    connect?: DeadlineAlertDismissalWhereUniqueInput | DeadlineAlertDismissalWhereUniqueInput[]
+  }
+
+  export type DepartmentCreateNestedManyWithoutInchargeInput = {
+    create?: XOR<DepartmentCreateWithoutInchargeInput, DepartmentUncheckedCreateWithoutInchargeInput> | DepartmentCreateWithoutInchargeInput[] | DepartmentUncheckedCreateWithoutInchargeInput[]
+    connectOrCreate?: DepartmentCreateOrConnectWithoutInchargeInput | DepartmentCreateOrConnectWithoutInchargeInput[]
+    createMany?: DepartmentCreateManyInchargeInputEnvelope
+    connect?: DepartmentWhereUniqueInput | DepartmentWhereUniqueInput[]
+  }
+
   export type UserRoleUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<UserRoleCreateWithoutUserInput, UserRoleUncheckedCreateWithoutUserInput> | UserRoleCreateWithoutUserInput[] | UserRoleUncheckedCreateWithoutUserInput[]
     connectOrCreate?: UserRoleCreateOrConnectWithoutUserInput | UserRoleCreateOrConnectWithoutUserInput[]
@@ -101060,6 +104913,27 @@ export namespace Prisma {
     connectOrCreate?: DyeingOrderCreateOrConnectWithoutInchargeInput | DyeingOrderCreateOrConnectWithoutInchargeInput[]
     createMany?: DyeingOrderCreateManyInchargeInputEnvelope
     connect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+  }
+
+  export type DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput = {
+    create?: XOR<DeadlineAlertCreateWithoutAssignedUserInput, DeadlineAlertUncheckedCreateWithoutAssignedUserInput> | DeadlineAlertCreateWithoutAssignedUserInput[] | DeadlineAlertUncheckedCreateWithoutAssignedUserInput[]
+    connectOrCreate?: DeadlineAlertCreateOrConnectWithoutAssignedUserInput | DeadlineAlertCreateOrConnectWithoutAssignedUserInput[]
+    createMany?: DeadlineAlertCreateManyAssignedUserInputEnvelope
+    connect?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
+  }
+
+  export type DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<DeadlineAlertDismissalCreateWithoutUserInput, DeadlineAlertDismissalUncheckedCreateWithoutUserInput> | DeadlineAlertDismissalCreateWithoutUserInput[] | DeadlineAlertDismissalUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: DeadlineAlertDismissalCreateOrConnectWithoutUserInput | DeadlineAlertDismissalCreateOrConnectWithoutUserInput[]
+    createMany?: DeadlineAlertDismissalCreateManyUserInputEnvelope
+    connect?: DeadlineAlertDismissalWhereUniqueInput | DeadlineAlertDismissalWhereUniqueInput[]
+  }
+
+  export type DepartmentUncheckedCreateNestedManyWithoutInchargeInput = {
+    create?: XOR<DepartmentCreateWithoutInchargeInput, DepartmentUncheckedCreateWithoutInchargeInput> | DepartmentCreateWithoutInchargeInput[] | DepartmentUncheckedCreateWithoutInchargeInput[]
+    connectOrCreate?: DepartmentCreateOrConnectWithoutInchargeInput | DepartmentCreateOrConnectWithoutInchargeInput[]
+    createMany?: DepartmentCreateManyInchargeInputEnvelope
+    connect?: DepartmentWhereUniqueInput | DepartmentWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -101428,6 +105302,48 @@ export namespace Prisma {
     deleteMany?: DyeingOrderScalarWhereInput | DyeingOrderScalarWhereInput[]
   }
 
+  export type DeadlineAlertUpdateManyWithoutAssignedUserNestedInput = {
+    create?: XOR<DeadlineAlertCreateWithoutAssignedUserInput, DeadlineAlertUncheckedCreateWithoutAssignedUserInput> | DeadlineAlertCreateWithoutAssignedUserInput[] | DeadlineAlertUncheckedCreateWithoutAssignedUserInput[]
+    connectOrCreate?: DeadlineAlertCreateOrConnectWithoutAssignedUserInput | DeadlineAlertCreateOrConnectWithoutAssignedUserInput[]
+    upsert?: DeadlineAlertUpsertWithWhereUniqueWithoutAssignedUserInput | DeadlineAlertUpsertWithWhereUniqueWithoutAssignedUserInput[]
+    createMany?: DeadlineAlertCreateManyAssignedUserInputEnvelope
+    set?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
+    disconnect?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
+    delete?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
+    connect?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
+    update?: DeadlineAlertUpdateWithWhereUniqueWithoutAssignedUserInput | DeadlineAlertUpdateWithWhereUniqueWithoutAssignedUserInput[]
+    updateMany?: DeadlineAlertUpdateManyWithWhereWithoutAssignedUserInput | DeadlineAlertUpdateManyWithWhereWithoutAssignedUserInput[]
+    deleteMany?: DeadlineAlertScalarWhereInput | DeadlineAlertScalarWhereInput[]
+  }
+
+  export type DeadlineAlertDismissalUpdateManyWithoutUserNestedInput = {
+    create?: XOR<DeadlineAlertDismissalCreateWithoutUserInput, DeadlineAlertDismissalUncheckedCreateWithoutUserInput> | DeadlineAlertDismissalCreateWithoutUserInput[] | DeadlineAlertDismissalUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: DeadlineAlertDismissalCreateOrConnectWithoutUserInput | DeadlineAlertDismissalCreateOrConnectWithoutUserInput[]
+    upsert?: DeadlineAlertDismissalUpsertWithWhereUniqueWithoutUserInput | DeadlineAlertDismissalUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: DeadlineAlertDismissalCreateManyUserInputEnvelope
+    set?: DeadlineAlertDismissalWhereUniqueInput | DeadlineAlertDismissalWhereUniqueInput[]
+    disconnect?: DeadlineAlertDismissalWhereUniqueInput | DeadlineAlertDismissalWhereUniqueInput[]
+    delete?: DeadlineAlertDismissalWhereUniqueInput | DeadlineAlertDismissalWhereUniqueInput[]
+    connect?: DeadlineAlertDismissalWhereUniqueInput | DeadlineAlertDismissalWhereUniqueInput[]
+    update?: DeadlineAlertDismissalUpdateWithWhereUniqueWithoutUserInput | DeadlineAlertDismissalUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: DeadlineAlertDismissalUpdateManyWithWhereWithoutUserInput | DeadlineAlertDismissalUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: DeadlineAlertDismissalScalarWhereInput | DeadlineAlertDismissalScalarWhereInput[]
+  }
+
+  export type DepartmentUpdateManyWithoutInchargeNestedInput = {
+    create?: XOR<DepartmentCreateWithoutInchargeInput, DepartmentUncheckedCreateWithoutInchargeInput> | DepartmentCreateWithoutInchargeInput[] | DepartmentUncheckedCreateWithoutInchargeInput[]
+    connectOrCreate?: DepartmentCreateOrConnectWithoutInchargeInput | DepartmentCreateOrConnectWithoutInchargeInput[]
+    upsert?: DepartmentUpsertWithWhereUniqueWithoutInchargeInput | DepartmentUpsertWithWhereUniqueWithoutInchargeInput[]
+    createMany?: DepartmentCreateManyInchargeInputEnvelope
+    set?: DepartmentWhereUniqueInput | DepartmentWhereUniqueInput[]
+    disconnect?: DepartmentWhereUniqueInput | DepartmentWhereUniqueInput[]
+    delete?: DepartmentWhereUniqueInput | DepartmentWhereUniqueInput[]
+    connect?: DepartmentWhereUniqueInput | DepartmentWhereUniqueInput[]
+    update?: DepartmentUpdateWithWhereUniqueWithoutInchargeInput | DepartmentUpdateWithWhereUniqueWithoutInchargeInput[]
+    updateMany?: DepartmentUpdateManyWithWhereWithoutInchargeInput | DepartmentUpdateManyWithWhereWithoutInchargeInput[]
+    deleteMany?: DepartmentScalarWhereInput | DepartmentScalarWhereInput[]
+  }
+
   export type UserRoleUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<UserRoleCreateWithoutUserInput, UserRoleUncheckedCreateWithoutUserInput> | UserRoleCreateWithoutUserInput[] | UserRoleUncheckedCreateWithoutUserInput[]
     connectOrCreate?: UserRoleCreateOrConnectWithoutUserInput | UserRoleCreateOrConnectWithoutUserInput[]
@@ -101778,6 +105694,48 @@ export namespace Prisma {
     deleteMany?: DyeingOrderScalarWhereInput | DyeingOrderScalarWhereInput[]
   }
 
+  export type DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput = {
+    create?: XOR<DeadlineAlertCreateWithoutAssignedUserInput, DeadlineAlertUncheckedCreateWithoutAssignedUserInput> | DeadlineAlertCreateWithoutAssignedUserInput[] | DeadlineAlertUncheckedCreateWithoutAssignedUserInput[]
+    connectOrCreate?: DeadlineAlertCreateOrConnectWithoutAssignedUserInput | DeadlineAlertCreateOrConnectWithoutAssignedUserInput[]
+    upsert?: DeadlineAlertUpsertWithWhereUniqueWithoutAssignedUserInput | DeadlineAlertUpsertWithWhereUniqueWithoutAssignedUserInput[]
+    createMany?: DeadlineAlertCreateManyAssignedUserInputEnvelope
+    set?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
+    disconnect?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
+    delete?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
+    connect?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
+    update?: DeadlineAlertUpdateWithWhereUniqueWithoutAssignedUserInput | DeadlineAlertUpdateWithWhereUniqueWithoutAssignedUserInput[]
+    updateMany?: DeadlineAlertUpdateManyWithWhereWithoutAssignedUserInput | DeadlineAlertUpdateManyWithWhereWithoutAssignedUserInput[]
+    deleteMany?: DeadlineAlertScalarWhereInput | DeadlineAlertScalarWhereInput[]
+  }
+
+  export type DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<DeadlineAlertDismissalCreateWithoutUserInput, DeadlineAlertDismissalUncheckedCreateWithoutUserInput> | DeadlineAlertDismissalCreateWithoutUserInput[] | DeadlineAlertDismissalUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: DeadlineAlertDismissalCreateOrConnectWithoutUserInput | DeadlineAlertDismissalCreateOrConnectWithoutUserInput[]
+    upsert?: DeadlineAlertDismissalUpsertWithWhereUniqueWithoutUserInput | DeadlineAlertDismissalUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: DeadlineAlertDismissalCreateManyUserInputEnvelope
+    set?: DeadlineAlertDismissalWhereUniqueInput | DeadlineAlertDismissalWhereUniqueInput[]
+    disconnect?: DeadlineAlertDismissalWhereUniqueInput | DeadlineAlertDismissalWhereUniqueInput[]
+    delete?: DeadlineAlertDismissalWhereUniqueInput | DeadlineAlertDismissalWhereUniqueInput[]
+    connect?: DeadlineAlertDismissalWhereUniqueInput | DeadlineAlertDismissalWhereUniqueInput[]
+    update?: DeadlineAlertDismissalUpdateWithWhereUniqueWithoutUserInput | DeadlineAlertDismissalUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: DeadlineAlertDismissalUpdateManyWithWhereWithoutUserInput | DeadlineAlertDismissalUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: DeadlineAlertDismissalScalarWhereInput | DeadlineAlertDismissalScalarWhereInput[]
+  }
+
+  export type DepartmentUncheckedUpdateManyWithoutInchargeNestedInput = {
+    create?: XOR<DepartmentCreateWithoutInchargeInput, DepartmentUncheckedCreateWithoutInchargeInput> | DepartmentCreateWithoutInchargeInput[] | DepartmentUncheckedCreateWithoutInchargeInput[]
+    connectOrCreate?: DepartmentCreateOrConnectWithoutInchargeInput | DepartmentCreateOrConnectWithoutInchargeInput[]
+    upsert?: DepartmentUpsertWithWhereUniqueWithoutInchargeInput | DepartmentUpsertWithWhereUniqueWithoutInchargeInput[]
+    createMany?: DepartmentCreateManyInchargeInputEnvelope
+    set?: DepartmentWhereUniqueInput | DepartmentWhereUniqueInput[]
+    disconnect?: DepartmentWhereUniqueInput | DepartmentWhereUniqueInput[]
+    delete?: DepartmentWhereUniqueInput | DepartmentWhereUniqueInput[]
+    connect?: DepartmentWhereUniqueInput | DepartmentWhereUniqueInput[]
+    update?: DepartmentUpdateWithWhereUniqueWithoutInchargeInput | DepartmentUpdateWithWhereUniqueWithoutInchargeInput[]
+    updateMany?: DepartmentUpdateManyWithWhereWithoutInchargeInput | DepartmentUpdateManyWithWhereWithoutInchargeInput[]
+    deleteMany?: DepartmentScalarWhereInput | DepartmentScalarWhereInput[]
+  }
+
   export type UserRoleCreateNestedManyWithoutRoleInput = {
     create?: XOR<UserRoleCreateWithoutRoleInput, UserRoleUncheckedCreateWithoutRoleInput> | UserRoleCreateWithoutRoleInput[] | UserRoleUncheckedCreateWithoutRoleInput[]
     connectOrCreate?: UserRoleCreateOrConnectWithoutRoleInput | UserRoleCreateOrConnectWithoutRoleInput[]
@@ -101960,6 +105918,12 @@ export namespace Prisma {
     update?: XOR<XOR<RoleUpdateToOneWithWhereWithoutUserRolesInput, RoleUpdateWithoutUserRolesInput>, RoleUncheckedUpdateWithoutUserRolesInput>
   }
 
+  export type UserCreateNestedOneWithoutDepartmentsInChargeInput = {
+    create?: XOR<UserCreateWithoutDepartmentsInChargeInput, UserUncheckedCreateWithoutDepartmentsInChargeInput>
+    connectOrCreate?: UserCreateOrConnectWithoutDepartmentsInChargeInput
+    connect?: UserWhereUniqueInput
+  }
+
   export type WorkCenterCreateNestedManyWithoutDepartmentInput = {
     create?: XOR<WorkCenterCreateWithoutDepartmentInput, WorkCenterUncheckedCreateWithoutDepartmentInput> | WorkCenterCreateWithoutDepartmentInput[] | WorkCenterUncheckedCreateWithoutDepartmentInput[]
     connectOrCreate?: WorkCenterCreateOrConnectWithoutDepartmentInput | WorkCenterCreateOrConnectWithoutDepartmentInput[]
@@ -102036,6 +106000,16 @@ export namespace Prisma {
     decrement?: number
     multiply?: number
     divide?: number
+  }
+
+  export type UserUpdateOneWithoutDepartmentsInChargeNestedInput = {
+    create?: XOR<UserCreateWithoutDepartmentsInChargeInput, UserUncheckedCreateWithoutDepartmentsInChargeInput>
+    connectOrCreate?: UserCreateOrConnectWithoutDepartmentsInChargeInput
+    upsert?: UserUpsertWithoutDepartmentsInChargeInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutDepartmentsInChargeInput, UserUpdateWithoutDepartmentsInChargeInput>, UserUncheckedUpdateWithoutDepartmentsInChargeInput>
   }
 
   export type WorkCenterUpdateManyWithoutDepartmentNestedInput = {
@@ -103122,6 +107096,13 @@ export namespace Prisma {
     connect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
   }
 
+  export type DeadlineAlertCreateNestedManyWithoutProgramInput = {
+    create?: XOR<DeadlineAlertCreateWithoutProgramInput, DeadlineAlertUncheckedCreateWithoutProgramInput> | DeadlineAlertCreateWithoutProgramInput[] | DeadlineAlertUncheckedCreateWithoutProgramInput[]
+    connectOrCreate?: DeadlineAlertCreateOrConnectWithoutProgramInput | DeadlineAlertCreateOrConnectWithoutProgramInput[]
+    createMany?: DeadlineAlertCreateManyProgramInputEnvelope
+    connect?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
+  }
+
   export type ProgramFabricUncheckedCreateNestedManyWithoutProgramInput = {
     create?: XOR<ProgramFabricCreateWithoutProgramInput, ProgramFabricUncheckedCreateWithoutProgramInput> | ProgramFabricCreateWithoutProgramInput[] | ProgramFabricUncheckedCreateWithoutProgramInput[]
     connectOrCreate?: ProgramFabricCreateOrConnectWithoutProgramInput | ProgramFabricCreateOrConnectWithoutProgramInput[]
@@ -103246,6 +107227,13 @@ export namespace Prisma {
     connectOrCreate?: DyeingOrderCreateOrConnectWithoutProgramInput | DyeingOrderCreateOrConnectWithoutProgramInput[]
     createMany?: DyeingOrderCreateManyProgramInputEnvelope
     connect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+  }
+
+  export type DeadlineAlertUncheckedCreateNestedManyWithoutProgramInput = {
+    create?: XOR<DeadlineAlertCreateWithoutProgramInput, DeadlineAlertUncheckedCreateWithoutProgramInput> | DeadlineAlertCreateWithoutProgramInput[] | DeadlineAlertUncheckedCreateWithoutProgramInput[]
+    connectOrCreate?: DeadlineAlertCreateOrConnectWithoutProgramInput | DeadlineAlertCreateOrConnectWithoutProgramInput[]
+    createMany?: DeadlineAlertCreateManyProgramInputEnvelope
+    connect?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
   }
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
@@ -103550,6 +107538,20 @@ export namespace Prisma {
     deleteMany?: DyeingOrderScalarWhereInput | DyeingOrderScalarWhereInput[]
   }
 
+  export type DeadlineAlertUpdateManyWithoutProgramNestedInput = {
+    create?: XOR<DeadlineAlertCreateWithoutProgramInput, DeadlineAlertUncheckedCreateWithoutProgramInput> | DeadlineAlertCreateWithoutProgramInput[] | DeadlineAlertUncheckedCreateWithoutProgramInput[]
+    connectOrCreate?: DeadlineAlertCreateOrConnectWithoutProgramInput | DeadlineAlertCreateOrConnectWithoutProgramInput[]
+    upsert?: DeadlineAlertUpsertWithWhereUniqueWithoutProgramInput | DeadlineAlertUpsertWithWhereUniqueWithoutProgramInput[]
+    createMany?: DeadlineAlertCreateManyProgramInputEnvelope
+    set?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
+    disconnect?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
+    delete?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
+    connect?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
+    update?: DeadlineAlertUpdateWithWhereUniqueWithoutProgramInput | DeadlineAlertUpdateWithWhereUniqueWithoutProgramInput[]
+    updateMany?: DeadlineAlertUpdateManyWithWhereWithoutProgramInput | DeadlineAlertUpdateManyWithWhereWithoutProgramInput[]
+    deleteMany?: DeadlineAlertScalarWhereInput | DeadlineAlertScalarWhereInput[]
+  }
+
   export type ProgramFabricUncheckedUpdateManyWithoutProgramNestedInput = {
     create?: XOR<ProgramFabricCreateWithoutProgramInput, ProgramFabricUncheckedCreateWithoutProgramInput> | ProgramFabricCreateWithoutProgramInput[] | ProgramFabricUncheckedCreateWithoutProgramInput[]
     connectOrCreate?: ProgramFabricCreateOrConnectWithoutProgramInput | ProgramFabricCreateOrConnectWithoutProgramInput[]
@@ -103800,6 +107802,20 @@ export namespace Prisma {
     update?: DyeingOrderUpdateWithWhereUniqueWithoutProgramInput | DyeingOrderUpdateWithWhereUniqueWithoutProgramInput[]
     updateMany?: DyeingOrderUpdateManyWithWhereWithoutProgramInput | DyeingOrderUpdateManyWithWhereWithoutProgramInput[]
     deleteMany?: DyeingOrderScalarWhereInput | DyeingOrderScalarWhereInput[]
+  }
+
+  export type DeadlineAlertUncheckedUpdateManyWithoutProgramNestedInput = {
+    create?: XOR<DeadlineAlertCreateWithoutProgramInput, DeadlineAlertUncheckedCreateWithoutProgramInput> | DeadlineAlertCreateWithoutProgramInput[] | DeadlineAlertUncheckedCreateWithoutProgramInput[]
+    connectOrCreate?: DeadlineAlertCreateOrConnectWithoutProgramInput | DeadlineAlertCreateOrConnectWithoutProgramInput[]
+    upsert?: DeadlineAlertUpsertWithWhereUniqueWithoutProgramInput | DeadlineAlertUpsertWithWhereUniqueWithoutProgramInput[]
+    createMany?: DeadlineAlertCreateManyProgramInputEnvelope
+    set?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
+    disconnect?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
+    delete?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
+    connect?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
+    update?: DeadlineAlertUpdateWithWhereUniqueWithoutProgramInput | DeadlineAlertUpdateWithWhereUniqueWithoutProgramInput[]
+    updateMany?: DeadlineAlertUpdateManyWithWhereWithoutProgramInput | DeadlineAlertUpdateManyWithWhereWithoutProgramInput[]
+    deleteMany?: DeadlineAlertScalarWhereInput | DeadlineAlertScalarWhereInput[]
   }
 
   export type ProgramCreateNestedOneWithoutFabricsInput = {
@@ -104202,11 +108218,18 @@ export namespace Prisma {
     connect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
   }
 
-  export type DyeingOrderCreateNestedManyWithoutQc1ChallanInput = {
-    create?: XOR<DyeingOrderCreateWithoutQc1ChallanInput, DyeingOrderUncheckedCreateWithoutQc1ChallanInput> | DyeingOrderCreateWithoutQc1ChallanInput[] | DyeingOrderUncheckedCreateWithoutQc1ChallanInput[]
-    connectOrCreate?: DyeingOrderCreateOrConnectWithoutQc1ChallanInput | DyeingOrderCreateOrConnectWithoutQc1ChallanInput[]
-    createMany?: DyeingOrderCreateManyQc1ChallanInputEnvelope
+  export type DyeingOrderCreateNestedManyWithoutDyeingQcChallanInput = {
+    create?: XOR<DyeingOrderCreateWithoutDyeingQcChallanInput, DyeingOrderUncheckedCreateWithoutDyeingQcChallanInput> | DyeingOrderCreateWithoutDyeingQcChallanInput[] | DyeingOrderUncheckedCreateWithoutDyeingQcChallanInput[]
+    connectOrCreate?: DyeingOrderCreateOrConnectWithoutDyeingQcChallanInput | DyeingOrderCreateOrConnectWithoutDyeingQcChallanInput[]
+    createMany?: DyeingOrderCreateManyDyeingQcChallanInputEnvelope
     connect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+  }
+
+  export type DeadlineAlertCreateNestedManyWithoutChallanInput = {
+    create?: XOR<DeadlineAlertCreateWithoutChallanInput, DeadlineAlertUncheckedCreateWithoutChallanInput> | DeadlineAlertCreateWithoutChallanInput[] | DeadlineAlertUncheckedCreateWithoutChallanInput[]
+    connectOrCreate?: DeadlineAlertCreateOrConnectWithoutChallanInput | DeadlineAlertCreateOrConnectWithoutChallanInput[]
+    createMany?: DeadlineAlertCreateManyChallanInputEnvelope
+    connect?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
   }
 
   export type ChallanUncheckedCreateNestedManyWithoutParentChallanInput = {
@@ -104265,11 +108288,18 @@ export namespace Prisma {
     connect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
   }
 
-  export type DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput = {
-    create?: XOR<DyeingOrderCreateWithoutQc1ChallanInput, DyeingOrderUncheckedCreateWithoutQc1ChallanInput> | DyeingOrderCreateWithoutQc1ChallanInput[] | DyeingOrderUncheckedCreateWithoutQc1ChallanInput[]
-    connectOrCreate?: DyeingOrderCreateOrConnectWithoutQc1ChallanInput | DyeingOrderCreateOrConnectWithoutQc1ChallanInput[]
-    createMany?: DyeingOrderCreateManyQc1ChallanInputEnvelope
+  export type DyeingOrderUncheckedCreateNestedManyWithoutDyeingQcChallanInput = {
+    create?: XOR<DyeingOrderCreateWithoutDyeingQcChallanInput, DyeingOrderUncheckedCreateWithoutDyeingQcChallanInput> | DyeingOrderCreateWithoutDyeingQcChallanInput[] | DyeingOrderUncheckedCreateWithoutDyeingQcChallanInput[]
+    connectOrCreate?: DyeingOrderCreateOrConnectWithoutDyeingQcChallanInput | DyeingOrderCreateOrConnectWithoutDyeingQcChallanInput[]
+    createMany?: DyeingOrderCreateManyDyeingQcChallanInputEnvelope
     connect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
+  }
+
+  export type DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput = {
+    create?: XOR<DeadlineAlertCreateWithoutChallanInput, DeadlineAlertUncheckedCreateWithoutChallanInput> | DeadlineAlertCreateWithoutChallanInput[] | DeadlineAlertUncheckedCreateWithoutChallanInput[]
+    connectOrCreate?: DeadlineAlertCreateOrConnectWithoutChallanInput | DeadlineAlertCreateOrConnectWithoutChallanInput[]
+    createMany?: DeadlineAlertCreateManyChallanInputEnvelope
+    connect?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
   }
 
   export type ProgramUpdateOneRequiredWithoutChallansNestedInput = {
@@ -104456,18 +108486,32 @@ export namespace Prisma {
     deleteMany?: DyeingOrderScalarWhereInput | DyeingOrderScalarWhereInput[]
   }
 
-  export type DyeingOrderUpdateManyWithoutQc1ChallanNestedInput = {
-    create?: XOR<DyeingOrderCreateWithoutQc1ChallanInput, DyeingOrderUncheckedCreateWithoutQc1ChallanInput> | DyeingOrderCreateWithoutQc1ChallanInput[] | DyeingOrderUncheckedCreateWithoutQc1ChallanInput[]
-    connectOrCreate?: DyeingOrderCreateOrConnectWithoutQc1ChallanInput | DyeingOrderCreateOrConnectWithoutQc1ChallanInput[]
-    upsert?: DyeingOrderUpsertWithWhereUniqueWithoutQc1ChallanInput | DyeingOrderUpsertWithWhereUniqueWithoutQc1ChallanInput[]
-    createMany?: DyeingOrderCreateManyQc1ChallanInputEnvelope
+  export type DyeingOrderUpdateManyWithoutDyeingQcChallanNestedInput = {
+    create?: XOR<DyeingOrderCreateWithoutDyeingQcChallanInput, DyeingOrderUncheckedCreateWithoutDyeingQcChallanInput> | DyeingOrderCreateWithoutDyeingQcChallanInput[] | DyeingOrderUncheckedCreateWithoutDyeingQcChallanInput[]
+    connectOrCreate?: DyeingOrderCreateOrConnectWithoutDyeingQcChallanInput | DyeingOrderCreateOrConnectWithoutDyeingQcChallanInput[]
+    upsert?: DyeingOrderUpsertWithWhereUniqueWithoutDyeingQcChallanInput | DyeingOrderUpsertWithWhereUniqueWithoutDyeingQcChallanInput[]
+    createMany?: DyeingOrderCreateManyDyeingQcChallanInputEnvelope
     set?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
     disconnect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
     delete?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
     connect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
-    update?: DyeingOrderUpdateWithWhereUniqueWithoutQc1ChallanInput | DyeingOrderUpdateWithWhereUniqueWithoutQc1ChallanInput[]
-    updateMany?: DyeingOrderUpdateManyWithWhereWithoutQc1ChallanInput | DyeingOrderUpdateManyWithWhereWithoutQc1ChallanInput[]
+    update?: DyeingOrderUpdateWithWhereUniqueWithoutDyeingQcChallanInput | DyeingOrderUpdateWithWhereUniqueWithoutDyeingQcChallanInput[]
+    updateMany?: DyeingOrderUpdateManyWithWhereWithoutDyeingQcChallanInput | DyeingOrderUpdateManyWithWhereWithoutDyeingQcChallanInput[]
     deleteMany?: DyeingOrderScalarWhereInput | DyeingOrderScalarWhereInput[]
+  }
+
+  export type DeadlineAlertUpdateManyWithoutChallanNestedInput = {
+    create?: XOR<DeadlineAlertCreateWithoutChallanInput, DeadlineAlertUncheckedCreateWithoutChallanInput> | DeadlineAlertCreateWithoutChallanInput[] | DeadlineAlertUncheckedCreateWithoutChallanInput[]
+    connectOrCreate?: DeadlineAlertCreateOrConnectWithoutChallanInput | DeadlineAlertCreateOrConnectWithoutChallanInput[]
+    upsert?: DeadlineAlertUpsertWithWhereUniqueWithoutChallanInput | DeadlineAlertUpsertWithWhereUniqueWithoutChallanInput[]
+    createMany?: DeadlineAlertCreateManyChallanInputEnvelope
+    set?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
+    disconnect?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
+    delete?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
+    connect?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
+    update?: DeadlineAlertUpdateWithWhereUniqueWithoutChallanInput | DeadlineAlertUpdateWithWhereUniqueWithoutChallanInput[]
+    updateMany?: DeadlineAlertUpdateManyWithWhereWithoutChallanInput | DeadlineAlertUpdateManyWithWhereWithoutChallanInput[]
+    deleteMany?: DeadlineAlertScalarWhereInput | DeadlineAlertScalarWhereInput[]
   }
 
   export type ChallanUncheckedUpdateManyWithoutParentChallanNestedInput = {
@@ -104582,18 +108626,32 @@ export namespace Prisma {
     deleteMany?: DyeingOrderScalarWhereInput | DyeingOrderScalarWhereInput[]
   }
 
-  export type DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput = {
-    create?: XOR<DyeingOrderCreateWithoutQc1ChallanInput, DyeingOrderUncheckedCreateWithoutQc1ChallanInput> | DyeingOrderCreateWithoutQc1ChallanInput[] | DyeingOrderUncheckedCreateWithoutQc1ChallanInput[]
-    connectOrCreate?: DyeingOrderCreateOrConnectWithoutQc1ChallanInput | DyeingOrderCreateOrConnectWithoutQc1ChallanInput[]
-    upsert?: DyeingOrderUpsertWithWhereUniqueWithoutQc1ChallanInput | DyeingOrderUpsertWithWhereUniqueWithoutQc1ChallanInput[]
-    createMany?: DyeingOrderCreateManyQc1ChallanInputEnvelope
+  export type DyeingOrderUncheckedUpdateManyWithoutDyeingQcChallanNestedInput = {
+    create?: XOR<DyeingOrderCreateWithoutDyeingQcChallanInput, DyeingOrderUncheckedCreateWithoutDyeingQcChallanInput> | DyeingOrderCreateWithoutDyeingQcChallanInput[] | DyeingOrderUncheckedCreateWithoutDyeingQcChallanInput[]
+    connectOrCreate?: DyeingOrderCreateOrConnectWithoutDyeingQcChallanInput | DyeingOrderCreateOrConnectWithoutDyeingQcChallanInput[]
+    upsert?: DyeingOrderUpsertWithWhereUniqueWithoutDyeingQcChallanInput | DyeingOrderUpsertWithWhereUniqueWithoutDyeingQcChallanInput[]
+    createMany?: DyeingOrderCreateManyDyeingQcChallanInputEnvelope
     set?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
     disconnect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
     delete?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
     connect?: DyeingOrderWhereUniqueInput | DyeingOrderWhereUniqueInput[]
-    update?: DyeingOrderUpdateWithWhereUniqueWithoutQc1ChallanInput | DyeingOrderUpdateWithWhereUniqueWithoutQc1ChallanInput[]
-    updateMany?: DyeingOrderUpdateManyWithWhereWithoutQc1ChallanInput | DyeingOrderUpdateManyWithWhereWithoutQc1ChallanInput[]
+    update?: DyeingOrderUpdateWithWhereUniqueWithoutDyeingQcChallanInput | DyeingOrderUpdateWithWhereUniqueWithoutDyeingQcChallanInput[]
+    updateMany?: DyeingOrderUpdateManyWithWhereWithoutDyeingQcChallanInput | DyeingOrderUpdateManyWithWhereWithoutDyeingQcChallanInput[]
     deleteMany?: DyeingOrderScalarWhereInput | DyeingOrderScalarWhereInput[]
+  }
+
+  export type DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput = {
+    create?: XOR<DeadlineAlertCreateWithoutChallanInput, DeadlineAlertUncheckedCreateWithoutChallanInput> | DeadlineAlertCreateWithoutChallanInput[] | DeadlineAlertUncheckedCreateWithoutChallanInput[]
+    connectOrCreate?: DeadlineAlertCreateOrConnectWithoutChallanInput | DeadlineAlertCreateOrConnectWithoutChallanInput[]
+    upsert?: DeadlineAlertUpsertWithWhereUniqueWithoutChallanInput | DeadlineAlertUpsertWithWhereUniqueWithoutChallanInput[]
+    createMany?: DeadlineAlertCreateManyChallanInputEnvelope
+    set?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
+    disconnect?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
+    delete?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
+    connect?: DeadlineAlertWhereUniqueInput | DeadlineAlertWhereUniqueInput[]
+    update?: DeadlineAlertUpdateWithWhereUniqueWithoutChallanInput | DeadlineAlertUpdateWithWhereUniqueWithoutChallanInput[]
+    updateMany?: DeadlineAlertUpdateManyWithWhereWithoutChallanInput | DeadlineAlertUpdateManyWithWhereWithoutChallanInput[]
+    deleteMany?: DeadlineAlertScalarWhereInput | DeadlineAlertScalarWhereInput[]
   }
 
   export type ChallanCreateNestedOneWithoutItemsInput = {
@@ -106394,9 +110452,9 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
-  export type ChallanCreateNestedOneWithoutDyeingQc1OrdersInput = {
-    create?: XOR<ChallanCreateWithoutDyeingQc1OrdersInput, ChallanUncheckedCreateWithoutDyeingQc1OrdersInput>
-    connectOrCreate?: ChallanCreateOrConnectWithoutDyeingQc1OrdersInput
+  export type ChallanCreateNestedOneWithoutDyeingQcOrdersInput = {
+    create?: XOR<ChallanCreateWithoutDyeingQcOrdersInput, ChallanUncheckedCreateWithoutDyeingQcOrdersInput>
+    connectOrCreate?: ChallanCreateOrConnectWithoutDyeingQcOrdersInput
     connect?: ChallanWhereUniqueInput
   }
 
@@ -106428,14 +110486,132 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutDyeingOrdersInchargeInput, UserUpdateWithoutDyeingOrdersInchargeInput>, UserUncheckedUpdateWithoutDyeingOrdersInchargeInput>
   }
 
-  export type ChallanUpdateOneWithoutDyeingQc1OrdersNestedInput = {
-    create?: XOR<ChallanCreateWithoutDyeingQc1OrdersInput, ChallanUncheckedCreateWithoutDyeingQc1OrdersInput>
-    connectOrCreate?: ChallanCreateOrConnectWithoutDyeingQc1OrdersInput
-    upsert?: ChallanUpsertWithoutDyeingQc1OrdersInput
+  export type ChallanUpdateOneWithoutDyeingQcOrdersNestedInput = {
+    create?: XOR<ChallanCreateWithoutDyeingQcOrdersInput, ChallanUncheckedCreateWithoutDyeingQcOrdersInput>
+    connectOrCreate?: ChallanCreateOrConnectWithoutDyeingQcOrdersInput
+    upsert?: ChallanUpsertWithoutDyeingQcOrdersInput
     disconnect?: ChallanWhereInput | boolean
     delete?: ChallanWhereInput | boolean
     connect?: ChallanWhereUniqueInput
-    update?: XOR<XOR<ChallanUpdateToOneWithWhereWithoutDyeingQc1OrdersInput, ChallanUpdateWithoutDyeingQc1OrdersInput>, ChallanUncheckedUpdateWithoutDyeingQc1OrdersInput>
+    update?: XOR<XOR<ChallanUpdateToOneWithWhereWithoutDyeingQcOrdersInput, ChallanUpdateWithoutDyeingQcOrdersInput>, ChallanUncheckedUpdateWithoutDyeingQcOrdersInput>
+  }
+
+  export type ChallanCreateNestedOneWithoutDeadlineAlertsInput = {
+    create?: XOR<ChallanCreateWithoutDeadlineAlertsInput, ChallanUncheckedCreateWithoutDeadlineAlertsInput>
+    connectOrCreate?: ChallanCreateOrConnectWithoutDeadlineAlertsInput
+    connect?: ChallanWhereUniqueInput
+  }
+
+  export type ProgramCreateNestedOneWithoutDeadlineAlertsInput = {
+    create?: XOR<ProgramCreateWithoutDeadlineAlertsInput, ProgramUncheckedCreateWithoutDeadlineAlertsInput>
+    connectOrCreate?: ProgramCreateOrConnectWithoutDeadlineAlertsInput
+    connect?: ProgramWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutDeadlineAlertsAssignedInput = {
+    create?: XOR<UserCreateWithoutDeadlineAlertsAssignedInput, UserUncheckedCreateWithoutDeadlineAlertsAssignedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutDeadlineAlertsAssignedInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type DeadlineAlertDismissalCreateNestedManyWithoutAlertInput = {
+    create?: XOR<DeadlineAlertDismissalCreateWithoutAlertInput, DeadlineAlertDismissalUncheckedCreateWithoutAlertInput> | DeadlineAlertDismissalCreateWithoutAlertInput[] | DeadlineAlertDismissalUncheckedCreateWithoutAlertInput[]
+    connectOrCreate?: DeadlineAlertDismissalCreateOrConnectWithoutAlertInput | DeadlineAlertDismissalCreateOrConnectWithoutAlertInput[]
+    createMany?: DeadlineAlertDismissalCreateManyAlertInputEnvelope
+    connect?: DeadlineAlertDismissalWhereUniqueInput | DeadlineAlertDismissalWhereUniqueInput[]
+  }
+
+  export type DeadlineAlertDismissalUncheckedCreateNestedManyWithoutAlertInput = {
+    create?: XOR<DeadlineAlertDismissalCreateWithoutAlertInput, DeadlineAlertDismissalUncheckedCreateWithoutAlertInput> | DeadlineAlertDismissalCreateWithoutAlertInput[] | DeadlineAlertDismissalUncheckedCreateWithoutAlertInput[]
+    connectOrCreate?: DeadlineAlertDismissalCreateOrConnectWithoutAlertInput | DeadlineAlertDismissalCreateOrConnectWithoutAlertInput[]
+    createMany?: DeadlineAlertDismissalCreateManyAlertInputEnvelope
+    connect?: DeadlineAlertDismissalWhereUniqueInput | DeadlineAlertDismissalWhereUniqueInput[]
+  }
+
+  export type ChallanUpdateOneWithoutDeadlineAlertsNestedInput = {
+    create?: XOR<ChallanCreateWithoutDeadlineAlertsInput, ChallanUncheckedCreateWithoutDeadlineAlertsInput>
+    connectOrCreate?: ChallanCreateOrConnectWithoutDeadlineAlertsInput
+    upsert?: ChallanUpsertWithoutDeadlineAlertsInput
+    disconnect?: ChallanWhereInput | boolean
+    delete?: ChallanWhereInput | boolean
+    connect?: ChallanWhereUniqueInput
+    update?: XOR<XOR<ChallanUpdateToOneWithWhereWithoutDeadlineAlertsInput, ChallanUpdateWithoutDeadlineAlertsInput>, ChallanUncheckedUpdateWithoutDeadlineAlertsInput>
+  }
+
+  export type ProgramUpdateOneWithoutDeadlineAlertsNestedInput = {
+    create?: XOR<ProgramCreateWithoutDeadlineAlertsInput, ProgramUncheckedCreateWithoutDeadlineAlertsInput>
+    connectOrCreate?: ProgramCreateOrConnectWithoutDeadlineAlertsInput
+    upsert?: ProgramUpsertWithoutDeadlineAlertsInput
+    disconnect?: ProgramWhereInput | boolean
+    delete?: ProgramWhereInput | boolean
+    connect?: ProgramWhereUniqueInput
+    update?: XOR<XOR<ProgramUpdateToOneWithWhereWithoutDeadlineAlertsInput, ProgramUpdateWithoutDeadlineAlertsInput>, ProgramUncheckedUpdateWithoutDeadlineAlertsInput>
+  }
+
+  export type UserUpdateOneWithoutDeadlineAlertsAssignedNestedInput = {
+    create?: XOR<UserCreateWithoutDeadlineAlertsAssignedInput, UserUncheckedCreateWithoutDeadlineAlertsAssignedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutDeadlineAlertsAssignedInput
+    upsert?: UserUpsertWithoutDeadlineAlertsAssignedInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutDeadlineAlertsAssignedInput, UserUpdateWithoutDeadlineAlertsAssignedInput>, UserUncheckedUpdateWithoutDeadlineAlertsAssignedInput>
+  }
+
+  export type DeadlineAlertDismissalUpdateManyWithoutAlertNestedInput = {
+    create?: XOR<DeadlineAlertDismissalCreateWithoutAlertInput, DeadlineAlertDismissalUncheckedCreateWithoutAlertInput> | DeadlineAlertDismissalCreateWithoutAlertInput[] | DeadlineAlertDismissalUncheckedCreateWithoutAlertInput[]
+    connectOrCreate?: DeadlineAlertDismissalCreateOrConnectWithoutAlertInput | DeadlineAlertDismissalCreateOrConnectWithoutAlertInput[]
+    upsert?: DeadlineAlertDismissalUpsertWithWhereUniqueWithoutAlertInput | DeadlineAlertDismissalUpsertWithWhereUniqueWithoutAlertInput[]
+    createMany?: DeadlineAlertDismissalCreateManyAlertInputEnvelope
+    set?: DeadlineAlertDismissalWhereUniqueInput | DeadlineAlertDismissalWhereUniqueInput[]
+    disconnect?: DeadlineAlertDismissalWhereUniqueInput | DeadlineAlertDismissalWhereUniqueInput[]
+    delete?: DeadlineAlertDismissalWhereUniqueInput | DeadlineAlertDismissalWhereUniqueInput[]
+    connect?: DeadlineAlertDismissalWhereUniqueInput | DeadlineAlertDismissalWhereUniqueInput[]
+    update?: DeadlineAlertDismissalUpdateWithWhereUniqueWithoutAlertInput | DeadlineAlertDismissalUpdateWithWhereUniqueWithoutAlertInput[]
+    updateMany?: DeadlineAlertDismissalUpdateManyWithWhereWithoutAlertInput | DeadlineAlertDismissalUpdateManyWithWhereWithoutAlertInput[]
+    deleteMany?: DeadlineAlertDismissalScalarWhereInput | DeadlineAlertDismissalScalarWhereInput[]
+  }
+
+  export type DeadlineAlertDismissalUncheckedUpdateManyWithoutAlertNestedInput = {
+    create?: XOR<DeadlineAlertDismissalCreateWithoutAlertInput, DeadlineAlertDismissalUncheckedCreateWithoutAlertInput> | DeadlineAlertDismissalCreateWithoutAlertInput[] | DeadlineAlertDismissalUncheckedCreateWithoutAlertInput[]
+    connectOrCreate?: DeadlineAlertDismissalCreateOrConnectWithoutAlertInput | DeadlineAlertDismissalCreateOrConnectWithoutAlertInput[]
+    upsert?: DeadlineAlertDismissalUpsertWithWhereUniqueWithoutAlertInput | DeadlineAlertDismissalUpsertWithWhereUniqueWithoutAlertInput[]
+    createMany?: DeadlineAlertDismissalCreateManyAlertInputEnvelope
+    set?: DeadlineAlertDismissalWhereUniqueInput | DeadlineAlertDismissalWhereUniqueInput[]
+    disconnect?: DeadlineAlertDismissalWhereUniqueInput | DeadlineAlertDismissalWhereUniqueInput[]
+    delete?: DeadlineAlertDismissalWhereUniqueInput | DeadlineAlertDismissalWhereUniqueInput[]
+    connect?: DeadlineAlertDismissalWhereUniqueInput | DeadlineAlertDismissalWhereUniqueInput[]
+    update?: DeadlineAlertDismissalUpdateWithWhereUniqueWithoutAlertInput | DeadlineAlertDismissalUpdateWithWhereUniqueWithoutAlertInput[]
+    updateMany?: DeadlineAlertDismissalUpdateManyWithWhereWithoutAlertInput | DeadlineAlertDismissalUpdateManyWithWhereWithoutAlertInput[]
+    deleteMany?: DeadlineAlertDismissalScalarWhereInput | DeadlineAlertDismissalScalarWhereInput[]
+  }
+
+  export type DeadlineAlertCreateNestedOneWithoutDismissalsInput = {
+    create?: XOR<DeadlineAlertCreateWithoutDismissalsInput, DeadlineAlertUncheckedCreateWithoutDismissalsInput>
+    connectOrCreate?: DeadlineAlertCreateOrConnectWithoutDismissalsInput
+    connect?: DeadlineAlertWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutDeadlineAlertDismissalsInput = {
+    create?: XOR<UserCreateWithoutDeadlineAlertDismissalsInput, UserUncheckedCreateWithoutDeadlineAlertDismissalsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutDeadlineAlertDismissalsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type DeadlineAlertUpdateOneRequiredWithoutDismissalsNestedInput = {
+    create?: XOR<DeadlineAlertCreateWithoutDismissalsInput, DeadlineAlertUncheckedCreateWithoutDismissalsInput>
+    connectOrCreate?: DeadlineAlertCreateOrConnectWithoutDismissalsInput
+    upsert?: DeadlineAlertUpsertWithoutDismissalsInput
+    connect?: DeadlineAlertWhereUniqueInput
+    update?: XOR<XOR<DeadlineAlertUpdateToOneWithWhereWithoutDismissalsInput, DeadlineAlertUpdateWithoutDismissalsInput>, DeadlineAlertUncheckedUpdateWithoutDismissalsInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutDeadlineAlertDismissalsNestedInput = {
+    create?: XOR<UserCreateWithoutDeadlineAlertDismissalsInput, UserUncheckedCreateWithoutDeadlineAlertDismissalsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutDeadlineAlertDismissalsInput
+    upsert?: UserUpsertWithoutDeadlineAlertDismissalsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutDeadlineAlertDismissalsInput, UserUpdateWithoutDeadlineAlertDismissalsInput>, UserUncheckedUpdateWithoutDeadlineAlertDismissalsInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -106980,6 +111156,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutCreatedByInput = {
@@ -107056,6 +111233,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutCreatedByInput = {
@@ -107142,6 +111320,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutApprovedByInput = {
@@ -107218,6 +111397,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutApprovedByInput = {
@@ -107303,6 +111483,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
@@ -107331,7 +111512,8 @@ export namespace Prisma {
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutCreatedByInput = {
@@ -107345,6 +111527,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     issuedById?: string | null
@@ -107369,7 +111552,8 @@ export namespace Prisma {
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderUncheckedCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutCreatedByInput = {
@@ -107389,6 +111573,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
@@ -107417,7 +111602,8 @@ export namespace Prisma {
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutIssuedByInput = {
@@ -107431,6 +111617,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     createdById: string
@@ -107455,7 +111642,8 @@ export namespace Prisma {
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderUncheckedCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutIssuedByInput = {
@@ -107475,6 +111663,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
@@ -107503,7 +111692,8 @@ export namespace Prisma {
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutReceivedByInput = {
@@ -107517,6 +111707,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     createdById: string
@@ -107541,7 +111732,8 @@ export namespace Prisma {
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderUncheckedCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutReceivedByInput = {
@@ -107561,6 +111753,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
@@ -107589,7 +111782,8 @@ export namespace Prisma {
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutApprovedByInput = {
@@ -107603,6 +111797,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     createdById: string
@@ -107627,7 +111822,8 @@ export namespace Prisma {
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderUncheckedCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutApprovedByInput = {
@@ -107931,7 +112127,13 @@ export namespace Prisma {
   export type DefectRecordCreateWithoutDetectedByInput = {
     id?: string
     defectCode: string
+    productionSheetNumber?: string | null
     departmentCode: string
+    shelfCode?: string | null
+    color?: string | null
+    fabricType?: string | null
+    quantityUnit?: string
+    responsibleIncharge?: string | null
     itemDescription: string
     severity: string
     quantity: number
@@ -107939,6 +112141,8 @@ export namespace Prisma {
     status?: string
     resolutionNotes?: string | null
     resolvedAt?: Date | string | null
+    shelfRemovedAt?: Date | string | null
+    shelfRemovalReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     program: ProgramCreateNestedOneWithoutDefectsInput
@@ -107952,8 +112156,14 @@ export namespace Prisma {
     id?: string
     defectCode: string
     programId: string
+    productionSheetNumber?: string | null
     challanId?: string | null
     departmentCode: string
+    shelfCode?: string | null
+    color?: string | null
+    fabricType?: string | null
+    quantityUnit?: string
+    responsibleIncharge?: string | null
     bundleId?: string | null
     itemDescription: string
     severity: string
@@ -107962,6 +112172,8 @@ export namespace Prisma {
     status?: string
     resolutionNotes?: string | null
     resolvedAt?: Date | string | null
+    shelfRemovedAt?: Date | string | null
+    shelfRemovalReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     reworks?: ReworkTransactionUncheckedCreateNestedManyWithoutDefectInput
@@ -108337,18 +112549,20 @@ export namespace Prisma {
   export type DyeingOrderCreateWithoutInchargeInput = {
     id?: string
     orderNumber: string
+    inboundChallanItemId?: string | null
     status?: string
     priority?: string
     fabricName: string
     fabricType?: string | null
+    currentColor?: string | null
     targetColor: string
     dyedColor?: string | null
     colorCode?: string | null
     requiredQuantity: number
     dyedQuantity?: number
     undyedQuantity?: number
-    readyForQc1Quantity?: number
-    sentToQc1Quantity?: number
+    readyForDyeingQcQuantity?: number
+    sentToDyeingQcQuantity?: number
     uom?: string
     inchargeName?: string | null
     batchNumber?: string | null
@@ -108356,12 +112570,12 @@ export namespace Prisma {
     processRemarks?: string | null
     startedAt?: Date | string | null
     completedAt?: Date | string | null
-    sentToQc1At?: Date | string | null
+    sentToDyeingQcAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     program: ProgramCreateNestedOneWithoutDyeingOrdersInput
     inboundChallan?: ChallanCreateNestedOneWithoutDyeingInboundOrdersInput
-    qc1Challan?: ChallanCreateNestedOneWithoutDyeingQc1OrdersInput
+    dyeingQcChallan?: ChallanCreateNestedOneWithoutDyeingQcOrdersInput
   }
 
   export type DyeingOrderUncheckedCreateWithoutInchargeInput = {
@@ -108369,27 +112583,29 @@ export namespace Prisma {
     orderNumber: string
     programId: string
     inboundChallanId?: string | null
+    inboundChallanItemId?: string | null
     status?: string
     priority?: string
     fabricName: string
     fabricType?: string | null
+    currentColor?: string | null
     targetColor: string
     dyedColor?: string | null
     colorCode?: string | null
     requiredQuantity: number
     dyedQuantity?: number
     undyedQuantity?: number
-    readyForQc1Quantity?: number
-    sentToQc1Quantity?: number
+    readyForDyeingQcQuantity?: number
+    sentToDyeingQcQuantity?: number
     uom?: string
     inchargeName?: string | null
     batchNumber?: string | null
     machineNumber?: string | null
     processRemarks?: string | null
-    qc1ChallanId?: string | null
+    dyeingQcChallanId?: string | null
     startedAt?: Date | string | null
     completedAt?: Date | string | null
-    sentToQc1At?: Date | string | null
+    sentToDyeingQcAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -108401,6 +112617,120 @@ export namespace Prisma {
 
   export type DyeingOrderCreateManyInchargeInputEnvelope = {
     data: DyeingOrderCreateManyInchargeInput | DyeingOrderCreateManyInchargeInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type DeadlineAlertCreateWithoutAssignedUserInput = {
+    id?: string
+    dedupeKey: string
+    departmentCode: string
+    taskType: string
+    taskId: string
+    stage: string
+    severity: string
+    deadlineAt: Date | string
+    deadlineSource: string
+    status?: string
+    resolutionReason?: string | null
+    createdAt?: Date | string
+    lastEvaluatedAt?: Date | string
+    resolvedAt?: Date | string | null
+    challan?: ChallanCreateNestedOneWithoutDeadlineAlertsInput
+    program?: ProgramCreateNestedOneWithoutDeadlineAlertsInput
+    dismissals?: DeadlineAlertDismissalCreateNestedManyWithoutAlertInput
+  }
+
+  export type DeadlineAlertUncheckedCreateWithoutAssignedUserInput = {
+    id?: string
+    dedupeKey: string
+    departmentCode: string
+    taskType: string
+    taskId: string
+    challanId?: string | null
+    programId?: string | null
+    stage: string
+    severity: string
+    deadlineAt: Date | string
+    deadlineSource: string
+    status?: string
+    resolutionReason?: string | null
+    createdAt?: Date | string
+    lastEvaluatedAt?: Date | string
+    resolvedAt?: Date | string | null
+    dismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutAlertInput
+  }
+
+  export type DeadlineAlertCreateOrConnectWithoutAssignedUserInput = {
+    where: DeadlineAlertWhereUniqueInput
+    create: XOR<DeadlineAlertCreateWithoutAssignedUserInput, DeadlineAlertUncheckedCreateWithoutAssignedUserInput>
+  }
+
+  export type DeadlineAlertCreateManyAssignedUserInputEnvelope = {
+    data: DeadlineAlertCreateManyAssignedUserInput | DeadlineAlertCreateManyAssignedUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type DeadlineAlertDismissalCreateWithoutUserInput = {
+    id?: string
+    dismissedAt?: Date | string
+    alert: DeadlineAlertCreateNestedOneWithoutDismissalsInput
+  }
+
+  export type DeadlineAlertDismissalUncheckedCreateWithoutUserInput = {
+    id?: string
+    alertId: string
+    dismissedAt?: Date | string
+  }
+
+  export type DeadlineAlertDismissalCreateOrConnectWithoutUserInput = {
+    where: DeadlineAlertDismissalWhereUniqueInput
+    create: XOR<DeadlineAlertDismissalCreateWithoutUserInput, DeadlineAlertDismissalUncheckedCreateWithoutUserInput>
+  }
+
+  export type DeadlineAlertDismissalCreateManyUserInputEnvelope = {
+    data: DeadlineAlertDismissalCreateManyUserInput | DeadlineAlertDismissalCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type DepartmentCreateWithoutInchargeInput = {
+    id?: string
+    code: string
+    name: string
+    sequenceOrder: number
+    description?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    workCenters?: WorkCenterCreateNestedManyWithoutDepartmentInput
+    operations?: OperationCreateNestedManyWithoutDepartmentInput
+    defectCodes?: DefectCodeCreateNestedManyWithoutDepartmentInput
+    fromChallans?: ChallanCreateNestedManyWithoutFromDeptRelInput
+    toChallans?: ChallanCreateNestedManyWithoutToDeptRelInput
+  }
+
+  export type DepartmentUncheckedCreateWithoutInchargeInput = {
+    id?: string
+    code: string
+    name: string
+    sequenceOrder: number
+    description?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    workCenters?: WorkCenterUncheckedCreateNestedManyWithoutDepartmentInput
+    operations?: OperationUncheckedCreateNestedManyWithoutDepartmentInput
+    defectCodes?: DefectCodeUncheckedCreateNestedManyWithoutDepartmentInput
+    fromChallans?: ChallanUncheckedCreateNestedManyWithoutFromDeptRelInput
+    toChallans?: ChallanUncheckedCreateNestedManyWithoutToDeptRelInput
+  }
+
+  export type DepartmentCreateOrConnectWithoutInchargeInput = {
+    where: DepartmentWhereUniqueInput
+    create: XOR<DepartmentCreateWithoutInchargeInput, DepartmentUncheckedCreateWithoutInchargeInput>
+  }
+
+  export type DepartmentCreateManyInchargeInputEnvelope = {
+    data: DepartmentCreateManyInchargeInput | DepartmentCreateManyInchargeInput[]
     skipDuplicates?: boolean
   }
 
@@ -108617,6 +112947,7 @@ export namespace Prisma {
     status?: StringFilter<"Challan"> | string
     priority?: StringFilter<"Challan"> | string
     issuedDate?: DateTimeNullableFilter<"Challan"> | Date | string | null
+    deliveryDate?: DateTimeNullableFilter<"Challan"> | Date | string | null
     receivedDate?: DateTimeNullableFilter<"Challan"> | Date | string | null
     completedDate?: DateTimeNullableFilter<"Challan"> | Date | string | null
     createdById?: StringFilter<"Challan"> | string
@@ -108912,17 +113243,25 @@ export namespace Prisma {
     id?: StringFilter<"DefectRecord"> | string
     defectCode?: StringFilter<"DefectRecord"> | string
     programId?: StringFilter<"DefectRecord"> | string
+    productionSheetNumber?: StringNullableFilter<"DefectRecord"> | string | null
     challanId?: StringNullableFilter<"DefectRecord"> | string | null
     departmentCode?: StringFilter<"DefectRecord"> | string
+    shelfCode?: StringNullableFilter<"DefectRecord"> | string | null
+    color?: StringNullableFilter<"DefectRecord"> | string | null
+    fabricType?: StringNullableFilter<"DefectRecord"> | string | null
+    quantityUnit?: StringFilter<"DefectRecord"> | string
+    responsibleIncharge?: StringNullableFilter<"DefectRecord"> | string | null
     bundleId?: StringNullableFilter<"DefectRecord"> | string | null
     itemDescription?: StringFilter<"DefectRecord"> | string
     severity?: StringFilter<"DefectRecord"> | string
-    quantity?: IntFilter<"DefectRecord"> | number
+    quantity?: FloatFilter<"DefectRecord"> | number
     reason?: StringFilter<"DefectRecord"> | string
     detectedById?: StringFilter<"DefectRecord"> | string
     status?: StringFilter<"DefectRecord"> | string
     resolutionNotes?: StringNullableFilter<"DefectRecord"> | string | null
     resolvedAt?: DateTimeNullableFilter<"DefectRecord"> | Date | string | null
+    shelfRemovedAt?: DateTimeNullableFilter<"DefectRecord"> | Date | string | null
+    shelfRemovalReason?: StringNullableFilter<"DefectRecord"> | string | null
     createdAt?: DateTimeFilter<"DefectRecord"> | Date | string
     updatedAt?: DateTimeFilter<"DefectRecord"> | Date | string
   }
@@ -109220,30 +113559,128 @@ export namespace Prisma {
     orderNumber?: StringFilter<"DyeingOrder"> | string
     programId?: StringFilter<"DyeingOrder"> | string
     inboundChallanId?: StringNullableFilter<"DyeingOrder"> | string | null
+    inboundChallanItemId?: StringNullableFilter<"DyeingOrder"> | string | null
     status?: StringFilter<"DyeingOrder"> | string
     priority?: StringFilter<"DyeingOrder"> | string
     fabricName?: StringFilter<"DyeingOrder"> | string
     fabricType?: StringNullableFilter<"DyeingOrder"> | string | null
+    currentColor?: StringNullableFilter<"DyeingOrder"> | string | null
     targetColor?: StringFilter<"DyeingOrder"> | string
     dyedColor?: StringNullableFilter<"DyeingOrder"> | string | null
     colorCode?: StringNullableFilter<"DyeingOrder"> | string | null
     requiredQuantity?: FloatFilter<"DyeingOrder"> | number
     dyedQuantity?: FloatFilter<"DyeingOrder"> | number
     undyedQuantity?: FloatFilter<"DyeingOrder"> | number
-    readyForQc1Quantity?: FloatFilter<"DyeingOrder"> | number
-    sentToQc1Quantity?: FloatFilter<"DyeingOrder"> | number
+    readyForDyeingQcQuantity?: FloatFilter<"DyeingOrder"> | number
+    sentToDyeingQcQuantity?: FloatFilter<"DyeingOrder"> | number
     uom?: StringFilter<"DyeingOrder"> | string
     inchargeId?: StringNullableFilter<"DyeingOrder"> | string | null
     inchargeName?: StringNullableFilter<"DyeingOrder"> | string | null
     batchNumber?: StringNullableFilter<"DyeingOrder"> | string | null
     machineNumber?: StringNullableFilter<"DyeingOrder"> | string | null
     processRemarks?: StringNullableFilter<"DyeingOrder"> | string | null
-    qc1ChallanId?: StringNullableFilter<"DyeingOrder"> | string | null
+    dyeingQcChallanId?: StringNullableFilter<"DyeingOrder"> | string | null
     startedAt?: DateTimeNullableFilter<"DyeingOrder"> | Date | string | null
     completedAt?: DateTimeNullableFilter<"DyeingOrder"> | Date | string | null
-    sentToQc1At?: DateTimeNullableFilter<"DyeingOrder"> | Date | string | null
+    sentToDyeingQcAt?: DateTimeNullableFilter<"DyeingOrder"> | Date | string | null
     createdAt?: DateTimeFilter<"DyeingOrder"> | Date | string
     updatedAt?: DateTimeFilter<"DyeingOrder"> | Date | string
+  }
+
+  export type DeadlineAlertUpsertWithWhereUniqueWithoutAssignedUserInput = {
+    where: DeadlineAlertWhereUniqueInput
+    update: XOR<DeadlineAlertUpdateWithoutAssignedUserInput, DeadlineAlertUncheckedUpdateWithoutAssignedUserInput>
+    create: XOR<DeadlineAlertCreateWithoutAssignedUserInput, DeadlineAlertUncheckedCreateWithoutAssignedUserInput>
+  }
+
+  export type DeadlineAlertUpdateWithWhereUniqueWithoutAssignedUserInput = {
+    where: DeadlineAlertWhereUniqueInput
+    data: XOR<DeadlineAlertUpdateWithoutAssignedUserInput, DeadlineAlertUncheckedUpdateWithoutAssignedUserInput>
+  }
+
+  export type DeadlineAlertUpdateManyWithWhereWithoutAssignedUserInput = {
+    where: DeadlineAlertScalarWhereInput
+    data: XOR<DeadlineAlertUpdateManyMutationInput, DeadlineAlertUncheckedUpdateManyWithoutAssignedUserInput>
+  }
+
+  export type DeadlineAlertScalarWhereInput = {
+    AND?: DeadlineAlertScalarWhereInput | DeadlineAlertScalarWhereInput[]
+    OR?: DeadlineAlertScalarWhereInput[]
+    NOT?: DeadlineAlertScalarWhereInput | DeadlineAlertScalarWhereInput[]
+    id?: StringFilter<"DeadlineAlert"> | string
+    dedupeKey?: StringFilter<"DeadlineAlert"> | string
+    departmentCode?: StringFilter<"DeadlineAlert"> | string
+    taskType?: StringFilter<"DeadlineAlert"> | string
+    taskId?: StringFilter<"DeadlineAlert"> | string
+    challanId?: StringNullableFilter<"DeadlineAlert"> | string | null
+    programId?: StringNullableFilter<"DeadlineAlert"> | string | null
+    assignedUserId?: StringNullableFilter<"DeadlineAlert"> | string | null
+    stage?: StringFilter<"DeadlineAlert"> | string
+    severity?: StringFilter<"DeadlineAlert"> | string
+    deadlineAt?: DateTimeFilter<"DeadlineAlert"> | Date | string
+    deadlineSource?: StringFilter<"DeadlineAlert"> | string
+    status?: StringFilter<"DeadlineAlert"> | string
+    resolutionReason?: StringNullableFilter<"DeadlineAlert"> | string | null
+    createdAt?: DateTimeFilter<"DeadlineAlert"> | Date | string
+    lastEvaluatedAt?: DateTimeFilter<"DeadlineAlert"> | Date | string
+    resolvedAt?: DateTimeNullableFilter<"DeadlineAlert"> | Date | string | null
+  }
+
+  export type DeadlineAlertDismissalUpsertWithWhereUniqueWithoutUserInput = {
+    where: DeadlineAlertDismissalWhereUniqueInput
+    update: XOR<DeadlineAlertDismissalUpdateWithoutUserInput, DeadlineAlertDismissalUncheckedUpdateWithoutUserInput>
+    create: XOR<DeadlineAlertDismissalCreateWithoutUserInput, DeadlineAlertDismissalUncheckedCreateWithoutUserInput>
+  }
+
+  export type DeadlineAlertDismissalUpdateWithWhereUniqueWithoutUserInput = {
+    where: DeadlineAlertDismissalWhereUniqueInput
+    data: XOR<DeadlineAlertDismissalUpdateWithoutUserInput, DeadlineAlertDismissalUncheckedUpdateWithoutUserInput>
+  }
+
+  export type DeadlineAlertDismissalUpdateManyWithWhereWithoutUserInput = {
+    where: DeadlineAlertDismissalScalarWhereInput
+    data: XOR<DeadlineAlertDismissalUpdateManyMutationInput, DeadlineAlertDismissalUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type DeadlineAlertDismissalScalarWhereInput = {
+    AND?: DeadlineAlertDismissalScalarWhereInput | DeadlineAlertDismissalScalarWhereInput[]
+    OR?: DeadlineAlertDismissalScalarWhereInput[]
+    NOT?: DeadlineAlertDismissalScalarWhereInput | DeadlineAlertDismissalScalarWhereInput[]
+    id?: StringFilter<"DeadlineAlertDismissal"> | string
+    alertId?: StringFilter<"DeadlineAlertDismissal"> | string
+    userId?: StringFilter<"DeadlineAlertDismissal"> | string
+    dismissedAt?: DateTimeFilter<"DeadlineAlertDismissal"> | Date | string
+  }
+
+  export type DepartmentUpsertWithWhereUniqueWithoutInchargeInput = {
+    where: DepartmentWhereUniqueInput
+    update: XOR<DepartmentUpdateWithoutInchargeInput, DepartmentUncheckedUpdateWithoutInchargeInput>
+    create: XOR<DepartmentCreateWithoutInchargeInput, DepartmentUncheckedCreateWithoutInchargeInput>
+  }
+
+  export type DepartmentUpdateWithWhereUniqueWithoutInchargeInput = {
+    where: DepartmentWhereUniqueInput
+    data: XOR<DepartmentUpdateWithoutInchargeInput, DepartmentUncheckedUpdateWithoutInchargeInput>
+  }
+
+  export type DepartmentUpdateManyWithWhereWithoutInchargeInput = {
+    where: DepartmentScalarWhereInput
+    data: XOR<DepartmentUpdateManyMutationInput, DepartmentUncheckedUpdateManyWithoutInchargeInput>
+  }
+
+  export type DepartmentScalarWhereInput = {
+    AND?: DepartmentScalarWhereInput | DepartmentScalarWhereInput[]
+    OR?: DepartmentScalarWhereInput[]
+    NOT?: DepartmentScalarWhereInput | DepartmentScalarWhereInput[]
+    id?: StringFilter<"Department"> | string
+    code?: StringFilter<"Department"> | string
+    name?: StringFilter<"Department"> | string
+    sequenceOrder?: IntFilter<"Department"> | number
+    description?: StringNullableFilter<"Department"> | string | null
+    isActive?: BoolFilter<"Department"> | boolean
+    inchargeUserId?: StringNullableFilter<"Department"> | string | null
+    createdAt?: DateTimeFilter<"Department"> | Date | string
+    updatedAt?: DateTimeFilter<"Department"> | Date | string
   }
 
   export type UserRoleCreateWithoutRoleInput = {
@@ -109516,6 +113953,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutUserRolesInput = {
@@ -109552,6 +113992,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutUserRolesInput = {
@@ -109631,6 +114074,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutUserRolesInput = {
@@ -109667,6 +114113,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type RoleUpsertWithoutUserRolesInput = {
@@ -109700,6 +114149,89 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     rolePerms?: RolePermissionUncheckedUpdateManyWithoutRoleNestedInput
+  }
+
+  export type UserCreateWithoutDepartmentsInChargeInput = {
+    id?: string
+    username: string
+    email: string
+    fullName: string
+    passwordHash: string
+    departmentCode?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userRoles?: UserRoleCreateNestedManyWithoutUserInput
+    createdPrograms?: ProgramCreateNestedManyWithoutCreatedByInput
+    approvedPrograms?: ProgramCreateNestedManyWithoutApprovedByInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    attachments?: AttachmentCreateNestedManyWithoutUploadedByInput
+    createdChallans?: ChallanCreateNestedManyWithoutCreatedByInput
+    issuedChallans?: ChallanCreateNestedManyWithoutIssuedByInput
+    receivedChallans?: ChallanCreateNestedManyWithoutReceivedByInput
+    approvedChallans?: ChallanCreateNestedManyWithoutApprovedByInput
+    productionRecords?: ProductionTransactionCreateNestedManyWithoutOperatorInput
+    inspections?: QualityInspectionCreateNestedManyWithoutInspectorInput
+    challanEvents?: ChallanEventCreateNestedManyWithoutActorInput
+    stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutActorInput
+    dispatchesApproved?: DispatchOrderCreateNestedManyWithoutApprovedByInput
+    dispatchesOperated?: DispatchOrderCreateNestedManyWithoutDispatchedByInput
+    defectsDetected?: DefectRecordCreateNestedManyWithoutDetectedByInput
+    reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
+    recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
+    recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutDepartmentsInChargeInput = {
+    id?: string
+    username: string
+    email: string
+    fullName: string
+    passwordHash: string
+    departmentCode?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userRoles?: UserRoleUncheckedCreateNestedManyWithoutUserInput
+    createdPrograms?: ProgramUncheckedCreateNestedManyWithoutCreatedByInput
+    approvedPrograms?: ProgramUncheckedCreateNestedManyWithoutApprovedByInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    attachments?: AttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+    createdChallans?: ChallanUncheckedCreateNestedManyWithoutCreatedByInput
+    issuedChallans?: ChallanUncheckedCreateNestedManyWithoutIssuedByInput
+    receivedChallans?: ChallanUncheckedCreateNestedManyWithoutReceivedByInput
+    approvedChallans?: ChallanUncheckedCreateNestedManyWithoutApprovedByInput
+    productionRecords?: ProductionTransactionUncheckedCreateNestedManyWithoutOperatorInput
+    inspections?: QualityInspectionUncheckedCreateNestedManyWithoutInspectorInput
+    challanEvents?: ChallanEventUncheckedCreateNestedManyWithoutActorInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutActorInput
+    dispatchesApproved?: DispatchOrderUncheckedCreateNestedManyWithoutApprovedByInput
+    dispatchesOperated?: DispatchOrderUncheckedCreateNestedManyWithoutDispatchedByInput
+    defectsDetected?: DefectRecordUncheckedCreateNestedManyWithoutDetectedByInput
+    reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
+    recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
+    recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutDepartmentsInChargeInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutDepartmentsInChargeInput, UserUncheckedCreateWithoutDepartmentsInChargeInput>
   }
 
   export type WorkCenterCreateWithoutDepartmentInput = {
@@ -109809,6 +114341,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
@@ -109837,7 +114370,8 @@ export namespace Prisma {
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutFromDeptRelInput = {
@@ -109850,6 +114384,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     createdById: string
@@ -109875,7 +114410,8 @@ export namespace Prisma {
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderUncheckedCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutFromDeptRelInput = {
@@ -109895,6 +114431,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
@@ -109923,7 +114460,8 @@ export namespace Prisma {
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutToDeptRelInput = {
@@ -109936,6 +114474,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     createdById: string
@@ -109961,7 +114500,8 @@ export namespace Prisma {
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderUncheckedCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutToDeptRelInput = {
@@ -109972,6 +114512,95 @@ export namespace Prisma {
   export type ChallanCreateManyToDeptRelInputEnvelope = {
     data: ChallanCreateManyToDeptRelInput | ChallanCreateManyToDeptRelInput[]
     skipDuplicates?: boolean
+  }
+
+  export type UserUpsertWithoutDepartmentsInChargeInput = {
+    update: XOR<UserUpdateWithoutDepartmentsInChargeInput, UserUncheckedUpdateWithoutDepartmentsInChargeInput>
+    create: XOR<UserCreateWithoutDepartmentsInChargeInput, UserUncheckedCreateWithoutDepartmentsInChargeInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutDepartmentsInChargeInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutDepartmentsInChargeInput, UserUncheckedUpdateWithoutDepartmentsInChargeInput>
+  }
+
+  export type UserUpdateWithoutDepartmentsInChargeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    departmentCode?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userRoles?: UserRoleUpdateManyWithoutUserNestedInput
+    createdPrograms?: ProgramUpdateManyWithoutCreatedByNestedInput
+    approvedPrograms?: ProgramUpdateManyWithoutApprovedByNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    attachments?: AttachmentUpdateManyWithoutUploadedByNestedInput
+    createdChallans?: ChallanUpdateManyWithoutCreatedByNestedInput
+    issuedChallans?: ChallanUpdateManyWithoutIssuedByNestedInput
+    receivedChallans?: ChallanUpdateManyWithoutReceivedByNestedInput
+    approvedChallans?: ChallanUpdateManyWithoutApprovedByNestedInput
+    productionRecords?: ProductionTransactionUpdateManyWithoutOperatorNestedInput
+    inspections?: QualityInspectionUpdateManyWithoutInspectorNestedInput
+    challanEvents?: ChallanEventUpdateManyWithoutActorNestedInput
+    stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutActorNestedInput
+    dispatchesApproved?: DispatchOrderUpdateManyWithoutApprovedByNestedInput
+    dispatchesOperated?: DispatchOrderUpdateManyWithoutDispatchedByNestedInput
+    defectsDetected?: DefectRecordUpdateManyWithoutDetectedByNestedInput
+    reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
+    recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
+    recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutDepartmentsInChargeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    departmentCode?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userRoles?: UserRoleUncheckedUpdateManyWithoutUserNestedInput
+    createdPrograms?: ProgramUncheckedUpdateManyWithoutCreatedByNestedInput
+    approvedPrograms?: ProgramUncheckedUpdateManyWithoutApprovedByNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    attachments?: AttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+    createdChallans?: ChallanUncheckedUpdateManyWithoutCreatedByNestedInput
+    issuedChallans?: ChallanUncheckedUpdateManyWithoutIssuedByNestedInput
+    receivedChallans?: ChallanUncheckedUpdateManyWithoutReceivedByNestedInput
+    approvedChallans?: ChallanUncheckedUpdateManyWithoutApprovedByNestedInput
+    productionRecords?: ProductionTransactionUncheckedUpdateManyWithoutOperatorNestedInput
+    inspections?: QualityInspectionUncheckedUpdateManyWithoutInspectorNestedInput
+    challanEvents?: ChallanEventUncheckedUpdateManyWithoutActorNestedInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutActorNestedInput
+    dispatchesApproved?: DispatchOrderUncheckedUpdateManyWithoutApprovedByNestedInput
+    dispatchesOperated?: DispatchOrderUncheckedUpdateManyWithoutDispatchedByNestedInput
+    defectsDetected?: DefectRecordUncheckedUpdateManyWithoutDetectedByNestedInput
+    reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
+    recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+    recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type WorkCenterUpsertWithWhereUniqueWithoutDepartmentInput = {
@@ -110108,6 +114737,7 @@ export namespace Prisma {
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    incharge?: UserCreateNestedOneWithoutDepartmentsInChargeInput
     operations?: OperationCreateNestedManyWithoutDepartmentInput
     defectCodes?: DefectCodeCreateNestedManyWithoutDepartmentInput
     fromChallans?: ChallanCreateNestedManyWithoutFromDeptRelInput
@@ -110121,6 +114751,7 @@ export namespace Prisma {
     sequenceOrder: number
     description?: string | null
     isActive?: boolean
+    inchargeUserId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     operations?: OperationUncheckedCreateNestedManyWithoutDepartmentInput
@@ -110188,6 +114819,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    incharge?: UserUpdateOneWithoutDepartmentsInChargeNestedInput
     operations?: OperationUpdateManyWithoutDepartmentNestedInput
     defectCodes?: DefectCodeUpdateManyWithoutDepartmentNestedInput
     fromChallans?: ChallanUpdateManyWithoutFromDeptRelNestedInput
@@ -110201,6 +114833,7 @@ export namespace Prisma {
     sequenceOrder?: IntFieldUpdateOperationsInput | number
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    inchargeUserId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     operations?: OperationUncheckedUpdateManyWithoutDepartmentNestedInput
@@ -110716,6 +115349,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutCustomerInput = {
@@ -110792,6 +115426,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutCustomerInput = {
@@ -111361,6 +115996,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutDesignInput = {
@@ -111437,6 +116073,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutDesignInput = {
@@ -111778,6 +116415,7 @@ export namespace Prisma {
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    incharge?: UserCreateNestedOneWithoutDepartmentsInChargeInput
     workCenters?: WorkCenterCreateNestedManyWithoutDepartmentInput
     defectCodes?: DefectCodeCreateNestedManyWithoutDepartmentInput
     fromChallans?: ChallanCreateNestedManyWithoutFromDeptRelInput
@@ -111791,6 +116429,7 @@ export namespace Prisma {
     sequenceOrder: number
     description?: string | null
     isActive?: boolean
+    inchargeUserId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     workCenters?: WorkCenterUncheckedCreateNestedManyWithoutDepartmentInput
@@ -111866,6 +116505,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    incharge?: UserUpdateOneWithoutDepartmentsInChargeNestedInput
     workCenters?: WorkCenterUpdateManyWithoutDepartmentNestedInput
     defectCodes?: DefectCodeUpdateManyWithoutDepartmentNestedInput
     fromChallans?: ChallanUpdateManyWithoutFromDeptRelNestedInput
@@ -111879,6 +116519,7 @@ export namespace Prisma {
     sequenceOrder?: IntFieldUpdateOperationsInput | number
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    inchargeUserId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     workCenters?: WorkCenterUncheckedUpdateManyWithoutDepartmentNestedInput
@@ -111932,6 +116573,7 @@ export namespace Prisma {
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    incharge?: UserCreateNestedOneWithoutDepartmentsInChargeInput
     workCenters?: WorkCenterCreateNestedManyWithoutDepartmentInput
     operations?: OperationCreateNestedManyWithoutDepartmentInput
     fromChallans?: ChallanCreateNestedManyWithoutFromDeptRelInput
@@ -111945,6 +116587,7 @@ export namespace Prisma {
     sequenceOrder: number
     description?: string | null
     isActive?: boolean
+    inchargeUserId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     workCenters?: WorkCenterUncheckedCreateNestedManyWithoutDepartmentInput
@@ -111978,6 +116621,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    incharge?: UserUpdateOneWithoutDepartmentsInChargeNestedInput
     workCenters?: WorkCenterUpdateManyWithoutDepartmentNestedInput
     operations?: OperationUpdateManyWithoutDepartmentNestedInput
     fromChallans?: ChallanUpdateManyWithoutFromDeptRelNestedInput
@@ -111991,6 +116635,7 @@ export namespace Prisma {
     sequenceOrder?: IntFieldUpdateOperationsInput | number
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    inchargeUserId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     workCenters?: WorkCenterUncheckedUpdateManyWithoutDepartmentNestedInput
@@ -112109,6 +116754,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutCreatedProgramsInput = {
@@ -112145,6 +116793,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutCreatedProgramsInput = {
@@ -112186,6 +116837,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutApprovedProgramsInput = {
@@ -112222,6 +116876,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutApprovedProgramsInput = {
@@ -112450,6 +117107,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
@@ -112478,7 +117136,8 @@ export namespace Prisma {
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutProgramInput = {
@@ -112491,6 +117150,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     createdById: string
@@ -112516,7 +117176,8 @@ export namespace Prisma {
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderUncheckedCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutProgramInput = {
@@ -112744,7 +117405,13 @@ export namespace Prisma {
   export type DefectRecordCreateWithoutProgramInput = {
     id?: string
     defectCode: string
+    productionSheetNumber?: string | null
     departmentCode: string
+    shelfCode?: string | null
+    color?: string | null
+    fabricType?: string | null
+    quantityUnit?: string
+    responsibleIncharge?: string | null
     itemDescription: string
     severity: string
     quantity: number
@@ -112752,6 +117419,8 @@ export namespace Prisma {
     status?: string
     resolutionNotes?: string | null
     resolvedAt?: Date | string | null
+    shelfRemovedAt?: Date | string | null
+    shelfRemovalReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     challan?: ChallanCreateNestedOneWithoutDefectsInput
@@ -112764,8 +117433,14 @@ export namespace Prisma {
   export type DefectRecordUncheckedCreateWithoutProgramInput = {
     id?: string
     defectCode: string
+    productionSheetNumber?: string | null
     challanId?: string | null
     departmentCode: string
+    shelfCode?: string | null
+    color?: string | null
+    fabricType?: string | null
+    quantityUnit?: string
+    responsibleIncharge?: string | null
     bundleId?: string | null
     itemDescription: string
     severity: string
@@ -112775,6 +117450,8 @@ export namespace Prisma {
     status?: string
     resolutionNotes?: string | null
     resolvedAt?: Date | string | null
+    shelfRemovedAt?: Date | string | null
+    shelfRemovalReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     reworks?: ReworkTransactionUncheckedCreateNestedManyWithoutDefectInput
@@ -113040,18 +117717,20 @@ export namespace Prisma {
   export type DyeingOrderCreateWithoutProgramInput = {
     id?: string
     orderNumber: string
+    inboundChallanItemId?: string | null
     status?: string
     priority?: string
     fabricName: string
     fabricType?: string | null
+    currentColor?: string | null
     targetColor: string
     dyedColor?: string | null
     colorCode?: string | null
     requiredQuantity: number
     dyedQuantity?: number
     undyedQuantity?: number
-    readyForQc1Quantity?: number
-    sentToQc1Quantity?: number
+    readyForDyeingQcQuantity?: number
+    sentToDyeingQcQuantity?: number
     uom?: string
     inchargeName?: string | null
     batchNumber?: string | null
@@ -113059,40 +117738,42 @@ export namespace Prisma {
     processRemarks?: string | null
     startedAt?: Date | string | null
     completedAt?: Date | string | null
-    sentToQc1At?: Date | string | null
+    sentToDyeingQcAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     inboundChallan?: ChallanCreateNestedOneWithoutDyeingInboundOrdersInput
     incharge?: UserCreateNestedOneWithoutDyeingOrdersInchargeInput
-    qc1Challan?: ChallanCreateNestedOneWithoutDyeingQc1OrdersInput
+    dyeingQcChallan?: ChallanCreateNestedOneWithoutDyeingQcOrdersInput
   }
 
   export type DyeingOrderUncheckedCreateWithoutProgramInput = {
     id?: string
     orderNumber: string
     inboundChallanId?: string | null
+    inboundChallanItemId?: string | null
     status?: string
     priority?: string
     fabricName: string
     fabricType?: string | null
+    currentColor?: string | null
     targetColor: string
     dyedColor?: string | null
     colorCode?: string | null
     requiredQuantity: number
     dyedQuantity?: number
     undyedQuantity?: number
-    readyForQc1Quantity?: number
-    sentToQc1Quantity?: number
+    readyForDyeingQcQuantity?: number
+    sentToDyeingQcQuantity?: number
     uom?: string
     inchargeId?: string | null
     inchargeName?: string | null
     batchNumber?: string | null
     machineNumber?: string | null
     processRemarks?: string | null
-    qc1ChallanId?: string | null
+    dyeingQcChallanId?: string | null
     startedAt?: Date | string | null
     completedAt?: Date | string | null
-    sentToQc1At?: Date | string | null
+    sentToDyeingQcAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -113104,6 +117785,56 @@ export namespace Prisma {
 
   export type DyeingOrderCreateManyProgramInputEnvelope = {
     data: DyeingOrderCreateManyProgramInput | DyeingOrderCreateManyProgramInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type DeadlineAlertCreateWithoutProgramInput = {
+    id?: string
+    dedupeKey: string
+    departmentCode: string
+    taskType: string
+    taskId: string
+    stage: string
+    severity: string
+    deadlineAt: Date | string
+    deadlineSource: string
+    status?: string
+    resolutionReason?: string | null
+    createdAt?: Date | string
+    lastEvaluatedAt?: Date | string
+    resolvedAt?: Date | string | null
+    challan?: ChallanCreateNestedOneWithoutDeadlineAlertsInput
+    assignedUser?: UserCreateNestedOneWithoutDeadlineAlertsAssignedInput
+    dismissals?: DeadlineAlertDismissalCreateNestedManyWithoutAlertInput
+  }
+
+  export type DeadlineAlertUncheckedCreateWithoutProgramInput = {
+    id?: string
+    dedupeKey: string
+    departmentCode: string
+    taskType: string
+    taskId: string
+    challanId?: string | null
+    assignedUserId?: string | null
+    stage: string
+    severity: string
+    deadlineAt: Date | string
+    deadlineSource: string
+    status?: string
+    resolutionReason?: string | null
+    createdAt?: Date | string
+    lastEvaluatedAt?: Date | string
+    resolvedAt?: Date | string | null
+    dismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutAlertInput
+  }
+
+  export type DeadlineAlertCreateOrConnectWithoutProgramInput = {
+    where: DeadlineAlertWhereUniqueInput
+    create: XOR<DeadlineAlertCreateWithoutProgramInput, DeadlineAlertUncheckedCreateWithoutProgramInput>
+  }
+
+  export type DeadlineAlertCreateManyProgramInputEnvelope = {
+    data: DeadlineAlertCreateManyProgramInput | DeadlineAlertCreateManyProgramInput[]
     skipDuplicates?: boolean
   }
 
@@ -113240,6 +117971,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCreatedProgramsInput = {
@@ -113276,6 +118010,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUpsertWithoutApprovedProgramsInput = {
@@ -113323,6 +118060,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutApprovedProgramsInput = {
@@ -113359,6 +118099,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type ProgramFabricUpsertWithWhereUniqueWithoutProgramInput = {
@@ -113708,6 +118451,22 @@ export namespace Prisma {
     data: XOR<DyeingOrderUpdateManyMutationInput, DyeingOrderUncheckedUpdateManyWithoutProgramInput>
   }
 
+  export type DeadlineAlertUpsertWithWhereUniqueWithoutProgramInput = {
+    where: DeadlineAlertWhereUniqueInput
+    update: XOR<DeadlineAlertUpdateWithoutProgramInput, DeadlineAlertUncheckedUpdateWithoutProgramInput>
+    create: XOR<DeadlineAlertCreateWithoutProgramInput, DeadlineAlertUncheckedCreateWithoutProgramInput>
+  }
+
+  export type DeadlineAlertUpdateWithWhereUniqueWithoutProgramInput = {
+    where: DeadlineAlertWhereUniqueInput
+    data: XOR<DeadlineAlertUpdateWithoutProgramInput, DeadlineAlertUncheckedUpdateWithoutProgramInput>
+  }
+
+  export type DeadlineAlertUpdateManyWithWhereWithoutProgramInput = {
+    where: DeadlineAlertScalarWhereInput
+    data: XOR<DeadlineAlertUpdateManyMutationInput, DeadlineAlertUncheckedUpdateManyWithoutProgramInput>
+  }
+
   export type ProgramCreateWithoutFabricsInput = {
     id?: string
     programNumber: string
@@ -113782,6 +118541,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutFabricsInput = {
@@ -113858,6 +118618,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutFabricsInput = {
@@ -114014,6 +118775,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutFabricsInput = {
@@ -114090,6 +118852,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type FabricUpsertWithoutProgramFabricsInput = {
@@ -114242,6 +119005,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutColoursInput = {
@@ -114318,6 +119082,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutColoursInput = {
@@ -114439,6 +119204,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutColoursInput = {
@@ -114515,6 +119281,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type ColourUpsertWithoutProgramColoursInput = {
@@ -114626,6 +119393,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutSizesInput = {
@@ -114702,6 +119470,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutSizesInput = {
@@ -114823,6 +119592,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutSizesInput = {
@@ -114899,6 +119669,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type SizeUpsertWithoutProgramSizesInput = {
@@ -115010,6 +119781,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutSpecificationsInput = {
@@ -115086,6 +119858,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutSpecificationsInput = {
@@ -115207,6 +119980,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutSpecificationsInput = {
@@ -115283,6 +120057,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type SizeUpsertWithoutSpecificationsInput = {
@@ -115394,6 +120169,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutBomItemsInput = {
@@ -115470,6 +120246,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutBomItemsInput = {
@@ -115636,6 +120413,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutBomItemsInput = {
@@ -115712,6 +120490,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type ItemUpsertWithoutBomItemsInput = {
@@ -115874,6 +120653,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutRoutesInput = {
@@ -115950,6 +120730,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutRoutesInput = {
@@ -116084,6 +120865,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutRoutesInput = {
@@ -116160,6 +120942,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramRouteStepUpsertWithWhereUniqueWithoutProgramRouteInput = {
@@ -116336,6 +121119,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutAttachmentsInput = {
@@ -116372,6 +121158,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutAttachmentsInput = {
@@ -116424,6 +121213,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAttachmentsInput = {
@@ -116460,6 +121252,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserCreateWithoutAuditLogsInput = {
@@ -116496,6 +121291,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutAuditLogsInput = {
@@ -116532,6 +121330,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutAuditLogsInput = {
@@ -116584,6 +121385,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAuditLogsInput = {
@@ -116620,6 +121424,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type ProgramCreateWithoutChallansInput = {
@@ -116696,6 +121503,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutChallansInput = {
@@ -116772,6 +121580,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutChallansInput = {
@@ -116786,6 +121595,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
@@ -116814,7 +121624,8 @@ export namespace Prisma {
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutChildChallansInput = {
@@ -116828,6 +121639,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     createdById: string
@@ -116852,7 +121664,8 @@ export namespace Prisma {
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderUncheckedCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutChildChallansInput = {
@@ -116867,6 +121680,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
@@ -116895,7 +121709,8 @@ export namespace Prisma {
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutParentChallanInput = {
@@ -116908,6 +121723,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     createdById: string
@@ -116933,7 +121749,8 @@ export namespace Prisma {
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderUncheckedCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutParentChallanInput = {
@@ -116955,6 +121772,7 @@ export namespace Prisma {
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    incharge?: UserCreateNestedOneWithoutDepartmentsInChargeInput
     workCenters?: WorkCenterCreateNestedManyWithoutDepartmentInput
     operations?: OperationCreateNestedManyWithoutDepartmentInput
     defectCodes?: DefectCodeCreateNestedManyWithoutDepartmentInput
@@ -116968,6 +121786,7 @@ export namespace Prisma {
     sequenceOrder: number
     description?: string | null
     isActive?: boolean
+    inchargeUserId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     workCenters?: WorkCenterUncheckedCreateNestedManyWithoutDepartmentInput
@@ -116990,6 +121809,7 @@ export namespace Prisma {
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    incharge?: UserCreateNestedOneWithoutDepartmentsInChargeInput
     workCenters?: WorkCenterCreateNestedManyWithoutDepartmentInput
     operations?: OperationCreateNestedManyWithoutDepartmentInput
     defectCodes?: DefectCodeCreateNestedManyWithoutDepartmentInput
@@ -117003,6 +121823,7 @@ export namespace Prisma {
     sequenceOrder: number
     description?: string | null
     isActive?: boolean
+    inchargeUserId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     workCenters?: WorkCenterUncheckedCreateNestedManyWithoutDepartmentInput
@@ -117050,6 +121871,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutCreatedChallansInput = {
@@ -117086,6 +121910,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutCreatedChallansInput = {
@@ -117127,6 +121954,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutIssuedChallansInput = {
@@ -117163,6 +121993,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutIssuedChallansInput = {
@@ -117204,6 +122037,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutReceivedChallansInput = {
@@ -117240,6 +122076,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutReceivedChallansInput = {
@@ -117281,6 +122120,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutApprovedChallansInput = {
@@ -117317,6 +122159,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutApprovedChallansInput = {
@@ -117330,6 +122175,8 @@ export namespace Prisma {
     fabricCode?: string | null
     colour?: string | null
     shade?: string | null
+    requiredDyeColor?: string | null
+    requiredDyeQuantity?: number | null
     size?: string | null
     unitType: string
     rollNumber?: string | null
@@ -117353,6 +122200,8 @@ export namespace Prisma {
     fabricCode?: string | null
     colour?: string | null
     shade?: string | null
+    requiredDyeColor?: string | null
+    requiredDyeQuantity?: number | null
     size?: string | null
     unitType: string
     rollNumber?: string | null
@@ -117567,7 +122416,13 @@ export namespace Prisma {
   export type DefectRecordCreateWithoutChallanInput = {
     id?: string
     defectCode: string
+    productionSheetNumber?: string | null
     departmentCode: string
+    shelfCode?: string | null
+    color?: string | null
+    fabricType?: string | null
+    quantityUnit?: string
+    responsibleIncharge?: string | null
     itemDescription: string
     severity: string
     quantity: number
@@ -117575,6 +122430,8 @@ export namespace Prisma {
     status?: string
     resolutionNotes?: string | null
     resolvedAt?: Date | string | null
+    shelfRemovedAt?: Date | string | null
+    shelfRemovalReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     program: ProgramCreateNestedOneWithoutDefectsInput
@@ -117588,7 +122445,13 @@ export namespace Prisma {
     id?: string
     defectCode: string
     programId: string
+    productionSheetNumber?: string | null
     departmentCode: string
+    shelfCode?: string | null
+    color?: string | null
+    fabricType?: string | null
+    quantityUnit?: string
+    responsibleIncharge?: string | null
     bundleId?: string | null
     itemDescription: string
     severity: string
@@ -117598,6 +122461,8 @@ export namespace Prisma {
     status?: string
     resolutionNotes?: string | null
     resolvedAt?: Date | string | null
+    shelfRemovedAt?: Date | string | null
+    shelfRemovalReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     reworks?: ReworkTransactionUncheckedCreateNestedManyWithoutDefectInput
@@ -117617,18 +122482,20 @@ export namespace Prisma {
   export type DyeingOrderCreateWithoutInboundChallanInput = {
     id?: string
     orderNumber: string
+    inboundChallanItemId?: string | null
     status?: string
     priority?: string
     fabricName: string
     fabricType?: string | null
+    currentColor?: string | null
     targetColor: string
     dyedColor?: string | null
     colorCode?: string | null
     requiredQuantity: number
     dyedQuantity?: number
     undyedQuantity?: number
-    readyForQc1Quantity?: number
-    sentToQc1Quantity?: number
+    readyForDyeingQcQuantity?: number
+    sentToDyeingQcQuantity?: number
     uom?: string
     inchargeName?: string | null
     batchNumber?: string | null
@@ -117636,40 +122503,42 @@ export namespace Prisma {
     processRemarks?: string | null
     startedAt?: Date | string | null
     completedAt?: Date | string | null
-    sentToQc1At?: Date | string | null
+    sentToDyeingQcAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     program: ProgramCreateNestedOneWithoutDyeingOrdersInput
     incharge?: UserCreateNestedOneWithoutDyeingOrdersInchargeInput
-    qc1Challan?: ChallanCreateNestedOneWithoutDyeingQc1OrdersInput
+    dyeingQcChallan?: ChallanCreateNestedOneWithoutDyeingQcOrdersInput
   }
 
   export type DyeingOrderUncheckedCreateWithoutInboundChallanInput = {
     id?: string
     orderNumber: string
     programId: string
+    inboundChallanItemId?: string | null
     status?: string
     priority?: string
     fabricName: string
     fabricType?: string | null
+    currentColor?: string | null
     targetColor: string
     dyedColor?: string | null
     colorCode?: string | null
     requiredQuantity: number
     dyedQuantity?: number
     undyedQuantity?: number
-    readyForQc1Quantity?: number
-    sentToQc1Quantity?: number
+    readyForDyeingQcQuantity?: number
+    sentToDyeingQcQuantity?: number
     uom?: string
     inchargeId?: string | null
     inchargeName?: string | null
     batchNumber?: string | null
     machineNumber?: string | null
     processRemarks?: string | null
-    qc1ChallanId?: string | null
+    dyeingQcChallanId?: string | null
     startedAt?: Date | string | null
     completedAt?: Date | string | null
-    sentToQc1At?: Date | string | null
+    sentToDyeingQcAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -117684,21 +122553,23 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type DyeingOrderCreateWithoutQc1ChallanInput = {
+  export type DyeingOrderCreateWithoutDyeingQcChallanInput = {
     id?: string
     orderNumber: string
+    inboundChallanItemId?: string | null
     status?: string
     priority?: string
     fabricName: string
     fabricType?: string | null
+    currentColor?: string | null
     targetColor: string
     dyedColor?: string | null
     colorCode?: string | null
     requiredQuantity: number
     dyedQuantity?: number
     undyedQuantity?: number
-    readyForQc1Quantity?: number
-    sentToQc1Quantity?: number
+    readyForDyeingQcQuantity?: number
+    sentToDyeingQcQuantity?: number
     uom?: string
     inchargeName?: string | null
     batchNumber?: string | null
@@ -117706,7 +122577,7 @@ export namespace Prisma {
     processRemarks?: string | null
     startedAt?: Date | string | null
     completedAt?: Date | string | null
-    sentToQc1At?: Date | string | null
+    sentToDyeingQcAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     program: ProgramCreateNestedOneWithoutDyeingOrdersInput
@@ -117714,23 +122585,25 @@ export namespace Prisma {
     incharge?: UserCreateNestedOneWithoutDyeingOrdersInchargeInput
   }
 
-  export type DyeingOrderUncheckedCreateWithoutQc1ChallanInput = {
+  export type DyeingOrderUncheckedCreateWithoutDyeingQcChallanInput = {
     id?: string
     orderNumber: string
     programId: string
     inboundChallanId?: string | null
+    inboundChallanItemId?: string | null
     status?: string
     priority?: string
     fabricName: string
     fabricType?: string | null
+    currentColor?: string | null
     targetColor: string
     dyedColor?: string | null
     colorCode?: string | null
     requiredQuantity: number
     dyedQuantity?: number
     undyedQuantity?: number
-    readyForQc1Quantity?: number
-    sentToQc1Quantity?: number
+    readyForDyeingQcQuantity?: number
+    sentToDyeingQcQuantity?: number
     uom?: string
     inchargeId?: string | null
     inchargeName?: string | null
@@ -117739,18 +122612,68 @@ export namespace Prisma {
     processRemarks?: string | null
     startedAt?: Date | string | null
     completedAt?: Date | string | null
-    sentToQc1At?: Date | string | null
+    sentToDyeingQcAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
-  export type DyeingOrderCreateOrConnectWithoutQc1ChallanInput = {
+  export type DyeingOrderCreateOrConnectWithoutDyeingQcChallanInput = {
     where: DyeingOrderWhereUniqueInput
-    create: XOR<DyeingOrderCreateWithoutQc1ChallanInput, DyeingOrderUncheckedCreateWithoutQc1ChallanInput>
+    create: XOR<DyeingOrderCreateWithoutDyeingQcChallanInput, DyeingOrderUncheckedCreateWithoutDyeingQcChallanInput>
   }
 
-  export type DyeingOrderCreateManyQc1ChallanInputEnvelope = {
-    data: DyeingOrderCreateManyQc1ChallanInput | DyeingOrderCreateManyQc1ChallanInput[]
+  export type DyeingOrderCreateManyDyeingQcChallanInputEnvelope = {
+    data: DyeingOrderCreateManyDyeingQcChallanInput | DyeingOrderCreateManyDyeingQcChallanInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type DeadlineAlertCreateWithoutChallanInput = {
+    id?: string
+    dedupeKey: string
+    departmentCode: string
+    taskType: string
+    taskId: string
+    stage: string
+    severity: string
+    deadlineAt: Date | string
+    deadlineSource: string
+    status?: string
+    resolutionReason?: string | null
+    createdAt?: Date | string
+    lastEvaluatedAt?: Date | string
+    resolvedAt?: Date | string | null
+    program?: ProgramCreateNestedOneWithoutDeadlineAlertsInput
+    assignedUser?: UserCreateNestedOneWithoutDeadlineAlertsAssignedInput
+    dismissals?: DeadlineAlertDismissalCreateNestedManyWithoutAlertInput
+  }
+
+  export type DeadlineAlertUncheckedCreateWithoutChallanInput = {
+    id?: string
+    dedupeKey: string
+    departmentCode: string
+    taskType: string
+    taskId: string
+    programId?: string | null
+    assignedUserId?: string | null
+    stage: string
+    severity: string
+    deadlineAt: Date | string
+    deadlineSource: string
+    status?: string
+    resolutionReason?: string | null
+    createdAt?: Date | string
+    lastEvaluatedAt?: Date | string
+    resolvedAt?: Date | string | null
+    dismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutAlertInput
+  }
+
+  export type DeadlineAlertCreateOrConnectWithoutChallanInput = {
+    where: DeadlineAlertWhereUniqueInput
+    create: XOR<DeadlineAlertCreateWithoutChallanInput, DeadlineAlertUncheckedCreateWithoutChallanInput>
+  }
+
+  export type DeadlineAlertCreateManyChallanInputEnvelope = {
+    data: DeadlineAlertCreateManyChallanInput | DeadlineAlertCreateManyChallanInput[]
     skipDuplicates?: boolean
   }
 
@@ -117839,6 +122762,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutChallansInput = {
@@ -117915,6 +122839,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type ChallanUpsertWithoutChildChallansInput = {
@@ -117935,6 +122860,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -117963,7 +122889,8 @@ export namespace Prisma {
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutChildChallansInput = {
@@ -117977,6 +122904,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -118001,7 +122929,8 @@ export namespace Prisma {
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUncheckedUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
   }
 
   export type ChallanUpsertWithWhereUniqueWithoutParentChallanInput = {
@@ -118040,6 +122969,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    incharge?: UserUpdateOneWithoutDepartmentsInChargeNestedInput
     workCenters?: WorkCenterUpdateManyWithoutDepartmentNestedInput
     operations?: OperationUpdateManyWithoutDepartmentNestedInput
     defectCodes?: DefectCodeUpdateManyWithoutDepartmentNestedInput
@@ -118053,6 +122983,7 @@ export namespace Prisma {
     sequenceOrder?: IntFieldUpdateOperationsInput | number
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    inchargeUserId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     workCenters?: WorkCenterUncheckedUpdateManyWithoutDepartmentNestedInput
@@ -118081,6 +123012,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    incharge?: UserUpdateOneWithoutDepartmentsInChargeNestedInput
     workCenters?: WorkCenterUpdateManyWithoutDepartmentNestedInput
     operations?: OperationUpdateManyWithoutDepartmentNestedInput
     defectCodes?: DefectCodeUpdateManyWithoutDepartmentNestedInput
@@ -118094,6 +123026,7 @@ export namespace Prisma {
     sequenceOrder?: IntFieldUpdateOperationsInput | number
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    inchargeUserId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     workCenters?: WorkCenterUncheckedUpdateManyWithoutDepartmentNestedInput
@@ -118147,6 +123080,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCreatedChallansInput = {
@@ -118183,6 +123119,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUpsertWithoutIssuedChallansInput = {
@@ -118230,6 +123169,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutIssuedChallansInput = {
@@ -118266,6 +123208,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUpsertWithoutReceivedChallansInput = {
@@ -118313,6 +123258,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReceivedChallansInput = {
@@ -118349,6 +123297,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUpsertWithoutApprovedChallansInput = {
@@ -118396,6 +123347,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutApprovedChallansInput = {
@@ -118432,6 +123386,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type ChallanItemUpsertWithWhereUniqueWithoutChallanInput = {
@@ -118460,6 +123417,8 @@ export namespace Prisma {
     fabricCode?: StringNullableFilter<"ChallanItem"> | string | null
     colour?: StringNullableFilter<"ChallanItem"> | string | null
     shade?: StringNullableFilter<"ChallanItem"> | string | null
+    requiredDyeColor?: StringNullableFilter<"ChallanItem"> | string | null
+    requiredDyeQuantity?: FloatNullableFilter<"ChallanItem"> | number | null
     size?: StringNullableFilter<"ChallanItem"> | string | null
     unitType?: StringFilter<"ChallanItem"> | string
     rollNumber?: StringNullableFilter<"ChallanItem"> | string | null
@@ -118573,20 +123532,36 @@ export namespace Prisma {
     data: XOR<DyeingOrderUpdateManyMutationInput, DyeingOrderUncheckedUpdateManyWithoutInboundChallanInput>
   }
 
-  export type DyeingOrderUpsertWithWhereUniqueWithoutQc1ChallanInput = {
+  export type DyeingOrderUpsertWithWhereUniqueWithoutDyeingQcChallanInput = {
     where: DyeingOrderWhereUniqueInput
-    update: XOR<DyeingOrderUpdateWithoutQc1ChallanInput, DyeingOrderUncheckedUpdateWithoutQc1ChallanInput>
-    create: XOR<DyeingOrderCreateWithoutQc1ChallanInput, DyeingOrderUncheckedCreateWithoutQc1ChallanInput>
+    update: XOR<DyeingOrderUpdateWithoutDyeingQcChallanInput, DyeingOrderUncheckedUpdateWithoutDyeingQcChallanInput>
+    create: XOR<DyeingOrderCreateWithoutDyeingQcChallanInput, DyeingOrderUncheckedCreateWithoutDyeingQcChallanInput>
   }
 
-  export type DyeingOrderUpdateWithWhereUniqueWithoutQc1ChallanInput = {
+  export type DyeingOrderUpdateWithWhereUniqueWithoutDyeingQcChallanInput = {
     where: DyeingOrderWhereUniqueInput
-    data: XOR<DyeingOrderUpdateWithoutQc1ChallanInput, DyeingOrderUncheckedUpdateWithoutQc1ChallanInput>
+    data: XOR<DyeingOrderUpdateWithoutDyeingQcChallanInput, DyeingOrderUncheckedUpdateWithoutDyeingQcChallanInput>
   }
 
-  export type DyeingOrderUpdateManyWithWhereWithoutQc1ChallanInput = {
+  export type DyeingOrderUpdateManyWithWhereWithoutDyeingQcChallanInput = {
     where: DyeingOrderScalarWhereInput
-    data: XOR<DyeingOrderUpdateManyMutationInput, DyeingOrderUncheckedUpdateManyWithoutQc1ChallanInput>
+    data: XOR<DyeingOrderUpdateManyMutationInput, DyeingOrderUncheckedUpdateManyWithoutDyeingQcChallanInput>
+  }
+
+  export type DeadlineAlertUpsertWithWhereUniqueWithoutChallanInput = {
+    where: DeadlineAlertWhereUniqueInput
+    update: XOR<DeadlineAlertUpdateWithoutChallanInput, DeadlineAlertUncheckedUpdateWithoutChallanInput>
+    create: XOR<DeadlineAlertCreateWithoutChallanInput, DeadlineAlertUncheckedCreateWithoutChallanInput>
+  }
+
+  export type DeadlineAlertUpdateWithWhereUniqueWithoutChallanInput = {
+    where: DeadlineAlertWhereUniqueInput
+    data: XOR<DeadlineAlertUpdateWithoutChallanInput, DeadlineAlertUncheckedUpdateWithoutChallanInput>
+  }
+
+  export type DeadlineAlertUpdateManyWithWhereWithoutChallanInput = {
+    where: DeadlineAlertScalarWhereInput
+    data: XOR<DeadlineAlertUpdateManyMutationInput, DeadlineAlertUncheckedUpdateManyWithoutChallanInput>
   }
 
   export type ChallanCreateWithoutItemsInput = {
@@ -118596,6 +123571,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
@@ -118624,7 +123600,8 @@ export namespace Prisma {
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutItemsInput = {
@@ -118638,6 +123615,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     createdById: string
@@ -118662,7 +123640,8 @@ export namespace Prisma {
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderUncheckedCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutItemsInput = {
@@ -118688,6 +123667,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -118716,7 +123696,8 @@ export namespace Prisma {
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutItemsInput = {
@@ -118730,6 +123711,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -118754,7 +123736,8 @@ export namespace Prisma {
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUncheckedUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
   }
 
   export type ProgramCreateWithoutProductionLogsInput = {
@@ -118831,6 +123814,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutProductionLogsInput = {
@@ -118907,6 +123891,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutProductionLogsInput = {
@@ -118921,6 +123906,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
@@ -118949,7 +123935,8 @@ export namespace Prisma {
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutProductionLogsInput = {
@@ -118963,6 +123950,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     createdById: string
@@ -118987,7 +123975,8 @@ export namespace Prisma {
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderUncheckedCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutProductionLogsInput = {
@@ -119029,6 +124018,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutProductionRecordsInput = {
@@ -119065,6 +124057,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutProductionRecordsInput = {
@@ -119157,6 +124152,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutProductionLogsInput = {
@@ -119233,6 +124229,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type ChallanUpsertWithoutProductionLogsInput = {
@@ -119253,6 +124250,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -119281,7 +124279,8 @@ export namespace Prisma {
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutProductionLogsInput = {
@@ -119295,6 +124294,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -119319,7 +124319,8 @@ export namespace Prisma {
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUncheckedUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
   }
 
   export type UserUpsertWithoutProductionRecordsInput = {
@@ -119367,6 +124368,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutProductionRecordsInput = {
@@ -119403,6 +124407,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type ChallanCreateWithoutInspectionsInput = {
@@ -119412,6 +124419,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
@@ -119440,7 +124448,8 @@ export namespace Prisma {
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutInspectionsInput = {
@@ -119454,6 +124463,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     createdById: string
@@ -119478,7 +124488,8 @@ export namespace Prisma {
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderUncheckedCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutInspectionsInput = {
@@ -119520,6 +124531,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutInspectionsInput = {
@@ -119556,6 +124570,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutInspectionsInput = {
@@ -119641,6 +124658,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -119669,7 +124687,8 @@ export namespace Prisma {
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutInspectionsInput = {
@@ -119683,6 +124702,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -119707,7 +124727,8 @@ export namespace Prisma {
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUncheckedUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
   }
 
   export type UserUpsertWithoutInspectionsInput = {
@@ -119755,6 +124776,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutInspectionsInput = {
@@ -119791,6 +124815,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type DefectLogUpsertWithWhereUniqueWithoutInspectionInput = {
@@ -119928,6 +124955,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
@@ -119956,7 +124984,8 @@ export namespace Prisma {
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutEventsInput = {
@@ -119970,6 +124999,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     createdById: string
@@ -119994,7 +125024,8 @@ export namespace Prisma {
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderUncheckedCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutEventsInput = {
@@ -120036,6 +125067,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutChallanEventsInput = {
@@ -120072,6 +125106,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutChallanEventsInput = {
@@ -120097,6 +125134,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -120125,7 +125163,8 @@ export namespace Prisma {
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutEventsInput = {
@@ -120139,6 +125178,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -120163,7 +125203,8 @@ export namespace Prisma {
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUncheckedUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
   }
 
   export type UserUpsertWithoutChallanEventsInput = {
@@ -120211,6 +125252,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutChallanEventsInput = {
@@ -120247,6 +125291,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type ProgramCreateWithoutStockLedgerEntriesInput = {
@@ -120323,6 +125370,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutStockLedgerEntriesInput = {
@@ -120399,6 +125447,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutStockLedgerEntriesInput = {
@@ -120440,6 +125489,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutStockLedgerEntriesInput = {
@@ -120476,6 +125528,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutStockLedgerEntriesInput = {
@@ -120568,6 +125623,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutStockLedgerEntriesInput = {
@@ -120644,6 +125700,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type UserUpsertWithoutStockLedgerEntriesInput = {
@@ -120691,6 +125748,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutStockLedgerEntriesInput = {
@@ -120727,6 +125787,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type ProgramCreateWithoutRollsInput = {
@@ -120803,6 +125866,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutRollsInput = {
@@ -120879,6 +125943,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutRollsInput = {
@@ -121074,6 +126139,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutRollsInput = {
@@ -121150,6 +126216,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type SupplierUpsertWithoutFabricRollsInput = {
@@ -121291,6 +126358,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutBundlesInput = {
@@ -121367,6 +126435,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutBundlesInput = {
@@ -121381,6 +126450,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
@@ -121409,7 +126479,8 @@ export namespace Prisma {
     events?: ChallanEventCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutBundlesInput = {
@@ -121423,6 +126494,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     createdById: string
@@ -121447,7 +126519,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderUncheckedCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutBundlesInput = {
@@ -121503,7 +126576,13 @@ export namespace Prisma {
   export type DefectRecordCreateWithoutBundleInput = {
     id?: string
     defectCode: string
+    productionSheetNumber?: string | null
     departmentCode: string
+    shelfCode?: string | null
+    color?: string | null
+    fabricType?: string | null
+    quantityUnit?: string
+    responsibleIncharge?: string | null
     itemDescription: string
     severity: string
     quantity: number
@@ -121511,6 +126590,8 @@ export namespace Prisma {
     status?: string
     resolutionNotes?: string | null
     resolvedAt?: Date | string | null
+    shelfRemovedAt?: Date | string | null
+    shelfRemovalReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     program: ProgramCreateNestedOneWithoutDefectsInput
@@ -121524,8 +126605,14 @@ export namespace Prisma {
     id?: string
     defectCode: string
     programId: string
+    productionSheetNumber?: string | null
     challanId?: string | null
     departmentCode: string
+    shelfCode?: string | null
+    color?: string | null
+    fabricType?: string | null
+    quantityUnit?: string
+    responsibleIncharge?: string | null
     itemDescription: string
     severity: string
     quantity: number
@@ -121534,6 +126621,8 @@ export namespace Prisma {
     status?: string
     resolutionNotes?: string | null
     resolvedAt?: Date | string | null
+    shelfRemovedAt?: Date | string | null
+    shelfRemovalReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     reworks?: ReworkTransactionUncheckedCreateNestedManyWithoutDefectInput
@@ -121751,6 +126840,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutBundlesInput = {
@@ -121827,6 +126917,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type ChallanUpsertWithoutBundlesInput = {
@@ -121847,6 +126938,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -121875,7 +126967,8 @@ export namespace Prisma {
     events?: ChallanEventUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutBundlesInput = {
@@ -121889,6 +126982,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -121913,7 +127007,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUncheckedUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
   }
 
   export type FabricRollUpsertWithoutBundlesInput = {
@@ -122116,6 +127211,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutCartonsInput = {
@@ -122192,6 +127288,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutCartonsInput = {
@@ -122330,6 +127427,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutCartonsInput = {
@@ -122406,6 +127504,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type CartonBundleUpsertWithWhereUniqueWithoutCartonInput = {
@@ -122733,6 +127832,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutDispatchesApprovedInput = {
@@ -122769,6 +127871,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutDispatchesApprovedInput = {
@@ -122810,6 +127915,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutDispatchesOperatedInput = {
@@ -122846,6 +127954,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutDispatchesOperatedInput = {
@@ -122967,6 +128078,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutDispatchesApprovedInput = {
@@ -123003,6 +128117,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUpsertWithoutDispatchesOperatedInput = {
@@ -123050,6 +128167,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutDispatchesOperatedInput = {
@@ -123086,6 +128206,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type DispatchCartonUpsertWithWhereUniqueWithoutDispatchInput = {
@@ -123374,6 +128497,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutDefectsInput = {
@@ -123450,6 +128574,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutDefectsInput = {
@@ -123464,6 +128589,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
@@ -123492,7 +128618,8 @@ export namespace Prisma {
     events?: ChallanEventCreateNestedManyWithoutChallanInput
     bundles?: BundleCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutDefectsInput = {
@@ -123506,6 +128633,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     createdById: string
@@ -123530,7 +128658,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedCreateNestedManyWithoutChallanInput
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
-    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderUncheckedCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutDefectsInput = {
@@ -123627,6 +128756,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutDefectsDetectedInput = {
@@ -123663,6 +128795,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutDefectsDetectedInput = {
@@ -123843,6 +128978,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutDefectsInput = {
@@ -123919,6 +129055,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type ChallanUpsertWithoutDefectsInput = {
@@ -123939,6 +129076,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -123967,7 +129105,8 @@ export namespace Prisma {
     events?: ChallanEventUpdateManyWithoutChallanNestedInput
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutDefectsInput = {
@@ -123981,6 +129120,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -124005,7 +129145,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedUpdateManyWithoutChallanNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUncheckedUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
   }
 
   export type BundleUpsertWithoutDefectsInput = {
@@ -124114,6 +129255,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutDefectsDetectedInput = {
@@ -124150,6 +129294,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type ReworkTransactionUpsertWithWhereUniqueWithoutDefectInput = {
@@ -124187,7 +129334,13 @@ export namespace Prisma {
   export type DefectRecordCreateWithoutReworksInput = {
     id?: string
     defectCode: string
+    productionSheetNumber?: string | null
     departmentCode: string
+    shelfCode?: string | null
+    color?: string | null
+    fabricType?: string | null
+    quantityUnit?: string
+    responsibleIncharge?: string | null
     itemDescription: string
     severity: string
     quantity: number
@@ -124195,6 +129348,8 @@ export namespace Prisma {
     status?: string
     resolutionNotes?: string | null
     resolvedAt?: Date | string | null
+    shelfRemovedAt?: Date | string | null
+    shelfRemovalReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     program: ProgramCreateNestedOneWithoutDefectsInput
@@ -124208,8 +129363,14 @@ export namespace Prisma {
     id?: string
     defectCode: string
     programId: string
+    productionSheetNumber?: string | null
     challanId?: string | null
     departmentCode: string
+    shelfCode?: string | null
+    color?: string | null
+    fabricType?: string | null
+    quantityUnit?: string
+    responsibleIncharge?: string | null
     bundleId?: string | null
     itemDescription: string
     severity: string
@@ -124219,6 +129380,8 @@ export namespace Prisma {
     status?: string
     resolutionNotes?: string | null
     resolvedAt?: Date | string | null
+    shelfRemovedAt?: Date | string | null
+    shelfRemovalReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutDefectInput
@@ -124303,6 +129466,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutReworkTransactionsInput = {
@@ -124379,6 +129543,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutReworkTransactionsInput = {
@@ -124420,6 +129585,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutReworkOperationsInput = {
@@ -124456,6 +129624,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutReworkOperationsInput = {
@@ -124477,14 +129648,22 @@ export namespace Prisma {
   export type DefectRecordUpdateWithoutReworksInput = {
     id?: StringFieldUpdateOperationsInput | string
     defectCode?: StringFieldUpdateOperationsInput | string
+    productionSheetNumber?: NullableStringFieldUpdateOperationsInput | string | null
     departmentCode?: StringFieldUpdateOperationsInput | string
+    shelfCode?: NullableStringFieldUpdateOperationsInput | string | null
+    color?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    quantityUnit?: StringFieldUpdateOperationsInput | string
+    responsibleIncharge?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovalReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     program?: ProgramUpdateOneRequiredWithoutDefectsNestedInput
@@ -124498,17 +129677,25 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     defectCode?: StringFieldUpdateOperationsInput | string
     programId?: StringFieldUpdateOperationsInput | string
+    productionSheetNumber?: NullableStringFieldUpdateOperationsInput | string | null
     challanId?: NullableStringFieldUpdateOperationsInput | string | null
     departmentCode?: StringFieldUpdateOperationsInput | string
+    shelfCode?: NullableStringFieldUpdateOperationsInput | string | null
+    color?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    quantityUnit?: StringFieldUpdateOperationsInput | string
+    responsibleIncharge?: NullableStringFieldUpdateOperationsInput | string | null
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovalReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutDefectNestedInput
@@ -124599,6 +129786,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutReworkTransactionsInput = {
@@ -124675,6 +129863,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type UserUpsertWithoutReworkOperationsInput = {
@@ -124722,6 +129911,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReworkOperationsInput = {
@@ -124758,6 +129950,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type ProgramCreateWithoutRecutRequestsInput = {
@@ -124834,6 +130029,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutRecutRequestsInput = {
@@ -124910,6 +130106,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutRecutRequestsInput = {
@@ -124920,7 +130117,13 @@ export namespace Prisma {
   export type DefectRecordCreateWithoutRecutRequestsInput = {
     id?: string
     defectCode: string
+    productionSheetNumber?: string | null
     departmentCode: string
+    shelfCode?: string | null
+    color?: string | null
+    fabricType?: string | null
+    quantityUnit?: string
+    responsibleIncharge?: string | null
     itemDescription: string
     severity: string
     quantity: number
@@ -124928,6 +130131,8 @@ export namespace Prisma {
     status?: string
     resolutionNotes?: string | null
     resolvedAt?: Date | string | null
+    shelfRemovedAt?: Date | string | null
+    shelfRemovalReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     program: ProgramCreateNestedOneWithoutDefectsInput
@@ -124941,8 +130146,14 @@ export namespace Prisma {
     id?: string
     defectCode: string
     programId: string
+    productionSheetNumber?: string | null
     challanId?: string | null
     departmentCode: string
+    shelfCode?: string | null
+    color?: string | null
+    fabricType?: string | null
+    quantityUnit?: string
+    responsibleIncharge?: string | null
     bundleId?: string | null
     itemDescription: string
     severity: string
@@ -124952,6 +130163,8 @@ export namespace Prisma {
     status?: string
     resolutionNotes?: string | null
     resolvedAt?: Date | string | null
+    shelfRemovedAt?: Date | string | null
+    shelfRemovalReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     reworks?: ReworkTransactionUncheckedCreateNestedManyWithoutDefectInput
@@ -125051,6 +130264,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutRecutsRequestedInput = {
@@ -125087,6 +130303,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutRecutsRequestedInput = {
@@ -125128,6 +130347,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutRecutsApprovedInput = {
@@ -125164,6 +130386,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutRecutsApprovedInput = {
@@ -125311,6 +130536,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutRecutRequestsInput = {
@@ -125387,6 +130613,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type DefectRecordUpsertWithoutRecutRequestsInput = {
@@ -125403,14 +130630,22 @@ export namespace Prisma {
   export type DefectRecordUpdateWithoutRecutRequestsInput = {
     id?: StringFieldUpdateOperationsInput | string
     defectCode?: StringFieldUpdateOperationsInput | string
+    productionSheetNumber?: NullableStringFieldUpdateOperationsInput | string | null
     departmentCode?: StringFieldUpdateOperationsInput | string
+    shelfCode?: NullableStringFieldUpdateOperationsInput | string | null
+    color?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    quantityUnit?: StringFieldUpdateOperationsInput | string
+    responsibleIncharge?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovalReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     program?: ProgramUpdateOneRequiredWithoutDefectsNestedInput
@@ -125424,17 +130659,25 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     defectCode?: StringFieldUpdateOperationsInput | string
     programId?: StringFieldUpdateOperationsInput | string
+    productionSheetNumber?: NullableStringFieldUpdateOperationsInput | string | null
     challanId?: NullableStringFieldUpdateOperationsInput | string | null
     departmentCode?: StringFieldUpdateOperationsInput | string
+    shelfCode?: NullableStringFieldUpdateOperationsInput | string | null
+    color?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    quantityUnit?: StringFieldUpdateOperationsInput | string
+    responsibleIncharge?: NullableStringFieldUpdateOperationsInput | string | null
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovalReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reworks?: ReworkTransactionUncheckedUpdateManyWithoutDefectNestedInput
@@ -125546,6 +130789,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutRecutsRequestedInput = {
@@ -125582,6 +130828,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUpsertWithoutRecutsApprovedInput = {
@@ -125629,6 +130878,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutRecutsApprovedInput = {
@@ -125665,6 +130917,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type BundleUpsertWithoutReplacementForInput = {
@@ -126054,6 +131309,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutFabricBatchesInput = {
@@ -126130,6 +131386,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
     dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutFabricBatchesInput = {
@@ -126171,6 +131428,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutFabricBatchesCreatedInput = {
@@ -126207,6 +131467,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutFabricBatchesCreatedInput = {
@@ -126437,6 +131700,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutFabricBatchesInput = {
@@ -126513,6 +131777,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type UserUpsertWithoutFabricBatchesCreatedInput = {
@@ -126560,6 +131825,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutFabricBatchesCreatedInput = {
@@ -126596,6 +131864,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type FabricStoreRollUpsertWithWhereUniqueWithoutBatchInput = {
@@ -126754,6 +132025,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutFabricRollsInspectedInput = {
@@ -126790,6 +132064,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutFabricRollsInspectedInput = {
@@ -126871,6 +132148,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutFabricStoreRollsInput = {
@@ -126947,6 +132225,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutFabricStoreRollsInput = {
@@ -127189,6 +132468,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutFabricRollsInspectedInput = {
@@ -127225,6 +132507,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type ProgramUpsertWithoutFabricStoreRollsInput = {
@@ -127312,6 +132597,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutFabricStoreRollsInput = {
@@ -127388,6 +132674,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type MaterialReceiptItemUpsertWithWhereUniqueWithoutRollInput = {
@@ -127530,6 +132817,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutGrnReceivedInput = {
@@ -127566,6 +132856,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutGrnReceivedInput = {
@@ -127697,6 +132990,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutGrnReceivedInput = {
@@ -127733,6 +133029,9 @@ export namespace Prisma {
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type MaterialReceiptItemUpsertWithWhereUniqueWithoutReceiptInput = {
@@ -128016,6 +133315,9 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutFabricQCInspectionsInput = {
@@ -128052,6 +133354,9 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutFabricQCInspectionsInput = {
@@ -128157,6 +133462,9 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutFabricQCInspectionsInput = {
@@ -128193,6 +133501,9 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type FabricStoreRollCreateWithoutLedgerEntriesInput = {
@@ -128379,6 +133690,9 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutFabricLedgerEntriesInput = {
@@ -128415,6 +133729,9 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutFabricLedgerEntriesInput = {
@@ -128641,6 +133958,9 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutFabricLedgerEntriesInput = {
@@ -128677,6 +133997,9 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type ProgramCreateWithoutDyeingOrdersInput = {
@@ -128753,6 +134076,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramUncheckedCreateWithoutDyeingOrdersInput = {
@@ -128829,6 +134153,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
     fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
     fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutProgramInput
   }
 
   export type ProgramCreateOrConnectWithoutDyeingOrdersInput = {
@@ -128843,6 +134168,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
@@ -128871,7 +134197,8 @@ export namespace Prisma {
     events?: ChallanEventCreateNestedManyWithoutChallanInput
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
-    dyeingQc1Orders?: DyeingOrderCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanUncheckedCreateWithoutDyeingInboundOrdersInput = {
@@ -128885,6 +134212,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     createdById: string
@@ -128909,7 +134237,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedCreateNestedManyWithoutChallanInput
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
-    dyeingQc1Orders?: DyeingOrderUncheckedCreateNestedManyWithoutQc1ChallanInput
+    dyeingQcOrders?: DyeingOrderUncheckedCreateNestedManyWithoutDyeingQcChallanInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
   }
 
   export type ChallanCreateOrConnectWithoutDyeingInboundOrdersInput = {
@@ -128951,6 +134280,9 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    deadlineAlertsAssigned?: DeadlineAlertCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentCreateNestedManyWithoutInchargeInput
   }
 
   export type UserUncheckedCreateWithoutDyeingOrdersInchargeInput = {
@@ -128987,6 +134319,9 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
     fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentUncheckedCreateNestedManyWithoutInchargeInput
   }
 
   export type UserCreateOrConnectWithoutDyeingOrdersInchargeInput = {
@@ -128994,13 +134329,14 @@ export namespace Prisma {
     create: XOR<UserCreateWithoutDyeingOrdersInchargeInput, UserUncheckedCreateWithoutDyeingOrdersInchargeInput>
   }
 
-  export type ChallanCreateWithoutDyeingQc1OrdersInput = {
+  export type ChallanCreateWithoutDyeingQcOrdersInput = {
     id?: string
     challanNumber: string
     challanType: string
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
@@ -129030,9 +134366,10 @@ export namespace Prisma {
     bundles?: BundleCreateNestedManyWithoutChallanInput
     defects?: DefectRecordCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
+    deadlineAlerts?: DeadlineAlertCreateNestedManyWithoutChallanInput
   }
 
-  export type ChallanUncheckedCreateWithoutDyeingQc1OrdersInput = {
+  export type ChallanUncheckedCreateWithoutDyeingQcOrdersInput = {
     id?: string
     challanNumber: string
     challanType: string
@@ -129043,6 +134380,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     createdById: string
@@ -129068,11 +134406,12 @@ export namespace Prisma {
     bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
     defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
     dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
+    deadlineAlerts?: DeadlineAlertUncheckedCreateNestedManyWithoutChallanInput
   }
 
-  export type ChallanCreateOrConnectWithoutDyeingQc1OrdersInput = {
+  export type ChallanCreateOrConnectWithoutDyeingQcOrdersInput = {
     where: ChallanWhereUniqueInput
-    create: XOR<ChallanCreateWithoutDyeingQc1OrdersInput, ChallanUncheckedCreateWithoutDyeingQc1OrdersInput>
+    create: XOR<ChallanCreateWithoutDyeingQcOrdersInput, ChallanUncheckedCreateWithoutDyeingQcOrdersInput>
   }
 
   export type ProgramUpsertWithoutDyeingOrdersInput = {
@@ -129160,6 +134499,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutDyeingOrdersInput = {
@@ -129236,6 +134576,7 @@ export namespace Prisma {
     recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type ChallanUpsertWithoutDyeingInboundOrdersInput = {
@@ -129256,6 +134597,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -129284,7 +134626,8 @@ export namespace Prisma {
     events?: ChallanEventUpdateManyWithoutChallanNestedInput
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutDyeingInboundOrdersInput = {
@@ -129298,6 +134641,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -129322,7 +134666,8 @@ export namespace Prisma {
     events?: ChallanEventUncheckedUpdateManyWithoutChallanNestedInput
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUncheckedUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
   }
 
   export type UserUpsertWithoutDyeingOrdersInchargeInput = {
@@ -129370,6 +134715,9 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserUncheckedUpdateWithoutDyeingOrdersInchargeInput = {
@@ -129406,26 +134754,30 @@ export namespace Prisma {
     fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
     fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
     fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
-  export type ChallanUpsertWithoutDyeingQc1OrdersInput = {
-    update: XOR<ChallanUpdateWithoutDyeingQc1OrdersInput, ChallanUncheckedUpdateWithoutDyeingQc1OrdersInput>
-    create: XOR<ChallanCreateWithoutDyeingQc1OrdersInput, ChallanUncheckedCreateWithoutDyeingQc1OrdersInput>
+  export type ChallanUpsertWithoutDyeingQcOrdersInput = {
+    update: XOR<ChallanUpdateWithoutDyeingQcOrdersInput, ChallanUncheckedUpdateWithoutDyeingQcOrdersInput>
+    create: XOR<ChallanCreateWithoutDyeingQcOrdersInput, ChallanUncheckedCreateWithoutDyeingQcOrdersInput>
     where?: ChallanWhereInput
   }
 
-  export type ChallanUpdateToOneWithWhereWithoutDyeingQc1OrdersInput = {
+  export type ChallanUpdateToOneWithWhereWithoutDyeingQcOrdersInput = {
     where?: ChallanWhereInput
-    data: XOR<ChallanUpdateWithoutDyeingQc1OrdersInput, ChallanUncheckedUpdateWithoutDyeingQc1OrdersInput>
+    data: XOR<ChallanUpdateWithoutDyeingQcOrdersInput, ChallanUncheckedUpdateWithoutDyeingQcOrdersInput>
   }
 
-  export type ChallanUpdateWithoutDyeingQc1OrdersInput = {
+  export type ChallanUpdateWithoutDyeingQcOrdersInput = {
     id?: StringFieldUpdateOperationsInput | string
     challanNumber?: StringFieldUpdateOperationsInput | string
     challanType?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -129455,9 +134807,10 @@ export namespace Prisma {
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
   }
 
-  export type ChallanUncheckedUpdateWithoutDyeingQc1OrdersInput = {
+  export type ChallanUncheckedUpdateWithoutDyeingQcOrdersInput = {
     id?: StringFieldUpdateOperationsInput | string
     challanNumber?: StringFieldUpdateOperationsInput | string
     challanType?: StringFieldUpdateOperationsInput | string
@@ -129468,6 +134821,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -129493,6 +134847,985 @@ export namespace Prisma {
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
+  }
+
+  export type ChallanCreateWithoutDeadlineAlertsInput = {
+    id?: string
+    challanNumber: string
+    challanType: string
+    status?: string
+    priority?: string
+    issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
+    receivedDate?: Date | string | null
+    completedDate?: Date | string | null
+    remarks?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
+    program: ProgramCreateNestedOneWithoutChallansInput
+    parentChallan?: ChallanCreateNestedOneWithoutChildChallansInput
+    childChallans?: ChallanCreateNestedManyWithoutParentChallanInput
+    fromDeptRel: DepartmentCreateNestedOneWithoutFromChallansInput
+    toDeptRel: DepartmentCreateNestedOneWithoutToChallansInput
+    createdBy: UserCreateNestedOneWithoutCreatedChallansInput
+    issuedBy?: UserCreateNestedOneWithoutIssuedChallansInput
+    receivedBy?: UserCreateNestedOneWithoutReceivedChallansInput
+    approvedBy?: UserCreateNestedOneWithoutApprovedChallansInput
+    items?: ChallanItemCreateNestedManyWithoutChallanInput
+    productionLogs?: ProductionTransactionCreateNestedManyWithoutChallanInput
+    inspections?: QualityInspectionCreateNestedManyWithoutChallanInput
+    events?: ChallanEventCreateNestedManyWithoutChallanInput
+    bundles?: BundleCreateNestedManyWithoutChallanInput
+    defects?: DefectRecordCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderCreateNestedManyWithoutInboundChallanInput
+    dyeingQcOrders?: DyeingOrderCreateNestedManyWithoutDyeingQcChallanInput
+  }
+
+  export type ChallanUncheckedCreateWithoutDeadlineAlertsInput = {
+    id?: string
+    challanNumber: string
+    challanType: string
+    programId: string
+    parentChallanId?: string | null
+    fromDepartment: string
+    toDepartment: string
+    status?: string
+    priority?: string
+    issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
+    receivedDate?: Date | string | null
+    completedDate?: Date | string | null
+    createdById: string
+    issuedById?: string | null
+    receivedById?: string | null
+    approvedById?: string | null
+    remarks?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    fabricIn?: number | null
+    fabricOut?: number | null
+    fabricUnit?: string | null
+    defectivePieces?: number | null
+    defectiveShelfLocation?: string | null
+    defectReason?: string | null
+    detectedFromChallanId?: string | null
+    detectedFromDepartment?: string | null
+    childChallans?: ChallanUncheckedCreateNestedManyWithoutParentChallanInput
+    items?: ChallanItemUncheckedCreateNestedManyWithoutChallanInput
+    productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutChallanInput
+    inspections?: QualityInspectionUncheckedCreateNestedManyWithoutChallanInput
+    events?: ChallanEventUncheckedCreateNestedManyWithoutChallanInput
+    bundles?: BundleUncheckedCreateNestedManyWithoutChallanInput
+    defects?: DefectRecordUncheckedCreateNestedManyWithoutChallanInput
+    dyeingInboundOrders?: DyeingOrderUncheckedCreateNestedManyWithoutInboundChallanInput
+    dyeingQcOrders?: DyeingOrderUncheckedCreateNestedManyWithoutDyeingQcChallanInput
+  }
+
+  export type ChallanCreateOrConnectWithoutDeadlineAlertsInput = {
+    where: ChallanWhereUniqueInput
+    create: XOR<ChallanCreateWithoutDeadlineAlertsInput, ChallanUncheckedCreateWithoutDeadlineAlertsInput>
+  }
+
+  export type ProgramCreateWithoutDeadlineAlertsInput = {
+    id?: string
+    programNumber: string
+    programDate?: Date | string
+    buyerName: string
+    orderNumber: string
+    designName: string
+    styleCode: string
+    productCategory: string
+    targetQuantity: number
+    deliveryDate: Date | string
+    priority?: string
+    status?: string
+    remarks?: string | null
+    approvedAt?: Date | string | null
+    programSerialNo?: string | null
+    startDate?: Date | string | null
+    designNumber?: string | null
+    clientName?: string | null
+    clientPriority?: string | null
+    mainStyle?: string | null
+    subStyle?: string | null
+    pattern?: string | null
+    baseDesignType?: string | null
+    baseDesignPhoto?: string | null
+    wilcomDesignNumber?: string | null
+    wilcomDesignPhoto?: string | null
+    embroideryDesign?: string | null
+    embroideryDesignSize?: string | null
+    fabricName?: string | null
+    fabricType?: string | null
+    fabricWidth?: string | null
+    fabricWidthInches?: number | null
+    fabricColor?: string | null
+    fabricColorAvailable?: string | null
+    fabricAverage?: number | null
+    fabricAverageType?: string | null
+    fabricAverageMeasurement?: string | null
+    fabricDyeingRequired?: boolean
+    fabricIssuedToDyeing?: number | null
+    fabricSentToDyeing?: number | null
+    colorQuantity?: number | null
+    quantityMeasurement?: string | null
+    specialMaterial?: string | null
+    specialMaterialQuantity?: string | null
+    productionDesignDate?: Date | string | null
+    productionEndDate?: Date | string | null
+    piecesRejection?: number | null
+    rejectionReason?: string | null
+    comments?: string | null
+    metadataJson?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    customer?: CustomerCreateNestedOneWithoutProgramsInput
+    design?: DesignCreateNestedOneWithoutProgramsInput
+    createdBy: UserCreateNestedOneWithoutCreatedProgramsInput
+    approvedBy?: UserCreateNestedOneWithoutApprovedProgramsInput
+    fabrics?: ProgramFabricCreateNestedManyWithoutProgramInput
+    colours?: ProgramColourCreateNestedManyWithoutProgramInput
+    sizes?: ProgramSizeCreateNestedManyWithoutProgramInput
+    specifications?: ProgramSpecificationCreateNestedManyWithoutProgramInput
+    bomItems?: ProgramBOMCreateNestedManyWithoutProgramInput
+    routes?: ProgramRouteCreateNestedManyWithoutProgramInput
+    challans?: ChallanCreateNestedManyWithoutProgramInput
+    productionLogs?: ProductionTransactionCreateNestedManyWithoutProgramInput
+    rolls?: FabricRollCreateNestedManyWithoutProgramInput
+    bundles?: BundleCreateNestedManyWithoutProgramInput
+    cartons?: CartonCreateNestedManyWithoutProgramInput
+    defects?: DefectRecordCreateNestedManyWithoutProgramInput
+    stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutProgramInput
+    reworkTransactions?: ReworkTransactionCreateNestedManyWithoutProgramInput
+    recutRequests?: RecutRequestCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderCreateNestedManyWithoutProgramInput
+  }
+
+  export type ProgramUncheckedCreateWithoutDeadlineAlertsInput = {
+    id?: string
+    programNumber: string
+    programDate?: Date | string
+    customerId?: string | null
+    buyerName: string
+    orderNumber: string
+    designId?: string | null
+    designName: string
+    styleCode: string
+    productCategory: string
+    targetQuantity: number
+    deliveryDate: Date | string
+    priority?: string
+    status?: string
+    remarks?: string | null
+    createdById: string
+    approvedById?: string | null
+    approvedAt?: Date | string | null
+    programSerialNo?: string | null
+    startDate?: Date | string | null
+    designNumber?: string | null
+    clientName?: string | null
+    clientPriority?: string | null
+    mainStyle?: string | null
+    subStyle?: string | null
+    pattern?: string | null
+    baseDesignType?: string | null
+    baseDesignPhoto?: string | null
+    wilcomDesignNumber?: string | null
+    wilcomDesignPhoto?: string | null
+    embroideryDesign?: string | null
+    embroideryDesignSize?: string | null
+    fabricName?: string | null
+    fabricType?: string | null
+    fabricWidth?: string | null
+    fabricWidthInches?: number | null
+    fabricColor?: string | null
+    fabricColorAvailable?: string | null
+    fabricAverage?: number | null
+    fabricAverageType?: string | null
+    fabricAverageMeasurement?: string | null
+    fabricDyeingRequired?: boolean
+    fabricIssuedToDyeing?: number | null
+    fabricSentToDyeing?: number | null
+    colorQuantity?: number | null
+    quantityMeasurement?: string | null
+    specialMaterial?: string | null
+    specialMaterialQuantity?: string | null
+    productionDesignDate?: Date | string | null
+    productionEndDate?: Date | string | null
+    piecesRejection?: number | null
+    rejectionReason?: string | null
+    comments?: string | null
+    metadataJson?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    fabrics?: ProgramFabricUncheckedCreateNestedManyWithoutProgramInput
+    colours?: ProgramColourUncheckedCreateNestedManyWithoutProgramInput
+    sizes?: ProgramSizeUncheckedCreateNestedManyWithoutProgramInput
+    specifications?: ProgramSpecificationUncheckedCreateNestedManyWithoutProgramInput
+    bomItems?: ProgramBOMUncheckedCreateNestedManyWithoutProgramInput
+    routes?: ProgramRouteUncheckedCreateNestedManyWithoutProgramInput
+    challans?: ChallanUncheckedCreateNestedManyWithoutProgramInput
+    productionLogs?: ProductionTransactionUncheckedCreateNestedManyWithoutProgramInput
+    rolls?: FabricRollUncheckedCreateNestedManyWithoutProgramInput
+    bundles?: BundleUncheckedCreateNestedManyWithoutProgramInput
+    cartons?: CartonUncheckedCreateNestedManyWithoutProgramInput
+    defects?: DefectRecordUncheckedCreateNestedManyWithoutProgramInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutProgramInput
+    reworkTransactions?: ReworkTransactionUncheckedCreateNestedManyWithoutProgramInput
+    recutRequests?: RecutRequestUncheckedCreateNestedManyWithoutProgramInput
+    fabricBatches?: FabricBatchUncheckedCreateNestedManyWithoutProgramInput
+    fabricStoreRolls?: FabricStoreRollUncheckedCreateNestedManyWithoutProgramIssuedToInput
+    dyeingOrders?: DyeingOrderUncheckedCreateNestedManyWithoutProgramInput
+  }
+
+  export type ProgramCreateOrConnectWithoutDeadlineAlertsInput = {
+    where: ProgramWhereUniqueInput
+    create: XOR<ProgramCreateWithoutDeadlineAlertsInput, ProgramUncheckedCreateWithoutDeadlineAlertsInput>
+  }
+
+  export type UserCreateWithoutDeadlineAlertsAssignedInput = {
+    id?: string
+    username: string
+    email: string
+    fullName: string
+    passwordHash: string
+    departmentCode?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userRoles?: UserRoleCreateNestedManyWithoutUserInput
+    createdPrograms?: ProgramCreateNestedManyWithoutCreatedByInput
+    approvedPrograms?: ProgramCreateNestedManyWithoutApprovedByInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    attachments?: AttachmentCreateNestedManyWithoutUploadedByInput
+    createdChallans?: ChallanCreateNestedManyWithoutCreatedByInput
+    issuedChallans?: ChallanCreateNestedManyWithoutIssuedByInput
+    receivedChallans?: ChallanCreateNestedManyWithoutReceivedByInput
+    approvedChallans?: ChallanCreateNestedManyWithoutApprovedByInput
+    productionRecords?: ProductionTransactionCreateNestedManyWithoutOperatorInput
+    inspections?: QualityInspectionCreateNestedManyWithoutInspectorInput
+    challanEvents?: ChallanEventCreateNestedManyWithoutActorInput
+    stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutActorInput
+    dispatchesApproved?: DispatchOrderCreateNestedManyWithoutApprovedByInput
+    dispatchesOperated?: DispatchOrderCreateNestedManyWithoutDispatchedByInput
+    defectsDetected?: DefectRecordCreateNestedManyWithoutDetectedByInput
+    reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
+    recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
+    recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentCreateNestedManyWithoutInchargeInput
+  }
+
+  export type UserUncheckedCreateWithoutDeadlineAlertsAssignedInput = {
+    id?: string
+    username: string
+    email: string
+    fullName: string
+    passwordHash: string
+    departmentCode?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userRoles?: UserRoleUncheckedCreateNestedManyWithoutUserInput
+    createdPrograms?: ProgramUncheckedCreateNestedManyWithoutCreatedByInput
+    approvedPrograms?: ProgramUncheckedCreateNestedManyWithoutApprovedByInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    attachments?: AttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+    createdChallans?: ChallanUncheckedCreateNestedManyWithoutCreatedByInput
+    issuedChallans?: ChallanUncheckedCreateNestedManyWithoutIssuedByInput
+    receivedChallans?: ChallanUncheckedCreateNestedManyWithoutReceivedByInput
+    approvedChallans?: ChallanUncheckedCreateNestedManyWithoutApprovedByInput
+    productionRecords?: ProductionTransactionUncheckedCreateNestedManyWithoutOperatorInput
+    inspections?: QualityInspectionUncheckedCreateNestedManyWithoutInspectorInput
+    challanEvents?: ChallanEventUncheckedCreateNestedManyWithoutActorInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutActorInput
+    dispatchesApproved?: DispatchOrderUncheckedCreateNestedManyWithoutApprovedByInput
+    dispatchesOperated?: DispatchOrderUncheckedCreateNestedManyWithoutDispatchedByInput
+    defectsDetected?: DefectRecordUncheckedCreateNestedManyWithoutDetectedByInput
+    reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
+    recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
+    recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    departmentsInCharge?: DepartmentUncheckedCreateNestedManyWithoutInchargeInput
+  }
+
+  export type UserCreateOrConnectWithoutDeadlineAlertsAssignedInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutDeadlineAlertsAssignedInput, UserUncheckedCreateWithoutDeadlineAlertsAssignedInput>
+  }
+
+  export type DeadlineAlertDismissalCreateWithoutAlertInput = {
+    id?: string
+    dismissedAt?: Date | string
+    user: UserCreateNestedOneWithoutDeadlineAlertDismissalsInput
+  }
+
+  export type DeadlineAlertDismissalUncheckedCreateWithoutAlertInput = {
+    id?: string
+    userId: string
+    dismissedAt?: Date | string
+  }
+
+  export type DeadlineAlertDismissalCreateOrConnectWithoutAlertInput = {
+    where: DeadlineAlertDismissalWhereUniqueInput
+    create: XOR<DeadlineAlertDismissalCreateWithoutAlertInput, DeadlineAlertDismissalUncheckedCreateWithoutAlertInput>
+  }
+
+  export type DeadlineAlertDismissalCreateManyAlertInputEnvelope = {
+    data: DeadlineAlertDismissalCreateManyAlertInput | DeadlineAlertDismissalCreateManyAlertInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ChallanUpsertWithoutDeadlineAlertsInput = {
+    update: XOR<ChallanUpdateWithoutDeadlineAlertsInput, ChallanUncheckedUpdateWithoutDeadlineAlertsInput>
+    create: XOR<ChallanCreateWithoutDeadlineAlertsInput, ChallanUncheckedCreateWithoutDeadlineAlertsInput>
+    where?: ChallanWhereInput
+  }
+
+  export type ChallanUpdateToOneWithWhereWithoutDeadlineAlertsInput = {
+    where?: ChallanWhereInput
+    data: XOR<ChallanUpdateWithoutDeadlineAlertsInput, ChallanUncheckedUpdateWithoutDeadlineAlertsInput>
+  }
+
+  export type ChallanUpdateWithoutDeadlineAlertsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    challanNumber?: StringFieldUpdateOperationsInput | string
+    challanType?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    priority?: StringFieldUpdateOperationsInput | string
+    issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    program?: ProgramUpdateOneRequiredWithoutChallansNestedInput
+    parentChallan?: ChallanUpdateOneWithoutChildChallansNestedInput
+    childChallans?: ChallanUpdateManyWithoutParentChallanNestedInput
+    fromDeptRel?: DepartmentUpdateOneRequiredWithoutFromChallansNestedInput
+    toDeptRel?: DepartmentUpdateOneRequiredWithoutToChallansNestedInput
+    createdBy?: UserUpdateOneRequiredWithoutCreatedChallansNestedInput
+    issuedBy?: UserUpdateOneWithoutIssuedChallansNestedInput
+    receivedBy?: UserUpdateOneWithoutReceivedChallansNestedInput
+    approvedBy?: UserUpdateOneWithoutApprovedChallansNestedInput
+    items?: ChallanItemUpdateManyWithoutChallanNestedInput
+    productionLogs?: ProductionTransactionUpdateManyWithoutChallanNestedInput
+    inspections?: QualityInspectionUpdateManyWithoutChallanNestedInput
+    events?: ChallanEventUpdateManyWithoutChallanNestedInput
+    bundles?: BundleUpdateManyWithoutChallanNestedInput
+    defects?: DefectRecordUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUpdateManyWithoutDyeingQcChallanNestedInput
+  }
+
+  export type ChallanUncheckedUpdateWithoutDeadlineAlertsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    challanNumber?: StringFieldUpdateOperationsInput | string
+    challanType?: StringFieldUpdateOperationsInput | string
+    programId?: StringFieldUpdateOperationsInput | string
+    parentChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    fromDepartment?: StringFieldUpdateOperationsInput | string
+    toDepartment?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    priority?: StringFieldUpdateOperationsInput | string
+    issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdById?: StringFieldUpdateOperationsInput | string
+    issuedById?: NullableStringFieldUpdateOperationsInput | string | null
+    receivedById?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedById?: NullableStringFieldUpdateOperationsInput | string | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
+    defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    defectReason?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedFromDepartment?: NullableStringFieldUpdateOperationsInput | string | null
+    childChallans?: ChallanUncheckedUpdateManyWithoutParentChallanNestedInput
+    items?: ChallanItemUncheckedUpdateManyWithoutChallanNestedInput
+    productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutChallanNestedInput
+    inspections?: QualityInspectionUncheckedUpdateManyWithoutChallanNestedInput
+    events?: ChallanEventUncheckedUpdateManyWithoutChallanNestedInput
+    bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
+    defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
+    dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUncheckedUpdateManyWithoutDyeingQcChallanNestedInput
+  }
+
+  export type ProgramUpsertWithoutDeadlineAlertsInput = {
+    update: XOR<ProgramUpdateWithoutDeadlineAlertsInput, ProgramUncheckedUpdateWithoutDeadlineAlertsInput>
+    create: XOR<ProgramCreateWithoutDeadlineAlertsInput, ProgramUncheckedCreateWithoutDeadlineAlertsInput>
+    where?: ProgramWhereInput
+  }
+
+  export type ProgramUpdateToOneWithWhereWithoutDeadlineAlertsInput = {
+    where?: ProgramWhereInput
+    data: XOR<ProgramUpdateWithoutDeadlineAlertsInput, ProgramUncheckedUpdateWithoutDeadlineAlertsInput>
+  }
+
+  export type ProgramUpdateWithoutDeadlineAlertsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    programNumber?: StringFieldUpdateOperationsInput | string
+    programDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    buyerName?: StringFieldUpdateOperationsInput | string
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    designName?: StringFieldUpdateOperationsInput | string
+    styleCode?: StringFieldUpdateOperationsInput | string
+    productCategory?: StringFieldUpdateOperationsInput | string
+    targetQuantity?: IntFieldUpdateOperationsInput | number
+    deliveryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    priority?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    programSerialNo?: NullableStringFieldUpdateOperationsInput | string | null
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    designNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    clientName?: NullableStringFieldUpdateOperationsInput | string | null
+    clientPriority?: NullableStringFieldUpdateOperationsInput | string | null
+    mainStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    subStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    pattern?: NullableStringFieldUpdateOperationsInput | string | null
+    baseDesignType?: NullableStringFieldUpdateOperationsInput | string | null
+    baseDesignPhoto?: NullableStringFieldUpdateOperationsInput | string | null
+    wilcomDesignNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    wilcomDesignPhoto?: NullableStringFieldUpdateOperationsInput | string | null
+    embroideryDesign?: NullableStringFieldUpdateOperationsInput | string | null
+    embroideryDesignSize?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricName?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricWidth?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricWidthInches?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricColor?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricColorAvailable?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricAverage?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricAverageType?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricAverageMeasurement?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricDyeingRequired?: BoolFieldUpdateOperationsInput | boolean
+    fabricIssuedToDyeing?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricSentToDyeing?: NullableFloatFieldUpdateOperationsInput | number | null
+    colorQuantity?: NullableIntFieldUpdateOperationsInput | number | null
+    quantityMeasurement?: NullableStringFieldUpdateOperationsInput | string | null
+    specialMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    specialMaterialQuantity?: NullableStringFieldUpdateOperationsInput | string | null
+    productionDesignDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    productionEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    piecesRejection?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    comments?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    customer?: CustomerUpdateOneWithoutProgramsNestedInput
+    design?: DesignUpdateOneWithoutProgramsNestedInput
+    createdBy?: UserUpdateOneRequiredWithoutCreatedProgramsNestedInput
+    approvedBy?: UserUpdateOneWithoutApprovedProgramsNestedInput
+    fabrics?: ProgramFabricUpdateManyWithoutProgramNestedInput
+    colours?: ProgramColourUpdateManyWithoutProgramNestedInput
+    sizes?: ProgramSizeUpdateManyWithoutProgramNestedInput
+    specifications?: ProgramSpecificationUpdateManyWithoutProgramNestedInput
+    bomItems?: ProgramBOMUpdateManyWithoutProgramNestedInput
+    routes?: ProgramRouteUpdateManyWithoutProgramNestedInput
+    challans?: ChallanUpdateManyWithoutProgramNestedInput
+    productionLogs?: ProductionTransactionUpdateManyWithoutProgramNestedInput
+    rolls?: FabricRollUpdateManyWithoutProgramNestedInput
+    bundles?: BundleUpdateManyWithoutProgramNestedInput
+    cartons?: CartonUpdateManyWithoutProgramNestedInput
+    defects?: DefectRecordUpdateManyWithoutProgramNestedInput
+    stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutProgramNestedInput
+    reworkTransactions?: ReworkTransactionUpdateManyWithoutProgramNestedInput
+    recutRequests?: RecutRequestUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
+  }
+
+  export type ProgramUncheckedUpdateWithoutDeadlineAlertsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    programNumber?: StringFieldUpdateOperationsInput | string
+    programDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    customerId?: NullableStringFieldUpdateOperationsInput | string | null
+    buyerName?: StringFieldUpdateOperationsInput | string
+    orderNumber?: StringFieldUpdateOperationsInput | string
+    designId?: NullableStringFieldUpdateOperationsInput | string | null
+    designName?: StringFieldUpdateOperationsInput | string
+    styleCode?: StringFieldUpdateOperationsInput | string
+    productCategory?: StringFieldUpdateOperationsInput | string
+    targetQuantity?: IntFieldUpdateOperationsInput | number
+    deliveryDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    priority?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    createdById?: StringFieldUpdateOperationsInput | string
+    approvedById?: NullableStringFieldUpdateOperationsInput | string | null
+    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    programSerialNo?: NullableStringFieldUpdateOperationsInput | string | null
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    designNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    clientName?: NullableStringFieldUpdateOperationsInput | string | null
+    clientPriority?: NullableStringFieldUpdateOperationsInput | string | null
+    mainStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    subStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    pattern?: NullableStringFieldUpdateOperationsInput | string | null
+    baseDesignType?: NullableStringFieldUpdateOperationsInput | string | null
+    baseDesignPhoto?: NullableStringFieldUpdateOperationsInput | string | null
+    wilcomDesignNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    wilcomDesignPhoto?: NullableStringFieldUpdateOperationsInput | string | null
+    embroideryDesign?: NullableStringFieldUpdateOperationsInput | string | null
+    embroideryDesignSize?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricName?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricWidth?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricWidthInches?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricColor?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricColorAvailable?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricAverage?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricAverageType?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricAverageMeasurement?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricDyeingRequired?: BoolFieldUpdateOperationsInput | boolean
+    fabricIssuedToDyeing?: NullableFloatFieldUpdateOperationsInput | number | null
+    fabricSentToDyeing?: NullableFloatFieldUpdateOperationsInput | number | null
+    colorQuantity?: NullableIntFieldUpdateOperationsInput | number | null
+    quantityMeasurement?: NullableStringFieldUpdateOperationsInput | string | null
+    specialMaterial?: NullableStringFieldUpdateOperationsInput | string | null
+    specialMaterialQuantity?: NullableStringFieldUpdateOperationsInput | string | null
+    productionDesignDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    productionEndDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    piecesRejection?: NullableIntFieldUpdateOperationsInput | number | null
+    rejectionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    comments?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataJson?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fabrics?: ProgramFabricUncheckedUpdateManyWithoutProgramNestedInput
+    colours?: ProgramColourUncheckedUpdateManyWithoutProgramNestedInput
+    sizes?: ProgramSizeUncheckedUpdateManyWithoutProgramNestedInput
+    specifications?: ProgramSpecificationUncheckedUpdateManyWithoutProgramNestedInput
+    bomItems?: ProgramBOMUncheckedUpdateManyWithoutProgramNestedInput
+    routes?: ProgramRouteUncheckedUpdateManyWithoutProgramNestedInput
+    challans?: ChallanUncheckedUpdateManyWithoutProgramNestedInput
+    productionLogs?: ProductionTransactionUncheckedUpdateManyWithoutProgramNestedInput
+    rolls?: FabricRollUncheckedUpdateManyWithoutProgramNestedInput
+    bundles?: BundleUncheckedUpdateManyWithoutProgramNestedInput
+    cartons?: CartonUncheckedUpdateManyWithoutProgramNestedInput
+    defects?: DefectRecordUncheckedUpdateManyWithoutProgramNestedInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutProgramNestedInput
+    reworkTransactions?: ReworkTransactionUncheckedUpdateManyWithoutProgramNestedInput
+    recutRequests?: RecutRequestUncheckedUpdateManyWithoutProgramNestedInput
+    fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
+    fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
+    dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
+  }
+
+  export type UserUpsertWithoutDeadlineAlertsAssignedInput = {
+    update: XOR<UserUpdateWithoutDeadlineAlertsAssignedInput, UserUncheckedUpdateWithoutDeadlineAlertsAssignedInput>
+    create: XOR<UserCreateWithoutDeadlineAlertsAssignedInput, UserUncheckedCreateWithoutDeadlineAlertsAssignedInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutDeadlineAlertsAssignedInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutDeadlineAlertsAssignedInput, UserUncheckedUpdateWithoutDeadlineAlertsAssignedInput>
+  }
+
+  export type UserUpdateWithoutDeadlineAlertsAssignedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    departmentCode?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userRoles?: UserRoleUpdateManyWithoutUserNestedInput
+    createdPrograms?: ProgramUpdateManyWithoutCreatedByNestedInput
+    approvedPrograms?: ProgramUpdateManyWithoutApprovedByNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    attachments?: AttachmentUpdateManyWithoutUploadedByNestedInput
+    createdChallans?: ChallanUpdateManyWithoutCreatedByNestedInput
+    issuedChallans?: ChallanUpdateManyWithoutIssuedByNestedInput
+    receivedChallans?: ChallanUpdateManyWithoutReceivedByNestedInput
+    approvedChallans?: ChallanUpdateManyWithoutApprovedByNestedInput
+    productionRecords?: ProductionTransactionUpdateManyWithoutOperatorNestedInput
+    inspections?: QualityInspectionUpdateManyWithoutInspectorNestedInput
+    challanEvents?: ChallanEventUpdateManyWithoutActorNestedInput
+    stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutActorNestedInput
+    dispatchesApproved?: DispatchOrderUpdateManyWithoutApprovedByNestedInput
+    dispatchesOperated?: DispatchOrderUpdateManyWithoutDispatchedByNestedInput
+    defectsDetected?: DefectRecordUpdateManyWithoutDetectedByNestedInput
+    reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
+    recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
+    recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUpdateManyWithoutInchargeNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutDeadlineAlertsAssignedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    departmentCode?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userRoles?: UserRoleUncheckedUpdateManyWithoutUserNestedInput
+    createdPrograms?: ProgramUncheckedUpdateManyWithoutCreatedByNestedInput
+    approvedPrograms?: ProgramUncheckedUpdateManyWithoutApprovedByNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    attachments?: AttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+    createdChallans?: ChallanUncheckedUpdateManyWithoutCreatedByNestedInput
+    issuedChallans?: ChallanUncheckedUpdateManyWithoutIssuedByNestedInput
+    receivedChallans?: ChallanUncheckedUpdateManyWithoutReceivedByNestedInput
+    approvedChallans?: ChallanUncheckedUpdateManyWithoutApprovedByNestedInput
+    productionRecords?: ProductionTransactionUncheckedUpdateManyWithoutOperatorNestedInput
+    inspections?: QualityInspectionUncheckedUpdateManyWithoutInspectorNestedInput
+    challanEvents?: ChallanEventUncheckedUpdateManyWithoutActorNestedInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutActorNestedInput
+    dispatchesApproved?: DispatchOrderUncheckedUpdateManyWithoutApprovedByNestedInput
+    dispatchesOperated?: DispatchOrderUncheckedUpdateManyWithoutDispatchedByNestedInput
+    defectsDetected?: DefectRecordUncheckedUpdateManyWithoutDetectedByNestedInput
+    reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
+    recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+    recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    departmentsInCharge?: DepartmentUncheckedUpdateManyWithoutInchargeNestedInput
+  }
+
+  export type DeadlineAlertDismissalUpsertWithWhereUniqueWithoutAlertInput = {
+    where: DeadlineAlertDismissalWhereUniqueInput
+    update: XOR<DeadlineAlertDismissalUpdateWithoutAlertInput, DeadlineAlertDismissalUncheckedUpdateWithoutAlertInput>
+    create: XOR<DeadlineAlertDismissalCreateWithoutAlertInput, DeadlineAlertDismissalUncheckedCreateWithoutAlertInput>
+  }
+
+  export type DeadlineAlertDismissalUpdateWithWhereUniqueWithoutAlertInput = {
+    where: DeadlineAlertDismissalWhereUniqueInput
+    data: XOR<DeadlineAlertDismissalUpdateWithoutAlertInput, DeadlineAlertDismissalUncheckedUpdateWithoutAlertInput>
+  }
+
+  export type DeadlineAlertDismissalUpdateManyWithWhereWithoutAlertInput = {
+    where: DeadlineAlertDismissalScalarWhereInput
+    data: XOR<DeadlineAlertDismissalUpdateManyMutationInput, DeadlineAlertDismissalUncheckedUpdateManyWithoutAlertInput>
+  }
+
+  export type DeadlineAlertCreateWithoutDismissalsInput = {
+    id?: string
+    dedupeKey: string
+    departmentCode: string
+    taskType: string
+    taskId: string
+    stage: string
+    severity: string
+    deadlineAt: Date | string
+    deadlineSource: string
+    status?: string
+    resolutionReason?: string | null
+    createdAt?: Date | string
+    lastEvaluatedAt?: Date | string
+    resolvedAt?: Date | string | null
+    challan?: ChallanCreateNestedOneWithoutDeadlineAlertsInput
+    program?: ProgramCreateNestedOneWithoutDeadlineAlertsInput
+    assignedUser?: UserCreateNestedOneWithoutDeadlineAlertsAssignedInput
+  }
+
+  export type DeadlineAlertUncheckedCreateWithoutDismissalsInput = {
+    id?: string
+    dedupeKey: string
+    departmentCode: string
+    taskType: string
+    taskId: string
+    challanId?: string | null
+    programId?: string | null
+    assignedUserId?: string | null
+    stage: string
+    severity: string
+    deadlineAt: Date | string
+    deadlineSource: string
+    status?: string
+    resolutionReason?: string | null
+    createdAt?: Date | string
+    lastEvaluatedAt?: Date | string
+    resolvedAt?: Date | string | null
+  }
+
+  export type DeadlineAlertCreateOrConnectWithoutDismissalsInput = {
+    where: DeadlineAlertWhereUniqueInput
+    create: XOR<DeadlineAlertCreateWithoutDismissalsInput, DeadlineAlertUncheckedCreateWithoutDismissalsInput>
+  }
+
+  export type UserCreateWithoutDeadlineAlertDismissalsInput = {
+    id?: string
+    username: string
+    email: string
+    fullName: string
+    passwordHash: string
+    departmentCode?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userRoles?: UserRoleCreateNestedManyWithoutUserInput
+    createdPrograms?: ProgramCreateNestedManyWithoutCreatedByInput
+    approvedPrograms?: ProgramCreateNestedManyWithoutApprovedByInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    attachments?: AttachmentCreateNestedManyWithoutUploadedByInput
+    createdChallans?: ChallanCreateNestedManyWithoutCreatedByInput
+    issuedChallans?: ChallanCreateNestedManyWithoutIssuedByInput
+    receivedChallans?: ChallanCreateNestedManyWithoutReceivedByInput
+    approvedChallans?: ChallanCreateNestedManyWithoutApprovedByInput
+    productionRecords?: ProductionTransactionCreateNestedManyWithoutOperatorInput
+    inspections?: QualityInspectionCreateNestedManyWithoutInspectorInput
+    challanEvents?: ChallanEventCreateNestedManyWithoutActorInput
+    stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutActorInput
+    dispatchesApproved?: DispatchOrderCreateNestedManyWithoutApprovedByInput
+    dispatchesOperated?: DispatchOrderCreateNestedManyWithoutDispatchedByInput
+    defectsDetected?: DefectRecordCreateNestedManyWithoutDetectedByInput
+    reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
+    recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
+    recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertCreateNestedManyWithoutAssignedUserInput
+    departmentsInCharge?: DepartmentCreateNestedManyWithoutInchargeInput
+  }
+
+  export type UserUncheckedCreateWithoutDeadlineAlertDismissalsInput = {
+    id?: string
+    username: string
+    email: string
+    fullName: string
+    passwordHash: string
+    departmentCode?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userRoles?: UserRoleUncheckedCreateNestedManyWithoutUserInput
+    createdPrograms?: ProgramUncheckedCreateNestedManyWithoutCreatedByInput
+    approvedPrograms?: ProgramUncheckedCreateNestedManyWithoutApprovedByInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    attachments?: AttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+    createdChallans?: ChallanUncheckedCreateNestedManyWithoutCreatedByInput
+    issuedChallans?: ChallanUncheckedCreateNestedManyWithoutIssuedByInput
+    receivedChallans?: ChallanUncheckedCreateNestedManyWithoutReceivedByInput
+    approvedChallans?: ChallanUncheckedCreateNestedManyWithoutApprovedByInput
+    productionRecords?: ProductionTransactionUncheckedCreateNestedManyWithoutOperatorInput
+    inspections?: QualityInspectionUncheckedCreateNestedManyWithoutInspectorInput
+    challanEvents?: ChallanEventUncheckedCreateNestedManyWithoutActorInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutActorInput
+    dispatchesApproved?: DispatchOrderUncheckedCreateNestedManyWithoutApprovedByInput
+    dispatchesOperated?: DispatchOrderUncheckedCreateNestedManyWithoutDispatchedByInput
+    defectsDetected?: DefectRecordUncheckedCreateNestedManyWithoutDetectedByInput
+    reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
+    recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
+    recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedCreateNestedManyWithoutAssignedUserInput
+    departmentsInCharge?: DepartmentUncheckedCreateNestedManyWithoutInchargeInput
+  }
+
+  export type UserCreateOrConnectWithoutDeadlineAlertDismissalsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutDeadlineAlertDismissalsInput, UserUncheckedCreateWithoutDeadlineAlertDismissalsInput>
+  }
+
+  export type DeadlineAlertUpsertWithoutDismissalsInput = {
+    update: XOR<DeadlineAlertUpdateWithoutDismissalsInput, DeadlineAlertUncheckedUpdateWithoutDismissalsInput>
+    create: XOR<DeadlineAlertCreateWithoutDismissalsInput, DeadlineAlertUncheckedCreateWithoutDismissalsInput>
+    where?: DeadlineAlertWhereInput
+  }
+
+  export type DeadlineAlertUpdateToOneWithWhereWithoutDismissalsInput = {
+    where?: DeadlineAlertWhereInput
+    data: XOR<DeadlineAlertUpdateWithoutDismissalsInput, DeadlineAlertUncheckedUpdateWithoutDismissalsInput>
+  }
+
+  export type DeadlineAlertUpdateWithoutDismissalsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    departmentCode?: StringFieldUpdateOperationsInput | string
+    taskType?: StringFieldUpdateOperationsInput | string
+    taskId?: StringFieldUpdateOperationsInput | string
+    stage?: StringFieldUpdateOperationsInput | string
+    severity?: StringFieldUpdateOperationsInput | string
+    deadlineAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deadlineSource?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    resolutionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastEvaluatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    challan?: ChallanUpdateOneWithoutDeadlineAlertsNestedInput
+    program?: ProgramUpdateOneWithoutDeadlineAlertsNestedInput
+    assignedUser?: UserUpdateOneWithoutDeadlineAlertsAssignedNestedInput
+  }
+
+  export type DeadlineAlertUncheckedUpdateWithoutDismissalsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    departmentCode?: StringFieldUpdateOperationsInput | string
+    taskType?: StringFieldUpdateOperationsInput | string
+    taskId?: StringFieldUpdateOperationsInput | string
+    challanId?: NullableStringFieldUpdateOperationsInput | string | null
+    programId?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    stage?: StringFieldUpdateOperationsInput | string
+    severity?: StringFieldUpdateOperationsInput | string
+    deadlineAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deadlineSource?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    resolutionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastEvaluatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type UserUpsertWithoutDeadlineAlertDismissalsInput = {
+    update: XOR<UserUpdateWithoutDeadlineAlertDismissalsInput, UserUncheckedUpdateWithoutDeadlineAlertDismissalsInput>
+    create: XOR<UserCreateWithoutDeadlineAlertDismissalsInput, UserUncheckedCreateWithoutDeadlineAlertDismissalsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutDeadlineAlertDismissalsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutDeadlineAlertDismissalsInput, UserUncheckedUpdateWithoutDeadlineAlertDismissalsInput>
+  }
+
+  export type UserUpdateWithoutDeadlineAlertDismissalsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    departmentCode?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userRoles?: UserRoleUpdateManyWithoutUserNestedInput
+    createdPrograms?: ProgramUpdateManyWithoutCreatedByNestedInput
+    approvedPrograms?: ProgramUpdateManyWithoutApprovedByNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    attachments?: AttachmentUpdateManyWithoutUploadedByNestedInput
+    createdChallans?: ChallanUpdateManyWithoutCreatedByNestedInput
+    issuedChallans?: ChallanUpdateManyWithoutIssuedByNestedInput
+    receivedChallans?: ChallanUpdateManyWithoutReceivedByNestedInput
+    approvedChallans?: ChallanUpdateManyWithoutApprovedByNestedInput
+    productionRecords?: ProductionTransactionUpdateManyWithoutOperatorNestedInput
+    inspections?: QualityInspectionUpdateManyWithoutInspectorNestedInput
+    challanEvents?: ChallanEventUpdateManyWithoutActorNestedInput
+    stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutActorNestedInput
+    dispatchesApproved?: DispatchOrderUpdateManyWithoutApprovedByNestedInput
+    dispatchesOperated?: DispatchOrderUpdateManyWithoutDispatchedByNestedInput
+    defectsDetected?: DefectRecordUpdateManyWithoutDetectedByNestedInput
+    reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
+    recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
+    recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUpdateManyWithoutAssignedUserNestedInput
+    departmentsInCharge?: DepartmentUpdateManyWithoutInchargeNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutDeadlineAlertDismissalsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    departmentCode?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userRoles?: UserRoleUncheckedUpdateManyWithoutUserNestedInput
+    createdPrograms?: ProgramUncheckedUpdateManyWithoutCreatedByNestedInput
+    approvedPrograms?: ProgramUncheckedUpdateManyWithoutApprovedByNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    attachments?: AttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+    createdChallans?: ChallanUncheckedUpdateManyWithoutCreatedByNestedInput
+    issuedChallans?: ChallanUncheckedUpdateManyWithoutIssuedByNestedInput
+    receivedChallans?: ChallanUncheckedUpdateManyWithoutReceivedByNestedInput
+    approvedChallans?: ChallanUncheckedUpdateManyWithoutApprovedByNestedInput
+    productionRecords?: ProductionTransactionUncheckedUpdateManyWithoutOperatorNestedInput
+    inspections?: QualityInspectionUncheckedUpdateManyWithoutInspectorNestedInput
+    challanEvents?: ChallanEventUncheckedUpdateManyWithoutActorNestedInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutActorNestedInput
+    dispatchesApproved?: DispatchOrderUncheckedUpdateManyWithoutApprovedByNestedInput
+    dispatchesOperated?: DispatchOrderUncheckedUpdateManyWithoutDispatchedByNestedInput
+    defectsDetected?: DefectRecordUncheckedUpdateManyWithoutDetectedByNestedInput
+    reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
+    recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+    recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    deadlineAlertsAssigned?: DeadlineAlertUncheckedUpdateManyWithoutAssignedUserNestedInput
+    departmentsInCharge?: DepartmentUncheckedUpdateManyWithoutInchargeNestedInput
   }
 
   export type UserRoleCreateManyUserInput = {
@@ -129651,6 +135984,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     issuedById?: string | null
@@ -129680,6 +136014,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     createdById: string
@@ -129709,6 +136044,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     createdById: string
@@ -129738,6 +136074,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     createdById: string
@@ -129870,8 +136207,14 @@ export namespace Prisma {
     id?: string
     defectCode: string
     programId: string
+    productionSheetNumber?: string | null
     challanId?: string | null
     departmentCode: string
+    shelfCode?: string | null
+    color?: string | null
+    fabricType?: string | null
+    quantityUnit?: string
+    responsibleIncharge?: string | null
     bundleId?: string | null
     itemDescription: string
     severity: string
@@ -129880,6 +136223,8 @@ export namespace Prisma {
     status?: string
     resolutionNotes?: string | null
     resolvedAt?: Date | string | null
+    shelfRemovedAt?: Date | string | null
+    shelfRemovalReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -130020,27 +136365,65 @@ export namespace Prisma {
     orderNumber: string
     programId: string
     inboundChallanId?: string | null
+    inboundChallanItemId?: string | null
     status?: string
     priority?: string
     fabricName: string
     fabricType?: string | null
+    currentColor?: string | null
     targetColor: string
     dyedColor?: string | null
     colorCode?: string | null
     requiredQuantity: number
     dyedQuantity?: number
     undyedQuantity?: number
-    readyForQc1Quantity?: number
-    sentToQc1Quantity?: number
+    readyForDyeingQcQuantity?: number
+    sentToDyeingQcQuantity?: number
     uom?: string
     inchargeName?: string | null
     batchNumber?: string | null
     machineNumber?: string | null
     processRemarks?: string | null
-    qc1ChallanId?: string | null
+    dyeingQcChallanId?: string | null
     startedAt?: Date | string | null
     completedAt?: Date | string | null
-    sentToQc1At?: Date | string | null
+    sentToDyeingQcAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DeadlineAlertCreateManyAssignedUserInput = {
+    id?: string
+    dedupeKey: string
+    departmentCode: string
+    taskType: string
+    taskId: string
+    challanId?: string | null
+    programId?: string | null
+    stage: string
+    severity: string
+    deadlineAt: Date | string
+    deadlineSource: string
+    status?: string
+    resolutionReason?: string | null
+    createdAt?: Date | string
+    lastEvaluatedAt?: Date | string
+    resolvedAt?: Date | string | null
+  }
+
+  export type DeadlineAlertDismissalCreateManyUserInput = {
+    id?: string
+    alertId: string
+    dismissedAt?: Date | string
+  }
+
+  export type DepartmentCreateManyInchargeInput = {
+    id?: string
+    code: string
+    name: string
+    sequenceOrder: number
+    description?: string | null
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -130137,6 +136520,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutCreatedByInput = {
@@ -130213,6 +136597,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateManyWithoutCreatedByInput = {
@@ -130347,6 +136732,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutApprovedByInput = {
@@ -130423,6 +136809,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateManyWithoutApprovedByInput = {
@@ -130559,6 +136946,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -130587,7 +136975,8 @@ export namespace Prisma {
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutCreatedByInput = {
@@ -130601,6 +136990,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     issuedById?: NullableStringFieldUpdateOperationsInput | string | null
@@ -130625,7 +137015,8 @@ export namespace Prisma {
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUncheckedUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateManyWithoutCreatedByInput = {
@@ -130639,6 +137030,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     issuedById?: NullableStringFieldUpdateOperationsInput | string | null
@@ -130664,6 +137056,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -130692,7 +137085,8 @@ export namespace Prisma {
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutIssuedByInput = {
@@ -130706,6 +137100,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -130730,7 +137125,8 @@ export namespace Prisma {
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUncheckedUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateManyWithoutIssuedByInput = {
@@ -130744,6 +137140,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -130769,6 +137166,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -130797,7 +137195,8 @@ export namespace Prisma {
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutReceivedByInput = {
@@ -130811,6 +137210,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -130835,7 +137235,8 @@ export namespace Prisma {
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUncheckedUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateManyWithoutReceivedByInput = {
@@ -130849,6 +137250,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -130874,6 +137276,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -130902,7 +137305,8 @@ export namespace Prisma {
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutApprovedByInput = {
@@ -130916,6 +137320,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -130940,7 +137345,8 @@ export namespace Prisma {
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUncheckedUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateManyWithoutApprovedByInput = {
@@ -130954,6 +137360,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -131313,14 +137720,22 @@ export namespace Prisma {
   export type DefectRecordUpdateWithoutDetectedByInput = {
     id?: StringFieldUpdateOperationsInput | string
     defectCode?: StringFieldUpdateOperationsInput | string
+    productionSheetNumber?: NullableStringFieldUpdateOperationsInput | string | null
     departmentCode?: StringFieldUpdateOperationsInput | string
+    shelfCode?: NullableStringFieldUpdateOperationsInput | string | null
+    color?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    quantityUnit?: StringFieldUpdateOperationsInput | string
+    responsibleIncharge?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovalReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     program?: ProgramUpdateOneRequiredWithoutDefectsNestedInput
@@ -131334,16 +137749,24 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     defectCode?: StringFieldUpdateOperationsInput | string
     programId?: StringFieldUpdateOperationsInput | string
+    productionSheetNumber?: NullableStringFieldUpdateOperationsInput | string | null
     challanId?: NullableStringFieldUpdateOperationsInput | string | null
     departmentCode?: StringFieldUpdateOperationsInput | string
+    shelfCode?: NullableStringFieldUpdateOperationsInput | string | null
+    color?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    quantityUnit?: StringFieldUpdateOperationsInput | string
+    responsibleIncharge?: NullableStringFieldUpdateOperationsInput | string | null
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovalReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reworks?: ReworkTransactionUncheckedUpdateManyWithoutDefectNestedInput
@@ -131354,16 +137777,24 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     defectCode?: StringFieldUpdateOperationsInput | string
     programId?: StringFieldUpdateOperationsInput | string
+    productionSheetNumber?: NullableStringFieldUpdateOperationsInput | string | null
     challanId?: NullableStringFieldUpdateOperationsInput | string | null
     departmentCode?: StringFieldUpdateOperationsInput | string
+    shelfCode?: NullableStringFieldUpdateOperationsInput | string | null
+    color?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    quantityUnit?: StringFieldUpdateOperationsInput | string
+    responsibleIncharge?: NullableStringFieldUpdateOperationsInput | string | null
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovalReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -131778,18 +138209,20 @@ export namespace Prisma {
   export type DyeingOrderUpdateWithoutInchargeInput = {
     id?: StringFieldUpdateOperationsInput | string
     orderNumber?: StringFieldUpdateOperationsInput | string
+    inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
     fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    currentColor?: NullableStringFieldUpdateOperationsInput | string | null
     targetColor?: StringFieldUpdateOperationsInput | string
     dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
     colorCode?: NullableStringFieldUpdateOperationsInput | string | null
     requiredQuantity?: FloatFieldUpdateOperationsInput | number
     dyedQuantity?: FloatFieldUpdateOperationsInput | number
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
-    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
-    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    readyForDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
+    sentToDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
@@ -131797,12 +138230,12 @@ export namespace Prisma {
     processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToDyeingQcAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     program?: ProgramUpdateOneRequiredWithoutDyeingOrdersNestedInput
     inboundChallan?: ChallanUpdateOneWithoutDyeingInboundOrdersNestedInput
-    qc1Challan?: ChallanUpdateOneWithoutDyeingQc1OrdersNestedInput
+    dyeingQcChallan?: ChallanUpdateOneWithoutDyeingQcOrdersNestedInput
   }
 
   export type DyeingOrderUncheckedUpdateWithoutInchargeInput = {
@@ -131810,27 +138243,29 @@ export namespace Prisma {
     orderNumber?: StringFieldUpdateOperationsInput | string
     programId?: StringFieldUpdateOperationsInput | string
     inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
     fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    currentColor?: NullableStringFieldUpdateOperationsInput | string | null
     targetColor?: StringFieldUpdateOperationsInput | string
     dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
     colorCode?: NullableStringFieldUpdateOperationsInput | string | null
     requiredQuantity?: FloatFieldUpdateOperationsInput | number
     dyedQuantity?: FloatFieldUpdateOperationsInput | number
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
-    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
-    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    readyForDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
+    sentToDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
     machineNumber?: NullableStringFieldUpdateOperationsInput | string | null
     processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
-    qc1ChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    dyeingQcChallanId?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToDyeingQcAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -131840,27 +138275,149 @@ export namespace Prisma {
     orderNumber?: StringFieldUpdateOperationsInput | string
     programId?: StringFieldUpdateOperationsInput | string
     inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
     fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    currentColor?: NullableStringFieldUpdateOperationsInput | string | null
     targetColor?: StringFieldUpdateOperationsInput | string
     dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
     colorCode?: NullableStringFieldUpdateOperationsInput | string | null
     requiredQuantity?: FloatFieldUpdateOperationsInput | number
     dyedQuantity?: FloatFieldUpdateOperationsInput | number
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
-    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
-    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    readyForDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
+    sentToDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
     machineNumber?: NullableStringFieldUpdateOperationsInput | string | null
     processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
-    qc1ChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    dyeingQcChallanId?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToDyeingQcAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeadlineAlertUpdateWithoutAssignedUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    departmentCode?: StringFieldUpdateOperationsInput | string
+    taskType?: StringFieldUpdateOperationsInput | string
+    taskId?: StringFieldUpdateOperationsInput | string
+    stage?: StringFieldUpdateOperationsInput | string
+    severity?: StringFieldUpdateOperationsInput | string
+    deadlineAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deadlineSource?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    resolutionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastEvaluatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    challan?: ChallanUpdateOneWithoutDeadlineAlertsNestedInput
+    program?: ProgramUpdateOneWithoutDeadlineAlertsNestedInput
+    dismissals?: DeadlineAlertDismissalUpdateManyWithoutAlertNestedInput
+  }
+
+  export type DeadlineAlertUncheckedUpdateWithoutAssignedUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    departmentCode?: StringFieldUpdateOperationsInput | string
+    taskType?: StringFieldUpdateOperationsInput | string
+    taskId?: StringFieldUpdateOperationsInput | string
+    challanId?: NullableStringFieldUpdateOperationsInput | string | null
+    programId?: NullableStringFieldUpdateOperationsInput | string | null
+    stage?: StringFieldUpdateOperationsInput | string
+    severity?: StringFieldUpdateOperationsInput | string
+    deadlineAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deadlineSource?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    resolutionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastEvaluatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutAlertNestedInput
+  }
+
+  export type DeadlineAlertUncheckedUpdateManyWithoutAssignedUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    departmentCode?: StringFieldUpdateOperationsInput | string
+    taskType?: StringFieldUpdateOperationsInput | string
+    taskId?: StringFieldUpdateOperationsInput | string
+    challanId?: NullableStringFieldUpdateOperationsInput | string | null
+    programId?: NullableStringFieldUpdateOperationsInput | string | null
+    stage?: StringFieldUpdateOperationsInput | string
+    severity?: StringFieldUpdateOperationsInput | string
+    deadlineAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deadlineSource?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    resolutionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastEvaluatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type DeadlineAlertDismissalUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dismissedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    alert?: DeadlineAlertUpdateOneRequiredWithoutDismissalsNestedInput
+  }
+
+  export type DeadlineAlertDismissalUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    alertId?: StringFieldUpdateOperationsInput | string
+    dismissedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeadlineAlertDismissalUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    alertId?: StringFieldUpdateOperationsInput | string
+    dismissedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DepartmentUpdateWithoutInchargeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    sequenceOrder?: IntFieldUpdateOperationsInput | number
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    workCenters?: WorkCenterUpdateManyWithoutDepartmentNestedInput
+    operations?: OperationUpdateManyWithoutDepartmentNestedInput
+    defectCodes?: DefectCodeUpdateManyWithoutDepartmentNestedInput
+    fromChallans?: ChallanUpdateManyWithoutFromDeptRelNestedInput
+    toChallans?: ChallanUpdateManyWithoutToDeptRelNestedInput
+  }
+
+  export type DepartmentUncheckedUpdateWithoutInchargeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    sequenceOrder?: IntFieldUpdateOperationsInput | number
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    workCenters?: WorkCenterUncheckedUpdateManyWithoutDepartmentNestedInput
+    operations?: OperationUncheckedUpdateManyWithoutDepartmentNestedInput
+    defectCodes?: DefectCodeUncheckedUpdateManyWithoutDepartmentNestedInput
+    fromChallans?: ChallanUncheckedUpdateManyWithoutFromDeptRelNestedInput
+    toChallans?: ChallanUncheckedUpdateManyWithoutToDeptRelNestedInput
+  }
+
+  export type DepartmentUncheckedUpdateManyWithoutInchargeInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    sequenceOrder?: IntFieldUpdateOperationsInput | number
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -131980,6 +138537,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     createdById: string
@@ -132009,6 +138567,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     createdById: string
@@ -132138,6 +138697,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -132166,7 +138726,8 @@ export namespace Prisma {
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutFromDeptRelInput = {
@@ -132179,6 +138740,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -132204,7 +138766,8 @@ export namespace Prisma {
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUncheckedUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateManyWithoutFromDeptRelInput = {
@@ -132217,6 +138780,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -132243,6 +138807,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -132271,7 +138836,8 @@ export namespace Prisma {
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutToDeptRelInput = {
@@ -132284,6 +138850,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -132309,7 +138876,8 @@ export namespace Prisma {
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUncheckedUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateManyWithoutToDeptRelInput = {
@@ -132322,6 +138890,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -132840,6 +139409,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutCustomerInput = {
@@ -132916,6 +139486,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateManyWithoutCustomerInput = {
@@ -133301,6 +139872,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateWithoutDesignInput = {
@@ -133377,6 +139949,7 @@ export namespace Prisma {
     fabricBatches?: FabricBatchUncheckedUpdateManyWithoutProgramNestedInput
     fabricStoreRolls?: FabricStoreRollUncheckedUpdateManyWithoutProgramIssuedToNestedInput
     dyeingOrders?: DyeingOrderUncheckedUpdateManyWithoutProgramNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutProgramNestedInput
   }
 
   export type ProgramUncheckedUpdateManyWithoutDesignInput = {
@@ -133799,6 +140372,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     createdById: string
@@ -133900,8 +140474,14 @@ export namespace Prisma {
   export type DefectRecordCreateManyProgramInput = {
     id?: string
     defectCode: string
+    productionSheetNumber?: string | null
     challanId?: string | null
     departmentCode: string
+    shelfCode?: string | null
+    color?: string | null
+    fabricType?: string | null
+    quantityUnit?: string
+    responsibleIncharge?: string | null
     bundleId?: string | null
     itemDescription: string
     severity: string
@@ -133911,6 +140491,8 @@ export namespace Prisma {
     status?: string
     resolutionNotes?: string | null
     resolvedAt?: Date | string | null
+    shelfRemovedAt?: Date | string | null
+    shelfRemovalReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -134011,30 +140593,51 @@ export namespace Prisma {
     id?: string
     orderNumber: string
     inboundChallanId?: string | null
+    inboundChallanItemId?: string | null
     status?: string
     priority?: string
     fabricName: string
     fabricType?: string | null
+    currentColor?: string | null
     targetColor: string
     dyedColor?: string | null
     colorCode?: string | null
     requiredQuantity: number
     dyedQuantity?: number
     undyedQuantity?: number
-    readyForQc1Quantity?: number
-    sentToQc1Quantity?: number
+    readyForDyeingQcQuantity?: number
+    sentToDyeingQcQuantity?: number
     uom?: string
     inchargeId?: string | null
     inchargeName?: string | null
     batchNumber?: string | null
     machineNumber?: string | null
     processRemarks?: string | null
-    qc1ChallanId?: string | null
+    dyeingQcChallanId?: string | null
     startedAt?: Date | string | null
     completedAt?: Date | string | null
-    sentToQc1At?: Date | string | null
+    sentToDyeingQcAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+  }
+
+  export type DeadlineAlertCreateManyProgramInput = {
+    id?: string
+    dedupeKey: string
+    departmentCode: string
+    taskType: string
+    taskId: string
+    challanId?: string | null
+    assignedUserId?: string | null
+    stage: string
+    severity: string
+    deadlineAt: Date | string
+    deadlineSource: string
+    status?: string
+    resolutionReason?: string | null
+    createdAt?: Date | string
+    lastEvaluatedAt?: Date | string
+    resolvedAt?: Date | string | null
   }
 
   export type ProgramFabricUpdateWithoutProgramInput = {
@@ -134274,6 +140877,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -134302,7 +140906,8 @@ export namespace Prisma {
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutProgramInput = {
@@ -134315,6 +140920,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -134340,7 +140946,8 @@ export namespace Prisma {
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUncheckedUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateManyWithoutProgramInput = {
@@ -134353,6 +140960,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -134626,14 +141234,22 @@ export namespace Prisma {
   export type DefectRecordUpdateWithoutProgramInput = {
     id?: StringFieldUpdateOperationsInput | string
     defectCode?: StringFieldUpdateOperationsInput | string
+    productionSheetNumber?: NullableStringFieldUpdateOperationsInput | string | null
     departmentCode?: StringFieldUpdateOperationsInput | string
+    shelfCode?: NullableStringFieldUpdateOperationsInput | string | null
+    color?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    quantityUnit?: StringFieldUpdateOperationsInput | string
+    responsibleIncharge?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovalReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     challan?: ChallanUpdateOneWithoutDefectsNestedInput
@@ -134646,17 +141262,25 @@ export namespace Prisma {
   export type DefectRecordUncheckedUpdateWithoutProgramInput = {
     id?: StringFieldUpdateOperationsInput | string
     defectCode?: StringFieldUpdateOperationsInput | string
+    productionSheetNumber?: NullableStringFieldUpdateOperationsInput | string | null
     challanId?: NullableStringFieldUpdateOperationsInput | string | null
     departmentCode?: StringFieldUpdateOperationsInput | string
+    shelfCode?: NullableStringFieldUpdateOperationsInput | string | null
+    color?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    quantityUnit?: StringFieldUpdateOperationsInput | string
+    responsibleIncharge?: NullableStringFieldUpdateOperationsInput | string | null
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovalReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reworks?: ReworkTransactionUncheckedUpdateManyWithoutDefectNestedInput
@@ -134666,17 +141290,25 @@ export namespace Prisma {
   export type DefectRecordUncheckedUpdateManyWithoutProgramInput = {
     id?: StringFieldUpdateOperationsInput | string
     defectCode?: StringFieldUpdateOperationsInput | string
+    productionSheetNumber?: NullableStringFieldUpdateOperationsInput | string | null
     challanId?: NullableStringFieldUpdateOperationsInput | string | null
     departmentCode?: StringFieldUpdateOperationsInput | string
+    shelfCode?: NullableStringFieldUpdateOperationsInput | string | null
+    color?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    quantityUnit?: StringFieldUpdateOperationsInput | string
+    responsibleIncharge?: NullableStringFieldUpdateOperationsInput | string | null
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovalReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -134972,18 +141604,20 @@ export namespace Prisma {
   export type DyeingOrderUpdateWithoutProgramInput = {
     id?: StringFieldUpdateOperationsInput | string
     orderNumber?: StringFieldUpdateOperationsInput | string
+    inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
     fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    currentColor?: NullableStringFieldUpdateOperationsInput | string | null
     targetColor?: StringFieldUpdateOperationsInput | string
     dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
     colorCode?: NullableStringFieldUpdateOperationsInput | string | null
     requiredQuantity?: FloatFieldUpdateOperationsInput | number
     dyedQuantity?: FloatFieldUpdateOperationsInput | number
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
-    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
-    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    readyForDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
+    sentToDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
@@ -134991,40 +141625,42 @@ export namespace Prisma {
     processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToDyeingQcAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     inboundChallan?: ChallanUpdateOneWithoutDyeingInboundOrdersNestedInput
     incharge?: UserUpdateOneWithoutDyeingOrdersInchargeNestedInput
-    qc1Challan?: ChallanUpdateOneWithoutDyeingQc1OrdersNestedInput
+    dyeingQcChallan?: ChallanUpdateOneWithoutDyeingQcOrdersNestedInput
   }
 
   export type DyeingOrderUncheckedUpdateWithoutProgramInput = {
     id?: StringFieldUpdateOperationsInput | string
     orderNumber?: StringFieldUpdateOperationsInput | string
     inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
     fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    currentColor?: NullableStringFieldUpdateOperationsInput | string | null
     targetColor?: StringFieldUpdateOperationsInput | string
     dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
     colorCode?: NullableStringFieldUpdateOperationsInput | string | null
     requiredQuantity?: FloatFieldUpdateOperationsInput | number
     dyedQuantity?: FloatFieldUpdateOperationsInput | number
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
-    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
-    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    readyForDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
+    sentToDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     inchargeId?: NullableStringFieldUpdateOperationsInput | string | null
     inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
     machineNumber?: NullableStringFieldUpdateOperationsInput | string | null
     processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
-    qc1ChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    dyeingQcChallanId?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToDyeingQcAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -135033,30 +141669,91 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     orderNumber?: StringFieldUpdateOperationsInput | string
     inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
     fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    currentColor?: NullableStringFieldUpdateOperationsInput | string | null
     targetColor?: StringFieldUpdateOperationsInput | string
     dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
     colorCode?: NullableStringFieldUpdateOperationsInput | string | null
     requiredQuantity?: FloatFieldUpdateOperationsInput | number
     dyedQuantity?: FloatFieldUpdateOperationsInput | number
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
-    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
-    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    readyForDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
+    sentToDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     inchargeId?: NullableStringFieldUpdateOperationsInput | string | null
     inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
     machineNumber?: NullableStringFieldUpdateOperationsInput | string | null
     processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
-    qc1ChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    dyeingQcChallanId?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToDyeingQcAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeadlineAlertUpdateWithoutProgramInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    departmentCode?: StringFieldUpdateOperationsInput | string
+    taskType?: StringFieldUpdateOperationsInput | string
+    taskId?: StringFieldUpdateOperationsInput | string
+    stage?: StringFieldUpdateOperationsInput | string
+    severity?: StringFieldUpdateOperationsInput | string
+    deadlineAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deadlineSource?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    resolutionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastEvaluatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    challan?: ChallanUpdateOneWithoutDeadlineAlertsNestedInput
+    assignedUser?: UserUpdateOneWithoutDeadlineAlertsAssignedNestedInput
+    dismissals?: DeadlineAlertDismissalUpdateManyWithoutAlertNestedInput
+  }
+
+  export type DeadlineAlertUncheckedUpdateWithoutProgramInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    departmentCode?: StringFieldUpdateOperationsInput | string
+    taskType?: StringFieldUpdateOperationsInput | string
+    taskId?: StringFieldUpdateOperationsInput | string
+    challanId?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    stage?: StringFieldUpdateOperationsInput | string
+    severity?: StringFieldUpdateOperationsInput | string
+    deadlineAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deadlineSource?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    resolutionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastEvaluatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutAlertNestedInput
+  }
+
+  export type DeadlineAlertUncheckedUpdateManyWithoutProgramInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    departmentCode?: StringFieldUpdateOperationsInput | string
+    taskType?: StringFieldUpdateOperationsInput | string
+    taskId?: StringFieldUpdateOperationsInput | string
+    challanId?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    stage?: StringFieldUpdateOperationsInput | string
+    severity?: StringFieldUpdateOperationsInput | string
+    deadlineAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deadlineSource?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    resolutionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastEvaluatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type ProgramRouteStepCreateManyProgramRouteInput = {
@@ -135133,6 +141830,7 @@ export namespace Prisma {
     status?: string
     priority?: string
     issuedDate?: Date | string | null
+    deliveryDate?: Date | string | null
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     createdById: string
@@ -135158,6 +141856,8 @@ export namespace Prisma {
     fabricCode?: string | null
     colour?: string | null
     shade?: string | null
+    requiredDyeColor?: string | null
+    requiredDyeQuantity?: number | null
     size?: string | null
     unitType: string
     rollNumber?: string | null
@@ -135245,7 +141945,13 @@ export namespace Prisma {
     id?: string
     defectCode: string
     programId: string
+    productionSheetNumber?: string | null
     departmentCode: string
+    shelfCode?: string | null
+    color?: string | null
+    fabricType?: string | null
+    quantityUnit?: string
+    responsibleIncharge?: string | null
     bundleId?: string | null
     itemDescription: string
     severity: string
@@ -135255,6 +141961,8 @@ export namespace Prisma {
     status?: string
     resolutionNotes?: string | null
     resolvedAt?: Date | string | null
+    shelfRemovedAt?: Date | string | null
+    shelfRemovalReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -135263,49 +141971,53 @@ export namespace Prisma {
     id?: string
     orderNumber: string
     programId: string
+    inboundChallanItemId?: string | null
     status?: string
     priority?: string
     fabricName: string
     fabricType?: string | null
+    currentColor?: string | null
     targetColor: string
     dyedColor?: string | null
     colorCode?: string | null
     requiredQuantity: number
     dyedQuantity?: number
     undyedQuantity?: number
-    readyForQc1Quantity?: number
-    sentToQc1Quantity?: number
+    readyForDyeingQcQuantity?: number
+    sentToDyeingQcQuantity?: number
     uom?: string
     inchargeId?: string | null
     inchargeName?: string | null
     batchNumber?: string | null
     machineNumber?: string | null
     processRemarks?: string | null
-    qc1ChallanId?: string | null
+    dyeingQcChallanId?: string | null
     startedAt?: Date | string | null
     completedAt?: Date | string | null
-    sentToQc1At?: Date | string | null
+    sentToDyeingQcAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
-  export type DyeingOrderCreateManyQc1ChallanInput = {
+  export type DyeingOrderCreateManyDyeingQcChallanInput = {
     id?: string
     orderNumber: string
     programId: string
     inboundChallanId?: string | null
+    inboundChallanItemId?: string | null
     status?: string
     priority?: string
     fabricName: string
     fabricType?: string | null
+    currentColor?: string | null
     targetColor: string
     dyedColor?: string | null
     colorCode?: string | null
     requiredQuantity: number
     dyedQuantity?: number
     undyedQuantity?: number
-    readyForQc1Quantity?: number
-    sentToQc1Quantity?: number
+    readyForDyeingQcQuantity?: number
+    sentToDyeingQcQuantity?: number
     uom?: string
     inchargeId?: string | null
     inchargeName?: string | null
@@ -135314,9 +142026,28 @@ export namespace Prisma {
     processRemarks?: string | null
     startedAt?: Date | string | null
     completedAt?: Date | string | null
-    sentToQc1At?: Date | string | null
+    sentToDyeingQcAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+  }
+
+  export type DeadlineAlertCreateManyChallanInput = {
+    id?: string
+    dedupeKey: string
+    departmentCode: string
+    taskType: string
+    taskId: string
+    programId?: string | null
+    assignedUserId?: string | null
+    stage: string
+    severity: string
+    deadlineAt: Date | string
+    deadlineSource: string
+    status?: string
+    resolutionReason?: string | null
+    createdAt?: Date | string
+    lastEvaluatedAt?: Date | string
+    resolvedAt?: Date | string | null
   }
 
   export type ChallanUpdateWithoutParentChallanInput = {
@@ -135326,6 +142057,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
@@ -135354,7 +142086,8 @@ export namespace Prisma {
     bundles?: BundleUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUpdateManyWithoutChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateWithoutParentChallanInput = {
@@ -135367,6 +142100,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -135392,7 +142126,8 @@ export namespace Prisma {
     bundles?: BundleUncheckedUpdateManyWithoutChallanNestedInput
     defects?: DefectRecordUncheckedUpdateManyWithoutChallanNestedInput
     dyeingInboundOrders?: DyeingOrderUncheckedUpdateManyWithoutInboundChallanNestedInput
-    dyeingQc1Orders?: DyeingOrderUncheckedUpdateManyWithoutQc1ChallanNestedInput
+    dyeingQcOrders?: DyeingOrderUncheckedUpdateManyWithoutDyeingQcChallanNestedInput
+    deadlineAlerts?: DeadlineAlertUncheckedUpdateManyWithoutChallanNestedInput
   }
 
   export type ChallanUncheckedUpdateManyWithoutParentChallanInput = {
@@ -135405,6 +142140,7 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     issuedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    deliveryDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -135430,6 +142166,8 @@ export namespace Prisma {
     fabricCode?: NullableStringFieldUpdateOperationsInput | string | null
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     shade?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredDyeColor?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredDyeQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     size?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: StringFieldUpdateOperationsInput | string
     rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
@@ -135453,6 +142191,8 @@ export namespace Prisma {
     fabricCode?: NullableStringFieldUpdateOperationsInput | string | null
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     shade?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredDyeColor?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredDyeQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     size?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: StringFieldUpdateOperationsInput | string
     rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
@@ -135476,6 +142216,8 @@ export namespace Prisma {
     fabricCode?: NullableStringFieldUpdateOperationsInput | string | null
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     shade?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredDyeColor?: NullableStringFieldUpdateOperationsInput | string | null
+    requiredDyeQuantity?: NullableFloatFieldUpdateOperationsInput | number | null
     size?: NullableStringFieldUpdateOperationsInput | string | null
     unitType?: StringFieldUpdateOperationsInput | string
     rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
@@ -135706,14 +142448,22 @@ export namespace Prisma {
   export type DefectRecordUpdateWithoutChallanInput = {
     id?: StringFieldUpdateOperationsInput | string
     defectCode?: StringFieldUpdateOperationsInput | string
+    productionSheetNumber?: NullableStringFieldUpdateOperationsInput | string | null
     departmentCode?: StringFieldUpdateOperationsInput | string
+    shelfCode?: NullableStringFieldUpdateOperationsInput | string | null
+    color?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    quantityUnit?: StringFieldUpdateOperationsInput | string
+    responsibleIncharge?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovalReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     program?: ProgramUpdateOneRequiredWithoutDefectsNestedInput
@@ -135727,16 +142477,24 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     defectCode?: StringFieldUpdateOperationsInput | string
     programId?: StringFieldUpdateOperationsInput | string
+    productionSheetNumber?: NullableStringFieldUpdateOperationsInput | string | null
     departmentCode?: StringFieldUpdateOperationsInput | string
+    shelfCode?: NullableStringFieldUpdateOperationsInput | string | null
+    color?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    quantityUnit?: StringFieldUpdateOperationsInput | string
+    responsibleIncharge?: NullableStringFieldUpdateOperationsInput | string | null
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovalReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reworks?: ReworkTransactionUncheckedUpdateManyWithoutDefectNestedInput
@@ -135747,16 +142505,24 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     defectCode?: StringFieldUpdateOperationsInput | string
     programId?: StringFieldUpdateOperationsInput | string
+    productionSheetNumber?: NullableStringFieldUpdateOperationsInput | string | null
     departmentCode?: StringFieldUpdateOperationsInput | string
+    shelfCode?: NullableStringFieldUpdateOperationsInput | string | null
+    color?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    quantityUnit?: StringFieldUpdateOperationsInput | string
+    responsibleIncharge?: NullableStringFieldUpdateOperationsInput | string | null
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovalReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -135764,18 +142530,20 @@ export namespace Prisma {
   export type DyeingOrderUpdateWithoutInboundChallanInput = {
     id?: StringFieldUpdateOperationsInput | string
     orderNumber?: StringFieldUpdateOperationsInput | string
+    inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
     fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    currentColor?: NullableStringFieldUpdateOperationsInput | string | null
     targetColor?: StringFieldUpdateOperationsInput | string
     dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
     colorCode?: NullableStringFieldUpdateOperationsInput | string | null
     requiredQuantity?: FloatFieldUpdateOperationsInput | number
     dyedQuantity?: FloatFieldUpdateOperationsInput | number
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
-    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
-    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    readyForDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
+    sentToDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
@@ -135783,40 +142551,42 @@ export namespace Prisma {
     processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToDyeingQcAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     program?: ProgramUpdateOneRequiredWithoutDyeingOrdersNestedInput
     incharge?: UserUpdateOneWithoutDyeingOrdersInchargeNestedInput
-    qc1Challan?: ChallanUpdateOneWithoutDyeingQc1OrdersNestedInput
+    dyeingQcChallan?: ChallanUpdateOneWithoutDyeingQcOrdersNestedInput
   }
 
   export type DyeingOrderUncheckedUpdateWithoutInboundChallanInput = {
     id?: StringFieldUpdateOperationsInput | string
     orderNumber?: StringFieldUpdateOperationsInput | string
     programId?: StringFieldUpdateOperationsInput | string
+    inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
     fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    currentColor?: NullableStringFieldUpdateOperationsInput | string | null
     targetColor?: StringFieldUpdateOperationsInput | string
     dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
     colorCode?: NullableStringFieldUpdateOperationsInput | string | null
     requiredQuantity?: FloatFieldUpdateOperationsInput | number
     dyedQuantity?: FloatFieldUpdateOperationsInput | number
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
-    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
-    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    readyForDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
+    sentToDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     inchargeId?: NullableStringFieldUpdateOperationsInput | string | null
     inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
     machineNumber?: NullableStringFieldUpdateOperationsInput | string | null
     processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
-    qc1ChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    dyeingQcChallanId?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToDyeingQcAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -135825,47 +142595,51 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     orderNumber?: StringFieldUpdateOperationsInput | string
     programId?: StringFieldUpdateOperationsInput | string
+    inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
     fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    currentColor?: NullableStringFieldUpdateOperationsInput | string | null
     targetColor?: StringFieldUpdateOperationsInput | string
     dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
     colorCode?: NullableStringFieldUpdateOperationsInput | string | null
     requiredQuantity?: FloatFieldUpdateOperationsInput | number
     dyedQuantity?: FloatFieldUpdateOperationsInput | number
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
-    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
-    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    readyForDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
+    sentToDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     inchargeId?: NullableStringFieldUpdateOperationsInput | string | null
     inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
     machineNumber?: NullableStringFieldUpdateOperationsInput | string | null
     processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
-    qc1ChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    dyeingQcChallanId?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToDyeingQcAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type DyeingOrderUpdateWithoutQc1ChallanInput = {
+  export type DyeingOrderUpdateWithoutDyeingQcChallanInput = {
     id?: StringFieldUpdateOperationsInput | string
     orderNumber?: StringFieldUpdateOperationsInput | string
+    inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
     fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    currentColor?: NullableStringFieldUpdateOperationsInput | string | null
     targetColor?: StringFieldUpdateOperationsInput | string
     dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
     colorCode?: NullableStringFieldUpdateOperationsInput | string | null
     requiredQuantity?: FloatFieldUpdateOperationsInput | number
     dyedQuantity?: FloatFieldUpdateOperationsInput | number
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
-    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
-    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    readyForDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
+    sentToDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
@@ -135873,7 +142647,7 @@ export namespace Prisma {
     processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToDyeingQcAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     program?: ProgramUpdateOneRequiredWithoutDyeingOrdersNestedInput
@@ -135881,23 +142655,25 @@ export namespace Prisma {
     incharge?: UserUpdateOneWithoutDyeingOrdersInchargeNestedInput
   }
 
-  export type DyeingOrderUncheckedUpdateWithoutQc1ChallanInput = {
+  export type DyeingOrderUncheckedUpdateWithoutDyeingQcChallanInput = {
     id?: StringFieldUpdateOperationsInput | string
     orderNumber?: StringFieldUpdateOperationsInput | string
     programId?: StringFieldUpdateOperationsInput | string
     inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
     fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    currentColor?: NullableStringFieldUpdateOperationsInput | string | null
     targetColor?: StringFieldUpdateOperationsInput | string
     dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
     colorCode?: NullableStringFieldUpdateOperationsInput | string | null
     requiredQuantity?: FloatFieldUpdateOperationsInput | number
     dyedQuantity?: FloatFieldUpdateOperationsInput | number
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
-    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
-    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    readyForDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
+    sentToDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     inchargeId?: NullableStringFieldUpdateOperationsInput | string | null
     inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
@@ -135906,28 +142682,30 @@ export namespace Prisma {
     processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToDyeingQcAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type DyeingOrderUncheckedUpdateManyWithoutQc1ChallanInput = {
+  export type DyeingOrderUncheckedUpdateManyWithoutDyeingQcChallanInput = {
     id?: StringFieldUpdateOperationsInput | string
     orderNumber?: StringFieldUpdateOperationsInput | string
     programId?: StringFieldUpdateOperationsInput | string
     inboundChallanId?: NullableStringFieldUpdateOperationsInput | string | null
+    inboundChallanItemId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
     priority?: StringFieldUpdateOperationsInput | string
     fabricName?: StringFieldUpdateOperationsInput | string
     fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    currentColor?: NullableStringFieldUpdateOperationsInput | string | null
     targetColor?: StringFieldUpdateOperationsInput | string
     dyedColor?: NullableStringFieldUpdateOperationsInput | string | null
     colorCode?: NullableStringFieldUpdateOperationsInput | string | null
     requiredQuantity?: FloatFieldUpdateOperationsInput | number
     dyedQuantity?: FloatFieldUpdateOperationsInput | number
     undyedQuantity?: FloatFieldUpdateOperationsInput | number
-    readyForQc1Quantity?: FloatFieldUpdateOperationsInput | number
-    sentToQc1Quantity?: FloatFieldUpdateOperationsInput | number
+    readyForDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
+    sentToDyeingQcQuantity?: FloatFieldUpdateOperationsInput | number
     uom?: StringFieldUpdateOperationsInput | string
     inchargeId?: NullableStringFieldUpdateOperationsInput | string | null
     inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
@@ -135936,9 +142714,68 @@ export namespace Prisma {
     processRemarks?: NullableStringFieldUpdateOperationsInput | string | null
     startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    sentToQc1At?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sentToDyeingQcAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeadlineAlertUpdateWithoutChallanInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    departmentCode?: StringFieldUpdateOperationsInput | string
+    taskType?: StringFieldUpdateOperationsInput | string
+    taskId?: StringFieldUpdateOperationsInput | string
+    stage?: StringFieldUpdateOperationsInput | string
+    severity?: StringFieldUpdateOperationsInput | string
+    deadlineAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deadlineSource?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    resolutionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastEvaluatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    program?: ProgramUpdateOneWithoutDeadlineAlertsNestedInput
+    assignedUser?: UserUpdateOneWithoutDeadlineAlertsAssignedNestedInput
+    dismissals?: DeadlineAlertDismissalUpdateManyWithoutAlertNestedInput
+  }
+
+  export type DeadlineAlertUncheckedUpdateWithoutChallanInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    departmentCode?: StringFieldUpdateOperationsInput | string
+    taskType?: StringFieldUpdateOperationsInput | string
+    taskId?: StringFieldUpdateOperationsInput | string
+    programId?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    stage?: StringFieldUpdateOperationsInput | string
+    severity?: StringFieldUpdateOperationsInput | string
+    deadlineAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deadlineSource?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    resolutionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastEvaluatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutAlertNestedInput
+  }
+
+  export type DeadlineAlertUncheckedUpdateManyWithoutChallanInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    departmentCode?: StringFieldUpdateOperationsInput | string
+    taskType?: StringFieldUpdateOperationsInput | string
+    taskId?: StringFieldUpdateOperationsInput | string
+    programId?: NullableStringFieldUpdateOperationsInput | string | null
+    assignedUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    stage?: StringFieldUpdateOperationsInput | string
+    severity?: StringFieldUpdateOperationsInput | string
+    deadlineAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deadlineSource?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    resolutionReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastEvaluatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type DefectLogCreateManyInspectionInput = {
@@ -136117,8 +142954,14 @@ export namespace Prisma {
     id?: string
     defectCode: string
     programId: string
+    productionSheetNumber?: string | null
     challanId?: string | null
     departmentCode: string
+    shelfCode?: string | null
+    color?: string | null
+    fabricType?: string | null
+    quantityUnit?: string
+    responsibleIncharge?: string | null
     itemDescription: string
     severity: string
     quantity: number
@@ -136127,6 +142970,8 @@ export namespace Prisma {
     status?: string
     resolutionNotes?: string | null
     resolvedAt?: Date | string | null
+    shelfRemovedAt?: Date | string | null
+    shelfRemovalReason?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -136177,14 +143022,22 @@ export namespace Prisma {
   export type DefectRecordUpdateWithoutBundleInput = {
     id?: StringFieldUpdateOperationsInput | string
     defectCode?: StringFieldUpdateOperationsInput | string
+    productionSheetNumber?: NullableStringFieldUpdateOperationsInput | string | null
     departmentCode?: StringFieldUpdateOperationsInput | string
+    shelfCode?: NullableStringFieldUpdateOperationsInput | string | null
+    color?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    quantityUnit?: StringFieldUpdateOperationsInput | string
+    responsibleIncharge?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovalReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     program?: ProgramUpdateOneRequiredWithoutDefectsNestedInput
@@ -136198,16 +143051,24 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     defectCode?: StringFieldUpdateOperationsInput | string
     programId?: StringFieldUpdateOperationsInput | string
+    productionSheetNumber?: NullableStringFieldUpdateOperationsInput | string | null
     challanId?: NullableStringFieldUpdateOperationsInput | string | null
     departmentCode?: StringFieldUpdateOperationsInput | string
+    shelfCode?: NullableStringFieldUpdateOperationsInput | string | null
+    color?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    quantityUnit?: StringFieldUpdateOperationsInput | string
+    responsibleIncharge?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovalReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reworks?: ReworkTransactionUncheckedUpdateManyWithoutDefectNestedInput
@@ -136218,16 +143079,24 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     defectCode?: StringFieldUpdateOperationsInput | string
     programId?: StringFieldUpdateOperationsInput | string
+    productionSheetNumber?: NullableStringFieldUpdateOperationsInput | string | null
     challanId?: NullableStringFieldUpdateOperationsInput | string | null
     departmentCode?: StringFieldUpdateOperationsInput | string
+    shelfCode?: NullableStringFieldUpdateOperationsInput | string | null
+    color?: NullableStringFieldUpdateOperationsInput | string | null
+    fabricType?: NullableStringFieldUpdateOperationsInput | string | null
+    quantityUnit?: StringFieldUpdateOperationsInput | string
+    responsibleIncharge?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    shelfRemovalReason?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -137169,6 +144038,30 @@ export namespace Prisma {
     measuredWeight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeadlineAlertDismissalCreateManyAlertInput = {
+    id?: string
+    userId: string
+    dismissedAt?: Date | string
+  }
+
+  export type DeadlineAlertDismissalUpdateWithoutAlertInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dismissedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutDeadlineAlertDismissalsNestedInput
+  }
+
+  export type DeadlineAlertDismissalUncheckedUpdateWithoutAlertInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    dismissedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DeadlineAlertDismissalUncheckedUpdateManyWithoutAlertInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    dismissedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

@@ -12,7 +12,7 @@
 The **Recutting Department** is an essential precision stage within the garment manufacturing pipeline of Shubham Fabrics. Its primary industrial function is the **accurate cutting and separation of embroidered designs and panels** on cloth, fabric, or dresses in strict accordance with the approved **Production Sheet** (`Program`) and incoming **Challan** (`Challan`).
 
 The standard manufacturing lifecycle established in the MES is:
-$$\text{QC Washing (QC3)} \longrightarrow \text{Recutting (RECUTTING)} \longrightarrow \text{Stitching (STITCHING)}$$
+$$\text{Washing QC} \longrightarrow \text{Recutting (RECUTTING)} \longrightarrow \text{Stitching (STITCHING)}$$
 
 This document presents the detailed architectural and codebase audit conducted across the full stack (`apps/api`, `apps/web`, `packages/database`, `packages/types`, `packages/config`, `packages/validation`) prior to implementation.
 
@@ -32,16 +32,16 @@ This document presents the detailed architectural and codebase audit conducted a
   - `metadataJson`: Structured parameters including component grids, forwarded components, wilcom entries, and stitch counts.
 - **Relationship**: The Production Sheet is the authoritative single source of truth for design specifications. It is directly linked to all transfers via `challan.programId`.
 
-### 2.2 QC Washing (`QC3` / `QCWASHING`)
-- **Entity**: Department code `QC3` (with alias `QCWASHING`).
+### 2.2 Washing QC (`WASHING_QC`)
+- **Entity**: Department code `WASHING_QC` (the former `QC3` and `QCWASHING` departments were merged into it).
 - **Current State**:
   - Receives washed goods from `WASHING` department (`CH-WSH-...`).
   - Performs 6-point wash quality and shrinkage verification.
-  - Quarantines defects to `DEF-SHELF-QC3` and creates re-wash tickets when necessary.
+  - Quarantines defects to `DEF-SHELF-WASHING-QC` and creates re-wash tickets when necessary.
   - Prepares outgoing handover challans for verified pieces.
 - **Integration Target**:
   - Previously defaulted to `FINISHING` in legacy UI buttons.
-  - **Required Flow**: QC Washing handovers of approved embroidered washed goods must now target `toDepartment: 'RECUTTING'`.
+  - **Required Flow**: Washing QC handovers of approved embroidered washed goods must now target `toDepartment: 'RECUTTING'`.
 
 ### 2.3 Challan System (`Challan` & `ChallanItem`)
 - **Entity**: `model Challan` & `model ChallanItem`.
@@ -74,9 +74,9 @@ This document presents the detailed architectural and codebase audit conducted a
   - `qc1` (Dyeing QC)
   - `embroidery` (Embroidery Incharge)
   - `cutting` (Thread Cutting)
-  - `qc2` (Thread Cutting QC)
+  - `qc2` (Threadcut QC)
   - `washing` (Washing & Laundry)
-  - `qcwashing` / `qc3` (QC Washing)
+  - `qcwashing` / `qc3` (Washing QC)
 - **Recutting Requirement**:
   - Department code: `RECUTTING`
   - System role: `RECUTTING_SUPERVISOR` / `RECUTTING_OPERATOR` / `RECUTTING_INCHARGE`
@@ -89,9 +89,9 @@ This document presents the detailed architectural and codebase audit conducted a
 
 | Area | Current System State | Recutting Requirement | Architecture Solution |
 | :--- | :--- | :--- | :--- |
-| **Department Routing** | `QC3` &rarr; `RECUTTING` exists in `STANDARD_FACTORY_ROUTE` | Outgoing challans from QC Washing must route to `RECUTTING` | Update QC Washing issue forms to default target `RECUTTING`. |
+| **Department Routing** | `WASHING_QC` &rarr; `RECUTTING` exists in `STANDARD_FACTORY_ROUTE` | Outgoing challans from Washing QC must route to `RECUTTING` | Update Washing QC issue forms to default target `RECUTTING`. |
 | **Database Master** | `RECUTTING` in `DepartmentCode` enum | `Department` table row for `RECUTTING` and `STITCHING` | Upsert `RECUTTING` and `STITCHING` in `scripts/setup-core-users.js` and auth login auto-seed. |
-| **Auth & Routing** | RBAC checks only handled up to `QC3` | RBAC must recognize `recutting` user and route to `/recutting` | Implement `isRecuttingUser()` in `apps/web/src/lib/rbac.ts` and update `DepartmentGuard`. |
+| **Auth & Routing** | RBAC checks only handled up to `WASHING_QC` | RBAC must recognize `recutting` user and route to `/recutting` | Implement `isRecuttingUser()` in `apps/web/src/lib/rbac.ts` and update `DepartmentGuard`. |
 | **Login Portal** | 10 stations on `/login` | Needs direct quick-login button for Recutting | Add Recutting tile to `STATIONS` array with scissor/slice icon and emerald-teal styling. |
 | **Operation API** | None for Recutting | Full operational REST API under `/api/recutting/...` | Implement receive, start, complete, verify, floor-board, dashboard, and handover endpoints. |
 | **Stitching Transfer** | Stitching exists as code | Outgoing Challan issued to `STITCHING` | Implement `/api/recutting/issue-challan` creating real `Challan` with `toDepartment: 'STITCHING'`. |

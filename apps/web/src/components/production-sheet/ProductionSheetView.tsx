@@ -178,7 +178,7 @@ export function ProductionSheetView({
               onClick={() => onCategoryChange(cat)}
               className={`px-3 py-1 rounded text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
                 activeCategory === cat
-                  ? 'bg-[#163767] text-white shadow-2xs'
+                  ? 'bg-lavender-800 text-white shadow-2xs'
                   : isEnabled
                     ? 'bg-slate-100 text-slate-800 hover:bg-slate-200 border border-slate-300'
                     : 'bg-slate-50 text-slate-400 border border-slate-200'
@@ -325,7 +325,7 @@ export function ProductionSheetView({
                 <td className="border-[1.5px] border-black p-1 font-black text-emerald-800 text-center">
                   {totalMtr > 0 ? totalMtr.toFixed(2) : '—'}
                 </td>
-                <td className="border-[1.5px] border-black p-1 font-black text-[#163767] text-center">
+                <td className="border-[1.5px] border-black p-1 font-black text-lavender-800 text-center">
                   {totalPcs > 0 ? totalPcs : '—'}
                 </td>
                 <td colSpan={2} className="border-[1.5px] border-black p-1 text-right text-[10px] pr-3">

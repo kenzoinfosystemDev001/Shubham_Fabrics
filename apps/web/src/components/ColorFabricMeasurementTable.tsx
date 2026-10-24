@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useId } from 'react';
 import { 
   Plus, 
   Trash2, 
@@ -32,28 +32,26 @@ export type ChallanContext =
   | 'PROGRAMMING_STORE'
   | 'STORE_DYEING'
   | 'STORE_EMBROIDERY'
-  | 'DYEING_QC1'
-  | 'QC1_EMBROIDERY'
+  | 'DYEING_TO_DYEING_QC'
+  | 'DYEING_QC_TO_EMBROIDERY'
   | 'EMBROIDERY_THREAD_CUTTING'
   | 'GENERIC';
 
 const FABRIC_TRACKING_DEPARTMENTS = new Set([
   'DYEING',
-  'QC1',
+  'DYEING_QC',
   'DYEING_QC',
   'EMBROIDERY',
   'THREAD_CUTTING',
-  'QC2',
+  'THREADCUT_QC',
   'WASHING',
-  'QC3',
-  'QCWASHING',
-  'QC_WASHING',
+  'WASHING_QC',
   'RECUTTING',
   'STITCHING',
   'ASSEMBLY',
   'FINISHING',
   'STEAM_PRESS',
-  'FINAL_CHECK',
+  'FINAL_QC',
   'PACKING',
 ]);
 
@@ -83,6 +81,8 @@ export interface ColorFabricMeasurementTableProps {
   showInOutController?: boolean;
   trackingOnly?: boolean;
   onSyncToItems?: (fabricOut: number, fabricUnit: 'MTR' | 'PCS') => void;
+  /** Optional note shown under a row's quantity (e.g. available stock), keyed by item id. */
+  rowHints?: Record<string, React.ReactNode>;
 }
 
 export function createBlankChallanItem(context?: ChallanContext): ChallanItemData {
@@ -99,7 +99,7 @@ export function createBlankChallanItem(context?: ChallanContext): ChallanItemDat
     item.requiredDyeQuantity = '';
   } else if (context === 'STORE_EMBROIDERY') {
     item.fabricProcessingStatus = 'Undyed';
-  } else if (context === 'QC1_EMBROIDERY') {
+  } else if (context === 'DYEING_QC_TO_EMBROIDERY') {
     item.fabricProcessingStatus = 'Dyed';
   }
 
@@ -107,21 +107,27 @@ export function createBlankChallanItem(context?: ChallanContext): ChallanItemDat
 }
 
 export function getDeptDefaultShelf(dept?: string): string {
-  if (!dept) return 'DEF-SHELF-STORE (Fabric Store Quarantined Shelf)';
+  if (!dept) return 'DEF-SHELF-DEPARTMENT';
   const d = dept.toUpperCase();
-  if (d.includes('QC1') || d.includes('DYEING QC') || d.includes('DYE QC'))
-    return 'DEF-SHELF-QC1 (Dyeing QC Defective Shelf)';
+  if (d.includes('DYEING_QC') || d.includes('DYEING QC') || d.includes('DYE QC'))
+    return 'DEF-SHELF-DYEING-QC (Dyeing QC Defective Shelf)';
   if (d.includes('DYE')) return 'DEF-SHELF-DYEING (Dyeing Station Defective Shelf)';
   if (d.includes('EMB')) return 'DEF-SHELF-EMBROIDERY (Embroidery Station Defective Shelf)';
-  if (d.includes('QC2') || d.includes('THREAD CUT QC') || d.includes('THREAD CUTTING QC'))
-    return 'DEF-SHELF-QC2 (Thread Cut QC Defective Shelf)';
+  if (d.includes('THREADCUT_QC') || d.includes('THREAD CUT QC') || d.includes('THREAD CUTTING QC'))
+    return 'DEF-SHELF-THREADCUT-QC (Threadcut QC Defective Shelf)';
+  if (d.includes('RECUT')) return 'DEF-SHELF-RECUTTING (Recutting Defective Shelf)';
   if (d.includes('THREAD') || d.includes('CUTTING') || d.includes('THC'))
     return 'DEF-SHELF-THREAD-CUTTING (Thread Cutting Trimming Shelf)';
-  if (d.includes('QC3') || d.includes('WASHING QC') || d.includes('WASH QC'))
-    return 'DEF-SHELF-QC3 (Washing QC Defective Shelf)';
-  if (d.includes('FINAL') || d.includes('FINAL_CHECK') || d.includes('FINAL CHECK'))
-    return 'DEF-SHELF-FINAL-CHECK (Final check Defective Shelf)';
-  return 'DEF-SHELF-STORE (Fabric Store Quarantined Shelf)';
+  if (d.includes('WASHING_QC') || d.includes('WASHING QC') || d.includes('WASH QC'))
+    return 'DEF-SHELF-WASHING-QC (Washing QC Defective Shelf)';
+  if (d.includes('WASH')) return 'DEF-SHELF-WASHING (Washing Station Defective Shelf)';
+  if (d.includes('STITCH')) return 'DEF-SHELF-STITCHING (Stitching Defective Shelf)';
+  if (d.includes('FINISH')) return 'DEF-SHELF-FINISHING (Finishing Defective Shelf)';
+  if (d.includes('STEAM') || d.includes('PRESS')) return 'DEF-SHELF-STEAM-PRESS (Steam Press Defective Shelf)';
+  if (d.includes('FINAL'))
+    return 'DEF-SHELF-FINAL-QC (Final QC Defective Shelf)';
+  if (d.includes('PACK')) return 'DEF-SHELF-PACKING (Packing Defective Shelf)';
+  return 'DEF-SHELF-DEPARTMENT';
 }
 
 export function createDepartmentInOutTracking(
@@ -138,7 +144,7 @@ export function createDepartmentInOutTracking(
     fabricUnit,
     defectivePieces,
     defectiveShelfLocation: values.defectiveShelfLocation || getDeptDefaultShelf(currentDepartment),
-    defectReason: values.defectReason || 'Broken Stitch / Needle Holes',
+    defectReason: values.defectReason || '',
     detectedFromDept: values.detectedFromDept ?? null,
     detectedFromChallanId: values.detectedFromChallanId ?? null,
     detectedFromChallanNumber: values.detectedFromChallanNumber ?? null,
@@ -158,6 +164,7 @@ export function ColorFabricMeasurementTable({
   showInOutController = true,
   trackingOnly = false,
   onSyncToItems,
+  rowHints,
 }: ColorFabricMeasurementTableProps) {
   // Local In/Out Tracking State
   const sumOfItems = items.reduce(
@@ -184,8 +191,13 @@ export function ColorFabricMeasurementTable({
   });
 
   const [defectReason, setDefectReason] = useState<string>(() => {
-    return externalTracking?.defectReason || 'Broken Stitch / Needle Holes';
+    return externalTracking?.defectReason || '';
   });
+  const defectReasonListId = useId();
+
+  useEffect(() => {
+    if (defectivePieces <= 0) setDefectReason('');
+  }, [defectivePieces]);
 
   const [detectedFromDept, setDetectedFromDept] = useState<string | null>(() => {
     return externalTracking?.detectedFromDept || null;
@@ -375,12 +387,12 @@ export function ColorFabricMeasurementTable({
     }
   };
 
-  const showRequiredDyeColor = context === 'STORE_DYEING' || context === 'DYEING_QC1';
+  const showRequiredDyeColor = context === 'STORE_DYEING' || context === 'DYEING_TO_DYEING_QC';
   const showRequiredDyeQty = context === 'STORE_DYEING';
-  const showActualDyedColor = context === 'DYEING_QC1';
+  const showActualDyedColor = context === 'DYEING_TO_DYEING_QC';
   const showProcessingStatus =
     context === 'STORE_EMBROIDERY' ||
-    context === 'QC1_EMBROIDERY' ||
+    context === 'DYEING_QC_TO_EMBROIDERY' ||
     context === 'EMBROIDERY_THREAD_CUTTING';
 
   return (
@@ -440,7 +452,7 @@ export function ColorFabricMeasurementTable({
                       min="0"
                       value={fabricIn}
                       onChange={(e) => setFabricIn(Math.max(0, parseFloat(e.target.value) || 0))}
-                      className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-600 rounded text-sm font-mono font-bold text-white focus:outline-none focus:border-slate-400"
+                      className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-600 rounded text-sm font-mono font-bold text-white focus:outline-none focus:border-lavender-300"
                       placeholder="0"
                     />
                     <select
@@ -474,7 +486,7 @@ export function ColorFabricMeasurementTable({
                     max={fabricIn}
                     value={defectivePieces}
                     onChange={(e) => setDefectivePieces(Math.max(0, Math.min(fabricIn, parseFloat(e.target.value) || 0)))}
-                    className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-600 rounded text-sm font-mono font-bold text-rose-300 focus:outline-none focus:border-rose-400"
+                    className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-600 rounded text-sm font-mono font-bold text-rose-300 focus:outline-none focus:border-lavender-400"
                     placeholder="0"
                   />
                 )}
@@ -482,58 +494,29 @@ export function ColorFabricMeasurementTable({
 
               {defectivePieces > 0 && !readOnly && (
                 <div className="space-y-1.5 pt-1">
-                  <select
+                  <input
+                    type="text"
+                    list={defectReasonListId}
                     value={defectReason}
                     onChange={(e) => setDefectReason(e.target.value)}
-                    className="w-full px-2 py-1 bg-slate-900 border border-slate-700 rounded text-xs text-rose-200 focus:outline-none cursor-pointer"
-                  >
-                    <option value="Broken Stitch / Needle Holes">Broken Stitch / Needle Holes</option>
-                    <option value="Fabric Stain / Oil Marks">Fabric Stain / Oil Marks</option>
-                    <option value="Shade Variation / Uneven Dyeing">Shade Variation / Uneven Dyeing</option>
-                    <option value="Selvage / Border Chew / Knife Cut">Selvage / Border Chew / Knife Cut</option>
-                    <option value="Weaving Slub / Fabric Tear">Weaving Slub / Fabric Tear</option>
-                    <option value="Thread Drop / Tension Knot">Thread Drop / Tension Knot</option>
-                    <option value="Other Defectiveness">Other Process Defect</option>
-                  </select>
+                    required={defectivePieces > 0}
+                    placeholder="Enter reason for defect"
+                    aria-label="Reason for defect"
+                    className="w-full px-2 py-1 bg-slate-900 border border-slate-700 rounded text-xs text-rose-200 focus:outline-none"
+                  />
+                  <datalist id={defectReasonListId}>
+                    <option value="Fabric damage" />
+                    <option value="Color mismatch" />
+                    <option value="Embroidery defect" />
+                    <option value="Stitching defect" />
+                    <option value="Washing defect" />
+                    <option value="Measurement issue" />
+                    <option value="Finishing defect" />
+                  </datalist>
 
-                  <select
-                    value={defectiveShelfLocation}
-                    onChange={(e) => setDefectiveShelfLocation(e.target.value)}
-                    className="w-full px-2 py-1 bg-slate-900 border border-slate-700 rounded text-xs font-mono text-amber-300 focus:outline-none cursor-pointer"
-                  >
-                    {currentDepartment && (
-                      <option value={getDeptDefaultShelf(currentDepartment)}>
-                        {getDeptDefaultShelf(currentDepartment)} (Dept Shelf)
-                      </option>
-                    )}
-                    <option value="DEF-SHELF-CENTRAL (Fabric Store Master Defective Shelf)">
-                      DEF-SHELF-CENTRAL (Store Master)
-                    </option>
-                    <option value="DEF-SHELF-STORE (Fabric Store Quarantined Shelf)">
-                      DEF-SHELF-STORE (Quarantine)
-                    </option>
-                    <option value="DEF-SHELF-DYEING (Dyeing Station Defective Shelf)">
-                      DEF-SHELF-DYEING (Dyeing)
-                    </option>
-                    <option value="DEF-SHELF-QC1 (Dyeing QC Defective Shelf)">
-                      DEF-SHELF-QC1 (QC1)
-                    </option>
-                    <option value="DEF-SHELF-EMBROIDERY (Embroidery Station Defective Shelf)">
-                      DEF-SHELF-EMBROIDERY (Embroidery)
-                    </option>
-                    <option value="DEF-SHELF-THREAD-CUTTING (Thread Cutting Trimming Shelf)">
-                      DEF-SHELF-THREAD-CUTTING (Thread Cut)
-                    </option>
-                    <option value="DEF-SHELF-QC2 (Thread Cut QC Defective Shelf)">
-                      DEF-SHELF-QC2 (QC2)
-                    </option>
-                    <option value="DEF-SHELF-QC3 (Washing QC Defective Shelf)">
-                      DEF-SHELF-QC3 (QC3)
-                    </option>
-                    <option value="DEF-SHELF-FINAL-CHECK (Final check Defective Shelf)">
-                      DEF-SHELF-FINAL-CHECK (Final Check)
-                    </option>
-                  </select>
+                  <div className="text-[10px] text-amber-300" aria-live="polite">
+                    Defective material is held on this department&apos;s shelf: {getDeptDefaultShelf(currentDepartment)}
+                  </div>
                 </div>
               )}
             </div>
@@ -552,7 +535,7 @@ export function ColorFabricMeasurementTable({
                   <button
                     type="button"
                     onClick={handleSyncToItems}
-                    className="px-2 py-1 bg-emerald-700 hover:bg-emerald-600 text-white text-[10px] font-bold rounded transition cursor-pointer"
+                    className="px-2 py-1 bg-lavender-700 hover:bg-lavender-600 text-white text-[10px] font-bold rounded transition cursor-pointer"
                     title="Populate table items"
                   >
                     Sync to Items
@@ -621,7 +604,7 @@ export function ColorFabricMeasurementTable({
                   <th className="py-2.5 px-3 w-28">Status</th>
                 )}
                 <th className="py-2.5 px-3 w-32">
-                  {context === 'QC1_EMBROIDERY'
+                  {context === 'DYEING_QC_TO_EMBROIDERY'
                     ? 'Passed Measurement'
                     : context === 'STORE_DYEING'
                     ? 'Fabric Qty Issued'
@@ -663,7 +646,7 @@ export function ColorFabricMeasurementTable({
                           onChange={(e) => handleFieldChange(idx, 'fabric', e.target.value)}
                           onFocus={(e) => e.target.select()}
                           placeholder=""
-                          className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 transition"
+                          className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-lavender-500 transition"
                         />
                       )}
                     </td>
@@ -681,7 +664,7 @@ export function ColorFabricMeasurementTable({
                             onChange={(e) => handleFieldChange(idx, 'color', e.target.value)}
                             onFocus={(e) => e.target.select()}
                             placeholder=""
-                            className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 transition"
+                            className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-lavender-500 transition"
                           />
                           <button
                             type="button"
@@ -696,7 +679,7 @@ export function ColorFabricMeasurementTable({
                       )}
                     </td>
 
-                    {/* REQUIRED DYE COLOR (Dyeing / QC1) */}
+                    {/* REQUIRED DYE COLOR (Dyeing / Dyeing QC) */}
                     {showRequiredDyeColor && (
                       <td className="py-2 px-3">
                         {readOnly ? (
@@ -709,13 +692,13 @@ export function ColorFabricMeasurementTable({
                             onChange={(e) => handleFieldChange(idx, 'requiredDyeColor', e.target.value)}
                             onFocus={(e) => e.target.select()}
                             placeholder=""
-                            className="w-full px-2.5 py-1.5 bg-white border border-purple-300 rounded-lg text-xs font-semibold text-purple-950 focus:outline-none focus:ring-1 focus:ring-purple-600 transition"
+                            className="w-full px-2.5 py-1.5 bg-white border border-purple-300 rounded-lg text-xs font-semibold text-purple-950 focus:outline-none focus:ring-1 focus:ring-lavender-600 transition"
                           />
                         )}
                       </td>
                     )}
 
-                    {/* ACTUAL DYED COLOR (Dyeing to QC1) */}
+                    {/* ACTUAL DYED COLOR (Dyeing to Dyeing QC) */}
                     {showActualDyedColor && (
                       <td className="py-2 px-3">
                         {readOnly ? (
@@ -728,7 +711,7 @@ export function ColorFabricMeasurementTable({
                             onChange={(e) => handleFieldChange(idx, 'actualDyedColor', e.target.value)}
                             onFocus={(e) => e.target.select()}
                             placeholder=""
-                            className="w-full px-2.5 py-1.5 bg-white border border-purple-300 rounded-lg text-xs font-semibold text-slate-900 focus:outline-none focus:ring-1 focus:ring-purple-600 transition"
+                            className="w-full px-2.5 py-1.5 bg-white border border-purple-300 rounded-lg text-xs font-semibold text-slate-900 focus:outline-none focus:ring-1 focus:ring-lavender-600 transition"
                           />
                         )}
                       </td>
@@ -737,7 +720,7 @@ export function ColorFabricMeasurementTable({
                     {/* PROCESSING STATUS (Undyed / Dyed) */}
                     {showProcessingStatus && (
                       <td className="py-2 px-3">
-                        {readOnly || context === 'STORE_EMBROIDERY' || context === 'QC1_EMBROIDERY' ? (
+                        {readOnly || context === 'STORE_EMBROIDERY' || context === 'DYEING_QC_TO_EMBROIDERY' ? (
                           <span
                             className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${
                               item.fabricProcessingStatus === 'Undyed'
@@ -753,7 +736,7 @@ export function ColorFabricMeasurementTable({
                             onChange={(e) =>
                               handleFieldChange(idx, 'fabricProcessingStatus', e.target.value as 'Dyed' | 'Undyed')
                             }
-                            className="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-900 transition cursor-pointer"
+                            className="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:ring-1 focus:ring-lavender-500 transition cursor-pointer"
                           >
                             <option value="Dyed">Dyed</option>
                             <option value="Undyed">Undyed</option>
@@ -776,8 +759,11 @@ export function ColorFabricMeasurementTable({
                           onChange={(e) => handleFieldChange(idx, 'measurement', e.target.value)}
                           onFocus={(e) => e.target.select()}
                           placeholder="0.00"
-                          className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 transition"
+                          className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-lavender-500 transition"
                         />
+                      )}
+                      {rowHints?.[item.id] && (
+                        <div className="mt-1 text-[10px] leading-tight">{rowHints[item.id]}</div>
                       )}
                     </td>
 
@@ -796,7 +782,7 @@ export function ColorFabricMeasurementTable({
                             onChange={(e) => handleFieldChange(idx, 'requiredDyeQuantity', e.target.value)}
                             onFocus={(e) => e.target.select()}
                             placeholder="0.00"
-                            className="w-full px-2.5 py-1.5 bg-white border border-purple-300 rounded-lg text-xs font-mono font-bold text-purple-950 focus:outline-none focus:ring-1 focus:ring-purple-600 transition"
+                            className="w-full px-2.5 py-1.5 bg-white border border-purple-300 rounded-lg text-xs font-mono font-bold text-purple-950 focus:outline-none focus:ring-1 focus:ring-lavender-600 transition"
                           />
                         )}
                       </td>
@@ -810,7 +796,7 @@ export function ColorFabricMeasurementTable({
                         <select
                           value={item.unit || 'MTR'}
                           onChange={(e) => handleFieldChange(idx, 'unit', e.target.value as 'MTR' | 'PCS')}
-                          className="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-900 transition cursor-pointer"
+                          className="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-lavender-500 transition cursor-pointer"
                         >
                           <option value="MTR">MTR (Meters)</option>
                           <option value="PCS">PCS (Pieces)</option>
@@ -829,7 +815,7 @@ export function ColorFabricMeasurementTable({
                           onChange={(e) => handleFieldChange(idx, 'remarks', e.target.value)}
                           onFocus={(e) => e.target.select()}
                           placeholder=""
-                          className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-600 focus:outline-none focus:ring-1 focus:ring-slate-900 transition"
+                          className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-600 focus:outline-none focus:ring-1 focus:ring-lavender-500 transition"
                         />
                       )}
                     </td>

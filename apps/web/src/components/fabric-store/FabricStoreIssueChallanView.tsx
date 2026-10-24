@@ -31,6 +31,7 @@ import {
   printProductionSheet,
 } from '@/lib/download-production-sheet';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
+import { getChallanNumberError } from '@/components/challan/ChallanNumberInput';
 
 import {
   ColorFabricMeasurementTable,
@@ -77,7 +78,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
     fabricUnit: 'MTR',
     defectivePieces: 0,
     defectiveShelfLocation: 'DEF-SHELF-STORE (Fabric Store Quarantined Shelf)',
-    defectReason: 'Weaving Slub / Fabric Tear',
+    defectReason: '',
     detectedFromDept: 'PROGRAMMING',
     detectedFromChallanId: null,
     detectedFromChallanNumber: null,
@@ -93,6 +94,9 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
   // UI States
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [challanNumberError, setChallanNumberError] = useState<string | null>(null);
+  // Per-line balance preview from the same matching the challan API uses (fabric + colour + unit).
+  const [lineStock, setLineStock] = useState<Record<string, { available: number; requestedTotal: number; unit: string; sufficient: boolean; matchedStock: boolean; itemName: string; color: string }>>({});
   const [showSheetModal, setShowSheetModal] = useState(false);
   const [issuedChallan, setIssuedChallan] = useState<any>(null);
 
@@ -147,19 +151,14 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
     }
   };
 
-  // Load Programs & Next Challan Number
+  // Load Programs (the challan number is always entered manually)
   const loadData = async () => {
     try {
       setLoading(true);
       setError('');
 
-      const [progRes, numRes] = await Promise.all([
-        fetch('/api/programs'),
-        fetch('/api/challans/next-number?department=STORE'),
-      ]);
-
+      const progRes = await fetch('/api/programs');
       const progData = await progRes.json();
-      const numData = await numRes.json();
 
       let progList: any[] = Array.isArray(progData) ? progData : [];
 
@@ -171,9 +170,6 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
       }
 
       setPrograms(progList);
-      if (numData?.nextNumber) {
-        setChallanNumber(numData.nextNumber);
-      }
 
       if (typeof window !== 'undefined') {
         try {
@@ -213,12 +209,9 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
     setDesignNumber(prog.designNumber || prog.wilcomDesignNumber || prog.styleCode || '');
     setPriority(prog.priority || 'NORMAL');
 
-    if (prog.deliveryDate) {
-      const dt = new Date(prog.deliveryDate).toISOString().split('T')[0];
-      setDeliveryDate(dt);
-    } else {
-      setDeliveryDate('');
-    }
+    // The challan delivery date is the department's actual deadline, so it is entered by the
+    // Store Incharge rather than copied from the sheet (whose date may be a system default).
+    setDeliveryDate('');
 
     const targetQ = Number(prog.targetQuantity || prog.fabricIssuedToDyeing || 0);
     const initialUnit: 'MTR' | 'PCS' = prog.quantityMeasurement === 'PCS' ? 'PCS' : 'MTR';
@@ -250,6 +243,64 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
 
   const selectedProgram = programs.find((p) => p.id === selectedProgramId);
 
+  useEffect(() => {
+    const lines = items
+      .filter((item) => item.fabric.trim() && Number(item.measurement) > 0)
+      .map((item) => ({
+        id: item.id,
+        fabric: item.fabric.trim(),
+        color: item.color.trim(),
+        unit: item.unit,
+        quantity: Number(item.measurement),
+        fabricProcessingStatus: destinationDepartment === 'EMBROIDERY' ? 'Undyed' : undefined,
+      }));
+    if (lines.length === 0) {
+      setLineStock({});
+      return;
+    }
+    let active = true;
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch('/api/fabric-store/stock-check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ toDepartment: destinationDepartment, lines }),
+        });
+        const json = await res.json();
+        if (!active || !res.ok || !Array.isArray(json.data)) return;
+        const next: typeof lineStock = {};
+        lines.forEach((line, index) => {
+          next[line.id] = json.data[index];
+        });
+        setLineStock(next);
+      } catch (err) {
+        console.error('Failed to check line stock:', err);
+      }
+    }, 400);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
+  }, [items, destinationDepartment]);
+
+  const rowHints: Record<string, React.ReactNode> = Object.fromEntries(
+    Object.entries(lineStock).map(([id, stock]) => [
+      id,
+      !stock.matchedStock ? (
+        <span className="font-semibold text-rose-700">No inward stock for this fabric / colour in {stock.unit}</span>
+      ) : stock.sufficient ? (
+        <span className="font-semibold text-emerald-700">Available: {stock.available} {stock.unit}</span>
+      ) : (
+        <span className="font-semibold text-rose-700">
+          Only {stock.available} {stock.unit} available ({stock.requestedTotal} {stock.unit} requested)
+        </span>
+      ),
+    ])
+  );
+  const hasStockShortage = Object.values(lineStock).some((stock) => !stock.sufficient);
+  // The Store Incharge can hold a production sheet; quantities are checked per line.
+  const isStoreHold = fabricAvailability?.statusLabel === 'OUT_OF_STOCK';
+
   // Submit Challan Store to Dyeing
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -259,10 +310,13 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
       return;
     }
 
-    if (!challanNumber.trim()) {
-      setError('Please provide a Challan Number.');
+    const numberError = getChallanNumberError(challanNumber);
+    if (numberError) {
+      setChallanNumberError(numberError);
+      setError(numberError);
       return;
     }
+    setChallanNumberError(null);
 
     // Only measured rows represent material moving out of the store.
     const rowsWithDetails = items.filter((it) => it.fabric.trim() || it.color.trim() || String(it.measurement).trim());
@@ -276,27 +330,43 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
       setError('Please enter at least one item in the Color / Fabric / Measurement table.');
       return;
     }
-    if (new Set(validItems.map((item) => item.unit)).size > 1) {
-      setError('Use the same unit for every quantity in one challan.');
-      return;
+    if (destinationDepartment === 'DYEING') {
+      const missingColorIndex = validItems.findIndex((item) => !String(item.requiredDyeColor || '').trim());
+      if (missingColorIndex >= 0) {
+        setError(`Item #${missingColorIndex + 1}: enter the Required Dye Color (the colour the fabric must be dyed to).`);
+        return;
+      }
+      const overIndex = validItems.findIndex((item) =>
+        String(item.requiredDyeQuantity ?? '').trim() !== '' && Number(item.requiredDyeQuantity) > Number(item.measurement)
+      );
+      if (overIndex >= 0) {
+        setError(`Item #${overIndex + 1}: Required Qty to Dye cannot be more than the fabric quantity issued.`);
+        return;
+      }
     }
 
-    const issueUnit: 'MTR' | 'PCS' = validItems[0].unit === 'PCS' ? 'PCS' : 'MTR';
+    // Each line keeps its own unit (MTR or PCS); meters and pieces are never added together.
+    const issueUnits = Array.from(new Set(validItems.map((item) => (item.unit === 'PCS' ? 'PCS' : 'MTR'))));
+    const isMixedUnits = issueUnits.length > 1;
+    const issueUnit: 'MTR' | 'PCS' = issueUnits[0] as 'MTR' | 'PCS';
     const issueQuantity = validItems.reduce((sum, item) => sum + Number(item.measurement), 0);
-    // The API also checks availability against this exact unit before creating the challan.
-    if (
-      fabricAvailability?.requiredUnit === issueUnit &&
-      !fabricAvailability.isAvailable
-    ) {
+    const quantityByUnit = issueUnits
+      .map((unit) => `${validItems.filter((item) => (item.unit === 'PCS' ? 'PCS' : 'MTR') === unit).reduce((sum, item) => sum + Number(item.measurement), 0)} ${unit}`)
+      .join(' + ');
+    if (isStoreHold) {
       setError(
-        `Fabric (${fabricAvailability.fabricName || 'fabric'}) is unavailable in the Fabric Store. Production sheet cannot move to ${destDept} until fabric arrives and is in stock.`
+        `Fabric (${fabricAvailability.fabricName || 'fabric'}) is marked Out of Stock (Hold) by the Fabric Store. Production sheet cannot move to ${destDept} until the hold is released.`
       );
       if (typeof window !== 'undefined') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
       return;
     }
-    const trackingMatchesUnit = storeTracking.fabricUnit === issueUnit;
+    if (hasStockShortage) {
+      setError('One or more items exceed the available Fabric Store stock for that fabric, colour and unit. Adjust the quantities or record the inward stock first.');
+      return;
+    }
+    const trackingMatchesUnit = !isMixedUnits && storeTracking.fabricUnit === issueUnit;
     const challanDefectiveQuantity = trackingMatchesUnit ? storeTracking.defectivePieces : 0;
     const challanFabricIn = issueQuantity + challanDefectiveQuantity;
 
@@ -309,11 +379,15 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
         itemDescription: `${item.fabric || 'Fabric'} — ${item.color || 'Standard'}`,
         unitType: 'ROLL',
         quantity: Number(item.measurement),
-        uom: issueUnit,
-        fabricCode: item.fabric || selectedProgram.fabricName || 'FABRIC',
+        uom: item.unit === 'PCS' ? 'PCS' : 'MTR',
+        // Must match the Inward Stock fabric name so the right stock is deducted.
+        fabricCode: item.fabric.trim(),
+        // Current fabric colour and the required dyeing colour are stored separately.
         colour: item.color || null,
-        shade: item.requiredDyeColor || null,
-        requiredDyeQuantity: item.requiredDyeQuantity || null,
+        requiredDyeColor: destinationDepartment === 'DYEING' ? String(item.requiredDyeColor || '').trim() || null : null,
+        requiredDyeQuantity: destinationDepartment === 'DYEING' && String(item.requiredDyeQuantity ?? '').trim() !== ''
+          ? Number(item.requiredDyeQuantity)
+          : null,
         fabricProcessingStatus: destinationDepartment === 'EMBROIDERY' ? 'Undyed' : undefined,
         rollNumber: item.rollNumber || null,
         remarks: item.remarks || null,
@@ -323,7 +397,9 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
         storeInchargeName ? `Store Incharge: ${storeInchargeName}` : null,
         storeInchargeContact ? `Contact: ${storeInchargeContact}` : null,
         designNumber ? `Design #: ${designNumber}` : null,
-        `Accounting: In: ${challanFabricIn} ${issueUnit} | Defective Cut: ${challanDefectiveQuantity} ${issueUnit} (${storeTracking.defectiveShelfLocation}) | Out to ${destinationDepartment}: ${issueQuantity} ${issueUnit}`,
+        isMixedUnits
+          ? `Accounting: Out to ${destinationDepartment}: ${quantityByUnit}`
+          : `Accounting: In: ${challanFabricIn} ${issueUnit} | Defective Cut: ${challanDefectiveQuantity} ${issueUnit} (${storeTracking.defectiveShelfLocation}) | Out to ${destinationDepartment}: ${issueQuantity} ${issueUnit}`,
       ]
         .filter(Boolean)
         .join(' · ');
@@ -336,12 +412,17 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
         toDepartment: destinationDepartment,
         priority: priority || 'NORMAL',
         issuedDate: challanDate,
-        fabricIn: challanFabricIn,
-        defectivePieces: challanDefectiveQuantity,
-        defectiveShelfLocation: storeTracking.defectiveShelfLocation,
-        defectReason: storeTracking.defectReason,
-        fabricOut: issueQuantity,
-        fabricUnit: issueUnit,
+        deliveryDate: deliveryDate || null,
+        ...(isMixedUnits
+          ? {}
+          : {
+              fabricIn: challanFabricIn,
+              defectivePieces: challanDefectiveQuantity,
+              defectiveShelfLocation: storeTracking.defectiveShelfLocation,
+              defectReason: storeTracking.defectReason,
+              fabricOut: issueQuantity,
+              fabricUnit: issueUnit,
+            }),
         detectedFromDepartment: storeTracking.detectedFromDept || 'PROGRAMMING',
         remarks: inchargeInfo,
         items: challanItems,
@@ -355,7 +436,8 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to dispatch challan to Dyeing');
+        if (data.field === 'challanNumber') setChallanNumberError(data.error);
+        throw new Error(data.error || `Failed to dispatch challan to ${destDept}`);
       }
 
       setIssuedChallan({
@@ -382,11 +464,14 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
   const handleReset = () => {
     setIssuedChallan(null);
     setError('');
+    setChallanNumber('');
+    setChallanNumberError(null);
+    setItems([createBlankChallanItem(challanContext)]);
     loadData();
   };
 
   return (
-    <div className="min-h-screen bg-[#F0FAF9] pb-24">
+    <div className="min-h-screen bg-ink-50 pb-24">
       {/* TOP NAVIGATION / HEADER */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 sm:px-8 py-3.5 shadow-2xs">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -545,7 +630,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
               <button
                 type="button"
                 onClick={handleReset}
-                className="flex items-center gap-1.5 px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-lg shadow-xs transition ml-auto"
+                className="flex items-center gap-1.5 px-4 py-2 bg-lavender-700 hover:bg-lavender-800 text-white text-xs font-bold rounded-lg shadow-xs transition ml-auto"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>Issue Another Challan</span>
@@ -606,7 +691,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                         checkingAvailability
                           ? 'bg-slate-200 text-slate-700'
                           : fabricAvailability?.isAvailable
-                          ? 'bg-emerald-600 text-white'
+                          ? 'bg-lavender-600 text-white'
                           : 'bg-rose-600 text-white'
                       }`}
                     >
@@ -629,10 +714,15 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                             <Check className="w-3 h-3 text-emerald-600" />
                             Fabric Available in Store — Cleared for {destDept} Handoff
                           </span>
-                        ) : (
+                        ) : isStoreHold ? (
                           <span className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-800 bg-rose-100 px-2 py-0.5 rounded-full">
                             <Lock className="w-3 h-3 text-rose-600" />
-                            Fabric Unavailable — Movement Blocked
+                            On Hold at Fabric Store — Movement Blocked
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">
+                            <AlertTriangle className="w-3 h-3 text-amber-600" />
+                            Sheet fabric not found in stock — each item is checked against its own fabric / colour / unit
                           </span>
                         )}
                       </div>
@@ -688,7 +778,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                         type="button"
                         disabled={updatingAvailability}
                         onClick={() => handleToggleAvailability(true)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition shadow-2xs cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-lavender-600 hover:bg-lavender-700 text-white rounded-lg text-xs font-bold transition shadow-2xs cursor-pointer"
                         title="Fabric Store Incharge confirms fabric physical presence in store"
                       >
                         <Check className="w-3.5 h-3.5" />
@@ -711,10 +801,20 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                   <input
                     type="text"
                     value={challanNumber}
-                    onChange={(e) => setChallanNumber(e.target.value)}
+                    onChange={(e) => {
+                      setChallanNumber(e.target.value);
+                      setChallanNumberError(null);
+                    }}
                     required
-                    className="w-full text-xs font-mono font-bold text-slate-900 border border-slate-300 rounded-lg px-3 py-2 bg-slate-50 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-teal-600 focus:border-transparent transition"
+                    maxLength={64}
+                    autoComplete="off"
+                    placeholder="Enter challan number"
+                    aria-invalid={Boolean(challanNumberError)}
+                    className={`w-full text-xs font-mono font-bold text-slate-900 border rounded-lg px-3 py-2 bg-slate-50 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-lavender-600 focus:border-transparent transition placeholder:font-normal placeholder:text-slate-400 ${challanNumberError ? 'border-rose-500' : 'border-slate-300'}`}
                   />
+                  {challanNumberError && (
+                    <p role="alert" className="mt-1 text-[11px] font-semibold text-rose-600">{challanNumberError}</p>
+                  )}
                 </div>
               </div>
 
@@ -729,7 +829,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                     value={challanDate}
                     onChange={(e) => setChallanDate(e.target.value)}
                     required
-                    className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-teal-600 focus:border-transparent transition"
+                    className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-lavender-600 focus:border-transparent transition"
                   />
                 </div>
               </div>
@@ -773,7 +873,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                   <select
                     value={priority}
                     onChange={(e) => setPriority(e.target.value)}
-                    className="w-full text-xs font-semibold border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-teal-600 focus:border-transparent transition cursor-pointer"
+                    className="w-full text-xs font-semibold border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-lavender-600 focus:border-transparent transition cursor-pointer"
                   >
                     <option value="NORMAL">NORMAL</option>
                     <option value="HIGH">HIGH</option>
@@ -792,8 +892,9 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                   <input
                     type="date"
                     value={deliveryDate}
+                    min={challanDate}
                     onChange={(e) => setDeliveryDate(e.target.value)}
-                    className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-teal-600 focus:border-transparent transition"
+                    className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-lavender-600 focus:border-transparent transition"
                   />
                 </div>
               </div>
@@ -808,7 +909,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                     type="text"
                     value={designNumber}
                     onChange={(e) => setDesignNumber(e.target.value)}
-                    className="w-full text-xs font-mono font-medium text-slate-900 border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-teal-600 focus:border-transparent transition"
+                    className="w-full text-xs font-mono font-medium text-slate-900 border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-lavender-600 focus:border-transparent transition"
                   />
                 </div>
               </div>
@@ -826,7 +927,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                       if (prog) handleProgramSelect(prog);
                     }}
                     required
-                    className="w-full text-xs font-mono font-bold text-slate-900 border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-teal-600 focus:border-transparent transition cursor-pointer"
+                    className="w-full text-xs font-mono font-bold text-slate-900 border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-lavender-600 focus:border-transparent transition cursor-pointer"
                   >
                     <option value="">Select Production Sheet Serial Number</option>
                     {programs.map((p) => (
@@ -849,6 +950,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                   tracking={storeTracking}
                   onTrackingChange={setStoreTracking}
                   showInOutController={false}
+                  rowHints={rowHints}
                 />
               </div>
 
@@ -864,14 +966,14 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                       value={storeInchargeName}
                       onChange={(e) => setStoreInchargeName(e.target.value)}
                       placeholder=""
-                      className="w-full text-xs font-medium border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-teal-600 focus:border-transparent transition"
+                      className="w-full text-xs font-medium border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-lavender-600 focus:border-transparent transition"
                     />
                     <input
                       type="text"
                       value={storeInchargeContact}
                       onChange={(e) => setStoreInchargeContact(e.target.value)}
                       placeholder=""
-                      className="w-full text-xs font-mono border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-teal-600 focus:border-transparent transition"
+                      className="w-full text-xs font-mono border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-lavender-600 focus:border-transparent transition"
                     />
                   </div>
                 </div>
@@ -881,10 +983,14 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
             {/* 11. SUBMIT BUTTON */}
             <div className="pt-4 border-t border-slate-200 flex items-center justify-between gap-4 flex-wrap">
               <div className="text-xs">
-                {fabricAvailability && !fabricAvailability.isAvailable ? (
+                {isStoreHold || hasStockShortage ? (
                   <span className="text-rose-700 font-bold flex items-center gap-1.5 bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-lg">
                     <Lock className="w-4 h-4 text-rose-600 shrink-0" />
-                    <span>Handoff locked: Fabric must be in store before moving to {destDept}.</span>
+                    <span>
+                      {isStoreHold
+                        ? `Handoff locked: production sheet is on hold at Fabric Store.`
+                        : `Handoff locked: an item exceeds the available stock for its fabric, colour and unit.`}
+                    </span>
                   </span>
                 ) : fabricAvailability?.isAvailable ? (
                   <span className="text-emerald-700 font-semibold flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg">
@@ -898,16 +1004,16 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
 
               <button
                 type="submit"
-                disabled={submitting || (fabricAvailability && !fabricAvailability.isAvailable)}
+                disabled={submitting || isStoreHold || hasStockShortage}
                 className={`inline-flex items-center gap-2 px-7 py-3 text-white text-xs font-bold rounded-xl shadow-xs transition ${
-                  fabricAvailability && !fabricAvailability.isAvailable
+                  isStoreHold || hasStockShortage
                     ? 'bg-slate-400 cursor-not-allowed opacity-60'
                     : 'bg-teal-700 hover:bg-teal-800 cursor-pointer'
                 }`}
               >
                 {submitting ? (
                   <RefreshCw className="w-4 h-4 animate-spin text-teal-200" />
-                ) : fabricAvailability && !fabricAvailability.isAvailable ? (
+                ) : isStoreHold || hasStockShortage ? (
                   <Lock className="w-4 h-4" />
                 ) : (
                   <Send className="w-4 h-4" />
@@ -915,8 +1021,8 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                 <span>
                   {submitting
                     ? 'Submitting Challan...'
-                    : fabricAvailability && !fabricAvailability.isAvailable
-                    ? `Movement Blocked — Fabric Not in Store`
+                    : isStoreHold || hasStockShortage
+                    ? `Movement Blocked — Insufficient Stock / Hold`
                     : `Submit Challan to ${destDept}`}
                 </span>
               </button>

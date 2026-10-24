@@ -85,11 +85,11 @@ export default function WashingDashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] pb-16">
+    <div className="min-h-screen bg-ink-50 pb-16">
       {/* TOP HEADER */}
       <header
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundImage: `linear-gradient(to right, rgba(37, 35, 42, 0.88), rgba(37, 35, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -119,7 +119,7 @@ export default function WashingDashboard() {
 
             <Link
               href="/washing/my-work"
-              className="px-3 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-lg text-xs font-semibold shadow-sm transition flex items-center gap-1.5"
+              className="px-3 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-semibold shadow-sm transition flex items-center gap-1.5"
             >
               <Briefcase className="w-4 h-4" />
               <span>Work Center</span>
@@ -225,7 +225,7 @@ export default function WashingDashboard() {
         </div>
 
         {/* WORKFLOW BANNER & QUICK LINKS */}
-        <div className="bg-gradient-to-r from-sky-900 to-slate-900 rounded-2xl p-5 text-white shadow-md flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="bg-sky-900 rounded-2xl p-5 text-white shadow-md flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="space-y-1 text-center md:text-left">
             <span className="text-[10px] font-bold uppercase tracking-widest text-cyan-300">
               Washing Mandatory Protocol
@@ -453,7 +453,7 @@ export default function WashingDashboard() {
                 Standard Washing Protocol
               </span>
               <ul className="space-y-1 text-slate-700 list-disc list-inside">
-                <li>Check Piece In against QC2 Challan slip.</li>
+                <li>Check Piece In against Threadcut QC Challan slip.</li>
                 <li>Assign unique Washing Barcode tag (`WB-...`).</li>
                 <li>Record Drum ID, Recipe, Water Temp, & Duration.</li>
                 <li>Count Piece Out and calculate Shrinkage %.</li>

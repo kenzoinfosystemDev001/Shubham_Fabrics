@@ -79,7 +79,7 @@ export function WashingNavigation() {
     const active = exact ? pathname === href : pathname === href || pathname.startsWith(href + '/');
     return `flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition ${
       active
-        ? 'bg-[#1E293B] text-white border-l-2 border-cyan-400 pl-2.5 shadow-xs'
+        ? 'bg-ink-800 text-white border-l-2 border-lavender-400 pl-2.5 shadow-xs'
         : 'text-slate-300 hover:bg-slate-800/60 hover:text-white'
     }`;
   };
@@ -87,7 +87,7 @@ export function WashingNavigation() {
   return (
     <>
       {/* MOBILE TOP BAR (visible on screens < md) */}
-      <div className="md:hidden sticky top-0 z-40 bg-[#0F172A] border-b border-slate-800 px-4 py-3 flex items-center justify-between shadow-sm">
+      <div className="md:hidden sticky top-0 z-40 bg-ink-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setMobileOpen(true)}
@@ -97,7 +97,7 @@ export function WashingNavigation() {
             <Menu className="w-6 h-6" />
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-white p-0.5 border border-cyan-500/40 flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-white p-0.5 border border-lavender-500/40 flex items-center justify-center shrink-0">
               <img
                 src="/shubham-logo.jpg"
                 alt="Shubham Fabrics Logo"
@@ -106,7 +106,7 @@ export function WashingNavigation() {
             </div>
             <div>
               <span className="text-xs font-bold text-white tracking-wide block leading-none">SHUBHAM FABRICS</span>
-              <span className="text-[9px] font-bold text-cyan-400 tracking-wider uppercase block">WASHING DEPT</span>
+              <span className="text-[9px] font-bold text-lavender-400 tracking-wider uppercase block">WASHING DEPT</span>
             </div>
           </div>
         </div>
@@ -134,7 +134,7 @@ export function WashingNavigation() {
       {/* SIDEBAR NAVIGATION (Desktop: sticky, Mobile: fixed slide-over) */}
       <aside
         style={{
-          backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.94), rgba(15, 23, 42, 0.88)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+          backgroundImage: `linear-gradient(to bottom, rgba(37, 35, 42, 0.94), rgba(37, 35, 42, 0.88)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -146,7 +146,7 @@ export function WashingNavigation() {
           {/* BRAND HEADER */}
           <div className="p-4 border-b border-slate-800 flex items-center justify-between">
             <Link href="/washing" className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-white p-0.5 border border-cyan-500/40 flex items-center justify-center shrink-0 shadow-xs">
+              <div className="w-9 h-9 rounded-lg bg-white p-0.5 border border-lavender-500/40 flex items-center justify-center shrink-0 shadow-xs">
                 <img
                   src="/shubham-logo.jpg"
                   alt="Shubham Fabrics Logo"
@@ -155,7 +155,7 @@ export function WashingNavigation() {
               </div>
               <div>
                 <span className="text-xs font-bold text-white tracking-wide block leading-none">SHUBHAM FABRICS</span>
-                <span className="text-[10px] font-bold text-cyan-400 tracking-wider uppercase block mt-1">
+                <span className="text-[10px] font-bold text-lavender-400 tracking-wider uppercase block mt-1">
                   WASHING & DRYING
                 </span>
               </div>
@@ -186,17 +186,17 @@ export function WashingNavigation() {
             </div>
 
             <Link href="/washing" className={linkClass('/washing', true)}>
-              <LayoutDashboard className="w-4 h-4 text-cyan-400" />
+              <LayoutDashboard className="w-4 h-4 text-lavender-400" />
               <span>Dashboard</span>
             </Link>
 
             <Link href="/washing/my-work" className={linkClass('/washing/my-work')}>
-              <Briefcase className="w-4 h-4 text-cyan-400" />
+              <Briefcase className="w-4 h-4 text-lavender-400" />
               <span>Work Center & Lots</span>
             </Link>
 
             <Link href="/washing/floor-board" className={linkClass('/washing/floor-board')}>
-              <Kanban className="w-4 h-4 text-cyan-400" />
+              <Kanban className="w-4 h-4 text-lavender-400" />
               <span>Washing Floor Board</span>
             </Link>
 
@@ -208,7 +208,7 @@ export function WashingNavigation() {
               href="/washing/my-work?tab=PRODUCTION_SHEETS"
               className={linkClass('/washing/my-work?tab=PRODUCTION_SHEETS')}
             >
-              <FileText className="w-4 h-4 text-cyan-400" />
+              <FileText className="w-4 h-4 text-lavender-400" />
               <span>Production Sheets</span>
             </Link>
           </nav>
@@ -217,18 +217,18 @@ export function WashingNavigation() {
           <div className="p-3 border-t border-slate-800/80 bg-slate-950/40">
             <div className="flex items-center justify-between gap-2 p-2 rounded-lg bg-slate-900/60 border border-slate-800">
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-8 h-8 rounded-full bg-cyan-900/40 border border-cyan-500/40 flex items-center justify-center shrink-0">
-                  <UserCircle className="w-5 h-5 text-cyan-400" />
+                <div className="w-8 h-8 rounded-full bg-lavender-900/40 border border-lavender-500/40 flex items-center justify-center shrink-0">
+                  <UserCircle className="w-5 h-5 text-lavender-400" />
                 </div>
                 <div className="min-w-0">
                   <span className="text-xs font-semibold text-white block truncate">
                     {currentUser?.fullName || 'Washing Incharge'}
                   </span>
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[9px] font-mono text-cyan-300 truncate">
+                    <span className="text-[9px] font-mono text-lavender-300 truncate">
                       {currentUser?.username || 'washing'}
                     </span>
-                    <span className="text-[8px] uppercase tracking-wider px-1 py-0.2 rounded bg-cyan-900/60 text-cyan-300 font-bold">
+                    <span className="text-[8px] uppercase tracking-wider px-1 py-0.2 rounded bg-lavender-900/60 text-lavender-300 font-bold">
                       WSH
                     </span>
                   </div>

@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 
 interface DepartmentStockViewProps {
-  department: 'STORE' | 'DYEING' | 'QC1' | 'EMBROIDERY' | 'THREAD_CUTTING' | 'QC2' | 'PROGRAMMING';
+  department: 'STORE' | 'DYEING' | 'DYEING_QC' | 'EMBROIDERY' | 'THREAD_CUTTING' | 'THREADCUT_QC' | 'PROGRAMMING';
   title?: string;
   accentColor?: string;
   createChallanUrl?: string;
@@ -186,7 +186,7 @@ export function DepartmentStockView({
           <button
             type="button"
             onClick={() => setStatusFilter('IN_TRANSIT')}
-            className="self-start sm:self-center px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold transition shadow-xs cursor-pointer whitespace-nowrap"
+            className="self-start sm:self-center px-3 py-1.5 bg-lavender-600 hover:bg-lavender-700 text-white rounded-lg text-xs font-bold transition shadow-xs cursor-pointer whitespace-nowrap"
           >
             View Incoming Lots
           </button>
@@ -285,7 +285,7 @@ export function DepartmentStockView({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by Program #, Challan #, Fabric, Color..."
-            className="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white bg-slate-50 transition"
+            className="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender-600 focus:bg-white bg-slate-50 transition"
           />
         </div>
 
@@ -407,7 +407,7 @@ export function DepartmentStockView({
                           type="button"
                           disabled={receivingId === item.id}
                           onClick={() => handleReceiveMaterial(item)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-xs transition cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1 bg-lavender-600 hover:bg-lavender-700 text-white rounded-lg text-xs font-bold shadow-xs transition cursor-pointer"
                           title="Click to receive this lot and update on-hand stock"
                         >
                           {receivingId === item.id ? (

@@ -23,6 +23,7 @@ import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import BarcodeStickerCard from '@/components/BarcodeStickerCard';
 import { ColorFabricMeasurementTable, createDepartmentInOutTracking } from '@/components/ColorFabricMeasurementTable';
+import { ChallanNumberInput, getChallanNumberError } from '@/components/challan/ChallanNumberInput';
 
 function SteamPressIssueChallanContent() {
   const router = useRouter();
@@ -35,8 +36,10 @@ function SteamPressIssueChallanContent() {
   const [selectedJob, setSelectedJob] = useState<any | null>(null);
   const [selectedSheetForView, setSelectedSheetForView] = useState<any | null>(null);
   const [generatedChallan, setGeneratedChallan] = useState<any | null>(null);
+  const [challanNumber, setChallanNumber] = useState('');
+  const [challanNumberError, setChallanNumberError] = useState<string | null>(null);
 
-  const [targetDepartment, setTargetDepartment] = useState('FINAL_CHECK');
+  const [targetDepartment, setTargetDepartment] = useState('FINAL_QC');
   const [priority, setPriority] = useState('NORMAL');
   const [remarks, setRemarks] = useState(
     'Steam pressed and moisture-extracted garments verified against Production Sheet. Transferred to Final QC.'
@@ -174,9 +177,17 @@ function SteamPressIssueChallanContent() {
       }
     }
 
+    const numberError = getChallanNumberError(challanNumber);
+    if (numberError) {
+      setChallanNumberError(numberError);
+      return;
+    }
+    setChallanNumberError(null);
+
     try {
       setLoading(true);
       const payload = {
+        challanNumber: challanNumber.trim(),
         parentChallanId: selectedJob.id,
         programId: selectedJob.programId,
         toDepartment: targetDepartment,
@@ -203,9 +214,16 @@ function SteamPressIssueChallanContent() {
       });
 
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error || 'Failed to issue challan');
+      if (!res.ok) {
+        if (json.field === 'challanNumber') {
+          setChallanNumberError(json.error || 'Invalid challan number.');
+          return;
+        }
+        throw new Error(json.error || 'Failed to issue challan');
+      }
 
       setGeneratedChallan(json.data);
+      setChallanNumber('');
     } catch (err: any) {
       alert(err.message || 'Error issuing challan');
     } finally {
@@ -217,7 +235,7 @@ function SteamPressIssueChallanContent() {
     <div
       className="min-h-screen text-slate-100 flex flex-col"
       style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.94), rgba(10, 15, 29, 0.98)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
+        backgroundImage: `linear-gradient(to bottom, rgba(37, 35, 42, 0.94), rgba(24, 22, 28, 0.98)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',
@@ -260,7 +278,7 @@ function SteamPressIssueChallanContent() {
               </div>
               <h2 className="text-xl font-bold text-white">Challan Issued Successfully!</h2>
               <p className="text-xs text-slate-400">
-                Official handover Challan dispatched to Final QC (`FINAL_CHECK`).
+                Official handover Challan dispatched to Final QC (`FINAL_QC`).
               </p>
             </div>
 
@@ -275,7 +293,7 @@ function SteamPressIssueChallanContent() {
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-400">To Department:</span>
-                <span className="font-semibold text-teal-300">{generatedChallan.toDepartment || 'FINAL_CHECK'}</span>
+                <span className="font-semibold text-teal-300">{generatedChallan.toDepartment || 'FINAL_QC'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-400">Handover Quantity:</span>
@@ -293,7 +311,7 @@ function SteamPressIssueChallanContent() {
                   designNumber: selectedJob?.program?.designNumber || 'N/A',
                   departmentName: 'Steam Press Department',
                   fromDepartment: 'STEAM_PRESS',
-                  toDepartment: generatedChallan.toDepartment || 'FINAL_CHECK',
+                  toDepartment: generatedChallan.toDepartment || 'FINAL_QC',
                   totalQuantity: totalTransferPieces,
                   uom: items[0]?.uom || 'PCS',
                   date: new Date().toLocaleDateString('en-GB'),
@@ -395,6 +413,16 @@ function SteamPressIssueChallanContent() {
                   2. Handover Routing & Parameters
                 </span>
 
+                <ChallanNumberInput
+                  value={challanNumber}
+                  onChange={(value) => {
+                    setChallanNumber(value);
+                    setChallanNumberError(null);
+                  }}
+                  error={challanNumberError}
+                  tone="dark"
+                  className="max-w-sm"
+                />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-slate-300 mb-1">
@@ -403,9 +431,9 @@ function SteamPressIssueChallanContent() {
                     <select
                       value={targetDepartment}
                       onChange={(e) => setTargetDepartment(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-400"
+                      className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-lavender-400"
                     >
-                      <option value="FINAL_CHECK">Final Quality Check (FINAL_CHECK)</option>
+                      <option value="FINAL_QC">Final Quality Check (FINAL_QC)</option>
                       <option value="FINISHED_GOODS">Finished Goods Warehouse (FINISHED_GOODS)</option>
                       <option value="DISPATCH">Dispatch / Packing (DISPATCH)</option>
                     </select>
@@ -416,7 +444,7 @@ function SteamPressIssueChallanContent() {
                     <select
                       value={priority}
                       onChange={(e) => setPriority(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-400"
+                      className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-lavender-400"
                     >
                       <option value="NORMAL">Normal Priority</option>
                       <option value="HIGH">High Priority</option>
@@ -433,7 +461,7 @@ function SteamPressIssueChallanContent() {
                     type="text"
                     value={remarks}
                     onChange={(e) => setRemarks(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-400"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-lavender-400"
                   />
                 </div>
 

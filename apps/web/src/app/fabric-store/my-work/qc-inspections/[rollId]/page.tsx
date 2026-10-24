@@ -109,7 +109,7 @@ export default function ConductQCPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F0FAF9] p-8 flex items-center justify-center text-xs text-slate-500">
+      <div className="min-h-screen bg-ink-50 p-8 flex items-center justify-center text-xs text-slate-500">
         Loading roll details for inspection...
       </div>
     );
@@ -117,7 +117,7 @@ export default function ConductQCPage() {
 
   if (!roll) {
     return (
-      <div className="min-h-screen bg-[#F0FAF9] p-8 max-w-xl mx-auto text-center space-y-4 pt-20">
+      <div className="min-h-screen bg-ink-50 p-8 max-w-xl mx-auto text-center space-y-4 pt-20">
         <h2 className="text-base font-bold text-slate-900">Roll Not Found</h2>
         <p className="text-xs text-slate-500">The requested roll could not be located in the system.</p>
         <Link
@@ -131,7 +131,7 @@ export default function ConductQCPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F0FAF9] pb-16">
+    <div className="min-h-screen bg-ink-50 pb-16">
       <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div className="flex items-center gap-3">
           <Link
@@ -225,7 +225,7 @@ export default function ConductQCPage() {
               <select
                 value={inspectionType}
                 onChange={(e) => setInspectionType(e.target.value)}
-                className="w-full sm:w-72 text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 focus:ring-1 focus:ring-amber-500 font-semibold"
+                className="w-full sm:w-72 text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 focus:ring-1 focus:ring-lavender-500 font-semibold"
               >
                 <option value="RECEIPT_QC">RECEIPT QC (Initial Inward)</option>
                 <option value="RETURN_QC">RETURN QC (Post-Production Return)</option>
@@ -311,7 +311,7 @@ export default function ConductQCPage() {
                         type="checkbox"
                         checked={selectedDefects.includes(defect)}
                         onChange={() => toggleDefect(defect)}
-                        className="rounded border-slate-300 text-amber-600 focus:ring-amber-500"
+                        className="rounded border-slate-300 text-amber-600 focus:ring-lavender-500"
                       />
                       <span>{defect}</span>
                     </label>
@@ -330,7 +330,7 @@ export default function ConductQCPage() {
                 placeholder=""
                 value={remarks}
                 onChange={(e) => setRemarks(e.target.value)}
-                className="w-full text-xs border border-slate-300 rounded-md p-3 focus:ring-1 focus:ring-amber-500"
+                className="w-full text-xs border border-slate-300 rounded-md p-3 focus:ring-1 focus:ring-lavender-500"
               />
             </div>
           </div>
@@ -347,9 +347,9 @@ export default function ConductQCPage() {
               disabled={submitting}
               className={`flex items-center gap-2 px-6 py-2.5 text-white text-xs font-bold rounded-md shadow-xs transition disabled:opacity-50 ${
                 result === 'PASS'
-                  ? 'bg-emerald-700 hover:bg-emerald-800'
+                  ? 'bg-lavender-700 hover:bg-lavender-800'
                   : result === 'HOLD'
-                  ? 'bg-amber-600 hover:bg-amber-700'
+                  ? 'bg-lavender-600 hover:bg-lavender-700'
                   : 'bg-rose-700 hover:bg-rose-800'
               }`}
             >

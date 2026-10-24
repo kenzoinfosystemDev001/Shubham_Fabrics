@@ -30,7 +30,7 @@ import {
   isAdminUser, 
   isDyeingUser, 
   isFabricStoreUser, 
-  isQc1User, 
+  isDyeingQcUser, 
   isEmbroideryUser,
   isThreadCuttingUser
 } from '@/lib/rbac';
@@ -44,7 +44,9 @@ import {
 } from '@/lib/barcode';
 import { 
   downloadChallanHtml, 
-  printChallan 
+  printChallan,
+  formatQuantitiesByUnit,
+  getChallanColorColumns,
 } from '@/lib/download-challan';
 
 export default function ChallanDetailPage() {
@@ -81,8 +83,8 @@ export default function ChallanDetailPage() {
         router.push('/fabric-store/my-work/incoming-challans');
         return;
       }
-      if (activeDept === 'QC1') {
-        router.push('/qc1/my-work');
+      if (activeDept === 'DYEING_QC') {
+        router.push('/dyeing-qc/my-work');
         return;
       }
       if (activeDept === 'PROGRAMMING') {
@@ -112,8 +114,8 @@ export default function ChallanDetailPage() {
         router.push('/fabric-store');
         return;
       }
-      if (challan.fromDepartment === 'QC1' || challan.toDepartment === 'QC1') {
-        router.push('/qc1/my-work');
+      if (challan.fromDepartment === 'DYEING_QC' || challan.toDepartment === 'DYEING_QC') {
+        router.push('/dyeing-qc/my-work');
         return;
       }
     }
@@ -122,7 +124,7 @@ export default function ChallanDetailPage() {
     if (isThreadCuttingUser(user)) { router.push('/thread-cutting/my-work'); return; }
     if (isDyeingUser(user)) { router.push('/dyeing/my-work'); return; }
     if (isFabricStoreUser(user)) { router.push('/fabric-store/my-work/incoming-challans'); return; }
-    if (isQc1User(user)) { router.push('/qc1/my-work'); return; }
+    if (isDyeingQcUser(user)) { router.push('/dyeing-qc/my-work'); return; }
 
     router.push('/login');
   };
@@ -148,7 +150,7 @@ export default function ChallanDetailPage() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen bg-[#F8FAFC] ${paddingClass} flex items-center justify-center`}>
+      <div className={`min-h-screen bg-ink-50 ${paddingClass} flex items-center justify-center`}>
         <div className="text-xs text-slate-500 font-mono animate-pulse">
           Loading Challan Document...
         </div>
@@ -158,7 +160,7 @@ export default function ChallanDetailPage() {
 
   if (error || !challan) {
     return (
-      <div className={`min-h-screen bg-[#F8FAFC] ${paddingClass} p-4 sm:p-8`}>
+      <div className={`min-h-screen bg-ink-50 ${paddingClass} p-4 sm:p-8`}>
         <div className="max-w-xl mx-auto p-6 bg-rose-50 border border-rose-200 rounded-xl text-center space-y-3">
           <AlertCircle className="w-8 h-8 text-rose-600 mx-auto" />
           <h2 className="text-sm font-bold text-rose-900">Error Loading Challan</h2>
@@ -187,11 +189,11 @@ export default function ChallanDetailPage() {
     STORE: 'FABRIC STORE',
     FABRIC_STORE: 'FABRIC STORE',
     DYEING: 'DYEING',
-    QC1: 'QC1',
+    DYEING_QC: 'DYEING_QC',
     EMBROIDERY: 'EMBROIDERY',
     THREAD_CUTTING: 'THREAD CUTTING',
     CUTTING: 'CUTTING',
-    QC2: 'QC2',
+    THREADCUT_QC: 'THREADCUT_QC',
     FINISHING: 'FINISHING',
     PACKING: 'PACKING'
   };
@@ -235,7 +237,7 @@ export default function ChallanDetailPage() {
   };
 
   return (
-    <div className={`min-h-screen bg-[#F8FAFC] ${paddingClass} pb-20`}>
+    <div className={`min-h-screen bg-ink-50 ${paddingClass} pb-20`}>
       {/* HEADER */}
       <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div className="flex items-center gap-4">
@@ -247,7 +249,7 @@ export default function ChallanDetailPage() {
             <ArrowLeft className="w-4 h-4" />
           </button>
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A66E22] block">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-lavender-700 block">
               SHUBHAM FABRICS · DISPATCH CHALLAN
             </span>
             <div className="flex items-center gap-3">
@@ -270,7 +272,7 @@ export default function ChallanDetailPage() {
                 type="button"
                 onClick={handleDownloadBarcodePng}
                 disabled={downloadingBarcode}
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-md shadow-xs transition cursor-pointer"
+                className="flex items-center gap-1.5 px-3.5 py-2 bg-lavender-600 hover:bg-lavender-700 text-white text-xs font-bold rounded-md shadow-xs transition cursor-pointer"
                 title="Download standalone barcode sticker with Design Number as PNG"
               >
                 <BarcodeIcon className="w-4 h-4" />
@@ -279,7 +281,7 @@ export default function ChallanDetailPage() {
               <button
                 type="button"
                 onClick={handlePrintBarcodeSticker}
-                className="flex items-center gap-1.5 px-3 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-md shadow-xs transition cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-2 bg-lavender-700 hover:bg-lavender-800 text-white text-xs font-bold rounded-md shadow-xs transition cursor-pointer"
                 title="Print 4x2.5 thermal sticker label directly"
               >
                 <Printer className="w-4 h-4" />
@@ -319,7 +321,7 @@ export default function ChallanDetailPage() {
           {/* VOUCHER TOP HEADER */}
           <div className="flex items-start justify-between pb-6 border-b-2 border-slate-900 gap-4">
             <div>
-              <span className="text-[11px] font-bold tracking-[0.2em] text-[#A66E22] block mb-1">
+              <span className="text-[11px] font-bold tracking-[0.2em] text-lavender-700 block mb-1">
                 SHUBHAM FABRICS INDIA PVT. LTD.
               </span>
               {challan.fromDepartment === 'STORE' && (challan.toDepartment === 'DYEING' || challan.toDepartment?.includes('DYE')) ? (
@@ -336,28 +338,28 @@ export default function ChallanDetailPage() {
                     </span>
                   </div>
                 </div>
-              ) : challan.fromDepartment === 'DYEING' || challan.toDepartment === 'QC1' || (challan.challanNumber && challan.challanNumber.startsWith('CH-DYE-')) ? (
+              ) : challan.fromDepartment === 'DYEING' || challan.toDepartment === 'DYEING_QC' || (challan.challanNumber && challan.challanNumber.startsWith('CH-DYE-')) ? (
                 <div>
                   <h2 className="text-xl font-serif font-black text-slate-900 tracking-wide">
                     DYEING DEPARTMENT
                   </h2>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-sm font-black font-mono tracking-wider text-blue-900 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
-                      DYEING → QC1
+                      DYEING → Dyeing QC
                     </span>
                     <span className="text-sm font-bold text-slate-800 tracking-widest">
                       CHALLAN
                     </span>
                   </div>
                 </div>
-              ) : challan.fromDepartment === 'THREAD_CUTTING' && challan.toDepartment === 'QC2' ? (
+              ) : challan.fromDepartment === 'THREAD_CUTTING' && challan.toDepartment === 'THREADCUT_QC' ? (
                 <div>
                   <h2 className="text-xl font-serif font-black text-slate-900 tracking-wide">
                     THREAD CUTTING DEPARTMENT
                   </h2>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-sm font-black font-mono tracking-wider text-cyan-900 bg-cyan-50 px-2 py-0.5 rounded border border-cyan-200">
-                      THREAD CUTTING → QC2 (QUALITY CHECK 2)
+                      THREAD CUTTING → Threadcut QC (QUALITY CHECK 2)
                     </span>
                     <span className="text-sm font-bold text-slate-800 tracking-widest">
                       CHALLAN
@@ -574,20 +576,22 @@ export default function ChallanDetailPage() {
             />
           )}
 
-          {/* TOTAL PIECES CALCULATION & QC2 CHECKING DIRECTIVE */}
+          {/* TOTAL PIECES CALCULATION & Threadcut QC CHECKING DIRECTIVE */}
           {(() => {
             const totalQuantity = (challan.items || []).reduce(
               (sum: number, it: any) => sum + (Number(it.quantity) || 0),
               0
             );
-            const isThreadCuttingToQc2 =
-              challan.fromDepartment === 'THREAD_CUTTING' && challan.toDepartment === 'QC2';
+            const { hasRequiredDyeColor, hasResultShade } = getChallanColorColumns(challan.items || []);
+            const itemColumnCount = 5 + (hasRequiredDyeColor ? 2 : 0) + (hasResultShade ? 1 : 0);
+            const isThreadCuttingToThreadcutQc =
+              challan.fromDepartment === 'THREAD_CUTTING' && challan.toDepartment === 'THREADCUT_QC';
 
             return (
               <>
-                {/* QC2 MANDATORY INSPECTION HANDOVER DIRECTIVE */}
-                {isThreadCuttingToQc2 && (
-                  <div className="p-4 bg-gradient-to-r from-emerald-50 via-teal-50 to-cyan-50 border-2 border-emerald-400 rounded-xl space-y-2.5">
+                {/* Threadcut QC MANDATORY INSPECTION HANDOVER DIRECTIVE */}
+                {isThreadCuttingToThreadcutQc && (
+                  <div className="p-4 bg-emerald-50 border-2 border-emerald-400 rounded-xl space-y-2.5">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-emerald-200 pb-2.5">
                       <div className="flex items-center gap-2">
                         <ShieldCheck className="w-5 h-5 text-emerald-700 shrink-0" />
@@ -596,12 +600,12 @@ export default function ChallanDetailPage() {
                             QUALITY ASSURANCE DIRECTIVE
                           </span>
                           <h4 className="text-sm font-bold text-slate-900">
-                            QC2 Piece-by-Piece Quality Inspection Basis
+                            Threadcut QC Piece-by-Piece Quality Inspection Basis
                           </h4>
                         </div>
                       </div>
                       <div className="text-left sm:text-right bg-white px-3.5 py-1.5 rounded-xl border border-emerald-300">
-                        <span className="text-[10px] uppercase font-bold text-slate-500 block">Pieces Dispatched to QC2</span>
+                        <span className="text-[10px] uppercase font-bold text-slate-500 block">Pieces Dispatched to Threadcut QC</span>
                         <strong className="text-lg font-mono font-black text-emerald-800">
                           {totalQuantity} PCS
                         </strong>
@@ -611,7 +615,13 @@ export default function ChallanDetailPage() {
                 )}
 
                 {/* DEPARTMENT PIECE / FABRIC IN & OUT AUTO-DETECTION & DEFECTIVE SHELF AUDIT CARD */}
-                {(() => {
+                {challan.fabricUnit === 'MIXED' ? (
+                  <div className="p-4 bg-slate-900 text-white rounded-xl border border-slate-700/80 text-xs">
+                    <span className="text-[10px] uppercase font-bold text-amber-300 block mb-1">Flow Audit</span>
+                    This challan carries both meter and piece lines, which are tracked separately:{' '}
+                    <strong className="font-mono">{formatQuantitiesByUnit(challan.items || [], challan)}</strong> to {challan.toDepartment}.
+                  </div>
+                ) : (() => {
                   const fIn = challan.fabricIn ?? (challan.parentChallan?.fabricOut || totalQuantity);
                   const fOut = challan.fabricOut ?? totalQuantity;
                   const fDef = challan.defectivePieces ?? 0;
@@ -621,7 +631,7 @@ export default function ChallanDetailPage() {
                   const detectedSource = challan.detectedFromDepartment || challan.parentChallan?.fromDepartment;
 
                   return (
-                    <div className="p-4 bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 text-white rounded-xl shadow-xs border border-slate-700/80 space-y-3">
+                    <div className="p-4 bg-slate-900 text-white rounded-xl shadow-xs border border-slate-700/80 space-y-3">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-700 pb-2.5">
                         <div className="flex items-center gap-2">
                           <span className="p-1.5 bg-amber-400/20 text-amber-300 rounded border border-amber-400/30 text-[10px] font-bold font-mono">
@@ -710,7 +720,7 @@ export default function ChallanDetailPage() {
                     <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
                       Transferred Work Items &amp; Materials
                     </h3>
-                    {isThreadCuttingToQc2 && (
+                    {isThreadCuttingToThreadcutQc && (
                       <span className="text-[11px] font-mono font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded border border-emerald-200">
                         Dispatched Pieces: {totalQuantity} PCS
                       </span>
@@ -722,7 +732,10 @@ export default function ChallanDetailPage() {
                         <tr>
                           <th className="py-2.5 px-4">#</th>
                           <th className="py-2.5 px-4">Description</th>
-                          <th className="py-2.5 px-4">Color</th>
+                          <th className="py-2.5 px-4">{hasRequiredDyeColor ? 'Current Color / Shade' : 'Color'}</th>
+                          {hasRequiredDyeColor && <th className="py-2.5 px-4">Required Dyeing Color</th>}
+                          {hasRequiredDyeColor && <th className="py-2.5 px-4 text-right">Qty to Dye</th>}
+                          {hasResultShade && <th className="py-2.5 px-4">Result Shade</th>}
                           <th className="py-2.5 px-4 text-right">Quantity</th>
                           <th className="py-2.5 px-4">UOM</th>
                         </tr>
@@ -732,14 +745,23 @@ export default function ChallanDetailPage() {
                           <tr key={item.id || idx}>
                             <td className="py-3 px-4 font-mono text-slate-500">{idx + 1}</td>
                             <td className="py-3 px-4 font-medium text-slate-900">{item.itemDescription}</td>
-                            <td className="py-3 px-4">{item.colour || 'Standard'}</td>
+                            <td className="py-3 px-4">{item.colour || '—'}</td>
+                            {hasRequiredDyeColor && (
+                              <td className="py-3 px-4 font-bold text-purple-900">{item.requiredDyeColor || '—'}</td>
+                            )}
+                            {hasRequiredDyeColor && (
+                              <td className="py-3 px-4 text-right font-mono">
+                                {item.requiredDyeColor ? `${item.requiredDyeQuantity ?? item.quantity} ${item.uom || ''}` : '—'}
+                              </td>
+                            )}
+                            {hasResultShade && <td className="py-3 px-4">{item.shade || '—'}</td>}
                             <td className="py-3 px-4 text-right font-mono font-bold">{item.quantity}</td>
                             <td className="py-3 px-4">{item.uom || 'PCS'}</td>
                           </tr>
                         ))}
                         {(!challan.items || challan.items.length === 0) && (
                           <tr>
-                            <td colSpan={5} className="py-4 text-center text-slate-400">
+                            <td colSpan={itemColumnCount} className="py-4 text-center text-slate-400">
                               No item records attached to this Challan.
                             </td>
                           </tr>
@@ -748,16 +770,13 @@ export default function ChallanDetailPage() {
                       {/* TABLE FOOTER WITH EXPLICIT TOTAL PIECES */}
                       <tfoot className="bg-slate-50 border-t-2 border-slate-300 font-bold text-xs text-slate-800">
                         <tr>
-                          <td colSpan={3} className="py-2.5 px-4 text-right uppercase text-[11px] tracking-wider text-slate-700">
-                            {isThreadCuttingToQc2
-                              ? 'Total Dispatched Pieces for QC2 Inspection:'
+                          <td colSpan={itemColumnCount - 2} className="py-2.5 px-4 text-right uppercase text-[11px] tracking-wider text-slate-700">
+                            {isThreadCuttingToThreadcutQc
+                              ? 'Total Dispatched Pieces for Threadcut QC Inspection:'
                               : 'Total Material Quantity:'}
                           </td>
-                          <td className="py-2.5 px-4 text-right font-mono text-sm font-black text-slate-900">
-                            {totalQuantity}
-                          </td>
-                          <td className="py-2.5 px-4 font-bold text-slate-700">
-                            {challan.items?.[0]?.uom || 'PCS'}
+                          <td colSpan={2} className="py-2.5 px-4 text-right font-mono text-sm font-black text-slate-900">
+                            {formatQuantitiesByUnit(challan.items || [], challan)}
                           </td>
                         </tr>
                       </tfoot>
@@ -770,9 +789,9 @@ export default function ChallanDetailPage() {
                 <div className="pt-8 border-t border-slate-200 grid grid-cols-2 gap-8 text-xs">
                   <div className="border-t border-dashed border-slate-400 pt-2 text-center space-y-1">
                     <span className="font-bold text-slate-800 block">
-                      {isThreadCuttingToQc2
+                      {isThreadCuttingToThreadcutQc
                         ? 'Thread Cutting Incharge'
-                        : challan.fromDepartment === 'DYEING' || challan.toDepartment === 'QC1'
+                        : challan.fromDepartment === 'DYEING' || challan.toDepartment === 'DYEING_QC'
                         ? 'Dyeing Department'
                         : challan.fromDepartment
                         ? `${challan.fromDepartment} Department`
@@ -784,10 +803,10 @@ export default function ChallanDetailPage() {
                   </div>
                   <div className="border-t border-dashed border-slate-400 pt-2 text-center space-y-1">
                     <span className="font-bold text-slate-800 block">
-                      {challan.toDepartment === 'QC2' ? 'QC2 Quality Inspector' : `${challan.toDepartment} Supervisor`}
+                      {challan.toDepartment === 'THREADCUT_QC' ? 'Threadcut QC Quality Inspector' : `${challan.toDepartment} Supervisor`}
                     </span>
                     <span className="text-[10px] text-slate-500 block">
-                      {challan.toDepartment === 'QC2'
+                      {challan.toDepartment === 'THREADCUT_QC'
                         ? `Checking Basis: ${totalQuantity} PCS | Checked: ____ | Passed: ____ | Defective: ____`
                         : 'Receiver Gate Inward Stamp & Signature'}
                     </span>

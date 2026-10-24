@@ -1,9 +1,19 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { auditAdminAction, readReason, reasonRequiredResponse, requireAdmin } from '@/lib/admin-auth';
 
 export const dynamic = 'force-dynamic';
 
-export async function DELETE() {
+export async function DELETE(request: Request) {
+  const auth = await requireAdmin(request);
+  if (!auth.actor) return auth.response;
+  const body = await request.json().catch(() => ({}));
+  // Irreversible bulk wipe: the admin must type the confirmation phrase and give a reason.
+  if (String(body?.confirm || '').trim() !== 'DELETE ALL CHALLANS') {
+    return NextResponse.json({ error: 'Type "DELETE ALL CHALLANS" to confirm.', field: 'confirm' }, { status: 400 });
+  }
+  const reason = readReason(body);
+  if (!reason) return reasonRequiredResponse();
   try {
     await prisma.$transaction(
       async (tx) => {
@@ -14,7 +24,7 @@ export async function DELETE() {
 
         // 2. Unlink Challans from Dyeing Orders
         await tx.dyeingOrder.updateMany({
-          data: { inboundChallanId: null, qc1ChallanId: null },
+          data: { inboundChallanId: null, dyeingQcChallanId: null },
         });
 
         // 3. Delete production logs referencing challans
@@ -29,16 +39,17 @@ export async function DELETE() {
         await tx.defectRecord.deleteMany({});
 
         // 5. Delete challan line items and tracking events
+        // Deadline alerts reference challans and programs; clear them with the data they describe.
+        await tx.deadlineAlertDismissal.deleteMany({});
+        await tx.deadlineAlert.deleteMany({});
         await tx.challanItem.deleteMany({});
         await tx.challanEvent.deleteMany({});
 
-        // 6. Delete challan audit logs
-        await tx.auditLog.deleteMany({
-          where: { entity: 'Challan' },
-        });
 
         // 7. Permanently delete ALL Challans from PostgreSQL
         await tx.challan.deleteMany({});
+
+        await auditAdminAction(request, auth.actor.id, 'ALL_CHALLANS_DELETED', 'System', 'ALL_CHALLANS_DELETED', { after: { reason } }, tx);
       },
       { maxWait: 20000, timeout: 60000 }
     );
