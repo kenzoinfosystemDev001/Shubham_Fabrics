@@ -22,12 +22,61 @@ import {
   Search,
   RefreshCw,
   KeyRound,
-  UserPlus
+  UserPlus,
+  Pencil
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { getCurrentUser, isAdminUser } from '@/lib/rbac';
 import { ShubhamLogo } from '@/components/ShubhamLogo';
 import { printProductionSheet } from '@/lib/download-production-sheet';
+
+// Every department a user can belong to, with the role a new user there normally gets.
+const DEPARTMENT_OPTIONS = [
+  { code: 'ADMIN', label: 'Administration', defaultRole: 'ADMIN' },
+  { code: 'PROGRAMMING', label: 'Programming', defaultRole: 'PROGRAMMING_INCHARGE' },
+  { code: 'STORE', label: 'Fabric Store', defaultRole: 'FABRIC_STORE' },
+  { code: 'DYEING', label: 'Dyeing', defaultRole: 'DYEING_INCHARGE' },
+  { code: 'QC1', label: 'Dyeing QC (QC1)', defaultRole: 'QC1_INSPECTOR' },
+  { code: 'EMBROIDERY', label: 'Embroidery', defaultRole: 'EMBROIDERY_INCHARGE' },
+  { code: 'THREAD_CUTTING', label: 'Thread Cutting', defaultRole: 'THREAD_CUTTING_INCHARGE' },
+  { code: 'QC2', label: 'QC2', defaultRole: 'QC2_INSPECTOR' },
+  { code: 'WASHING', label: 'Washing', defaultRole: 'WASHING_INCHARGE' },
+  { code: 'QC3', label: 'QC Washing (QC3)', defaultRole: 'QC3_INSPECTOR' },
+  { code: 'RECUTTING', label: 'Recutting', defaultRole: 'RECUTTING_SUPERVISOR' },
+  { code: 'STITCHING', label: 'Stitching', defaultRole: 'STITCHING_SUPERVISOR' },
+  { code: 'FINISHING', label: 'Finishing', defaultRole: 'FINISHING_SUPERVISOR' },
+  { code: 'STEAM_PRESS', label: 'Steam Press', defaultRole: 'STEAM_PRESS_SUPERVISOR' },
+  { code: 'FINAL_CHECK', label: 'Final QC', defaultRole: 'FINAL_CHECK_INSPECTOR' },
+  { code: 'PACKING', label: 'Packing & Inventory', defaultRole: 'PACKING_SUPERVISOR' },
+];
+
+const ROLE_OPTIONS = Array.from(
+  new Set([
+    ...DEPARTMENT_OPTIONS.map((d) => d.defaultRole),
+    'SUPER_ADMIN',
+    'DYEING_OPERATOR',
+    'EMBROIDERY_OPERATOR',
+    'WASHING_OPERATOR',
+    'RECUTTING_OPERATOR',
+    'STITCHING_OPERATOR',
+    'FINISHING_OPERATOR',
+    'STEAM_PRESS_OPERATOR',
+    'PACKING_OPERATOR',
+  ])
+);
+
+const defaultRoleFor = (departmentCode: string) =>
+  DEPARTMENT_OPTIONS.find((d) => d.code === departmentCode)?.defaultRole || 'USER';
+
+interface EditableUser {
+  id: string;
+  username: string;
+  fullName: string;
+  departmentCode: string;
+  roleCode: string;
+  isActive: boolean;
+  pin: string;
+}
 
 export default function AdminConsolePage() {
   const router = useRouter();
@@ -51,11 +100,12 @@ export default function AdminConsolePage() {
   const [newUser, setNewUser] = useState({
     username: '',
     fullName: '',
-    pin: '1234',
+    pin: '',
     departmentCode: 'PROGRAMMING',
     roleCode: 'PROGRAMMING_INCHARGE',
     email: '',
   });
+  const [editingUser, setEditingUser] = useState<EditableUser | null>(null);
 
   const [showAddSupplierModal, setShowAddSupplierModal] = useState(false);
   const [newSupplier, setNewSupplier] = useState({
@@ -144,11 +194,36 @@ export default function AdminConsolePage() {
       setNewUser({
         username: '',
         fullName: '',
-        pin: '1234',
+        pin: '',
         departmentCode: 'PROGRAMMING',
         roleCode: 'PROGRAMMING_INCHARGE',
         email: '',
       });
+      loadData();
+    } catch (err: any) {
+      showNotification(err.message, 'error');
+    } finally {
+      setSubmittingModal(false);
+    }
+  };
+
+  // Edit User handler (name, department, role, status and optional new PIN)
+  const handleUpdateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingUser) return;
+    try {
+      setSubmittingModal(true);
+      const { id, username, pin, ...changes } = editingUser;
+      const res = await fetch(`/api/admin/users/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(pin.trim() ? { ...changes, pin } : changes),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to update user');
+
+      showNotification(pin.trim() ? `User "${username}" updated and PIN changed.` : `User "${username}" updated.`);
+      setEditingUser(null);
       loadData();
     } catch (err: any) {
       showNotification(err.message, 'error');
@@ -627,17 +702,36 @@ export default function AdminConsolePage() {
                             </span>
                           </td>
                           <td className="py-3 px-4 text-right">
-                            {u.username !== 'admin' ? (
+                            <div className="inline-flex items-center gap-1">
                               <button
-                                onClick={() => handleDeleteUser(u.id, u.username)}
-                                className="p-1 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded transition"
-                                title="Delete User"
+                                onClick={() =>
+                                  setEditingUser({
+                                    id: u.id,
+                                    username: u.username,
+                                    fullName: u.fullName,
+                                    departmentCode: u.departmentCode,
+                                    roleCode: u.role,
+                                    isActive: u.isActive,
+                                    pin: '',
+                                  })
+                                }
+                                className="p-1 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded transition"
+                                title="Edit user / change PIN"
                               >
-                                <Trash2 className="w-3.5 h-3.5" />
+                                <Pencil className="w-3.5 h-3.5" />
                               </button>
-                            ) : (
-                              <span className="text-[10px] text-slate-400 font-mono">Protected</span>
-                            )}
+                              {u.username !== 'admin' && u.id !== currentUser?.id ? (
+                                <button
+                                  onClick={() => handleDeleteUser(u.id, u.username)}
+                                  className="p-1 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded transition"
+                                  title="Delete User"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              ) : (
+                                <span className="text-[10px] text-slate-400 font-mono px-1">Protected</span>
+                              )}
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -1129,17 +1223,16 @@ export default function AdminConsolePage() {
                   </label>
                   <select
                     value={newUser.departmentCode}
-                    onChange={(e) => setNewUser({ ...newUser, departmentCode: e.target.value })}
+                    onChange={(e) =>
+                      setNewUser({ ...newUser, departmentCode: e.target.value, roleCode: defaultRoleFor(e.target.value) })
+                    }
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none"
                   >
-                    <option value="PROGRAMMING">PROGRAMMING</option>
-                    <option value="STORE">FABRIC STORE</option>
-                    <option value="DYEING">DYEING</option>
-                    <option value="QC1">QC1</option>
-                    <option value="EMBROIDERY">EMBROIDERY</option>
-                    <option value="THREAD_CUTTING">THREAD CUTTING</option>
-                    <option value="QC2">QC2</option>
-                    <option value="ADMIN">ADMIN</option>
+                    {DEPARTMENT_OPTIONS.map((d) => (
+                      <option key={d.code} value={d.code}>
+                        {d.label}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -1153,14 +1246,11 @@ export default function AdminConsolePage() {
                   onChange={(e) => setNewUser({ ...newUser, roleCode: e.target.value })}
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none"
                 >
-                  <option value="PROGRAMMING_INCHARGE">PROGRAMMING_INCHARGE</option>
-                  <option value="FABRIC_STORE">FABRIC_STORE</option>
-                  <option value="ADMIN">ADMIN (Full Access)</option>
-                  <option value="DYEING_OPERATOR">DYEING_OPERATOR</option>
-                  <option value="QC_INSPECTOR">QC1_INSPECTOR</option>
-                  <option value="EMBROIDERY_OPERATOR">EMBROIDERY_OPERATOR</option>
-                  <option value="THREAD_CUTTING_INCHARGE">THREAD_CUTTING_INCHARGE</option>
-                  <option value="QC2_INSPECTOR">QC2_INSPECTOR</option>
+                  {ROLE_OPTIONS.map((r) => (
+                    <option key={r} value={r}>
+                      {r === 'ADMIN' ? 'ADMIN (Full Access)' : r}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -1178,6 +1268,118 @@ export default function AdminConsolePage() {
                   className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer"
                 >
                   {submittingModal ? 'Saving...' : 'Save User'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: EDIT USER / CHANGE PIN */}
+      {editingUser && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 p-6 animate-in fade-in zoom-in-95">
+            <h3 className="text-base font-bold text-slate-900 mb-1 flex items-center gap-2">
+              <KeyRound className="w-5 h-5 text-indigo-600" />
+              Edit User
+            </h3>
+            <p className="text-xs text-slate-500 mb-4 font-mono">{editingUser.username}</p>
+
+            <form onSubmit={handleUpdateUser} className="space-y-3.5">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Full Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={editingUser.fullName}
+                  onChange={(e) => setEditingUser({ ...editingUser, fullName: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Department *</label>
+                  <select
+                    value={editingUser.departmentCode}
+                    onChange={(e) =>
+                      setEditingUser({
+                        ...editingUser,
+                        departmentCode: e.target.value,
+                        roleCode: defaultRoleFor(e.target.value),
+                      })
+                    }
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                  >
+                    {!DEPARTMENT_OPTIONS.some((d) => d.code === editingUser.departmentCode) && (
+                      <option value={editingUser.departmentCode}>{editingUser.departmentCode}</option>
+                    )}
+                    {DEPARTMENT_OPTIONS.map((d) => (
+                      <option key={d.code} value={d.code}>
+                        {d.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Security Role *</label>
+                  <select
+                    value={editingUser.roleCode}
+                    onChange={(e) => setEditingUser({ ...editingUser, roleCode: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                  >
+                    {!ROLE_OPTIONS.includes(editingUser.roleCode) && (
+                      <option value={editingUser.roleCode}>{editingUser.roleCode}</option>
+                    )}
+                    {ROLE_OPTIONS.map((r) => (
+                      <option key={r} value={r}>
+                        {r === 'ADMIN' ? 'ADMIN (Full Access)' : r}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">New PIN</label>
+                <input
+                  type="password"
+                  autoComplete="new-password"
+                  placeholder="Leave blank to keep the current PIN"
+                  value={editingUser.pin}
+                  onChange={(e) => setEditingUser({ ...editingUser, pin: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono tracking-widest focus:ring-2 focus:ring-indigo-600 focus:outline-none"
+                />
+                <p className="mt-1 text-[10px] text-slate-500">
+                  At least 4 characters. Simple PINs like 1234 or 0000 are not accepted.
+                </p>
+              </div>
+
+              <label className="flex items-center gap-2 text-xs font-semibold text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={editingUser.isActive}
+                  disabled={editingUser.id === currentUser?.id}
+                  onChange={(e) => setEditingUser({ ...editingUser, isActive: e.target.checked })}
+                  className="rounded border-slate-300"
+                />
+                Account active (inactive users cannot sign in)
+              </label>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setEditingUser(null)}
+                  className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submittingModal}
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer"
+                >
+                  {submittingModal ? 'Saving...' : 'Save Changes'}
                 </button>
               </div>
             </form>

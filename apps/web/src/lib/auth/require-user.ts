@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
-import type { SessionUser } from './session-user';
+import { buildSessionUser, type SessionUser } from './session-user';
 import {
   AuthConfigError,
   DEPT_COOKIE,
@@ -63,20 +63,19 @@ export async function getSessionUser(request: Request): Promise<AuthenticatedUse
   });
   if (!user || !user.isActive) return null;
 
+  // Role and department are recomputed from the database on every request, so an admin's
+  // changes (new department, removed admin role) apply immediately, not at the next login.
   const roles = user.userRoles.map(({ role }) => role.code.toUpperCase());
+  const current = buildSessionUser(user);
   return {
     id: user.id,
     username: user.username,
     fullName: user.fullName,
     departmentCode: user.departmentCode,
     roles,
-    sessionRole: claims.role,
-    sessionDepartment: claims.dept,
-    isAdmin:
-      isAdminClaims(claims) ||
-      user.departmentCode?.toUpperCase() === 'ADMIN' ||
-      roles.includes('ADMIN') ||
-      roles.includes('SUPER_ADMIN'),
+    sessionRole: current.role,
+    sessionDepartment: current.departmentCode,
+    isAdmin: isAdminClaims({ role: current.role, roles, dept: current.departmentCode }),
   };
 }
 

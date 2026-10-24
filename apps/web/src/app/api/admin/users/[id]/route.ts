@@ -70,9 +70,34 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
 
+    const existing = await prisma.user.findUnique({ where: { id }, select: { id: true } });
+    if (!existing) {
+      return NextResponse.json({ error: 'User not found.' }, { status: 404 });
+    }
+
+    const roleCode = typeof body.roleCode === 'string' ? body.roleCode.trim().toUpperCase() : '';
+    const departmentCode =
+      typeof body.departmentCode === 'string' ? body.departmentCode.trim().toUpperCase() : undefined;
+
+    // An administrator cannot lock themselves out of the admin console.
+    if (id === authUser.id) {
+      if (body.isActive === false) {
+        return NextResponse.json({ error: 'You cannot deactivate your own account.' }, { status: 400 });
+      }
+      if ((roleCode && !['ADMIN', 'SUPER_ADMIN'].includes(roleCode)) || (departmentCode && departmentCode !== 'ADMIN')) {
+        return NextResponse.json({ error: 'You cannot remove administrator access from your own account.' }, { status: 400 });
+      }
+    }
+
     const dataToUpdate: any = {};
-    if (body.fullName !== undefined) dataToUpdate.fullName = body.fullName.trim();
-    if (body.departmentCode !== undefined) dataToUpdate.departmentCode = body.departmentCode.trim().toUpperCase();
+    if (body.fullName !== undefined) {
+      const fullName = String(body.fullName).trim();
+      if (!fullName) {
+        return NextResponse.json({ error: 'Full name cannot be empty.' }, { status: 400 });
+      }
+      dataToUpdate.fullName = fullName;
+    }
+    if (departmentCode) dataToUpdate.departmentCode = departmentCode;
     if (body.isActive !== undefined) dataToUpdate.isActive = Boolean(body.isActive);
 
     if (body.pin) {
@@ -86,16 +111,20 @@ export async function PATCH(
     const updated = await prisma.user.update({
       where: { id },
       data: dataToUpdate,
+      // Never send the password hash back to the browser.
+      select: { id: true, username: true, fullName: true, email: true, departmentCode: true, isActive: true },
     });
 
-    if (body.roleCode) {
-      const role = await prisma.role.findFirst({ where: { code: body.roleCode } });
-      if (role) {
-        await prisma.userRole.deleteMany({ where: { userId: id } });
-        await prisma.userRole.create({
-          data: { userId: id, roleId: role.id },
-        });
-      }
+    if (roleCode) {
+      const role = await prisma.role.upsert({
+        where: { code: roleCode },
+        update: {},
+        create: { code: roleCode, name: roleCode.replace(/_/g, ' '), isSystem: false },
+      });
+      await prisma.$transaction([
+        prisma.userRole.deleteMany({ where: { userId: id } }),
+        prisma.userRole.create({ data: { userId: id, roleId: role.id } }),
+      ]);
     }
 
     return NextResponse.json({
