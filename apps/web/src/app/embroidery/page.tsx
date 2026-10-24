@@ -17,7 +17,6 @@ import {
   FileText,
   PackageCheck
 } from 'lucide-react';
-import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 
 export default function EmbroideryDashboard() {
   const [loading, setLoading] = useState(true);
@@ -55,22 +54,17 @@ export default function EmbroideryDashboard() {
   const programs = data?.programs || [];
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-neutral-50">
       {/* TOP HEADER (REAL DB BACKGROUND) */}
       <header
-        style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.70)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-        className="border-b border-slate-700/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md text-white"
+        className="bg-white border-b border-neutral-200 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md text-neutral-900"
       >
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-fuchsia-400 block drop-shadow-sm">
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-600 block drop-shadow-sm">
             SHUBHAM FABRICS MES · EMBROIDERY SECTION
           </span>
-          <h1 className="text-xl font-bold text-white flex items-center gap-2.5 drop-shadow-sm">
-            <Sparkles className="w-5 h-5 text-fuchsia-400" />
+          <h1 className="text-xl font-bold text-neutral-900 flex items-center gap-2.5 drop-shadow-sm">
+            <Sparkles className="w-5 h-5 text-brand-600" />
             <span>Embroidery Department Dashboard</span>
           </h1>
         </div>
@@ -79,7 +73,7 @@ export default function EmbroideryDashboard() {
           <button
             onClick={loadData}
             disabled={loading}
-            className="p-2 text-slate-300 hover:text-white hover:bg-slate-800/80 rounded-lg border border-slate-700/60 transition"
+            className="p-2 text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg border border-neutral-200 transition"
             title="Refresh Data"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -87,7 +81,7 @@ export default function EmbroideryDashboard() {
 
           <Link
             href="/embroidery/my-work"
-            className="flex items-center gap-2 px-3.5 py-2 bg-fuchsia-600 hover:bg-fuchsia-700 text-white text-xs font-semibold rounded-lg shadow-xs transition"
+            className="flex items-center gap-2 px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-lg shadow-xs transition"
           >
             <Briefcase className="w-4 h-4" />
             <span>Create Challan to Thread Cutting</span>
@@ -95,7 +89,7 @@ export default function EmbroideryDashboard() {
 
           <Link
             href="/embroidery/incoming-challans"
-            className="flex items-center gap-2 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow-xs transition"
+            className="flex items-center gap-2 px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-lg shadow-xs transition"
           >
             <Layers className="w-4 h-4" />
             <span>Incoming Challans (Store &amp; Dyeing)</span>
@@ -103,9 +97,9 @@ export default function EmbroideryDashboard() {
 
           <Link
             href="/embroidery/floor-board"
-            className="flex items-center gap-2 px-3.5 py-2 bg-slate-800/90 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg border border-slate-700 transition"
+            className="flex items-center gap-2 px-3.5 py-2 bg-neutral-50 hover:bg-neutral-100 text-neutral-900 text-xs font-semibold rounded-lg border border-neutral-200 transition"
           >
-            <Kanban className="w-4 h-4 text-amber-400" />
+            <Kanban className="w-4 h-4 text-accent-700" />
             <span>Floor Board</span>
           </Link>
         </div>
@@ -115,51 +109,51 @@ export default function EmbroideryDashboard() {
       <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
         {/* KPI CARDS */}
         <section className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div className="bg-white border border-slate-200/90 rounded-xl p-4 shadow-xs">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+          <div className="bg-white border border-neutral-200/90 rounded-xl p-4 shadow-xs">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block">
               Incoming Challans
             </span>
-            <p className="text-2xl font-bold text-slate-900 mt-1">{stats.totalChallans}</p>
-            <span className="text-[10px] text-slate-500 mt-0.5 block">Store (Undyed) &amp; Dyeing QC1</span>
+            <p className="text-2xl font-bold text-neutral-900 mt-1">{stats.totalChallans}</p>
+            <span className="text-[10px] text-neutral-500 mt-0.5 block">Store (Undyed) &amp; Dyeing QC1</span>
           </div>
 
-          <div className="bg-white border border-slate-200/90 rounded-xl p-4 shadow-xs">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 block">
+          <div className="bg-white border border-neutral-200/90 rounded-xl p-4 shadow-xs">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block">
               Pending Acceptance
             </span>
-            <p className="text-2xl font-bold text-amber-600 mt-1">{stats.pendingTransfer}</p>
-            <span className="text-[10px] text-slate-500 mt-0.5 block">Awaiting receipt verification</span>
+            <p className="text-2xl font-bold text-neutral-900 mt-1">{stats.pendingTransfer}</p>
+            <span className="text-[10px] text-neutral-500 mt-0.5 block">Awaiting receipt verification</span>
           </div>
 
-          <div className="bg-white border border-slate-200/90 rounded-xl p-4 shadow-xs">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-fuchsia-600 block">
+          <div className="bg-white border border-neutral-200/90 rounded-xl p-4 shadow-xs">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-brand-600 block">
               Active in Machines
             </span>
-            <p className="text-2xl font-bold text-fuchsia-600 mt-1">{stats.activeInStitch}</p>
-            <span className="text-[10px] text-slate-500 mt-0.5 block">Multi-head frames active</span>
+            <p className="text-2xl font-bold text-brand-600 mt-1">{stats.activeInStitch}</p>
+            <span className="text-[10px] text-neutral-500 mt-0.5 block">Multi-head frames active</span>
           </div>
 
-          <div className="bg-white border border-slate-200/90 rounded-xl p-4 shadow-xs">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 block">
+          <div className="bg-white border border-neutral-200/90 rounded-xl p-4 shadow-xs">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block">
               Wilcom Patterns
             </span>
-            <p className="text-2xl font-bold text-emerald-600 mt-1">{stats.activeWilcomDesigns}</p>
-            <span className="text-[10px] text-slate-500 mt-0.5 block">Approved design files</span>
+            <p className="text-2xl font-bold text-neutral-900 mt-1">{stats.activeWilcomDesigns}</p>
+            <span className="text-[10px] text-neutral-500 mt-0.5 block">Approved design files</span>
           </div>
         </section>
 
         {/* INCOMING CHALLANS FROM STORE & DYEING */}
-        <section className="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-200/80 flex items-center justify-between">
+        <section className="bg-white border border-neutral-200/90 rounded-xl shadow-xs overflow-hidden">
+          <div className="px-6 py-4 border-b border-neutral-200/80 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <PackageCheck className="w-4 h-4 text-fuchsia-600" />
-              <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
+              <PackageCheck className="w-4 h-4 text-brand-600" />
+              <h2 className="text-sm font-bold text-neutral-900 uppercase tracking-wide">
                 Incoming Challans from Fabric Store &amp; QC 1 Departments
               </h2>
             </div>
             <Link
               href="/embroidery/incoming-challans"
-              className="text-xs font-semibold text-fuchsia-600 hover:text-fuchsia-800 flex items-center gap-1 transition"
+              className="text-xs font-semibold text-brand-600 hover:text-brand-800 flex items-center gap-1 transition"
             >
               <span>Checking of Incoming Challans</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -167,16 +161,16 @@ export default function EmbroideryDashboard() {
           </div>
 
           {challans.length === 0 ? (
-            <div className="p-8 text-center text-slate-500 text-xs">
-              <Scissors className="w-8 h-8 mx-auto text-slate-300 mb-2" />
-              <p className="font-semibold text-slate-700">No incoming challans currently staged for Embroidery</p>
-              <p className="text-slate-400 mt-1">Challans issued from Fabric Store (Pre-Dyed) or QC 1 (Post-Dyeing Passed) will appear here automatically with their Production Sheet.</p>
+            <div className="p-8 text-center text-neutral-500 text-xs">
+              <Scissors className="w-8 h-8 mx-auto text-neutral-700 mb-2" />
+              <p className="font-semibold text-neutral-700">No incoming challans currently staged for Embroidery</p>
+              <p className="text-neutral-500 mt-1">Challans issued from Fabric Store (Pre-Dyed) or QC 1 (Post-Dyeing Passed) will appear here automatically with their Production Sheet.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="bg-slate-50/80 border-b border-slate-200/80 text-slate-500 font-semibold uppercase text-[10px]">
+                  <tr className="bg-neutral-50/80 border-b border-neutral-200/80 text-neutral-500 font-semibold uppercase text-[10px]">
                     <th className="py-3 px-4">Challan No</th>
                     <th className="py-3 px-4">Program / Design</th>
                     <th className="py-3 px-4">Wilcom Design</th>
@@ -185,37 +179,37 @@ export default function EmbroideryDashboard() {
                     <th className="py-3 px-4 text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-neutral-100">
                   {challans.slice(0, 8).map((ch: any) => (
-                    <tr key={ch.id} className="hover:bg-slate-50/50 transition">
-                      <td className="py-3 px-4 font-mono font-bold text-slate-800">
+                    <tr key={ch.id} className="hover:bg-neutral-50/50 transition">
+                      <td className="py-3 px-4 font-mono font-bold text-neutral-900">
                         {ch.challanNumber}
                       </td>
                       <td className="py-3 px-4">
-                        <span className="font-semibold text-slate-800 block">
+                        <span className="font-semibold text-neutral-900 block">
                           {ch.program?.mainStyle || ch.program?.clientName || 'General Embroidery'}
                         </span>
-                        <span className="text-[10px] text-slate-400 font-mono">
+                        <span className="text-[10px] text-neutral-500 font-mono">
                           {ch.program?.programNumber || '—'}
                         </span>
                       </td>
                       <td className="py-3 px-4">
-                        <span className="font-mono text-fuchsia-700 bg-fuchsia-50 px-2 py-0.5 rounded border border-fuchsia-200 text-[11px] font-semibold">
+                        <span className="font-mono text-brand-700 bg-brand-50 px-2 py-0.5 rounded border border-brand-200 text-[11px] font-semibold">
                           {ch.program?.wilcomDesignNumber || ch.program?.embroideryDesign || 'WILCOM-STD'}
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-slate-600">
+                      <td className="py-3 px-4 text-neutral-600">
                         {ch.fromDepartment === 'STORE' ? 'Store Department' : ch.fromDepartment}
                       </td>
                       <td className="py-3 px-4">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-accent-50 text-accent-800 border border-accent-200">
                           {ch.status}
                         </span>
                       </td>
                       <td className="py-3 px-4 text-right">
                         <Link
                           href={`/embroidery/my-work`}
-                          className="px-2.5 py-1 text-[11px] font-semibold bg-fuchsia-50 text-fuchsia-700 hover:bg-fuchsia-100 rounded border border-fuchsia-200 transition"
+                          className="px-2.5 py-1 text-[11px] font-semibold bg-brand-50 text-brand-700 hover:bg-brand-100 rounded border border-brand-200 transition"
                         >
                           Process
                         </Link>
@@ -229,11 +223,11 @@ export default function EmbroideryDashboard() {
         </section>
 
         {/* WILCOM EMBROIDERY SPECIFICATIONS CATALOG */}
-        <section className="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-200/80 flex items-center justify-between">
+        <section className="bg-white border border-neutral-200/90 rounded-xl shadow-xs overflow-hidden">
+          <div className="px-6 py-4 border-b border-neutral-200/80 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <Scissors className="w-4 h-4 text-fuchsia-600" />
-              <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
+              <Scissors className="w-4 h-4 text-brand-600" />
+              <h2 className="text-sm font-bold text-neutral-900 uppercase tracking-wide">
                 Production Sheets with Technical Embroidery Specs
               </h2>
             </div>
@@ -243,37 +237,37 @@ export default function EmbroideryDashboard() {
             {programs.slice(0, 6).map((prog: any) => (
               <div
                 key={prog.id}
-                className="p-4 rounded-xl border border-slate-200/90 hover:border-fuchsia-300 bg-slate-50/50 hover:bg-fuchsia-50/20 transition flex flex-col justify-between"
+                className="p-4 rounded-xl border border-neutral-200/90 hover:border-brand-300 bg-neutral-50/50 hover:bg-brand-50/20 transition flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-2">
-                    <span className="font-mono text-xs font-bold text-slate-900">
+                    <span className="font-mono text-xs font-bold text-neutral-900">
                       {prog.programNumber}
                     </span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-fuchsia-100 text-fuchsia-800 font-semibold">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-brand-100 text-brand-800 font-semibold">
                       {prog.wilcomDesignNumber || 'W-STD'}
                     </span>
                   </div>
-                  <h3 className="text-xs font-bold text-slate-800 line-clamp-1">
+                  <h3 className="text-xs font-bold text-neutral-900 line-clamp-1">
                     {prog.clientName || prog.buyerName || 'Client Order'} · {prog.mainStyle || 'Style'}
                   </h3>
-                  <p className="text-[11px] text-slate-500 mt-1 line-clamp-2">
-                    Embroidery: <span className="text-slate-700 font-medium">{prog.embroideryDesign || 'Standard logo'}</span>
+                  <p className="text-[11px] text-neutral-500 mt-1 line-clamp-2">
+                    Embroidery: <span className="text-neutral-700 font-medium">{prog.embroideryDesign || 'Standard logo'}</span>
                   </p>
                   {prog.embroideryDesignSize && (
-                    <p className="text-[10px] text-slate-400 mt-0.5 font-mono">
+                    <p className="text-[10px] text-neutral-500 mt-0.5 font-mono">
                       Frame/Size: {prog.embroideryDesignSize}
                     </p>
                   )}
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between">
-                  <span className="text-[10px] text-slate-500">
-                    Target: <strong className="text-slate-800">{prog.targetQuantity || '—'} pcs</strong>
+                <div className="mt-4 pt-3 border-t border-neutral-200 flex items-center justify-between">
+                  <span className="text-[10px] text-neutral-500">
+                    Target: <strong className="text-neutral-900">{prog.targetQuantity || '—'} pcs</strong>
                   </span>
                   <Link
                     href={`/programs/${prog.id}`}
-                    className="text-[11px] font-semibold text-fuchsia-600 hover:text-fuchsia-800 flex items-center gap-1"
+                    className="text-[11px] font-semibold text-brand-600 hover:text-brand-800 flex items-center gap-1"
                   >
                     Traveler Card <ArrowRight className="w-3 h-3" />
                   </Link>

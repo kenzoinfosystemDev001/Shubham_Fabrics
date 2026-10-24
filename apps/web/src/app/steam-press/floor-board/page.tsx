@@ -17,7 +17,6 @@ import {
   FileText,
   Package,
 } from 'lucide-react';
-import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 
 export default function SteamPressFloorBoard() {
   const [loading, setLoading] = useState(true);
@@ -88,81 +87,76 @@ export default function SteamPressFloorBoard() {
       id: 'INCOMING',
       title: '1. Inward Receipt',
       description: 'Incoming bundles from Finishing',
-      color: 'border-cyan-500/40 text-cyan-400 bg-cyan-950/20',
-      badgeColor: 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30',
+      color: 'border-brand-500/40 text-brand-600 bg-brand-50',
+      badgeColor: 'bg-brand-500/10 text-brand-600 border-brand-500/30',
       cards: filterCards(lanes.INCOMING || []),
     },
     {
       id: 'IN_PRESSING',
       title: '2. In Steam Pressing',
       description: 'Crease setting & moisture extract',
-      color: 'border-blue-500/40 text-blue-400 bg-blue-950/20',
-      badgeColor: 'bg-blue-500/10 text-blue-300 border-blue-500/30',
+      color: 'border-brand-500/40 text-brand-600 bg-brand-50',
+      badgeColor: 'bg-brand-500/10 text-brand-600 border-brand-500/30',
       cards: filterCards(lanes.IN_PRESSING || []),
     },
     {
       id: 'INSPECTION',
       title: '3. Quality & Moisture Audit',
       description: 'Shine & wrinkle-free check',
-      color: 'border-teal-500/40 text-teal-400 bg-teal-950/20',
-      badgeColor: 'bg-teal-500/10 text-teal-300 border-teal-500/30',
+      color: 'border-brand-500/40 text-brand-600 bg-brand-50',
+      badgeColor: 'bg-brand-500/10 text-brand-600 border-brand-500/30',
       cards: filterCards(lanes.INSPECTION || []),
     },
     {
       id: 'READY_FOR_DISPATCH',
       title: '4. Ready for Handover',
       description: 'Cleared for Final QC handover',
-      color: 'border-emerald-500/40 text-emerald-400 bg-emerald-950/20',
-      badgeColor: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30',
+      color: 'border-accent-500/40 text-accent-700 bg-accent-50',
+      badgeColor: 'bg-accent-400/10 text-accent-700 border-accent-500/30',
       cards: filterCards(lanes.READY_FOR_DISPATCH || []),
     },
   ];
 
   return (
     <div
-      className="min-h-screen text-slate-100 flex flex-col"
-      style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.94), rgba(10, 15, 29, 0.98)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
-      }}
+      className="min-h-screen text-neutral-900 flex flex-col"
+      
     >
       {/* HEADER */}
-      <header className="border-b border-slate-800/80 bg-slate-950/60 backdrop-blur-md px-6 py-4 sticky top-0 z-30 shadow-md">
+      <header className="border-b border-neutral-200 bg-white backdrop-blur-md px-6 py-4 sticky top-0 z-30 shadow-md">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-inner">
+            <div className="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-600 shadow-inner">
               <Kanban className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+              <h1 className="text-xl font-bold tracking-tight text-neutral-900 flex items-center gap-2">
                 Steam Press Live Floor Board
               </h1>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-neutral-500">
                 Live synchronized kanban visualization of pressing floor operations
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-2 text-[11px] text-slate-400 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-800">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+            <div className="hidden sm:flex items-center gap-2 text-[11px] text-neutral-500 bg-white px-3 py-1.5 rounded-lg border border-neutral-200">
+              <span className="w-2 h-2 rounded-full bg-accent-400 animate-ping" />
               <span>Live Sync: {lastSyncTime.toLocaleTimeString()}</span>
             </div>
 
             <button
               onClick={() => loadBoard(true)}
               disabled={loading}
-              className="p-2 rounded-lg bg-slate-900 border border-slate-700/80 hover:bg-slate-800 text-slate-300 hover:text-white transition disabled:opacity-50"
+              className="p-2 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-100 text-neutral-700 hover:text-neutral-900 transition disabled:opacity-50"
               title="Refresh Kanban"
             >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-cyan-400' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-brand-600' : ''}`} />
             </button>
 
             <Link
               href="/steam-press/my-work"
-              className="px-3.5 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold shadow-md shadow-cyan-900/30 transition flex items-center gap-1.5"
+              className="px-3.5 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold shadow-sm transition flex items-center gap-1.5"
             >
               <Flame className="w-4 h-4" />
               <span>Workstation</span>
@@ -174,28 +168,28 @@ export default function SteamPressFloorBoard() {
       {/* MAIN KANBAN BOARD */}
       <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-6 space-y-4">
         {/* SEARCH BAR */}
-        <div className="flex items-center justify-between gap-4 bg-slate-900/60 border border-slate-800 rounded-xl p-3 backdrop-blur-xs">
+        <div className="flex items-center justify-between gap-4 bg-white border border-neutral-200 rounded-xl p-3 backdrop-blur-xs">
           <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-500" />
+            <Search className="w-4 h-4 absolute left-3 top-2.5 text-neutral-500" />
             <input
               type="text"
               placeholder="Filter by Challan, Program, Style, Client..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-1.5 bg-slate-950/80 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 transition"
+              className="w-full pl-9 pr-4 py-1.5 bg-white border border-neutral-200 rounded-lg text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-brand-500 transition"
             />
           </div>
 
-          <div className="text-xs text-slate-400">
+          <div className="text-xs text-neutral-500">
             Total Active WIP:{' '}
-            <span className="font-mono font-bold text-white">
+            <span className="font-mono font-bold text-neutral-900">
               {laneConfigs.reduce((acc, l) => acc + l.cards.length, 0)} Jobs
             </span>
           </div>
         </div>
 
         {error && (
-          <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-300 text-xs flex items-center gap-2">
+          <div className="p-3 bg-danger-500/10 border border-danger-500/30 rounded-xl text-danger-600 text-xs flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
@@ -209,10 +203,10 @@ export default function SteamPressFloorBoard() {
               className={`rounded-2xl border ${lane.color} p-4 flex flex-col space-y-3 backdrop-blur-md min-h-[580px] shadow-sm`}
             >
               {/* Lane Header */}
-              <div className="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
+              <div className="flex items-center justify-between border-b border-neutral-200 pb-2.5">
                 <div>
-                  <h3 className="font-bold text-xs text-white">{lane.title}</h3>
-                  <p className="text-[10px] text-slate-400">{lane.description}</p>
+                  <h3 className="font-bold text-xs text-neutral-900">{lane.title}</h3>
+                  <p className="text-[10px] text-neutral-500">{lane.description}</p>
                 </div>
                 <span
                   className={`px-2 py-0.5 rounded-full text-xs font-bold border ${lane.badgeColor}`}
@@ -224,7 +218,7 @@ export default function SteamPressFloorBoard() {
               {/* Cards List */}
               <div className="space-y-3 flex-1 overflow-y-auto max-h-[680px] pr-1">
                 {lane.cards.length === 0 ? (
-                  <div className="p-8 text-center text-slate-500 text-xs border border-dashed border-slate-800/60 rounded-xl">
+                  <div className="p-8 text-center text-neutral-500 text-xs border border-dashed border-neutral-200 rounded-xl">
                     No jobs in this stage.
                   </div>
                 ) : (
@@ -232,28 +226,28 @@ export default function SteamPressFloorBoard() {
                     <Link
                       key={card.id}
                       href={`/steam-press/my-work?jobId=${card.id}`}
-                      className="block p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-cyan-500/60 transition shadow-sm hover:shadow-cyan-950/40 space-y-2.5 group"
+                      className="block p-3.5 rounded-xl bg-white border border-neutral-200 hover:border-brand-500/60 transition shadow-sm space-y-2.5 group"
                     >
                       <div className="flex items-start justify-between gap-1">
-                        <span className="font-mono text-xs font-bold text-cyan-300 group-hover:text-cyan-200">
+                        <span className="font-mono text-xs font-bold text-brand-600 group-hover:text-brand-800">
                           {card.challanNumber}
                         </span>
                         {card.priority === 'URGENT' && (
-                          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40">
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-danger-500/20 text-danger-600 border border-danger-500/40">
                             URGENT
                           </span>
                         )}
                       </div>
 
                       <div className="space-y-0.5 text-[11px]">
-                        <div className="text-slate-300 font-semibold truncate">{card.styleCode}</div>
-                        <div className="text-slate-400">Prog: {card.programNumber}</div>
-                        <div className="text-slate-400 truncate">{card.clientName}</div>
+                        <div className="text-neutral-700 font-semibold truncate">{card.styleCode}</div>
+                        <div className="text-neutral-500">Prog: {card.programNumber}</div>
+                        <div className="text-neutral-500 truncate">{card.clientName}</div>
                       </div>
 
-                      <div className="flex items-center justify-between pt-2 border-t border-slate-800/60 text-xs">
-                        <span className="font-mono font-bold text-white">{card.totalPieces} PCS</span>
-                        <div className="flex items-center gap-1 text-[11px] text-cyan-400 group-hover:translate-x-0.5 transition">
+                      <div className="flex items-center justify-between pt-2 border-t border-neutral-200 text-xs">
+                        <span className="font-mono font-bold text-neutral-900">{card.totalPieces} PCS</span>
+                        <div className="flex items-center gap-1 text-[11px] text-brand-600 group-hover:translate-x-0.5 transition">
                           <span>Open</span>
                           <ArrowRight className="w-3 h-3" />
                         </div>

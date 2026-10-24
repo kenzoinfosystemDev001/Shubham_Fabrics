@@ -22,7 +22,6 @@ import {
   Pause,
   Play,
 } from 'lucide-react';
-import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 
 export default function SteamPressFocusWorkspacePage({
@@ -176,22 +175,22 @@ export default function SteamPressFocusWorkspacePage({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 text-slate-200 flex items-center justify-center">
-        <RefreshCw className="w-8 h-8 animate-spin text-cyan-400" />
+      <div className="min-h-screen bg-canvas text-neutral-900 flex items-center justify-center">
+        <RefreshCw className="w-8 h-8 animate-spin text-brand-600" />
       </div>
     );
   }
 
   if (error || !job) {
     return (
-      <div className="min-h-screen bg-slate-950 text-slate-200 p-8">
-        <div className="max-w-md mx-auto p-6 bg-slate-900 border border-slate-800 rounded-2xl text-center space-y-4">
-          <AlertCircle className="w-10 h-10 text-rose-500 mx-auto" />
-          <h2 className="text-lg font-bold text-white">Job Not Found</h2>
-          <p className="text-xs text-slate-400">{error || 'Unable to load specified job record.'}</p>
+      <div className="min-h-screen bg-canvas text-neutral-900 p-8">
+        <div className="max-w-md mx-auto p-6 bg-white border border-neutral-200 rounded-2xl text-center space-y-4">
+          <AlertCircle className="w-10 h-10 text-danger-600 mx-auto" />
+          <h2 className="text-lg font-bold text-neutral-900">Job Not Found</h2>
+          <p className="text-xs text-neutral-500">{error || 'Unable to load specified job record.'}</p>
           <Link
             href="/steam-press/my-work"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 text-xs font-semibold rounded-lg"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Return to Workstation</span>
@@ -203,37 +202,32 @@ export default function SteamPressFocusWorkspacePage({
 
   return (
     <div
-      className="min-h-screen text-slate-100 flex flex-col"
-      style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.95), rgba(10, 15, 29, 0.98)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
-      }}
+      className="min-h-screen text-neutral-900 flex flex-col"
+      
     >
       {/* HEADER */}
-      <header className="border-b border-slate-800 bg-slate-950/70 backdrop-blur-md px-6 py-4 sticky top-0 z-30 shadow-md">
+      <header className="border-b border-neutral-200 bg-white backdrop-blur-md px-6 py-4 sticky top-0 z-30 shadow-md">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link
               href="/steam-press/my-work"
-              className="p-2 rounded-lg bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 hover:text-white transition"
+              className="p-2 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-100 text-neutral-700 hover:text-neutral-900 transition"
               title="Back to Floor"
             >
               <ArrowLeft className="w-4 h-4" />
             </Link>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-mono text-base font-bold text-cyan-300">
+                <span className="font-mono text-base font-bold text-brand-600">
                   {job.challanNumber}
                 </span>
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold border uppercase tracking-wider bg-cyan-500/10 text-cyan-300 border-cyan-500/30">
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold border uppercase tracking-wider bg-brand-500/10 text-brand-600 border-brand-500/30">
                   {job.status.replace(/_/g, ' ')}
                 </span>
               </div>
-              <p className="text-xs text-slate-400">
-                Style: <span className="text-white font-semibold">{job.program?.styleCode || 'Standard'}</span> | Program:{' '}
-                <span className="font-mono text-slate-300">{job.program?.programNumber || 'N/A'}</span>
+              <p className="text-xs text-neutral-500">
+                Style: <span className="text-neutral-900 font-semibold">{job.program?.styleCode || 'Standard'}</span> | Program:{' '}
+                <span className="font-mono text-neutral-700">{job.program?.programNumber || 'N/A'}</span>
               </p>
             </div>
           </div>
@@ -242,9 +236,9 @@ export default function SteamPressFocusWorkspacePage({
             {job.program && (
               <button
                 onClick={() => setShowTechSheet(true)}
-                className="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:bg-slate-800 text-xs text-slate-300 flex items-center gap-1.5"
+                className="px-3 py-1.5 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-100 text-xs text-neutral-700 flex items-center gap-1.5"
               >
-                <FileText className="w-3.5 h-3.5 text-cyan-400" />
+                <FileText className="w-3.5 h-3.5 text-brand-600" />
                 <span>Tech Sheet</span>
               </button>
             )}
@@ -253,7 +247,7 @@ export default function SteamPressFocusWorkspacePage({
               <button
                 onClick={handleStartPressing}
                 disabled={saving}
-                className="px-3.5 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition flex items-center gap-1.5"
+                className="px-3.5 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold transition flex items-center gap-1.5"
               >
                 <Flame className="w-3.5 h-3.5" />
                 <span>Start Pressing</span>
@@ -264,7 +258,7 @@ export default function SteamPressFocusWorkspacePage({
               <button
                 onClick={handlePauseJob}
                 disabled={saving}
-                className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-semibold border border-amber-500/30 transition flex items-center gap-1.5"
+                className="px-3 py-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-accent-700 text-xs font-semibold border border-accent-500/30 transition flex items-center gap-1.5"
               >
                 <Pause className="w-3.5 h-3.5" />
                 <span>Pause</span>
@@ -275,7 +269,7 @@ export default function SteamPressFocusWorkspacePage({
               <button
                 onClick={handleResumeJob}
                 disabled={saving}
-                className="px-3.5 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold transition flex items-center gap-1.5"
+                className="px-3.5 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold transition flex items-center gap-1.5"
               >
                 <Play className="w-3.5 h-3.5" />
                 <span>Resume</span>
@@ -288,38 +282,38 @@ export default function SteamPressFocusWorkspacePage({
       {/* MAIN FOCUS CONTENT */}
       <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-6 space-y-6">
         {saveSuccess && (
-          <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-300 text-xs flex items-center gap-2">
+          <div className="p-3 bg-accent-400/10 border border-accent-500/30 rounded-xl text-accent-700 text-xs flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 shrink-0" />
             <span>{saveSuccess}</span>
           </div>
         )}
 
         {/* INPUT VS OUTPUT SUMMARY BANNER */}
-        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 backdrop-blur-md flex flex-wrap items-center justify-between gap-4">
+        <div className="bg-white border border-neutral-200 rounded-2xl p-5 backdrop-blur-md flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-6">
             <div>
-              <span className="text-xs text-slate-400 block">Total Inward Received</span>
-              <span className="font-mono text-2xl font-bold text-white">{totalInput} PCS</span>
+              <span className="text-xs text-neutral-500 block">Total Inward Received</span>
+              <span className="font-mono text-2xl font-bold text-neutral-900">{totalInput} PCS</span>
             </div>
-            <div className="h-8 w-px bg-slate-800" />
+            <div className="h-8 w-px bg-neutral-100" />
             <div>
-              <span className="text-xs text-slate-400 block">Reconciled Sum</span>
+              <span className="text-xs text-neutral-500 block">Reconciled Sum</span>
               <span
                 className={`font-mono text-2xl font-bold ${
                   currentReconciled === totalInput
-                    ? 'text-emerald-400'
+                    ? 'text-accent-700'
                     : currentReconciled < totalInput
-                    ? 'text-amber-400'
-                    : 'text-rose-400'
+                    ? 'text-accent-700'
+                    : 'text-danger-600'
                 }`}
               >
                 {currentReconciled} PCS
               </span>
             </div>
-            <div className="h-8 w-px bg-slate-800" />
+            <div className="h-8 w-px bg-neutral-100" />
             <div>
-              <span className="text-xs text-slate-400 block">Unprocessed WIP Balance</span>
-              <span className="font-mono text-2xl font-bold text-slate-300">{balanceRemaining} PCS</span>
+              <span className="text-xs text-neutral-500 block">Unprocessed WIP Balance</span>
+              <span className="font-mono text-2xl font-bold text-neutral-700">{balanceRemaining} PCS</span>
             </div>
           </div>
 
@@ -327,14 +321,14 @@ export default function SteamPressFocusWorkspacePage({
             <button
               onClick={() => handleSaveReconciliation(false)}
               disabled={saving || !isBalanced}
-              className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold border border-slate-700 transition flex items-center gap-2 disabled:opacity-50"
+              className="px-4 py-2 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-900 text-xs font-bold border border-neutral-200 transition flex items-center gap-2 disabled:opacity-50"
             >
               <span>Save Progress</span>
             </button>
             <button
               onClick={() => handleSaveReconciliation(true)}
               disabled={saving || !isBalanced}
-              className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-lg shadow-emerald-950/50 transition flex items-center gap-2 disabled:opacity-50"
+              className="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-sm transition flex items-center gap-2 disabled:opacity-50"
             >
               <CheckCircle2 className="w-4 h-4" />
               <span>Complete & Authorize Release</span>
@@ -345,12 +339,12 @@ export default function SteamPressFocusWorkspacePage({
         {/* RAPID TALLY COUNTER CARDS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* GOOD PRESSED */}
-          <div className="bg-slate-900/80 border border-emerald-500/40 rounded-2xl p-6 backdrop-blur-md space-y-4 shadow-lg">
+          <div className="bg-white border border-accent-500/40 rounded-2xl p-6 backdrop-blur-md space-y-4 shadow-sm">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">
+              <span className="text-xs font-bold uppercase tracking-wider text-neutral-700">
                 Good Pressed Output
               </span>
-              <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+              <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-accent-400/10 text-accent-700 border border-accent-500/20">
                 Standard
               </span>
             </div>
@@ -361,33 +355,33 @@ export default function SteamPressFocusWorkspacePage({
                 min="0"
                 value={goodCount}
                 onChange={(e) => setGoodCount(Math.max(0, Number(e.target.value)))}
-                className="w-full text-center font-mono text-5xl font-black bg-transparent text-emerald-300 focus:outline-none"
+                className="w-full text-center font-mono text-5xl font-black bg-transparent text-accent-700 focus:outline-none"
               />
-              <span className="text-xs text-slate-500 block mt-1">PIECES</span>
+              <span className="text-xs text-neutral-500 block mt-1">PIECES</span>
             </div>
 
-            <div className="flex items-center justify-center gap-2 pt-2 border-t border-slate-800">
+            <div className="flex items-center justify-center gap-2 pt-2 border-t border-neutral-200">
               <button
                 onClick={() => setGoodCount((c) => Math.max(0, c - 1))}
-                className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-bold transition"
+                className="p-2.5 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-900 text-sm font-bold transition"
               >
                 <Minus className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setGoodCount((c) => c + 1)}
-                className="px-4 py-2 rounded-xl bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/40 text-emerald-300 text-sm font-bold transition"
+                className="px-4 py-2 rounded-xl bg-accent-400/30 hover:bg-accent-400/50 border border-accent-500/40 text-accent-700 text-sm font-bold transition"
               >
                 +1
               </button>
               <button
                 onClick={() => setGoodCount((c) => c + 5)}
-                className="px-4 py-2 rounded-xl bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/40 text-emerald-300 text-sm font-bold transition"
+                className="px-4 py-2 rounded-xl bg-accent-400/30 hover:bg-accent-400/50 border border-accent-500/40 text-accent-700 text-sm font-bold transition"
               >
                 +5
               </button>
               <button
                 onClick={() => setGoodCount((c) => c + 10)}
-                className="px-4 py-2 rounded-xl bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/40 text-emerald-300 text-sm font-bold transition"
+                className="px-4 py-2 rounded-xl bg-accent-400/30 hover:bg-accent-400/50 border border-accent-500/40 text-accent-700 text-sm font-bold transition"
               >
                 +10
               </button>
@@ -395,12 +389,12 @@ export default function SteamPressFocusWorkspacePage({
           </div>
 
           {/* REWORK (RE-PRESS) */}
-          <div className="bg-slate-900/80 border border-amber-500/40 rounded-2xl p-6 backdrop-blur-md space-y-4 shadow-lg">
+          <div className="bg-white border border-accent-500/40 rounded-2xl p-6 backdrop-blur-md space-y-4 shadow-sm">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
+              <span className="text-xs font-bold uppercase tracking-wider text-neutral-700">
                 Re-press Rework
               </span>
-              <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/20">
+              <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-accent-400/10 text-accent-700 border border-accent-500/20">
                 Minor Crease/Damp
               </span>
             </div>
@@ -411,27 +405,27 @@ export default function SteamPressFocusWorkspacePage({
                 min="0"
                 value={reworkCount}
                 onChange={(e) => setReworkCount(Math.max(0, Number(e.target.value)))}
-                className="w-full text-center font-mono text-5xl font-black bg-transparent text-amber-300 focus:outline-none"
+                className="w-full text-center font-mono text-5xl font-black bg-transparent text-accent-700 focus:outline-none"
               />
-              <span className="text-xs text-slate-500 block mt-1">PIECES</span>
+              <span className="text-xs text-neutral-500 block mt-1">PIECES</span>
             </div>
 
-            <div className="flex items-center justify-center gap-2 pt-2 border-t border-slate-800">
+            <div className="flex items-center justify-center gap-2 pt-2 border-t border-neutral-200">
               <button
                 onClick={() => setReworkCount((c) => Math.max(0, c - 1))}
-                className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-bold transition"
+                className="p-2.5 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-900 text-sm font-bold transition"
               >
                 <Minus className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setReworkCount((c) => c + 1)}
-                className="px-4 py-2 rounded-xl bg-amber-600/30 hover:bg-amber-600/50 border border-amber-500/40 text-amber-300 text-sm font-bold transition"
+                className="px-4 py-2 rounded-xl bg-accent-400/30 hover:bg-accent-400/50 border border-accent-500/40 text-accent-700 text-sm font-bold transition"
               >
                 +1
               </button>
               <button
                 onClick={() => setReworkCount((c) => c + 5)}
-                className="px-4 py-2 rounded-xl bg-amber-600/30 hover:bg-amber-600/50 border border-amber-500/40 text-amber-300 text-sm font-bold transition"
+                className="px-4 py-2 rounded-xl bg-accent-400/30 hover:bg-accent-400/50 border border-accent-500/40 text-accent-700 text-sm font-bold transition"
               >
                 +5
               </button>
@@ -439,12 +433,12 @@ export default function SteamPressFocusWorkspacePage({
           </div>
 
           {/* REJECT (SCORCH / SCRAP) */}
-          <div className="bg-slate-900/80 border border-rose-500/40 rounded-2xl p-6 backdrop-blur-md space-y-4 shadow-lg">
+          <div className="bg-white border border-danger-500/40 rounded-2xl p-6 backdrop-blur-md space-y-4 shadow-sm">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-rose-400">
+              <span className="text-xs font-bold uppercase tracking-wider text-danger-600">
                 Scorch Scrap Reject
               </span>
-              <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-500/10 text-rose-300 border border-rose-500/20">
+              <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-danger-500/10 text-danger-600 border border-danger-500/20">
                 Permanent Scorch
               </span>
             </div>
@@ -455,27 +449,27 @@ export default function SteamPressFocusWorkspacePage({
                 min="0"
                 value={rejectCount}
                 onChange={(e) => setRejectCount(Math.max(0, Number(e.target.value)))}
-                className="w-full text-center font-mono text-5xl font-black bg-transparent text-rose-300 focus:outline-none"
+                className="w-full text-center font-mono text-5xl font-black bg-transparent text-danger-600 focus:outline-none"
               />
-              <span className="text-xs text-slate-500 block mt-1">PIECES</span>
+              <span className="text-xs text-neutral-500 block mt-1">PIECES</span>
             </div>
 
-            <div className="flex items-center justify-center gap-2 pt-2 border-t border-slate-800">
+            <div className="flex items-center justify-center gap-2 pt-2 border-t border-neutral-200">
               <button
                 onClick={() => setRejectCount((c) => Math.max(0, c - 1))}
-                className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-bold transition"
+                className="p-2.5 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-900 text-sm font-bold transition"
               >
                 <Minus className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setRejectCount((c) => c + 1)}
-                className="px-4 py-2 rounded-xl bg-rose-600/30 hover:bg-rose-600/50 border border-rose-500/40 text-rose-300 text-sm font-bold transition"
+                className="px-4 py-2 rounded-xl bg-danger-500/30 hover:bg-danger-500/50 border border-danger-500/40 text-danger-600 text-sm font-bold transition"
               >
                 +1
               </button>
               <button
                 onClick={() => setRejectCount((c) => c + 5)}
-                className="px-4 py-2 rounded-xl bg-rose-600/30 hover:bg-rose-600/50 border border-rose-500/40 text-rose-300 text-sm font-bold transition"
+                className="px-4 py-2 rounded-xl bg-danger-500/30 hover:bg-danger-500/50 border border-danger-500/40 text-danger-600 text-sm font-bold transition"
               >
                 +5
               </button>
@@ -485,14 +479,14 @@ export default function SteamPressFocusWorkspacePage({
 
         {/* DEFECT CATEGORIZATION & NOTES */}
         {Number(rejectCount) > 0 && (
-          <div className="bg-slate-900/80 border border-rose-500/30 rounded-2xl p-4 backdrop-blur-md space-y-3">
-            <span className="text-xs font-semibold text-rose-300 block">
+          <div className="bg-white border border-danger-500/30 rounded-2xl p-4 backdrop-blur-md space-y-3">
+            <span className="text-xs font-semibold text-danger-600 block">
               Primary Scrap Reason (Defect Logging)
             </span>
             <select
               value={defectReason}
               onChange={(e) => setDefectReason(e.target.value)}
-              className="w-full max-w-md px-3 py-2 bg-slate-950 border border-rose-500/40 rounded-lg text-xs text-white focus:outline-none"
+              className="w-full max-w-md px-3 py-2 bg-canvas border border-danger-500/40 rounded-lg text-xs text-neutral-900 focus:outline-none"
             >
               <option value="Scorch mark / glaze shine">Scorch mark / glaze shine</option>
               <option value="Melted embroidery / sequin deformation">Melted embroidery / sequin deformation</option>
@@ -502,14 +496,14 @@ export default function SteamPressFocusWorkspacePage({
           </div>
         )}
 
-        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 backdrop-blur-md space-y-2">
-          <span className="text-xs font-semibold text-slate-300 block">Operator Observation Notes</span>
+        <div className="bg-white border border-neutral-200 rounded-2xl p-4 backdrop-blur-md space-y-2">
+          <span className="text-xs font-semibold text-neutral-700 block">Operator Observation Notes</span>
           <textarea
             rows={2}
             value={operatorNotes}
             onChange={(e) => setOperatorNotes(e.target.value)}
             placeholder="Record any notes regarding boiler pressure, steam vacuum, or specific fabric observations..."
-            className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-400 resize-none"
+            className="w-full px-3 py-2 bg-canvas border border-neutral-200 rounded-lg text-xs text-neutral-900 focus:outline-none focus:border-brand-500 resize-none"
           />
         </div>
 

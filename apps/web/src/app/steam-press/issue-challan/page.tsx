@@ -19,7 +19,6 @@ import {
   Printer,
   Barcode,
 } from 'lucide-react';
-import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import BarcodeStickerCard from '@/components/BarcodeStickerCard';
 import { ColorFabricMeasurementTable, createDepartmentInOutTracking } from '@/components/ColorFabricMeasurementTable';
@@ -215,26 +214,21 @@ function SteamPressIssueChallanContent() {
 
   return (
     <div
-      className="min-h-screen text-slate-100 flex flex-col"
-      style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.94), rgba(10, 15, 29, 0.98)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
-      }}
+      className="min-h-screen text-neutral-900 flex flex-col"
+      
     >
       {/* HEADER */}
-      <header className="border-b border-slate-800/80 bg-slate-950/60 backdrop-blur-md px-6 py-4 sticky top-0 z-30 shadow-md">
+      <header className="border-b border-neutral-200 bg-white backdrop-blur-md px-6 py-4 sticky top-0 z-30 shadow-md">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-inner">
+            <div className="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-600 shadow-inner">
               <Send className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+              <h1 className="text-xl font-bold tracking-tight text-neutral-900 flex items-center gap-2">
                 Issue Handover Challan
               </h1>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-neutral-500">
                 Generate official transfer Challan and barcode sticker for Final QC inspection
               </p>
             </div>
@@ -242,7 +236,7 @@ function SteamPressIssueChallanContent() {
 
           <Link
             href="/steam-press/my-work"
-            className="px-3.5 py-1.5 rounded-lg bg-slate-900 border border-slate-700/80 hover:bg-slate-800 text-slate-300 text-xs font-semibold transition"
+            className="px-3.5 py-1.5 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-100 text-neutral-700 text-xs font-semibold transition"
           >
             Workstation
           </Link>
@@ -253,40 +247,40 @@ function SteamPressIssueChallanContent() {
       <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-6">
         {generatedChallan ? (
           /* SUCCESS STATE WITH BARCODE STICKER */
-          <div className="bg-slate-900/80 border border-emerald-500/40 rounded-2xl p-8 backdrop-blur-md max-w-2xl mx-auto space-y-6 shadow-2xl">
+          <div className="bg-white border border-accent-500/40 rounded-2xl p-8 backdrop-blur-md max-w-2xl mx-auto space-y-6 shadow-2xl">
             <div className="text-center space-y-2">
-              <div className="w-14 h-14 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl flex items-center justify-center text-emerald-400 mx-auto shadow-inner">
+              <div className="w-14 h-14 bg-accent-400/10 border border-accent-500/30 rounded-2xl flex items-center justify-center text-accent-700 mx-auto shadow-inner">
                 <CheckCircle2 className="w-8 h-8" />
               </div>
-              <h2 className="text-xl font-bold text-white">Challan Issued Successfully!</h2>
-              <p className="text-xs text-slate-400">
+              <h2 className="text-xl font-bold text-neutral-900">Challan Issued Successfully!</h2>
+              <p className="text-xs text-neutral-500">
                 Official handover Challan dispatched to Final QC (`FINAL_CHECK`).
               </p>
             </div>
 
-            <div className="bg-slate-950/70 p-4 rounded-xl border border-slate-800 space-y-2 text-xs">
+            <div className="bg-white p-4 rounded-xl border border-neutral-200 space-y-2 text-xs">
               <div className="flex justify-between">
-                <span className="text-slate-400">Challan Number:</span>
-                <span className="font-mono font-bold text-cyan-300">{generatedChallan.challanNumber}</span>
+                <span className="text-neutral-500">Challan Number:</span>
+                <span className="font-mono font-bold text-brand-600">{generatedChallan.challanNumber}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">From Department:</span>
-                <span className="font-semibold text-slate-200">Steam Press (STEAM_PRESS)</span>
+                <span className="text-neutral-500">From Department:</span>
+                <span className="font-semibold text-neutral-900">Steam Press (STEAM_PRESS)</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">To Department:</span>
-                <span className="font-semibold text-teal-300">{generatedChallan.toDepartment || 'FINAL_CHECK'}</span>
+                <span className="text-neutral-500">To Department:</span>
+                <span className="font-semibold text-brand-600">{generatedChallan.toDepartment || 'FINAL_CHECK'}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Handover Quantity:</span>
-                <span className="font-mono font-bold text-white">
+                <span className="text-neutral-500">Handover Quantity:</span>
+                <span className="font-mono font-bold text-neutral-900">
                   {totalTransferLabel}
                 </span>
               </div>
             </div>
 
             {/* Printable Barcode Sticker Card */}
-            <div className="p-3 bg-white rounded-xl border border-slate-200">
+            <div className="p-3 bg-white rounded-xl border border-neutral-200">
               <BarcodeStickerCard
                 params={{
                   challanNumber: generatedChallan.challanNumber,
@@ -306,7 +300,7 @@ function SteamPressIssueChallanContent() {
             <div className="flex items-center justify-center gap-3 pt-2">
               <button
                 onClick={() => window.print()}
-                className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl transition flex items-center gap-2 shadow-md shadow-cyan-950/40"
+                className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl transition flex items-center gap-2 shadow-sm"
               >
                 <Printer className="w-4 h-4" />
                 <span>Print Barcode Sticker</span>
@@ -316,7 +310,7 @@ function SteamPressIssueChallanContent() {
                   setGeneratedChallan(null);
                   router.push('/steam-press/my-work');
                 }}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl transition"
+                className="px-4 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 text-xs font-semibold rounded-xl transition"
               >
                 Back to Workstation
               </button>
@@ -340,18 +334,18 @@ function SteamPressIssueChallanContent() {
             />
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* SOURCE JOB SELECTION */}
-              <div className="lg:col-span-1 bg-slate-900/80 border border-slate-800 rounded-2xl p-5 backdrop-blur-md space-y-4">
-                <span className="text-xs font-bold uppercase tracking-wider text-cyan-400 block">
+              <div className="lg:col-span-1 bg-white border border-neutral-200 rounded-2xl p-5 backdrop-blur-md space-y-4">
+                <span className="text-xs font-bold uppercase tracking-wider text-brand-600 block">
                   1. Select Source Job
                 </span>
 
                 {fetchingJobs ? (
-                  <div className="py-12 text-center text-slate-400 text-xs">
-                    <RefreshCw className="w-6 h-6 animate-spin text-cyan-400 mx-auto mb-2" />
+                  <div className="py-12 text-center text-neutral-500 text-xs">
+                    <RefreshCw className="w-6 h-6 animate-spin text-brand-600 mx-auto mb-2" />
                     <span>Loading active jobs...</span>
                   </div>
                 ) : sourceJobs.length === 0 ? (
-                  <div className="p-4 text-center text-slate-400 text-xs bg-slate-950/50 rounded-xl border border-slate-800">
+                  <div className="p-4 text-center text-neutral-500 text-xs bg-white rounded-xl border border-neutral-200">
                     No active or completed jobs ready for handover.
                   </div>
                 ) : (
@@ -365,22 +359,22 @@ function SteamPressIssueChallanContent() {
                           onClick={() => selectJob(job)}
                           className={`p-3 rounded-xl border cursor-pointer transition text-xs space-y-1 ${
                             isSel
-                              ? 'bg-cyan-950/30 border-cyan-500 ring-1 ring-cyan-500'
-                              : 'bg-slate-950/50 border-slate-800/80 hover:border-slate-700'
+                              ? 'bg-brand-50 border-brand-500 ring-1 ring-brand-500'
+                              : 'bg-white border-neutral-200 hover:border-neutral-200'
                           }`}
                         >
                           <div className="flex items-center justify-between">
-                            <span className="font-mono font-bold text-cyan-300">{job.challanNumber}</span>
-                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300">
+                            <span className="font-mono font-bold text-brand-600">{job.challanNumber}</span>
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-neutral-100 text-neutral-700">
                               {job.status}
                             </span>
                           </div>
-                          <div className="text-slate-400 text-[11px]">
-                            Style: <span className="text-slate-200">{job.program?.styleCode || 'Standard'}</span>
+                          <div className="text-neutral-500 text-[11px]">
+                            Style: <span className="text-neutral-900">{job.program?.styleCode || 'Standard'}</span>
                           </div>
-                          <div className="flex justify-between text-[11px] pt-1 border-t border-slate-800/50 text-slate-400">
+                          <div className="flex justify-between text-[11px] pt-1 border-t border-neutral-200 text-neutral-500">
                             <span>Available:</span>
-                            <span className="font-mono font-bold text-emerald-400">{availableGood} {sourceQuantityUnit}</span>
+                            <span className="font-mono font-bold text-accent-700">{availableGood} {sourceQuantityUnit}</span>
                           </div>
                         </div>
                       );
@@ -390,20 +384,20 @@ function SteamPressIssueChallanContent() {
               </div>
 
               {/* ROUTING & DESTINATION */}
-              <div className="lg:col-span-2 bg-slate-900/80 border border-slate-800 rounded-2xl p-5 backdrop-blur-md space-y-5">
-                <span className="text-xs font-bold uppercase tracking-wider text-cyan-400 block">
+              <div className="lg:col-span-2 bg-white border border-neutral-200 rounded-2xl p-5 backdrop-blur-md space-y-5">
+                <span className="text-xs font-bold uppercase tracking-wider text-brand-600 block">
                   2. Handover Routing & Parameters
                 </span>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">
+                    <label className="block text-xs font-semibold text-neutral-700 mb-1">
                       Target Destination Department *
                     </label>
                     <select
                       value={targetDepartment}
                       onChange={(e) => setTargetDepartment(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-400"
+                      className="w-full px-3 py-2 bg-canvas border border-neutral-200 rounded-lg text-xs text-neutral-900 focus:outline-none focus:border-brand-500"
                     >
                       <option value="FINAL_CHECK">Final Quality Check (FINAL_CHECK)</option>
                       <option value="FINISHED_GOODS">Finished Goods Warehouse (FINISHED_GOODS)</option>
@@ -412,11 +406,11 @@ function SteamPressIssueChallanContent() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">Priority</label>
+                    <label className="block text-xs font-semibold text-neutral-700 mb-1">Priority</label>
                     <select
                       value={priority}
                       onChange={(e) => setPriority(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-400"
+                      className="w-full px-3 py-2 bg-canvas border border-neutral-200 rounded-lg text-xs text-neutral-900 focus:outline-none focus:border-brand-500"
                     >
                       <option value="NORMAL">Normal Priority</option>
                       <option value="HIGH">High Priority</option>
@@ -426,25 +420,25 @@ function SteamPressIssueChallanContent() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-neutral-700 mb-1">
                     Transfer Handover Remarks
                   </label>
                   <input
                     type="text"
                     value={remarks}
                     onChange={(e) => setRemarks(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-400"
+                    className="w-full px-3 py-2 bg-canvas border border-neutral-200 rounded-lg text-xs text-neutral-900 focus:outline-none focus:border-brand-500"
                   />
                 </div>
 
                 {/* LINE ITEMS */}
-                <div className="space-y-3 pt-2 border-t border-slate-800">
+                <div className="space-y-3 pt-2 border-t border-neutral-200">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-slate-300">Handover Bundle Line Items</span>
+                    <span className="text-xs font-semibold text-neutral-700">Handover Bundle Line Items</span>
                     <button
                       type="button"
                       onClick={addItemRow}
-                      className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-cyan-300 rounded text-xs flex items-center gap-1"
+                      className="px-2.5 py-1 bg-neutral-100 hover:bg-neutral-200 text-brand-600 rounded text-xs flex items-center gap-1"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       <span>Add Row</span>
@@ -455,7 +449,7 @@ function SteamPressIssueChallanContent() {
                     {items.map((it, idx) => (
                       <div
                         key={idx}
-                        className="grid grid-cols-12 gap-2 bg-slate-950/60 p-2.5 rounded-xl border border-slate-800 items-center text-xs"
+                        className="grid grid-cols-12 gap-2 bg-white p-2.5 rounded-xl border border-neutral-200 items-center text-xs"
                       >
                         <div className="col-span-6">
                           <input
@@ -463,7 +457,7 @@ function SteamPressIssueChallanContent() {
                             value={it.itemDescription}
                             onChange={(e) => handleItemChange(idx, 'itemDescription', e.target.value)}
                             placeholder="Item description"
-                            className="w-full px-2 py-1 bg-slate-900 border border-slate-700 rounded text-xs text-white"
+                            className="w-full px-2 py-1 bg-white border border-neutral-200 rounded text-xs text-neutral-900"
                           />
                         </div>
                         <div className="col-span-3">
@@ -474,18 +468,18 @@ function SteamPressIssueChallanContent() {
                             value={it.quantity}
                             onChange={(e) => handleItemChange(idx, 'quantity', e.target.value)}
                             placeholder={`Qty (${it.uom})`}
-                            className="w-full px-2 py-1 bg-slate-900 border border-slate-700 rounded text-xs text-white font-mono font-bold"
+                            className="w-full px-2 py-1 bg-white border border-neutral-200 rounded text-xs text-neutral-900 font-mono font-bold"
                           />
                         </div>
                         <div className="col-span-2">
-                          <label className="mb-1 block text-[10px] font-semibold text-slate-400">Unit *</label>
+                          <label className="mb-1 block text-[10px] font-semibold text-neutral-500">Unit *</label>
                           <select
                             value={it.uom}
                             onChange={(e) => {
                               handleItemChange(idx, 'uom', e.target.value);
                               handleItemChange(idx, 'unitType', e.target.value);
                             }}
-                            className="w-full px-2 py-1 bg-slate-900 border border-slate-700 rounded text-xs text-white"
+                            className="w-full px-2 py-1 bg-white border border-neutral-200 rounded text-xs text-neutral-900"
                             aria-label="Quantity unit"
                           >
                             <option value="MTR">MTR</option>
@@ -497,7 +491,7 @@ function SteamPressIssueChallanContent() {
                             <button
                               type="button"
                               onClick={() => removeItemRow(idx)}
-                              className="text-slate-500 hover:text-rose-400"
+                              className="text-neutral-500 hover:text-danger-600"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -507,9 +501,9 @@ function SteamPressIssueChallanContent() {
                     ))}
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-cyan-950/20 border border-cyan-500/30 rounded-xl">
-                    <span className="text-xs text-slate-300">Total Handover Quantity:</span>
-                    <span className="font-mono text-base font-bold text-cyan-300">{totalTransferLabel}</span>
+                  <div className="flex items-center justify-between p-3 bg-brand-50 border border-brand-500/30 rounded-xl">
+                    <span className="text-xs text-neutral-700">Total Handover Quantity:</span>
+                    <span className="font-mono text-base font-bold text-brand-600">{totalTransferLabel}</span>
                   </div>
                 </div>
 
@@ -517,7 +511,7 @@ function SteamPressIssueChallanContent() {
                   <button
                     type="submit"
                     disabled={loading || !selectedJob}
-                    className="px-6 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-cyan-950/50 transition disabled:opacity-50 flex items-center gap-2"
+                    className="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl shadow-sm transition disabled:opacity-50 flex items-center gap-2"
                   >
                     <Send className="w-4 h-4" />
                     <span>{loading ? 'Issuing...' : 'Generate & Issue Handover Challan'}</span>
@@ -545,8 +539,8 @@ export default function SteamPressIssueChallanPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-slate-950 text-slate-200 flex items-center justify-center">
-          <RefreshCw className="w-8 h-8 animate-spin text-cyan-400" />
+        <div className="min-h-screen bg-canvas text-neutral-900 flex items-center justify-center">
+          <RefreshCw className="w-8 h-8 animate-spin text-brand-600" />
         </div>
       }
     >

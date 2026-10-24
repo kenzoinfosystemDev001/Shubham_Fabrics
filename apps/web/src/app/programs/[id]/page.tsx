@@ -141,8 +141,8 @@ export default function ProgramDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] pl-0 md:pl-64 flex items-center justify-center">
-        <div className="text-xs text-slate-500 font-mono animate-pulse">
+      <div className="min-h-screen bg-neutral-50 pl-0 md:pl-64 flex items-center justify-center">
+        <div className="text-xs text-neutral-500 font-mono animate-pulse">
           Loading Production Sheet...
         </div>
       </div>
@@ -151,23 +151,23 @@ export default function ProgramDetailPage() {
 
   if (error || !program) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] pl-0 md:pl-64 p-4 sm:p-8 flex items-center justify-center">
-        <div className="max-w-md w-full p-6 bg-rose-50 border border-rose-200 rounded-2xl text-center space-y-4 shadow-xs">
-          <AlertCircle className="w-10 h-10 text-rose-600 mx-auto" />
-          <h2 className="text-base font-bold text-rose-900">Error Loading Sheet</h2>
-          <p className="text-xs text-rose-700 leading-relaxed">{error || 'Production Sheet not found'}</p>
+      <div className="min-h-screen bg-neutral-50 pl-0 md:pl-64 p-4 sm:p-8 flex items-center justify-center">
+        <div className="max-w-md w-full p-6 bg-danger-50 border border-danger-200 rounded-2xl text-center space-y-4 shadow-xs">
+          <AlertCircle className="w-10 h-10 text-danger-600 mx-auto" />
+          <h2 className="text-base font-bold text-danger-900">Error Loading Sheet</h2>
+          <p className="text-xs text-danger-700 leading-relaxed">{error || 'Production Sheet not found'}</p>
           <div className="flex items-center justify-center gap-2 pt-2">
             <button
               type="button"
               onClick={loadProgram}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               <span>Retry</span>
             </button>
             <Link
               href="/programming"
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-rose-800 hover:bg-rose-900 text-white rounded-lg text-xs font-semibold shadow-xs transition"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-danger-800 hover:bg-danger-700 text-white rounded-lg text-xs font-semibold shadow-xs transition"
             >
               ← Return to Dashboard
             </Link>
@@ -323,35 +323,35 @@ export default function ProgramDetailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pl-0 md:pl-64 pb-20">
+    <div className="min-h-screen bg-neutral-50 pl-0 md:pl-64 pb-20">
       {/* HEADER */}
-      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+      <header className="bg-white border-b border-neutral-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div className="flex items-center gap-4">
           <button
             type="button"
             onClick={handleBack}
-            className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-md transition cursor-pointer"
+            className="p-2 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 rounded-md transition cursor-pointer"
             title="Back to my department station"
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#A66E22] block">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-700 block">
               SHUBHAM FABRICS · PRODUCTION SHEET
             </span>
             <div className="flex items-center gap-3">
-              <h1 className="text-xl font-bold font-mono text-slate-900">
+              <h1 className="text-xl font-bold font-mono text-neutral-900">
                 {program.programSerialNo || program.programNumber}
               </h1>
               <span
                 className={`px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
                   isDraft
-                    ? 'bg-amber-100 text-amber-900'
+                    ? 'bg-accent-100 text-accent-800'
                     : isReady
-                    ? 'bg-indigo-100 text-indigo-900'
+                    ? 'bg-brand-100 text-brand-900'
                     : isIssued
-                    ? 'bg-emerald-100 text-emerald-900'
-                    : 'bg-blue-100 text-blue-900'
+                    ? 'bg-accent-100 text-accent-800'
+                    : 'bg-brand-100 text-brand-900'
                 }`}
               >
                 {program.status}
@@ -370,7 +370,7 @@ export default function ProgramDetailPage() {
           {isDraft && (
             <button
               onClick={() => handleUpdateStatus('READY_FOR_ISSUE')}
-              className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-md shadow-xs transition cursor-pointer"
+              className="px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-md shadow-xs transition cursor-pointer"
             >
               Mark Ready
             </button>
@@ -379,7 +379,7 @@ export default function ProgramDetailPage() {
           {currentUser?.departmentCode === 'STORE' || currentUser?.role === 'STORE_INCHARGE' || currentUser?.role === 'FABRIC_STORE' ? (
             <Link
               href={`/fabric-store/my-work/issue-challan?programId=${program.id}`}
-              className="flex items-center gap-1.5 px-3.5 py-2 bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold rounded-md shadow-xs transition"
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-brand-700 hover:bg-brand-800 text-white text-xs font-semibold rounded-md shadow-xs transition"
             >
               <Send className="w-3.5 h-3.5" />
               <span>Issue Store Challan</span>
@@ -387,7 +387,7 @@ export default function ProgramDetailPage() {
           ) : (
             <Link
               href={`/my-work/issue-challan?programId=${program.id}`}
-              className="flex items-center gap-1.5 px-3.5 py-2 bg-[#163767] hover:bg-[#0F264A] text-white text-xs font-semibold rounded-md shadow-xs transition"
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-md shadow-xs transition"
             >
               <Send className="w-3.5 h-3.5" />
               <span>Issue Challan</span>
@@ -403,15 +403,15 @@ export default function ProgramDetailPage() {
         <div
           className={`p-4 rounded-xl border transition-all ${
             storeAvailability?.isAvailable
-              ? 'bg-emerald-50/80 border-emerald-300 text-emerald-950'
-              : 'bg-amber-50/90 border-amber-300 text-amber-950'
+              ? 'bg-accent-50/80 border-accent-300 text-accent-800'
+              : 'bg-accent-50/90 border-accent-300 text-accent-800'
           }`}
         >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-start gap-3">
               <div
                 className={`p-2.5 rounded-lg shrink-0 ${
-                  storeAvailability?.isAvailable ? 'bg-emerald-600 text-white' : 'bg-amber-600 text-white'
+                  storeAvailability?.isAvailable ? 'bg-accent-400 text-neutral-900' : 'bg-accent-400 text-neutral-900'
                 }`}
               >
                 {storeAvailability?.isAvailable ? (
@@ -422,41 +422,41 @@ export default function ProgramDetailPage() {
               </div>
               <div className="space-y-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded font-mono bg-white/90 border border-slate-200">
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded font-mono bg-white/90 border border-neutral-200">
                     Fabric Store Gatekeeper
                   </span>
                   <span
                     className={`text-[11px] font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-1 ${
                       storeAvailability?.isAvailable
-                        ? 'bg-emerald-200 text-emerald-900 border border-emerald-300'
-                        : 'bg-amber-200 text-amber-950 border border-amber-300'
+                        ? 'bg-accent-200 text-accent-800 border border-accent-300'
+                        : 'bg-accent-200 text-accent-800 border border-accent-300'
                     }`}
                   >
                     {storeAvailability?.isAvailable ? (
                       <>
-                        <Check className="w-3 h-3 text-emerald-800" />
+                        <Check className="w-3 h-3 text-accent-800" />
                         Movement Cleared
                       </>
                     ) : (
                       <>
-                        <Lock className="w-3 h-3 text-amber-900" />
+                        <Lock className="w-3 h-3 text-accent-800" />
                         Movement Blocked (Awaiting Fabric in Store)
                       </>
                     )}
                   </span>
-                  <span className="text-[10px] font-mono text-slate-600">
+                  <span className="text-[10px] font-mono text-neutral-600">
                     Next Dept:{' '}
                     <strong>{program.fabricDyeingRequired ? 'Dyeing' : 'Embroidery / Cutting'}</strong>
                   </span>
                 </div>
 
-                <h3 className="text-sm font-bold text-slate-900">
+                <h3 className="text-sm font-bold text-neutral-900">
                   {storeAvailability?.isAvailable
                     ? `Fabric available in store (${storeAvailability.totalStoreStockMeters || 0}m). Production Sheet authorized to move.`
                     : `Production Sheet cannot move to ${program.fabricDyeingRequired ? 'Dyeing' : 'Embroidery'} until fabric is in Store.`}
                 </h3>
 
-                <p className="text-xs text-slate-600 leading-relaxed max-w-2xl">
+                <p className="text-xs text-neutral-600 leading-relaxed max-w-2xl">
                   {storeAvailability?.message ||
                     (storeAvailability?.isAvailable
                       ? 'Physical fabric stock confirmed in store inventory.'
@@ -464,7 +464,7 @@ export default function ProgramDetailPage() {
                 </p>
 
                 {storeAvailability?.fabricStoreVerified && (
-                  <p className="text-[11px] text-emerald-800 font-semibold pt-0.5">
+                  <p className="text-[11px] text-accent-800 font-semibold pt-0.5">
                     ✓ Verified by {storeAvailability.fabricStoreVerifiedBy || 'Store Incharge'}
                     {storeAvailability.fabricStoreVerifiedAt &&
                       ` on ${new Date(storeAvailability.fabricStoreVerifiedAt).toLocaleDateString()}`}
@@ -476,7 +476,7 @@ export default function ProgramDetailPage() {
             <div className="flex flex-wrap items-center gap-2 self-start sm:self-center shrink-0">
               <Link
                 href="/fabric-store/inventory/inward"
-                className="text-xs font-semibold px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded-md transition shadow-2xs"
+                className="text-xs font-semibold px-3 py-1.5 bg-white hover:bg-neutral-50 text-neutral-700 border border-neutral-300 rounded-md transition shadow-2xs"
               >
                 Inward Stock
               </Link>
@@ -485,7 +485,7 @@ export default function ProgramDetailPage() {
                   type="button"
                   onClick={() => handleToggleStoreVerification(false)}
                   disabled={verifyingStore}
-                  className="text-xs font-semibold px-3 py-1.5 bg-white hover:bg-rose-50 text-rose-700 border border-rose-300 rounded-md transition cursor-pointer"
+                  className="text-xs font-semibold px-3 py-1.5 bg-white hover:bg-danger-50 text-danger-700 border border-danger-300 rounded-md transition cursor-pointer"
                   title="Mark fabric missing/out of stock and hold movement"
                 >
                   {verifyingStore ? 'Updating…' : 'Mark Out of Stock'}
@@ -495,7 +495,7 @@ export default function ProgramDetailPage() {
                   type="button"
                   onClick={() => handleToggleStoreVerification(true)}
                   disabled={verifyingStore}
-                  className="text-xs font-semibold px-3 py-1.5 bg-teal-700 hover:bg-teal-800 text-white rounded-md transition cursor-pointer flex items-center gap-1 shadow-xs"
+                  className="text-xs font-semibold px-3 py-1.5 bg-brand-700 hover:bg-brand-800 text-white rounded-md transition cursor-pointer flex items-center gap-1 shadow-xs"
                   title="Confirm physical fabric presence in store to authorize movement"
                 >
                   <Check className="w-3.5 h-3.5" />
@@ -507,30 +507,30 @@ export default function ProgramDetailPage() {
         </div>
         
         {/* SUMMARY STRIP */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-5 bg-white border border-slate-200/90 rounded-xl shadow-xs text-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-5 bg-white border border-neutral-200/90 rounded-xl shadow-xs text-xs">
           <div>
-            <span className="text-slate-400 block text-[10px] font-semibold uppercase tracking-wider">Client</span>
-            <span className="font-bold text-slate-900 text-sm">{program.clientName || program.buyerName || 'Standard Client'}</span>
+            <span className="text-neutral-500 block text-[10px] font-semibold uppercase tracking-wider">Client</span>
+            <span className="font-bold text-neutral-900 text-sm">{program.clientName || program.buyerName || 'Standard Client'}</span>
             {isClientCodeVisible && (
-              <span className="inline-flex items-center gap-1 mt-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-50 text-amber-900 border border-amber-200 block w-fit">
-                <span>🔒 Code:</span>
+              <span className="inline-flex items-center gap-1 mt-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-accent-50 text-accent-800 border border-accent-200 block w-fit">
+                <span>Code:</span>
                 <span>{program.clientCode}</span>
               </span>
             )}
           </div>
           <div>
-            <span className="text-slate-400 block text-[10px] font-semibold uppercase tracking-wider">Main Style</span>
-            <span className="font-bold text-slate-900 text-sm">{program.mainStyle || program.styleCode || '—'}</span>
+            <span className="text-neutral-500 block text-[10px] font-semibold uppercase tracking-wider">Main Style</span>
+            <span className="font-bold text-neutral-900 text-sm">{program.mainStyle || program.styleCode || '—'}</span>
           </div>
           <div>
-            <span className="text-slate-400 block text-[10px] font-semibold uppercase tracking-wider">Target Quantity</span>
-            <span className="font-bold font-mono text-slate-900 text-sm">
+            <span className="text-neutral-500 block text-[10px] font-semibold uppercase tracking-wider">Target Quantity</span>
+            <span className="font-bold font-mono text-neutral-900 text-sm">
               {program.colorQuantity || program.targetQuantity} {program.quantityMeasurement || 'PCS'}
             </span>
           </div>
           <div>
-            <span className="text-slate-400 block text-[10px] font-semibold uppercase tracking-wider">Delivery Target</span>
-            <span className="font-bold text-rose-700 text-sm">
+            <span className="text-neutral-500 block text-[10px] font-semibold uppercase tracking-wider">Delivery Target</span>
+            <span className="font-bold text-danger-700 text-sm">
               {program.deliveryDate ? new Date(program.deliveryDate).toLocaleDateString() : '—'}
             </span>
           </div>
@@ -540,39 +540,39 @@ export default function ProgramDetailPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
           {/* PROGRAM INFORMATION */}
-          <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-3">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-blue-900 bg-blue-50 px-2 py-0.5 rounded">
+          <div className="bg-white border border-neutral-200/90 rounded-xl p-5 shadow-xs space-y-3">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-brand-900 bg-brand-50 px-2 py-0.5 rounded">
               Program Identification
             </span>
             <div className="grid grid-cols-2 gap-3 text-xs pt-1">
               <div>
-                <span className="text-slate-400 block text-[11px]">Program Serial #</span>
-                <span className="font-mono font-bold text-slate-900">{program.programSerialNo || program.programNumber}</span>
+                <span className="text-neutral-500 block text-[11px]">Program Serial #</span>
+                <span className="font-mono font-bold text-neutral-900">{program.programSerialNo || program.programNumber}</span>
               </div>
               <div>
-                <span className="text-slate-400 block text-[11px]">Design Number</span>
-                <span className="font-semibold text-slate-900">{program.designNumber || '—'}</span>
+                <span className="text-neutral-500 block text-[11px]">Design Number</span>
+                <span className="font-semibold text-neutral-900">{program.designNumber || '—'}</span>
               </div>
               <div>
-                <span className="text-slate-400 block text-[11px]">Start Date</span>
-                <span className="text-slate-700">{program.startDate ? new Date(program.startDate).toLocaleDateString() : '—'}</span>
+                <span className="text-neutral-500 block text-[11px]">Start Date</span>
+                <span className="text-neutral-700">{program.startDate ? new Date(program.startDate).toLocaleDateString() : '—'}</span>
               </div>
               <div>
-                <span className="text-slate-400 block text-[11px]">Delivery Date</span>
-                <span className="font-semibold text-rose-700">{program.deliveryDate ? new Date(program.deliveryDate).toLocaleDateString() : '—'}</span>
+                <span className="text-neutral-500 block text-[11px]">Delivery Date</span>
+                <span className="font-semibold text-danger-700">{program.deliveryDate ? new Date(program.deliveryDate).toLocaleDateString() : '—'}</span>
               </div>
               {isClientCodeVisible && (
-                <div className="col-span-2 mt-2 p-2.5 bg-amber-50/80 rounded-lg border border-amber-200 flex items-center justify-between">
+                <div className="col-span-2 mt-2 p-2.5 bg-accent-50/80 rounded-lg border border-accent-200 flex items-center justify-between">
                   <div>
-                    <span className="text-[10px] font-bold text-amber-900 uppercase tracking-wider block">
+                    <span className="text-[10px] font-bold text-neutral-700 uppercase tracking-wider block">
                       Client Code (Confidential)
                     </span>
-                    <span className="font-mono font-black text-amber-950 text-sm">
+                    <span className="font-mono font-black text-accent-800 text-sm">
                       {program.clientCode}
                     </span>
                   </div>
-                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-200/90 text-amber-950 border border-amber-300">
-                    🔒 Admin &amp; Programming Only
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-accent-200/90 text-accent-800 border border-accent-300">
+                    Admin &amp; Programming Only
                   </span>
                 </div>
               )}
@@ -580,8 +580,8 @@ export default function ProgramDetailPage() {
           </div>
 
           {/* PRIORITY */}
-          <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-3">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-rose-900 bg-rose-50 px-2 py-0.5 rounded">
+          <div className="bg-white border border-neutral-200/90 rounded-xl p-5 shadow-xs space-y-3">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-danger-900 bg-danger-50 px-2 py-0.5 rounded">
               Priority &amp; Dispatch Urgency
             </span>
             <div className="pt-1">
@@ -589,20 +589,20 @@ export default function ProgramDetailPage() {
                 const priority = (program.clientPriority || program.priority || 'NORMAL').toUpperCase();
                 const config: Record<string, { badge: string; border: string }> = {
                   LOW: {
-                    badge: 'bg-slate-100 text-slate-800 border-slate-300',
-                    border: 'border-slate-200 bg-slate-50/50',
+                    badge: 'bg-neutral-100 text-neutral-900 border-neutral-300',
+                    border: 'border-neutral-200 bg-neutral-50/50',
                   },
                   NORMAL: {
-                    badge: 'bg-blue-100 text-blue-900 border-blue-300',
-                    border: 'border-blue-200 bg-blue-50/40',
+                    badge: 'bg-brand-100 text-brand-900 border-brand-300',
+                    border: 'border-brand-200 bg-brand-50/40',
                   },
                   HIGH: {
-                    badge: 'bg-amber-100 text-amber-900 border-amber-300',
-                    border: 'border-amber-200 bg-amber-50/40',
+                    badge: 'bg-accent-100 text-accent-800 border-accent-300',
+                    border: 'border-accent-200 bg-accent-50/40',
                   },
                   URGENT: {
-                    badge: 'bg-rose-100 text-rose-900 border-rose-300',
-                    border: 'border-rose-200 bg-rose-50/40',
+                    badge: 'bg-danger-100 text-danger-900 border-danger-300',
+                    border: 'border-danger-200 bg-danger-50/40',
                   },
                 };
                 const current = config[priority] || config.NORMAL;
@@ -618,25 +618,25 @@ export default function ProgramDetailPage() {
           </div>
 
           {/* STYLE INFORMATION */}
-          <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-3">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-900 bg-amber-50 px-2 py-0.5 rounded">
+          <div className="bg-white border border-neutral-200/90 rounded-xl p-5 shadow-xs space-y-3">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-accent-800 bg-accent-50 px-2 py-0.5 rounded">
               Style &amp; Pattern
             </span>
             <div className="grid grid-cols-2 gap-3 text-xs pt-1">
               <div>
-                <span className="text-slate-400 block text-[11px]">Main Style</span>
-                <span className="font-semibold text-slate-900">{program.mainStyle || program.styleCode}</span>
+                <span className="text-neutral-500 block text-[11px]">Main Style</span>
+                <span className="font-semibold text-neutral-900">{program.mainStyle || program.styleCode}</span>
               </div>
               <div>
-                <span className="text-slate-400 block text-[11px]">Pattern Ref #</span>
-                <span className="font-mono text-slate-700">{program.pattern || '—'}</span>
+                <span className="text-neutral-500 block text-[11px]">Pattern Ref #</span>
+                <span className="font-mono text-neutral-700">{program.pattern || '—'}</span>
               </div>
               <div>
-                <span className="text-slate-400 block text-[11px]">Base Design Type</span>
-                <span className="text-slate-700">{program.baseDesignType || 'Standard'}</span>
+                <span className="text-neutral-500 block text-[11px]">Base Design Type</span>
+                <span className="text-neutral-700">{program.baseDesignType || 'Standard'}</span>
               </div>
-              <div className="col-span-2 pt-2 border-t border-slate-100">
-                <span className="text-slate-400 block text-[11px] mb-1 font-bold uppercase tracking-wider">
+              <div className="col-span-2 pt-2 border-t border-neutral-100">
+                <span className="text-neutral-500 block text-[11px] mb-1 font-bold uppercase tracking-wider">
                   Sub Styles ({programSubStyles.length})
                 </span>
                 {programSubStyles.length > 0 ? (
@@ -644,60 +644,60 @@ export default function ProgramDetailPage() {
                     {programSubStyles.map((sub: string, sIdx: number) => (
                       <span
                         key={sIdx}
-                        className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-amber-50 border border-amber-200 text-amber-950 font-semibold text-[11px] shadow-2xs"
+                        className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-accent-50 border border-accent-200 text-accent-800 font-semibold text-[11px] shadow-2xs"
                       >
-                        <span className="w-1.5 h-1.5 rounded-full bg-amber-600 shrink-0" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-accent-400 shrink-0" />
                         <span>{sub}</span>
                       </span>
                     ))}
                   </div>
                 ) : (
-                  <span className="text-slate-500 italic text-xs">Standard</span>
+                  <span className="text-neutral-500 italic text-xs">Standard</span>
                 )}
               </div>
             </div>
           </div>
 
           {/* WILCOM & EMBROIDERY */}
-          <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-3">
+          <div className="bg-white border border-neutral-200/90 rounded-xl p-5 shadow-xs space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-purple-900 bg-purple-50 px-2 py-0.5 rounded">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-brand-900 bg-brand-50 px-2 py-0.5 rounded">
                 Wilcom &amp; Embroidery
               </span>
               <button
                 type="button"
                 onClick={() => setShowWilcomPrintModal(true)}
-                className="text-[11px] font-bold text-purple-700 hover:text-purple-900 flex items-center gap-1 cursor-pointer"
+                className="text-[11px] font-bold text-brand-700 hover:text-brand-900 flex items-center gap-1 cursor-pointer"
               >
                 <span>View Wilcom Form</span>
-                <span className="font-mono text-[10px] bg-purple-100 text-purple-900 px-1.5 py-0.2 rounded-full font-bold">
+                <span className="font-mono text-[10px] bg-brand-100 text-brand-900 px-1.5 py-0.2 rounded-full font-bold">
                   {wilcomEntries.length}
                 </span>
               </button>
             </div>
             <div className="grid grid-cols-2 gap-3 text-xs pt-1">
               <div>
-                <span className="text-slate-400 block text-[11px]">Wilcom Design #</span>
-                <span className="font-mono font-bold text-purple-950">{program.wilcomDesignNumber || 'WLC-N/A'}</span>
+                <span className="text-neutral-500 block text-[11px]">Wilcom Design #</span>
+                <span className="font-mono font-bold text-brand-900">{program.wilcomDesignNumber || 'WLC-N/A'}</span>
               </div>
               <div>
-                <span className="text-slate-400 block text-[11px]">Embroidery Design</span>
-                <span className="text-slate-700">{program.embroideryDesign || 'Standard Embroidery'}</span>
+                <span className="text-neutral-500 block text-[11px]">Embroidery Design</span>
+                <span className="text-neutral-700">{program.embroideryDesign || 'Standard Embroidery'}</span>
               </div>
               <div>
-                <span className="text-slate-400 block text-[11px]">Design Size</span>
-                <span className="text-slate-700">{program.embroideryDesignSize || 'Standard Size'}</span>
+                <span className="text-neutral-500 block text-[11px]">Design Size</span>
+                <span className="text-neutral-700">{program.embroideryDesignSize || 'Standard Size'}</span>
               </div>
               <div>
-                <span className="text-slate-400 block text-[11px]">Wilcom Artwork</span>
-                <span className="text-slate-700 font-semibold">{rootWilcomPhoto ? 'Photo Uploaded' : 'No photo uploaded'}</span>
+                <span className="text-neutral-500 block text-[11px]">Wilcom Artwork</span>
+                <span className="text-neutral-700 font-semibold">{rootWilcomPhoto ? 'Photo Uploaded' : 'No photo uploaded'}</span>
               </div>
 
               {/* WILCOM IMAGE THUMBNAIL / UPLOAD IN SPECIFICATION CARD */}
-              <div className="col-span-2 pt-2.5 border-t border-purple-100 flex items-center justify-between gap-3">
+              <div className="col-span-2 pt-2.5 border-t border-brand-100 flex items-center justify-between gap-3">
                 {rootWilcomPhoto ? (
                   <div className="flex items-center gap-3">
-                    <div className="w-16 h-16 border border-purple-300 rounded-md bg-purple-50/50 flex items-center justify-center overflow-hidden shrink-0 shadow-2xs">
+                    <div className="w-16 h-16 border border-brand-300 rounded-md bg-brand-50/50 flex items-center justify-center overflow-hidden shrink-0 shadow-2xs">
                       <img
                         src={rootWilcomPhoto}
                         alt={program.wilcomDesignNumber || 'Wilcom Artwork'}
@@ -707,11 +707,11 @@ export default function ProgramDetailPage() {
                       />
                     </div>
                     <div>
-                      <span className="font-bold text-slate-800 text-xs block">Wilcom Design Reference</span>
+                      <span className="font-bold text-neutral-900 text-xs block">Wilcom Design Reference</span>
                       <button
                         type="button"
                         onClick={() => setViewingPhotoModal(rootWilcomPhoto)}
-                        className="text-[11px] font-bold text-purple-700 hover:text-purple-900 hover:underline flex items-center gap-1 mt-0.5 cursor-pointer"
+                        className="text-[11px] font-bold text-brand-700 hover:text-brand-900 hover:underline flex items-center gap-1 mt-0.5 cursor-pointer"
                       >
                         <Eye className="w-3.5 h-3.5" />
                         <span>Enlarge Photo</span>
@@ -719,8 +719,8 @@ export default function ProgramDetailPage() {
                     </div>
                   </div>
                 ) : (
-                  <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-200 rounded-lg text-xs font-bold transition cursor-pointer shadow-2xs">
-                    <Upload className="w-3.5 h-3.5 text-purple-700" />
+                  <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-900 border border-brand-200 rounded-lg text-xs font-bold transition cursor-pointer shadow-2xs">
+                    <Upload className="w-3.5 h-3.5 text-brand-700" />
                     <span>Upload Wilcom Artwork Photo</span>
                     <input
                       type="file"
@@ -761,62 +761,62 @@ export default function ProgramDetailPage() {
           </div>
 
           {/* FABRIC SPECIFICATIONS */}
-          <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-3">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-900 bg-emerald-50 px-2 py-0.5 rounded">
+          <div className="bg-white border border-neutral-200/90 rounded-xl p-5 shadow-xs space-y-3">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-accent-800 bg-accent-50 px-2 py-0.5 rounded">
               Fabric Specifications
             </span>
             <div className="grid grid-cols-2 gap-3 text-xs pt-1">
               <div>
-                <span className="text-slate-400 block text-[11px]">Fabric Name</span>
-                <span className="font-semibold text-slate-900">{program.fabricName || 'Cotton'}</span>
+                <span className="text-neutral-500 block text-[11px]">Fabric Name</span>
+                <span className="font-semibold text-neutral-900">{program.fabricName || 'Cotton'}</span>
               </div>
               <div>
-                <span className="text-slate-400 block text-[11px]">Fabric Type</span>
-                <span className="text-slate-700">{program.fabricType || 'Woven'}</span>
+                <span className="text-neutral-500 block text-[11px]">Fabric Type</span>
+                <span className="text-neutral-700">{program.fabricType || 'Woven'}</span>
               </div>
               <div>
-                <span className="text-slate-400 block text-[11px]">Fabric Width</span>
-                <span className="font-mono text-slate-800">{program.fabricWidthInches || '58'} Inches</span>
+                <span className="text-neutral-500 block text-[11px]">Fabric Width</span>
+                <span className="font-mono text-neutral-900">{program.fabricWidthInches || '58'} Inches</span>
               </div>
               <div>
-                <span className="text-slate-400 block text-[11px]">Fabric Color</span>
-                <span className="font-semibold text-slate-900">{program.fabricColor || 'Natural'}</span>
+                <span className="text-neutral-500 block text-[11px]">Fabric Color</span>
+                <span className="font-semibold text-neutral-900">{program.fabricColor || 'Natural'}</span>
               </div>
               <div>
-                <span className="text-slate-400 block text-[11px]">Fabric Average</span>
-                <span className="font-mono text-slate-800">{program.fabricAverage || '1.25'} {program.fabricAverageType || 'Mtr/Pc'}</span>
+                <span className="text-neutral-500 block text-[11px]">Fabric Average</span>
+                <span className="font-mono text-neutral-900">{program.fabricAverage || '1.25'} {program.fabricAverageType || 'Mtr/Pc'}</span>
               </div>
               <div>
-                <span className="text-slate-400 block text-[11px]">Color Availability</span>
-                <span className="font-semibold text-emerald-700">{program.fabricColorAvailable || 'IN_STOCK'}</span>
+                <span className="text-neutral-500 block text-[11px]">Color Availability</span>
+                <span className="font-semibold text-accent-800">{program.fabricColorAvailable || 'IN_STOCK'}</span>
               </div>
             </div>
           </div>
 
           {/* DYEING */}
-          <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-3">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-rose-900 bg-rose-50 px-2 py-0.5 rounded">
+          <div className="bg-white border border-neutral-200/90 rounded-xl p-5 shadow-xs space-y-3">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-danger-900 bg-danger-50 px-2 py-0.5 rounded">
               Dyeing Requirements
             </span>
             <div className="grid grid-cols-2 gap-3 text-xs pt-1">
               <div>
-                <span className="text-slate-400 block text-[11px]">Dyeing Required?</span>
-                <span className={`font-bold ${program.fabricDyeingRequired ? 'text-rose-700' : 'text-slate-700'}`}>
+                <span className="text-neutral-500 block text-[11px]">Dyeing Required?</span>
+                <span className={`font-bold ${program.fabricDyeingRequired ? 'text-danger-700' : 'text-neutral-700'}`}>
                   {program.fabricDyeingRequired ? 'YES (Undyed / Kora)' : 'NO (Pre-Dyed / Direct)'}
                 </span>
               </div>
               <div>
-                <span className="text-slate-400 block text-[11px]">Next Department Flow</span>
-                <span className={`font-bold ${program.fabricDyeingRequired ? 'text-amber-700' : 'text-emerald-700'}`}>
+                <span className="text-neutral-500 block text-[11px]">Next Department Flow</span>
+                <span className={`font-bold ${program.fabricDyeingRequired ? 'text-accent-800' : 'text-accent-800'}`}>
                   {program.fabricDyeingRequired ? 'Dyeing Department' : 'Embroidery Department'}
                 </span>
               </div>
             </div>          </div>
 
           {/* PRODUCTION SHEET SPECIFICATION & BREAKDOWN */}
-          <div className="bg-white border-2 border-black rounded-lg p-5 shadow-xs space-y-4 md:col-span-2 text-black">
+          <div className="bg-white border-2 border-neutral-200 rounded-lg p-5 shadow-xs space-y-4 md:col-span-2 text-neutral-900">
             {/* PRODUCTION SHEET COMPONENT SELECTOR */}
-            <div className="flex items-center gap-2 pb-2 border-b border-black/10 overflow-x-auto">
+            <div className="flex items-center gap-2 pb-2 border-b border-neutral-200 overflow-x-auto">
               {componentCategories.map((cat) => {
                 const isEnabled = components ? components[cat]?.enabled !== false : (cat === 'TOP');
                 const isForwarded = forwardedComponents.includes(cat);
@@ -828,15 +828,15 @@ export default function ProgramDetailPage() {
                     onClick={() => setActiveCategoryTab(cat)}
                     className={`px-3 py-1 rounded text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
                       activeCategoryTab === cat
-                        ? 'bg-[#163767] text-white shadow-2xs'
+                        ? 'bg-brand-600 text-white shadow-2xs'
                         : isEnabled
-                          ? 'bg-slate-100 text-slate-800 hover:bg-slate-200 border border-slate-300'
-                          : 'bg-slate-50 text-slate-400 border border-slate-200'
+                          ? 'bg-neutral-100 text-neutral-900 hover:bg-neutral-200 border border-neutral-300'
+                          : 'bg-neutral-50 text-neutral-500 border border-neutral-200'
                     }`}
                   >
                     <span>{categoryName} Sheet</span>
                     {isForwarded && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" title="Forwarded Component" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-accent-400" title="Forwarded Component" />
                     )}
                   </button>
                 );
@@ -854,36 +854,36 @@ export default function ProgramDetailPage() {
           </div>
 
           {/* PRODUCTION DATES */}
-          <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-3 md:col-span-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-900 bg-slate-100 px-2 py-0.5 rounded">
+          <div className="bg-white border border-neutral-200/90 rounded-xl p-5 shadow-xs space-y-3 md:col-span-2">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-900 bg-neutral-100 px-2 py-0.5 rounded">
               Production Dates
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs pt-1">
               <div>
-                <span className="text-slate-400 block text-[11px]">Production Design Date</span>
-                <span className="text-slate-800">{program.productionDesignDate ? new Date(program.productionDesignDate).toLocaleDateString() : '—'}</span>
+                <span className="text-neutral-500 block text-[11px]">Production Design Date</span>
+                <span className="text-neutral-900">{program.productionDesignDate ? new Date(program.productionDesignDate).toLocaleDateString() : '—'}</span>
               </div>
               <div>
-                <span className="text-slate-400 block text-[11px]">Projected End Date</span>
-                <span className="text-slate-800">{program.productionEndDate ? new Date(program.productionEndDate).toLocaleDateString() : '—'}</span>
+                <span className="text-neutral-500 block text-[11px]">Projected End Date</span>
+                <span className="text-neutral-900">{program.productionEndDate ? new Date(program.productionEndDate).toLocaleDateString() : '—'}</span>
               </div>
             </div>
           </div>
 
           {/* DISPATCHED CHALLANS ACCOMPANYING THIS PRODUCTION SHEET */}
-          <div className="bg-white border border-slate-200/90 rounded-xl p-5 shadow-xs space-y-4 md:col-span-2">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+          <div className="bg-white border border-neutral-200/90 rounded-xl p-5 shadow-xs space-y-4 md:col-span-2">
+            <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
               <div>
-                <h3 className="text-sm font-bold text-slate-900">
+                <h3 className="text-sm font-bold text-neutral-900">
                   Accompanying Departmental Challans ({challans.length})
                 </h3>
-                <p className="text-[11px] text-slate-500 mt-0.5">
+                <p className="text-[11px] text-neutral-500 mt-0.5">
                   Physical and digital challans traveling department-to-department with this Production Sheet
                 </p>
               </div>
               <Link
                 href={`/my-work/issue-challan?programId=${program.id}`}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#163767] hover:bg-[#0F264A] text-white text-xs font-semibold rounded-md shadow-xs transition"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-md shadow-xs transition"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>+ Issue New Challan</span>
@@ -919,19 +919,19 @@ export default function ProgramDetailPage() {
       {/* PHOTO LIGHTBOX MODAL */}
       {viewingPhotoModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xs p-4 cursor-pointer"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-900/80 backdrop-blur-xs p-4 cursor-pointer"
           onClick={() => setViewingPhotoModal(null)}
         >
           <div
             className="relative max-w-3xl max-h-[90vh] bg-white p-4 rounded-xl shadow-2xl flex flex-col items-center cursor-default"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="w-full flex items-center justify-between pb-2 border-b border-slate-200">
-              <span className="text-xs font-bold text-slate-800">Wilcom Design Artwork Reference</span>
+            <div className="w-full flex items-center justify-between pb-2 border-b border-neutral-200">
+              <span className="text-xs font-bold text-neutral-900">Wilcom Design Artwork Reference</span>
               <button
                 type="button"
                 onClick={() => setViewingPhotoModal(null)}
-                className="text-slate-500 hover:text-slate-800 text-sm font-black p-1 hover:bg-slate-100 rounded transition cursor-pointer"
+                className="text-neutral-500 hover:text-neutral-900 text-sm font-black p-1 hover:bg-neutral-100 rounded transition cursor-pointer"
               >
                 ✕
               </button>
@@ -940,7 +940,7 @@ export default function ProgramDetailPage() {
               <img
                 src={viewingPhotoModal}
                 alt="Wilcom Design Artwork"
-                className="max-w-full max-h-[70vh] object-contain rounded border border-slate-200 shadow-sm"
+                className="max-w-full max-h-[70vh] object-contain rounded border border-neutral-200 shadow-sm"
               />
             </div>
           </div>

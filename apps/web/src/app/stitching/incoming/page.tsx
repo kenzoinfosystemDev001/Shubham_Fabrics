@@ -20,7 +20,6 @@ import {
   ShieldCheck,
   Scissors,
 } from 'lucide-react';
-import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
 
 export default function StitchingIncomingPage() {
@@ -151,24 +150,19 @@ export default function StitchingIncomingPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-canvas text-neutral-900 flex flex-col">
       {/* HEADER */}
       <div
-        style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.85)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-        className="border-b border-slate-800 p-6 shadow-md"
+        className="bg-white border-b border-neutral-200 p-6 shadow-sm"
       >
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center">
-              <ArrowDownLeft className="w-6 h-6 text-amber-400" />
+            <div className="w-10 h-10 rounded-xl bg-accent-400/20 border border-accent-500/40 flex items-center justify-center">
+              <ArrowDownLeft className="w-6 h-6 text-accent-700" />
             </div>
             <div>
-              <h1 className="text-xl font-black text-white">Incoming Challans Terminal</h1>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <h1 className="text-xl font-black text-neutral-900">Incoming Challans Terminal</h1>
+              <p className="text-xs text-neutral-500 mt-0.5">
                 Verify cut panels from Recutting Department, check piece counts, and admit into Stitching queue
               </p>
             </div>
@@ -178,7 +172,7 @@ export default function StitchingIncomingPage() {
             <button
               onClick={() => loadData(true)}
               disabled={loading}
-              className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition border border-slate-700 disabled:opacity-50"
+              className="p-2 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 hover:text-neutral-900 transition border border-neutral-200 disabled:opacity-50"
               title="Refresh"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -186,7 +180,7 @@ export default function StitchingIncomingPage() {
 
             <Link
               href="/stitching/my-work"
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition shadow-md"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs transition shadow-sm"
             >
               <Shirt className="w-3.5 h-3.5" />
               <span>Go to Stitching Floor</span>
@@ -198,22 +192,22 @@ export default function StitchingIncomingPage() {
       {/* FILTER BAR & LIST */}
       <div className="max-w-7xl mx-auto w-full p-4 md:p-6 space-y-4 flex-1">
         {error && (
-          <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-sm flex items-center gap-3">
-            <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />
+          <div className="p-4 rounded-xl bg-danger-500/10 border border-danger-500/30 text-danger-600 text-sm flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 text-danger-600 shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
         {/* CONTROLS */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white p-3 rounded-xl border border-neutral-200">
           {/* TABS */}
           <div className="flex items-center gap-1.5 w-full sm:w-auto">
             <button
               onClick={() => setActiveTab('ALL')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
                 activeTab === 'ALL'
-                  ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-brand-600 text-white shadow-sm'
+                  : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100'
               }`}
             >
               All Incoming ({challans.length})
@@ -222,8 +216,8 @@ export default function StitchingIncomingPage() {
               onClick={() => setActiveTab('ISSUED')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
                 activeTab === 'ISSUED'
-                  ? 'bg-amber-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-accent-400 text-neutral-900 shadow-sm'
+                  : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100'
               }`}
             >
               Awaiting Physical Receipt ({challans.filter((c) => c.status === 'ISSUED').length})
@@ -232,8 +226,8 @@ export default function StitchingIncomingPage() {
               onClick={() => setActiveTab('RECEIVED')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
                 activeTab === 'RECEIVED'
-                  ? 'bg-emerald-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-accent-400 text-neutral-900 shadow-sm'
+                  : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100'
               }`}
             >
               Accepted & In Process ({challans.filter((c) => c.status !== 'ISSUED').length})
@@ -242,28 +236,28 @@ export default function StitchingIncomingPage() {
 
           {/* SEARCH */}
           <div className="relative w-full sm:w-72">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search challan, style, program..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-950/80 border border-slate-800 rounded-lg pl-9 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+              className="w-full bg-white border border-neutral-200 rounded-lg pl-9 pr-3 py-1.5 text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-brand-500"
             />
           </div>
         </div>
 
         {/* CHALLANS GRID */}
         {loading && challans.length === 0 ? (
-          <div className="p-12 text-center text-slate-400 text-xs">
-            <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-indigo-400" />
+          <div className="p-12 text-center text-neutral-500 text-xs">
+            <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-brand-600" />
             Loading incoming challans...
           </div>
         ) : filteredChallans.length === 0 ? (
-          <div className="p-12 text-center rounded-2xl bg-slate-900/40 border border-dashed border-slate-800">
-            <CheckCircle2 className="w-8 h-8 text-emerald-400/60 mx-auto mb-2" />
-            <p className="text-sm font-semibold text-white">No incoming challans found</p>
-            <p className="text-xs text-slate-400 mt-1">There are currently no challans matching the selected filter.</p>
+          <div className="p-12 text-center rounded-2xl bg-white border border-dashed border-neutral-200">
+            <CheckCircle2 className="w-8 h-8 text-accent-700 mx-auto mb-2" />
+            <p className="text-sm font-semibold text-neutral-900">No incoming challans found</p>
+            <p className="text-xs text-neutral-500 mt-1">There are currently no challans matching the selected filter.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -274,28 +268,28 @@ export default function StitchingIncomingPage() {
               return (
                 <div
                   key={ch.id}
-                  className={`p-4 rounded-xl bg-slate-900/70 border transition flex flex-col justify-between gap-4 ${
+                  className={`p-4 rounded-xl bg-white border transition flex flex-col justify-between gap-4 ${
                     isIssued
-                      ? 'border-amber-500/40 hover:border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.05)]'
-                      : 'border-slate-800 hover:border-slate-700'
+                      ? 'border-accent-500/40 hover:border-accent-500'
+                      : 'border-neutral-200 hover:border-neutral-200'
                   }`}
                 >
                   <div className="space-y-3">
                     {/* CARD HEADER */}
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <span className="text-xs font-mono font-bold text-white block">{ch.challanNumber}</span>
-                        <span className="text-[11px] text-slate-400">
-                          From: <strong className="text-slate-200">{ch.fromDepartment}</strong>
+                        <span className="text-xs font-mono font-bold text-neutral-900 block">{ch.challanNumber}</span>
+                        <span className="text-[11px] text-neutral-500">
+                          From: <strong className="text-neutral-900">{ch.fromDepartment}</strong>
                         </span>
                       </div>
                       <span
                         className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
                           isIssued
-                            ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+                            ? 'bg-accent-400/20 text-accent-700 border-accent-500/30'
                             : ch.status === 'IN_PROCESS'
-                            ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30'
-                            : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                            ? 'bg-brand-500/20 text-brand-600 border-brand-500/30'
+                            : 'bg-accent-400/20 text-accent-700 border-accent-500/30'
                         }`}
                       >
                         {isIssued ? 'AWAITING RECEIPT' : ch.status}
@@ -303,42 +297,42 @@ export default function StitchingIncomingPage() {
                     </div>
 
                     {/* PROGRAM INFO */}
-                    <div className="p-3 rounded-lg bg-slate-950/60 border border-slate-800/80 space-y-1 text-xs">
+                    <div className="p-3 rounded-lg bg-white border border-neutral-200 space-y-1 text-xs">
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-400">Program:</span>
-                        <span className="font-semibold text-white">{ch.program?.programNumber || 'N/A'}</span>
+                        <span className="text-neutral-500">Program:</span>
+                        <span className="font-semibold text-neutral-900">{ch.program?.programNumber || 'N/A'}</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-400">Style Code:</span>
-                        <span className="font-semibold text-indigo-300">{ch.program?.styleCode || 'Standard'}</span>
+                        <span className="text-neutral-500">Style Code:</span>
+                        <span className="font-semibold text-brand-600">{ch.program?.styleCode || 'Standard'}</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-400">Client:</span>
-                        <span className="text-slate-300">{ch.program?.clientName || 'Confidential'}</span>
+                        <span className="text-neutral-500">Client:</span>
+                        <span className="text-neutral-700">{ch.program?.clientName || 'Confidential'}</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-slate-400">Wilcom Design:</span>
-                        <span className="font-mono text-amber-300">{ch.program?.wilcomDesignNumber || ch.program?.designNumber || '-'}</span>
+                        <span className="text-neutral-500">Wilcom Design:</span>
+                        <span className="font-mono text-accent-700">{ch.program?.wilcomDesignNumber || ch.program?.designNumber || '-'}</span>
                       </div>
                     </div>
 
                     {/* QUANTITY SUMMARY */}
                     <div className="flex items-center justify-between px-1 text-xs">
-                      <span className="text-slate-400">Transfer Quantity:</span>
-                      <span className="text-base font-black text-white">
-                        {totalPieces.toLocaleString()} <span className="text-xs font-normal text-slate-400">pcs</span>
+                      <span className="text-neutral-500">Transfer Quantity:</span>
+                      <span className="text-base font-black text-neutral-900">
+                        {totalPieces.toLocaleString()} <span className="text-xs font-normal text-neutral-500">pcs</span>
                       </span>
                     </div>
 
                     {ch.remarks && (
-                      <p className="text-[11px] text-slate-400 italic line-clamp-2 px-1">
+                      <p className="text-[11px] text-neutral-500 italic line-clamp-2 px-1">
                         &ldquo;{ch.remarks}&rdquo;
                       </p>
                     )}
                   </div>
 
                   {/* ACTION FOOTER */}
-                  <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between gap-2 flex-wrap">
+                  <div className="pt-3 border-t border-neutral-200 flex items-center justify-between gap-2 flex-wrap">
                     <DocumentActionButtons
                       challan={ch}
                       program={ch.program}
@@ -348,7 +342,7 @@ export default function StitchingIncomingPage() {
                     {isIssued ? (
                       <button
                         onClick={() => openReceiveModal(ch)}
-                        className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition shadow-sm flex items-center gap-1.5"
+                        className="px-3.5 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs transition shadow-sm flex items-center gap-1.5"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5" />
                         <span>Confirm Receipt</span>
@@ -356,7 +350,7 @@ export default function StitchingIncomingPage() {
                     ) : (
                       <Link
                         href={`/stitching/workspace/${ch.id}`}
-                        className="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition shadow-sm flex items-center gap-1.5"
+                        className="px-3.5 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-700 text-white font-semibold text-xs transition shadow-sm flex items-center gap-1.5"
                       >
                         <Shirt className="w-3.5 h-3.5" />
                         <span>Open Workspace</span>
@@ -372,63 +366,63 @@ export default function StitchingIncomingPage() {
 
       {/* PHYSICAL RECEIPT MODAL */}
       {selectedChallan && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#0F172A] border border-slate-700 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="fixed inset-0 z-50 bg-neutral-900/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-neutral-200 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-lg bg-emerald-500/20 text-emerald-400">
+                <div className="p-2 rounded-lg bg-accent-400/20 text-accent-700">
                   <CheckCircle2 className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white">Physical Receipt Verification</h3>
-                  <p className="text-xs text-slate-400">Challan: {selectedChallan.challanNumber}</p>
+                  <h3 className="text-base font-bold text-neutral-900">Physical Receipt Verification</h3>
+                  <p className="text-xs text-neutral-500">Challan: {selectedChallan.challanNumber}</p>
                 </div>
               </div>
               <button
                 onClick={closeReceiveModal}
-                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                className="p-1 rounded-lg text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 transition"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {receiveError && (
-              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
+              <div className="p-3 rounded-xl bg-danger-500/10 border border-danger-500/30 text-danger-600 text-xs flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{receiveError}</span>
               </div>
             )}
 
             {receiveSuccess && (
-              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2">
+              <div className="p-3 rounded-xl bg-accent-400/10 border border-accent-500/30 text-accent-700 text-xs flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 shrink-0" />
                 <span>{receiveSuccess}</span>
               </div>
             )}
 
             <form onSubmit={handleReceiveSubmit} className="space-y-4 text-xs">
-              <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 space-y-2">
+              <div className="p-3 rounded-xl bg-white border border-neutral-200 space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Style / Design:</span>
-                  <span className="font-semibold text-white">
+                  <span className="text-neutral-500">Style / Design:</span>
+                  <span className="font-semibold text-neutral-900">
                     {selectedChallan.program?.styleCode || 'Standard'} &bull; {selectedChallan.program?.designNumber || '-'}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Source Department:</span>
-                  <span className="font-semibold text-indigo-300">{selectedChallan.fromDepartment}</span>
+                  <span className="text-neutral-500">Source Department:</span>
+                  <span className="font-semibold text-brand-600">{selectedChallan.fromDepartment}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400">Issued Piece Count:</span>
-                  <span className="font-black text-amber-400 text-sm">
+                  <span className="text-neutral-500">Issued Piece Count:</span>
+                  <span className="font-black text-accent-700 text-sm">
                     {selectedChallan.items.reduce((s: number, it: any) => s + (Number(it.quantity) || 0), 0)} pcs
                   </span>
                 </div>
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">
-                  Actual Received Physical Count (Pcs) <span className="text-rose-400">*</span>
+                <label className="block text-neutral-700 font-semibold mb-1">
+                  Actual Received Physical Count (Pcs) <span className="text-danger-600">*</span>
                 </label>
                 <input
                   type="number"
@@ -436,21 +430,21 @@ export default function StitchingIncomingPage() {
                   max={selectedChallan.items.reduce((s: number, it: any) => s + (Number(it.quantity) || 0), 0)}
                   value={receiveQuantity}
                   onChange={(e) => setReceiveQuantity(e.target.value === '' ? '' : Number(e.target.value))}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-bold focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-canvas border border-neutral-200 rounded-lg px-3 py-2 text-sm text-neutral-900 font-bold focus:outline-none focus:border-brand-500"
                   required
                 />
-                <p className="text-[10px] text-slate-500 mt-1">
+                <p className="text-[10px] text-neutral-500 mt-1">
                   Ensure physical bundle counting matches the delivery Challan exactly.
                 </p>
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">Receipt Remarks / Notes</label>
+                <label className="block text-neutral-700 font-semibold mb-1">Receipt Remarks / Notes</label>
                 <textarea
                   rows={2}
                   value={receiveRemarks}
                   onChange={(e) => setReceiveRemarks(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-canvas border border-neutral-200 rounded-lg p-2.5 text-xs text-neutral-900 focus:outline-none focus:border-brand-500"
                   placeholder="Notes on cut panel bundle condition, sizes, or notes..."
                 />
               </div>
@@ -461,26 +455,26 @@ export default function StitchingIncomingPage() {
                   id="markOnHold"
                   checked={markOnHold}
                   onChange={(e) => setMarkOnHold(e.target.checked)}
-                  className="rounded border-slate-700 text-indigo-600 focus:ring-0"
+                  className="rounded border-neutral-200 text-brand-600 focus:ring-0"
                 />
-                <label htmlFor="markOnHold" className="text-slate-400 text-xs cursor-pointer">
+                <label htmlFor="markOnHold" className="text-neutral-500 text-xs cursor-pointer">
                   Mark job ON HOLD for inspection (do not move directly into ready queue)
                 </label>
               </div>
 
-              <div className="pt-3 border-t border-slate-800 flex items-center justify-end gap-2">
+              <div className="pt-3 border-t border-neutral-200 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={closeReceiveModal}
                   disabled={submittingReceive}
-                  className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition"
+                  className="px-4 py-2 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-semibold transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submittingReceive}
-                  className="px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition shadow-md flex items-center gap-1.5 disabled:opacity-50"
+                  className="px-5 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold transition shadow-sm flex items-center gap-1.5 disabled:opacity-50"
                 >
                   {submittingReceive ? (
                     <>
@@ -502,60 +496,60 @@ export default function StitchingIncomingPage() {
 
       {/* TECH SHEET PREVIEW MODAL */}
       {previewProgram && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#0F172A] border border-slate-700 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="fixed inset-0 z-50 bg-neutral-900/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-neutral-200 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
               <div className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-indigo-400" />
-                <h3 className="text-base font-bold text-white">Production Sheet Specification</h3>
+                <FileText className="w-5 h-5 text-brand-600" />
+                <h3 className="text-base font-bold text-neutral-900">Production Sheet Specification</h3>
               </div>
               <button
                 onClick={() => setPreviewProgram(null)}
-                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                className="p-1 rounded-lg text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 transition"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="space-y-3 text-xs">
-              <div className="grid grid-cols-2 gap-3 p-3 rounded-xl bg-slate-950/60 border border-slate-800">
+              <div className="grid grid-cols-2 gap-3 p-3 rounded-xl bg-white border border-neutral-200">
                 <div>
-                  <span className="text-slate-400 block">Program Serial:</span>
-                  <span className="font-bold text-white font-mono">{previewProgram.programNumber}</span>
+                  <span className="text-neutral-500 block">Program Serial:</span>
+                  <span className="font-bold text-neutral-900 font-mono">{previewProgram.programNumber}</span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block">Style Code:</span>
-                  <span className="font-bold text-indigo-300">{previewProgram.styleCode || 'Standard'}</span>
+                  <span className="text-neutral-500 block">Style Code:</span>
+                  <span className="font-bold text-brand-600">{previewProgram.styleCode || 'Standard'}</span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block">Target Quantity:</span>
-                  <span className="font-bold text-white">{previewProgram.targetQuantity || 'N/A'} {previewProgram.quantityMeasurement || 'PCS'}</span>
+                  <span className="text-neutral-500 block">Target Quantity:</span>
+                  <span className="font-bold text-neutral-900">{previewProgram.targetQuantity || 'N/A'} {previewProgram.quantityMeasurement || 'PCS'}</span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block">Fabric Name:</span>
-                  <span className="font-bold text-slate-200">{previewProgram.fabricName || 'Cotton / Poly'}</span>
+                  <span className="text-neutral-500 block">Fabric Name:</span>
+                  <span className="font-bold text-neutral-900">{previewProgram.fabricName || 'Cotton / Poly'}</span>
                 </div>
               </div>
 
               {previewProgram.wilcomDesign && (
-                <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1">
-                  <span className="text-slate-400 font-semibold block mb-1">Wilcom Embroidery Specs:</span>
+                <div className="p-3 rounded-xl bg-white border border-neutral-200 space-y-1">
+                  <span className="text-neutral-500 font-semibold block mb-1">Wilcom Embroidery Specs:</span>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">Design No:</span>
-                    <span className="font-mono text-amber-300">{previewProgram.wilcomDesign.wilcomDesignNumber}</span>
+                    <span className="text-neutral-500">Design No:</span>
+                    <span className="font-mono text-accent-700">{previewProgram.wilcomDesign.wilcomDesignNumber}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">Total Stitches:</span>
-                    <span className="text-white font-mono">{previewProgram.wilcomDesign.stitchCount?.toLocaleString()}</span>
+                    <span className="text-neutral-500">Total Stitches:</span>
+                    <span className="text-neutral-900 font-mono">{previewProgram.wilcomDesign.stitchCount?.toLocaleString()}</span>
                   </div>
                 </div>
               )}
             </div>
 
-            <div className="pt-3 border-t border-slate-800 flex justify-end">
+            <div className="pt-3 border-t border-neutral-200 flex justify-end">
               <button
                 onClick={() => setPreviewProgram(null)}
-                className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition"
+                className="px-4 py-2 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-semibold transition"
               >
                 Close
               </button>

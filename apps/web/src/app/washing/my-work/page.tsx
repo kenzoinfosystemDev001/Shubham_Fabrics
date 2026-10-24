@@ -28,7 +28,6 @@ import {
   Kanban,
   FileText
 } from 'lucide-react';
-import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { downloadProductionSheetHtml, printProductionSheet } from '@/lib/download-production-sheet';
@@ -411,23 +410,18 @@ export default function WashingWorkCenter() {
   }, [challans]);
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] pb-16">
+    <div className="min-h-screen bg-neutral-50 pb-16">
       {/* HEADER */}
       <header
-        style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-        className="border-b border-slate-700/80 sticky top-0 z-30 px-4 sm:px-8 py-4 shadow-md text-white"
+        className="bg-white border-b border-neutral-200 sticky top-0 z-30 px-4 sm:px-8 py-4 shadow-md text-neutral-900"
       >
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400 block drop-shadow-sm">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-600 block drop-shadow-sm">
               SHUBHAM FABRICS MES · WASHING & DRYING WORKSTATION
             </span>
-            <h1 className="text-xl font-bold text-white flex items-center gap-2.5 drop-shadow-sm">
-              <Waves className="w-5 h-5 text-cyan-400" />
+            <h1 className="text-xl font-bold text-neutral-900 flex items-center gap-2.5 drop-shadow-sm">
+              <Waves className="w-5 h-5 text-brand-600" />
               <span>Washing Operations Control Terminal</span>
             </h1>
           </div>
@@ -436,24 +430,24 @@ export default function WashingWorkCenter() {
             <button
               onClick={loadData}
               disabled={loading}
-              className="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-200 transition border border-slate-600/50 flex items-center gap-1.5 text-xs font-semibold shadow-xs"
+              className="p-2 rounded-lg bg-neutral-50 hover:bg-neutral-200 text-neutral-900 transition border border-neutral-200 flex items-center gap-1.5 text-xs font-semibold shadow-xs"
               title="Refresh"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-cyan-400' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-brand-600' : ''}`} />
               <span className="hidden sm:inline">Refresh</span>
             </button>
 
             <Link
               href="/washing/floor-board"
-              className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold border border-slate-600/50 transition flex items-center gap-1.5"
+              className="px-3 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 rounded-lg text-xs font-semibold border border-neutral-200 transition flex items-center gap-1.5"
             >
-              <Kanban className="w-4 h-4 text-cyan-400" />
+              <Kanban className="w-4 h-4 text-brand-600" />
               <span>Floor Board</span>
             </Link>
 
             <Link
               href="/programs"
-              className="px-3 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-lg text-xs font-semibold shadow-sm transition flex items-center gap-1.5"
+              className="px-3 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-semibold shadow-sm transition flex items-center gap-1.5"
             >
               <FileText className="w-4 h-4" />
               <span>All Production Sheets</span>
@@ -465,12 +459,12 @@ export default function WashingWorkCenter() {
       {/* TOAST MESSAGE */}
       {toastMessage && (
         <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-4">
-          <div className="bg-emerald-50 border border-emerald-300 text-emerald-900 rounded-xl p-3.5 shadow-sm flex items-center justify-between text-xs font-semibold animate-in fade-in">
+          <div className="bg-accent-50 border border-accent-300 text-accent-800 rounded-xl p-3.5 shadow-sm flex items-center justify-between text-xs font-semibold animate-in fade-in">
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <CheckCircle2 className="w-4 h-4 text-accent-700" />
               <span>{toastMessage}</span>
             </div>
-            <button onClick={() => setToastHandover(null)} className="text-emerald-700 hover:text-emerald-900">
+            <button onClick={() => setToastHandover(null)} className="text-accent-800 hover:text-accent-800">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -480,20 +474,20 @@ export default function WashingWorkCenter() {
       {/* MAIN CONTENT */}
       <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6 space-y-6">
         {/* TABS NAVIGATION */}
-        <div className="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto">
+        <div className="flex items-center gap-2 border-b border-neutral-200 pb-2 overflow-x-auto">
           <button
             onClick={() => setActiveTab('WASH_TERMINAL')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 ${
               activeTab === 'WASH_TERMINAL'
-                ? 'bg-cyan-600 text-white shadow-xs'
-                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                ? 'bg-brand-600 text-white shadow-xs'
+                : 'bg-white text-neutral-600 hover:bg-neutral-100 border border-neutral-200'
             }`}
           >
             <Waves className="w-4 h-4" />
             <span>Washing Terminal & Lots</span>
             <span
               className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                activeTab === 'WASH_TERMINAL' ? 'bg-cyan-700 text-white' : 'bg-slate-100 text-slate-700'
+                activeTab === 'WASH_TERMINAL' ? 'bg-brand-700 text-white' : 'bg-neutral-100 text-neutral-700'
               }`}
             >
               {challans.length}
@@ -504,15 +498,15 @@ export default function WashingWorkCenter() {
             onClick={() => setActiveTab('ISSUE_HANDOVER')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 ${
               activeTab === 'ISSUE_HANDOVER'
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                ? 'bg-accent-400 text-neutral-900 shadow-xs'
+                : 'bg-white text-neutral-600 hover:bg-neutral-100 border border-neutral-200'
             }`}
           >
             <PackageCheck className="w-4 h-4" />
             <span>Handover to QC Washing</span>
             <span
               className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                activeTab === 'ISSUE_HANDOVER' ? 'bg-emerald-700 text-white' : 'bg-slate-100 text-slate-700'
+                activeTab === 'ISSUE_HANDOVER' ? 'bg-accent-500 text-neutral-900' : 'bg-neutral-100 text-neutral-700'
               }`}
             >
               {dispatchedChallans.length}
@@ -523,8 +517,8 @@ export default function WashingWorkCenter() {
             onClick={() => setActiveTab('DEFECTED_SHELF')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 ${
               activeTab === 'DEFECTED_SHELF'
-                ? 'bg-rose-600 text-white shadow-xs'
-                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                ? 'bg-danger-600 text-white shadow-xs'
+                : 'bg-white text-neutral-600 hover:bg-neutral-100 border border-neutral-200'
             }`}
           >
             <Archive className="w-4 h-4" />
@@ -535,15 +529,15 @@ export default function WashingWorkCenter() {
             onClick={() => setActiveTab('PRODUCTION_SHEETS')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 ${
               activeTab === 'PRODUCTION_SHEETS'
-                ? 'bg-blue-600 text-white shadow-xs'
-                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                ? 'bg-brand-600 text-white shadow-xs'
+                : 'bg-white text-neutral-600 hover:bg-neutral-100 border border-neutral-200'
             }`}
           >
             <FileText className="w-4 h-4" />
             <span>Production Sheets Traveler</span>
             <span
               className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                activeTab === 'PRODUCTION_SHEETS' ? 'bg-blue-700 text-white' : 'bg-slate-100 text-slate-700'
+                activeTab === 'PRODUCTION_SHEETS' ? 'bg-brand-700 text-white' : 'bg-neutral-100 text-neutral-700'
               }`}
             >
               {productionProgramsList.length}
@@ -555,24 +549,24 @@ export default function WashingWorkCenter() {
         {activeTab === 'WASH_TERMINAL' && (
           <div className="space-y-4">
             {/* SEARCH & FILTERS BAR */}
-            <div className="bg-white p-4 rounded-xl border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-3 shadow-2xs">
+            <div className="bg-white p-4 rounded-xl border border-neutral-200 flex flex-col md:flex-row items-center justify-between gap-3 shadow-2xs">
               <div className="relative flex-1 w-full">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" />
                 <input
                   type="text"
                   placeholder="Search by challan, sheet #, client, or style..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-hidden focus:ring-2 focus:ring-cyan-500"
+                  className="w-full pl-9 pr-4 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-xs focus:outline-hidden focus:ring-2 focus:ring-brand-500"
                 />
               </div>
 
               <div className="flex items-center gap-2 w-full md:w-auto">
-                <Filter className="w-4 h-4 text-slate-400" />
+                <Filter className="w-4 h-4 text-neutral-500" />
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium focus:outline-hidden"
+                  className="px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-xs font-medium focus:outline-hidden"
                 >
                   <option value="ALL">All Statuses</option>
                   <option value="PENDING">Pending Washing</option>
@@ -583,11 +577,11 @@ export default function WashingWorkCenter() {
             </div>
 
             {/* LOTS TABLE */}
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+            <div className="bg-white rounded-2xl border border-neutral-200 overflow-hidden shadow-xs">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[10px]">
+                    <tr className="bg-neutral-50/80 border-b border-neutral-200 text-neutral-600 font-bold uppercase tracking-wider text-[10px]">
                       <th className="py-3 px-4">Challan #</th>
                       <th className="py-3 px-4">Program / Sheet #</th>
                       <th className="py-3 px-4">Client / Style</th>
@@ -598,18 +592,18 @@ export default function WashingWorkCenter() {
                       <th className="py-3 px-4 text-center">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-neutral-100">
                     {loading ? (
                       <tr>
-                        <td colSpan={8} className="py-12 text-center text-slate-400">
-                          <RefreshCw className="w-6 h-6 animate-spin mx-auto text-cyan-600 mb-2" />
+                        <td colSpan={8} className="py-12 text-center text-neutral-500">
+                          <RefreshCw className="w-6 h-6 animate-spin mx-auto text-brand-600 mb-2" />
                           <span>Loading Washing lots...</span>
                         </td>
                       </tr>
                     ) : filteredChallans.length === 0 ? (
                       <tr>
-                        <td colSpan={8} className="py-12 text-center text-slate-400">
-                          <Waves className="w-8 h-8 mx-auto text-slate-300 mb-2" />
+                        <td colSpan={8} className="py-12 text-center text-neutral-500">
+                          <Waves className="w-8 h-8 mx-auto text-neutral-700 mb-2" />
                           <span>No washing lots found matching criteria.</span>
                         </td>
                       </tr>
@@ -625,44 +619,44 @@ export default function WashingWorkCenter() {
                         const isApproved = ['QC_APPROVED', 'WASH_COMPLETED'].includes(c.status);
 
                         return (
-                          <tr key={c.id} className="hover:bg-cyan-50/20 transition">
-                            <td className="py-3 px-4 font-mono font-bold text-slate-900">
+                          <tr key={c.id} className="hover:bg-brand-50/20 transition">
+                            <td className="py-3 px-4 font-mono font-bold text-neutral-900">
                               {c.challanNumber}
                             </td>
-                            <td className="py-3 px-4 font-mono font-semibold text-blue-700">
+                            <td className="py-3 px-4 font-mono font-semibold text-brand-700">
                               {c.program?.programSerialNo || c.program?.programNumber || '—'}
                             </td>
                             <td className="py-3 px-4">
-                              <span className="font-semibold text-slate-800 block truncate max-w-[160px]">
+                              <span className="font-semibold text-neutral-900 block truncate max-w-[160px]">
                                 {c.program?.clientName || 'Standard Client'}
                               </span>
-                              <span className="text-[10px] text-slate-500 block truncate max-w-[160px]">
+                              <span className="text-[10px] text-neutral-500 block truncate max-w-[160px]">
                                 {c.program?.mainStyle || c.program?.styleCode || 'General Lot'}
                               </span>
                             </td>
-                            <td className="py-3 px-4 text-right font-mono font-bold text-slate-900">
+                            <td className="py-3 px-4 text-right font-mono font-bold text-neutral-900">
                               {pIn} PCS
                             </td>
-                            <td className="py-3 px-4 text-right font-mono font-bold text-emerald-700">
+                            <td className="py-3 px-4 text-right font-mono font-bold text-accent-800">
                               {pOut !== '—' ? `${pOut} PCS` : '—'}
                             </td>
-                            <td className="py-3 px-4 font-mono text-[11px] text-slate-700">
+                            <td className="py-3 px-4 font-mono text-[11px] text-neutral-700">
                               {barcode !== '—' ? (
-                                <span className="bg-slate-100 px-1.5 py-0.5 rounded font-bold text-slate-800">
+                                <span className="bg-neutral-100 px-1.5 py-0.5 rounded font-bold text-neutral-900">
                                   {barcode}
                                 </span>
                               ) : (
-                                <span className="text-slate-400 italic">Not Tagged</span>
+                                <span className="text-neutral-500 italic">Not Tagged</span>
                               )}
                             </td>
                             <td className="py-3 px-4">
                               <span
                                 className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded ${
                                   isApproved
-                                    ? 'bg-emerald-100 text-emerald-800'
+                                    ? 'bg-accent-100 text-accent-800'
                                     : isPending
-                                    ? 'bg-cyan-100 text-cyan-800'
-                                    : 'bg-slate-100 text-slate-800'
+                                    ? 'bg-brand-100 text-brand-800'
+                                    : 'bg-neutral-100 text-neutral-900'
                                 }`}
                               >
                                 {c.status}
@@ -682,7 +676,7 @@ export default function WashingWorkCenter() {
                                   <button
                                     type="button"
                                     onClick={() => handleOpenWashModal(c)}
-                                    className="px-2.5 py-1 bg-cyan-600 hover:bg-cyan-700 text-white rounded text-[11px] font-semibold flex items-center gap-1 transition shadow-2xs"
+                                    className="px-2.5 py-1 bg-brand-600 hover:bg-brand-700 text-white rounded text-[11px] font-semibold flex items-center gap-1 transition shadow-2xs"
                                   >
                                     <Waves className="w-3 h-3" />
                                     <span>Wash Run</span>
@@ -693,7 +687,7 @@ export default function WashingWorkCenter() {
                                     <button
                                       type="button"
                                       onClick={() => handleIssueToFinishing(c)}
-                                      className="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[11px] font-semibold flex items-center gap-1 transition shadow-2xs"
+                                      className="px-2 py-1 bg-accent-400 hover:bg-accent-500 text-neutral-900 rounded text-[11px] font-semibold flex items-center gap-1 transition shadow-2xs"
                                       title="Issue Handover Challan to QC Washing"
                                     >
                                       <PackageCheck className="w-3 h-3" />
@@ -717,31 +711,31 @@ export default function WashingWorkCenter() {
         {/* TAB 2: ISSUE HANDOVER CHALLAN TO FINISHING */}
         {activeTab === 'ISSUE_HANDOVER' && (
           <div className="space-y-4">
-            <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div className="bg-white rounded-2xl border border-neutral-200 p-5 shadow-xs">
+              <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
                 <div className="flex items-center gap-2">
-                  <PackageCheck className="w-5 h-5 text-emerald-600" />
+                  <PackageCheck className="w-5 h-5 text-accent-700" />
                   <div>
-                    <h3 className="text-sm font-bold text-slate-900">
+                    <h3 className="text-sm font-bold text-neutral-900">
                       Dispatched Challans to QC Washing Department
                     </h3>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-neutral-500">
                       Washed and barcode-tagged lots transferred to QC Washing for verification & quality check
                     </p>
                   </div>
                 </div>
-                <span className="text-xs font-mono font-bold text-slate-700 bg-slate-100 px-2 py-1 rounded">
+                <span className="text-xs font-mono font-bold text-neutral-700 bg-neutral-100 px-2 py-1 rounded">
                   {dispatchedChallans.length} Handed Over
                 </span>
               </div>
 
               {dispatchedChallans.length === 0 ? (
-                <div className="py-12 text-center text-slate-400">
-                  <PackageCheck className="w-8 h-8 mx-auto text-slate-300 mb-2" />
+                <div className="py-12 text-center text-neutral-500">
+                  <PackageCheck className="w-8 h-8 mx-auto text-neutral-700 mb-2" />
                   <p className="text-xs font-medium">No outgoing handover challans issued yet.</p>
                 </div>
               ) : (
-                <div className="divide-y divide-slate-100 pt-2">
+                <div className="divide-y divide-neutral-100 pt-2">
                   {dispatchedChallans.map((c) => {
                     const qty = c.items.reduce((s: number, it: any) => s + (Number(it.quantity) || 0), 0);
                     const barcode = c.items?.[0]?.barcode || '—';
@@ -749,15 +743,15 @@ export default function WashingWorkCenter() {
                       <div key={c.id} className="py-3 flex items-center justify-between gap-3 text-xs">
                         <div className="space-y-0.5">
                           <div className="flex items-center gap-2">
-                            <span className="font-mono font-bold text-slate-900">{c.challanNumber}</span>
-                            <span className="text-emerald-700 font-semibold bg-emerald-50 px-1.5 py-0.2 rounded text-[10px]">
+                            <span className="font-mono font-bold text-neutral-900">{c.challanNumber}</span>
+                            <span className="text-accent-800 font-semibold bg-accent-50 px-1.5 py-0.2 rounded text-[10px]">
                               To: {c.toDepartment}
                             </span>
-                            <span className="font-mono font-bold text-slate-700 bg-slate-100 px-1.5 py-0.2 rounded text-[10px]">
+                            <span className="font-mono font-bold text-neutral-700 bg-neutral-100 px-1.5 py-0.2 rounded text-[10px]">
                               Tag: {barcode}
                             </span>
                           </div>
-                          <div className="text-slate-600">
+                          <div className="text-neutral-600">
                             <span>{c.program?.clientName || 'Standard Client'}</span>
                             {' · '}
                             <span className="font-mono">
@@ -767,7 +761,7 @@ export default function WashingWorkCenter() {
                         </div>
 
                         <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2">
-                          <span className="font-mono font-bold text-emerald-700 text-sm">{qty} PCS</span>
+                          <span className="font-mono font-bold text-accent-800 text-sm">{qty} PCS</span>
                           
                           {/* ACTIONS */}
                           <DocumentActionButtons
@@ -788,25 +782,25 @@ export default function WashingWorkCenter() {
         {/* TAB 3: DEFECTED / QUARANTINE LOG */}
         {activeTab === 'DEFECTED_SHELF' && (
           <div className="space-y-4">
-            <div className="bg-white rounded-2xl border border-rose-200 p-5 shadow-xs">
-              <div className="flex items-center justify-between pb-3 border-b border-rose-100">
+            <div className="bg-white rounded-2xl border border-danger-200 p-5 shadow-xs">
+              <div className="flex items-center justify-between pb-3 border-b border-danger-100">
                 <div className="flex items-center gap-2">
-                  <Archive className="w-5 h-5 text-rose-600" />
+                  <Archive className="w-5 h-5 text-danger-600" />
                   <div>
-                    <h3 className="text-sm font-bold text-rose-900">
+                    <h3 className="text-sm font-bold text-danger-900">
                       Washing Defected Pieces & Quarantine Log (DEF-SHELF-01)
                     </h3>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-neutral-500">
                       Track shrinkage deviations, color bleeding, torn pieces, or fabric damage during wash
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="divide-y divide-slate-100 pt-2">
+              <div className="divide-y divide-neutral-100 pt-2">
                 {challans.filter((c) => (c.defectivePieces || 0) > 0).length === 0 ? (
-                  <div className="py-12 text-center text-slate-400">
-                    <CheckCircle2 className="w-8 h-8 mx-auto text-emerald-400 mb-2" />
+                  <div className="py-12 text-center text-neutral-500">
+                    <CheckCircle2 className="w-8 h-8 mx-auto text-accent-700 mb-2" />
                     <p className="text-xs font-medium">Zero defective pieces quarantined from washing.</p>
                   </div>
                 ) : (
@@ -816,17 +810,17 @@ export default function WashingWorkCenter() {
                       <div key={c.id} className="py-3 flex items-center justify-between gap-3 text-xs">
                         <div className="space-y-0.5">
                           <div className="flex items-center gap-2">
-                            <span className="font-mono font-bold text-slate-900">{c.challanNumber}</span>
-                            <span className="font-mono font-bold text-rose-700 bg-rose-50 px-1.5 py-0.2 rounded text-[10px]">
+                            <span className="font-mono font-bold text-neutral-900">{c.challanNumber}</span>
+                            <span className="font-mono font-bold text-danger-700 bg-danger-50 px-1.5 py-0.2 rounded text-[10px]">
                               DEF-SHELF-01
                             </span>
                           </div>
-                          <p className="text-slate-600 font-medium">
+                          <p className="text-neutral-600 font-medium">
                             {c.defectReason || 'Shrinkage & Wash Defect'}
                           </p>
                         </div>
                         <div className="flex items-center gap-3">
-                          <span className="font-mono font-bold text-rose-700 text-sm">
+                          <span className="font-mono font-bold text-danger-700 text-sm">
                             {c.defectivePieces} PCS Defective
                           </span>
                           <DocumentActionButtons
@@ -846,31 +840,31 @@ export default function WashingWorkCenter() {
         {/* TAB 4: PRODUCTION SHEETS TRAVELER */}
         {activeTab === 'PRODUCTION_SHEETS' && (
           <div className="space-y-4">
-            <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div className="bg-white rounded-2xl border border-neutral-200 p-5 shadow-xs">
+              <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
                 <div className="flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-blue-600" />
+                  <FileText className="w-5 h-5 text-brand-600" />
                   <div>
-                    <h3 className="text-sm font-bold text-slate-900">
+                    <h3 className="text-sm font-bold text-neutral-900">
                       Master Production Sheets (Travelers)
                     </h3>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-neutral-500">
                       Direct view and printable production sheets for Washing & Drying Specifications
                     </p>
                   </div>
                 </div>
                 <Link
                   href="/programs"
-                  className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow-xs"
+                  className="px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-semibold shadow-xs"
                 >
                   All Sheets →
                 </Link>
               </div>
 
-              <div className="divide-y divide-slate-100 pt-2">
+              <div className="divide-y divide-neutral-100 pt-2">
                 {productionProgramsList.length === 0 ? (
-                  <div className="py-12 text-center text-slate-400">
-                    <FileText className="w-8 h-8 mx-auto text-slate-300 mb-2" />
+                  <div className="py-12 text-center text-neutral-500">
+                    <FileText className="w-8 h-8 mx-auto text-neutral-700 mb-2" />
                     <p className="text-xs font-medium">No production programs linked to incoming challans yet.</p>
                   </div>
                 ) : (
@@ -878,14 +872,14 @@ export default function WashingWorkCenter() {
                     <div key={prog.id} className="py-3 flex items-center justify-between gap-3 text-xs">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-mono font-bold text-slate-900 text-sm">
+                          <span className="font-mono font-bold text-neutral-900 text-sm">
                             {prog.programSerialNo || prog.programNumber}
                           </span>
-                          <span className="font-semibold text-blue-700 bg-blue-50 px-2 py-0.2 rounded text-[10px]">
+                          <span className="font-semibold text-brand-700 bg-brand-50 px-2 py-0.2 rounded text-[10px]">
                             {prog.clientName || 'Standard Client'}
                           </span>
                         </div>
-                        <div className="text-slate-600 text-[11px] mt-0.5">
+                        <div className="text-neutral-600 text-[11px] mt-0.5">
                           <span>Style: {prog.mainStyle || prog.styleCode || 'General'}</span>
                           {prog.fabricName && <span> · Fabric: {prog.fabricName}</span>}
                           {prog.fabricColor && <span> · Color: {prog.fabricColor}</span>}
@@ -907,19 +901,19 @@ export default function WashingWorkCenter() {
 
       {/* WASHING PROCESSING TERMINAL MODAL (ALL MANDATORY FIELDS) */}
       {selectedChallanForWash && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in overflow-y-auto">
-          <div className="relative w-full max-w-2xl bg-white rounded-2xl p-6 shadow-2xl border border-slate-200 text-slate-800 space-y-4 my-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-900/70 backdrop-blur-xs animate-in fade-in overflow-y-auto">
+          <div className="relative w-full max-w-2xl bg-white rounded-2xl p-6 shadow-2xl border border-neutral-200 text-neutral-900 space-y-4 my-auto">
             {/* MODAL HEADER */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+            <div className="flex items-center justify-between pb-3 border-b border-neutral-200">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-cyan-100 flex items-center justify-center text-cyan-700">
+                <div className="w-9 h-9 rounded-xl bg-brand-100 flex items-center justify-center text-brand-700">
                   <Waves className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">
+                  <h3 className="text-base font-bold text-neutral-900">
                     Washing Cycle Terminal · Challan #{selectedChallanForWash.challanNumber}
                   </h3>
-                  <p className="text-xs text-slate-500 font-mono">
+                  <p className="text-xs text-neutral-500 font-mono">
                     Program: {selectedChallanForWash.program?.programSerialNo || selectedChallanForWash.program?.programNumber || '—'} · {selectedChallanForWash.program?.clientName}
                   </p>
                 </div>
@@ -931,7 +925,7 @@ export default function WashingWorkCenter() {
                     <button
                       type="button"
                       onClick={() => setSelectedSheetForView(selectedChallanForWash.program)}
-                      className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold flex items-center gap-1 shadow-xs transition"
+                      className="px-2.5 py-1 bg-brand-600 hover:bg-brand-700 text-white rounded text-xs font-semibold flex items-center gap-1 shadow-xs transition"
                       title="View Official Production Sheet"
                     >
                       <FileText className="w-3.5 h-3.5" />
@@ -940,7 +934,7 @@ export default function WashingWorkCenter() {
                     <button
                       type="button"
                       onClick={() => downloadProductionSheetHtml(selectedChallanForWash.program)}
-                      className="px-2 py-1 bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 rounded text-xs font-semibold flex items-center gap-1 transition"
+                      className="px-2 py-1 bg-brand-50 hover:bg-brand-100 text-brand-700 border border-brand-200 rounded text-xs font-semibold flex items-center gap-1 transition"
                       title="Download Production Sheet HTML"
                     >
                       <Download className="w-3.5 h-3.5" />
@@ -949,7 +943,7 @@ export default function WashingWorkCenter() {
                     <button
                       type="button"
                       onClick={() => printProductionSheet(selectedChallanForWash.program)}
-                      className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-xs font-semibold flex items-center gap-1 transition"
+                      className="px-2 py-1 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded text-xs font-semibold flex items-center gap-1 transition"
                       title="Print Production Sheet Traveler"
                     >
                       <Printer className="w-3.5 h-3.5" />
@@ -959,7 +953,7 @@ export default function WashingWorkCenter() {
                 )}
                 <button
                   onClick={() => setSelectedChallanForWash(null)}
-                  className="p-1 rounded text-slate-400 hover:text-slate-700"
+                  className="p-1 rounded text-neutral-500 hover:text-neutral-700"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -969,9 +963,9 @@ export default function WashingWorkCenter() {
             {/* FORM */}
             <form onSubmit={handleSubmitWashRun} className="space-y-4">
               {/* ROW 1: MANDATORY PIECE IN & PIECE OUT & CALCULATED SHRINKAGE */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 bg-neutral-50 rounded-xl border border-neutral-200">
                 <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1">
+                  <label className="block text-xs font-bold text-neutral-900 mb-1">
                     Piece In (Mandatory) *
                   </label>
                   <input
@@ -980,14 +974,14 @@ export default function WashingWorkCenter() {
                     required
                     value={washForm.pieceIn}
                     onChange={(e) => setWashForm({ ...washForm, pieceIn: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold focus:ring-2 focus:ring-cyan-500"
+                    className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-lg text-xs font-mono font-bold focus:ring-2 focus:ring-brand-500"
                     placeholder="e.g. 500"
                   />
-                  <span className="text-[10px] text-slate-500 mt-0.5 block">Received into washer</span>
+                  <span className="text-[10px] text-neutral-500 mt-0.5 block">Received into washer</span>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-emerald-800 mb-1">
+                  <label className="block text-xs font-bold text-accent-800 mb-1">
                     Piece Out (Mandatory) *
                   </label>
                   <input
@@ -1005,17 +999,17 @@ export default function WashingWorkCenter() {
                         defectivePieces: String(diff),
                       });
                     }}
-                    className="w-full px-3 py-2 bg-white border border-emerald-300 rounded-lg text-xs font-mono font-bold text-emerald-700 focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-3 py-2 bg-white border border-accent-300 rounded-lg text-xs font-mono font-bold text-accent-800 focus:ring-2 focus:ring-brand-500/40"
                     placeholder="e.g. 490"
                   />
-                  <span className="text-[10px] text-emerald-600 mt-0.5 block">Good pieces washed</span>
+                  <span className="text-[10px] text-accent-700 mt-0.5 block">Good pieces washed</span>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-amber-800 mb-1">
+                  <label className="block text-xs font-bold text-accent-800 mb-1">
                     Shrinkage Loss %
                   </label>
-                  <div className="px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg text-xs font-mono font-bold text-amber-900">
+                  <div className="px-3 py-2 bg-accent-50 border border-accent-200 rounded-lg text-xs font-mono font-bold text-accent-800">
                     {Number(washForm.pieceIn) > 0
                       ? `${(
                           ((Number(washForm.pieceIn) - Number(washForm.pieceOut || 0)) /
@@ -1024,7 +1018,7 @@ export default function WashingWorkCenter() {
                         ).toFixed(2)} %`
                       : '0.00 %'}
                   </div>
-                  <span className="text-[10px] text-amber-700 mt-0.5 block">
+                  <span className="text-[10px] text-accent-800 mt-0.5 block">
                     {Math.max(0, Number(washForm.pieceIn) - Number(washForm.pieceOut || 0))} PCS Difference
                   </span>
                 </div>
@@ -1033,31 +1027,31 @@ export default function WashingWorkCenter() {
               {/* ROW 2: MANDATORY WASHING BARCODE & DRUM ID */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1">
+                  <label className="block text-xs font-bold text-neutral-900 mb-1">
                     Washing Barcode (Mandatory) *
                   </label>
                   <div className="relative">
-                    <Barcode className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <Barcode className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" />
                     <input
                       type="text"
                       required
                       value={washForm.washingBarcode}
                       onChange={(e) => setWashForm({ ...washForm, washingBarcode: e.target.value })}
-                      className="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold focus:ring-2 focus:ring-cyan-500"
+                      className="w-full pl-9 pr-3 py-2 bg-white border border-neutral-300 rounded-lg text-xs font-mono font-bold focus:ring-2 focus:ring-brand-500"
                       placeholder="e.g. WB-2026-0042"
                     />
                   </div>
-                  <span className="text-[10px] text-slate-500 mt-0.5 block">Unique lot sticker barcode</span>
+                  <span className="text-[10px] text-neutral-500 mt-0.5 block">Unique lot sticker barcode</span>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1">
+                  <label className="block text-xs font-bold text-neutral-900 mb-1">
                     Machine / Drum ID (Mandatory) *
                   </label>
                   <select
                     value={washForm.machineId}
                     onChange={(e) => setWashForm({ ...washForm, machineId: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium focus:ring-2 focus:ring-cyan-500"
+                    className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-lg text-xs font-medium focus:ring-2 focus:ring-brand-500"
                   >
                     <option value="WASH-DRUM-01">WASH-DRUM-01 (100 KG Capacity)</option>
                     <option value="WASH-DRUM-02">WASH-DRUM-02 (150 KG Capacity)</option>
@@ -1070,13 +1064,13 @@ export default function WashingWorkCenter() {
               {/* ROW 3: WASH RECIPE & DRYING METHOD */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1">
+                  <label className="block text-xs font-bold text-neutral-900 mb-1">
                     Wash Recipe / Treatment *
                   </label>
                   <select
                     value={washForm.washRecipe}
                     onChange={(e) => setWashForm({ ...washForm, washRecipe: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium focus:ring-2 focus:ring-cyan-500"
+                    className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-lg text-xs font-medium focus:ring-2 focus:ring-brand-500"
                   >
                     <option value="BIO_POLISH_SOFT_WASH">Bio-Polish & Enzyme Soft Wash</option>
                     <option value="SILICON_SOFTENER_WASH">Silicon Softener Premium Wash</option>
@@ -1088,13 +1082,13 @@ export default function WashingWorkCenter() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1">
+                  <label className="block text-xs font-bold text-neutral-900 mb-1">
                     Drying Method & Temperature
                   </label>
                   <select
                     value={washForm.dryingMethod}
                     onChange={(e) => setWashForm({ ...washForm, dryingMethod: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium focus:ring-2 focus:ring-cyan-500"
+                    className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-lg text-xs font-medium focus:ring-2 focus:ring-brand-500"
                   >
                     <option value="Tumble Dry (60°C)">Tumble Dry (60°C Medium Heat)</option>
                     <option value="Tumble Dry (80°C High)">Tumble Dry (80°C High Shrinkage Lock)</option>
@@ -1108,13 +1102,13 @@ export default function WashingWorkCenter() {
               {/* ROW 4: TEMPERATURE, DURATION & LIQUOR RATIO */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1">
+                  <label className="block text-xs font-bold text-neutral-900 mb-1">
                     Water Temp
                   </label>
                   <select
                     value={washForm.waterTemp}
                     onChange={(e) => setWashForm({ ...washForm, waterTemp: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium"
+                    className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-lg text-xs font-medium"
                   >
                     <option value="Ambient Cold (25°C)">Ambient Cold (25°C)</option>
                     <option value="40°C Warm">40°C Warm (Recommended)</option>
@@ -1124,7 +1118,7 @@ export default function WashingWorkCenter() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1">
+                  <label className="block text-xs font-bold text-neutral-900 mb-1">
                     Wash Duration (Mins)
                   </label>
                   <input
@@ -1132,19 +1126,19 @@ export default function WashingWorkCenter() {
                     min="5"
                     value={washForm.durationMinutes}
                     onChange={(e) => setWashForm({ ...washForm, durationMinutes: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-mono font-medium"
+                    className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-lg text-xs font-mono font-medium"
                     placeholder="45"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1">
+                  <label className="block text-xs font-bold text-neutral-900 mb-1">
                     Liquor Ratio
                   </label>
                   <select
                     value={washForm.liquorRatio}
                     onChange={(e) => setWashForm({ ...washForm, liquorRatio: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs font-medium"
+                    className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-lg text-xs font-medium"
                   >
                     <option value="1:5">1:5 (Low Liquor)</option>
                     <option value="1:8">1:8 (Standard)</option>
@@ -1157,7 +1151,7 @@ export default function WashingWorkCenter() {
               {/* ROW 5: DEFECT / REMARKS */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-rose-800 mb-1">
+                  <label className="block text-xs font-bold text-danger-800 mb-1">
                     Quarantine / Defective Pieces (DEF-SHELF-01)
                   </label>
                   <input
@@ -1165,34 +1159,34 @@ export default function WashingWorkCenter() {
                     min="0"
                     value={washForm.defectivePieces}
                     onChange={(e) => setWashForm({ ...washForm, defectivePieces: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-rose-300 rounded-lg text-xs font-mono font-bold text-rose-700"
+                    className="w-full px-3 py-2 bg-white border border-danger-300 rounded-lg text-xs font-mono font-bold text-danger-700"
                     placeholder="0"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-800 mb-1">
+                  <label className="block text-xs font-bold text-neutral-900 mb-1">
                     Defect Reason (if any)
                   </label>
                   <input
                     type="text"
                     value={washForm.defectReason}
                     onChange={(e) => setWashForm({ ...washForm, defectReason: e.target.value })}
-                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs"
+                    className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-lg text-xs"
                     placeholder="e.g. Color bleeding, fraying, shrinkage deviation"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-800 mb-1">
+                <label className="block text-xs font-bold text-neutral-900 mb-1">
                   Hand-Feel & Quality Inspection Remarks
                 </label>
                 <input
                   type="text"
                   value={washForm.handFeelRemarks}
                   onChange={(e) => setWashForm({ ...washForm, handFeelRemarks: e.target.value })}
-                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs"
+                  className="w-full px-3 py-2 bg-white border border-neutral-300 rounded-lg text-xs"
                   placeholder="e.g. Soft hand-feel verified, zero fabric pills, color fast"
                 />
               </div>
@@ -1200,7 +1194,7 @@ export default function WashingWorkCenter() {
               {/* BARCODE STICKER CARD PREVIEW */}
               {washForm.washingBarcode && (
                 <div className="pt-2">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                  <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider block mb-1">
                     Live Barcode Sticker Preview (For Bundle Tagging)
                   </span>
                   <BarcodeStickerCard
@@ -1226,18 +1220,18 @@ export default function WashingWorkCenter() {
               )}
 
               {/* ACTION BUTTONS */}
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-200">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-neutral-200">
                 <button
                   type="button"
                   onClick={() => setSelectedChallanForWash(null)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition"
+                  className="px-4 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-semibold text-xs rounded-lg transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submittingWash}
-                  className="px-5 py-2 bg-cyan-600 hover:bg-cyan-700 text-white font-bold text-xs rounded-lg shadow-sm transition flex items-center gap-1.5"
+                  className="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-lg shadow-sm transition flex items-center gap-1.5"
                 >
                   {submittingWash ? (
                     <>
@@ -1259,43 +1253,43 @@ export default function WashingWorkCenter() {
 
       {/* HANDOVER SUCCESS MODAL WITH BARCODE TAG */}
       {handoverChallanModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in overflow-y-auto">
-          <div className="relative w-full max-w-lg bg-white rounded-2xl p-6 shadow-2xl border border-slate-200 text-slate-800 space-y-4 my-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-900/70 backdrop-blur-xs animate-in fade-in overflow-y-auto">
+          <div className="relative w-full max-w-lg bg-white rounded-2xl p-6 shadow-2xl border border-neutral-200 text-neutral-900 space-y-4 my-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-neutral-200">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-700">
+                <div className="w-9 h-9 rounded-xl bg-accent-100 flex items-center justify-center text-accent-800">
                   <PackageCheck className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">
+                  <h3 className="text-base font-bold text-neutral-900">
                     Handover Challan Dispatched to Finishing!
                   </h3>
-                  <p className="text-xs text-slate-500 font-mono">
+                  <p className="text-xs text-neutral-500 font-mono">
                     {handoverChallanModal.challanNumber}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setHandoverChallanModal(null)}
-                className="p-1 rounded text-slate-400 hover:text-slate-700"
+                className="p-1 rounded text-neutral-500 hover:text-neutral-700"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="space-y-3">
-              <div className="bg-emerald-50/60 p-3 rounded-xl border border-emerald-100 text-xs space-y-1">
+              <div className="bg-accent-50/60 p-3 rounded-xl border border-accent-100 text-xs space-y-1">
                 <div className="flex justify-between">
-                  <span className="text-slate-600">From Department:</span>
-                  <span className="font-semibold text-slate-800">WASHING DEPARTMENT</span>
+                  <span className="text-neutral-600">From Department:</span>
+                  <span className="font-semibold text-neutral-900">WASHING DEPARTMENT</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-600">To Department:</span>
-                  <span className="font-bold text-emerald-700">FINISHING DEPARTMENT</span>
+                  <span className="text-neutral-600">To Department:</span>
+                  <span className="font-bold text-accent-800">FINISHING DEPARTMENT</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-600">Pieces Dispatched:</span>
-                  <span className="font-mono font-bold text-slate-900">
+                  <span className="text-neutral-600">Pieces Dispatched:</span>
+                  <span className="font-mono font-bold text-neutral-900">
                     {handoverChallanModal.items?.reduce((s: number, it: any) => s + (Number(it.quantity) || 0), 0) || '—'} PCS
                   </span>
                 </div>
@@ -1318,10 +1312,10 @@ export default function WashingWorkCenter() {
               />
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200">
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-neutral-200">
               <button
                 onClick={() => setHandoverChallanModal(null)}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition"
+                className="px-4 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-semibold text-xs rounded-lg transition"
               >
                 Close
               </button>

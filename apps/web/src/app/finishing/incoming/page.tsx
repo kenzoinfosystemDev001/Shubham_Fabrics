@@ -20,7 +20,6 @@ import {
   ShieldCheck,
   Scissors,
 } from 'lucide-react';
-import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 
 export default function FinishingIncomingPage() {
   const router = useRouter();
@@ -142,26 +141,21 @@ export default function FinishingIncomingPage() {
 
   return (
     <div
-      className="min-h-screen text-slate-100 flex flex-col"
-      style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.94), rgba(10, 15, 29, 0.98)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
-      }}
+      className="min-h-screen text-neutral-900 flex flex-col"
+      
     >
       {/* HEADER */}
-      <header className="border-b border-slate-800/80 bg-slate-950/60 backdrop-blur-md px-6 py-4 sticky top-0 z-30 shadow-md">
+      <header className="border-b border-neutral-200 bg-white backdrop-blur-md px-6 py-4 sticky top-0 z-30 shadow-md">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-inner">
+            <div className="w-10 h-10 rounded-xl bg-accent-400/10 border border-accent-500/30 flex items-center justify-center text-accent-700 shadow-inner">
               <ArrowDownLeft className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+              <h1 className="text-xl font-bold tracking-tight text-neutral-900 flex items-center gap-2">
                 Inward Challans (Stitching Handover)
               </h1>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-neutral-500">
                 Acknowledge physical bundle receipts, count verification, and transfer to finishing queue
               </p>
             </div>
@@ -171,14 +165,14 @@ export default function FinishingIncomingPage() {
             <button
               onClick={() => loadData(true)}
               disabled={loading}
-              className="p-2 rounded-lg bg-slate-900 border border-slate-700/80 hover:bg-slate-800 text-slate-300 hover:text-white transition disabled:opacity-50"
+              className="p-2 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-100 text-neutral-700 hover:text-neutral-900 transition disabled:opacity-50"
               title="Refresh Inward Challans"
             >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-amber-400' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-accent-700' : ''}`} />
             </button>
             <Link
               href="/finishing/my-work"
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-xs font-semibold shadow-md shadow-teal-900/30 transition"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold shadow-sm transition"
             >
               <Sparkles className="w-4 h-4" />
               <span>Finishing Floor Workspace</span>
@@ -190,15 +184,15 @@ export default function FinishingIncomingPage() {
       {/* MAIN CONTENT */}
       <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-6 space-y-6">
         {/* CONTROLS BAR: SEARCH & TABS */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-slate-900/60 border border-slate-800 rounded-xl p-3.5 backdrop-blur-xs">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white border border-neutral-200 rounded-xl p-3.5 backdrop-blur-xs">
           {/* Tabs */}
-          <div className="flex items-center gap-1.5 p-1 bg-slate-950/60 border border-slate-800 rounded-lg">
+          <div className="flex items-center gap-1.5 p-1 bg-white border border-neutral-200 rounded-lg">
             <button
               onClick={() => setActiveTab('ALL')}
               className={`px-3 py-1.5 rounded-md text-xs font-semibold transition ${
                 activeTab === 'ALL'
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-accent-400/20 text-accent-700 border border-accent-500/40'
+                  : 'text-neutral-500 hover:text-neutral-900'
               }`}
             >
               All Inward ({challans.length})
@@ -207,8 +201,8 @@ export default function FinishingIncomingPage() {
               onClick={() => setActiveTab('ISSUED')}
               className={`px-3 py-1.5 rounded-md text-xs font-semibold transition ${
                 activeTab === 'ISSUED'
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-accent-400/20 text-accent-700 border border-accent-500/40'
+                  : 'text-neutral-500 hover:text-neutral-900'
               }`}
             >
               Pending Receipt ({challans.filter((c) => c.status === 'ISSUED').length})
@@ -217,8 +211,8 @@ export default function FinishingIncomingPage() {
               onClick={() => setActiveTab('RECEIVED')}
               className={`px-3 py-1.5 rounded-md text-xs font-semibold transition ${
                 activeTab === 'RECEIVED'
-                  ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-brand-500/20 text-brand-600 border border-brand-500/40'
+                  : 'text-neutral-500 hover:text-neutral-900'
               }`}
             >
               In Finishing Queue ({challans.filter((c) => c.status !== 'ISSUED').length})
@@ -227,18 +221,18 @@ export default function FinishingIncomingPage() {
 
           {/* Search Input */}
           <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-500" />
+            <Search className="w-4 h-4 absolute left-3 top-2.5 text-neutral-500" />
             <input
               type="text"
               placeholder="Search by Challan, Program, Style, Client..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-slate-950/80 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400/60 transition"
+              className="w-full pl-9 pr-4 py-2 bg-white border border-neutral-200 rounded-lg text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-brand-500 transition"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-2.5 text-slate-500 hover:text-slate-300 text-xs"
+                className="absolute right-2.5 top-2.5 text-neutral-500 hover:text-neutral-700 text-xs"
               >
                 Clear
               </button>
@@ -248,7 +242,7 @@ export default function FinishingIncomingPage() {
 
         {/* ERROR DISPLAY */}
         {error && (
-          <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl flex items-center gap-3 text-rose-300 text-xs">
+          <div className="p-3 bg-danger-500/10 border border-danger-500/30 rounded-xl flex items-center gap-3 text-danger-600 text-xs">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
@@ -256,15 +250,15 @@ export default function FinishingIncomingPage() {
 
         {/* CHALLANS TABLE / GRID */}
         {loading ? (
-          <div className="py-20 text-center text-slate-400 text-xs flex flex-col items-center justify-center">
-            <RefreshCw className="w-8 h-8 animate-spin text-amber-400 mb-3" />
+          <div className="py-20 text-center text-neutral-500 text-xs flex flex-col items-center justify-center">
+            <RefreshCw className="w-8 h-8 animate-spin text-accent-700 mb-3" />
             <span>Loading incoming Challans...</span>
           </div>
         ) : filteredChallans.length === 0 ? (
-          <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-12 text-center text-slate-400 backdrop-blur-xs">
-            <Package className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-            <h3 className="text-base font-bold text-white mb-1">No Inward Challans Found</h3>
-            <p className="text-xs text-slate-400 max-w-sm mx-auto">
+          <div className="bg-white border border-neutral-200 rounded-2xl p-12 text-center text-neutral-500 backdrop-blur-xs">
+            <Package className="w-12 h-12 text-neutral-600 mx-auto mb-3" />
+            <h3 className="text-base font-bold text-neutral-900 mb-1">No Inward Challans Found</h3>
+            <p className="text-xs text-neutral-500 max-w-sm mx-auto">
               {searchQuery
                 ? 'No matching challans for your search query.'
                 : 'There are currently no challans routed to the Finishing Department.'}
@@ -287,38 +281,38 @@ export default function FinishingIncomingPage() {
               return (
                 <div
                   key={ch.id}
-                  className={`rounded-2xl border bg-slate-900/70 p-5 flex flex-col justify-between space-y-4 backdrop-blur-xs transition shadow-sm ${
+                  className={`rounded-2xl border bg-white p-5 flex flex-col justify-between space-y-4 backdrop-blur-xs transition shadow-sm ${
                     isIssued
-                      ? 'border-amber-500/40 hover:border-amber-400/70'
-                      : 'border-slate-800 hover:border-slate-700'
+                      ? 'border-accent-500/40 hover:border-accent-500/70'
+                      : 'border-neutral-200 hover:border-neutral-200'
                   }`}
                 >
                   {/* Top Bar: Challan & Status Badge */}
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <span className="font-mono text-xs font-bold text-amber-300 block">
+                      <span className="font-mono text-xs font-bold text-accent-700 block">
                         {ch.challanNumber}
                       </span>
-                      <span className="text-[10px] text-slate-400 block">
-                        From: <span className="text-slate-300 font-semibold">{ch.fromDepartment || 'STITCHING'}</span>
+                      <span className="text-[10px] text-neutral-500 block">
+                        From: <span className="text-neutral-700 font-semibold">{ch.fromDepartment || 'STITCHING'}</span>
                       </span>
                     </div>
 
                     <span
                       className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
                         isIssued
-                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse'
+                          ? 'bg-accent-400/20 text-accent-700 border border-accent-500/40 animate-pulse'
                           : isReceived
-                          ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40'
+                          ? 'bg-brand-500/20 text-brand-600 border border-brand-500/40'
                           : isInProcess
-                          ? 'bg-blue-500/20 text-blue-300 border border-blue-500/40'
+                          ? 'bg-brand-500/20 text-brand-600 border border-brand-500/40'
                           : isCompleted
-                          ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40'
+                          ? 'bg-brand-500/20 text-brand-600 border border-brand-500/40'
                           : isReady
-                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                          ? 'bg-accent-400/20 text-accent-700 border border-accent-500/40'
                           : isHold
-                          ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
-                          : 'bg-slate-800 text-slate-300'
+                          ? 'bg-danger-500/20 text-danger-600 border border-danger-500/40'
+                          : 'bg-neutral-100 text-neutral-700'
                       }`}
                     >
                       {ch.status.replace(/_/g, ' ')}
@@ -326,41 +320,41 @@ export default function FinishingIncomingPage() {
                   </div>
 
                   {/* Program & Garment Details */}
-                  <div className="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3 space-y-1.5 text-xs">
+                  <div className="bg-white border border-neutral-200 rounded-xl p-3 space-y-1.5 text-xs">
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-400">Program Sheet:</span>
-                      <span className="font-semibold text-white font-mono">
+                      <span className="text-neutral-500">Program Sheet:</span>
+                      <span className="font-semibold text-neutral-900 font-mono">
                         {ch.program?.programNumber || 'N/A'}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-400">Style Code:</span>
-                      <span className="font-semibold text-teal-300">
+                      <span className="text-neutral-500">Style Code:</span>
+                      <span className="font-semibold text-brand-600">
                         {ch.program?.styleCode || 'Standard'}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-400">Client / Buyer:</span>
-                      <span className="text-slate-200 truncate max-w-[140px]">
+                      <span className="text-neutral-500">Client / Buyer:</span>
+                      <span className="text-neutral-900 truncate max-w-[140px]">
                         {ch.program?.buyerName || ch.program?.clientName || 'Direct'}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between pt-1 border-t border-slate-800/60 font-medium">
-                      <span className="text-slate-400">Total Bundle Pcs:</span>
-                      <span className="font-bold text-white font-mono text-sm">
+                    <div className="flex items-center justify-between pt-1 border-t border-neutral-200 font-medium">
+                      <span className="text-neutral-500">Total Bundle Pcs:</span>
+                      <span className="font-bold text-neutral-900 font-mono text-sm">
                         {totalPieces} {ch.items[0]?.uom || 'PCS'}
                       </span>
                     </div>
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="pt-2 flex items-center justify-between gap-2 border-t border-slate-800/80">
+                  <div className="pt-2 flex items-center justify-between gap-2 border-t border-neutral-200">
                     {ch.program && (
                       <button
                         onClick={() => setPreviewProgram(ch.program)}
-                        className="text-[11px] font-semibold text-slate-400 hover:text-white flex items-center gap-1 transition"
+                        className="text-[11px] font-semibold text-neutral-500 hover:text-neutral-900 flex items-center gap-1 transition"
                       >
-                        <FileText className="w-3.5 h-3.5 text-teal-400" />
+                        <FileText className="w-3.5 h-3.5 text-brand-600" />
                         <span>Specs</span>
                       </button>
                     )}
@@ -368,7 +362,7 @@ export default function FinishingIncomingPage() {
                     {isIssued ? (
                       <button
                         onClick={() => openReceiveModal(ch)}
-                        className="px-3.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold shadow-md shadow-amber-900/30 transition flex items-center gap-1.5 ml-auto"
+                        className="px-3.5 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-sm transition flex items-center gap-1.5 ml-auto"
                       >
                         <ShieldCheck className="w-3.5 h-3.5" />
                         <span>Inward Bundle</span>
@@ -376,7 +370,7 @@ export default function FinishingIncomingPage() {
                     ) : (
                       <Link
                         href={`/finishing/workspace/${ch.id}`}
-                        className="px-3 py-1.5 rounded-lg bg-teal-600/30 hover:bg-teal-600/50 text-teal-200 border border-teal-500/40 text-xs font-semibold transition flex items-center gap-1.5 ml-auto"
+                        className="px-3 py-1.5 rounded-lg bg-brand-500/30 hover:bg-brand-500/50 text-brand-800 border border-brand-500/40 text-xs font-semibold transition flex items-center gap-1.5 ml-auto"
                       >
                         <Scissors className="w-3.5 h-3.5" />
                         <span>Open Workspace</span>
@@ -392,45 +386,45 @@ export default function FinishingIncomingPage() {
 
         {/* INWARD RECEIPT VERIFICATION MODAL */}
         {selectedChallan && (
-          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl relative">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div className="fixed inset-0 z-50 bg-neutral-900/70 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="bg-white border border-neutral-200 rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl relative">
+              <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
                 <div className="flex items-center gap-2.5">
-                  <ShieldCheck className="w-5 h-5 text-amber-400" />
-                  <h3 className="text-base font-bold text-white">Physical Bundle Verification</h3>
+                  <ShieldCheck className="w-5 h-5 text-accent-700" />
+                  <h3 className="text-base font-bold text-neutral-900">Physical Bundle Verification</h3>
                 </div>
                 <button
                   onClick={() => setSelectedChallan(null)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                  className="p-1 rounded-lg text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 transition"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               {receiveSuccess ? (
-                <div className="py-6 text-center text-emerald-400 space-y-2">
-                  <CheckCircle2 className="w-12 h-12 mx-auto text-emerald-400" />
+                <div className="py-6 text-center text-accent-700 space-y-2">
+                  <CheckCircle2 className="w-12 h-12 mx-auto text-accent-700" />
                   <p className="text-sm font-bold">{receiveSuccess}</p>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <div className="bg-slate-950/60 border border-slate-800 rounded-xl p-3.5 space-y-2 text-xs">
+                  <div className="bg-white border border-neutral-200 rounded-xl p-3.5 space-y-2 text-xs">
                     <div className="flex justify-between">
-                      <span className="text-slate-400">Challan Number:</span>
-                      <span className="font-mono font-bold text-amber-300">
+                      <span className="text-neutral-500">Challan Number:</span>
+                      <span className="font-mono font-bold text-accent-700">
                         {selectedChallan.challanNumber}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-400">Style / Program:</span>
-                      <span className="text-white font-medium">
+                      <span className="text-neutral-500">Style / Program:</span>
+                      <span className="text-neutral-900 font-medium">
                         {selectedChallan.program?.styleCode || 'Standard'} (
                         {selectedChallan.program?.programNumber || 'N/A'})
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-400">Issued Pieces (Stitching):</span>
-                      <span className="font-bold text-white font-mono">
+                      <span className="text-neutral-500">Issued Pieces (Stitching):</span>
+                      <span className="font-bold text-neutral-900 font-mono">
                         {selectedChallan.items.reduce(
                           (s: number, it: any) => s + (Number(it.quantity) || 0),
                           0
@@ -441,7 +435,7 @@ export default function FinishingIncomingPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">
+                    <label className="block text-xs font-semibold text-neutral-700 mb-1">
                       Physically Counted Garments (PCS) *
                     </label>
                     <input
@@ -451,14 +445,14 @@ export default function FinishingIncomingPage() {
                       onChange={(e) =>
                         setReceiveQuantity(e.target.value === '' ? '' : Number(e.target.value))
                       }
-                      className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-sm text-white font-mono font-bold focus:outline-none focus:border-amber-400"
+                      className="w-full px-3 py-2 bg-canvas border border-neutral-200 rounded-lg text-sm text-neutral-900 font-mono font-bold focus:outline-none focus:border-brand-500"
                     />
                     {Number(receiveQuantity) <
                       selectedChallan.items.reduce(
                         (s: number, it: any) => s + (Number(it.quantity) || 0),
                         0
                       ) && (
-                      <p className="text-[11px] text-amber-400 mt-1 flex items-center gap-1">
+                      <p className="text-[11px] text-accent-700 mt-1 flex items-center gap-1">
                         <AlertCircle className="w-3.5 h-3.5" />
                         Discrepancy detected: short by{' '}
                         {selectedChallan.items.reduce(
@@ -476,15 +470,15 @@ export default function FinishingIncomingPage() {
                       id="markHold"
                       checked={markOnHold}
                       onChange={(e) => setMarkOnHold(e.target.checked)}
-                      className="rounded border-slate-700 bg-slate-950 text-amber-500 focus:ring-0"
+                      className="rounded border-neutral-200 bg-canvas text-accent-700 focus:ring-0"
                     />
-                    <label htmlFor="markHold" className="text-xs text-slate-300">
+                    <label htmlFor="markHold" className="text-xs text-neutral-700">
                       Flag bundle on hold (requires supervisor or stitching clarification)
                     </label>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">
+                    <label className="block text-xs font-semibold text-neutral-700 mb-1">
                       Inward Remarks / Inspection Notes
                     </label>
                     <textarea
@@ -492,28 +486,28 @@ export default function FinishingIncomingPage() {
                       value={receiveRemarks}
                       onChange={(e) => setReceiveRemarks(e.target.value)}
                       placeholder="e.g., Bundle count verified, tags intact, ready for trimming"
-                      className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-amber-400 resize-none"
+                      className="w-full px-3 py-2 bg-canvas border border-neutral-200 rounded-lg text-xs text-neutral-900 focus:outline-none focus:border-brand-500 resize-none"
                     />
                   </div>
 
                   {receiveError && (
-                    <div className="p-2.5 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-300 text-xs flex items-center gap-2">
+                    <div className="p-2.5 bg-danger-500/10 border border-danger-500/30 rounded-lg text-danger-600 text-xs flex items-center gap-2">
                       <AlertCircle className="w-4 h-4 shrink-0" />
                       <span>{receiveError}</span>
                     </div>
                   )}
 
-                  <div className="pt-2 flex items-center justify-end gap-3 border-t border-slate-800">
+                  <div className="pt-2 flex items-center justify-end gap-3 border-t border-neutral-200">
                     <button
                       onClick={() => setSelectedChallan(null)}
-                      className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition"
+                      className="px-4 py-2 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-semibold transition"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleConfirmReceive}
                       disabled={submittingReceive}
-                      className="px-5 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold shadow-md shadow-amber-900/30 transition disabled:opacity-50 flex items-center gap-1.5"
+                      className="px-5 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-sm transition disabled:opacity-50 flex items-center gap-1.5"
                     >
                       <CheckCircle2 className="w-4 h-4" />
                       <span>{submittingReceive ? 'Verifying...' : 'Confirm Inward'}</span>
@@ -527,44 +521,44 @@ export default function FinishingIncomingPage() {
 
         {/* PRODUCTION SHEET PREVIEW MODAL */}
         {previewProgram && (
-          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 space-y-4 shadow-2xl relative max-h-[85vh] overflow-y-auto">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div className="fixed inset-0 z-50 bg-neutral-900/70 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="bg-white border border-neutral-200 rounded-2xl max-w-xl w-full p-6 space-y-4 shadow-2xl relative max-h-[85vh] overflow-y-auto">
+              <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
                 <div className="flex items-center gap-2.5">
-                  <FileText className="w-5 h-5 text-teal-400" />
-                  <h3 className="text-base font-bold text-white">Production Sheet Specifications</h3>
+                  <FileText className="w-5 h-5 text-brand-600" />
+                  <h3 className="text-base font-bold text-neutral-900">Production Sheet Specifications</h3>
                 </div>
                 <button
                   onClick={() => setPreviewProgram(null)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                  className="p-1 rounded-lg text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 transition"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               <div className="space-y-3 text-xs">
-                <div className="grid grid-cols-2 gap-3 bg-slate-950/60 p-3 rounded-xl border border-slate-800">
+                <div className="grid grid-cols-2 gap-3 bg-white p-3 rounded-xl border border-neutral-200">
                   <div>
-                    <span className="text-slate-400 block text-[10px]">Program Number:</span>
-                    <span className="font-mono font-bold text-white">{previewProgram.programNumber}</span>
+                    <span className="text-neutral-500 block text-[10px]">Program Number:</span>
+                    <span className="font-mono font-bold text-neutral-900">{previewProgram.programNumber}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block text-[10px]">Style Code:</span>
-                    <span className="font-bold text-teal-300">{previewProgram.styleCode || 'Standard'}</span>
+                    <span className="text-neutral-500 block text-[10px]">Style Code:</span>
+                    <span className="font-bold text-brand-600">{previewProgram.styleCode || 'Standard'}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block text-[10px]">Client / Buyer:</span>
-                    <span className="text-slate-200">{previewProgram.buyerName || previewProgram.clientName || 'Standard'}</span>
+                    <span className="text-neutral-500 block text-[10px]">Client / Buyer:</span>
+                    <span className="text-neutral-900">{previewProgram.buyerName || previewProgram.clientName || 'Standard'}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block text-[10px]">Target Quantity:</span>
-                    <span className="font-mono font-bold text-white">{previewProgram.targetQuantity || 'N/A'}</span>
+                    <span className="text-neutral-500 block text-[10px]">Target Quantity:</span>
+                    <span className="font-mono font-bold text-neutral-900">{previewProgram.targetQuantity || 'N/A'}</span>
                   </div>
                 </div>
 
-                <div className="bg-slate-950/60 p-3 rounded-xl border border-slate-800 space-y-1.5">
-                  <span className="text-slate-400 font-semibold block">Finishing Quality Guidelines:</span>
-                  <ul className="list-disc pl-4 space-y-1 text-slate-300">
+                <div className="bg-white p-3 rounded-xl border border-neutral-200 space-y-1.5">
+                  <span className="text-neutral-500 font-semibold block">Finishing Quality Guidelines:</span>
+                  <ul className="list-disc pl-4 space-y-1 text-neutral-700">
                     <li>Trim all loose threads to &lt; 2mm length cleanly without cutting fabric yarn.</li>
                     <li>Inspect front embroidery motifs, collars, and hems for jump stitch loops.</li>
                     <li>Remove oil spots and chalk marks using designated non-solvent stain cleaners.</li>
@@ -573,10 +567,10 @@ export default function FinishingIncomingPage() {
                 </div>
               </div>
 
-              <div className="pt-2 flex justify-end border-t border-slate-800">
+              <div className="pt-2 flex justify-end border-t border-neutral-200">
                 <button
                   onClick={() => setPreviewProgram(null)}
-                  className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition"
+                  className="px-4 py-2 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-900 text-xs font-semibold transition"
                 >
                   Close
                 </button>

@@ -29,7 +29,6 @@ import {
   Pause,
   Play,
 } from 'lucide-react';
-import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 
 function FinishingWorkstationContent() {
@@ -319,26 +318,21 @@ function FinishingWorkstationContent() {
 
   return (
     <div
-      className="min-h-screen text-slate-100 flex flex-col"
-      style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.94), rgba(10, 15, 29, 0.98)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
-      }}
+      className="min-h-screen text-neutral-900 flex flex-col"
+      
     >
       {/* HEADER */}
-      <header className="border-b border-slate-800/80 bg-slate-950/60 backdrop-blur-md px-6 py-4 sticky top-0 z-30 shadow-md">
+      <header className="border-b border-neutral-200 bg-white backdrop-blur-md px-6 py-4 sticky top-0 z-30 shadow-md">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/30 flex items-center justify-center text-teal-400 shadow-inner">
+            <div className="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-600 shadow-inner">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+              <h1 className="text-xl font-bold tracking-tight text-neutral-900 flex items-center gap-2">
                 Finishing Floor & Workstation
               </h1>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-neutral-500">
                 Live queue, station allocation, trimming, spot cleaning, pressing, and output accounting
               </p>
             </div>
@@ -348,14 +342,14 @@ function FinishingWorkstationContent() {
             <button
               onClick={() => loadJobs()}
               disabled={loading}
-              className="p-2 rounded-lg bg-slate-900 border border-slate-700/80 hover:bg-slate-800 text-slate-300 hover:text-white transition disabled:opacity-50"
+              className="p-2 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-100 text-neutral-700 hover:text-neutral-900 transition disabled:opacity-50"
               title="Refresh Queue"
             >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-teal-400' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-brand-600' : ''}`} />
             </button>
             <Link
               href="/finishing/issue-challan"
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-xs font-semibold shadow-md shadow-teal-900/30 transition"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold shadow-sm transition"
             >
               <Send className="w-4 h-4" />
               <span>Issue Handover Challan</span>
@@ -367,7 +361,7 @@ function FinishingWorkstationContent() {
       {/* ERROR DISPLAY */}
       {error && (
         <div className="max-w-7xl mx-auto w-full px-6 pt-4">
-          <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl flex items-center gap-3 text-rose-300 text-xs">
+          <div className="p-3 bg-danger-500/10 border border-danger-500/30 rounded-xl flex items-center gap-3 text-danger-600 text-xs">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
@@ -379,16 +373,16 @@ function FinishingWorkstationContent() {
         {/* LEFT PANE: JOBS LIST */}
         <div className="w-full lg:w-5/12 flex flex-col space-y-4">
           {/* SEARCH & FILTER TABS */}
-          <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-3.5 space-y-3 backdrop-blur-xs">
+          <div className="bg-white border border-neutral-200 rounded-2xl p-3.5 space-y-3 backdrop-blur-xs">
             {/* Search */}
             <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-500" />
+              <Search className="w-4 h-4 absolute left-3 top-2.5 text-neutral-500" />
               <input
                 type="text"
                 placeholder="Search style, program, challan..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-slate-950/80 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-teal-400"
+                className="w-full pl-9 pr-4 py-2 bg-white border border-neutral-200 rounded-lg text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-brand-500"
               />
             </div>
 
@@ -398,8 +392,8 @@ function FinishingWorkstationContent() {
                 onClick={() => setActiveTab('ALL')}
                 className={`px-2.5 py-1.5 rounded-lg font-semibold shrink-0 transition ${
                   activeTab === 'ALL'
-                    ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-brand-500/20 text-brand-600 border border-brand-500/40'
+                    : 'text-neutral-500 hover:text-neutral-900'
                 }`}
               >
                 All ({jobs.length})
@@ -408,8 +402,8 @@ function FinishingWorkstationContent() {
                 onClick={() => setActiveTab('READY_TO_START')}
                 className={`px-2.5 py-1.5 rounded-lg font-semibold shrink-0 transition ${
                   activeTab === 'READY_TO_START'
-                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-accent-400/20 text-accent-700 border border-accent-500/40'
+                    : 'text-neutral-500 hover:text-neutral-900'
                 }`}
               >
                 Queue ({jobs.filter((j) => j.status === 'RECEIVED').length})
@@ -418,8 +412,8 @@ function FinishingWorkstationContent() {
                 onClick={() => setActiveTab('IN_PROGRESS')}
                 className={`px-2.5 py-1.5 rounded-lg font-semibold shrink-0 transition ${
                   activeTab === 'IN_PROGRESS'
-                    ? 'bg-blue-500/20 text-blue-300 border border-blue-500/40'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-brand-500/20 text-brand-600 border border-brand-500/40'
+                    : 'text-neutral-500 hover:text-neutral-900'
                 }`}
               >
                 In Finishing ({jobs.filter((j) => j.status === 'IN_PROCESS' || j.status === 'ON_HOLD').length})
@@ -428,8 +422,8 @@ function FinishingWorkstationContent() {
                 onClick={() => setActiveTab('INSPECTION')}
                 className={`px-2.5 py-1.5 rounded-lg font-semibold shrink-0 transition ${
                   activeTab === 'INSPECTION'
-                    ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-brand-500/20 text-brand-600 border border-brand-500/40'
+                    : 'text-neutral-500 hover:text-neutral-900'
                 }`}
               >
                 Inspection ({jobs.filter((j) => j.status === 'COMPLETED').length})
@@ -438,8 +432,8 @@ function FinishingWorkstationContent() {
                 onClick={() => setActiveTab('READY_FOR_HANDOVER')}
                 className={`px-2.5 py-1.5 rounded-lg font-semibold shrink-0 transition ${
                   activeTab === 'READY_FOR_HANDOVER'
-                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-accent-400/20 text-accent-700 border border-accent-500/40'
+                    : 'text-neutral-500 hover:text-neutral-900'
                 }`}
               >
                 Ready ({jobs.filter((j) => j.status === 'READY_FOR_HANDOVER').length})
@@ -450,12 +444,12 @@ function FinishingWorkstationContent() {
           {/* JOB CARDS SCROLLABLE */}
           <div className="flex-1 space-y-2.5 overflow-y-auto max-h-[calc(100vh-250px)] pr-1">
             {loading ? (
-              <div className="py-20 text-center text-slate-400 text-xs flex flex-col items-center">
-                <RefreshCw className="w-6 h-6 animate-spin text-teal-400 mb-2" />
+              <div className="py-20 text-center text-neutral-500 text-xs flex flex-col items-center">
+                <RefreshCw className="w-6 h-6 animate-spin text-brand-600 mb-2" />
                 <span>Loading queue...</span>
               </div>
             ) : filteredJobs.length === 0 ? (
-              <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 text-center text-slate-400 text-xs">
+              <div className="bg-white border border-neutral-200 rounded-2xl p-8 text-center text-neutral-500 text-xs">
                 No jobs found in this category.
               </div>
             ) : (
@@ -472,46 +466,46 @@ function FinishingWorkstationContent() {
                     onClick={() => setSelectedJob(job)}
                     className={`p-4 rounded-xl border cursor-pointer transition flex flex-col space-y-2 backdrop-blur-xs ${
                       isSelected
-                        ? 'bg-teal-950/40 border-teal-500/80 shadow-md ring-1 ring-teal-500/30'
-                        : 'bg-slate-900/70 border-slate-800/80 hover:border-slate-700'
+                        ? 'bg-brand-50 border-brand-500/80 shadow-sm ring-1 ring-brand-500/30'
+                        : 'bg-white border-neutral-200 hover:border-neutral-200'
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-mono text-xs font-bold text-white">
+                      <span className="font-mono text-xs font-bold text-neutral-900">
                         {job.challanNumber}
                       </span>
                       <span
                         className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
                           job.status === 'RECEIVED'
-                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                            ? 'bg-accent-400/20 text-accent-700 border border-accent-500/40'
                             : job.status === 'IN_PROCESS'
-                            ? 'bg-blue-500/20 text-blue-300 border border-blue-500/40'
+                            ? 'bg-brand-500/20 text-brand-600 border border-brand-500/40'
                             : job.status === 'COMPLETED'
-                            ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40'
+                            ? 'bg-brand-500/20 text-brand-600 border border-brand-500/40'
                             : job.status === 'READY_FOR_HANDOVER'
-                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                            ? 'bg-accent-400/20 text-accent-700 border border-accent-500/40'
                             : job.status === 'ON_HOLD'
-                            ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
-                            : 'bg-slate-800 text-slate-300'
+                            ? 'bg-danger-500/20 text-danger-600 border border-danger-500/40'
+                            : 'bg-neutral-100 text-neutral-700'
                         }`}
                       >
                         {job.status.replace(/_/g, ' ')}
                       </span>
                     </div>
 
-                    <div className="text-xs text-slate-300 font-semibold flex items-center justify-between">
+                    <div className="text-xs text-neutral-700 font-semibold flex items-center justify-between">
                       <span>{job.program?.styleCode || 'Standard Style'}</span>
-                      <span className="text-[11px] font-mono text-slate-400">
+                      <span className="text-[11px] font-mono text-neutral-500">
                         {job.program?.programNumber || 'N/A'}
                       </span>
                     </div>
 
-                    <div className="text-[11px] text-slate-400 flex items-center justify-between pt-1 border-t border-slate-800/60">
+                    <div className="text-[11px] text-neutral-500 flex items-center justify-between pt-1 border-t border-neutral-200">
                       <span>
-                        Bundle: <strong className="text-white font-mono">{totalPieces} pcs</strong>
+                        Bundle: <strong className="text-neutral-900 font-mono">{totalPieces} pcs</strong>
                       </span>
                       {job.fabricOut ? (
-                        <span className="text-emerald-400 font-semibold font-mono">
+                        <span className="text-accent-700 font-semibold font-mono">
                           Good: {job.fabricOut} pcs
                         </span>
                       ) : null}
@@ -526,42 +520,42 @@ function FinishingWorkstationContent() {
         {/* RIGHT PANE: SELECTED JOB DETAIL & ACTIONS */}
         <div className="w-full lg:w-7/12 flex flex-col space-y-4">
           {!selectedJob ? (
-            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-12 text-center text-slate-400 backdrop-blur-xs flex flex-col items-center justify-center min-h-[400px]">
-              <Sparkles className="w-12 h-12 text-slate-600 mb-3" />
-              <h3 className="text-base font-bold text-white">Select a Finishing Job</h3>
-              <p className="text-xs text-slate-400 max-w-sm mt-1">
+            <div className="bg-white border border-neutral-200 rounded-2xl p-12 text-center text-neutral-500 backdrop-blur-xs flex flex-col items-center justify-center min-h-[400px]">
+              <Sparkles className="w-12 h-12 text-neutral-600 mb-3" />
+              <h3 className="text-base font-bold text-neutral-900">Select a Finishing Job</h3>
+              <p className="text-xs text-neutral-500 max-w-sm mt-1">
                 Choose a job from the left panel to inspect specifications, assign workstations, record finished counts, or issue outgoing challans.
               </p>
             </div>
           ) : (
-            <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-6 space-y-6 backdrop-blur-xs">
+            <div className="bg-white border border-neutral-200 rounded-2xl p-6 space-y-6 backdrop-blur-xs">
               {/* TOP SUMMARY BAR */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-slate-800 gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-neutral-200 gap-3">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-base font-bold text-white">
+                    <span className="font-mono text-base font-bold text-neutral-900">
                       {selectedJob.challanNumber}
                     </span>
                     <span
                       className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
                         selectedJob.status === 'RECEIVED'
-                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                          ? 'bg-accent-400/20 text-accent-700 border border-accent-500/40'
                           : selectedJob.status === 'IN_PROCESS'
-                          ? 'bg-blue-500/20 text-blue-300 border border-blue-500/40'
+                          ? 'bg-brand-500/20 text-brand-600 border border-brand-500/40'
                           : selectedJob.status === 'COMPLETED'
-                          ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40'
+                          ? 'bg-brand-500/20 text-brand-600 border border-brand-500/40'
                           : selectedJob.status === 'READY_FOR_HANDOVER'
-                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                          ? 'bg-accent-400/20 text-accent-700 border border-accent-500/40'
                           : selectedJob.status === 'ON_HOLD'
-                          ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
-                          : 'bg-slate-800 text-slate-300'
+                          ? 'bg-danger-500/20 text-danger-600 border border-danger-500/40'
+                          : 'bg-neutral-100 text-neutral-700'
                       }`}
                     >
                       {selectedJob.status.replace(/_/g, ' ')}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    Transferred from: <strong className="text-slate-300">{selectedJob.fromDepartment || 'STITCHING'}</strong>
+                  <p className="text-xs text-neutral-500 mt-0.5">
+                    Transferred from: <strong className="text-neutral-700">{selectedJob.fromDepartment || 'STITCHING'}</strong>
                   </p>
                 </div>
 
@@ -572,16 +566,16 @@ function FinishingWorkstationContent() {
                         setTechSheetProgram(selectedJob.program);
                         setShowTechSheet(true);
                       }}
-                      className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition"
+                      className="px-3 py-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-900 text-xs font-semibold flex items-center gap-1.5 transition"
                     >
-                      <FileText className="w-3.5 h-3.5 text-teal-400" />
+                      <FileText className="w-3.5 h-3.5 text-brand-600" />
                       <span>Production Sheet</span>
                     </button>
                   )}
 
                   <Link
                     href={`/finishing/workspace/${selectedJob.id}`}
-                    className="px-3 py-1.5 rounded-lg bg-teal-600/30 hover:bg-teal-600/50 text-teal-200 border border-teal-500/40 text-xs font-semibold flex items-center gap-1.5 transition"
+                    className="px-3 py-1.5 rounded-lg bg-brand-500/30 hover:bg-brand-500/50 text-brand-800 border border-brand-500/40 text-xs font-semibold flex items-center gap-1.5 transition"
                   >
                     <Scissors className="w-3.5 h-3.5" />
                     <span>Focus Mode</span>
@@ -590,28 +584,28 @@ function FinishingWorkstationContent() {
               </div>
 
               {/* SPECIFICATION CARD */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-950/60 p-4 rounded-xl border border-slate-800/80 text-xs">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white p-4 rounded-xl border border-neutral-200 text-xs">
                 <div>
-                  <span className="text-slate-500 block text-[10px]">PROGRAM</span>
-                  <span className="font-mono font-bold text-white">
+                  <span className="text-neutral-500 block text-[10px]">PROGRAM</span>
+                  <span className="font-mono font-bold text-neutral-900">
                     {selectedJob.program?.programNumber || 'N/A'}
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block text-[10px]">STYLE CODE</span>
-                  <span className="font-bold text-teal-300">
+                  <span className="text-neutral-500 block text-[10px]">STYLE CODE</span>
+                  <span className="font-bold text-brand-600">
                     {selectedJob.program?.styleCode || 'Standard'}
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block text-[10px]">BUYER / CLIENT</span>
-                  <span className="text-slate-200 truncate block">
+                  <span className="text-neutral-500 block text-[10px]">BUYER / CLIENT</span>
+                  <span className="text-neutral-900 truncate block">
                     {selectedJob.program?.buyerName || selectedJob.program?.clientName || 'Direct'}
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block text-[10px]">BUNDLE PIECES</span>
-                  <span className="font-mono font-bold text-white text-sm">
+                  <span className="text-neutral-500 block text-[10px]">BUNDLE PIECES</span>
+                  <span className="font-mono font-bold text-neutral-900 text-sm">
                     {selectedJob.items.reduce((s: number, it: any) => s + (Number(it.quantity) || 0), 0)} PCS
                   </span>
                 </div>
@@ -619,24 +613,24 @@ function FinishingWorkstationContent() {
 
               {/* ITEMS BREAKDOWN */}
               <div className="space-y-2">
-                <h4 className="text-xs font-bold text-slate-300 tracking-wide uppercase">
+                <h4 className="text-xs font-bold text-neutral-700 tracking-wide uppercase">
                   Bundle Garments Breakdown
                 </h4>
-                <div className="bg-slate-950/60 border border-slate-800 rounded-xl overflow-hidden">
+                <div className="bg-white border border-neutral-200 rounded-xl overflow-hidden">
                   <table className="w-full text-left text-xs">
                     <thead>
-                      <tr className="border-b border-slate-800 text-slate-400 font-semibold">
+                      <tr className="border-b border-neutral-200 text-neutral-500 font-semibold">
                         <th className="py-2.5 px-3">Description</th>
                         <th className="py-2.5 px-3">Color</th>
                         <th className="py-2.5 px-3 text-right">Quantity</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800/60 text-slate-300">
+                    <tbody className="divide-y divide-neutral-200 text-neutral-700">
                       {selectedJob.items.map((it: any) => (
                         <tr key={it.id}>
-                          <td className="py-2 px-3 font-medium text-white">{it.itemDescription}</td>
-                          <td className="py-2 px-3 text-slate-400">{it.colour || 'Standard'}</td>
-                          <td className="py-2 px-3 text-right font-mono font-bold text-white">
+                          <td className="py-2 px-3 font-medium text-neutral-900">{it.itemDescription}</td>
+                          <td className="py-2 px-3 text-neutral-500">{it.colour || 'Standard'}</td>
+                          <td className="py-2 px-3 text-right font-mono font-bold text-neutral-900">
                             {it.quantity} {it.uom || 'PCS'}
                           </td>
                         </tr>
@@ -647,8 +641,8 @@ function FinishingWorkstationContent() {
               </div>
 
               {/* OPERATION ACTIONS BAR */}
-              <div className="p-4 bg-slate-950/80 border border-slate-800 rounded-xl space-y-3">
-                <h4 className="text-xs font-bold text-slate-300 tracking-wide uppercase">
+              <div className="p-4 bg-white border border-neutral-200 rounded-xl space-y-3">
+                <h4 className="text-xs font-bold text-neutral-700 tracking-wide uppercase">
                   Finishing Operation Controls
                 </h4>
 
@@ -656,7 +650,7 @@ function FinishingWorkstationContent() {
                   {selectedJob.status === 'RECEIVED' && (
                     <button
                       onClick={() => openStartModal(selectedJob)}
-                      className="px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold shadow-md shadow-teal-900/30 transition flex items-center gap-2"
+                      className="px-4 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-sm transition flex items-center gap-2"
                     >
                       <Sparkles className="w-4 h-4" />
                       <span>Start Finishing & Assign Table</span>
@@ -667,7 +661,7 @@ function FinishingWorkstationContent() {
                     <>
                       <button
                         onClick={() => openCompleteModal(selectedJob)}
-                        className="px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold shadow-md shadow-teal-900/30 transition flex items-center gap-2"
+                        className="px-4 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-sm transition flex items-center gap-2"
                       >
                         <CheckCircle2 className="w-4 h-4" />
                         <span>Record Finishing Output</span>
@@ -676,7 +670,7 @@ function FinishingWorkstationContent() {
                       <button
                         onClick={() => handlePauseJob(selectedJob)}
                         disabled={submittingPause}
-                        className="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 text-xs font-semibold transition flex items-center gap-2"
+                        className="px-3.5 py-2 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-accent-700 border border-accent-500/30 text-xs font-semibold transition flex items-center gap-2"
                       >
                         <Pause className="w-4 h-4" />
                         <span>Pause Job</span>
@@ -688,7 +682,7 @@ function FinishingWorkstationContent() {
                     <button
                       onClick={() => handleResumeJob(selectedJob)}
                       disabled={submittingResume}
-                      className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-md shadow-blue-900/30 transition flex items-center gap-2"
+                      className="px-4 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-sm transition flex items-center gap-2"
                     >
                       <Play className="w-4 h-4" />
                       <span>Resume Finishing</span>
@@ -698,7 +692,7 @@ function FinishingWorkstationContent() {
                   {selectedJob.status === 'COMPLETED' && (
                     <button
                       onClick={() => openInspectModal(selectedJob)}
-                      className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold shadow-md shadow-purple-900/30 transition flex items-center gap-2"
+                      className="px-4 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-sm transition flex items-center gap-2"
                     >
                       <ShieldCheck className="w-4 h-4" />
                       <span>Perform Quality Audit & Release</span>
@@ -708,7 +702,7 @@ function FinishingWorkstationContent() {
                   {selectedJob.status === 'READY_FOR_HANDOVER' && (
                     <Link
                       href={`/finishing/issue-challan?jobId=${selectedJob.id}`}
-                      className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-900/30 transition flex items-center gap-2"
+                      className="px-4 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-sm transition flex items-center gap-2"
                     >
                       <Send className="w-4 h-4" />
                       <span>Issue Outgoing Challan</span>
@@ -720,19 +714,19 @@ function FinishingWorkstationContent() {
               {/* AUDIT EVENTS TRAIL */}
               {selectedJob.events && selectedJob.events.length > 0 && (
                 <div className="space-y-2">
-                  <h4 className="text-xs font-bold text-slate-400 tracking-wide uppercase">
+                  <h4 className="text-xs font-bold text-neutral-500 tracking-wide uppercase">
                     Audit Trail & Events
                   </h4>
-                  <div className="space-y-1.5 text-[11px] text-slate-400">
+                  <div className="space-y-1.5 text-[11px] text-neutral-500">
                     {selectedJob.events.slice(0, 5).map((ev: any) => (
                       <div
                         key={ev.id}
-                        className="p-2 rounded-lg bg-slate-950/40 border border-slate-800/60 flex items-center justify-between"
+                        className="p-2 rounded-lg bg-white border border-neutral-200 flex items-center justify-between"
                       >
-                        <span className="text-slate-300 font-medium">
+                        <span className="text-neutral-700 font-medium">
                           {ev.action}: {ev.notes}
                         </span>
-                        <span className="font-mono text-slate-500 text-[10px]">
+                        <span className="font-mono text-neutral-500 text-[10px]">
                           {new Date(ev.createdAt).toLocaleTimeString()}
                         </span>
                       </div>
@@ -746,16 +740,16 @@ function FinishingWorkstationContent() {
 
         {/* START FINISHING MODAL */}
         {showStartModal && (
-          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl relative">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div className="fixed inset-0 z-50 bg-neutral-900/70 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="bg-white border border-neutral-200 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl relative">
+              <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-teal-400" />
-                  <h3 className="text-base font-bold text-white">Start Finishing Job</h3>
+                  <Sparkles className="w-5 h-5 text-brand-600" />
+                  <h3 className="text-base font-bold text-neutral-900">Start Finishing Job</h3>
                 </div>
                 <button
                   onClick={() => setShowStartModal(false)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-white"
+                  className="p-1 rounded-lg text-neutral-500 hover:text-neutral-900"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -763,29 +757,29 @@ function FinishingWorkstationContent() {
 
               <div className="space-y-3 text-xs">
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">Workstation / Table #</label>
+                  <label className="block font-semibold text-neutral-700 mb-1">Workstation / Table #</label>
                   <input
                     type="text"
                     value={workstationNumber}
                     onChange={(e) => setWorkstationNumber(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white"
+                    className="w-full px-3 py-2 bg-canvas border border-neutral-200 rounded-lg text-neutral-900"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">Finishing Specialist / Trimmer</label>
+                  <label className="block font-semibold text-neutral-700 mb-1">Finishing Specialist / Trimmer</label>
                   <input
                     type="text"
                     value={operatorName}
                     onChange={(e) => setOperatorName(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white"
+                    className="w-full px-3 py-2 bg-canvas border border-neutral-200 rounded-lg text-neutral-900"
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">Primary Operation</label>
+                  <label className="block font-semibold text-neutral-700 mb-1">Primary Operation</label>
                   <select
                     value={operationType}
                     onChange={(e) => setOperationType(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white"
+                    className="w-full px-3 py-2 bg-canvas border border-neutral-200 rounded-lg text-neutral-900"
                   >
                     <option value="THREAD_TRIMMING_AND_CLEANING">Thread Trimming & Spot Cleaning</option>
                     <option value="FORM_PRESSING_AND_CREASE">Form Pressing & Crease Setting</option>
@@ -794,17 +788,17 @@ function FinishingWorkstationContent() {
                 </div>
               </div>
 
-              <div className="pt-2 flex justify-end gap-3 border-t border-slate-800">
+              <div className="pt-2 flex justify-end gap-3 border-t border-neutral-200">
                 <button
                   onClick={() => setShowStartModal(false)}
-                  className="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold"
+                  className="px-4 py-2 rounded-lg bg-neutral-100 text-neutral-700 text-xs font-semibold"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleConfirmStart}
                   disabled={submittingStart}
-                  className="px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold transition disabled:opacity-50"
+                  className="px-4 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold transition disabled:opacity-50"
                 >
                   {submittingStart ? 'Starting...' : 'Confirm & Begin'}
                 </button>
@@ -815,32 +809,32 @@ function FinishingWorkstationContent() {
 
         {/* OUTPUT RECONCILIATION MODAL */}
         {showCompleteModal && (
-          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div className="fixed inset-0 z-50 bg-neutral-900/70 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="bg-white border border-neutral-200 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-teal-400" />
-                  <h3 className="text-base font-bold text-white">Record Finishing Output</h3>
+                  <CheckCircle2 className="w-5 h-5 text-brand-600" />
+                  <h3 className="text-base font-bold text-neutral-900">Record Finishing Output</h3>
                 </div>
                 <button
                   onClick={() => setShowCompleteModal(false)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-white"
+                  className="p-1 rounded-lg text-neutral-500 hover:text-neutral-900"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               <div className="space-y-4 text-xs">
-                <div className="p-3 bg-slate-950/60 rounded-xl border border-slate-800 flex justify-between">
-                  <span className="text-slate-400">Total Input Garments:</span>
-                  <span className="font-mono font-bold text-white text-sm">
+                <div className="p-3 bg-white rounded-xl border border-neutral-200 flex justify-between">
+                  <span className="text-neutral-500">Total Input Garments:</span>
+                  <span className="font-mono font-bold text-neutral-900 text-sm">
                     {completeInputQty} PCS
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block font-semibold text-emerald-400 mb-1">
+                    <label className="block font-semibold text-accent-700 mb-1">
                       Good Finished Garments *
                     </label>
                     <input
@@ -848,11 +842,11 @@ function FinishingWorkstationContent() {
                       min="0"
                       value={completeGoodQty}
                       onChange={(e) => setCompleteGoodQty(Number(e.target.value))}
-                      className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white font-mono font-bold"
+                      className="w-full px-3 py-2 bg-canvas border border-neutral-200 rounded-lg text-neutral-900 font-mono font-bold"
                     />
                   </div>
                   <div>
-                    <label className="block font-semibold text-amber-400 mb-1">
+                    <label className="block font-semibold text-accent-700 mb-1">
                       Rework / Re-trim
                     </label>
                     <input
@@ -860,11 +854,11 @@ function FinishingWorkstationContent() {
                       min="0"
                       value={completeReworkQty}
                       onChange={(e) => setCompleteReworkQty(Number(e.target.value))}
-                      className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white font-mono font-bold"
+                      className="w-full px-3 py-2 bg-canvas border border-neutral-200 rounded-lg text-neutral-900 font-mono font-bold"
                     />
                   </div>
                   <div>
-                    <label className="block font-semibold text-rose-400 mb-1">
+                    <label className="block font-semibold text-danger-600 mb-1">
                       Reject / Scrap
                     </label>
                     <input
@@ -872,11 +866,11 @@ function FinishingWorkstationContent() {
                       min="0"
                       value={completeRejectQty}
                       onChange={(e) => setCompleteRejectQty(Number(e.target.value))}
-                      className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white font-mono font-bold"
+                      className="w-full px-3 py-2 bg-canvas border border-neutral-200 rounded-lg text-neutral-900 font-mono font-bold"
                     />
                   </div>
                   <div>
-                    <label className="block font-semibold text-slate-400 mb-1">
+                    <label className="block font-semibold text-neutral-500 mb-1">
                       Balance in Finishing
                     </label>
                     <input
@@ -884,7 +878,7 @@ function FinishingWorkstationContent() {
                       min="0"
                       value={completeBalanceQty}
                       onChange={(e) => setCompleteBalanceQty(Number(e.target.value))}
-                      className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white font-mono font-bold"
+                      className="w-full px-3 py-2 bg-canvas border border-neutral-200 rounded-lg text-neutral-900 font-mono font-bold"
                     />
                   </div>
                 </div>
@@ -897,8 +891,8 @@ function FinishingWorkstationContent() {
                       Number(completeRejectQty) +
                       Number(completeBalanceQty) ===
                     Number(completeInputQty)
-                      ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
-                      : 'bg-rose-500/10 border-rose-500/30 text-rose-300'
+                      ? 'bg-accent-400/10 border-accent-500/30 text-accent-700'
+                      : 'bg-danger-500/10 border-danger-500/30 text-danger-600'
                   }`}
                 >
                   <span>Reconciled Sum:</span>
@@ -913,13 +907,13 @@ function FinishingWorkstationContent() {
 
                 {completeRejectQty > 0 && (
                   <div>
-                    <label className="block font-semibold text-rose-400 mb-1">
+                    <label className="block font-semibold text-danger-600 mb-1">
                       Reject Reason / Defect Classification
                     </label>
                     <select
                       value={completeDefectReason}
                       onChange={(e) => setCompleteDefectReason(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white"
+                      className="w-full px-3 py-2 bg-canvas border border-neutral-200 rounded-lg text-neutral-900"
                     >
                       <option value="Fabric cut / scissor nip">Fabric cut / scissor nip</option>
                       <option value="Permanent chemical/oil stain">Permanent chemical/oil stain</option>
@@ -935,32 +929,32 @@ function FinishingWorkstationContent() {
                     id="autoInspectFinishing"
                     checked={autoInspect}
                     onChange={(e) => setAutoInspect(e.target.checked)}
-                    className="rounded border-slate-700 bg-slate-950 text-teal-500"
+                    className="rounded border-neutral-200 bg-canvas text-brand-600"
                   />
-                  <label htmlFor="autoInspectFinishing" className="text-slate-300">
+                  <label htmlFor="autoInspectFinishing" className="text-neutral-700">
                     Auto-pass Finishing QC (Ready for Handover directly)
                   </label>
                 </div>
 
                 {completeError && (
-                  <div className="p-2.5 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-300 flex items-center gap-2">
+                  <div className="p-2.5 bg-danger-500/10 border border-danger-500/30 rounded-lg text-danger-600 flex items-center gap-2">
                     <AlertCircle className="w-4 h-4 shrink-0" />
                     <span>{completeError}</span>
                   </div>
                 )}
               </div>
 
-              <div className="pt-2 flex justify-end gap-3 border-t border-slate-800">
+              <div className="pt-2 flex justify-end gap-3 border-t border-neutral-200">
                 <button
                   onClick={() => setShowCompleteModal(false)}
-                  className="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold"
+                  className="px-4 py-2 rounded-lg bg-neutral-100 text-neutral-700 text-xs font-semibold"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleConfirmComplete}
                   disabled={submittingComplete}
-                  className="px-5 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold transition disabled:opacity-50"
+                  className="px-5 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold transition disabled:opacity-50"
                 >
                   {submittingComplete ? 'Saving...' : 'Confirm Output'}
                 </button>
@@ -971,16 +965,16 @@ function FinishingWorkstationContent() {
 
         {/* QUALITY INSPECTION MODAL */}
         {showInspectModal && (
-          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl relative">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div className="fixed inset-0 z-50 bg-neutral-900/70 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="bg-white border border-neutral-200 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl relative">
+              <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
                 <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-5 h-5 text-purple-400" />
-                  <h3 className="text-base font-bold text-white">Finishing Quality Audit</h3>
+                  <ShieldCheck className="w-5 h-5 text-brand-600" />
+                  <h3 className="text-base font-bold text-neutral-900">Finishing Quality Audit</h3>
                 </div>
                 <button
                   onClick={() => setShowInspectModal(false)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-white"
+                  className="p-1 rounded-lg text-neutral-500 hover:text-neutral-900"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -996,15 +990,15 @@ function FinishingWorkstationContent() {
                   ].map((item) => (
                     <div
                       key={item.key}
-                      className="flex items-center justify-between p-2.5 bg-slate-950/60 border border-slate-800 rounded-lg"
+                      className="flex items-center justify-between p-2.5 bg-white border border-neutral-200 rounded-lg"
                     >
-                      <span className="text-slate-300 font-medium">{item.label}</span>
+                      <span className="text-neutral-700 font-medium">{item.label}</span>
                       <select
                         value={(inspectChecks as any)[item.key]}
                         onChange={(e) =>
                           setInspectChecks({ ...inspectChecks, [item.key]: e.target.value })
                         }
-                        className="px-2 py-1 bg-slate-900 border border-slate-700 rounded text-xs text-white"
+                        className="px-2 py-1 bg-white border border-neutral-200 rounded text-xs text-neutral-900"
                       >
                         <option value="PASS">PASS</option>
                         <option value="FAIL">FAIL</option>
@@ -1014,34 +1008,34 @@ function FinishingWorkstationContent() {
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">Inspector Notes</label>
+                  <label className="block font-semibold text-neutral-700 mb-1">Inspector Notes</label>
                   <textarea
                     rows={2}
                     value={inspectNotes}
                     onChange={(e) => setInspectNotes(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white resize-none"
+                    className="w-full px-3 py-2 bg-canvas border border-neutral-200 rounded-lg text-neutral-900 resize-none"
                   />
                 </div>
 
                 {inspectError && (
-                  <div className="p-2.5 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-300 flex items-center gap-2">
+                  <div className="p-2.5 bg-danger-500/10 border border-danger-500/30 rounded-lg text-danger-600 flex items-center gap-2">
                     <AlertCircle className="w-4 h-4 shrink-0" />
                     <span>{inspectError}</span>
                   </div>
                 )}
               </div>
 
-              <div className="pt-2 flex justify-end gap-3 border-t border-slate-800">
+              <div className="pt-2 flex justify-end gap-3 border-t border-neutral-200">
                 <button
                   onClick={() => setShowInspectModal(false)}
-                  className="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold"
+                  className="px-4 py-2 rounded-lg bg-neutral-100 text-neutral-700 text-xs font-semibold"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleConfirmInspect}
                   disabled={submittingInspect}
-                  className="px-5 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition disabled:opacity-50"
+                  className="px-5 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold transition disabled:opacity-50"
                 >
                   {submittingInspect ? 'Saving...' : 'Release for Handover'}
                 </button>
@@ -1070,7 +1064,7 @@ export default function FinishingWorkstationPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-slate-950 flex items-center justify-center text-teal-400">
+        <div className="min-h-screen bg-canvas flex items-center justify-center text-brand-600">
           <RefreshCw className="w-8 h-8 animate-spin" />
         </div>
       }

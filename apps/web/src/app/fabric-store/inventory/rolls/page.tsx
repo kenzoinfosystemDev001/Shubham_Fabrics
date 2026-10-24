@@ -79,19 +79,19 @@ function InventoryRollsContent() {
 
   const statusBadge = (status: string) => {
     const colors: Record<string, string> = {
-      RECEIVED: 'bg-slate-100 text-slate-800',
-      QC_HOLD: 'bg-amber-100 text-amber-800',
-      QC_PASSED: 'bg-emerald-100 text-emerald-800',
-      QC_REJECTED: 'bg-rose-100 text-rose-800',
-      IN_STOCK: 'bg-teal-100 text-teal-800',
-      ISSUED: 'bg-blue-100 text-blue-800',
-      RETURNED: 'bg-purple-100 text-purple-800',
-      CONSUMED: 'bg-slate-200 text-slate-800',
+      RECEIVED: 'bg-neutral-100 text-neutral-900',
+      QC_HOLD: 'bg-accent-100 text-accent-800',
+      QC_PASSED: 'bg-accent-100 text-accent-800',
+      QC_REJECTED: 'bg-danger-100 text-danger-800',
+      IN_STOCK: 'bg-brand-100 text-brand-800',
+      ISSUED: 'bg-brand-100 text-brand-800',
+      RETURNED: 'bg-brand-100 text-brand-800',
+      CONSUMED: 'bg-neutral-200 text-neutral-900',
     };
     return (
       <span
         className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-          colors[status] || 'bg-slate-100 text-slate-700'
+          colors[status] || 'bg-neutral-100 text-neutral-700'
         }`}
       >
         {status?.replace('_', ' ')}
@@ -100,14 +100,14 @@ function InventoryRollsContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F0FAF9] pb-16">
-      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+    <div className="min-h-screen bg-brand-50 pb-16">
+      <header className="bg-white border-b border-neutral-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-teal-700 block">
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-700 block">
             FABRIC STORE · INVENTORY
           </span>
-          <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-            <ListChecks className="w-5 h-5 text-teal-600" />
+          <h1 className="text-xl font-bold text-neutral-900 flex items-center gap-2">
+            <ListChecks className="w-5 h-5 text-brand-600" />
             Individual Fabric Roll Inventory
           </h1>
         </div>
@@ -115,7 +115,7 @@ function InventoryRollsContent() {
           <button
             onClick={loadData}
             disabled={loading}
-            className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-md transition"
+            className="p-2 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 rounded-md transition"
             title="Refresh"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -125,13 +125,13 @@ function InventoryRollsContent() {
 
       <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
         {/* Filters */}
-        <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-xs flex flex-wrap items-center justify-between gap-4">
+        <div className="bg-white p-4 rounded-xl border border-neutral-200/90 shadow-xs flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3">
-            <Filter className="w-4 h-4 text-slate-400" />
+            <Filter className="w-4 h-4 text-neutral-500" />
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="text-xs border border-slate-300 rounded-md px-3 py-1.5"
+              className="text-xs border border-neutral-300 rounded-md px-3 py-1.5"
             >
               <option value="">All Statuses</option>
               <option value="IN_STOCK">In Stock</option>
@@ -145,7 +145,7 @@ function InventoryRollsContent() {
             <select
               value={qcStatusFilter}
               onChange={(e) => setQcStatusFilter(e.target.value)}
-              className="text-xs border border-slate-300 rounded-md px-3 py-1.5"
+              className="text-xs border border-neutral-300 rounded-md px-3 py-1.5"
             >
               <option value="">All QC Statuses</option>
               <option value="PASSED">Passed</option>
@@ -157,7 +157,7 @@ function InventoryRollsContent() {
             <select
               value={locationFilter}
               onChange={(e) => setLocationFilter(e.target.value)}
-              className="text-xs border border-slate-300 rounded-md px-3 py-1.5"
+              className="text-xs border border-neutral-300 rounded-md px-3 py-1.5"
             >
               <option value="">All Locations</option>
               {locations.map((loc) => (
@@ -170,30 +170,30 @@ function InventoryRollsContent() {
             {batchIdFilter && (
               <button
                 onClick={() => setBatchIdFilter('')}
-                className="text-xs font-semibold text-rose-600 hover:underline"
+                className="text-xs font-semibold text-danger-600 hover:underline"
               >
                 Clear Batch Filter ✕
               </button>
             )}
           </div>
-          <span className="text-xs text-slate-500">
-            Total Rolls: <strong className="text-slate-800">{rolls.length}</strong>
+          <span className="text-xs text-neutral-500">
+            Total Rolls: <strong className="text-neutral-900">{rolls.length}</strong>
           </span>
         </div>
 
         {/* Rolls table */}
-        <div className="bg-white border border-slate-200/90 rounded-xl shadow-xs overflow-hidden">
+        <div className="bg-white border border-neutral-200/90 rounded-xl shadow-xs overflow-hidden">
           {loading ? (
-            <div className="p-12 text-center text-xs text-slate-400">Loading rolls...</div>
+            <div className="p-12 text-center text-xs text-neutral-500">Loading rolls...</div>
           ) : rolls.length === 0 ? (
             <div className="p-16 text-center space-y-3">
-              <ListChecks className="w-10 h-10 text-slate-300 mx-auto" />
-              <p className="text-sm font-semibold text-slate-700">No fabric rolls matching criteria</p>
+              <ListChecks className="w-10 h-10 text-neutral-700 mx-auto" />
+              <p className="text-sm font-semibold text-neutral-700">No fabric rolls matching criteria</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50/80 text-slate-600 font-semibold border-b border-slate-200">
+                <thead className="bg-neutral-50/80 text-neutral-600 font-semibold border-b border-neutral-200">
                   <tr>
                     <th className="py-3 px-4">Roll Number</th>
                     <th className="py-3 px-4">Batch #</th>
@@ -207,25 +207,25 @@ function InventoryRollsContent() {
                     <th className="py-3 px-4 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-slate-700">
+                <tbody className="divide-y divide-neutral-100 text-neutral-700">
                   {rolls.map((roll) => (
-                    <tr key={roll.id} className="hover:bg-slate-50/60 transition">
-                      <td className="py-3 px-4 font-mono font-bold text-teal-900">{roll.rollNumber}</td>
-                      <td className="py-3 px-4 font-mono text-slate-600">{roll.batch?.batchNumber}</td>
+                    <tr key={roll.id} className="hover:bg-neutral-50/60 transition">
+                      <td className="py-3 px-4 font-mono font-bold text-brand-900">{roll.rollNumber}</td>
+                      <td className="py-3 px-4 font-mono text-neutral-600">{roll.batch?.batchNumber}</td>
                       <td className="py-3 px-4">
-                        <span className="font-semibold block text-slate-900">{roll.batch?.fabricType}</span>
-                        <span className="text-[10px] text-slate-500">{roll.batch?.fabricDescription}</span>
+                        <span className="font-semibold block text-neutral-900">{roll.batch?.fabricType}</span>
+                        <span className="text-[10px] text-neutral-500">{roll.batch?.fabricDescription}</span>
                       </td>
-                      <td className="py-3 px-4 font-mono font-bold text-slate-900">
+                      <td className="py-3 px-4 font-mono font-bold text-neutral-900">
                         {parseFloat(roll.length).toFixed(2)} m
                       </td>
-                      <td className="py-3 px-4 font-mono text-slate-600">
+                      <td className="py-3 px-4 font-mono text-neutral-600">
                         {roll.width ? `${roll.width} cm` : '—'}
                       </td>
-                      <td className="py-3 px-4 font-mono text-slate-600">
+                      <td className="py-3 px-4 font-mono text-neutral-600">
                         {roll.weight ? `${roll.weight} kg` : '—'}
                       </td>
-                      <td className="py-3 px-4 font-mono font-semibold text-teal-800">
+                      <td className="py-3 px-4 font-mono font-semibold text-brand-800">
                         {roll.location?.locationCode || 'UNASSIGNED'}
                       </td>
                       <td className="py-3 px-4">{statusBadge(roll.status)}</td>
@@ -233,12 +233,12 @@ function InventoryRollsContent() {
                         <span
                           className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
                             roll.qcStatus === 'PASSED'
-                              ? 'bg-emerald-100 text-emerald-800'
+                              ? 'bg-accent-100 text-accent-800'
                               : roll.qcStatus === 'ON_HOLD'
-                              ? 'bg-amber-100 text-amber-800'
+                              ? 'bg-accent-100 text-accent-800'
                               : roll.qcStatus === 'FAILED'
-                              ? 'bg-rose-100 text-rose-800'
-                              : 'bg-orange-100 text-orange-800'
+                              ? 'bg-danger-100 text-danger-800'
+                              : 'bg-accent-100 text-accent-800'
                           }`}
                         >
                           {roll.qcStatus}
@@ -251,9 +251,9 @@ function InventoryRollsContent() {
                             setMovingRoll(roll);
                             setNewLocationId(roll.locationId || '');
                           }}
-                          className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-700 hover:text-teal-900 bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded transition"
+                          className="inline-flex items-center gap-1 text-[11px] font-semibold text-neutral-700 hover:text-brand-900 bg-neutral-100 hover:bg-neutral-200 px-2 py-1 rounded transition"
                         >
-                          <MapPin className="w-3 h-3 text-slate-500" />
+                          <MapPin className="w-3 h-3 text-neutral-500" />
                           <span>Assign Rack</span>
                         </button>
                       </td>
@@ -267,23 +267,23 @@ function InventoryRollsContent() {
 
         {/* Location Assignment Modal */}
         {movingRoll && (
-          <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-2xs flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 bg-neutral-900/60 backdrop-blur-2xs flex items-center justify-center p-4">
             <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
-              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-teal-600" />
+              <h3 className="text-sm font-bold text-neutral-900 flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-brand-600" />
                 Assign Storage Location for {movingRoll.rollNumber}
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-neutral-500">
                 Updating roll location automatically logs a TRANSFER entry in the immutable Stock Ledger.
               </p>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-neutral-700 mb-1">
                   Select Target Storage Location
                 </label>
                 <select
                   value={newLocationId}
                   onChange={(e) => setNewLocationId(e.target.value)}
-                  className="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white text-slate-900 font-semibold focus:ring-1 focus:ring-teal-500"
+                  className="w-full text-xs border border-neutral-300 rounded-md px-3 py-2 bg-white text-neutral-900 font-semibold focus:ring-1 focus:ring-brand-500"
                 >
                   <option value="">-- No Location (Unassigned) --</option>
                   {locations.map((loc) => (
@@ -298,7 +298,7 @@ function InventoryRollsContent() {
                 <button
                   type="button"
                   onClick={() => setMovingRoll(null)}
-                  className="px-3.5 py-1.5 border border-slate-300 rounded text-xs font-semibold text-slate-700 hover:bg-slate-100"
+                  className="px-3.5 py-1.5 border border-neutral-300 rounded text-xs font-semibold text-neutral-700 hover:bg-neutral-100"
                 >
                   Cancel
                 </button>
@@ -306,7 +306,7 @@ function InventoryRollsContent() {
                   type="button"
                   disabled={savingLocation}
                   onClick={handleMoveLocation}
-                  className="px-4 py-1.5 bg-teal-700 text-white rounded text-xs font-bold hover:bg-teal-800 disabled:opacity-50"
+                  className="px-4 py-1.5 bg-brand-700 text-white rounded text-xs font-bold hover:bg-brand-800 disabled:opacity-50"
                 >
                   {savingLocation ? 'Updating...' : 'Save Location'}
                 </button>
@@ -321,7 +321,7 @@ function InventoryRollsContent() {
 
 export default function InventoryRollsPage() {
   return (
-    <React.Suspense fallback={<div className="min-h-screen bg-[#F0FAF9] p-8 text-xs text-slate-400">Loading rolls inventory...</div>}>
+    <React.Suspense fallback={<div className="min-h-screen bg-brand-50 p-8 text-xs text-neutral-500">Loading rolls inventory...</div>}>
       <InventoryRollsContent />
     </React.Suspense>
   );

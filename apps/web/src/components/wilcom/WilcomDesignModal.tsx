@@ -225,26 +225,26 @@ export function WilcomDesignModal({
       <div className="bg-white w-full h-full flex flex-col overflow-hidden animate-in fade-in duration-200">
         
         {/* MODAL HEADER */}
-        <div className="px-7 py-4 border-b border-slate-200 flex items-center justify-between bg-white shrink-0">
+        <div className="px-7 py-4 border-b border-neutral-200 flex items-center justify-between bg-white shrink-0">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-[#163767] shadow-2xs">
-              <Sparkles className="w-7 h-7 text-[#163767]" />
+            <div className="w-14 h-14 rounded-2xl bg-neutral-100 border border-neutral-200 flex items-center justify-center text-brand-600 shadow-2xs">
+              <Sparkles className="w-7 h-7 text-brand-600" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+              <h2 className="text-xl font-bold text-neutral-900 tracking-tight">
                 Wilcom Sheet
               </h2>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="px-4 py-2 bg-slate-100 border border-slate-200 rounded-full text-sm font-semibold text-slate-700">
+            <span className="px-4 py-2 bg-neutral-100 border border-neutral-200 rounded-full text-sm font-semibold text-neutral-700">
               {wilcomEntries.length} {wilcomEntries.length === 1 ? 'Design' : 'Designs'}
             </span>
             <button
               type="button"
               onClick={onClose}
-              className="p-2 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition cursor-pointer"
+              className="p-2 text-neutral-500 hover:text-neutral-700 rounded-lg hover:bg-neutral-100 transition cursor-pointer"
               title="Close modal"
             >
               <X className="w-7 h-7" />
@@ -253,20 +253,20 @@ export function WilcomDesignModal({
         </div>
 
         {/* MODAL CONTENT */}
-        <div className="px-7 py-8 overflow-y-auto space-y-8 flex-1 bg-slate-50/50">
+        <div className="px-7 py-8 overflow-y-auto space-y-8 flex-1 bg-neutral-50/50">
           
           {/* ENTRY FORM */}
-          <div className="bg-white border border-slate-200 rounded-2xl p-7 shadow-xs space-y-6">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <h3 className="text-base font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2">
-                <Plus className="w-5 h-5 text-[#163767]" />
+          <div className="bg-white border border-neutral-200 rounded-2xl p-7 shadow-xs space-y-6">
+            <div className="flex items-center justify-between border-b border-neutral-100 pb-4">
+              <h3 className="text-base font-bold uppercase tracking-wider text-neutral-900 flex items-center gap-2">
+                <Plus className="w-5 h-5 text-brand-600" />
                 <span>{editingId ? 'Edit Design' : 'Add Design'}</span>
               </h3>
               {editingId && (
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="text-sm font-semibold text-slate-500 hover:text-slate-800 underline cursor-pointer"
+                  className="text-sm font-semibold text-neutral-500 hover:text-neutral-900 underline cursor-pointer"
                 >
                   Cancel Edit
                 </button>
@@ -277,7 +277,7 @@ export function WilcomDesignModal({
               {/* Category */}
               <div>
                 <div className="flex items-center justify-between gap-2 mb-2">
-                  <label className="block text-sm font-bold text-slate-700 uppercase">
+                  <label className="block text-sm font-bold text-neutral-700 uppercase">
                     Category *
                   </label>
                   {isCustomCategory && (
@@ -288,7 +288,7 @@ export function WilcomDesignModal({
                         setCategory('TOP');
                         setCustomCategory('');
                       }}
-                      className="text-xs font-semibold text-slate-500 hover:text-slate-800 underline cursor-pointer whitespace-nowrap"
+                      className="text-xs font-semibold text-neutral-500 hover:text-neutral-900 underline cursor-pointer whitespace-nowrap"
                     >
                       Standard (Top/Bottom/Dupatta)
                     </button>
@@ -308,7 +308,7 @@ export function WilcomDesignModal({
                       setCustomCategory('');
                     }
                   }}
-                  className="w-full h-12 px-4 rounded-xl border border-slate-300 bg-white font-medium text-base text-slate-900 focus:border-[#163767] focus:ring-2 focus:ring-[#163767]/20 focus:outline-none"
+                  className="w-full h-12 px-4 rounded-xl border border-neutral-300 bg-white font-medium text-base text-neutral-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none"
                 >
                   <option value="TOP">Top</option>
                   <option value="BOTTOM">Bottom</option>
@@ -318,7 +318,7 @@ export function WilcomDesignModal({
 
                 {isCustomCategory && (
                   <div className="mt-4 space-y-2 animate-in fade-in duration-150">
-                    <label className="block text-sm font-bold text-slate-700 uppercase">
+                    <label className="block text-sm font-bold text-neutral-700 uppercase">
                       Category Name *
                     </label>
                     <input
@@ -326,7 +326,7 @@ export function WilcomDesignModal({
                       value={customCategory}
                       onChange={(e) => setCustomCategory(e.target.value)}
                       placeholder="ENTER CATEGORY NAME (E.G. KOTI, JACKET, BELT, SLEEVE)"
-                      className="w-full h-12 px-4 rounded-xl border border-slate-300 bg-white font-medium text-base text-slate-900 placeholder:text-slate-400 focus:border-[#163767] focus:outline-none focus:ring-2 focus:ring-[#163767]/30 shadow-2xs"
+                      className="w-full h-12 px-4 rounded-xl border border-neutral-300 bg-white font-medium text-base text-neutral-900 placeholder:text-neutral-500 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30 shadow-2xs"
                       autoFocus
                     />
                   </div>
@@ -335,7 +335,7 @@ export function WilcomDesignModal({
 
               {/* Style Name / Part */}
               <div>
-                <label className="block text-sm font-bold text-slate-700 uppercase mb-2">
+                <label className="block text-sm font-bold text-neutral-700 uppercase mb-2">
                   Style Name / Part
                 </label>
                 <input
@@ -343,13 +343,13 @@ export function WilcomDesignModal({
                   value={styleName}
                   onChange={(e) => setStyleName(e.target.value)}
                   placeholder=""
-                  className="w-full h-12 px-4 rounded-xl border border-slate-300 bg-white text-base font-medium text-slate-900 focus:border-[#163767] focus:ring-2 focus:ring-[#163767]/20 focus:outline-none"
+                  className="w-full h-12 px-4 rounded-xl border border-neutral-300 bg-white text-base font-medium text-neutral-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none"
                 />
               </div>
 
               {/* Wilcom Design Number */}
               <div>
-                <label className="block text-sm font-bold text-slate-700 uppercase mb-2">
+                <label className="block text-sm font-bold text-neutral-700 uppercase mb-2">
                   Design Number
                 </label>
                 <input
@@ -357,18 +357,18 @@ export function WilcomDesignModal({
                   value={designNumber}
                   onChange={(e) => setDesignNumber(e.target.value)}
                   placeholder=""
-                  className="w-full h-12 px-4 rounded-xl border border-slate-300 bg-white font-mono font-bold text-base uppercase text-slate-900 focus:border-[#163767] focus:ring-2 focus:ring-[#163767]/20 focus:outline-none"
+                  className="w-full h-12 px-4 rounded-xl border border-neutral-300 bg-white font-mono font-bold text-base uppercase text-neutral-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none"
                 />
               </div>
 
               {/* Artwork Photo Upload */}
               <div className="sm:col-span-3">
-                <label className="block text-sm font-bold text-slate-700 uppercase mb-2">
+                <label className="block text-sm font-bold text-neutral-700 uppercase mb-2">
                   Artwork Photo
                 </label>
                 <div className="flex items-center gap-3">
-                  <label className="inline-flex items-center gap-3 px-5 py-3 rounded-xl border border-dashed border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-700 cursor-pointer font-semibold text-base transition shadow-2xs">
-                    <Upload className="w-5 h-5 text-slate-600" />
+                  <label className="inline-flex items-center gap-3 px-5 py-3 rounded-xl border border-dashed border-neutral-300 bg-neutral-50 hover:bg-neutral-100 text-neutral-700 cursor-pointer font-semibold text-base transition shadow-2xs">
+                    <Upload className="w-5 h-5 text-neutral-600" />
                     <span>Upload Photo</span>
                     <input
                       type="file"
@@ -381,7 +381,7 @@ export function WilcomDesignModal({
                     <button
                       type="button"
                       onClick={() => setPhotoUrl('')}
-                      className="text-sm font-semibold text-rose-600 hover:text-rose-800 underline cursor-pointer"
+                      className="text-sm font-semibold text-danger-600 hover:text-danger-800 underline cursor-pointer"
                     >
                       Remove Photo
                     </button>
@@ -393,9 +393,9 @@ export function WilcomDesignModal({
                     <img
                       src={photoUrl}
                       alt="Wilcom preview"
-                      className="w-14 h-14 object-contain rounded-lg border border-slate-200 bg-white shadow-2xs p-1"
+                      className="w-14 h-14 object-contain rounded-lg border border-neutral-200 bg-white shadow-2xs p-1"
                     />
-                    <span className="text-xs text-emerald-700 font-semibold flex items-center gap-1">
+                    <span className="text-xs text-accent-800 font-semibold flex items-center gap-1">
                       <Check className="w-3.5 h-3.5" />
                       Photo Ready
                     </span>
@@ -405,7 +405,7 @@ export function WilcomDesignModal({
 
               {/* Remarks */}
               <div className="sm:col-span-3">
-                <label className="block text-sm font-bold text-slate-700 uppercase mb-2">
+                <label className="block text-sm font-bold text-neutral-700 uppercase mb-2">
                   Notes / Instructions
                 </label>
                 <input
@@ -413,7 +413,7 @@ export function WilcomDesignModal({
                   value={remarks}
                   onChange={(e) => setRemarks(e.target.value)}
                   placeholder=""
-                  className="w-full h-12 px-4 rounded-xl border border-slate-300 bg-white text-base text-slate-900 focus:border-[#163767] focus:ring-2 focus:ring-[#163767]/20 focus:outline-none"
+                  className="w-full h-12 px-4 rounded-xl border border-neutral-300 bg-white text-base text-neutral-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none"
                 />
               </div>
             </div>
@@ -422,7 +422,7 @@ export function WilcomDesignModal({
               <button
                 type="button"
                 onClick={handleSaveCurrent}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-[#163767] hover:bg-[#0F264A] text-white rounded-xl text-base font-bold shadow-xs transition cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-base font-bold shadow-xs transition cursor-pointer"
               >
                 <Check className="w-5 h-5" />
                 <span>{editingId ? 'Update Design' : 'Add Design'}</span>
@@ -432,7 +432,7 @@ export function WilcomDesignModal({
 
           {/* LIST OF CURRENT ENTRIES */}
           <div className="space-y-4">
-            <h3 className="text-base font-bold uppercase tracking-wider text-slate-800">
+            <h3 className="text-base font-bold uppercase tracking-wider text-neutral-900">
               Attached Designs ({wilcomEntries.length})
             </h3>
 
@@ -441,10 +441,10 @@ export function WilcomDesignModal({
                 {wilcomEntries.map((entry, idx) => (
                   <div
                     key={entry.id || idx}
-                    className="p-3.5 rounded-xl border border-slate-200 bg-white flex items-start justify-between gap-3 shadow-2xs hover:border-slate-300 transition"
+                    className="p-3.5 rounded-xl border border-neutral-200 bg-white flex items-start justify-between gap-3 shadow-2xs hover:border-neutral-300 transition"
                   >
                     <div className="flex items-start gap-3 min-w-0 flex-1">
-                      <div className="w-12 h-12 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-center shrink-0 overflow-hidden">
+                      <div className="w-12 h-12 rounded-lg border border-neutral-200 bg-neutral-50 flex items-center justify-center shrink-0 overflow-hidden">
                         {entry.photoUrl ? (
                           <img
                             src={entry.photoUrl}
@@ -452,34 +452,34 @@ export function WilcomDesignModal({
                             className="w-full h-full object-contain"
                           />
                         ) : (
-                          <ImageIcon className="w-5 h-5 text-slate-400" />
+                          <ImageIcon className="w-5 h-5 text-neutral-500" />
                         )}
                       </div>
 
                       <div className="min-w-0 flex-1 space-y-1 text-xs">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase text-white ${
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase text-neutral-900 ${
                             entry.category === 'TOP'
-                              ? 'bg-[#163767]'
+                              ? 'bg-brand-600'
                               : entry.category === 'BOTTOM'
-                                ? 'bg-emerald-700'
+                                ? 'bg-accent-500'
                                 : entry.category === 'DUPATTA'
-                                  ? 'bg-amber-700'
-                                  : 'bg-slate-700'
+                                  ? 'bg-accent-500'
+                                  : 'bg-neutral-200'
                           }`}>
                             {entry.category}
                           </span>
                           {entry.styleName && (
-                            <span className="font-semibold text-slate-900 truncate">
+                            <span className="font-semibold text-neutral-900 truncate">
                               {entry.styleName}
                             </span>
                           )}
                         </div>
-                        <div className="font-mono font-bold text-slate-900 text-xs">
+                        <div className="font-mono font-bold text-neutral-900 text-xs">
                           {entry.wilcomDesignNumber}
                         </div>
                         {entry.remarks && (
-                          <p className="text-[11px] text-slate-500 truncate">
+                          <p className="text-[11px] text-neutral-500 truncate">
                             {entry.remarks}
                           </p>
                         )}
@@ -490,7 +490,7 @@ export function WilcomDesignModal({
                       <button
                         type="button"
                         onClick={() => handleEdit(entry)}
-                        className="p-1.5 text-slate-400 hover:text-[#163767] hover:bg-slate-100 rounded-lg cursor-pointer transition"
+                        className="p-1.5 text-neutral-500 hover:text-brand-600 hover:bg-neutral-100 rounded-lg cursor-pointer transition"
                         title="Edit design"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
@@ -498,7 +498,7 @@ export function WilcomDesignModal({
                       <button
                         type="button"
                         onClick={() => handleDelete(entry.id)}
-                        className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg cursor-pointer transition"
+                        className="p-1.5 text-neutral-500 hover:text-danger-600 hover:bg-danger-50 rounded-lg cursor-pointer transition"
                         title="Delete design"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -508,7 +508,7 @@ export function WilcomDesignModal({
                 ))}
               </div>
             ) : (
-              <div className="p-8 text-center border border-dashed border-slate-200 rounded-xl bg-white text-slate-400 text-xs">
+              <div className="p-8 text-center border border-dashed border-neutral-200 rounded-xl bg-white text-neutral-500 text-xs">
                 No Wilcom designs added yet.
               </div>
             )}
@@ -516,14 +516,14 @@ export function WilcomDesignModal({
         </div>
 
         {/* MODAL FOOTER */}
-        <div className="px-7 py-5 border-t border-slate-200 bg-white flex items-center justify-between shrink-0">
-          <div className="text-base font-medium text-slate-500">
+        <div className="px-7 py-5 border-t border-neutral-200 bg-white flex items-center justify-between shrink-0">
+          <div className="text-base font-medium text-neutral-500">
             {wilcomEntries.length} {wilcomEntries.length === 1 ? 'design' : 'designs'}
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="px-6 py-3 bg-[#163767] hover:bg-[#0F264A] text-white rounded-xl text-base font-bold transition shadow-xs cursor-pointer"
+            className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-base font-bold transition shadow-xs cursor-pointer"
           >
             Done
           </button>

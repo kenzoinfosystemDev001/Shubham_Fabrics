@@ -131,8 +131,8 @@ export function generateChallanHtml(challan: any): string {
       print-color-adjust: exact !important;
     }
     body {
-      background-color: #f1f5f9;
-      color: #0f172a;
+      background-color: #f1eff4;
+      color: #25232a;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       padding: 16px;
       font-size: 12px;
@@ -141,7 +141,7 @@ export function generateChallanHtml(challan: any): string {
     .no-print-bar {
       max-width: 820px;
       margin: 0 auto 16px auto;
-      background: #0f172a;
+      background: #25232a;
       color: #ffffff;
       padding: 12px 20px;
       border-radius: 8px;
@@ -173,15 +173,16 @@ export function generateChallanHtml(challan: any): string {
       transition: background 0.15s;
     }
     .btn-print {
-      background: #2563eb;
+      background: #8e55c4;
       color: #ffffff;
     }
-    .btn-print:hover { background: #1d4ed8; }
+    .btn-print:hover { background: #7442a6; }
     .btn-download {
-      background: #059669;
-      color: #ffffff;
+      background: #ffffff;
+      color: #7442a6;
+      border: 1px solid #8e55c4;
     }
-    .btn-download:hover { background: #047857; }
+    .btn-download:hover { background: #f7f1fc; }
 
     /* CHALLAN SHEET CONTAINER */
     .challan-container {
@@ -222,8 +223,8 @@ export function generateChallanHtml(challan: any): string {
       display: inline-block;
       margin-top: 4px;
       padding: 2px 6px;
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
+      background: #f1eff4;
+      border: 1px solid #d3ced8;
       color: #000000;
       font-size: 10px;
       font-weight: 800;
@@ -241,7 +242,7 @@ export function generateChallanHtml(challan: any): string {
     .barcode-svg-wrap {
       background: #ffffff;
       padding: 4px;
-      border: 1px solid #cbd5e1;
+      border: 1px solid #d3ced8;
       border-radius: 4px;
       display: inline-block;
       margin-bottom: 4px;
@@ -251,12 +252,12 @@ export function generateChallanHtml(challan: any): string {
       font-size: 13px;
       font-weight: 800;
       letter-spacing: 1px;
-      color: #0f172a;
+      color: #25232a;
     }
     .design-tag {
       font-size: 10px;
       font-weight: 700;
-      color: #475569;
+      color: #57545e;
       margin-top: 2px;
     }
 
@@ -265,7 +266,7 @@ export function generateChallanHtml(challan: any): string {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 8px;
-      background: #f8fafc;
+      background: #f8f7fa;
       border: 1.5px solid #000000;
       padding: 8px 12px;
       margin-bottom: 8px;
@@ -278,7 +279,7 @@ export function generateChallanHtml(challan: any): string {
       font-size: 9px;
       font-weight: 900;
       text-transform: uppercase;
-      color: #475569;
+      color: #57545e;
       letter-spacing: 0.5px;
       margin-bottom: 1px;
     }
@@ -290,8 +291,9 @@ export function generateChallanHtml(challan: any): string {
 
     /* FLOW AUDIT LEDGER */
     .flow-ledger {
-      background: #0f172a;
-      color: #ffffff;
+      background: #ffffff;
+      color: #000000;
+      border: 1.5px solid #000000;
       border-radius: 6px;
       padding: 12px 14px;
       margin-bottom: 14px;
@@ -300,14 +302,14 @@ export function generateChallanHtml(challan: any): string {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid #334155;
+      border-bottom: 1px solid #000000;
       padding-bottom: 6px;
       margin-bottom: 8px;
       font-size: 10px;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 1px;
-      color: #fcd34d;
+      color: #000000;
     }
     .flow-grid {
       display: grid;
@@ -315,38 +317,38 @@ export function generateChallanHtml(challan: any): string {
       gap: 10px;
     }
     .flow-card {
-      background: #1e293b;
-      border: 1px solid #334155;
+      background: #ffffff;
+      border: 1px solid #6b6872;
       border-radius: 4px;
       padding: 8px 10px;
     }
     .flow-card.defect {
-      background: #450a0a;
-      border-color: #991b1b;
+      background: #ffffff;
+      border: 2px dashed #c93a22;
     }
     .flow-card.out {
-      background: #064e3b;
-      border-color: #047857;
+      background: #ffffff;
+      border: 2px solid #000000;
     }
     .flow-card-label {
       font-size: 9px;
       font-weight: 700;
       text-transform: uppercase;
-      color: #94a3b8;
+      color: #43404a;
     }
-    .flow-card.defect .flow-card-label { color: #fca5a5; }
-    .flow-card.out .flow-card-label { color: #86efac; }
+    .flow-card.defect .flow-card-label { color: #a52e1a; }
+    .flow-card.out .flow-card-label { color: #000000; }
     .flow-card-val {
       font-family: monospace;
       font-size: 16px;
       font-weight: 900;
       margin-top: 2px;
     }
-    .flow-card.defect .flow-card-val { color: #fecaca; }
-    .flow-card.out .flow-card-val { color: #a7f3d0; }
+    .flow-card.defect .flow-card-val { color: #a52e1a; }
+    .flow-card.out .flow-card-val { color: #000000; }
     .flow-card-sub {
       font-size: 9px;
-      color: #cbd5e1;
+      color: #43404a;
       margin-top: 2px;
       white-space: nowrap;
       overflow: hidden;
@@ -362,7 +364,7 @@ export function generateChallanHtml(challan: any): string {
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 1px;
-      color: #334155;
+      color: #43404a;
       margin-bottom: 6px;
       display: flex;
       justify-content: space-between;
@@ -374,16 +376,16 @@ export function generateChallanHtml(challan: any): string {
       font-size: 11px;
     }
     th, td {
-      border: 1.5px solid #cbd5e1;
+      border: 1.5px solid #d3ced8;
       padding: 6px 10px;
       text-align: left;
     }
     th {
-      background: #f1f5f9;
+      background: #f1eff4;
       font-weight: 800;
       text-transform: uppercase;
       font-size: 9px;
-      color: #475569;
+      color: #57545e;
       letter-spacing: 0.5px;
     }
     td.num {
@@ -392,16 +394,16 @@ export function generateChallanHtml(challan: any): string {
       font-weight: 700;
     }
     tr.totals-row td {
-      background: #f8fafc;
+      background: #f8f7fa;
       font-weight: 800;
       font-size: 11px;
-      border-top: 2px solid #0f172a;
+      border-top: 2px solid #25232a;
     }
 
     /* PRODUCTION SHEET ATTACHMENT CARD */
     .sheet-ref-card {
-      background: #faf5ff;
-      border: 1.5px dashed #a855f7;
+      background: #ffffff;
+      border: 1.5px dashed #000000;
       border-radius: 6px;
       padding: 10px 14px;
       margin-bottom: 14px;
@@ -412,13 +414,13 @@ export function generateChallanHtml(challan: any): string {
     .sheet-ref-title {
       font-size: 11px;
       font-weight: 800;
-      color: #6b21a8;
+      color: #000000;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
     .sheet-ref-sub {
       font-size: 10px;
-      color: #4c1d95;
+      color: #000000;
       margin-top: 2px;
     }
 
@@ -429,22 +431,22 @@ export function generateChallanHtml(challan: any): string {
       grid-template-columns: 1fr 1fr;
       gap: 32px;
       padding-top: 14px;
-      border-top: 1.5px solid #e2e8f0;
+      border-top: 1.5px solid #e5e1e8;
     }
     .sign-box {
-      border-top: 1.5px dashed #64748b;
+      border-top: 1.5px dashed #6b6872;
       padding-top: 8px;
       text-align: center;
     }
     .sign-title {
       font-weight: 800;
       font-size: 11px;
-      color: #0f172a;
+      color: #25232a;
       text-transform: uppercase;
     }
     .sign-sub {
       font-size: 9px;
-      color: #64748b;
+      color: #6b6872;
       margin-top: 2px;
     }
 
@@ -452,12 +454,12 @@ export function generateChallanHtml(challan: any): string {
     .footer-notice {
       margin-top: 14px;
       padding-top: 10px;
-      border-top: 1px solid #e2e8f0;
+      border-top: 1px solid #e5e1e8;
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-size: 9px;
-      color: #64748b;
+      color: #6b6872;
       font-family: monospace;
     }
 
@@ -485,16 +487,16 @@ export function generateChallanHtml(challan: any): string {
   <div class="no-print-bar">
     <div>
       <h3>MATERIAL DISPATCH CHALLAN · ${challanNo}</h3>
-      <span style="font-size: 10px; color: #94a3b8; font-family: monospace;">
+      <span style="font-size: 10px; color: #8f8a96; font-family: monospace;">
         Shubham Fabrics India Pvt. Ltd. · ${fromDept} → ${toDept}
       </span>
     </div>
     <div class="btn-group">
       <button class="btn btn-print" onclick="window.print()">
-        🖨️ Print Slip
+        Print Slip
       </button>
       <button class="btn btn-download" onclick="window.downloadSelf()">
-        💾 Save HTML
+        Save HTML
       </button>
     </div>
   </div>
@@ -587,7 +589,7 @@ export function generateChallanHtml(challan: any): string {
     ` : ''}
 
     ${defectivePieces > 0 ? `
-    <div style="border: 1.5px solid #991b1b; background: #fef2f2; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; font-size: 11px; font-weight: bold; color: #991b1b;">
+    <div style="border: 1.5px solid #a52e1a; background: #fff4f2; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; font-size: 11px; font-weight: bold; color: #a52e1a;">
       DEFECTIVE CUT (TO SHELF): ${defectivePieces} ${fabricUnit} [Location: ${defectiveShelf}]${defectReason ? ` &middot; Reason: ${defectReason}` : ''}
     </div>
     ` : ''}

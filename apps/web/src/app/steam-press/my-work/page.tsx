@@ -30,7 +30,6 @@ import {
   Play,
   Maximize2,
 } from 'lucide-react';
-import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 
 function SteamPressWorkstationContent() {
@@ -333,26 +332,21 @@ function SteamPressWorkstationContent() {
 
   return (
     <div
-      className="min-h-screen text-slate-100 flex flex-col"
-      style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(15, 23, 42, 0.94), rgba(10, 15, 29, 0.98)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
-      }}
+      className="min-h-screen text-neutral-900 flex flex-col"
+      
     >
       {/* HEADER */}
-      <header className="border-b border-slate-800/80 bg-slate-950/60 backdrop-blur-md px-6 py-4 sticky top-0 z-30 shadow-md">
+      <header className="border-b border-neutral-200 bg-white backdrop-blur-md px-6 py-4 sticky top-0 z-30 shadow-md">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-inner">
+            <div className="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-600 shadow-inner">
               <Wind className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+              <h1 className="text-xl font-bold tracking-tight text-neutral-900 flex items-center gap-2">
                 Steam Press Workstation Floor
               </h1>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-neutral-500">
                 Execute high-temperature pressing, crease setting, moisture extraction, and hand over to Final QC
               </p>
             </div>
@@ -362,14 +356,14 @@ function SteamPressWorkstationContent() {
             <button
               onClick={() => loadJobs()}
               disabled={loading}
-              className="p-2 rounded-lg bg-slate-900 border border-slate-700/80 hover:bg-slate-800 text-slate-300 hover:text-white transition disabled:opacity-50"
+              className="p-2 rounded-lg bg-white border border-neutral-200 hover:bg-neutral-100 text-neutral-700 hover:text-neutral-900 transition disabled:opacity-50"
               title="Refresh Workstation"
             >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-cyan-400' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-brand-600' : ''}`} />
             </button>
             <Link
               href="/steam-press/issue-challan"
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold shadow-md shadow-cyan-900/30 transition"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold shadow-sm transition"
             >
               <Send className="w-4 h-4" />
               <span>Issue Handover Challan</span>
@@ -381,9 +375,9 @@ function SteamPressWorkstationContent() {
       {/* MAIN TWO-COLUMN WORKSTATION LAYOUT */}
       <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-6 space-y-4">
         {/* TABS & SEARCH BAR */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 bg-slate-900/60 border border-slate-800 rounded-xl p-3 backdrop-blur-xs">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 bg-white border border-neutral-200 rounded-xl p-3 backdrop-blur-xs">
           {/* Status Tabs */}
-          <div className="flex items-center gap-1 overflow-x-auto p-1 bg-slate-950/60 border border-slate-800 rounded-lg text-xs">
+          <div className="flex items-center gap-1 overflow-x-auto p-1 bg-white border border-neutral-200 rounded-lg text-xs">
             {[
               { id: 'ALL', label: 'All Jobs', count: jobs.length },
               { id: 'QUEUE', label: 'Queue', count: jobs.filter((j) => j.status === 'RECEIVED').length },
@@ -397,8 +391,8 @@ function SteamPressWorkstationContent() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`px-2.5 py-1 rounded-md font-semibold whitespace-nowrap transition ${
                   activeTab === tab.id
-                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-brand-500/20 text-brand-600 border border-brand-500/40'
+                    : 'text-neutral-500 hover:text-neutral-900'
                 }`}
               >
                 {tab.label} ({tab.count})
@@ -408,19 +402,19 @@ function SteamPressWorkstationContent() {
 
           {/* Search bar */}
           <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-500" />
+            <Search className="w-4 h-4 absolute left-3 top-2.5 text-neutral-500" />
             <input
               type="text"
               placeholder="Search challan, program, style, client..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-slate-950/80 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 transition"
+              className="w-full pl-9 pr-4 py-2 bg-white border border-neutral-200 rounded-lg text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-brand-500 transition"
             />
           </div>
         </div>
 
         {error && (
-          <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl flex items-center gap-3 text-rose-300 text-xs">
+          <div className="p-3 bg-danger-500/10 border border-danger-500/30 rounded-xl flex items-center gap-3 text-danger-600 text-xs">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
@@ -431,20 +425,20 @@ function SteamPressWorkstationContent() {
           {/* LEFT: JOB QUEUE LIST (5 cols) */}
           <div className="lg:col-span-5 space-y-3">
             <div className="flex items-center justify-between px-1">
-              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+              <span className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
                 Active Queue ({filteredJobs.length})
               </span>
-              <span className="text-[11px] text-slate-500">Select to inspect or process</span>
+              <span className="text-[11px] text-neutral-500">Select to inspect or process</span>
             </div>
 
             {loading ? (
-              <div className="py-20 text-center text-slate-400 text-xs flex flex-col items-center justify-center bg-slate-900/40 rounded-xl border border-slate-800">
-                <RefreshCw className="w-6 h-6 animate-spin text-cyan-400 mb-2" />
+              <div className="py-20 text-center text-neutral-500 text-xs flex flex-col items-center justify-center bg-white rounded-xl border border-neutral-200">
+                <RefreshCw className="w-6 h-6 animate-spin text-brand-600 mb-2" />
                 <span>Loading pressing floor jobs...</span>
               </div>
             ) : filteredJobs.length === 0 ? (
-              <div className="p-8 text-center text-slate-400 text-xs bg-slate-900/40 rounded-xl border border-slate-800">
-                <Package className="w-10 h-10 text-slate-600 mx-auto mb-2" />
+              <div className="p-8 text-center text-neutral-500 text-xs bg-white rounded-xl border border-neutral-200">
+                <Package className="w-10 h-10 text-neutral-600 mx-auto mb-2" />
                 <p>No jobs found in this category.</p>
               </div>
             ) : (
@@ -463,41 +457,41 @@ function SteamPressWorkstationContent() {
                       onClick={() => setSelectedJob(job)}
                       className={`p-3.5 rounded-xl border cursor-pointer transition flex flex-col justify-between space-y-2.5 backdrop-blur-xs ${
                         isSelected
-                          ? 'bg-slate-900/90 border-cyan-500 shadow-md shadow-cyan-950/50 ring-1 ring-cyan-500/50'
-                          : 'bg-slate-900/50 border-slate-800/80 hover:border-slate-700 hover:bg-slate-900/70'
+                          ? 'bg-white border-brand-500 shadow-sm  ring-1 ring-brand-500/50'
+                          : 'bg-white border-neutral-200 hover:border-neutral-200 hover:bg-white'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <span className="font-mono text-xs font-bold text-cyan-300 block">
+                          <span className="font-mono text-xs font-bold text-brand-600 block">
                             {job.challanNumber}
                           </span>
-                          <span className="text-[11px] text-slate-400">
+                          <span className="text-[11px] text-neutral-500">
                             {job.program?.styleCode || 'Standard Style'}
                           </span>
                         </div>
                         <span
                           className={`px-2 py-0.5 rounded text-[9px] font-bold border uppercase tracking-wider ${
                             job.status === 'RECEIVED'
-                              ? 'bg-teal-500/10 text-teal-300 border-teal-500/30'
+                              ? 'bg-brand-500/10 text-brand-600 border-brand-500/30'
                               : job.status === 'IN_PROCESS'
-                              ? 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30 animate-pulse'
+                              ? 'bg-brand-500/10 text-brand-600 border-brand-500/30 animate-pulse'
                               : job.status === 'COMPLETED' || job.status === 'READY_FOR_HANDOVER'
-                              ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
+                              ? 'bg-accent-400/10 text-accent-700 border-accent-500/30'
                               : job.status === 'ON_HOLD'
-                              ? 'bg-rose-500/10 text-rose-400 border-rose-500/30'
-                              : 'bg-slate-800 text-slate-300 border-slate-700'
+                              ? 'bg-danger-500/10 text-danger-600 border-danger-500/30'
+                              : 'bg-neutral-100 text-neutral-700 border-neutral-200'
                           }`}
                         >
                           {job.status.replace(/_/g, ' ')}
                         </span>
                       </div>
 
-                      <div className="flex items-center justify-between text-xs text-slate-300 bg-slate-950/50 px-2.5 py-1.5 rounded-lg border border-slate-800/60">
-                        <span className="text-[11px] text-slate-400">
-                          Prog: <span className="font-mono font-bold text-white">{job.program?.programNumber || 'N/A'}</span>
+                      <div className="flex items-center justify-between text-xs text-neutral-700 bg-white px-2.5 py-1.5 rounded-lg border border-neutral-200">
+                        <span className="text-[11px] text-neutral-500">
+                          Prog: <span className="font-mono font-bold text-neutral-900">{job.program?.programNumber || 'N/A'}</span>
                         </span>
-                        <span className="font-mono font-bold text-cyan-300 text-xs">
+                        <span className="font-mono font-bold text-brand-600 text-xs">
                           {goodPcs > 0 ? `${goodPcs} / ` : ''}{totalPcs} PCS
                         </span>
                       </div>
@@ -511,31 +505,31 @@ function SteamPressWorkstationContent() {
           {/* RIGHT: SELECTED JOB DETAILS & WORKSPACE CONTROLS (7 cols) */}
           <div className="lg:col-span-7">
             {selectedJob ? (
-              <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 backdrop-blur-md space-y-6 shadow-xl">
+              <div className="bg-white border border-neutral-200 rounded-2xl p-6 backdrop-blur-md space-y-6 shadow-sm">
                 {/* Header: Challan and Action Buttons */}
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 border-b border-slate-800 pb-4">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 border-b border-neutral-200 pb-4">
                   <div>
                     <div className="flex items-center gap-2.5">
-                      <span className="font-mono text-lg font-bold text-cyan-300">
+                      <span className="font-mono text-lg font-bold text-brand-600">
                         {selectedJob.challanNumber}
                       </span>
                       <span
                         className={`px-2.5 py-0.5 rounded text-[10px] font-bold border uppercase tracking-wider ${
                           selectedJob.status === 'RECEIVED'
-                            ? 'bg-teal-500/10 text-teal-300 border-teal-500/30'
+                            ? 'bg-brand-500/10 text-brand-600 border-brand-500/30'
                             : selectedJob.status === 'IN_PROCESS'
-                            ? 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30'
+                            ? 'bg-brand-500/10 text-brand-600 border-brand-500/30'
                             : selectedJob.status === 'COMPLETED' || selectedJob.status === 'READY_FOR_HANDOVER'
-                            ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
-                            : 'bg-rose-500/10 text-rose-400 border-rose-500/30'
+                            ? 'bg-accent-400/10 text-accent-700 border-accent-500/30'
+                            : 'bg-danger-500/10 text-danger-600 border-danger-500/30'
                         }`}
                       >
                         {selectedJob.status.replace(/_/g, ' ')}
                       </span>
                     </div>
-                    <span className="text-xs text-slate-400 mt-1 block">
+                    <span className="text-xs text-neutral-500 mt-1 block">
                       Received from{' '}
-                      <span className="text-slate-200 font-semibold">{selectedJob.fromDepartment || 'FINISHING'}</span> on{' '}
+                      <span className="text-neutral-900 font-semibold">{selectedJob.fromDepartment || 'FINISHING'}</span> on{' '}
                       {new Date(selectedJob.updatedAt || selectedJob.createdAt).toLocaleDateString()}
                     </span>
                   </div>
@@ -545,9 +539,9 @@ function SteamPressWorkstationContent() {
                     {selectedJob.program && (
                       <button
                         onClick={() => openTechSheet(selectedJob.program)}
-                        className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5"
+                        className="px-3 py-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-900 text-xs font-semibold border border-neutral-200 transition flex items-center gap-1.5"
                       >
-                        <FileText className="w-3.5 h-3.5 text-cyan-400" />
+                        <FileText className="w-3.5 h-3.5 text-brand-600" />
                         <span>Production Sheet</span>
                       </button>
                     )}
@@ -555,7 +549,7 @@ function SteamPressWorkstationContent() {
                     {/* Dedicated Focus Workspace Link */}
                     <Link
                       href={`/steam-press/workspace/${selectedJob.id}`}
-                      className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-semibold border border-cyan-500/40 transition flex items-center gap-1.5 shadow-sm"
+                      className="px-3 py-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-brand-600 text-xs font-semibold border border-brand-500/40 transition flex items-center gap-1.5 shadow-sm"
                     >
                       <Maximize2 className="w-3.5 h-3.5" />
                       <span>Focus Mode</span>
@@ -564,28 +558,28 @@ function SteamPressWorkstationContent() {
                 </div>
 
                 {/* SPECIFICATION CARD */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-950/60 p-3.5 rounded-xl border border-slate-800">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white p-3.5 rounded-xl border border-neutral-200">
                   <div>
-                    <span className="text-slate-400 block text-[10px]">Program Number:</span>
-                    <span className="font-mono font-bold text-white text-xs">
+                    <span className="text-neutral-500 block text-[10px]">Program Number:</span>
+                    <span className="font-mono font-bold text-neutral-900 text-xs">
                       {selectedJob.program?.programNumber || 'N/A'}
                     </span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block text-[10px]">Style Code:</span>
-                    <span className="font-bold text-cyan-300 text-xs">
+                    <span className="text-neutral-500 block text-[10px]">Style Code:</span>
+                    <span className="font-bold text-brand-600 text-xs">
                       {selectedJob.program?.styleCode || 'Standard'}
                     </span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block text-[10px]">Design Number:</span>
-                    <span className="text-slate-200 text-xs">
+                    <span className="text-neutral-500 block text-[10px]">Design Number:</span>
+                    <span className="text-neutral-900 text-xs">
                       {selectedJob.program?.designNumber || 'N/A'}
                     </span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block text-[10px]">Client / Buyer:</span>
-                    <span className="text-slate-200 text-xs truncate block">
+                    <span className="text-neutral-500 block text-[10px]">Client / Buyer:</span>
+                    <span className="text-neutral-900 text-xs truncate block">
                       {selectedJob.program?.clientName || 'Standard Client'}
                     </span>
                   </div>
@@ -593,41 +587,41 @@ function SteamPressWorkstationContent() {
 
                 {/* QUANTITY RECONCILIATION SUMMARY */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  <div className="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3">
-                    <span className="text-[10px] text-slate-400 block">Input Received</span>
-                    <span className="font-mono text-lg font-bold text-white">
+                  <div className="bg-white border border-neutral-200 rounded-xl p-3">
+                    <span className="text-[10px] text-neutral-500 block">Input Received</span>
+                    <span className="font-mono text-lg font-bold text-neutral-900">
                       {selectedJob.fabricIn ||
                         selectedJob.items?.reduce((s: number, it: any) => s + (Number(it.quantity) || 0), 0) ||
                         0}{' '}
-                      <span className="text-xs font-normal text-slate-400">PCS</span>
+                      <span className="text-xs font-normal text-neutral-500">PCS</span>
                     </span>
                   </div>
-                  <div className="bg-emerald-950/20 border border-emerald-800/40 rounded-xl p-3">
-                    <span className="text-[10px] text-emerald-400 block">Good Pressed</span>
-                    <span className="font-mono text-lg font-bold text-emerald-300">
+                  <div className="bg-accent-50 border border-accent-500/40 rounded-xl p-3">
+                    <span className="text-[10px] text-accent-700 block">Good Pressed</span>
+                    <span className="font-mono text-lg font-bold text-neutral-900">
                       {selectedJob.fabricOut ?? 0}{' '}
-                      <span className="text-xs font-normal text-slate-400">PCS</span>
+                      <span className="text-xs font-normal text-neutral-500">PCS</span>
                     </span>
                   </div>
-                  <div className="bg-amber-950/20 border border-amber-800/40 rounded-xl p-3">
-                    <span className="text-[10px] text-amber-400 block">Re-press Rework</span>
-                    <span className="font-mono text-lg font-bold text-amber-300">
+                  <div className="bg-accent-50 border border-accent-500/40 rounded-xl p-3">
+                    <span className="text-[10px] text-accent-700 block">Re-press Rework</span>
+                    <span className="font-mono text-lg font-bold text-neutral-900">
                       {selectedJob.reworkQty ?? 0}{' '}
-                      <span className="text-xs font-normal text-slate-400">PCS</span>
+                      <span className="text-xs font-normal text-neutral-500">PCS</span>
                     </span>
                   </div>
-                  <div className="bg-rose-950/20 border border-rose-800/40 rounded-xl p-3">
-                    <span className="text-[10px] text-rose-400 block">Scorch Scrap</span>
-                    <span className="font-mono text-lg font-bold text-rose-300">
+                  <div className="bg-danger-50 border border-danger-500/40 rounded-xl p-3">
+                    <span className="text-[10px] text-danger-600 block">Scorch Scrap</span>
+                    <span className="font-mono text-lg font-bold text-danger-600">
                       {selectedJob.rejectQty ?? 0}{' '}
-                      <span className="text-xs font-normal text-slate-400">PCS</span>
+                      <span className="text-xs font-normal text-neutral-500">PCS</span>
                     </span>
                   </div>
                 </div>
 
                 {/* WORKFLOW STAGE ACTIONS */}
-                <div className="p-4 bg-slate-950/80 border border-slate-800 rounded-xl space-y-3">
-                  <span className="text-xs font-semibold text-slate-300 block uppercase tracking-wider">
+                <div className="p-4 bg-white border border-neutral-200 rounded-xl space-y-3">
+                  <span className="text-xs font-semibold text-neutral-700 block uppercase tracking-wider">
                     Station Controls & Workflow Transition:
                   </span>
 
@@ -636,7 +630,7 @@ function SteamPressWorkstationContent() {
                     {selectedJob.status === 'RECEIVED' && (
                       <button
                         onClick={() => openStartModal(selectedJob)}
-                        className="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold shadow-md shadow-cyan-900/30 transition flex items-center gap-2"
+                        className="px-4 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-sm transition flex items-center gap-2"
                       >
                         <Flame className="w-4 h-4" />
                         <span>Start Pressing (Allocate Table)</span>
@@ -648,7 +642,7 @@ function SteamPressWorkstationContent() {
                       <>
                         <button
                           onClick={() => openCompleteModal(selectedJob)}
-                          className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-900/30 transition flex items-center gap-2"
+                          className="px-4 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-sm transition flex items-center gap-2"
                         >
                           <CheckCircle2 className="w-4 h-4" />
                           <span>Reconcile & Complete</span>
@@ -657,7 +651,7 @@ function SteamPressWorkstationContent() {
                         <button
                           onClick={handlePauseJob}
                           disabled={submittingPause}
-                          className="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-semibold border border-amber-500/30 transition flex items-center gap-1.5"
+                          className="px-3.5 py-2 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-accent-700 text-xs font-semibold border border-accent-500/30 transition flex items-center gap-1.5"
                         >
                           <Pause className="w-4 h-4" />
                           <span>Pause Job</span>
@@ -670,7 +664,7 @@ function SteamPressWorkstationContent() {
                       <button
                         onClick={handleResumeJob}
                         disabled={submittingResume}
-                        className="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold shadow-md shadow-cyan-900/30 transition flex items-center gap-2"
+                        className="px-4 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-sm transition flex items-center gap-2"
                       >
                         <Play className="w-4 h-4" />
                         <span>Resume Pressing</span>
@@ -681,7 +675,7 @@ function SteamPressWorkstationContent() {
                     {selectedJob.status === 'COMPLETED' && (
                       <button
                         onClick={() => openInspectModal(selectedJob)}
-                        className="px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold shadow-md shadow-teal-900/30 transition flex items-center gap-2"
+                        className="px-4 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-sm transition flex items-center gap-2"
                       >
                         <ShieldCheck className="w-4 h-4" />
                         <span>Quality & Appearance Audit</span>
@@ -692,7 +686,7 @@ function SteamPressWorkstationContent() {
                     {(selectedJob.status === 'READY_FOR_HANDOVER' || selectedJob.status === 'COMPLETED') && (
                       <Link
                         href={`/steam-press/issue-challan?jobId=${selectedJob.id}`}
-                        className="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold shadow-md shadow-cyan-900/30 transition flex items-center gap-2"
+                        className="px-4 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-sm transition flex items-center gap-2"
                       >
                         <Send className="w-4 h-4" />
                         <span>Issue Handover Challan to Final QC</span>
@@ -703,21 +697,21 @@ function SteamPressWorkstationContent() {
 
                 {/* ACTIVITY LOG & EVENTS */}
                 {selectedJob.events && selectedJob.events.length > 0 && (
-                  <div className="space-y-2 pt-2 border-t border-slate-800/80">
-                    <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
+                  <div className="space-y-2 pt-2 border-t border-neutral-200">
+                    <span className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider block">
                       Recent Activity & Audit Trail:
                     </span>
                     <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
                       {selectedJob.events.map((ev: any) => (
                         <div
                           key={ev.id}
-                          className="flex items-start justify-between bg-slate-950/40 p-2 rounded-lg border border-slate-800/50 text-[11px]"
+                          className="flex items-start justify-between bg-white p-2 rounded-lg border border-neutral-200 text-[11px]"
                         >
                           <div>
-                            <span className="font-semibold text-slate-300 mr-2">{ev.action}</span>
-                            <span className="text-slate-400">{ev.details || ''}</span>
+                            <span className="font-semibold text-neutral-700 mr-2">{ev.action}</span>
+                            <span className="text-neutral-500">{ev.details || ''}</span>
                           </div>
-                          <span className="text-[10px] text-slate-500 whitespace-nowrap">
+                          <span className="text-[10px] text-neutral-500 whitespace-nowrap">
                             {new Date(ev.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </span>
                         </div>
@@ -727,10 +721,10 @@ function SteamPressWorkstationContent() {
                 )}
               </div>
             ) : (
-              <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-16 text-center text-slate-400">
-                <Wind className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-                <h3 className="text-base font-bold text-white mb-1">No Job Selected</h3>
-                <p className="text-xs text-slate-400">
+              <div className="bg-white border border-neutral-200 rounded-2xl p-16 text-center text-neutral-500">
+                <Wind className="w-12 h-12 text-neutral-600 mx-auto mb-3" />
+                <h3 className="text-base font-bold text-neutral-900 mb-1">No Job Selected</h3>
+                <p className="text-xs text-neutral-500">
                   Select a job card from the left panel to inspect specifications or execute pressing.
                 </p>
               </div>
@@ -740,16 +734,16 @@ function SteamPressWorkstationContent() {
 
         {/* START / ALLOCATION MODAL */}
         {showStartModal && selectedJob && (
-          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl relative">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div className="fixed inset-0 z-50 bg-neutral-900/70 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="bg-white border border-neutral-200 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl relative">
+              <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
                 <div className="flex items-center gap-2">
-                  <Flame className="w-5 h-5 text-cyan-400" />
-                  <h3 className="text-base font-bold text-white">Start Steam Pressing</h3>
+                  <Flame className="w-5 h-5 text-brand-600" />
+                  <h3 className="text-base font-bold text-neutral-900">Start Steam Pressing</h3>
                 </div>
                 <button
                   onClick={() => setShowStartModal(false)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                  className="p-1 rounded-lg text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 transition"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -757,7 +751,7 @@ function SteamPressWorkstationContent() {
 
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-neutral-700 mb-1">
                     Pressing Table / Station ID
                   </label>
                   <input
@@ -765,12 +759,12 @@ function SteamPressWorkstationContent() {
                     value={workstationNumber}
                     onChange={(e) => setWorkstationNumber(e.target.value)}
                     placeholder="e.g. Table 1, Table 2, Vacuum Station A"
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-400"
+                    className="w-full px-3 py-2 bg-canvas border border-neutral-200 rounded-lg text-xs text-neutral-900 focus:outline-none focus:border-brand-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-neutral-700 mb-1">
                     Operator / Presser Name
                   </label>
                   <input
@@ -778,18 +772,18 @@ function SteamPressWorkstationContent() {
                     value={operatorName}
                     onChange={(e) => setOperatorName(e.target.value)}
                     placeholder="e.g. Steam Press Specialist"
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-400"
+                    className="w-full px-3 py-2 bg-canvas border border-neutral-200 rounded-lg text-xs text-neutral-900 focus:outline-none focus:border-brand-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-neutral-700 mb-1">
                     Pressing Operation Type
                   </label>
                   <select
                     value={operationType}
                     onChange={(e) => setOperationType(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-400"
+                    className="w-full px-3 py-2 bg-canvas border border-neutral-200 rounded-lg text-xs text-neutral-900 focus:outline-none focus:border-brand-500"
                   >
                     <option value="STEAM_PRESSING_STANDARD">Standard Steam Pressing & Vacuum Extract</option>
                     <option value="STEAM_PRESSING_HEAVY">Heavy Fabric Crease Setting</option>
@@ -798,17 +792,17 @@ function SteamPressWorkstationContent() {
                 </div>
               </div>
 
-              <div className="pt-2 flex justify-end gap-3 border-t border-slate-800">
+              <div className="pt-2 flex justify-end gap-3 border-t border-neutral-200">
                 <button
                   onClick={() => setShowStartModal(false)}
-                  className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition"
+                  className="px-4 py-2 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-semibold transition"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleStartJob}
                   disabled={submittingStart}
-                  className="px-5 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold shadow-md shadow-cyan-900/30 transition disabled:opacity-50 flex items-center gap-1.5"
+                  className="px-5 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-sm transition disabled:opacity-50 flex items-center gap-1.5"
                 >
                   <Flame className="w-4 h-4" />
                   <span>{submittingStart ? 'Starting...' : 'Confirm & Start'}</span>
@@ -820,16 +814,16 @@ function SteamPressWorkstationContent() {
 
         {/* OUTPUT RECONCILIATION MODAL */}
         {showCompleteModal && selectedJob && (
-          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl relative">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div className="fixed inset-0 z-50 bg-neutral-900/70 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="bg-white border border-neutral-200 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl relative">
+              <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                  <h3 className="text-base font-bold text-white">Pressing Output Reconciliation</h3>
+                  <CheckCircle2 className="w-5 h-5 text-accent-700" />
+                  <h3 className="text-base font-bold text-neutral-900">Pressing Output Reconciliation</h3>
                 </div>
                 <button
                   onClick={() => setShowCompleteModal(false)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                  className="p-1 rounded-lg text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 transition"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -837,14 +831,14 @@ function SteamPressWorkstationContent() {
 
               {/* Quantities Form */}
               <div className="space-y-3">
-                <div className="bg-slate-950/60 p-3 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
-                  <span className="text-slate-400">Total Input Quantity:</span>
-                  <span className="font-mono font-bold text-white text-sm">{completeInputQty} PCS</span>
+                <div className="bg-white p-3 rounded-xl border border-neutral-200 flex items-center justify-between text-xs">
+                  <span className="text-neutral-500">Total Input Quantity:</span>
+                  <span className="font-mono font-bold text-neutral-900 text-sm">{completeInputQty} PCS</span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-emerald-400 mb-1">
+                    <label className="block text-xs font-semibold text-accent-700 mb-1">
                       Good Pressed (PCS) *
                     </label>
                     <input
@@ -852,12 +846,12 @@ function SteamPressWorkstationContent() {
                       min="0"
                       value={completeGoodQty}
                       onChange={(e) => setCompleteGoodQty(Number(e.target.value))}
-                      className="w-full px-3 py-2 bg-slate-950 border border-emerald-500/40 rounded-lg text-xs text-white font-mono font-bold focus:outline-none focus:border-emerald-400"
+                      className="w-full px-3 py-2 bg-canvas border border-accent-500/40 rounded-lg text-xs text-neutral-900 font-mono font-bold focus:outline-none focus:border-brand-500"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-amber-400 mb-1">
+                    <label className="block text-xs font-semibold text-accent-700 mb-1">
                       Re-press Rework (PCS)
                     </label>
                     <input
@@ -865,14 +859,14 @@ function SteamPressWorkstationContent() {
                       min="0"
                       value={completeReworkQty}
                       onChange={(e) => setCompleteReworkQty(Number(e.target.value))}
-                      className="w-full px-3 py-2 bg-slate-950 border border-amber-500/40 rounded-lg text-xs text-white font-mono font-bold focus:outline-none focus:border-amber-400"
+                      className="w-full px-3 py-2 bg-canvas border border-accent-500/40 rounded-lg text-xs text-neutral-900 font-mono font-bold focus:outline-none focus:border-brand-500"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-rose-400 mb-1">
+                    <label className="block text-xs font-semibold text-danger-600 mb-1">
                       Scorch / Glaze Scrap (PCS)
                     </label>
                     <input
@@ -880,12 +874,12 @@ function SteamPressWorkstationContent() {
                       min="0"
                       value={completeRejectQty}
                       onChange={(e) => setCompleteRejectQty(Number(e.target.value))}
-                      className="w-full px-3 py-2 bg-slate-950 border border-rose-500/40 rounded-lg text-xs text-white font-mono font-bold focus:outline-none focus:border-rose-400"
+                      className="w-full px-3 py-2 bg-canvas border border-danger-500/40 rounded-lg text-xs text-neutral-900 font-mono font-bold focus:outline-none focus:border-danger-500"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">
+                    <label className="block text-xs font-semibold text-neutral-700 mb-1">
                       WIP Balance Remaining
                     </label>
                     <input
@@ -893,7 +887,7 @@ function SteamPressWorkstationContent() {
                       min="0"
                       value={completeBalanceQty}
                       onChange={(e) => setCompleteBalanceQty(Number(e.target.value))}
-                      className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white font-mono font-bold focus:outline-none focus:border-cyan-400"
+                      className="w-full px-3 py-2 bg-canvas border border-neutral-200 rounded-lg text-xs text-neutral-900 font-mono font-bold focus:outline-none focus:border-brand-500"
                     />
                   </div>
                 </div>
@@ -902,25 +896,25 @@ function SteamPressWorkstationContent() {
                 <div
                   className={`p-2.5 rounded-lg border text-xs flex items-center justify-between ${
                     isCompleteBalanced
-                      ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
-                      : 'bg-rose-500/10 border-rose-500/30 text-rose-300'
+                      ? 'bg-accent-400/10 border-accent-500/30 text-accent-700'
+                      : 'bg-danger-500/10 border-danger-500/30 text-danger-600'
                   }`}
                 >
                   <span>Reconciled Sum: {totalReconciled} / {completeInputQty} PCS</span>
                   <span className="font-bold">
-                    {isCompleteBalanced ? '✓ 100% Balanced' : `⚠ Discrepancy (${totalReconciled - completeInputQty})`}
+                    {isCompleteBalanced ? '✓ 100% Balanced' : `Discrepancy (${totalReconciled - completeInputQty})`}
                   </span>
                 </div>
 
                 {Number(completeRejectQty) > 0 && (
                   <div>
-                    <label className="block text-xs font-semibold text-rose-300 mb-1">
+                    <label className="block text-xs font-semibold text-danger-600 mb-1">
                       Scrap / Defect Primary Reason
                     </label>
                     <select
                       value={completeDefectReason}
                       onChange={(e) => setCompleteDefectReason(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-950 border border-rose-500/40 rounded-lg text-xs text-white focus:outline-none focus:border-rose-400"
+                      className="w-full px-3 py-2 bg-canvas border border-danger-500/40 rounded-lg text-xs text-neutral-900 focus:outline-none focus:border-danger-500"
                     >
                       <option value="Scorch mark / glaze shine">Scorch mark / glaze shine</option>
                       <option value="Melted embroidery / sequin deformation">Melted embroidery / sequin deformation</option>
@@ -931,14 +925,14 @@ function SteamPressWorkstationContent() {
                 )}
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-neutral-700 mb-1">
                     Pressing Notes / Summary
                   </label>
                   <textarea
                     rows={2}
                     value={completeNotes}
                     onChange={(e) => setCompleteNotes(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-cyan-400 resize-none"
+                    className="w-full px-3 py-2 bg-canvas border border-neutral-200 rounded-lg text-xs text-neutral-900 focus:outline-none focus:border-brand-500 resize-none"
                   />
                 </div>
 
@@ -948,32 +942,32 @@ function SteamPressWorkstationContent() {
                     id="autoInspect"
                     checked={autoInspect}
                     onChange={(e) => setAutoInspect(e.target.checked)}
-                    className="rounded border-slate-700 bg-slate-950 text-cyan-500 focus:ring-0"
+                    className="rounded border-neutral-200 bg-canvas text-brand-600 focus:ring-0"
                   />
-                  <label htmlFor="autoInspect" className="text-xs text-slate-300">
+                  <label htmlFor="autoInspect" className="text-xs text-neutral-700">
                     Auto-advance to Ready for Handover (Quality Verified)
                   </label>
                 </div>
 
                 {completeError && (
-                  <div className="p-2.5 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-300 text-xs flex items-center gap-2">
+                  <div className="p-2.5 bg-danger-500/10 border border-danger-500/30 rounded-lg text-danger-600 text-xs flex items-center gap-2">
                     <AlertCircle className="w-4 h-4 shrink-0" />
                     <span>{completeError}</span>
                   </div>
                 )}
               </div>
 
-              <div className="pt-2 flex justify-end gap-3 border-t border-slate-800">
+              <div className="pt-2 flex justify-end gap-3 border-t border-neutral-200">
                 <button
                   onClick={() => setShowCompleteModal(false)}
-                  className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition"
+                  className="px-4 py-2 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-semibold transition"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleCompleteJob}
                   disabled={submittingComplete || !isCompleteBalanced}
-                  className="px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-900/30 transition disabled:opacity-50 flex items-center gap-1.5"
+                  className="px-5 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-sm transition disabled:opacity-50 flex items-center gap-1.5"
                 >
                   <CheckCircle2 className="w-4 h-4" />
                   <span>{submittingComplete ? 'Saving...' : 'Confirm Output'}</span>
@@ -985,16 +979,16 @@ function SteamPressWorkstationContent() {
 
         {/* QUALITY INSPECTION MODAL */}
         {showInspectModal && selectedJob && (
-          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl relative">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div className="fixed inset-0 z-50 bg-neutral-900/70 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="bg-white border border-neutral-200 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl relative">
+              <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
                 <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-5 h-5 text-teal-400" />
-                  <h3 className="text-base font-bold text-white">Quality & Appearance Audit</h3>
+                  <ShieldCheck className="w-5 h-5 text-brand-600" />
+                  <h3 className="text-base font-bold text-neutral-900">Quality & Appearance Audit</h3>
                 </div>
                 <button
                   onClick={() => setShowInspectModal(false)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                  className="p-1 rounded-lg text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 transition"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1010,17 +1004,17 @@ function SteamPressWorkstationContent() {
                   ].map((chk) => (
                     <div
                       key={chk.key}
-                      className="flex items-center justify-between p-2.5 bg-slate-950/60 rounded-lg border border-slate-800"
+                      className="flex items-center justify-between p-2.5 bg-white rounded-lg border border-neutral-200"
                     >
-                      <span className="text-slate-300 font-medium">{chk.label}</span>
+                      <span className="text-neutral-700 font-medium">{chk.label}</span>
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
                           onClick={() => setInspectChecks((prev) => ({ ...prev, [chk.key]: 'PASS' }))}
                           className={`px-2.5 py-1 rounded text-xs font-bold transition ${
                             (inspectChecks as any)[chk.key] === 'PASS'
-                              ? 'bg-emerald-600 text-white'
-                              : 'bg-slate-800 text-slate-400'
+                              ? 'bg-accent-400 text-neutral-900'
+                              : 'bg-neutral-100 text-neutral-500'
                           }`}
                         >
                           PASS
@@ -1030,8 +1024,8 @@ function SteamPressWorkstationContent() {
                           onClick={() => setInspectChecks((prev) => ({ ...prev, [chk.key]: 'FAIL' }))}
                           className={`px-2.5 py-1 rounded text-xs font-bold transition ${
                             (inspectChecks as any)[chk.key] === 'FAIL'
-                              ? 'bg-rose-600 text-white'
-                              : 'bg-slate-800 text-slate-400'
+                              ? 'bg-danger-600 text-white'
+                              : 'bg-neutral-100 text-neutral-500'
                           }`}
                         >
                           FAIL
@@ -1042,36 +1036,36 @@ function SteamPressWorkstationContent() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-neutral-700 mb-1">
                     Inspection Remarks
                   </label>
                   <textarea
                     rows={2}
                     value={inspectNotes}
                     onChange={(e) => setInspectNotes(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-teal-400 resize-none"
+                    className="w-full px-3 py-2 bg-canvas border border-neutral-200 rounded-lg text-xs text-neutral-900 focus:outline-none focus:border-brand-500 resize-none"
                   />
                 </div>
 
                 {inspectError && (
-                  <div className="p-2.5 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-300 text-xs flex items-center gap-2">
+                  <div className="p-2.5 bg-danger-500/10 border border-danger-500/30 rounded-lg text-danger-600 text-xs flex items-center gap-2">
                     <AlertCircle className="w-4 h-4 shrink-0" />
                     <span>{inspectError}</span>
                   </div>
                 )}
               </div>
 
-              <div className="pt-2 flex justify-end gap-3 border-t border-slate-800">
+              <div className="pt-2 flex justify-end gap-3 border-t border-neutral-200">
                 <button
                   onClick={() => setShowInspectModal(false)}
-                  className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition"
+                  className="px-4 py-2 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-semibold transition"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleInspectJob}
                   disabled={submittingInspect}
-                  className="px-5 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold shadow-md shadow-teal-900/30 transition disabled:opacity-50 flex items-center gap-1.5"
+                  className="px-5 py-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-sm transition disabled:opacity-50 flex items-center gap-1.5"
                 >
                   <ShieldCheck className="w-4 h-4" />
                   <span>{submittingInspect ? 'Saving...' : 'Authorize Release'}</span>
@@ -1101,8 +1095,8 @@ export default function SteamPressWorkstationPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-slate-950 text-slate-200 flex items-center justify-center">
-          <RefreshCw className="w-8 h-8 animate-spin text-cyan-400" />
+        <div className="min-h-screen bg-canvas text-neutral-900 flex items-center justify-center">
+          <RefreshCw className="w-8 h-8 animate-spin text-brand-600" />
         </div>
       }
     >

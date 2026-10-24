@@ -22,7 +22,6 @@ import {
   Download,
   Printer,
 } from 'lucide-react';
-import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { 
@@ -159,31 +158,26 @@ export default function RecuttingIncomingPage() {
   const receivedCount = challans.filter((c) => c.status === 'RECEIVED').length;
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] pb-16">
+    <div className="min-h-screen bg-neutral-50 pb-16">
       {/* HEADER */}
       <header
-        style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-        className="border-b border-slate-700/80 sticky top-0 z-30 px-4 sm:px-8 py-4 shadow-md text-white"
+        className="bg-white border-b border-neutral-200 sticky top-0 z-30 px-4 sm:px-8 py-4 shadow-md text-neutral-900"
       >
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+              <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-accent-400/20 text-accent-700 border border-accent-500/30">
                 QC WASHING INTAKE
               </span>
-              <span className="text-xs text-slate-300 font-medium">
+              <span className="text-xs text-neutral-700 font-medium">
                 Physical Receipt & Material Intake
               </span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight mt-1 flex items-center gap-2">
-              <ArrowDownLeft className="w-6 h-6 text-amber-400" />
+            <h1 className="text-xl sm:text-2xl font-extrabold text-neutral-900 tracking-tight mt-1 flex items-center gap-2">
+              <ArrowDownLeft className="w-6 h-6 text-accent-700" />
               <span>Incoming Challans from QC Washing</span>
             </h1>
-            <p className="text-xs text-slate-300 mt-0.5">
+            <p className="text-xs text-neutral-700 mt-0.5">
               Verify incoming pieces from QC Washing before opening cutting workstations.
             </p>
           </div>
@@ -192,14 +186,14 @@ export default function RecuttingIncomingPage() {
             <button
               onClick={() => loadData(true)}
               disabled={loading}
-              className="px-3 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-600 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition shadow-xs disabled:opacity-50"
+              className="px-3 py-1.5 bg-neutral-50 hover:bg-neutral-200 text-neutral-900 border border-neutral-200 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition shadow-xs disabled:opacity-50"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
               <span>Refresh</span>
             </button>
             <Link
               href="/recutting/my-work"
-              className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition shadow-xs"
+              className="px-3 py-1.5 bg-danger-600 hover:bg-danger-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition shadow-xs"
             >
               <Scissors className="w-3.5 h-3.5" />
               <span>Open Cutting Queue</span>
@@ -211,12 +205,12 @@ export default function RecuttingIncomingPage() {
       {/* MAIN CONTAINER */}
       <main className="max-w-7xl mx-auto px-4 sm:px-8 py-6 space-y-6">
         {error && (
-          <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-sm flex items-center gap-3">
+          <div className="p-4 bg-danger-50 border border-danger-200 rounded-xl text-danger-700 text-sm flex items-center gap-3">
             <AlertCircle className="w-5 h-5 shrink-0" />
             <span className="flex-1">{error}</span>
             <button
               onClick={() => loadData(true)}
-              className="px-3 py-1 bg-rose-600 text-white text-xs font-semibold rounded"
+              className="px-3 py-1 bg-danger-600 text-white text-xs font-semibold rounded"
             >
               Retry
             </button>
@@ -224,14 +218,14 @@ export default function RecuttingIncomingPage() {
         )}
 
         {/* TABS & SEARCH CONTROLS */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
-          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3 rounded-xl border border-neutral-200 shadow-xs">
+          <div className="flex items-center gap-1 bg-neutral-100 p-1 rounded-lg">
             <button
               onClick={() => setActiveTab('ALL')}
               className={`px-3 py-1.5 text-xs font-bold rounded-md transition ${
                 activeTab === 'ALL'
-                  ? 'bg-white text-slate-900 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-white text-neutral-900 shadow-xs'
+                  : 'text-neutral-600 hover:text-neutral-900'
               }`}
             >
               All ({challans.length})
@@ -240,8 +234,8 @@ export default function RecuttingIncomingPage() {
               onClick={() => setActiveTab('ISSUED')}
               className={`px-3 py-1.5 text-xs font-bold rounded-md transition ${
                 activeTab === 'ISSUED'
-                  ? 'bg-amber-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-accent-400 text-neutral-900 shadow-xs'
+                  : 'text-neutral-600 hover:text-neutral-900'
               }`}
             >
               Awaiting Receipt ({issuedCount})
@@ -250,8 +244,8 @@ export default function RecuttingIncomingPage() {
               onClick={() => setActiveTab('RECEIVED')}
               className={`px-3 py-1.5 text-xs font-bold rounded-md transition ${
                 activeTab === 'RECEIVED'
-                  ? 'bg-rose-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-danger-600 text-white shadow-xs'
+                  : 'text-neutral-600 hover:text-neutral-900'
               }`}
             >
               Received ({receivedCount})
@@ -259,13 +253,13 @@ export default function RecuttingIncomingPage() {
           </div>
 
           <div className="relative w-full sm:w-80">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" />
             <input
               type="text"
               placeholder="Search challan, program, buyer, design..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
+              className="w-full pl-9 pr-3 py-1.5 text-xs border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-danger-500"
             />
           </div>
         </div>
@@ -273,10 +267,10 @@ export default function RecuttingIncomingPage() {
         {/* INCOMING CHALLANS GRID */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredChallans.length === 0 ? (
-            <div className="col-span-full bg-white p-12 rounded-xl border border-slate-200 text-center text-slate-400">
+            <div className="col-span-full bg-white p-12 rounded-xl border border-neutral-200 text-center text-neutral-500">
               <Package className="w-10 h-10 mx-auto mb-2 opacity-50" />
-              <p className="text-sm font-semibold text-slate-600">No incoming challans found</p>
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-sm font-semibold text-neutral-600">No incoming challans found</p>
+              <p className="text-xs text-neutral-500 mt-1">
                 {activeTab === 'ISSUED'
                   ? 'No pending transfers awaiting receipt from QC Washing.'
                   : 'Adjust filters or check again when new challans are issued.'}
@@ -296,28 +290,28 @@ export default function RecuttingIncomingPage() {
                   key={ch.id}
                   className={`bg-white rounded-xl border transition shadow-xs flex flex-col justify-between overflow-hidden ${
                     isIssued
-                      ? 'border-amber-300 hover:border-amber-400'
-                      : 'border-slate-200 hover:border-rose-400'
+                      ? 'border-accent-300 hover:border-accent-500'
+                      : 'border-neutral-200 hover:border-danger-500'
                   }`}
                 >
                   <div className="p-4">
                     {/* Header: Challan # & Status badge */}
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-mono font-bold text-xs bg-slate-100 text-slate-800 px-2 py-0.5 rounded border border-slate-200">
+                      <span className="font-mono font-bold text-xs bg-neutral-100 text-neutral-900 px-2 py-0.5 rounded border border-neutral-200">
                         {ch.challanNumber}
                       </span>
                       {isIssued && (
-                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">
+                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-accent-100 text-accent-800 border border-accent-200">
                           Awaiting Receipt
                         </span>
                       )}
                       {isReceived && (
-                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
+                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-accent-100 text-accent-800 border border-accent-200">
                           Received
                         </span>
                       )}
                       {!isIssued && !isReceived && (
-                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-neutral-100 text-neutral-700 border border-neutral-200">
                           {ch.status}
                         </span>
                       )}
@@ -325,45 +319,45 @@ export default function RecuttingIncomingPage() {
 
                     {/* Program & Design */}
                     <div className="mt-3">
-                      <div className="text-xs font-extrabold text-slate-900">
+                      <div className="text-xs font-extrabold text-neutral-900">
                         {ch.program?.programNumber || 'No Program Sheet'}
                       </div>
-                      <div className="text-xs text-slate-600 mt-0.5">
-                        Buyer: <strong className="text-slate-800">{ch.program?.buyerName || ch.program?.clientName || 'N/A'}</strong>
+                      <div className="text-xs text-neutral-600 mt-0.5">
+                        Buyer: <strong className="text-neutral-900">{ch.program?.buyerName || ch.program?.clientName || 'N/A'}</strong>
                       </div>
                     </div>
 
                     {/* Specifications */}
-                    <div className="mt-3 p-2.5 bg-slate-50 rounded-lg border border-slate-100 space-y-1 text-[11px] text-slate-600">
+                    <div className="mt-3 p-2.5 bg-neutral-50 rounded-lg border border-neutral-100 space-y-1 text-[11px] text-neutral-600">
                       <div className="flex justify-between">
                         <span>Design #:</span>
-                        <strong className="text-slate-800">{ch.program?.designNumber || 'N/A'}</strong>
+                        <strong className="text-neutral-900">{ch.program?.designNumber || 'N/A'}</strong>
                       </div>
                       <div className="flex justify-between">
                         <span>Wilcom #:</span>
-                        <strong className="text-slate-800">{ch.program?.wilcomDesignNumber || 'N/A'}</strong>
+                        <strong className="text-neutral-900">{ch.program?.wilcomDesignNumber || 'N/A'}</strong>
                       </div>
                       <div className="flex justify-between">
                         <span>Fabric:</span>
-                        <strong className="text-slate-800">{ch.program?.fabricName || 'Embroidered Cloth'}</strong>
+                        <strong className="text-neutral-900">{ch.program?.fabricName || 'Embroidered Cloth'}</strong>
                       </div>
                       <div className="flex justify-between">
                         <span>Issued From:</span>
-                        <strong className="text-slate-800">{ch.fromDepartment || 'QC WASHING'}</strong>
+                        <strong className="text-neutral-900">{ch.fromDepartment || 'QC WASHING'}</strong>
                       </div>
                     </div>
 
                     {/* Quantity summary */}
-                    <div className="mt-3 flex items-center justify-between pt-2 border-t border-slate-100">
-                      <span className="text-xs font-semibold text-slate-500">Total Material:</span>
-                      <span className="text-base font-black text-slate-900">
+                    <div className="mt-3 flex items-center justify-between pt-2 border-t border-neutral-100">
+                      <span className="text-xs font-semibold text-neutral-500">Total Material:</span>
+                      <span className="text-base font-black text-neutral-900">
                         {totalQty.toLocaleString()} {ch.items[0]?.uom || 'PCS'}
                       </span>
                     </div>
                   </div>
 
                   {/* Actions toolbar */}
-                  <div className="p-3 bg-slate-50/80 border-t border-slate-100 space-y-2">
+                  <div className="p-3 bg-neutral-50/80 border-t border-neutral-100 space-y-2">
                     <div className="flex items-center justify-between gap-1 flex-wrap">
                       <DocumentActionButtons
                         challan={ch}
@@ -372,11 +366,11 @@ export default function RecuttingIncomingPage() {
                       />
                     </div>
 
-                    <div className="pt-1 border-t border-slate-200/60">
+                    <div className="pt-1 border-t border-neutral-200/60">
                       {isIssued ? (
                         <button
                           onClick={() => openReceiveModal(ch)}
-                          className="w-full py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-bold transition shadow-xs flex items-center justify-center gap-1.5"
+                          className="w-full py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold transition shadow-xs flex items-center justify-center gap-1.5"
                         >
                           <ArrowDownLeft className="w-3.5 h-3.5" />
                           <span>Perform Physical Check & Receive</span>
@@ -384,7 +378,7 @@ export default function RecuttingIncomingPage() {
                       ) : (
                         <Link
                           href={`/recutting/my-work?jobId=${ch.id}`}
-                          className="w-full py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-bold transition shadow-xs flex items-center justify-center gap-1.5"
+                          className="w-full py-2 bg-danger-600 hover:bg-danger-700 text-white rounded-lg text-xs font-bold transition shadow-xs flex items-center justify-center gap-1.5"
                         >
                           <Scissors className="w-3.5 h-3.5" />
                           <span>Open Cutting Workstation</span>
@@ -401,12 +395,12 @@ export default function RecuttingIncomingPage() {
 
       {/* RECEIVE MODAL */}
       {selectedChallan && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 bg-neutral-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl border border-neutral-200 shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in duration-200">
             {/* Modal Header */}
-            <div className="p-4 bg-slate-900 text-white flex items-center justify-between">
+            <div className="p-4 bg-brand-50 text-neutral-900 flex items-center justify-between border-b border-brand-200">
               <div className="flex items-center gap-2">
-                <ArrowDownLeft className="w-5 h-5 text-amber-400" />
+                <ArrowDownLeft className="w-5 h-5 text-accent-700" />
                 <h3 className="text-sm font-bold tracking-wide">
                   Receive Material into Recutting
                 </h3>
@@ -414,7 +408,7 @@ export default function RecuttingIncomingPage() {
               <button
                 onClick={closeReceiveModal}
                 disabled={submittingReceive}
-                className="text-slate-400 hover:text-white p-1"
+                className="text-neutral-500 hover:text-neutral-900 p-1"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -423,38 +417,38 @@ export default function RecuttingIncomingPage() {
             {/* Modal Body */}
             <form onSubmit={handleReceiveSubmit} className="p-5 space-y-4">
               {receiveError && (
-                <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-lg flex items-center gap-2">
+                <div className="p-3 bg-danger-50 border border-danger-200 text-danger-700 text-xs rounded-lg flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 shrink-0" />
                   <span>{receiveError}</span>
                 </div>
               )}
 
               {receiveSuccess && (
-                <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs rounded-lg flex items-center gap-2">
+                <div className="p-3 bg-accent-50 border border-accent-200 text-accent-800 text-xs rounded-lg flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 shrink-0" />
                   <span>{receiveSuccess}</span>
                 </div>
               )}
 
               {/* Challan overview */}
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5 text-xs">
+              <div className="p-3 bg-neutral-50 border border-neutral-200 rounded-xl space-y-1.5 text-xs">
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Challan Number:</span>
-                  <span className="font-mono font-bold text-slate-900">{selectedChallan.challanNumber}</span>
+                  <span className="text-neutral-500">Challan Number:</span>
+                  <span className="font-mono font-bold text-neutral-900">{selectedChallan.challanNumber}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Program Sheet:</span>
-                  <span className="font-bold text-slate-800">{selectedChallan.program?.programNumber || 'N/A'}</span>
+                  <span className="text-neutral-500">Program Sheet:</span>
+                  <span className="font-bold text-neutral-900">{selectedChallan.program?.programNumber || 'N/A'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Design / Wilcom:</span>
-                  <span className="font-semibold text-slate-800">
+                  <span className="text-neutral-500">Design / Wilcom:</span>
+                  <span className="font-semibold text-neutral-900">
                     {selectedChallan.program?.designNumber || 'N/A'} ({selectedChallan.program?.wilcomDesignNumber || 'N/A'})
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Issued Quantity:</span>
-                  <span className="font-extrabold text-slate-900">
+                  <span className="text-neutral-500">Issued Quantity:</span>
+                  <span className="font-extrabold text-neutral-900">
                     {selectedChallan.items.reduce((s: number, it: any) => s + (Number(it.quantity) || 0), 0)} PCS
                   </span>
                 </div>
@@ -462,7 +456,7 @@ export default function RecuttingIncomingPage() {
 
               {/* Input: Received Quantity */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-neutral-700 mb-1">
                   Physically Verified Received Quantity (PCS) *
                 </label>
                 <input
@@ -472,16 +466,16 @@ export default function RecuttingIncomingPage() {
                   value={receiveQuantity}
                   onChange={(e) => setReceiveQuantity(e.target.value === '' ? '' : Number(e.target.value))}
                   required
-                  className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 font-semibold"
+                  className="w-full px-3 py-2 text-sm border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-danger-500 font-semibold"
                 />
-                <span className="text-[11px] text-slate-500 mt-1 block">
+                <span className="text-[11px] text-neutral-500 mt-1 block">
                   Must match the count of washed embroidered panels/pieces physically counted.
                 </span>
               </div>
 
               {/* Input: Remarks */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-neutral-700 mb-1">
                   Physical Verification Notes / Remarks
                 </label>
                 <textarea
@@ -489,24 +483,24 @@ export default function RecuttingIncomingPage() {
                   value={receiveRemarks}
                   onChange={(e) => setReceiveRemarks(e.target.value)}
                   placeholder="Note condition, cleanliness, or bundle tag checks..."
-                  className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500"
+                  className="w-full px-3 py-2 text-xs border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-danger-500"
                 />
               </div>
 
               {/* Buttons */}
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+              <div className="pt-3 border-t border-neutral-100 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={closeReceiveModal}
                   disabled={submittingReceive}
-                  className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800"
+                  className="px-4 py-2 text-xs font-semibold text-neutral-600 hover:text-neutral-900"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submittingReceive}
-                  className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-bold shadow-xs transition flex items-center gap-1.5 disabled:opacity-50"
+                  className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold shadow-xs transition flex items-center gap-1.5 disabled:opacity-50"
                 >
                   {submittingReceive ? (
                     <>

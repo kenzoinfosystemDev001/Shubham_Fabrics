@@ -90,19 +90,19 @@ export default function FinalCheckDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-950 px-4 py-8 text-slate-100 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-canvas px-4 py-8 text-neutral-900 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl space-y-8">
         <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">Quality Control</p>
-            <h1 className="mt-1 text-3xl font-bold text-white">Final QC Dashboard</h1>
-            <p className="mt-2 text-sm text-slate-400">Final garment inspection, quality status, and handover overview.</p>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-neutral-700">Quality Control</p>
+            <h1 className="mt-1 text-3xl font-bold text-neutral-900">Final QC Dashboard</h1>
+            <p className="mt-2 text-sm text-neutral-500">Final garment inspection, quality status, and handover overview.</p>
           </div>
           <button
             type="button"
             onClick={() => void loadDashboard()}
             disabled={loading}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-emerald-500/50 hover:text-white disabled:opacity-60"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-neutral-200 bg-white px-4 py-2.5 text-sm font-semibold text-neutral-900 transition hover:border-accent-500/50 hover:text-neutral-900 disabled:opacity-60"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             Refresh
@@ -110,7 +110,7 @@ export default function FinalCheckDashboard() {
         </header>
 
         {error && (
-          <div role="alert" className="flex items-center gap-3 rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-200">
+          <div role="alert" className="flex items-center gap-3 rounded-xl border border-danger-500/30 bg-danger-500/10 p-4 text-sm text-danger-800">
             <ShieldAlert className="h-5 w-5 shrink-0" />
             <span>{error}</span>
           </div>
@@ -118,14 +118,14 @@ export default function FinalCheckDashboard() {
 
         <section aria-label="Final QC summary" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {cards.map(({ label, count, pieces, icon: Icon }) => (
-            <article key={label} className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg shadow-black/10">
+            <article key={label} className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm shadow-black/10">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-400">{label}</p>
-                  <p className="mt-3 text-3xl font-bold text-white">{loading ? '—' : count}</p>
-                  <p className="mt-1 text-xs text-slate-500">{pieces.toLocaleString()} pcs</p>
+                  <p className="text-sm font-medium text-neutral-500">{label}</p>
+                  <p className="mt-3 text-3xl font-bold text-neutral-900">{loading ? '—' : count}</p>
+                  <p className="mt-1 text-xs text-neutral-500">{pieces.toLocaleString()} pcs</p>
                 </div>
-                <span className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-3 text-emerald-300">
+                <span className="rounded-xl border border-accent-500/20 bg-accent-400/10 p-3 text-accent-700">
                   <Icon className="h-5 w-5" />
                 </span>
               </div>
@@ -134,33 +134,33 @@ export default function FinalCheckDashboard() {
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
-          <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/80">
-            <div className="flex items-center justify-between border-b border-slate-800 px-5 py-4">
+          <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white">
+            <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-4">
               <div>
-                <h2 className="font-semibold text-white">Incoming Challans</h2>
-                <p className="mt-1 text-xs text-slate-500">Latest handovers awaiting Final QC receipt or inspection</p>
+                <h2 className="font-semibold text-neutral-900">Incoming Challans</h2>
+                <p className="mt-1 text-xs text-neutral-500">Latest handovers awaiting Final QC receipt or inspection</p>
               </div>
-              <span className="rounded-full bg-slate-800 px-2.5 py-1 text-xs text-slate-300">
+              <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-700">
                 {data?.incomingChallans.length ?? 0}
               </span>
             </div>
             {loading && !data ? (
-              <p className="p-6 text-sm text-slate-400">Loading Final QC data…</p>
+              <p className="p-6 text-sm text-neutral-500">Loading Final QC data…</p>
             ) : data?.incomingChallans.length ? (
-              <div className="divide-y divide-slate-800">
+              <div className="divide-y divide-neutral-200">
                 {data.incomingChallans.slice(0, 10).map((challan) => {
                   const quantity = challan.items.reduce((total, item) => total + Number(item.quantity || 0), 0);
                   return (
                     <article key={challan.id} className="flex flex-col gap-2 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-white">{challan.challanNumber}</p>
-                        <p className="mt-1 text-xs text-slate-400">
+                        <p className="truncate text-sm font-semibold text-neutral-900">{challan.challanNumber}</p>
+                        <p className="mt-1 text-xs text-neutral-500">
                           {challan.program?.programNumber || 'Program unavailable'} · From {challan.fromDepartment}
                         </p>
                       </div>
                       <div className="flex items-center gap-3 text-xs">
-                        <span className="font-medium text-slate-300">{quantity.toLocaleString()} pcs</span>
-                        <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-emerald-300">
+                        <span className="font-medium text-neutral-700">{quantity.toLocaleString()} pcs</span>
+                        <span className="rounded-full border border-accent-500/20 bg-accent-400/10 px-2.5 py-1 text-accent-700">
                           {challan.status.replaceAll('_', ' ')}
                         </span>
                       </div>
@@ -169,35 +169,35 @@ export default function FinalCheckDashboard() {
                 })}
               </div>
             ) : (
-              <p className="p-6 text-sm text-slate-400">No incoming Final QC challans yet.</p>
+              <p className="p-6 text-sm text-neutral-500">No incoming Final QC challans yet.</p>
             )}
           </div>
 
-          <aside className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5">
-            <h2 className="font-semibold text-white">Quality Summary</h2>
-            <p className="mt-1 text-xs text-slate-500">Recorded Final QC production totals</p>
+          <aside className="rounded-2xl border border-neutral-200 bg-white p-5">
+            <h2 className="font-semibold text-neutral-900">Quality Summary</h2>
+            <p className="mt-1 text-xs text-neutral-500">Recorded Final QC production totals</p>
             <dl className="mt-5 space-y-4">
               <div className="flex justify-between gap-3 text-sm">
-                <dt className="text-slate-400">First-pass yield</dt>
-                <dd className="font-semibold text-emerald-300">{summary?.firstPassYield ?? '—'}%</dd>
+                <dt className="text-neutral-500">First-pass yield</dt>
+                <dd className="font-semibold text-accent-700">{summary?.firstPassYield ?? '—'}%</dd>
               </div>
               <div className="flex justify-between gap-3 text-sm">
-                <dt className="text-slate-400">Input inspected</dt>
-                <dd className="font-medium text-white">{(summary?.totalInputPcs ?? 0).toLocaleString()} pcs</dd>
+                <dt className="text-neutral-500">Input inspected</dt>
+                <dd className="font-medium text-neutral-900">{(summary?.totalInputPcs ?? 0).toLocaleString()} pcs</dd>
               </div>
               <div className="flex justify-between gap-3 text-sm">
-                <dt className="text-slate-400">Accepted</dt>
-                <dd className="font-medium text-white">{(summary?.totalAcceptedPcs ?? 0).toLocaleString()} pcs</dd>
+                <dt className="text-neutral-500">Accepted</dt>
+                <dd className="font-medium text-neutral-900">{(summary?.totalAcceptedPcs ?? 0).toLocaleString()} pcs</dd>
               </div>
               <div className="flex justify-between gap-3 text-sm">
-                <dt className="text-slate-400">Rework / rejects</dt>
-                <dd className="font-medium text-white">
+                <dt className="text-neutral-500">Rework / rejects</dt>
+                <dd className="font-medium text-neutral-900">
                   {(summary?.totalReworkPcs ?? 0).toLocaleString()} / {(summary?.totalRejectPcs ?? 0).toLocaleString()} pcs
                 </dd>
               </div>
             </dl>
             {lastUpdated && (
-              <p className="mt-6 border-t border-slate-800 pt-4 text-xs text-slate-500">
+              <p className="mt-6 border-t border-neutral-200 pt-4 text-xs text-neutral-500">
                 Updated {lastUpdated.toLocaleTimeString()}
               </p>
             )}

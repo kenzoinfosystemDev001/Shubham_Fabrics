@@ -386,30 +386,30 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
   };
 
   return (
-    <div className="min-h-screen bg-[#F0FAF9] pb-24">
+    <div className="min-h-screen bg-brand-50 pb-24">
       {/* TOP NAVIGATION / HEADER */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 px-4 sm:px-8 py-3.5 shadow-2xs">
+      <header className="bg-white border-b border-neutral-200 sticky top-0 z-30 px-4 sm:px-8 py-3.5 shadow-2xs">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <Link
               href="/fabric-store"
-              className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-md transition"
+              className="p-1.5 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 rounded-md transition"
               title="Back to Fabric Store"
             >
               <ArrowLeft className="w-4 h-4" />
             </Link>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-teal-700">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-brand-700">
                   FABRIC STORE
                 </span>
-                <span className="text-slate-300">/</span>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                <span className="text-neutral-700">/</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">
                   MY WORK
                 </span>
               </div>
-              <h1 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                <Send className="w-4 h-4 text-indigo-600" />
+              <h1 className="text-lg font-bold text-neutral-900 flex items-center gap-2">
+                <Send className="w-4 h-4 text-brand-600" />
                 <span>Challan Store to {destDept}</span>
               </h1>
             </div>
@@ -420,9 +420,9 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
               <button
                 type="button"
                 onClick={() => setShowSheetModal(true)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-300 rounded-lg text-xs font-bold transition shadow-2xs"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-800 border border-brand-300 rounded-lg text-xs font-bold transition shadow-2xs"
               >
-                <FileText className="w-3.5 h-3.5 text-teal-700" />
+                <FileText className="w-3.5 h-3.5 text-brand-700" />
                 <span>Show Production Sheet</span>
               </button>
             )}
@@ -430,7 +430,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
               type="button"
               onClick={loadData}
               disabled={loading}
-              className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition"
+              className="p-2 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition"
               title="Refresh"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -442,8 +442,8 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
       <main className="p-4 sm:p-8 max-w-6xl mx-auto space-y-6">
         {/* ERROR NOTIFICATION */}
         {error && (
-          <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 flex items-center gap-2.5">
-            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+          <div className="p-3.5 bg-danger-50 border border-danger-200 rounded-xl text-xs text-danger-800 flex items-center gap-2.5">
+            <AlertCircle className="w-4 h-4 text-danger-600 shrink-0" />
             <span className="font-medium">{error}</span>
           </div>
         )}
@@ -452,69 +452,69 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
         {/* SUCCESS CONFIRMATION STATE                                     */}
         {/* ============================================================== */}
         {issuedChallan ? (
-          <div className="bg-white border border-emerald-200 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
+          <div className="bg-white border border-accent-200 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-xl flex items-center justify-center shrink-0">
+              <div className="w-12 h-12 bg-accent-100 text-accent-800 rounded-xl flex items-center justify-center shrink-0">
                 <CheckCircle2 className="w-7 h-7" />
               </div>
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-700 block">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-700 block">
                   CHALLAN DISPATCHED &amp; SYNCED
                 </span>
-                <h2 className="text-xl font-bold text-slate-900 mt-0.5">
+                <h2 className="text-xl font-bold text-neutral-900 mt-0.5">
                   Challan {issuedChallan.challanNumber} Dispatched to {issuedChallan.destinationDepartment === 'DYEING' ? 'Dyeing' : 'Embroidery'} Department
                 </h2>
-                <p className="text-xs text-slate-600 mt-1">
+                <p className="text-xs text-neutral-600 mt-1">
                   The Production Sheet and Challan items have been transferred to the {destDept} department worklist.
                 </p>
               </div>
             </div>
 
             {/* SUMMARY GRID */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 p-4 bg-slate-50 border border-slate-200/80 rounded-xl text-xs">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 p-4 bg-neutral-50 border border-neutral-200/80 rounded-xl text-xs">
               <div>
-                <span className="text-slate-500 block text-[10px] uppercase font-semibold">Challan Number</span>
-                <strong className="font-mono text-slate-900 text-sm">{issuedChallan.challanNumber}</strong>
+                <span className="text-neutral-500 block text-[10px] uppercase font-semibold">Challan Number</span>
+                <strong className="font-mono text-neutral-900 text-sm">{issuedChallan.challanNumber}</strong>
               </div>
               <div>
-                <span className="text-slate-500 block text-[10px] uppercase font-semibold">Serial Number</span>
-                <strong className="font-mono text-teal-800 text-sm">
+                <span className="text-neutral-500 block text-[10px] uppercase font-semibold">Serial Number</span>
+                <strong className="font-mono text-brand-800 text-sm">
                   {issuedChallan.program?.programSerialNo || issuedChallan.program?.programNumber || '—'}
                 </strong>
               </div>
               <div>
-                <span className="text-slate-500 block text-[10px] uppercase font-semibold">Design Number</span>
-                <strong className="text-slate-900">{designNumber || '—'}</strong>
+                <span className="text-neutral-500 block text-[10px] uppercase font-semibold">Design Number</span>
+                <strong className="text-neutral-900">{designNumber || '—'}</strong>
               </div>
               <div>
-                <span className="text-slate-500 block text-[10px] uppercase font-semibold">Priority</span>
-                <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-800 uppercase">
+                <span className="text-neutral-500 block text-[10px] uppercase font-semibold">Priority</span>
+                <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-brand-100 text-brand-800 uppercase">
                   {priority}
                 </span>
               </div>
               <div>
-                <span className="text-slate-500 block text-[10px] uppercase font-semibold">Source</span>
-                <strong className="text-slate-900">{sourceDept}</strong>
+                <span className="text-neutral-500 block text-[10px] uppercase font-semibold">Source</span>
+                <strong className="text-neutral-900">{sourceDept}</strong>
               </div>
               <div>
-                <span className="text-slate-500 block text-[10px] uppercase font-semibold">Destination</span>
-                <strong className="text-slate-900">{destDept}</strong>
+                <span className="text-neutral-500 block text-[10px] uppercase font-semibold">Destination</span>
+                <strong className="text-neutral-900">{destDept}</strong>
               </div>
               <div>
-                <span className="text-slate-500 block text-[10px] uppercase font-semibold">Store Incharge</span>
-                <strong className="text-slate-900">{storeInchargeName || '—'}</strong>
+                <span className="text-neutral-500 block text-[10px] uppercase font-semibold">Store Incharge</span>
+                <strong className="text-neutral-900">{storeInchargeName || '—'}</strong>
               </div>
               <div>
-                <span className="text-slate-500 block text-[10px] uppercase font-semibold">Contact</span>
-                <span className="text-slate-700">{storeInchargeContact || '—'}</span>
+                <span className="text-neutral-500 block text-[10px] uppercase font-semibold">Contact</span>
+                <span className="text-neutral-700">{storeInchargeContact || '—'}</span>
               </div>
             </div>
 
             {/* ACTION BUTTONS */}
-            <div className="flex flex-wrap items-center gap-2.5 pt-2 border-t border-slate-100">
+            <div className="flex flex-wrap items-center gap-2.5 pt-2 border-t border-neutral-100">
               <Link
                 href={`/challans/${issuedChallan.id}`}
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-indigo-700 hover:bg-indigo-800 text-white text-xs font-bold rounded-lg shadow-xs transition"
+                className="flex items-center gap-1.5 px-3.5 py-2 bg-brand-700 hover:bg-brand-800 text-white text-xs font-bold rounded-lg shadow-xs transition"
               >
                 <Printer className="w-3.5 h-3.5" />
                 <span>View &amp; Print Challan Slip</span>
@@ -522,7 +522,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
               <button
                 type="button"
                 onClick={() => printProductionSheet(issuedChallan.program)}
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold rounded-lg transition"
+                className="flex items-center gap-1.5 px-3.5 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 text-xs font-semibold rounded-lg transition"
               >
                 <Printer className="w-3.5 h-3.5" />
                 <span>Print Production Sheet</span>
@@ -530,22 +530,22 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
               <button
                 type="button"
                 onClick={() => downloadProductionSheetHtml(issuedChallan.program)}
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xs transition"
+                className="flex items-center gap-1.5 px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-lg shadow-xs transition"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>Download HTML</span>
               </button>
               <Link
                 href={destinationDepartment === 'DYEING' ? '/dyeing/my-work' : '/embroidery/my-work'}
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-teal-50 hover:bg-teal-100 border border-teal-300 text-teal-900 text-xs font-bold rounded-lg transition"
+                className="flex items-center gap-1.5 px-3.5 py-2 bg-brand-50 hover:bg-brand-100 border border-brand-300 text-brand-900 text-xs font-bold rounded-lg transition"
               >
-                <Eye className="w-3.5 h-3.5 text-teal-700" />
+                <Eye className="w-3.5 h-3.5 text-brand-700" />
                 <span>View in {destDept} Worklist →</span>
               </Link>
               <button
                 type="button"
                 onClick={handleReset}
-                className="flex items-center gap-1.5 px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-lg shadow-xs transition ml-auto"
+                className="flex items-center gap-1.5 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-lg shadow-xs transition ml-auto"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>Issue Another Challan</span>
@@ -557,14 +557,14 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
           /* FORM: (Challan Store to Dyeing)                                */
           /* Exact field layout specified in handwritten sketch             */
           /* ============================================================== */
-          <form onSubmit={handleSubmit} className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
+          <form onSubmit={handleSubmit} className="bg-white border border-neutral-200/90 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
             {/* CARD TITLE & "Show Production sheet" BUTTON */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-neutral-200 pb-4">
               <div>
-                <h2 className="text-xl font-bold font-serif text-slate-900">
+                <h2 className="text-xl font-bold font-serif text-neutral-900">
                   (Challan Store to {destDept})
                 </h2>
-                <span className="text-xs text-slate-500">
+                <span className="text-xs text-neutral-500">
                   Dispatch production lots and master traveler from Fabric Store to Dyeing department
                 </span>
               </div>
@@ -573,13 +573,13 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                 <button
                   type="button"
                   onClick={() => setShowSheetModal(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold shadow-xs transition"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-xs transition"
                 >
                   <FileText className="w-4 h-4" />
                   <span>Show Production sheet</span>
                 </button>
               ) : (
-                <span className="text-xs text-slate-400 italic">
+                <span className="text-xs text-neutral-500 italic">
                   Select Serial Number to preview Production Sheet
                 </span>
               )}
@@ -593,10 +593,10 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
               <div
                 className={`p-4 rounded-xl border transition-all ${
                   checkingAvailability
-                    ? 'bg-slate-50 border-slate-200 text-slate-600'
+                    ? 'bg-neutral-50 border-neutral-200 text-neutral-600'
                     : fabricAvailability?.isAvailable
-                    ? 'bg-emerald-50/90 border-emerald-300 text-emerald-950 shadow-2xs'
-                    : 'bg-rose-50/90 border-rose-300 text-rose-950 shadow-2xs'
+                    ? 'bg-accent-50/90 border-accent-300 text-accent-800 shadow-2xs'
+                    : 'bg-danger-50/90 border-danger-300 text-danger-900 shadow-2xs'
                 }`}
               >
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
@@ -604,10 +604,10 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                     <div
                       className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
                         checkingAvailability
-                          ? 'bg-slate-200 text-slate-700'
+                          ? 'bg-neutral-200 text-neutral-700'
                           : fabricAvailability?.isAvailable
-                          ? 'bg-emerald-600 text-white'
-                          : 'bg-rose-600 text-white'
+                          ? 'bg-accent-400 text-neutral-900'
+                          : 'bg-danger-600 text-white'
                       }`}
                     >
                       {checkingAvailability ? (
@@ -625,13 +625,13 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                           FABRIC STORE GATEWAY
                         </span>
                         {fabricAvailability?.isAvailable ? (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
-                            <Check className="w-3 h-3 text-emerald-600" />
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-accent-800 bg-accent-100 px-2 py-0.5 rounded-full">
+                            <Check className="w-3 h-3 text-accent-700" />
                             Fabric Available in Store — Cleared for {destDept} Handoff
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-800 bg-rose-100 px-2 py-0.5 rounded-full">
-                            <Lock className="w-3 h-3 text-rose-600" />
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-danger-800 bg-danger-100 px-2 py-0.5 rounded-full">
+                            <Lock className="w-3 h-3 text-danger-600" />
                             Fabric Unavailable — Movement Blocked
                           </span>
                         )}
@@ -644,12 +644,12 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                             : 'Fabric status check complete.')}
                       </p>
 
-                      <div className="flex items-center gap-3 text-[11px] text-slate-600 mt-1 flex-wrap font-mono">
+                      <div className="flex items-center gap-3 text-[11px] text-neutral-600 mt-1 flex-wrap font-mono">
                         <span>Fabric: <strong>{fabricAvailability?.fabricName || selectedProgram.fabricName || '—'}</strong></span>
                         <span>·</span>
                         <span>Color: <strong>{fabricAvailability?.fabricColor || selectedProgram.fabricColor || 'Natural'}</strong></span>
                         <span>·</span>
-                        <span>Store Stock: <strong className={(fabricAvailability?.totalStoreStockMeters > 0 || fabricAvailability?.totalStoreStockPcs > 0) ? 'text-emerald-700' : 'text-rose-700'}>
+                        <span>Store Stock: <strong className={(fabricAvailability?.totalStoreStockMeters > 0 || fabricAvailability?.totalStoreStockPcs > 0) ? 'text-accent-800' : 'text-danger-700'}>
                           {fabricAvailability?.totalStoreStockMeters ?? 0} MTR / {fabricAvailability?.totalStoreStockPcs ?? 0} PCS
                         </strong></span>
                         <span>·</span>
@@ -665,10 +665,10 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                     <Link
                       href="/fabric-store/inventory/inward"
                       target="_blank"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 rounded-lg text-xs font-bold transition shadow-2xs"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-neutral-50 text-neutral-900 border border-neutral-300 rounded-lg text-xs font-bold transition shadow-2xs"
                       title="Open Fabric Store Inward form to add incoming fabric stock"
                     >
-                      <PackagePlus className="w-3.5 h-3.5 text-teal-700" />
+                      <PackagePlus className="w-3.5 h-3.5 text-brand-700" />
                       <span>Inward Stock</span>
                     </Link>
 
@@ -677,10 +677,10 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                         type="button"
                         disabled={updatingAvailability}
                         onClick={() => handleToggleAvailability(false)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-lg text-xs font-bold transition shadow-2xs cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-danger-50 hover:bg-danger-100 text-danger-700 border border-danger-300 rounded-lg text-xs font-bold transition shadow-2xs cursor-pointer"
                         title="Mark fabric out of stock and put production sheet on hold"
                       >
-                        <Lock className="w-3.5 h-3.5 text-rose-600" />
+                        <Lock className="w-3.5 h-3.5 text-danger-600" />
                         <span>{updatingAvailability ? 'Saving…' : 'Mark Out of Stock (Hold)'}</span>
                       </button>
                     ) : (
@@ -688,7 +688,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                         type="button"
                         disabled={updatingAvailability}
                         onClick={() => handleToggleAvailability(true)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition shadow-2xs cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold transition shadow-2xs cursor-pointer"
                         title="Fabric Store Incharge confirms fabric physical presence in store"
                       >
                         <Check className="w-3.5 h-3.5" />
@@ -704,8 +704,8 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
             <div className="space-y-4">
               {/* 1. CHALLAN NUMBER */}
               <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
-                <label className="text-xs font-bold text-slate-700 sm:text-right sm:pr-4">
-                  Challan Number <span className="text-rose-500">*</span>
+                <label className="text-xs font-bold text-neutral-700 sm:text-right sm:pr-4">
+                  Challan Number <span className="text-danger-600">*</span>
                 </label>
                 <div className="sm:col-span-2 max-w-lg">
                   <input
@@ -713,15 +713,15 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                     value={challanNumber}
                     onChange={(e) => setChallanNumber(e.target.value)}
                     required
-                    className="w-full text-xs font-mono font-bold text-slate-900 border border-slate-300 rounded-lg px-3 py-2 bg-slate-50 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-teal-600 focus:border-transparent transition"
+                    className="w-full text-xs font-mono font-bold text-neutral-900 border border-neutral-300 rounded-lg px-3 py-2 bg-neutral-50 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
                   />
                 </div>
               </div>
 
               {/* 2. CHALLAN DATE */}
               <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
-                <label className="text-xs font-bold text-slate-700 sm:text-right sm:pr-4">
-                  Challan Date <span className="text-rose-500">*</span>
+                <label className="text-xs font-bold text-neutral-700 sm:text-right sm:pr-4">
+                  Challan Date <span className="text-danger-600">*</span>
                 </label>
                 <div className="sm:col-span-2 max-w-lg">
                   <input
@@ -729,20 +729,20 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                     value={challanDate}
                     onChange={(e) => setChallanDate(e.target.value)}
                     required
-                    className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-teal-600 focus:border-transparent transition"
+                    className="w-full text-xs border border-neutral-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
                   />
                 </div>
               </div>
 
               {/* 3. SOURCE (Fabric store) */}
               <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
-                <label className="text-xs font-bold text-slate-700 sm:text-right sm:pr-4">
+                <label className="text-xs font-bold text-neutral-700 sm:text-right sm:pr-4">
                   Source (Fabric store)
                 </label>
                 <div className="sm:col-span-2 max-w-lg">
-                  <div className="w-full text-xs font-semibold text-slate-800 border border-slate-200 rounded-lg px-3 py-2 bg-slate-100 flex items-center justify-between">
+                  <div className="w-full text-xs font-semibold text-neutral-900 border border-neutral-200 rounded-lg px-3 py-2 bg-neutral-100 flex items-center justify-between">
                     <span>{sourceDept}</span>
-                    <span className="text-[10px] font-bold text-teal-800 bg-teal-100 px-2 py-0.5 rounded uppercase">
+                    <span className="text-[10px] font-bold text-brand-800 bg-brand-100 px-2 py-0.5 rounded uppercase">
                       STORE
                     </span>
                   </div>
@@ -751,13 +751,13 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
 
               {/* 4. DESTINATION (Dyeing) */}
               <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
-                <label className="text-xs font-bold text-slate-700 sm:text-right sm:pr-4">
+                <label className="text-xs font-bold text-neutral-700 sm:text-right sm:pr-4">
                   Destination (Dyeing)
                 </label>
                 <div className="sm:col-span-2 max-w-lg">
-                  <div className="w-full text-xs font-semibold text-slate-800 border border-slate-200 rounded-lg px-3 py-2 bg-slate-100 flex items-center justify-between">
+                  <div className="w-full text-xs font-semibold text-neutral-900 border border-neutral-200 rounded-lg px-3 py-2 bg-neutral-100 flex items-center justify-between">
                     <span>{destDept}</span>
-                    <span className="text-[10px] font-bold text-indigo-800 bg-indigo-100 px-2 py-0.5 rounded uppercase">
+                    <span className="text-[10px] font-bold text-brand-800 bg-brand-100 px-2 py-0.5 rounded uppercase">
                       DYEING
                     </span>
                   </div>
@@ -766,14 +766,14 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
 
               {/* 5. PRIORITY */}
               <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
-                <label className="text-xs font-bold text-slate-700 sm:text-right sm:pr-4">
+                <label className="text-xs font-bold text-neutral-700 sm:text-right sm:pr-4">
                   Priority
                 </label>
                 <div className="sm:col-span-2 max-w-lg">
                   <select
                     value={priority}
                     onChange={(e) => setPriority(e.target.value)}
-                    className="w-full text-xs font-semibold border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-teal-600 focus:border-transparent transition cursor-pointer"
+                    className="w-full text-xs font-semibold border border-neutral-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-brand-500 focus:border-transparent transition cursor-pointer"
                   >
                     <option value="NORMAL">NORMAL</option>
                     <option value="HIGH">HIGH</option>
@@ -785,7 +785,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
 
               {/* 6. DELIVERY DATE */}
               <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
-                <label className="text-xs font-bold text-slate-700 sm:text-right sm:pr-4">
+                <label className="text-xs font-bold text-neutral-700 sm:text-right sm:pr-4">
                   Delivery Date
                 </label>
                 <div className="sm:col-span-2 max-w-lg">
@@ -793,14 +793,14 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                     type="date"
                     value={deliveryDate}
                     onChange={(e) => setDeliveryDate(e.target.value)}
-                    className="w-full text-xs border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-teal-600 focus:border-transparent transition"
+                    className="w-full text-xs border border-neutral-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
                   />
                 </div>
               </div>
 
               {/* 7. DESIGN NUMBER */}
               <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
-                <label className="text-xs font-bold text-slate-700 sm:text-right sm:pr-4">
+                <label className="text-xs font-bold text-neutral-700 sm:text-right sm:pr-4">
                   Design Number
                 </label>
                 <div className="sm:col-span-2 max-w-lg">
@@ -808,15 +808,15 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                     type="text"
                     value={designNumber}
                     onChange={(e) => setDesignNumber(e.target.value)}
-                    className="w-full text-xs font-mono font-medium text-slate-900 border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-teal-600 focus:border-transparent transition"
+                    className="w-full text-xs font-mono font-medium text-neutral-900 border border-neutral-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
                   />
                 </div>
               </div>
 
               {/* 8. SERIAL NUMBER (Production Sheet Selector) */}
               <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
-                <label className="text-xs font-bold text-slate-700 sm:text-right sm:pr-4">
-                  Serial Number <span className="text-rose-500">*</span>
+                <label className="text-xs font-bold text-neutral-700 sm:text-right sm:pr-4">
+                  Serial Number <span className="text-danger-600">*</span>
                 </label>
                 <div className="sm:col-span-2 max-w-lg">
                   <select
@@ -826,7 +826,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                       if (prog) handleProgramSelect(prog);
                     }}
                     required
-                    className="w-full text-xs font-mono font-bold text-slate-900 border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-teal-600 focus:border-transparent transition cursor-pointer"
+                    className="w-full text-xs font-mono font-bold text-neutral-900 border border-neutral-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-brand-500 focus:border-transparent transition cursor-pointer"
                   >
                     <option value="">Select Production Sheet Serial Number</option>
                     {programs.map((p) => (
@@ -839,7 +839,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
               </div>
 
               {/* 9. COLOR / FABRIC / MEASUREMENT (Universal Challan Item Component with In/Cut/Out Tracking) */}
-              <div className="pt-3 border-t border-slate-200">
+              <div className="pt-3 border-t border-neutral-200">
                 <ColorFabricMeasurementTable
                   items={items}
                   onChange={handleItemsChange}
@@ -853,9 +853,9 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
               </div>
 
               {/* 10. STORE INCHARGE (Name / Contact) */}
-              <div className="pt-3 border-t border-slate-200">
+              <div className="pt-3 border-t border-neutral-200">
                 <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
-                  <label className="text-xs font-bold text-slate-700 sm:text-right sm:pr-4">
+                  <label className="text-xs font-bold text-neutral-700 sm:text-right sm:pr-4">
                     Store Incharge (Name / Contact)
                   </label>
                   <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-lg">
@@ -864,14 +864,14 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                       value={storeInchargeName}
                       onChange={(e) => setStoreInchargeName(e.target.value)}
                       placeholder=""
-                      className="w-full text-xs font-medium border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-teal-600 focus:border-transparent transition"
+                      className="w-full text-xs font-medium border border-neutral-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
                     />
                     <input
                       type="text"
                       value={storeInchargeContact}
                       onChange={(e) => setStoreInchargeContact(e.target.value)}
                       placeholder=""
-                      className="w-full text-xs font-mono border border-slate-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-teal-600 focus:border-transparent transition"
+                      className="w-full text-xs font-mono border border-neutral-300 rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
                     />
                   </div>
                 </div>
@@ -879,34 +879,34 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
             </div>
 
             {/* 11. SUBMIT BUTTON */}
-            <div className="pt-4 border-t border-slate-200 flex items-center justify-between gap-4 flex-wrap">
+            <div className="pt-4 border-t border-neutral-200 flex items-center justify-between gap-4 flex-wrap">
               <div className="text-xs">
                 {fabricAvailability && !fabricAvailability.isAvailable ? (
-                  <span className="text-rose-700 font-bold flex items-center gap-1.5 bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-lg">
-                    <Lock className="w-4 h-4 text-rose-600 shrink-0" />
+                  <span className="text-danger-700 font-bold flex items-center gap-1.5 bg-danger-50 border border-danger-200 px-3 py-1.5 rounded-lg">
+                    <Lock className="w-4 h-4 text-danger-600 shrink-0" />
                     <span>Handoff locked: Fabric must be in store before moving to {destDept}.</span>
                   </span>
                 ) : fabricAvailability?.isAvailable ? (
-                  <span className="text-emerald-700 font-semibold flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span className="text-accent-800 font-semibold flex items-center gap-1.5 bg-accent-50 border border-accent-200 px-3 py-1.5 rounded-lg">
+                    <CheckCircle2 className="w-4 h-4 text-accent-700 shrink-0" />
                     <span>Fabric verified in store. Cleared for dispatch to {destDept}.</span>
                   </span>
                 ) : (
-                  <span className="text-slate-500 italic">Select program to verify store stock</span>
+                  <span className="text-neutral-500 italic">Select program to verify store stock</span>
                 )}
               </div>
 
               <button
                 type="submit"
                 disabled={submitting || (fabricAvailability && !fabricAvailability.isAvailable)}
-                className={`inline-flex items-center gap-2 px-7 py-3 text-white text-xs font-bold rounded-xl shadow-xs transition ${
+                className={`inline-flex items-center gap-2 px-7 py-3 text-neutral-900 text-xs font-bold rounded-xl shadow-xs transition ${
                   fabricAvailability && !fabricAvailability.isAvailable
-                    ? 'bg-slate-400 cursor-not-allowed opacity-60'
-                    : 'bg-teal-700 hover:bg-teal-800 cursor-pointer'
+                    ? 'bg-neutral-300 cursor-not-allowed opacity-60'
+                    : 'bg-brand-700 hover:bg-brand-100 cursor-pointer'
                 }`}
               >
                 {submitting ? (
-                  <RefreshCw className="w-4 h-4 animate-spin text-teal-200" />
+                  <RefreshCw className="w-4 h-4 animate-spin text-brand-800" />
                 ) : fabricAvailability && !fabricAvailability.isAvailable ? (
                   <Lock className="w-4 h-4" />
                 ) : (

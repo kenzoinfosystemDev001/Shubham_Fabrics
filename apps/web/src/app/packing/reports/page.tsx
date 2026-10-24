@@ -87,35 +87,35 @@ export default function PackingReportsPage() {
   const summary = data?.summary;
 
   return (
-    <div className="min-h-screen bg-slate-950 px-4 py-8 text-slate-100 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-canvas px-4 py-8 text-neutral-900 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl space-y-6">
         {/* HEADER */}
         <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div>
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/30">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-brand-500/10 text-brand-600 border border-brand-500/30">
                 <BarChart3 className="w-3.5 h-3.5" />
                 Production Analytics
               </span>
             </div>
-            <h1 className="mt-2 text-3xl font-extrabold text-white tracking-tight">
+            <h1 className="mt-2 text-3xl font-extrabold text-neutral-900 tracking-tight">
               Yield & Packaging Reports
             </h1>
-            <p className="mt-1 text-sm text-slate-400">
+            <p className="mt-1 text-sm text-neutral-500">
               Packing output analytics, style-wise yield, carton distribution, and size breakdown for the selected period.
             </p>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1 bg-slate-900/80 border border-slate-800 rounded-lg p-1">
+            <div className="flex items-center gap-1 bg-white border border-neutral-200 rounded-lg p-1">
               {[7, 14, 30, 90].map((d) => (
                 <button
                   key={d}
                   onClick={() => setDays(d)}
                   className={`px-3 py-1.5 rounded text-xs font-bold transition ${
                     days === d
-                      ? 'bg-amber-500 text-slate-950'
-                      : 'text-slate-400 hover:text-white'
+                      ? 'bg-accent-400 text-neutral-900'
+                      : 'text-neutral-500 hover:text-neutral-900'
                   }`}
                 >
                   {d}d
@@ -125,29 +125,29 @@ export default function PackingReportsPage() {
             <button
               onClick={() => void loadReports()}
               disabled={loading}
-              className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800/80 px-3.5 py-2 text-xs font-semibold text-slate-200 transition hover:bg-slate-700 hover:text-white disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-lg border border-neutral-200 bg-neutral-50 px-3.5 py-2 text-xs font-semibold text-neutral-900 transition hover:bg-neutral-200 hover:text-neutral-900 disabled:opacity-50"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-amber-400' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-accent-700' : ''}`} />
               <span>Refresh</span>
             </button>
           </div>
         </header>
 
         {error && (
-          <div className="rounded-xl border border-rose-500/40 bg-rose-500/10 p-4 text-sm text-rose-300 flex items-center gap-3">
-            <AlertTriangle className="w-5 h-5 shrink-0 text-rose-400" />
+          <div className="rounded-xl border border-danger-500/40 bg-danger-500/10 p-4 text-sm text-danger-600 flex items-center gap-3">
+            <AlertTriangle className="w-5 h-5 shrink-0 text-danger-600" />
             <p className="font-semibold">{error}</p>
           </div>
         )}
 
         {/* PERIOD INFO */}
         {data?.period && (
-          <div className="flex items-center gap-2 text-xs text-slate-400 bg-slate-900/60 border border-slate-800 rounded-lg px-4 py-2">
-            <Calendar className="w-4 h-4 text-amber-400" />
+          <div className="flex items-center gap-2 text-xs text-neutral-500 bg-white border border-neutral-200 rounded-lg px-4 py-2">
+            <Calendar className="w-4 h-4 text-accent-700" />
             <span>
-              Reporting Period: <strong className="text-white">{new Date(data.period.from).toLocaleDateString()}</strong>
+              Reporting Period: <strong className="text-neutral-900">{new Date(data.period.from).toLocaleDateString()}</strong>
               {' → '}
-              <strong className="text-white">{new Date(data.period.to).toLocaleDateString()}</strong>
+              <strong className="text-neutral-900">{new Date(data.period.to).toLocaleDateString()}</strong>
               {' '}({data.period.days} days)
             </span>
           </div>
@@ -156,19 +156,19 @@ export default function PackingReportsPage() {
         {/* SUMMARY CARDS */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {[
-            { label: 'Packing Jobs', value: summary?.totalPackingJobs ?? 0, color: 'text-amber-400', icon: Package },
-            { label: 'Cartons Created', value: summary?.totalCartonsCreated ?? 0, color: 'text-emerald-400', icon: Boxes },
-            { label: 'Total Pieces Packed', value: (summary?.totalPiecesPacked ?? 0).toLocaleString(), color: 'text-white', icon: Layers },
-            { label: 'FG Stock Added', value: (summary?.totalFgStockAdded ?? 0).toLocaleString(), color: 'text-indigo-400', icon: TrendingUp },
-            { label: 'Avg Cartons/Job', value: (summary?.avgCartonsPerJob ?? 0).toFixed(1), color: 'text-sky-400', icon: BarChart3 },
-            { label: 'Avg Pcs/Carton', value: (summary?.avgPiecesPerCarton ?? 0).toFixed(1), color: 'text-purple-400', icon: BarChart3 },
+            { label: 'Packing Jobs', value: summary?.totalPackingJobs ?? 0, color: 'text-accent-700', icon: Package },
+            { label: 'Cartons Created', value: summary?.totalCartonsCreated ?? 0, color: 'text-accent-700', icon: Boxes },
+            { label: 'Total Pieces Packed', value: (summary?.totalPiecesPacked ?? 0).toLocaleString(), color: 'text-neutral-900', icon: Layers },
+            { label: 'FG Stock Added', value: (summary?.totalFgStockAdded ?? 0).toLocaleString(), color: 'text-brand-600', icon: TrendingUp },
+            { label: 'Avg Cartons/Job', value: (summary?.avgCartonsPerJob ?? 0).toFixed(1), color: 'text-brand-600', icon: BarChart3 },
+            { label: 'Avg Pcs/Carton', value: (summary?.avgPiecesPerCarton ?? 0).toFixed(1), color: 'text-brand-600', icon: BarChart3 },
           ].map((card) => {
             const Icon = card.icon;
             return (
-              <div key={card.label} className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 text-center">
+              <div key={card.label} className="rounded-xl border border-neutral-200 bg-white p-4 text-center">
                 <Icon className={`w-5 h-5 mx-auto mb-2 ${card.color}`} />
                 <div className={`text-xl font-black ${card.color}`}>{card.value}</div>
-                <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mt-1">{card.label}</div>
+                <div className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 mt-1">{card.label}</div>
               </div>
             );
           })}
@@ -176,14 +176,14 @@ export default function PackingReportsPage() {
 
         {/* STYLE-WISE BREAKDOWN */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 space-y-4">
-            <h2 className="text-base font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
-              <Package className="w-4 h-4 text-amber-400" />
+          <div className="rounded-xl border border-neutral-200 bg-white p-5 space-y-4">
+            <h2 className="text-base font-bold text-neutral-900 flex items-center gap-2 border-b border-neutral-200 pb-3">
+              <Package className="w-4 h-4 text-accent-700" />
               Style / Program Packing Yield
             </h2>
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-slate-300">
-                <thead className="bg-slate-950/80 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800">
+              <table className="w-full text-left text-xs text-neutral-700">
+                <thead className="bg-white text-[10px] font-bold uppercase tracking-wider text-neutral-500 border-b border-neutral-200">
                   <tr>
                     <th className="px-3 py-2">Style / Prog</th>
                     <th className="px-3 py-2 text-right">Pieces</th>
@@ -191,22 +191,22 @@ export default function PackingReportsPage() {
                     <th className="px-3 py-2 text-right">FG Stock</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60">
+                <tbody className="divide-y divide-neutral-200">
                   {data?.styleBreakdown && data.styleBreakdown.length > 0 ? (
                     data.styleBreakdown.slice(0, 10).map((row, idx) => (
-                      <tr key={idx} className="hover:bg-slate-800/30">
+                      <tr key={idx} className="hover:bg-neutral-100">
                         <td className="px-3 py-2.5">
-                          <span className="font-bold text-white block font-mono">{row.styleCode}</span>
-                          <span className="text-[10px] text-slate-500">#{row.programNumber}</span>
+                          <span className="font-bold text-neutral-900 block font-mono">{row.styleCode}</span>
+                          <span className="text-[10px] text-neutral-500">#{row.programNumber}</span>
                         </td>
-                        <td className="px-3 py-2.5 text-right font-mono font-black text-amber-400">{row.totalPiecesPacked}</td>
-                        <td className="px-3 py-2.5 text-right font-mono text-emerald-400">{row.cartonsCount}</td>
-                        <td className="px-3 py-2.5 text-right font-mono text-indigo-400">{row.fgStockAdded}</td>
+                        <td className="px-3 py-2.5 text-right font-mono font-black text-accent-700">{row.totalPiecesPacked}</td>
+                        <td className="px-3 py-2.5 text-right font-mono text-accent-700">{row.cartonsCount}</td>
+                        <td className="px-3 py-2.5 text-right font-mono text-brand-600">{row.fgStockAdded}</td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={4} className="px-3 py-8 text-center text-slate-500">
+                      <td colSpan={4} className="px-3 py-8 text-center text-neutral-500">
                         {loading ? 'Loading...' : 'No style data for this period.'}
                       </td>
                     </tr>
@@ -217,9 +217,9 @@ export default function PackingReportsPage() {
           </div>
 
           {/* SIZE BREAKDOWN */}
-          <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 space-y-4">
-            <h2 className="text-base font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
-              <Layers className="w-4 h-4 text-sky-400" />
+          <div className="rounded-xl border border-neutral-200 bg-white p-5 space-y-4">
+            <h2 className="text-base font-bold text-neutral-900 flex items-center gap-2 border-b border-neutral-200 pb-3">
+              <Layers className="w-4 h-4 text-brand-600" />
               Size-Wise Carton Distribution
             </h2>
             <div className="space-y-3">
@@ -230,16 +230,16 @@ export default function PackingReportsPage() {
                   return (
                     <div key={idx} className="space-y-1">
                       <div className="flex justify-between text-xs">
-                        <span className="font-bold text-white">{row.size}</span>
-                        <div className="flex items-center gap-3 font-mono text-slate-300">
+                        <span className="font-bold text-neutral-900">{row.size}</span>
+                        <div className="flex items-center gap-3 font-mono text-neutral-700">
                           <span>{row.totalPieces.toLocaleString()} pcs</span>
-                          <span className="text-slate-500">·</span>
-                          <span className="text-emerald-400">{row.cartonsCount} ctns</span>
+                          <span className="text-neutral-500">·</span>
+                          <span className="text-accent-700">{row.cartonsCount} ctns</span>
                         </div>
                       </div>
-                      <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                      <div className="w-full bg-neutral-100 h-2 rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-gradient-to-r from-amber-500 to-amber-400 transition-all"
+                          className="h-full bg-accent-400 transition-all"
                           style={{ width: `${pct}%` }}
                         />
                       </div>
@@ -247,7 +247,7 @@ export default function PackingReportsPage() {
                   );
                 })
               ) : (
-                <div className="py-8 text-center text-xs text-slate-500">
+                <div className="py-8 text-center text-xs text-neutral-500">
                   {loading ? 'Loading...' : 'No size breakdown data for this period.'}
                 </div>
               )}
@@ -256,23 +256,23 @@ export default function PackingReportsPage() {
         </div>
 
         {/* RECENT CARTONS TABLE */}
-        <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-            <h2 className="text-base font-bold text-white flex items-center gap-2">
-              <Boxes className="w-4 h-4 text-emerald-400" />
+        <div className="rounded-xl border border-neutral-200 bg-white p-5 space-y-4">
+          <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
+            <h2 className="text-base font-bold text-neutral-900 flex items-center gap-2">
+              <Boxes className="w-4 h-4 text-accent-700" />
               Recent Carton Packaging Activity
             </h2>
             <Link
               href="/packing/inventory"
-              className="text-xs font-semibold text-amber-400 hover:text-amber-300 flex items-center gap-1"
+              className="text-xs font-semibold text-accent-700 hover:text-accent-700 flex items-center gap-1"
             >
               Full FG Store <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-300">
-              <thead className="bg-slate-950/80 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800">
+            <table className="w-full text-left text-xs text-neutral-700">
+              <thead className="bg-white text-[10px] font-bold uppercase tracking-wider text-neutral-500 border-b border-neutral-200">
                 <tr>
                   <th className="px-4 py-2.5">Carton #</th>
                   <th className="px-4 py-2.5">Style</th>
@@ -281,18 +281,18 @@ export default function PackingReportsPage() {
                   <th className="px-4 py-2.5 text-right">Packed At</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 font-mono">
+              <tbody className="divide-y divide-neutral-200 font-mono">
                 {data?.recentCartons && data.recentCartons.length > 0 ? (
                   data.recentCartons.slice(0, 15).map((ctn, idx) => (
-                    <tr key={idx} className="hover:bg-slate-800/30">
-                      <td className="px-4 py-2.5 font-bold text-amber-400">{ctn.cartonNumber}</td>
+                    <tr key={idx} className="hover:bg-neutral-100">
+                      <td className="px-4 py-2.5 font-bold text-accent-700">{ctn.cartonNumber}</td>
                       <td className="px-4 py-2.5 font-sans">
-                        <span className="text-white font-bold">{ctn.program?.styleCode || 'N/A'}</span>
-                        <span className="text-[10px] text-slate-500 block">#{ctn.program?.programNumber || 'N/A'}</span>
+                        <span className="text-neutral-900 font-bold">{ctn.program?.styleCode || 'N/A'}</span>
+                        <span className="text-[10px] text-neutral-500 block">#{ctn.program?.programNumber || 'N/A'}</span>
                       </td>
-                      <td className="px-4 py-2.5 font-sans font-bold text-slate-200">{ctn.size}</td>
-                      <td className="px-4 py-2.5 text-right font-black text-emerald-400">{ctn.quantity}</td>
-                      <td className="px-4 py-2.5 text-right text-slate-500 text-[11px] font-sans">
+                      <td className="px-4 py-2.5 font-sans font-bold text-neutral-900">{ctn.size}</td>
+                      <td className="px-4 py-2.5 text-right font-black text-accent-700">{ctn.quantity}</td>
+                      <td className="px-4 py-2.5 text-right text-neutral-500 text-[11px] font-sans">
                         {new Date(ctn.createdAt).toLocaleString(undefined, {
                           dateStyle: 'medium',
                           timeStyle: 'short',
@@ -302,7 +302,7 @@ export default function PackingReportsPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="px-4 py-8 text-center text-slate-500 font-sans">
+                    <td colSpan={5} className="px-4 py-8 text-center text-neutral-500 font-sans">
                       {loading ? 'Loading carton data...' : 'No cartons packed in this period.'}
                     </td>
                   </tr>

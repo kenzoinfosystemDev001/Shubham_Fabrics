@@ -1184,10 +1184,10 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
     </div>
     <div style="display: flex; gap: 8px;">
       <button class="btn btn-primary" onclick="window.print()">
-        🖨️ Print ${safeCategoryLabel} Sheet (A4)
+        Print ${safeCategoryLabel} Sheet (A4)
       </button>
-      <button class="btn btn-primary" style="background: #059669;" onclick="window.downloadSelf()">
-        💾 Download ${safeCategoryLabel} Sheet
+      <button class="btn btn-primary" style="background: #8e55c4;" onclick="window.downloadSelf()">
+        Download ${safeCategoryLabel} Sheet
       </button>
       <button class="btn btn-outline" onclick="window.close()">
         ✕ Close

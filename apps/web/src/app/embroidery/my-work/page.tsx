@@ -34,7 +34,6 @@ import {
   createBlankChallanItem,
   DepartmentInOutTracking,
 } from '@/components/ColorFabricMeasurementTable';
-import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { 
   downloadProductionSheetHtml, 
@@ -258,23 +257,18 @@ export default function EmbroideryMyWorkPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-neutral-50">
       {/* HEADER WITH REAL DB BACKGROUND */}
       <header
-        style={{
-          backgroundImage: `linear-gradient(to right, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.72)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-        className="border-b border-slate-700/80 sticky top-0 z-30 px-4 sm:px-8 py-4 shadow-md text-white"
+        className="bg-white border-b border-neutral-200 sticky top-0 z-30 px-4 sm:px-8 py-4 shadow-md text-neutral-900"
       >
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-fuchsia-400 block drop-shadow-sm">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-600 block drop-shadow-sm">
               SHUBHAM FABRICS MES · EMBROIDERY DEPARTMENT
             </span>
-            <h1 className="text-xl font-bold text-white flex items-center gap-2.5 drop-shadow-sm">
-              <Scissors className="w-5 h-5 text-fuchsia-400" />
+            <h1 className="text-xl font-bold text-neutral-900 flex items-center gap-2.5 drop-shadow-sm">
+              <Scissors className="w-5 h-5 text-brand-600" />
               <span>Embroidery Department · My Work</span>
             </h1>
           </div>
@@ -282,7 +276,7 @@ export default function EmbroideryMyWorkPage() {
           <div className="flex items-center gap-2.5">
             <Link
               href="/embroidery/incoming-challans"
-              className="flex items-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow-xs transition"
+              className="flex items-center gap-1.5 px-3 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-lg shadow-xs transition"
             >
               <Layers className="w-3.5 h-3.5" />
               <span>Checking of Incoming Challans</span>
@@ -290,7 +284,7 @@ export default function EmbroideryMyWorkPage() {
 
             <Link
               href="/embroidery"
-              className="px-3 py-2 bg-slate-800/80 hover:bg-slate-800 text-slate-300 text-xs font-semibold rounded-lg border border-slate-700 transition"
+              className="px-3 py-2 bg-neutral-50 hover:bg-neutral-100 text-neutral-700 text-xs font-semibold rounded-lg border border-neutral-200 transition"
             >
               Dashboard
             </Link>
@@ -301,8 +295,8 @@ export default function EmbroideryMyWorkPage() {
       {/* TOAST ALERT */}
       {successMsg && (
         <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-4">
-          <div className="p-3.5 bg-emerald-50 border border-emerald-300 rounded-xl text-emerald-900 text-xs font-semibold flex items-center gap-2 shadow-xs">
-            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+          <div className="p-3.5 bg-accent-50 border border-accent-300 rounded-xl text-accent-800 text-xs font-semibold flex items-center gap-2 shadow-xs">
+            <CheckCircle2 className="w-5 h-5 text-accent-700 shrink-0" />
             <span>{successMsg}</span>
           </div>
         </div>
@@ -314,18 +308,18 @@ export default function EmbroideryMyWorkPage() {
             - Create challan to Thread Cutting (PASS)
             - See production sheet
             - Checking of Incoming Challans */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-2 shadow-xs">
+        <div className="bg-white border border-neutral-200 rounded-2xl p-2 shadow-xs">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2">
             <button
               type="button"
               onClick={() => setActiveWorkflow('CREATE_CHALLAN')}
               className={`p-3 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer ${
                 activeWorkflow === 'CREATE_CHALLAN'
-                  ? 'bg-fuchsia-50/90 border-fuchsia-400 text-fuchsia-950 shadow-xs'
-                  : 'bg-slate-50/60 border-slate-200 text-slate-600 hover:bg-slate-100'
+                  ? 'bg-brand-50/90 border-brand-500 text-brand-900 shadow-xs'
+                  : 'bg-neutral-50/60 border-neutral-200 text-neutral-600 hover:bg-neutral-100'
               }`}
             >
-              <Send className="w-4 h-4 text-fuchsia-600" />
+              <Send className="w-4 h-4 text-brand-600" />
               <span>Create Challan to Thread Cutting</span>
             </button>
 
@@ -334,11 +328,11 @@ export default function EmbroideryMyWorkPage() {
               onClick={() => setActiveWorkflow('PRODUCTION_SHEETS')}
               className={`p-3 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer ${
                 activeWorkflow === 'PRODUCTION_SHEETS'
-                  ? 'bg-fuchsia-50/90 border-fuchsia-400 text-fuchsia-950 shadow-xs'
-                  : 'bg-slate-50/60 border-slate-200 text-slate-600 hover:bg-slate-100'
+                  ? 'bg-brand-50/90 border-brand-500 text-brand-900 shadow-xs'
+                  : 'bg-neutral-50/60 border-neutral-200 text-neutral-600 hover:bg-neutral-100'
               }`}
             >
-              <Eye className="w-4 h-4 text-blue-600" />
+              <Eye className="w-4 h-4 text-brand-600" />
               <span>See Production Sheet</span>
             </button>
 
@@ -347,11 +341,11 @@ export default function EmbroideryMyWorkPage() {
               onClick={() => setActiveWorkflow('INCOMING_CHECK')}
               className={`p-3 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer ${
                 activeWorkflow === 'INCOMING_CHECK'
-                  ? 'bg-fuchsia-50/90 border-fuchsia-400 text-fuchsia-950 shadow-xs'
-                  : 'bg-slate-50/60 border-slate-200 text-slate-600 hover:bg-slate-100'
+                  ? 'bg-brand-50/90 border-brand-500 text-brand-900 shadow-xs'
+                  : 'bg-neutral-50/60 border-neutral-200 text-neutral-600 hover:bg-neutral-100'
               }`}
             >
-              <Layers className="w-4 h-4 text-emerald-600" />
+              <Layers className="w-4 h-4 text-accent-700" />
               <span>Checking of Incoming Challans</span>
             </button>
 
@@ -360,11 +354,11 @@ export default function EmbroideryMyWorkPage() {
               onClick={() => setActiveWorkflow('STOCK')}
               className={`p-3 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer ${
                 activeWorkflow === 'STOCK'
-                  ? 'bg-fuchsia-50/90 border-fuchsia-400 text-fuchsia-950 shadow-xs'
-                  : 'bg-slate-50/60 border-slate-200 text-slate-600 hover:bg-slate-100'
+                  ? 'bg-brand-50/90 border-brand-500 text-brand-900 shadow-xs'
+                  : 'bg-neutral-50/60 border-neutral-200 text-neutral-600 hover:bg-neutral-100'
               }`}
             >
-              <Boxes className="w-4 h-4 text-purple-600" />
+              <Boxes className="w-4 h-4 text-brand-600" />
               <span>Embroidery Stock &amp; Balance</span>
             </button>
 
@@ -373,11 +367,11 @@ export default function EmbroideryMyWorkPage() {
               onClick={() => setActiveWorkflow('DEFECTIVE_SHELF')}
               className={`p-3 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer ${
                 activeWorkflow === 'DEFECTIVE_SHELF'
-                  ? 'bg-rose-50/90 border-rose-400 text-rose-950 shadow-xs'
-                  : 'bg-slate-50/60 border-slate-200 text-slate-600 hover:bg-slate-100'
+                  ? 'bg-danger-50/90 border-danger-500 text-danger-900 shadow-xs'
+                  : 'bg-neutral-50/60 border-neutral-200 text-neutral-600 hover:bg-neutral-100'
               }`}
             >
-              <AlertTriangle className="w-4 h-4 text-rose-600" />
+              <AlertTriangle className="w-4 h-4 text-danger-600" />
               <span>Defective Shelf (DEF-SHELF-EMBROIDERY)</span>
             </button>
           </div>
@@ -385,15 +379,15 @@ export default function EmbroideryMyWorkPage() {
 
         {/* WORKFLOW 1: CHALLAN FROM EMBROIDERY TO THREAD CUTTING (MAIN USER DRAWING) */}
         {activeWorkflow === 'CREATE_CHALLAN' && (
-          <div className="bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden">
+          <div className="bg-white border border-neutral-200/90 rounded-2xl shadow-sm overflow-hidden">
             <form onSubmit={handleSubmitChallan} className="p-6 sm:p-8 space-y-6">
               {/* TOP HEADER OF FORM WITH "Show production sheet" BUTTON */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-slate-200 gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-neutral-200 gap-3">
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-fuchsia-600 block">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-600 block">
                     MATERIAL MOVEMENT CHALLAN
                   </span>
-                  <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2 mt-0.5">
+                  <h2 className="text-lg font-bold text-neutral-900 flex items-center gap-2 mt-0.5">
                     <span>Challan from Embroidery to Thread Cutting</span>
                   </h2>
                 </div>
@@ -402,7 +396,7 @@ export default function EmbroideryMyWorkPage() {
                 <button
                   type="button"
                   onClick={() => setShowSheetPickerModal(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs transition"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-xs transition"
                 >
                   <Eye className="w-4 h-4" />
                   <span>(Show production sheet)</span>
@@ -411,19 +405,19 @@ export default function EmbroideryMyWorkPage() {
 
               {/* ACTIVE PRODUCTION SHEET BANNER IF SELECTED */}
               {selectedProgram && (
-                <div className="p-4 bg-teal-50/70 border border-teal-200 rounded-xl flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div className="p-4 bg-brand-50/70 border border-brand-200 rounded-xl flex flex-wrap items-center justify-between gap-3 text-xs">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-teal-600 text-white flex items-center justify-center font-mono font-bold text-sm shrink-0">
+                    <div className="w-9 h-9 rounded-lg bg-brand-600 text-white flex items-center justify-center font-mono font-bold text-sm shrink-0">
                       PS
                     </div>
                     <div>
-                      <span className="text-[10px] uppercase font-bold text-teal-800 tracking-wider block">
+                      <span className="text-[10px] uppercase font-bold text-brand-800 tracking-wider block">
                         Linked Master Production Sheet (Master Record)
                       </span>
-                      <strong className="text-slate-900 text-sm font-mono">
+                      <strong className="text-neutral-900 text-sm font-mono">
                         {selectedProgram.programSerialNo || selectedProgram.programNumber}
                       </strong>
-                      <span className="text-slate-600 ml-2">
+                      <span className="text-neutral-600 ml-2">
                         · {selectedProgram.clientName || selectedProgram.buyerName || 'Client'} · Style: {selectedProgram.mainStyle || 'Style'}
                       </span>
                     </div>
@@ -433,14 +427,14 @@ export default function EmbroideryMyWorkPage() {
                     <button
                       type="button"
                       onClick={() => setShowSheetDetailModal(selectedProgram)}
-                      className="text-xs font-bold text-teal-700 hover:text-teal-900 bg-teal-100 hover:bg-teal-200 px-3 py-1.5 rounded-lg transition"
+                      className="text-xs font-bold text-brand-700 hover:text-brand-900 bg-brand-100 hover:bg-brand-200 px-3 py-1.5 rounded-lg transition"
                     >
                       View Sheet Details
                     </button>
                     <button
                       type="button"
                       onClick={() => setShowSheetPickerModal(true)}
-                      className="text-xs text-slate-600 hover:text-slate-900 bg-white border border-slate-300 px-2.5 py-1.5 rounded-lg transition"
+                      className="text-xs text-neutral-600 hover:text-neutral-900 bg-white border border-neutral-300 px-2.5 py-1.5 rounded-lg transition"
                     >
                       Change Sheet
                     </button>
@@ -452,7 +446,7 @@ export default function EmbroideryMyWorkPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
                 {/* 1. Challan Number */}
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  <label className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider mb-1">
                     Challan Number *
                   </label>
                   <input
@@ -461,13 +455,13 @@ export default function EmbroideryMyWorkPage() {
                     value={challanNumber}
                     onChange={(e) => setChallanNumber(e.target.value)}
                     placeholder=""
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl font-mono font-bold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-fuchsia-600 transition"
+                    className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl font-mono font-bold text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
                   />
                 </div>
 
                 {/* 2. Challan Date */}
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  <label className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider mb-1">
                     Challan Date *
                   </label>
                   <input
@@ -475,45 +469,45 @@ export default function EmbroideryMyWorkPage() {
                     required
                     value={challanDate}
                     onChange={(e) => setChallanDate(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-fuchsia-600 transition"
+                    className="w-full px-3.5 py-2.5 bg-white border border-neutral-300 rounded-xl font-medium text-neutral-900 focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
                   />
                 </div>
 
                 {/* 3. Source (Embroidery) */}
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  <label className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider mb-1">
                     Source (Embroidery)
                   </label>
                   <input
                     type="text"
                     readOnly
                     value={sourceDept}
-                    className="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-300 rounded-xl font-bold text-slate-700 cursor-not-allowed"
+                    className="w-full px-3.5 py-2.5 bg-neutral-100 border border-neutral-300 rounded-xl font-bold text-neutral-700 cursor-not-allowed"
                   />
                 </div>
 
                 {/* 4. Destination (Thread Cutting) */}
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  <label className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider mb-1">
                     Destination (Thread Cutting)
                   </label>
                   <input
                     type="text"
                     readOnly
                     value={destinationDept}
-                    className="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-300 rounded-xl font-bold text-fuchsia-700 cursor-not-allowed"
+                    className="w-full px-3.5 py-2.5 bg-neutral-100 border border-neutral-300 rounded-xl font-bold text-brand-700 cursor-not-allowed"
                   />
                 </div>
 
                 {/* 5. Priority */}
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  <label className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider mb-1">
                     Priority
                   </label>
                   <select
                     value={priority}
                     onChange={(e: any) => setPriority(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-fuchsia-600 transition"
+                    className="w-full px-3.5 py-2.5 bg-white border border-neutral-300 rounded-xl font-bold text-neutral-900 focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
                   >
                     <option value="NORMAL">Normal Priority</option>
                     <option value="URGENT">Urgent (Express Line)</option>
@@ -523,20 +517,20 @@ export default function EmbroideryMyWorkPage() {
 
                 {/* 6. Delivery Date */}
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  <label className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider mb-1">
                     Delivery Date
                   </label>
                   <input
                     type="date"
                     value={deliveryDate}
                     onChange={(e) => setDeliveryDate(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-fuchsia-600 transition"
+                    className="w-full px-3.5 py-2.5 bg-white border border-neutral-300 rounded-xl font-medium text-neutral-900 focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
                   />
                 </div>
 
                 {/* 7. Design Number */}
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  <label className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider mb-1">
                     Design Number *
                   </label>
                   <input
@@ -545,13 +539,13 @@ export default function EmbroideryMyWorkPage() {
                     value={designNumber}
                     onChange={(e) => setDesignNumber(e.target.value)}
                     placeholder=""
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl font-mono font-bold text-fuchsia-800 focus:outline-none focus:ring-2 focus:ring-fuchsia-600 transition"
+                    className="w-full px-3.5 py-2.5 bg-white border border-neutral-300 rounded-xl font-mono font-bold text-brand-800 focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
                   />
                 </div>
 
                 {/* 8. Serial Number */}
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  <label className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider mb-1">
                     Serial Number *
                   </label>
                   <input
@@ -560,7 +554,7 @@ export default function EmbroideryMyWorkPage() {
                     value={serialNumber}
                     onChange={(e) => setSerialNumber(e.target.value)}
                     placeholder=""
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-fuchsia-600 transition"
+                    className="w-full px-3.5 py-2.5 bg-white border border-neutral-300 rounded-xl font-mono font-bold text-neutral-900 focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
                   />
                 </div>
               </div>
@@ -580,16 +574,16 @@ export default function EmbroideryMyWorkPage() {
               </div>
 
               {formError && (
-                <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-xs font-semibold flex items-center gap-2">
-                  <X className="w-4 h-4 text-rose-600 shrink-0" />
+                <div className="p-3 bg-danger-50 border border-danger-200 rounded-xl text-danger-800 text-xs font-semibold flex items-center gap-2">
+                  <X className="w-4 h-4 text-danger-600 shrink-0" />
                   <span>{formError}</span>
                 </div>
               )}
 
               {/* FOOTER: EMBROIDERY INCHARGE & SUBMIT BUTTON */}
-              <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="pt-4 border-t border-neutral-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="w-full sm:w-80">
-                  <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  <label className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider mb-1">
                     Embroidery Incharge *
                   </label>
                   <input
@@ -598,7 +592,7 @@ export default function EmbroideryMyWorkPage() {
                     value={inchargeName}
                     onChange={(e) => setInchargeName(e.target.value)}
                     placeholder=""
-                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-fuchsia-600 transition"
+                    className="w-full px-3.5 py-2 bg-neutral-50 border border-neutral-300 rounded-xl font-semibold text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
                   />
                 </div>
 
@@ -606,11 +600,11 @@ export default function EmbroideryMyWorkPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full sm:w-auto px-6 py-3 bg-fuchsia-700 hover:bg-fuchsia-800 disabled:opacity-50 active:scale-98 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 cursor-pointer transition"
+                  className="w-full sm:w-auto px-6 py-3 bg-brand-700 hover:bg-brand-800 disabled:opacity-50 active:scale-98 text-white font-bold text-xs rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition"
                   title="Issue Challan and dispatch verified leftover pieces to Thread Cutting"
                 >
                   {submitting ? (
-                    <RefreshCw className="w-4 h-4 animate-spin text-fuchsia-200" />
+                    <RefreshCw className="w-4 h-4 animate-spin text-brand-800" />
                   ) : (
                     <Send className="w-4 h-4" />
                   )}
@@ -627,13 +621,13 @@ export default function EmbroideryMyWorkPage() {
 
         {/* WORKFLOW 2: SEE PRODUCTION SHEET */}
         {activeWorkflow === 'PRODUCTION_SHEETS' && (
-          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 gap-3">
+          <div className="bg-white border border-neutral-200 rounded-2xl shadow-sm p-6 space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-neutral-200 gap-3">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-teal-600 block">
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-600 block">
                   MASTER RECORDS ARCHIVE (RULE 1)
                 </span>
-                <h2 className="text-lg font-bold text-slate-900">
+                <h2 className="text-lg font-bold text-neutral-900">
                   Active Production Sheets for Embroidery
                 </h2>
               </div>
@@ -644,9 +638,9 @@ export default function EmbroideryMyWorkPage() {
                   value={searchSheet}
                   onChange={(e) => setSearchSheet(e.target.value)}
                   placeholder="Search Sheet Serial, Buyer, Style..."
-                  className="w-full pl-9 pr-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-600"
+                  className="w-full pl-9 pr-3.5 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
-                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                <Search className="w-4 h-4 text-neutral-500 absolute left-3 top-2.5" />
               </div>
             </div>
 
@@ -664,40 +658,40 @@ export default function EmbroideryMyWorkPage() {
                 .map((prog) => (
                   <div
                     key={prog.id}
-                    className="p-5 border border-slate-200 rounded-2xl bg-white hover:border-teal-400 hover:shadow-xs transition space-y-3"
+                    className="p-5 border border-neutral-200 rounded-2xl bg-white hover:border-brand-500 hover:shadow-xs transition space-y-3"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-mono text-xs font-bold text-teal-900 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-md">
+                      <span className="font-mono text-xs font-bold text-brand-900 bg-brand-50 border border-brand-200 px-2 py-0.5 rounded-md">
                         {prog.programSerialNo || prog.programNumber}
                       </span>
-                      <span className="text-[10px] uppercase font-bold text-slate-500">
+                      <span className="text-[10px] uppercase font-bold text-neutral-500">
                         {prog.status || 'ACTIVE'}
                       </span>
                     </div>
 
                     <div>
-                      <h4 className="text-sm font-bold text-slate-900">
+                      <h4 className="text-sm font-bold text-neutral-900">
                         {prog.clientName || prog.buyerName || 'Standard Buyer'}
                       </h4>
-                      <p className="text-xs text-slate-600 font-medium">Style: {prog.mainStyle || 'Standard'}</p>
+                      <p className="text-xs text-neutral-600 font-medium">Style: {prog.mainStyle || 'Standard'}</p>
                     </div>
 
-                    <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200/80 text-xs space-y-1">
+                    <div className="p-2.5 bg-neutral-50 rounded-xl border border-neutral-200/80 text-xs space-y-1">
                       <div className="flex justify-between">
-                        <span className="text-slate-400 text-[10px]">Wilcom #</span>
-                        <strong className="font-mono text-fuchsia-700">{prog.wilcomDesignNumber || 'WLC-STD'}</strong>
+                        <span className="text-neutral-500 text-[10px]">Wilcom #</span>
+                        <strong className="font-mono text-brand-700">{prog.wilcomDesignNumber || 'WLC-STD'}</strong>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-slate-400 text-[10px]">Embroidery Size</span>
-                        <strong className="text-slate-700">{prog.embroideryDesignSize || 'Standard 12x12'}</strong>
+                        <span className="text-neutral-500 text-[10px]">Embroidery Size</span>
+                        <strong className="text-neutral-700">{prog.embroideryDesignSize || 'Standard 12x12'}</strong>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-slate-400 text-[10px]">Target Qty</span>
-                        <strong className="font-mono text-slate-800">{prog.targetQuantity || 0} PCS</strong>
+                        <span className="text-neutral-500 text-[10px]">Target Qty</span>
+                        <strong className="font-mono text-neutral-900">{prog.targetQuantity || 0} PCS</strong>
                       </div>
                     </div>
 
-                    <div className="pt-2 flex flex-col gap-1.5 border-t border-slate-100">
+                    <div className="pt-2 flex flex-col gap-1.5 border-t border-neutral-100">
                       <DocumentActionButtons program={prog} size="xs" className="w-full justify-between" />
                       <button
                         type="button"
@@ -705,7 +699,7 @@ export default function EmbroideryMyWorkPage() {
                           applyProgramToForm(prog);
                           setActiveWorkflow('CREATE_CHALLAN');
                         }}
-                        className="w-full py-1.5 px-2 bg-fuchsia-600 hover:bg-fuchsia-700 text-white rounded-lg text-xs font-bold shadow-2xs transition text-center"
+                        className="w-full py-1.5 px-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold shadow-2xs transition text-center"
                       >
                         Use in Challan
                       </button>
@@ -718,20 +712,20 @@ export default function EmbroideryMyWorkPage() {
 
         {/* WORKFLOW 3: CHECKING OF INCOMING CHALLANS (OVERVIEW) */}
         {activeWorkflow === 'INCOMING_CHECK' && (
-          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 gap-3">
+          <div className="bg-white border border-neutral-200 rounded-2xl shadow-sm p-6 space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-neutral-200 gap-3">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-600 block">
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-700 block">
                   RECEIVING VERIFICATION
                 </span>
-                <h2 className="text-lg font-bold text-slate-900">
+                <h2 className="text-lg font-bold text-neutral-900">
                   Checking of Incoming Challans Overview
                 </h2>
               </div>
 
               <Link
                 href="/embroidery/incoming-challans"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs transition"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-xs transition"
               >
                 <span>Open Full Incoming Verification Console</span>
                 <ArrowRight className="w-4 h-4" />
@@ -739,48 +733,48 @@ export default function EmbroideryMyWorkPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="p-5 border border-blue-200 bg-blue-50/50 rounded-2xl space-y-3">
+              <div className="p-5 border border-brand-200 bg-brand-50/50 rounded-2xl space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Warehouse className="w-5 h-5 text-blue-700" />
-                    <h3 className="text-sm font-bold text-blue-950 uppercase tracking-wide">
+                    <Warehouse className="w-5 h-5 text-brand-700" />
+                    <h3 className="text-sm font-bold text-brand-900 uppercase tracking-wide">
                       Route ①: From Fabric Store (Undyed)
                     </h3>
                   </div>
-                  <span className="text-xs font-bold font-mono px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">
+                  <span className="text-xs font-bold font-mono px-2 py-0.5 rounded-full bg-brand-100 text-brand-800">
                     {incomingChallans.filter((c) => c.fromDepartment === 'STORE').length} Challans
                   </span>
                 </div>
-                <p className="text-xs text-slate-600">
+                <p className="text-xs text-neutral-600">
                   Raw / Greige Kora fabric rolls delivered straight from raw fabric warehouse for direct embroidery.
                 </p>
                 <Link
                   href="/embroidery/incoming-challans"
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-700 hover:text-blue-900 pt-1"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-700 hover:text-brand-900 pt-1"
                 >
                   <span>Review Store Incoming Challans</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
 
-              <div className="p-5 border border-purple-200 bg-purple-50/50 rounded-2xl space-y-3">
+              <div className="p-5 border border-brand-200 bg-brand-50/50 rounded-2xl space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <ShieldCheck className="w-5 h-5 text-purple-700" />
-                    <h3 className="text-sm font-bold text-purple-950 uppercase tracking-wide">
+                    <ShieldCheck className="w-5 h-5 text-brand-700" />
+                    <h3 className="text-sm font-bold text-brand-900 uppercase tracking-wide">
                       Route ②: From Dyeing Department (QC1 PASS)
                     </h3>
                   </div>
-                  <span className="text-xs font-bold font-mono px-2 py-0.5 rounded-full bg-purple-100 text-purple-800">
+                  <span className="text-xs font-bold font-mono px-2 py-0.5 rounded-full bg-brand-100 text-brand-800">
                     {incomingChallans.filter((c) => c.fromDepartment === 'QC1' || c.fromDepartment === 'DYEING').length} Challans
                   </span>
                 </div>
-                <p className="text-xs text-slate-600">
+                <p className="text-xs text-neutral-600">
                   Dyed fabric processed through Dyeing and rigorously inspected by QC1 Quality Incharge before release.
                 </p>
                 <Link
                   href="/embroidery/incoming-challans"
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-700 hover:text-purple-900 pt-1"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-700 hover:text-brand-900 pt-1"
                 >
                   <span>Review Dyeing QC1 Incoming Challans</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -792,30 +786,30 @@ export default function EmbroideryMyWorkPage() {
             <div className="pt-2 space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900">
+                  <h3 className="text-sm font-bold text-neutral-900">
                     Incoming Lots Addressed to Embroidery
                   </h3>
-                  <p className="text-[11px] text-slate-500">
+                  <p className="text-[11px] text-neutral-500">
                     Click <strong>Receive Material</strong> to officially accept into Embroidery floor stock and material balance.
                   </p>
                 </div>
-                <span className="text-xs font-mono font-bold text-slate-600">
+                <span className="text-xs font-mono font-bold text-neutral-600">
                   {incomingChallans.length} Challan{incomingChallans.length === 1 ? '' : 's'}
                 </span>
               </div>
 
               {incomingChallans.length === 0 ? (
-                <div className="p-12 text-center border border-dashed border-slate-200 rounded-xl bg-slate-50/50 space-y-2">
-                  <CheckCircle2 className="w-8 h-8 text-slate-300 mx-auto" />
-                  <p className="text-xs font-semibold text-slate-700">No incoming challans pending receipt</p>
-                  <p className="text-[11px] text-slate-400">
+                <div className="p-12 text-center border border-dashed border-neutral-200 rounded-xl bg-neutral-50/50 space-y-2">
+                  <CheckCircle2 className="w-8 h-8 text-neutral-700 mx-auto" />
+                  <p className="text-xs font-semibold text-neutral-700">No incoming challans pending receipt</p>
+                  <p className="text-[11px] text-neutral-500">
                     Challans issued from Fabric Store or QC1 to Embroidery will appear here automatically.
                   </p>
                 </div>
               ) : (
-                <div className="border border-slate-200 rounded-xl overflow-hidden shadow-2xs overflow-x-auto">
+                <div className="border border-neutral-200 rounded-xl overflow-hidden shadow-2xs overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200 uppercase text-[10px]">
+                    <thead className="bg-neutral-50 text-neutral-600 font-semibold border-b border-neutral-200 uppercase text-[10px]">
                       <tr>
                         <th className="py-2.5 px-3">Challan #</th>
                         <th className="py-2.5 px-3">From Station</th>
@@ -826,7 +820,7 @@ export default function EmbroideryMyWorkPage() {
                         <th className="py-2.5 px-3 text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-neutral-100">
                       {incomingChallans.map((ch) => {
                         const totalQty = (ch.items || []).reduce(
                           (sum: number, it: any) => sum + (Number(it.quantity) || 0),
@@ -836,45 +830,45 @@ export default function EmbroideryMyWorkPage() {
                         const isReceived = ['RECEIVED', 'IN_PROCESS', 'COMPLETED'].includes(ch.status);
 
                         return (
-                          <tr key={ch.id} className="hover:bg-slate-50/80 transition">
+                          <tr key={ch.id} className="hover:bg-neutral-50/80 transition">
                             <td className="py-3 px-3 font-mono">
-                              <span className="font-bold text-slate-900 block">{ch.challanNumber}</span>
-                              <span className="text-[10px] text-slate-500 font-sans">
+                              <span className="font-bold text-neutral-900 block">{ch.challanNumber}</span>
+                              <span className="text-[10px] text-neutral-500 font-sans">
                                 {new Date(ch.issuedDate || ch.createdAt).toLocaleDateString('en-GB')}
                               </span>
                             </td>
                             <td className="py-3 px-3">
-                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-800 border border-slate-200">
+                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-neutral-100 text-neutral-900 border border-neutral-200">
                                 {ch.fromDepartment}
                               </span>
                             </td>
                             <td className="py-3 px-3">
-                              <span className="font-semibold text-slate-800 block">
+                              <span className="font-semibold text-neutral-900 block">
                                 {ch.program?.clientName || ch.program?.buyerName || 'Standard'}
                               </span>
-                              <span className="text-[10px] text-slate-500 block">
+                              <span className="text-[10px] text-neutral-500 block">
                                 Style: {ch.program?.mainStyle || ch.program?.styleCode || '—'} · Sheet #{ch.program?.programSerialNo || ch.program?.programNumber || '—'}
                               </span>
                             </td>
                             <td className="py-3 px-3">
-                              <span className="font-medium text-slate-800 block">
+                              <span className="font-medium text-neutral-900 block">
                                 {ch.items?.[0]?.itemDescription || ch.program?.fabricName || 'Fabric Lot'}
                               </span>
-                              <span className="text-[10px] text-slate-500">
+                              <span className="text-[10px] text-neutral-500">
                                 {ch.items?.[0]?.colour || ch.program?.fabricColor || 'Standard'}
                               </span>
                             </td>
-                            <td className="py-3 px-3 text-right font-mono font-bold text-slate-900">
+                            <td className="py-3 px-3 text-right font-mono font-bold text-neutral-900">
                               {effectiveQty} {ch.fabricUnit || ch.items?.[0]?.uom || 'PCS'}
                             </td>
                             <td className="py-3 px-3 text-center">
                               {isReceived ? (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-accent-100 text-accent-800 border border-accent-200">
+                                  <CheckCircle2 className="w-3 h-3 text-accent-700" />
                                   <span>{ch.status}</span>
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-accent-100 text-accent-800 border border-accent-300">
                                   <span>Pending Receipt</span>
                                 </span>
                               )}
@@ -888,7 +882,7 @@ export default function EmbroideryMyWorkPage() {
                                       type="button"
                                       disabled={receivingId === ch.id}
                                       onClick={() => handleReceiveIncoming(ch)}
-                                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-xs transition cursor-pointer"
+                                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-accent-400 hover:bg-accent-500 text-neutral-900 rounded-lg text-xs font-bold shadow-xs transition cursor-pointer"
                                       title="Receive material and book onto Embroidery floor stock"
                                     >
                                       {receivingId === ch.id ? (
@@ -910,7 +904,7 @@ export default function EmbroideryMyWorkPage() {
                                         if (ch.program) applyProgramToForm(ch.program);
                                         setActiveWorkflow('CREATE_CHALLAN');
                                       }}
-                                      className="inline-flex items-center gap-1 px-2.5 py-1 bg-fuchsia-600 hover:bg-fuchsia-700 text-white rounded-lg text-xs font-bold transition shadow-2xs cursor-pointer"
+                                      className="inline-flex items-center gap-1 px-2.5 py-1 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold transition shadow-2xs cursor-pointer"
                                       title="Use this received lot in a new Challan to Thread Cutting"
                                     >
                                       <Send className="w-3 h-3" />
@@ -936,63 +930,63 @@ export default function EmbroideryMyWorkPage() {
 
         {/* WORKFLOW 4: EMBROIDERY DEFECTIVE SHELF (DEF-SHELF-EMBROIDERY) */}
         {activeWorkflow === 'DEFECTIVE_SHELF' && (
-          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 gap-3">
+          <div className="bg-white border border-neutral-200 rounded-2xl shadow-sm p-6 space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-neutral-200 gap-3">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-rose-600 block">
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-danger-600 block">
                   DEPARTMENT ISOLATION SHELF
                 </span>
-                <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                  <Archive className="w-5 h-5 text-rose-600" />
+                <h2 className="text-lg font-bold text-neutral-900 flex items-center gap-2">
+                  <Archive className="w-5 h-5 text-danger-600" />
                   <span>Embroidery Defective Shelf (DEF-SHELF-EMBROIDERY)</span>
                 </h2>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-neutral-500 mt-0.5">
                   Quarantine record of panels cut due to embroidery defects. Automatically logged in the Fabric Store Master Defective Shelf (DEF-SHELF-CENTRAL).
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-500 font-mono">
-                  Shelf Code: <strong className="text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">DEF-SHELF-EMBROIDERY</strong>
+                <span className="text-xs text-neutral-500 font-mono">
+                  Shelf Code: <strong className="text-danger-700 bg-danger-50 px-2 py-0.5 rounded border border-danger-200">DEF-SHELF-EMBROIDERY</strong>
                 </span>
               </div>
             </div>
 
             {/* SUMMARY TILES */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="p-4 bg-rose-50/70 border border-rose-200 rounded-xl space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-rose-800">
+              <div className="p-4 bg-danger-50/70 border border-danger-200 rounded-xl space-y-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-danger-800">
                   Total Defective Pieces Cut
                 </span>
-                <div className="text-2xl font-mono font-bold text-rose-900">
+                <div className="text-2xl font-mono font-bold text-danger-900">
                   {embroideryDefects.reduce((acc, c) => acc + (Number(c.defectivePieces) || 0), 0)} PCS
                 </div>
-                <span className="text-[10px] text-rose-600">
+                <span className="text-[10px] text-danger-600">
                   Separated from Thread Cutting handovers
                 </span>
               </div>
 
-              <div className="p-4 bg-purple-50/70 border border-purple-200 rounded-xl space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-purple-800">
+              <div className="p-4 bg-brand-50/70 border border-brand-200 rounded-xl space-y-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-brand-800">
                   Fabric Store Master Log
                 </span>
-                <div className="text-base font-bold text-purple-900 flex items-center gap-1.5 mt-1">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <div className="text-base font-bold text-brand-900 flex items-center gap-1.5 mt-1">
+                  <CheckCircle2 className="w-4 h-4 text-accent-700" />
                   <span>Synchronized with Central Store</span>
                 </div>
-                <span className="text-[10px] text-purple-700">
+                <span className="text-[10px] text-brand-700">
                   Auto-mirrored to DEF-SHELF-CENTRAL
                 </span>
               </div>
 
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+              <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-xl space-y-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-600">
                   Logged Incidents
                 </span>
-                <div className="text-2xl font-mono font-bold text-slate-900">
+                <div className="text-2xl font-mono font-bold text-neutral-900">
                   {embroideryDefects.length} Records
                 </div>
-                <span className="text-[10px] text-slate-500">
+                <span className="text-[10px] text-neutral-500">
                   Audited with zero-loss balance math
                 </span>
               </div>
@@ -1000,17 +994,17 @@ export default function EmbroideryMyWorkPage() {
 
             {/* TABLE */}
             {embroideryDefects.length === 0 ? (
-              <div className="p-16 text-center space-y-3 border border-dashed border-slate-200 rounded-xl">
-                <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />
-                <p className="text-sm font-semibold text-slate-800">Embroidery Defective Shelf is Clean</p>
-                <p className="text-xs text-slate-500 max-w-md mx-auto">
+              <div className="p-16 text-center space-y-3 border border-dashed border-neutral-200 rounded-xl">
+                <CheckCircle2 className="w-12 h-12 text-accent-700 mx-auto" />
+                <p className="text-sm font-semibold text-neutral-900">Embroidery Defective Shelf is Clean</p>
+                <p className="text-xs text-neutral-500 max-w-md mx-auto">
                   No defective pieces have been cut in Embroidery yet. All embroidery runs have passed cleanly.
                 </p>
               </div>
             ) : (
-              <div className="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+              <div className="border border-neutral-200 rounded-xl overflow-hidden shadow-2xs">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200 uppercase text-[10px]">
+                  <thead className="bg-neutral-50 text-neutral-600 font-semibold border-b border-neutral-200 uppercase text-[10px]">
                     <tr>
                       <th className="py-2.5 px-3">Challan #</th>
                       <th className="py-2.5 px-3">Sheet / Style</th>
@@ -1021,41 +1015,41 @@ export default function EmbroideryMyWorkPage() {
                       <th className="py-2.5 px-3 text-right">Audit</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-neutral-100">
                     {embroideryDefects.map((ch) => (
-                      <tr key={ch.id} className="hover:bg-rose-50/30 transition">
-                        <td className="py-3 px-3 font-mono font-bold text-slate-900">
+                      <tr key={ch.id} className="hover:bg-danger-50/30 transition">
+                        <td className="py-3 px-3 font-mono font-bold text-neutral-900">
                           {ch.challanNumber}
                         </td>
                         <td className="py-3 px-3">
-                          <span className="font-semibold text-slate-800 block">
+                          <span className="font-semibold text-neutral-900 block">
                             {ch.program?.mainStyle || ch.program?.clientName || 'General Style'}
                           </span>
-                          <span className="text-[10px] font-mono text-fuchsia-700">
+                          <span className="text-[10px] font-mono text-brand-700">
                             Sheet: {ch.program?.programSerialNo || ch.program?.programNumber || '—'}
                           </span>
                         </td>
-                        <td className="py-3 px-3 text-center font-mono font-bold text-rose-700 text-sm">
+                        <td className="py-3 px-3 text-center font-mono font-bold text-danger-700 text-sm">
                           {ch.defectivePieces || 0} {ch.fabricUnit || 'PCS'}
                         </td>
                         <td className="py-3 px-3">
-                          <span className="px-2 py-0.5 rounded font-mono text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
+                          <span className="px-2 py-0.5 rounded font-mono text-[10px] font-bold bg-danger-100 text-danger-800 border border-danger-200">
                             {ch.defectiveShelfLocation || 'DEF-SHELF-EMBROIDERY'}
                           </span>
                         </td>
-                        <td className="py-3 px-3 text-slate-700 max-w-xs">
+                        <td className="py-3 px-3 text-neutral-700 max-w-xs">
                           <div className="font-semibold text-[11px]">{ch.defectReason || 'Broken Stitch'}</div>
-                          <p className="truncate text-[10px] text-slate-500">{ch.remarks || '—'}</p>
+                          <p className="truncate text-[10px] text-neutral-500">{ch.remarks || '—'}</p>
                         </td>
-                        <td className="py-3 px-3 text-slate-600 font-mono text-[11px]">
+                        <td className="py-3 px-3 text-neutral-600 font-mono text-[11px]">
                           {new Date(ch.createdAt).toLocaleDateString('en-GB')}
                         </td>
                         <td className="py-3 px-3 text-right">
                           <Link
                             href={`/challans/${ch.id}`}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-semibold transition"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 rounded-lg text-xs font-semibold transition"
                           >
-                            <FileText className="w-3.5 h-3.5 text-slate-600" />
+                            <FileText className="w-3.5 h-3.5 text-neutral-600" />
                             <span>View Challan</span>
                           </Link>
                         </td>
@@ -1079,27 +1073,27 @@ export default function EmbroideryMyWorkPage() {
 
       {/* POPUP MODAL: "Show production sheet" SELECTION */}
       {showSheetPickerModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="max-w-2xl w-full bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden space-y-4 p-6 my-8">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+        <div className="fixed inset-0 z-50 bg-neutral-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="max-w-2xl w-full bg-white rounded-2xl shadow-2xl border border-neutral-200 overflow-hidden space-y-4 p-6 my-8">
+            <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-teal-600 block">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-brand-600 block">
                   Select Master Record (Rule 1)
                 </span>
-                <h3 className="text-base font-bold text-slate-900">
+                <h3 className="text-base font-bold text-neutral-900">
                   Show Production Sheet for Embroidery
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setShowSheetPickerModal(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
+                className="p-1 rounded-lg text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 transition"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-neutral-500">
               Select an active Production Sheet to automatically populate Design Number, Serial Number, and Material Item measurements.
             </p>
 
@@ -1111,32 +1105,32 @@ export default function EmbroideryMyWorkPage() {
                     applyProgramToForm(prog);
                     setShowSheetPickerModal(false);
                   }}
-                  className="p-3.5 border border-slate-200 rounded-xl hover:border-teal-400 hover:bg-teal-50/40 cursor-pointer transition flex items-center justify-between"
+                  className="p-3.5 border border-neutral-200 rounded-xl hover:border-brand-500 hover:bg-brand-50/40 cursor-pointer transition flex items-center justify-between"
                 >
                   <div>
-                    <span className="font-mono text-xs font-bold text-teal-800">
+                    <span className="font-mono text-xs font-bold text-brand-800">
                       Sheet #{prog.programSerialNo || prog.programNumber}
                     </span>
-                    <h5 className="text-xs font-semibold text-slate-900 mt-0.5">
+                    <h5 className="text-xs font-semibold text-neutral-900 mt-0.5">
                       {prog.clientName || prog.buyerName || 'Client'} · {prog.mainStyle || 'Style'}
                     </h5>
-                    <span className="text-[11px] text-fuchsia-700 font-mono">
+                    <span className="text-[11px] text-brand-700 font-mono">
                       Wilcom: {prog.wilcomDesignNumber || 'WILCOM-STD'}
                     </span>
                   </div>
 
-                  <span className="px-3 py-1 bg-teal-600 text-white rounded-lg text-xs font-bold shadow-2xs">
+                  <span className="px-3 py-1 bg-brand-600 text-white rounded-lg text-xs font-bold shadow-2xs">
                     Select Sheet
                   </span>
                 </div>
               ))}
             </div>
 
-            <div className="pt-2 flex justify-end border-t border-slate-200">
+            <div className="pt-2 flex justify-end border-t border-neutral-200">
               <button
                 type="button"
                 onClick={() => setShowSheetPickerModal(false)}
-                className="px-4 py-2 border border-slate-300 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-50"
+                className="px-4 py-2 border border-neutral-300 rounded-lg text-xs font-bold text-neutral-700 hover:bg-neutral-50"
               >
                 Cancel
               </button>
@@ -1154,73 +1148,73 @@ export default function EmbroideryMyWorkPage() {
 
       {/* POPUP MODAL: CHALLAN CREATED SUCCESSFULLY WITH BARCODE & PRINT (RULE 2) */}
       {createdChallanModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="max-w-2xl w-full bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden space-y-5 p-6 my-8">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+        <div className="fixed inset-0 z-50 bg-neutral-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="max-w-2xl w-full bg-white rounded-2xl shadow-2xl border border-neutral-200 overflow-hidden space-y-5 p-6 my-8">
+            <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                <h3 className="text-base font-bold text-slate-900">
+                <CheckCircle2 className="w-5 h-5 text-accent-700" />
+                <h3 className="text-base font-bold text-neutral-900">
                   Challan Issued Successfully!
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setCreatedChallanModal(null)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
+                className="p-1 rounded-lg text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 transition"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl space-y-2 text-xs">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 block">
+            <div className="p-4 bg-accent-50 border border-accent-200 rounded-xl space-y-2 text-xs">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block">
                 Challan Receipt Confirmed (Rule 2)
               </span>
-              <div className="grid grid-cols-2 gap-2 text-slate-800">
+              <div className="grid grid-cols-2 gap-2 text-neutral-900">
                 <div>
-                  <span className="text-slate-500 text-[10px] block">Challan Number</span>
-                  <strong className="font-mono text-sm text-slate-900">{createdChallanModal.challanNumber}</strong>
+                  <span className="text-neutral-500 text-[10px] block">Challan Number</span>
+                  <strong className="font-mono text-sm text-neutral-900">{createdChallanModal.challanNumber}</strong>
                 </div>
                 <div>
-                  <span className="text-slate-500 text-[10px] block">Destination</span>
-                  <strong className="text-slate-900">Thread Cutting Department</strong>
+                  <span className="text-neutral-500 text-[10px] block">Destination</span>
+                  <strong className="text-neutral-900">Thread Cutting Department</strong>
                 </div>
                 <div>
-                  <span className="text-slate-500 text-[10px] block">Design Number</span>
-                  <strong className="font-mono text-fuchsia-700">{designNumber}</strong>
+                  <span className="text-neutral-500 text-[10px] block">Design Number</span>
+                  <strong className="font-mono text-brand-700">{designNumber}</strong>
                 </div>
                 <div>
-                  <span className="text-slate-500 text-[10px] block">Total Items Transferred</span>
-                  <strong className="text-slate-900">{items.length} Items</strong>
+                  <span className="text-neutral-500 text-[10px] block">Total Items Transferred</span>
+                  <strong className="text-neutral-900">{items.length} Items</strong>
                 </div>
               </div>
             </div>
 
             {/* BARCODE PREVIEW (RULE 2) */}
-            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-center space-y-2">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 block">
+            <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-xl text-center space-y-2">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 block">
                 Security Barcode Identification
               </span>
-              <div className="font-mono font-bold tracking-[0.3em] text-lg text-slate-800 py-2 border-y border-dashed border-slate-300">
+              <div className="font-mono font-bold tracking-[0.3em] text-lg text-neutral-900 py-2 border-y border-dashed border-neutral-300">
                 *{createdChallanModal.challanNumber}*
               </div>
-              <span className="text-[10px] text-slate-500">
+              <span className="text-[10px] text-neutral-500">
                 Scan barcode at Thread Cutting receipt terminal to acknowledge.
               </span>
             </div>
 
-            <div className="pt-2 flex flex-wrap items-center justify-end gap-2 border-t border-slate-200">
+            <div className="pt-2 flex flex-wrap items-center justify-end gap-2 border-t border-neutral-200">
               <button
                 type="button"
                 onClick={() => setCreatedChallanModal(null)}
-                className="px-4 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                className="px-4 py-2 border border-neutral-300 rounded-lg text-xs font-semibold text-neutral-700 hover:bg-neutral-50"
               >
                 Create Another Challan
               </button>
               <button
                 type="button"
                 onClick={() => downloadChallanHtml(createdChallanModal)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 rounded-lg text-xs font-bold transition"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-brand-50 hover:bg-brand-100 text-brand-800 border border-brand-200 rounded-lg text-xs font-bold transition"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>Download Challan</span>
@@ -1228,7 +1222,7 @@ export default function EmbroideryMyWorkPage() {
               <button
                 type="button"
                 onClick={() => printChallan(createdChallanModal)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-lg text-xs font-bold transition"
               >
                 <Printer className="w-3.5 h-3.5" />
                 <span>Print Challan</span>
@@ -1238,24 +1232,24 @@ export default function EmbroideryMyWorkPage() {
                   <button
                     type="button"
                     onClick={() => setShowSheetDetailModal(selectedProgram)}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-300 rounded-lg text-xs font-bold transition"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-brand-50 hover:bg-brand-100 text-brand-900 border border-brand-300 rounded-lg text-xs font-bold transition"
                   >
-                    <FileText className="w-3.5 h-3.5 text-teal-700" />
+                    <FileText className="w-3.5 h-3.5 text-brand-700" />
                     <span>View Production Sheet</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => downloadProductionSheetHtml(selectedProgram)}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-300 rounded-lg text-xs font-bold transition"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-brand-50 hover:bg-brand-100 text-brand-800 border border-brand-300 rounded-lg text-xs font-bold transition"
                   >
-                    <Download className="w-3.5 h-3.5 text-sky-700" />
+                    <Download className="w-3.5 h-3.5 text-brand-700" />
                     <span>Download Sheet</span>
                   </button>
                 </>
               )}
               <Link
                 href={`/challans/${createdChallanModal.id}`}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-bold shadow-xs transition"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold shadow-xs transition"
               >
                 <Eye className="w-3.5 h-3.5" />
                 <span>View Full Challan Slip</span>

@@ -387,14 +387,14 @@ export function ColorFabricMeasurementTable({
     <div className="space-y-4">
       {/* 1. DEPARTMENT FABRIC / PIECE TRACKING CONTROLLER */}
       {trackingControllerVisible && (
-        <div className="bg-slate-900 text-white rounded-xl p-4 border border-slate-700/60 space-y-3">
-          <div className="flex items-center justify-between pb-2 border-b border-slate-700/60">
+        <div className="bg-brand-50 text-neutral-900 rounded-xl p-4 border border-brand-200 space-y-3">
+          <div className="flex items-center justify-between pb-2 border-b border-neutral-200">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-200">
+              <span className="text-xs font-bold uppercase tracking-wider text-neutral-900">
                 Fabric Tracking
               </span>
               {detectedFromDept && (
-                <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                <span className="text-[10px] font-mono text-accent-700 bg-accent-400/10 px-1.5 py-0.5 rounded border border-accent-500/20">
                   {detectedFromDept}
                 </span>
               )}
@@ -405,32 +405,32 @@ export function ColorFabricMeasurementTable({
                 type="button"
                 onClick={() => runAutoDetection()}
                 disabled={autoDetecting}
-                className="inline-flex items-center gap-1.5 px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded border border-slate-700 transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-2 py-1 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-medium rounded border border-neutral-200 transition cursor-pointer"
                 title="Sync from previous department"
               >
-                <RefreshCw className={`w-3 h-3 ${autoDetecting ? 'animate-spin text-amber-400' : ''}`} />
+                <RefreshCw className={`w-3 h-3 ${autoDetecting ? 'animate-spin text-accent-700' : ''}`} />
                 <span>{autoDetecting ? 'Syncing...' : 'Sync'}</span>
               </button>
             )}
           </div>
 
           {autoDetectMessage && (
-            <div className="px-2.5 py-1 bg-emerald-950/60 border border-emerald-500/30 rounded text-xs text-emerald-300 flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-emerald-400" />
+            <div className="px-2.5 py-1 bg-accent-50 border border-accent-500/30 rounded text-xs text-accent-700 flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-accent-700" />
               <span>{autoDetectMessage}</span>
             </div>
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {/* IN */}
-            <div className="bg-slate-800/90 border border-slate-700/70 rounded-lg p-3 space-y-1.5">
-              <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+            <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-3 space-y-1.5">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-neutral-500">
                 In
               </div>
               <div className="flex items-center gap-2">
                 {readOnly ? (
-                  <div className="text-xl font-mono font-bold text-white py-1">
-                    {fabricIn} <span className="text-xs text-slate-400 font-normal">{fabricUnit}</span>
+                  <div className="text-xl font-mono font-bold text-neutral-900 py-1">
+                    {fabricIn} <span className="text-xs text-neutral-500 font-normal">{fabricUnit}</span>
                   </div>
                 ) : (
                   <>
@@ -440,13 +440,13 @@ export function ColorFabricMeasurementTable({
                       min="0"
                       value={fabricIn}
                       onChange={(e) => setFabricIn(Math.max(0, parseFloat(e.target.value) || 0))}
-                      className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-600 rounded text-sm font-mono font-bold text-white focus:outline-none focus:border-slate-400"
+                      className="w-full px-2.5 py-1.5 bg-white border border-neutral-300 rounded text-sm font-mono font-bold text-neutral-900 focus:outline-none focus:border-brand-500"
                       placeholder="0"
                     />
                     <select
                       value={fabricUnit}
                       onChange={(e) => setFabricUnit(e.target.value as 'MTR' | 'PCS')}
-                      className="px-2 py-1.5 bg-slate-900 border border-slate-600 rounded text-xs font-bold text-slate-200 focus:outline-none cursor-pointer"
+                      className="px-2 py-1.5 bg-white border border-neutral-200 rounded text-xs font-bold text-neutral-900 focus:outline-none cursor-pointer"
                     >
                       <option value="MTR">MTR</option>
                       <option value="PCS">PCS</option>
@@ -457,14 +457,14 @@ export function ColorFabricMeasurementTable({
             </div>
 
             {/* DEFECTIVE */}
-            <div className="bg-slate-800/90 border border-slate-700/70 rounded-lg p-3 space-y-1.5">
-              <div className="text-[11px] font-bold uppercase tracking-wider text-rose-400">
+            <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-3 space-y-1.5">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-danger-600">
                 Defective
               </div>
               <div className="flex items-center gap-2">
                 {readOnly ? (
-                  <div className="text-xl font-mono font-bold text-rose-300 py-1">
-                    {defectivePieces} <span className="text-xs text-rose-400 font-normal">{fabricUnit}</span>
+                  <div className="text-xl font-mono font-bold text-danger-600 py-1">
+                    {defectivePieces} <span className="text-xs text-danger-600 font-normal">{fabricUnit}</span>
                   </div>
                 ) : (
                   <input
@@ -474,7 +474,7 @@ export function ColorFabricMeasurementTable({
                     max={fabricIn}
                     value={defectivePieces}
                     onChange={(e) => setDefectivePieces(Math.max(0, Math.min(fabricIn, parseFloat(e.target.value) || 0)))}
-                    className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-600 rounded text-sm font-mono font-bold text-rose-300 focus:outline-none focus:border-rose-400"
+                    className="w-full px-2.5 py-1.5 bg-white border border-neutral-200 rounded text-sm font-mono font-bold text-danger-600 focus:outline-none focus:border-danger-500"
                     placeholder="0"
                   />
                 )}
@@ -485,7 +485,7 @@ export function ColorFabricMeasurementTable({
                   <select
                     value={defectReason}
                     onChange={(e) => setDefectReason(e.target.value)}
-                    className="w-full px-2 py-1 bg-slate-900 border border-slate-700 rounded text-xs text-rose-200 focus:outline-none cursor-pointer"
+                    className="w-full px-2 py-1 bg-white border border-neutral-200 rounded text-xs text-danger-800 focus:outline-none cursor-pointer"
                   >
                     <option value="Broken Stitch / Needle Holes">Broken Stitch / Needle Holes</option>
                     <option value="Fabric Stain / Oil Marks">Fabric Stain / Oil Marks</option>
@@ -499,7 +499,7 @@ export function ColorFabricMeasurementTable({
                   <select
                     value={defectiveShelfLocation}
                     onChange={(e) => setDefectiveShelfLocation(e.target.value)}
-                    className="w-full px-2 py-1 bg-slate-900 border border-slate-700 rounded text-xs font-mono text-amber-300 focus:outline-none cursor-pointer"
+                    className="w-full px-2 py-1 bg-white border border-neutral-200 rounded text-xs font-mono text-accent-700 focus:outline-none cursor-pointer"
                   >
                     {currentDepartment && (
                       <option value={getDeptDefaultShelf(currentDepartment)}>
@@ -539,20 +539,20 @@ export function ColorFabricMeasurementTable({
             </div>
 
             {/* OUT */}
-            <div className="bg-slate-800/90 border border-slate-700/70 rounded-lg p-3 space-y-1.5">
-              <div className="text-[11px] font-bold uppercase tracking-wider text-emerald-400">
+            <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-3 space-y-1.5">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">
                 Out
               </div>
               <div className="flex items-center justify-between gap-2">
-                <div className="text-xl font-mono font-bold text-emerald-300 py-1">
-                  {fabricOut} <span className="text-xs text-emerald-400 font-normal">{fabricUnit}</span>
+                <div className="text-xl font-mono font-bold text-neutral-900 py-1">
+                  {fabricOut} <span className="text-xs text-accent-700 font-normal">{fabricUnit}</span>
                 </div>
 
                 {!readOnly && (
                   <button
                     type="button"
                     onClick={handleSyncToItems}
-                    className="px-2 py-1 bg-emerald-700 hover:bg-emerald-600 text-white text-[10px] font-bold rounded transition cursor-pointer"
+                    className="px-2 py-1 bg-accent-500 hover:bg-accent-600 text-neutral-900 text-[10px] font-bold rounded transition cursor-pointer"
                     title="Populate table items"
                   >
                     Sync to Items
@@ -569,14 +569,14 @@ export function ColorFabricMeasurementTable({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-800">
+            <span className="text-xs font-bold uppercase tracking-wider text-neutral-900">
               COLOR / FABRIC / MEASUREMENT SPECIFICATIONS
             </span>
-            <span className="text-[10px] font-mono font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full border border-slate-200">
+            <span className="text-[10px] font-mono font-bold bg-neutral-100 text-neutral-600 px-2 py-0.5 rounded-full border border-neutral-200">
               {items.length} {items.length === 1 ? 'Item' : 'Items'}
             </span>
           </div>
-          <p className="text-[11px] text-slate-500 mt-0.5">
+          <p className="text-[11px] text-neutral-500 mt-0.5">
             Specify color, fabric composition, exact measurement, and unit (meters or pieces).
           </p>
         </div>
@@ -585,7 +585,7 @@ export function ColorFabricMeasurementTable({
           <button
             type="button"
             onClick={handleAddItem}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg shadow-xs transition shrink-0 self-start sm:self-auto cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-lg shadow-xs transition shrink-0 self-start sm:self-auto cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add Item</span>
@@ -594,27 +594,27 @@ export function ColorFabricMeasurementTable({
       </div>
 
       {/* 3. ITEMS TABLE */}
-      <div className="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
+      <div className="border border-neutral-200 rounded-xl overflow-hidden bg-white shadow-2xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold uppercase text-[10px] tracking-wider">
+            <thead className="bg-neutral-50 border-b border-neutral-200 text-neutral-600 font-semibold uppercase text-[10px] tracking-wider">
               <tr>
                 <th className="py-2.5 px-3 w-10 text-center">#</th>
                 <th className="py-2.5 px-3 min-w-[140px]">
-                  Fabric Name / Spec <span className="text-rose-500">*</span>
+                  Fabric Name / Spec <span className="text-danger-600">*</span>
                 </th>
                 <th className="py-2.5 px-3 min-w-[120px]">
                   {context === 'STORE_DYEING' ? 'Base / Current Color' : 'Color / Shade'}{' '}
-                  <span className="text-rose-500">*</span>
+                  <span className="text-danger-600">*</span>
                 </th>
                 {showRequiredDyeColor && (
                   <th className="py-2.5 px-3 min-w-[120px]">
-                    Required Dye Color <span className="text-rose-500">*</span>
+                    Required Dye Color <span className="text-danger-600">*</span>
                   </th>
                 )}
                 {showActualDyedColor && (
                   <th className="py-2.5 px-3 min-w-[120px]">
-                    Actual Dyed Color <span className="text-rose-500">*</span>
+                    Actual Dyed Color <span className="text-danger-600">*</span>
                   </th>
                 )}
                 {showProcessingStatus && (
@@ -626,15 +626,15 @@ export function ColorFabricMeasurementTable({
                     : context === 'STORE_DYEING'
                     ? 'Fabric Qty Issued'
                     : 'Measurement / Qty'}{' '}
-                  <span className="text-rose-500">*</span>
+                  <span className="text-danger-600">*</span>
                 </th>
                 {showRequiredDyeQty && (
                   <th className="py-2.5 px-3 w-32">
-                    Required Qty to Dye <span className="text-rose-500">*</span>
+                    Required Qty to Dye <span className="text-danger-600">*</span>
                   </th>
                 )}
                 <th className="py-2.5 px-3 w-24">
-                  Unit <span className="text-rose-500">*</span>
+                  Unit <span className="text-danger-600">*</span>
                 </th>
                 <th className="py-2.5 px-3 min-w-[130px]">Remarks / Roll #</th>
                 {!readOnly && (
@@ -642,19 +642,19 @@ export function ColorFabricMeasurementTable({
                 )}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-neutral-100">
               {items.map((item, idx) => {
                 const itemError = errors[`item_${idx}`];
                 return (
-                  <tr key={item.id || idx} className="hover:bg-slate-50/60 transition">
-                    <td className="py-2 px-3 text-center text-slate-400 font-mono font-bold">
+                  <tr key={item.id || idx} className="hover:bg-neutral-50/60 transition">
+                    <td className="py-2 px-3 text-center text-neutral-500 font-mono font-bold">
                       {idx + 1}
                     </td>
 
                     {/* FABRIC */}
                     <td className="py-2 px-3">
                       {readOnly ? (
-                        <span className="font-semibold text-slate-900">{item.fabric || '—'}</span>
+                        <span className="font-semibold text-neutral-900">{item.fabric || '—'}</span>
                       ) : (
                         <input
                           type="text"
@@ -663,7 +663,7 @@ export function ColorFabricMeasurementTable({
                           onChange={(e) => handleFieldChange(idx, 'fabric', e.target.value)}
                           onFocus={(e) => e.target.select()}
                           placeholder=""
-                          className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 transition"
+                          className="w-full px-2.5 py-1.5 bg-white border border-neutral-300 rounded-lg text-xs text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500/40 transition"
                         />
                       )}
                     </td>
@@ -671,7 +671,7 @@ export function ColorFabricMeasurementTable({
                     {/* COLOR */}
                     <td className="py-2 px-3">
                       {readOnly ? (
-                        <span className="text-slate-800">{item.color || '—'}</span>
+                        <span className="text-neutral-900">{item.color || '—'}</span>
                       ) : (
                         <div className="space-y-1.5">
                           <input
@@ -681,12 +681,12 @@ export function ColorFabricMeasurementTable({
                             onChange={(e) => handleFieldChange(idx, 'color', e.target.value)}
                             onFocus={(e) => e.target.select()}
                             placeholder=""
-                            className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 transition"
+                            className="w-full px-2.5 py-1.5 bg-white border border-neutral-300 rounded-lg text-xs text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500/40 transition"
                           />
                           <button
                             type="button"
                             onClick={() => handleAddColorMeasurement(idx)}
-                            className="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-600 hover:text-slate-900 transition cursor-pointer whitespace-nowrap"
+                            className="inline-flex items-center gap-1 text-[10px] font-semibold text-neutral-600 hover:text-neutral-900 transition cursor-pointer whitespace-nowrap"
                             title="Add another color with its own measurement"
                           >
                             <Plus className="w-3 h-3" />
@@ -700,7 +700,7 @@ export function ColorFabricMeasurementTable({
                     {showRequiredDyeColor && (
                       <td className="py-2 px-3">
                         {readOnly ? (
-                          <span className="font-semibold text-purple-900">{item.requiredDyeColor || '—'}</span>
+                          <span className="font-semibold text-brand-900">{item.requiredDyeColor || '—'}</span>
                         ) : (
                           <input
                             type="text"
@@ -709,7 +709,7 @@ export function ColorFabricMeasurementTable({
                             onChange={(e) => handleFieldChange(idx, 'requiredDyeColor', e.target.value)}
                             onFocus={(e) => e.target.select()}
                             placeholder=""
-                            className="w-full px-2.5 py-1.5 bg-white border border-purple-300 rounded-lg text-xs font-semibold text-purple-950 focus:outline-none focus:ring-1 focus:ring-purple-600 transition"
+                            className="w-full px-2.5 py-1.5 bg-white border border-brand-300 rounded-lg text-xs font-semibold text-brand-900 focus:outline-none focus:ring-1 focus:ring-brand-500 transition"
                           />
                         )}
                       </td>
@@ -719,7 +719,7 @@ export function ColorFabricMeasurementTable({
                     {showActualDyedColor && (
                       <td className="py-2 px-3">
                         {readOnly ? (
-                          <span className="font-semibold text-slate-900">{item.actualDyedColor || '—'}</span>
+                          <span className="font-semibold text-neutral-900">{item.actualDyedColor || '—'}</span>
                         ) : (
                           <input
                             type="text"
@@ -728,7 +728,7 @@ export function ColorFabricMeasurementTable({
                             onChange={(e) => handleFieldChange(idx, 'actualDyedColor', e.target.value)}
                             onFocus={(e) => e.target.select()}
                             placeholder=""
-                            className="w-full px-2.5 py-1.5 bg-white border border-purple-300 rounded-lg text-xs font-semibold text-slate-900 focus:outline-none focus:ring-1 focus:ring-purple-600 transition"
+                            className="w-full px-2.5 py-1.5 bg-white border border-brand-300 rounded-lg text-xs font-semibold text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 transition"
                           />
                         )}
                       </td>
@@ -741,8 +741,8 @@ export function ColorFabricMeasurementTable({
                           <span
                             className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${
                               item.fabricProcessingStatus === 'Undyed'
-                                ? 'bg-amber-100 text-amber-900 border border-amber-200'
-                                : 'bg-purple-100 text-purple-900 border border-purple-200'
+                                ? 'bg-accent-100 text-accent-800 border border-accent-200'
+                                : 'bg-brand-100 text-brand-900 border border-brand-200'
                             }`}
                           >
                             {item.fabricProcessingStatus || (context === 'STORE_EMBROIDERY' ? 'Undyed' : 'Dyed')}
@@ -753,7 +753,7 @@ export function ColorFabricMeasurementTable({
                             onChange={(e) =>
                               handleFieldChange(idx, 'fabricProcessingStatus', e.target.value as 'Dyed' | 'Undyed')
                             }
-                            className="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-900 transition cursor-pointer"
+                            className="w-full px-2 py-1.5 bg-white border border-neutral-300 rounded-lg text-xs font-semibold text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500/40 transition cursor-pointer"
                           >
                             <option value="Dyed">Dyed</option>
                             <option value="Undyed">Undyed</option>
@@ -765,7 +765,7 @@ export function ColorFabricMeasurementTable({
                     {/* MEASUREMENT / QUANTITY */}
                     <td className="py-2 px-3">
                       {readOnly ? (
-                        <span className="font-mono font-bold text-slate-900">{item.measurement || '0'}</span>
+                        <span className="font-mono font-bold text-neutral-900">{item.measurement || '0'}</span>
                       ) : (
                         <input
                           type="number"
@@ -776,7 +776,7 @@ export function ColorFabricMeasurementTable({
                           onChange={(e) => handleFieldChange(idx, 'measurement', e.target.value)}
                           onFocus={(e) => e.target.select()}
                           placeholder="0.00"
-                          className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 transition"
+                          className="w-full px-2.5 py-1.5 bg-white border border-neutral-300 rounded-lg text-xs font-mono font-bold text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500/40 transition"
                         />
                       )}
                     </td>
@@ -785,7 +785,7 @@ export function ColorFabricMeasurementTable({
                     {showRequiredDyeQty && (
                       <td className="py-2 px-3">
                         {readOnly ? (
-                          <span className="font-mono font-bold text-purple-900">{item.requiredDyeQuantity || item.measurement || '0'}</span>
+                          <span className="font-mono font-bold text-brand-900">{item.requiredDyeQuantity || item.measurement || '0'}</span>
                         ) : (
                           <input
                             type="number"
@@ -796,7 +796,7 @@ export function ColorFabricMeasurementTable({
                             onChange={(e) => handleFieldChange(idx, 'requiredDyeQuantity', e.target.value)}
                             onFocus={(e) => e.target.select()}
                             placeholder="0.00"
-                            className="w-full px-2.5 py-1.5 bg-white border border-purple-300 rounded-lg text-xs font-mono font-bold text-purple-950 focus:outline-none focus:ring-1 focus:ring-purple-600 transition"
+                            className="w-full px-2.5 py-1.5 bg-white border border-brand-300 rounded-lg text-xs font-mono font-bold text-brand-900 focus:outline-none focus:ring-1 focus:ring-brand-500 transition"
                           />
                         )}
                       </td>
@@ -805,12 +805,12 @@ export function ColorFabricMeasurementTable({
                     {/* UNIT (MTR or PCS strictly) */}
                     <td className="py-2 px-3">
                       {readOnly ? (
-                        <span className="font-bold text-slate-700">{item.unit || 'MTR'}</span>
+                        <span className="font-bold text-neutral-700">{item.unit || 'MTR'}</span>
                       ) : (
                         <select
                           value={item.unit || 'MTR'}
                           onChange={(e) => handleFieldChange(idx, 'unit', e.target.value as 'MTR' | 'PCS')}
-                          className="w-full px-2 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-900 transition cursor-pointer"
+                          className="w-full px-2 py-1.5 bg-white border border-neutral-300 rounded-lg text-xs font-bold text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500/40 transition cursor-pointer"
                         >
                           <option value="MTR">MTR (Meters)</option>
                           <option value="PCS">PCS (Pieces)</option>
@@ -821,7 +821,7 @@ export function ColorFabricMeasurementTable({
                     {/* REMARKS */}
                     <td className="py-2 px-3">
                       {readOnly ? (
-                        <span className="text-slate-600">{item.remarks || '—'}</span>
+                        <span className="text-neutral-600">{item.remarks || '—'}</span>
                       ) : (
                         <input
                           type="text"
@@ -829,7 +829,7 @@ export function ColorFabricMeasurementTable({
                           onChange={(e) => handleFieldChange(idx, 'remarks', e.target.value)}
                           onFocus={(e) => e.target.select()}
                           placeholder=""
-                          className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs text-slate-600 focus:outline-none focus:ring-1 focus:ring-slate-900 transition"
+                          className="w-full px-2.5 py-1.5 bg-white border border-neutral-300 rounded-lg text-xs text-neutral-600 focus:outline-none focus:ring-1 focus:ring-brand-500/40 transition"
                         />
                       )}
                     </td>
@@ -840,7 +840,7 @@ export function ColorFabricMeasurementTable({
                         <button
                           type="button"
                           onClick={() => handleRemoveItem(idx)}
-                          className="p-1.5 text-slate-400 hover:text-rose-600 rounded-md hover:bg-rose-50 transition cursor-pointer"
+                          className="p-1.5 text-neutral-500 hover:text-danger-600 rounded-md hover:bg-danger-50 transition cursor-pointer"
                           title="Remove item"
                         >
                           <Trash2 className="w-3.5 h-3.5" />

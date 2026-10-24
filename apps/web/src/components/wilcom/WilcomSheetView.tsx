@@ -191,18 +191,18 @@ export function WilcomSheetView({
   return (
     <div className="space-y-4">
       {(loading || error) && (
-        <div className={`rounded-md px-3 py-2 text-xs ${error ? 'bg-rose-50 text-rose-800' : 'bg-blue-50 text-blue-800'}`}>
+        <div className={`rounded-md px-3 py-2 text-xs ${error ? 'bg-danger-50 text-danger-800' : 'bg-brand-50 text-brand-800'}`}>
           {error || 'Loading Wilcom artwork and production details…'}
         </div>
       )}
       {/* HEADER & ACTION BAR */}
       {showActions && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-neutral-200 pb-3">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 bg-neutral-100 px-2 py-0.5 rounded border border-neutral-200">
               Wilcom Specifications &middot; {displayEntries.length} {displayEntries.length === 1 ? 'Design' : 'Designs'}
             </span>
-            <h4 className="text-sm font-bold text-slate-900 mt-1 tracking-tight">
+            <h4 className="text-sm font-bold text-neutral-900 mt-1 tracking-tight">
               Embroidery Artwork &amp; Design Numbers
             </h4>
           </div>
@@ -211,7 +211,7 @@ export function WilcomSheetView({
             <button
               type="button"
               onClick={handlePrint}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#163767] hover:bg-[#0F264A] text-white text-xs font-semibold rounded-lg shadow-2xs transition cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-lg shadow-2xs transition cursor-pointer"
             >
               <Printer className="w-3.5 h-3.5" />
               <span>Print Wilcom Sheet</span>
@@ -219,7 +219,7 @@ export function WilcomSheetView({
             <button
               type="button"
               onClick={handleDownload}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-black text-white text-xs font-semibold rounded-lg shadow-2xs transition cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-lg shadow-2xs transition cursor-pointer"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Download Wilcom Sheet</span>
@@ -228,7 +228,7 @@ export function WilcomSheetView({
               <button
                 type="button"
                 onClick={onOpenPrintModal}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-300 text-slate-800 text-xs font-semibold rounded-lg hover:bg-slate-50 transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-neutral-300 text-neutral-900 text-xs font-semibold rounded-lg hover:bg-neutral-50 transition cursor-pointer"
               >
                 <Eye className="w-3.5 h-3.5" />
                 <span>Preview</span>
@@ -246,27 +246,27 @@ export function WilcomSheetView({
             return (
               <div 
                 key={entry.id || idx} 
-                className="p-4 border border-slate-200 rounded-xl bg-white space-y-3 shadow-2xs hover:border-slate-300 transition"
+                className="p-4 border border-neutral-200 rounded-xl bg-white space-y-3 shadow-2xs hover:border-neutral-300 transition"
               >
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-100 pb-2">
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${
                     entry.category === 'TOP'
-                      ? 'bg-blue-50 text-blue-900 border border-blue-200'
+                      ? 'bg-brand-50 text-brand-900 border border-brand-200'
                       : entry.category === 'BOTTOM'
-                        ? 'bg-emerald-50 text-emerald-900 border border-emerald-200'
+                        ? 'bg-accent-50 text-accent-800 border border-accent-200'
                         : entry.category === 'DUPATTA'
-                          ? 'bg-amber-50 text-amber-900 border border-amber-200'
-                          : 'bg-slate-100 text-slate-800 border border-slate-200'
+                          ? 'bg-accent-50 text-accent-800 border border-accent-200'
+                          : 'bg-neutral-100 text-neutral-900 border border-neutral-200'
                   }`}>
                     WILCOM {entry.category}
                   </span>
-                  <span className="min-w-0 max-w-full sm:max-w-[58%] break-all text-right font-mono text-[11px] leading-tight font-bold text-slate-900">
+                  <span className="min-w-0 max-w-full sm:max-w-[58%] break-all text-right font-mono text-[11px] leading-tight font-bold text-neutral-900">
                     {entry.wilcomDesignNumber || '—'}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-[140px_1fr] gap-4 items-start">
-                  <div className="w-[140px] h-[140px] border border-slate-200 rounded-lg bg-slate-50 flex flex-col items-center justify-center overflow-hidden shrink-0 relative group">
+                  <div className="w-[140px] h-[140px] border border-neutral-200 rounded-lg bg-neutral-50 flex flex-col items-center justify-center overflow-hidden shrink-0 relative group">
                     {photo ? (
                       <>
                         <img
@@ -276,16 +276,16 @@ export function WilcomSheetView({
                           onClick={() => setViewingPhoto(photo)}
                           title="Click to view full photo"
                         />
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
+                        <div className="absolute inset-0 bg-neutral-900/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
                           <button
                             type="button"
                             onClick={() => setViewingPhoto(photo)}
-                            className="p-1.5 bg-white/90 hover:bg-white text-slate-800 rounded-full shadow-xs cursor-pointer"
+                            className="p-1.5 bg-white/90 hover:bg-white text-neutral-900 rounded-full shadow-xs cursor-pointer"
                             title="View full size"
                           >
                             <Eye className="w-3.5 h-3.5" />
                           </button>
-                          <label className="p-1.5 bg-white/90 hover:bg-white text-slate-800 rounded-full shadow-xs cursor-pointer" title="Change photo">
+                          <label className="p-1.5 bg-white/90 hover:bg-white text-neutral-900 rounded-full shadow-xs cursor-pointer" title="Change photo">
                             <Upload className="w-3.5 h-3.5" />
                             <input
                               type="file"
@@ -298,11 +298,11 @@ export function WilcomSheetView({
                       </>
                     ) : (
                       <div className="text-center p-2.5 flex flex-col items-center justify-center gap-1.5">
-                        <ImageIcon className="w-6 h-6 text-slate-300" />
-                        <span className="text-[10px] text-slate-400 font-semibold">
+                        <ImageIcon className="w-6 h-6 text-neutral-700" />
+                        <span className="text-[10px] text-neutral-500 font-semibold">
                           No Artwork Photo
                         </span>
-                        <label className="inline-flex items-center gap-1 px-2 py-0.5 bg-white hover:bg-slate-100 text-[#163767] border border-slate-300 rounded text-[10px] font-bold shadow-2xs cursor-pointer transition">
+                        <label className="inline-flex items-center gap-1 px-2 py-0.5 bg-white hover:bg-neutral-100 text-brand-600 border border-neutral-300 rounded text-[10px] font-bold shadow-2xs cursor-pointer transition">
                           <Upload className="w-3 h-3" />
                           <span>{uploading ? '...' : 'Upload'}</span>
                           <input
@@ -319,32 +319,32 @@ export function WilcomSheetView({
 
                   <div className="space-y-1.5 text-xs">
                     <div>
-                      <span className="text-slate-400 block text-[10px]">Design Number:</span>
-                      <span className="font-mono font-bold text-slate-900 text-xs">{designNo}</span>
+                      <span className="text-neutral-500 block text-[10px]">Design Number:</span>
+                      <span className="font-mono font-bold text-neutral-900 text-xs">{designNo}</span>
                     </div>
                     <div>
-                      <span className="text-slate-400 block text-[10px]">Serial Number:</span>
-                      <span className="font-mono font-bold text-slate-900 text-xs">{serialNo}</span>
+                      <span className="text-neutral-500 block text-[10px]">Serial Number:</span>
+                      <span className="font-mono font-bold text-neutral-900 text-xs">{serialNo}</span>
                     </div>
                     <div>
-                      <span className="text-slate-400 block text-[10px]">Main Style:</span>
-                      <span className="font-bold text-slate-800 text-xs">{mainStyleVal}</span>
+                      <span className="text-neutral-500 block text-[10px]">Main Style:</span>
+                      <span className="font-bold text-neutral-900 text-xs">{mainStyleVal}</span>
                     </div>
                     <div>
-                      <span className="text-slate-400 block text-[10px]">Style:</span>
-                      <span className="font-semibold text-slate-800 text-xs">{entry.styleName || styleVal}</span>
+                      <span className="text-neutral-500 block text-[10px]">Style:</span>
+                      <span className="font-semibold text-neutral-900 text-xs">{entry.styleName || styleVal}</span>
                     </div>
                     {photo && (
                       <div className="flex items-center gap-3 pt-1">
                         <button
                           type="button"
                           onClick={() => setViewingPhoto(photo)}
-                          className="text-[11px] font-semibold text-[#163767] hover:underline flex items-center gap-1 cursor-pointer"
+                          className="text-[11px] font-semibold text-brand-600 hover:underline flex items-center gap-1 cursor-pointer"
                         >
                           <Eye className="w-3.5 h-3.5" />
                           <span>View Full Photo</span>
                         </button>
-                        <label className="text-[11px] font-semibold text-slate-600 hover:text-slate-900 hover:underline flex items-center gap-1 cursor-pointer">
+                        <label className="text-[11px] font-semibold text-neutral-600 hover:text-neutral-900 hover:underline flex items-center gap-1 cursor-pointer">
                           <Upload className="w-3.5 h-3.5" />
                           <span>Change Photo</span>
                           <input
@@ -363,7 +363,7 @@ export function WilcomSheetView({
           })}
         </div>
       ) : (
-        <div className="p-8 text-center border border-dashed border-slate-200 rounded-xl bg-white text-slate-400 text-xs">
+        <div className="p-8 text-center border border-dashed border-neutral-200 rounded-xl bg-white text-neutral-500 text-xs">
           No Wilcom designs recorded.
         </div>
       )}
@@ -371,7 +371,7 @@ export function WilcomSheetView({
       {/* FULL-SIZE PHOTO LIGHTBOX MODAL */}
       {viewingPhoto && (
         <div
-          className="fixed inset-0 z-60 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150"
+          className="fixed inset-0 z-60 bg-neutral-900/85 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150"
           onClick={() => setViewingPhoto(null)}
         >
           <div
@@ -381,7 +381,7 @@ export function WilcomSheetView({
             <button
               type="button"
               onClick={() => setViewingPhoto(null)}
-              className="absolute -top-3 -right-3 w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-black shadow-lg transition cursor-pointer"
+              className="absolute -top-3 -right-3 w-9 h-9 rounded-full bg-white text-neutral-900 flex items-center justify-center hover:bg-neutral-900 shadow-lg transition cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>

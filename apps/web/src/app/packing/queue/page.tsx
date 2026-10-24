@@ -83,21 +83,21 @@ export default function PackingQueuePage() {
   }, [loadQueue]);
 
   return (
-    <div className="min-h-screen bg-slate-950 px-4 py-8 text-slate-100 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-canvas px-4 py-8 text-neutral-900 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl space-y-6">
         {/* HEADER */}
         <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div>
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/30">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-brand-500/10 text-brand-600 border border-brand-500/30">
                 <ClipboardList className="w-3.5 h-3.5" />
                 Floor Worklist
               </span>
             </div>
-            <h1 className="mt-2 text-3xl font-extrabold text-white tracking-tight">
+            <h1 className="mt-2 text-3xl font-extrabold text-neutral-900 tracking-tight">
               Packing Queue
             </h1>
-            <p className="mt-1 text-sm text-slate-400">
+            <p className="mt-1 text-sm text-neutral-500">
               Active production jobs received on the floor ready for boxing, barcode assignment, and Finished Goods transfer.
             </p>
           </div>
@@ -106,14 +106,14 @@ export default function PackingQueuePage() {
             <button
               onClick={() => void loadQueue()}
               disabled={loading}
-              className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800/80 px-3.5 py-2 text-xs font-semibold text-slate-200 transition hover:bg-slate-700 hover:text-white disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-lg border border-neutral-200 bg-neutral-50 px-3.5 py-2 text-xs font-semibold text-neutral-900 transition hover:bg-neutral-200 hover:text-neutral-900 disabled:opacity-50"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-amber-400' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-accent-700' : ''}`} />
               <span>Refresh</span>
             </button>
             <Link
               href="/packing/incoming"
-              className="inline-flex items-center gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 px-3.5 py-2 text-xs font-bold text-amber-300 transition hover:bg-amber-500/20"
+              className="inline-flex items-center gap-2 rounded-lg border border-accent-500/40 bg-accent-400/10 px-3.5 py-2 text-xs font-bold text-accent-700 transition hover:bg-accent-400/20"
             >
               <Clock className="w-4 h-4" />
               <span>Inward Transfers</span>
@@ -122,14 +122,14 @@ export default function PackingQueuePage() {
         </header>
 
         {error && (
-          <div className="rounded-xl border border-rose-500/40 bg-rose-500/10 p-4 text-sm text-rose-300 flex items-center gap-3">
-            <AlertTriangle className="w-5 h-5 shrink-0 text-rose-400" />
+          <div className="rounded-xl border border-danger-500/40 bg-danger-500/10 p-4 text-sm text-danger-600 flex items-center gap-3">
+            <AlertTriangle className="w-5 h-5 shrink-0 text-danger-600" />
             <p className="font-semibold">{error}</p>
           </div>
         )}
 
         {/* FILTERS */}
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 bg-white p-4 rounded-xl border border-neutral-200">
           <div className="flex flex-wrap items-center gap-1.5">
             {[
               { id: 'ACTIVE', label: 'Active Jobs (Ready / In Progress)' },
@@ -143,8 +143,8 @@ export default function PackingQueuePage() {
                 onClick={() => setStatusFilter(tab.id)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
                   statusFilter === tab.id
-                    ? 'bg-amber-500 text-slate-950 shadow-sm'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                    ? 'bg-accent-400 text-neutral-900 shadow-sm'
+                    : 'text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900'
                 }`}
               >
                 {tab.label}
@@ -153,13 +153,13 @@ export default function PackingQueuePage() {
           </div>
 
           <div className="relative w-full md:w-72">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" />
             <input
               type="text"
               placeholder="Search Challan #, Prog #, Style..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-700/80 rounded-lg pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 transition"
+              className="w-full bg-canvas border border-neutral-200 rounded-lg pl-9 pr-3 py-2 text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-brand-500 transition"
             />
           </div>
         </div>
@@ -176,21 +176,21 @@ export default function PackingQueuePage() {
               return (
                 <div
                   key={job.id}
-                  className="rounded-xl border border-slate-800 bg-slate-900/70 p-5 flex flex-col justify-between hover:border-slate-700 transition shadow-lg"
+                  className="rounded-xl border border-neutral-200 bg-white p-5 flex flex-col justify-between hover:border-neutral-200 transition shadow-sm"
                 >
                   <div className="space-y-3">
                     {/* Header */}
                     <div className="flex items-center justify-between">
-                      <span className="font-mono text-xs font-black text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30">
+                      <span className="font-mono text-xs font-black text-accent-700 bg-accent-400/10 px-2 py-0.5 rounded border border-accent-500/30">
                         {job.challanNumber}
                       </span>
                       <span
                         className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
                           isCompleted
-                            ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40'
+                            ? 'bg-brand-500/20 text-brand-600 border border-brand-500/40'
                             : job.status === 'IN_PROCESS'
-                            ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40'
-                            : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                            ? 'bg-brand-500/20 text-brand-600 border border-brand-500/40'
+                            : 'bg-accent-400/20 text-accent-700 border border-accent-500/40'
                         }`}
                       >
                         {isCompleted ? 'FULLY PACKED' : job.status.replace(/_/g, ' ')}
@@ -199,61 +199,61 @@ export default function PackingQueuePage() {
 
                     {/* Program Info */}
                     <div>
-                      <h3 className="text-sm font-bold text-white">
+                      <h3 className="text-sm font-bold text-neutral-900">
                         Prog #{job.program?.programNumber || 'N/A'}
                       </h3>
-                      <p className="text-xs text-slate-300 font-mono mt-0.5">
-                        Style: <strong className="text-white">{job.program?.styleCode || 'N/A'}</strong>
+                      <p className="text-xs text-neutral-700 font-mono mt-0.5">
+                        Style: <strong className="text-neutral-900">{job.program?.styleCode || 'N/A'}</strong>
                       </p>
-                      <p className="text-[11px] text-slate-400 truncate">
+                      <p className="text-[11px] text-neutral-500 truncate">
                         {job.program?.buyerName || job.program?.clientName || 'Shubham Fabrics'}
                       </p>
                     </div>
 
                     {/* Quantity Progress Bar */}
-                    <div className="rounded-lg bg-slate-950 p-3 border border-slate-800 space-y-2">
+                    <div className="rounded-lg bg-canvas p-3 border border-neutral-200 space-y-2">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-slate-400">Packaging Progress:</span>
-                        <span className="font-bold text-white">{pct}%</span>
+                        <span className="text-neutral-500">Packaging Progress:</span>
+                        <span className="font-bold text-neutral-900">{pct}%</span>
                       </div>
-                      <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                      <div className="w-full bg-neutral-100 h-2 rounded-full overflow-hidden">
                         <div
                           className={`h-full transition-all ${
-                            isCompleted ? 'bg-indigo-400' : 'bg-amber-400'
+                            isCompleted ? 'bg-brand-500' : 'bg-accent-400'
                           }`}
                           style={{ width: `${pct}%` }}
                         />
                       </div>
                       <div className="grid grid-cols-3 gap-2 pt-1 text-center font-mono">
                         <div>
-                          <span className="text-[10px] text-slate-500 block uppercase">Received</span>
-                          <span className="text-xs font-bold text-slate-300">{job.totalReceivedPieces}</span>
+                          <span className="text-[10px] text-neutral-500 block uppercase">Received</span>
+                          <span className="text-xs font-bold text-neutral-700">{job.totalReceivedPieces}</span>
                         </div>
                         <div>
-                          <span className="text-[10px] text-slate-500 block uppercase">Packed</span>
-                          <span className="text-xs font-bold text-emerald-400">{job.totalPackedPieces}</span>
+                          <span className="text-[10px] text-neutral-500 block uppercase">Packed</span>
+                          <span className="text-xs font-bold text-accent-700">{job.totalPackedPieces}</span>
                         </div>
                         <div>
-                          <span className="text-[10px] text-slate-500 block uppercase">Remaining</span>
-                          <span className="text-xs font-bold text-amber-400">{job.remainingPieces}</span>
+                          <span className="text-[10px] text-neutral-500 block uppercase">Remaining</span>
+                          <span className="text-xs font-bold text-accent-700">{job.remainingPieces}</span>
                         </div>
                       </div>
                     </div>
 
                     {/* Cartons Counter */}
-                    <div className="flex items-center justify-between text-xs text-slate-400 px-1">
+                    <div className="flex items-center justify-between text-xs text-neutral-500 px-1">
                       <span className="flex items-center gap-1.5">
-                        <Boxes className="w-4 h-4 text-emerald-400" />
-                        Cartons created: <strong className="text-white">{job.cartonCount}</strong>
+                        <Boxes className="w-4 h-4 text-accent-700" />
+                        Cartons created: <strong className="text-neutral-900">{job.cartonCount}</strong>
                       </span>
                     </div>
                   </div>
 
                   {/* Action Button */}
-                  <div className="pt-4 mt-4 border-t border-slate-800">
+                  <div className="pt-4 mt-4 border-t border-neutral-200">
                     <Link
                       href={`/packing/workspace/${job.id}`}
-                      className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 py-2 px-3 text-xs font-bold transition shadow-xs"
+                      className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white py-2 px-3 text-xs font-bold transition shadow-xs"
                     >
                       <Package className="w-4 h-4" />
                       <span>{isCompleted ? 'View Packing Details' : 'Continue Packing'}</span>
@@ -264,22 +264,22 @@ export default function PackingQueuePage() {
               );
             })
           ) : (
-            <div className="col-span-full py-16 text-center text-slate-500 bg-slate-900/40 rounded-xl border border-slate-800">
+            <div className="col-span-full py-16 text-center text-neutral-500 bg-white rounded-xl border border-neutral-200">
               {loading ? (
                 <div className="flex items-center justify-center gap-2">
-                  <RefreshCw className="w-4 h-4 animate-spin text-amber-400" />
+                  <RefreshCw className="w-4 h-4 animate-spin text-accent-700" />
                   <span>Loading packing queue...</span>
                 </div>
               ) : (
                 <div>
-                  <Package className="w-10 h-10 mx-auto text-slate-600 mb-3" />
-                  <p className="font-semibold text-slate-300">No packing jobs in this queue view</p>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <Package className="w-10 h-10 mx-auto text-neutral-600 mb-3" />
+                  <p className="font-semibold text-neutral-700">No packing jobs in this queue view</p>
+                  <p className="text-xs text-neutral-500 mt-1">
                     Receive incoming pieces from Final QC to start packing.
                   </p>
                   <Link
                     href="/packing/incoming"
-                    className="inline-flex items-center gap-1.5 mt-4 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-400 px-3.5 py-1.5 text-xs font-bold border border-slate-700 transition"
+                    className="inline-flex items-center gap-1.5 mt-4 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-accent-700 px-3.5 py-1.5 text-xs font-bold border border-neutral-200 transition"
                   >
                     Go to Incoming Transfers &rarr;
                   </Link>
