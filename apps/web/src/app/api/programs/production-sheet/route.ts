@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { canViewClientCode, getSessionUser } from '@/lib/auth/require-user';
+import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -103,6 +105,8 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'PROGRAMMING');
+  if (!authUser) return authResponse;
   try {
     const data = await request.json();
     const targetStatus = data.status || 'DRAFT';
@@ -181,27 +185,7 @@ export async function POST(request: Request) {
       programNumber = candidateNumber;
     }
 
-    // Find default programmer user or admin guaranteed in the database
-    let user = await prisma.user.findFirst({
-      where: { OR: [{ username: 'programmer' }, { username: 'admin' }] },
-      select: { id: true },
-    });
-    if (!user) {
-      user = await prisma.user.findFirst({ select: { id: true } });
-    }
-    if (!user) {
-      user = await prisma.user.create({
-        data: {
-          username: 'programmer',
-          email: 'programmer@subhamfabrics.com',
-          fullName: 'Programming Incharge',
-          passwordHash: '$2a$10$abcdefghijklmnopqrstuu',
-          departmentCode: 'PROGRAMMING',
-        },
-        select: { id: true },
-      });
-    }
-    const actorId = user.id;
+    const actorId = authUser.id;
 
     // Safe dates
     const startDate = parseSafeDate(data.startDate, new Date()) || new Date();
@@ -377,9 +361,10 @@ export async function POST(request: Request) {
     const program = await prisma.$transaction(async (tx) => {
       let created;
       if (existing) {
+        const { createdById: _author, ...updateData } = programData;
         created = await tx.program.update({
           where: { id: existing.id },
-          data: programData,
+          data: updateData,
         });
         await tx.programFabric.deleteMany({ where: { programId: existing.id } });
         await tx.programColour.deleteMany({ where: { programId: existing.id } });
@@ -480,22 +465,8 @@ export async function POST(request: Request) {
       },
     });
 
-    const cookieHeader = request.headers.get('cookie') || '';
-    const deptHeader = request.headers.get('x-user-department') || '';
-    const roleHeader = request.headers.get('x-user-role') || '';
-
-    const isAuthorized = 
-      deptHeader.toUpperCase() === 'ADMIN' ||
-      deptHeader.toUpperCase() === 'PROGRAMMING' ||
-      roleHeader.toUpperCase() === 'ADMIN' ||
-      roleHeader.toUpperCase() === 'SUPER_ADMIN' ||
-      roleHeader.toUpperCase() === 'PROGRAMMER' ||
-      roleHeader.toUpperCase() === 'PROGRAMMING_INCHARGE' ||
-      cookieHeader.includes('subham_mes_dept=ADMIN') ||
-      cookieHeader.includes('subham_mes_dept=PROGRAMMING') ||
-      cookieHeader.includes('subham_mes_role=ADMIN') ||
-      cookieHeader.includes('subham_mes_role=SUPER_ADMIN') ||
-      cookieHeader.includes('subham_mes_role=PROGRAMMER');
+    const sessionUser = await getSessionUser(request);
+    const isAuthorized = !!sessionUser && canViewClientCode(sessionUser);
 
     let sanitizedProgram: any = {
       ...fullProgram,

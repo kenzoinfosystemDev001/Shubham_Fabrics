@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireDepartment } from '@/lib/auth/department-access';
 import {
   cleanFabricName,
   getChallanItemFabricType,
@@ -10,6 +11,8 @@ export const dynamic = 'force-dynamic';
 
 // GET /api/fabric-store/outward - list all outward fabric stock entries (auto from challans + manual)
 export async function GET(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE');
+  if (!authUser) return authResponse;
   try {
     const { searchParams } = new URL(request.url);
     const rawFilter = searchParams.get('fabricType')?.toUpperCase(); // "UNDYED" | "KORA" | "DYED" | "ALL"
@@ -296,6 +299,8 @@ export async function GET(request: Request) {
 
 // POST /api/fabric-store/outward - manually record outward fabric issue
 export async function POST(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE');
+  if (!authUser) return authResponse;
   try {
     const body = await request.json();
     const {

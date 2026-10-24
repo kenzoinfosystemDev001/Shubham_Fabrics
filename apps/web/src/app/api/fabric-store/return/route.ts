@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
 // POST /api/fabric-store/return — accept roll returns from production
 export async function POST(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE');
+  if (!authUser) return authResponse;
   try {
     const body = await request.json();
     const { rollIds, returnReason } = body;
@@ -14,12 +17,7 @@ export async function POST(request: Request) {
     }
 
     // Resolve actor
-    const actor = await prisma.user.findFirst({
-      where: { OR: [{ username: 'admin' }, { username: 'store_mgr' }, { username: 'jitender' }] },
-    });
-    if (!actor) {
-      return NextResponse.json({ error: 'No authorized user found' }, { status: 401 });
-    }
+    const actor = { id: authUser.id };
 
     const rolls = await prisma.fabricStoreRoll.findMany({
       where: { id: { in: rollIds } },
@@ -123,7 +121,9 @@ export async function POST(request: Request) {
 }
 
 // GET /api/fabric-store/return — list currently issued rolls (eligible for return)
-export async function GET() {
+export async function GET(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE');
+  if (!authUser) return authResponse;
   try {
     const issuedRolls = await prisma.fabricStoreRoll.findMany({
       where: { status: 'ISSUED' },

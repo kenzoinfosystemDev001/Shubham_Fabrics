@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
 // GET /api/fabric-store/qc — list rolls pending QC
 export async function GET(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE');
+  if (!authUser) return authResponse;
   try {
     const { searchParams } = new URL(request.url);
     const batchId = searchParams.get('batchId');
@@ -61,6 +64,8 @@ export async function GET(request: Request) {
 
 // POST /api/fabric-store/qc — create QC inspection
 export async function POST(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE');
+  if (!authUser) return authResponse;
   try {
     const body = await request.json();
     const { rollId, inspectionType, result, defects, remarks } = body;
@@ -73,12 +78,7 @@ export async function POST(request: Request) {
     }
 
     // Resolve actor (QC inspector)
-    const actor = await prisma.user.findFirst({
-      where: { OR: [{ username: 'admin' }, { username: 'qc_insp' }, { username: 'store_mgr' }] },
-    });
-    if (!actor) {
-      return NextResponse.json({ error: 'No authorized QC user found' }, { status: 401 });
-    }
+    const actor = { id: authUser.id };
 
     // Fetch roll
     const roll = await prisma.fabricStoreRoll.findUnique({ where: { id: rollId } });

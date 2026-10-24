@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -7,6 +8,8 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STITCHING');
+  if (!authUser) return authResponse;
   try {
     const { id } = await params;
     const body = await request.json().catch(() => ({}));
@@ -32,18 +35,7 @@ export async function POST(
     }
 
     // 2. Identify actor
-    let actorId = body.actorId;
-    if (!actorId) {
-      const stitchUser = await prisma.user.findFirst({
-        where: { OR: [{ username: 'stitching' }, { departmentCode: 'STITCHING' }] },
-        select: { id: true },
-      });
-      actorId = stitchUser?.id;
-    }
-    if (!actorId) {
-      const fallbackUser = await prisma.user.findFirst({ select: { id: true } });
-      actorId = fallbackUser?.id;
-    }
+    const actorId = authUser.id;
 
     // 3. Extract and parse quantities
     const totalIssuedQty = challan.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0);

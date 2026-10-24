@@ -1,13 +1,16 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
 // GET /api/fabric-store/rolls/[id]
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE');
+  if (!authUser) return authResponse;
   try {
     const { id } = await params;
     const roll = await prisma.fabricStoreRoll.findUnique({
@@ -50,6 +53,8 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE');
+  if (!authUser) return authResponse;
   try {
     const { id } = await params;
     const body = await request.json();
@@ -60,9 +65,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Roll not found' }, { status: 404 });
     }
 
-    const actor = await prisma.user.findFirst({
-      where: { OR: [{ username: 'admin' }, { username: 'store_mgr' }, { username: 'jitender' }] },
-    });
+    const actor = { id: authUser.id };
 
     await prisma.$transaction(async (tx) => {
       const updateData: any = {};

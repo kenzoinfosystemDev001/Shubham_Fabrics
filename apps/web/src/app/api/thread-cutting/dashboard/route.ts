@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'THREAD_CUTTING');
+  if (!authUser) return authResponse;
   try {
     // 1. Fetch incoming challans to Thread Cutting (primarily from Embroidery)
     const incomingChallans = await prisma.challan.findMany({

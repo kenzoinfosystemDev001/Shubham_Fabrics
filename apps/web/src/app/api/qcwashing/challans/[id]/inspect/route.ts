@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -7,6 +8,8 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'QC3');
+  if (!authUser) return authResponse;
   try {
     const { id } = await params;
     const body = await request.json();
@@ -177,22 +180,7 @@ export async function POST(
     }
 
     // 4. Resolve Actor
-    let actorUser = await prisma.user.findFirst({
-      where: {
-        OR: [
-          { id: inspectorId || '' },
-          { username: 'qcwashing' },
-          { username: 'qc3' },
-          { departmentCode: 'QC3' },
-          { departmentCode: 'QCWASHING' },
-          { username: 'admin' },
-        ],
-      },
-      select: { id: true, fullName: true, username: true },
-    });
-    if (!actorUser) {
-      actorUser = await prisma.user.findFirst({ select: { id: true, fullName: true, username: true } });
-    }
+    const actorUser = { id: authUser.id, fullName: authUser.fullName, username: authUser.username };
     const actorId = actorUser?.id || '';
 
     // Determine target challan status

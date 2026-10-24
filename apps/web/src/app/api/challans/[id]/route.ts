@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireUser } from '@/lib/auth/require-user';
+import { canUpdateChallan } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -75,6 +77,8 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { user: authUser, response: authResponse } = await requireUser(request, { admin: true });
+  if (!authUser) return authResponse;
   try {
     const { id } = await params;
 
@@ -192,6 +196,8 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { user: authUser, response: authResponse } = await requireUser(request);
+  if (!authUser) return authResponse;
   try {
     const { id } = await params;
     const body = await request.json();
@@ -207,6 +213,26 @@ export async function PATCH(
       defectiveShelfLocation,
       defectReason,
     } = body;
+
+    const current = await prisma.challan.findUnique({
+      where: { id },
+      select: { fromDepartment: true, toDepartment: true },
+    });
+    if (!current) {
+      return NextResponse.json({ error: 'Challan not found' }, { status: 404 });
+    }
+    if (!canUpdateChallan(authUser, current, status)) {
+      return NextResponse.json(
+        { error: 'Only the sending or receiving department can update this challan.' },
+        { status: 403 }
+      );
+    }
+    if ((toDepartment || fromDepartment) && !authUser.isAdmin) {
+      return NextResponse.json(
+        { error: 'Only an administrator can change the departments on a challan.' },
+        { status: 403 }
+      );
+    }
 
     const updateData: any = {};
     if (status) {
@@ -266,7 +292,7 @@ export async function PATCH(
 
       // If defective pieces were cut, ensure DefectRecord exists or is logged
       if (updateData.defectivePieces && updateData.defectivePieces > 0) {
-        const actor = await tx.user.findFirst({ select: { id: true } });
+        const actor = { id: authUser.id };
         if (actor) {
           try {
             await tx.defectRecord.create({

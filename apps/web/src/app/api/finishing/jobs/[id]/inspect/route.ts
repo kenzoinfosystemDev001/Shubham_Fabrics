@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -7,6 +8,8 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'FINISHING');
+  if (!authUser) return authResponse;
   try {
     const { id } = await params;
     const body = await request.json().catch(() => ({}));
@@ -32,18 +35,7 @@ export async function POST(
     }
 
     // 2. Identify inspector
-    let actorId = body.actorId;
-    if (!actorId) {
-      const finishingUser = await prisma.user.findFirst({
-        where: { OR: [{ username: 'finishing' }, { departmentCode: 'FINISHING' }] },
-        select: { id: true },
-      });
-      actorId = finishingUser?.id;
-    }
-    if (!actorId) {
-      const fallbackUser = await prisma.user.findFirst({ select: { id: true } });
-      actorId = fallbackUser?.id;
-    }
+    const actorId = authUser.id;
 
     const {
       trimmingCleanliness = 'PASS',

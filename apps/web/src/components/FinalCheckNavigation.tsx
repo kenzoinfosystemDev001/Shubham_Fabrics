@@ -50,7 +50,7 @@ export function FinalCheckNavigation() {
     }
 
     const syncUser = async () => {
-      if (!api.getToken()) return;
+      if (!api.hasSession()) return;
       try {
         const profile = await api.getProfile();
         if (profile) {

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -7,6 +8,8 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'QC1');
+  if (!authUser) return authResponse;
   try {
     const { id } = await params;
     const body = await request.json();
@@ -177,21 +180,7 @@ export async function POST(
     }
 
     // 4. Resolve Authenticated Inspector
-    let actorUser = await prisma.user.findFirst({
-      where: {
-        OR: [
-          { id: inspectorId || '' },
-          { username: 'qc_insp' },
-          { username: 'qc1' },
-          { departmentCode: 'QC1' },
-          { username: 'admin' },
-        ],
-      },
-      select: { id: true, fullName: true, username: true },
-    });
-    if (!actorUser) {
-      actorUser = await prisma.user.findFirst({ select: { id: true, fullName: true, username: true } });
-    }
+    const actorUser = { id: authUser.id, fullName: authUser.fullName, username: authUser.username };
     const actorId = actorUser?.id || '';
 
     const primaryItem = challan.items[0];

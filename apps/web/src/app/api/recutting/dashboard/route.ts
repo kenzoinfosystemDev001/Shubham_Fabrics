@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'RECUTTING');
+  if (!authUser) return authResponse;
   try {
     // 1. Incoming Challans from QC Washing (QC3)
     const incomingChallans = await prisma.challan.findMany({

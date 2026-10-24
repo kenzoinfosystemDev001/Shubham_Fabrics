@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -7,6 +8,8 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STEAM_PRESS');
+  if (!authUser) return authResponse;
   try {
     const { id } = await params;
     const body = await request.json().catch(() => ({}));
@@ -29,18 +32,7 @@ export async function POST(
     }
 
     // 2. Identify actor
-    let actorId = body.actorId;
-    if (!actorId) {
-      const steamPressUser = await prisma.user.findFirst({
-        where: { OR: [{ username: 'steampress' }, { username: 'steam_press' }, { departmentCode: 'STEAM_PRESS' }] },
-        select: { id: true },
-      });
-      actorId = steamPressUser?.id;
-    }
-    if (!actorId) {
-      const fallbackUser = await prisma.user.findFirst({ select: { id: true } });
-      actorId = fallbackUser?.id;
-    }
+    const actorId = authUser.id;
 
     const workstationNumber = body.workstationNumber || body.tableNumber || 'Table 1';
     const operatorName = body.operatorName || 'Steam Press Operator';

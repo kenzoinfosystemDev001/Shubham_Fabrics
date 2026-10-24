@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -7,10 +8,12 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'QC2');
+  if (!authUser) return authResponse;
   try {
     const { id } = await params;
     const body = await request.json().catch(() => ({}));
-    const { receiverId, notes } = body;
+    const { notes } = body;
 
     const challan = await prisma.challan.findUnique({
       where: { id },
@@ -42,21 +45,7 @@ export async function POST(
     }
 
     // Resolve authenticated actor
-    let actorUser = await prisma.user.findFirst({
-      where: {
-        OR: [
-          { id: receiverId || '' },
-          { username: 'qc2' },
-          { username: 'qc2_insp' },
-          { departmentCode: 'QC2' },
-          { username: 'admin' },
-        ],
-      },
-      select: { id: true, fullName: true, username: true },
-    });
-    if (!actorUser) {
-      actorUser = await prisma.user.findFirst({ select: { id: true, fullName: true, username: true } });
-    }
+    const actorUser = { id: authUser.id, fullName: authUser.fullName, username: authUser.username };
     const actorId = actorUser?.id || '';
 
     const totalQty = challan.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0);

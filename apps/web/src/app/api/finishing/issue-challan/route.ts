@@ -3,6 +3,7 @@ import { prisma } from '@subham/database';
 import { buildDepartmentTrackingData } from '@/lib/challan-tracking';
 import { STANDARD_FACTORY_ROUTE } from '@subham/config';
 import { DepartmentCode } from '@subham/types';
+import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,6 +14,8 @@ class HandoverError extends Error {
 }
 
 export async function POST(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'FINISHING');
+  if (!authUser) return authResponse;
   try {
     const body = await request.json().catch(() => null);
     if (!body || typeof body !== 'object' || Array.isArray(body)) {
@@ -110,16 +113,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const actor = await prisma.user.findFirst({
-      where: {
-        isActive: true,
-        OR: [{ username: 'finishing' }, { departmentCode: 'FINISHING' }],
-      },
-      select: { id: true },
-    });
-    if (!actor) {
-      return NextResponse.json({ error: 'No active Finishing operator is configured. Contact an administrator.' }, { status: 503 });
-    }
+    const actor = { id: authUser.id };
 
     const actorId = actor.id;
     const challanNumber = `CH-FN-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;

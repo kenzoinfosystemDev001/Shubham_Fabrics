@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import bcrypt from 'bcryptjs';
+import { requireUser } from '@/lib/auth/require-user';
+import { validatePin } from '@/lib/auth/pin';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,8 +10,13 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { user: authUser, response: authResponse } = await requireUser(request, { admin: true });
+  if (!authUser) return authResponse;
   try {
     const { id } = await params;
+    if (id === authUser.id) {
+      return NextResponse.json({ error: 'You cannot delete your own account.' }, { status: 400 });
+    }
 
     const user = await prisma.user.findUnique({
       where: { id },
@@ -57,6 +64,8 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { user: authUser, response: authResponse } = await requireUser(request, { admin: true });
+  if (!authUser) return authResponse;
   try {
     const { id } = await params;
     const body = await request.json();
@@ -67,6 +76,10 @@ export async function PATCH(
     if (body.isActive !== undefined) dataToUpdate.isActive = Boolean(body.isActive);
 
     if (body.pin) {
+      const pinError = validatePin(body.pin);
+      if (pinError) {
+        return NextResponse.json({ error: pinError }, { status: 400 });
+      }
       dataToUpdate.passwordHash = await bcrypt.hash(body.pin.trim(), 10);
     }
 

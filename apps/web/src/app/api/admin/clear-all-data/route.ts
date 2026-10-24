@@ -1,10 +1,16 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import bcrypt from 'bcryptjs';
+import { destructiveAdminActionsDisabled, requireUser } from '@/lib/auth/require-user';
+import { randomBytes } from 'crypto';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST() {
+export async function POST(request: Request) {
+  const { user: authUser, response: authResponse } = await requireUser(request, { admin: true });
+  if (!authUser) return authResponse;
+  const disabledResponse = destructiveAdminActionsDisabled();
+  if (disabledResponse) return disabledResponse;
   try {
     await prisma.$transaction(
       async (tx) => {
@@ -53,7 +59,8 @@ export async function POST() {
         await tx.auditLog.deleteMany({});
 
         // 8. Ensure Core RBAC Users & Departments are intact
-        const hashedPin = await bcrypt.hash('1234', 10);
+        // Core users that have to be recreated get an unguessable PIN; an administrator must set a real one.
+        const unusablePin = await bcrypt.hash(randomBytes(32).toString('hex'), 10);
 
         const departments = [
           { code: 'ADMIN', name: 'Administration', sequenceOrder: 0 },
@@ -103,7 +110,7 @@ export async function POST() {
                 username: u.username,
                 fullName: u.fullName,
                 email: u.email,
-                passwordHash: hashedPin,
+                passwordHash: unusablePin,
                 departmentCode: u.dept,
                 isActive: true,
               },
@@ -118,7 +125,6 @@ export async function POST() {
             await tx.user.update({
               where: { id: existing.id },
               data: {
-                passwordHash: hashedPin,
                 departmentCode: u.dept,
                 isActive: true,
               },

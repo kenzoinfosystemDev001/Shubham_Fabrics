@@ -13,7 +13,6 @@ import {
   Play,
   Pause,
 } from 'lucide-react';
-import { api } from '@/lib/api';
 
 type FinalCheckSection = 'incoming' | 'queue' | 'issue-challan' | 'floor-board' | 'reports';
 type WorkflowAction = 'receive' | 'start' | 'hold' | 'resume' | 'inspect' | 'handover';
@@ -138,9 +137,9 @@ function quantityOf(job: FinalCheckJob) {
   return job.items.reduce((total, item) => total + (Number(item.quantity) || 0), 0);
 }
 
+// The session travels in the httpOnly cookie, so no Authorization header is needed.
 function authorizationHeaders(): HeadersInit {
-  const token = api.getToken();
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  return {};
 }
 
 export function FinalCheckWorkspace({ section }: { section: FinalCheckSection }) {
