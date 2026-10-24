@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
+import {
+  assertChallanNumbersAvailable,
+  challanNumberErrorResponse,
+  requireChallanNumberSet,
+} from '@/lib/challan-number-server';
 
 export const dynamic = 'force-dynamic';
 
@@ -179,6 +184,16 @@ export async function POST(
       );
     }
 
+    // 3b. Manual challan numbers for every challan this inspection creates
+    const numberEntries: Array<{ field: string; label: string; value: unknown }> = [];
+    if (qFailed > 0) numberEntries.push({ field: 'rejectChallanNumber', label: 'Defective shelf challan number', value: body.rejectChallanNumber });
+    if (qRework > 0) numberEntries.push({ field: 'reworkChallanNumber', label: 'Rework challan number', value: body.reworkChallanNumber });
+    const typedNumbers = requireChallanNumberSet(numberEntries);
+    await assertChallanNumbersAvailable(
+      prisma,
+      Object.entries(typedNumbers).map(([field, value]) => ({ field, value })),
+    );
+
     // 4. Resolve Actor
     const actorUser = { id: authUser.id, fullName: authUser.fullName, username: authUser.username };
     const actorId = actorUser?.id || '';
@@ -287,7 +302,7 @@ export async function POST(
       // D. If Failed Pieces exist -> Create Defective Shelf Return Challan
       let defectiveReturnChallan: any = null;
       if (qFailed > 0) {
-        const nextRetNum = `DEF-QC3-${Date.now().toString().slice(-6)}`;
+        const nextRetNum = typedNumbers.rejectChallanNumber;
         defectiveReturnChallan = await tx.challan.create({
           data: {
             challanNumber: nextRetNum,
@@ -322,7 +337,7 @@ export async function POST(
       // E. If Rework Pieces exist -> Create Rework Challan back to WASHING
       let reworkChallan: any = null;
       if (qRework > 0) {
-        const nextRewNum = `REW-QC3-${Date.now().toString().slice(-6)}`;
+        const nextRewNum = typedNumbers.reworkChallanNumber;
         reworkChallan = await tx.challan.create({
           data: {
             challanNumber: nextRewNum,
@@ -429,6 +444,8 @@ export async function POST(
       reworkChallan: transactionResult.reworkChallan,
     });
   } catch (error: any) {
+    const numberResponse = challanNumberErrorResponse(error);
+    if (numberResponse) return numberResponse;
     console.error('Error recording QC Washing inspection:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to record QC Washing inspection' },

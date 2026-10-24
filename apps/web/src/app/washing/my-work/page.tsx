@@ -29,9 +29,11 @@ import {
   FileText
 } from 'lucide-react';
 import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
+import { TransferDocuments } from '@/components/common/TransferDocuments';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { downloadProductionSheetHtml, printProductionSheet } from '@/lib/download-production-sheet';
 import BarcodeStickerCard from '@/components/BarcodeStickerCard';
+import { ChallanNumberField, newSubmissionKey } from '@/components/challan/ChallanNumberField';
 
 interface WashingChallan {
   id: string;
@@ -118,6 +120,14 @@ export default function WashingWorkCenter() {
   const [selectedChallanForView, setSelectedChallanForView] = useState<WashingChallan | null>(null);
   const [selectedSheetForView, setSelectedSheetForView] = useState<any | null>(null);
   const [handoverChallanModal, setHandoverChallanModal] = useState<any | null>(null);
+  // Handover to QC Washing waits for the challan number typed by the Washing incharge.
+  const [handoverDraft, setHandoverDraft] = useState<{
+    challan: WashingChallan;
+    challanNumber: string;
+    error: string | null;
+    submissionKey: string;
+    submitting: boolean;
+  } | null>(null);
   const [submittingWash, setSubmittingWash] = useState(false);
 
   // Washing Processing Terminal Form State (All Mandatory Fields)
@@ -314,20 +324,29 @@ export default function WashingWorkCenter() {
     }
   };
 
-  // Issue Handover Challan to QC Washing
-  const handleIssueToFinishing = async (challan: WashingChallan) => {
+  // Issue Handover Challan to QC Washing: ask for the challan number first.
+  const handleIssueToFinishing = (challan: WashingChallan) => {
+    setHandoverDraft({ challan, challanNumber: '', error: null, submissionKey: newSubmissionKey(), submitting: false });
+  };
+
+  const confirmIssueToQcWashing = async () => {
+    if (!handoverDraft) return;
+    const { challan, submissionKey } = handoverDraft;
+    const challanNumber = handoverDraft.challanNumber.trim();
+    if (!challanNumber) {
+      setHandoverDraft({ ...handoverDraft, error: 'Challan Number is required.' });
+      return;
+    }
+    setHandoverDraft({ ...handoverDraft, error: null, submitting: true });
     try {
       const goodQty = challan.fabricOut ?? challan.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
       const barcode = challan.items?.[0]?.barcode || `WB-${new Date().getFullYear()}-0001`;
-
-      const numRes = await fetch('/api/challans/next-number?department=WASHING');
-      const numData = await numRes.json();
-      const challanNumber = numData.nextNumber || `CH-WSH-${new Date().getFullYear()}-00001`;
 
       const res = await fetch('/api/challans', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          idempotencyKey: submissionKey,
           challanNumber,
           challanType: 'REGULAR',
           programId: challan.programId,
@@ -358,7 +377,7 @@ export default function WashingWorkCenter() {
       });
 
       const data = await res.json();
-      if (res.ok && data.success) {
+      if (res.ok) {
         // Also update original challan status to COMPLETED
         await fetch(`/api/challans/${challan.id}`, {
           method: 'PATCH',
@@ -366,14 +385,15 @@ export default function WashingWorkCenter() {
           body: JSON.stringify({ status: 'COMPLETED' }),
         }).catch(() => {});
 
-        setHandoverChallanModal(data.data);
-        setToastHandover(`Challan ${data.data.challanNumber} issued to QC Washing Department successfully!`);
+        setHandoverDraft(null);
+        setHandoverChallanModal(data);
+        setToastHandover(`Challan ${data.challanNumber} issued to QC Washing Department successfully!`);
         loadData();
       } else {
-        throw new Error(data.error || 'Failed to issue challan to QC Washing');
+        setHandoverDraft((draft) => draft && { ...draft, submitting: false, error: data.error || 'Failed to issue challan to QC Washing' });
       }
     } catch (err: any) {
-      alert(`Error issuing to QC Washing: ${err.message}`);
+      setHandoverDraft((draft) => draft && { ...draft, submitting: false, error: err.message || 'Failed to issue challan to QC Washing' });
     }
   };
 
@@ -664,11 +684,7 @@ export default function WashingWorkCenter() {
                             </td>
                             <td className="py-3 px-4">
                               <div className="flex flex-col gap-1.5 items-center">
-                                <DocumentActionButtons
-                                  challan={c}
-                                  program={c.program}
-                                  size="xs"
-                                />
+                                <TransferDocuments challan={c} size="xs" />
 
                                 {/* WORKFLOW ACTIONS */}
                                 <div className="flex items-center gap-1.5 mt-0.5">
@@ -1252,6 +1268,44 @@ export default function WashingWorkCenter() {
       )}
 
       {/* HANDOVER SUCCESS MODAL WITH BARCODE TAG */}
+      {handoverDraft && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-900/60 p-3">
+          <div className="bg-white rounded-xl border border-neutral-300 shadow-2xl w-full max-w-sm p-4 space-y-3">
+            <div>
+              <h3 className="text-sm font-bold text-neutral-900">Issue challan to QC Washing</h3>
+              <p className="text-[11px] text-neutral-500">
+                Source challan {handoverDraft.challan.challanNumber} ·{' '}
+                {handoverDraft.challan.fabricOut ?? handoverDraft.challan.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0)} PCS
+              </p>
+            </div>
+            <ChallanNumberField
+              value={handoverDraft.challanNumber}
+              onChange={(value) => setHandoverDraft({ ...handoverDraft, challanNumber: value, error: null })}
+              error={handoverDraft.error}
+              disabled={handoverDraft.submitting}
+            />
+            <div className="flex justify-end gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => setHandoverDraft(null)}
+                disabled={handoverDraft.submitting}
+                className="px-3 py-1.5 border border-neutral-300 rounded-lg text-xs font-semibold text-neutral-700 hover:bg-neutral-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmIssueToQcWashing}
+                disabled={handoverDraft.submitting}
+                className="px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold disabled:opacity-50"
+              >
+                {handoverDraft.submitting ? 'Issuing...' : 'Issue Challan'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {handoverChallanModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-900/70 backdrop-blur-xs animate-in fade-in overflow-y-auto">
           <div className="relative w-full max-w-lg bg-white rounded-2xl p-6 shadow-2xl border border-neutral-200 text-neutral-900 space-y-4 my-auto">

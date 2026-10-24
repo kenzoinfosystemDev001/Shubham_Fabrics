@@ -1,6 +1,12 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
+import {
+  FabricStockError,
+  STOCK_TRANSACTION_OPTIONS,
+  fabricStockErrorBody,
+  syncInwardStock,
+} from '@/lib/fabric-stock-ledger';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,7 +51,9 @@ export async function PATCH(
       return NextResponse.json({ error: 'unit must be MTR or PCS' }, { status: 400 });
     }
 
-    const data = await (prisma as any).fabricInward.update({
+    // The ledger posts only the difference; a reduction below what was already issued is refused.
+    const data = await prisma.$transaction(async (tx) => {
+      const row = await tx.fabricInward.update({
       where: { id },
       data: {
         entryType: entryType === 'KORA' ? 'UNDYED' : entryType,
@@ -55,13 +63,20 @@ export async function PATCH(
         receivingDate,
         billQty,
         unit,
+        colour: body.colour ? String(body.colour).trim() : null,
         supplierName: body.supplierName ? String(body.supplierName).trim() : null,
         remarks: body.remarks ? String(body.remarks).trim() : null,
       },
-    });
+      });
+      await syncInwardStock(tx, id, authUser.id);
+      return row;
+    }, STOCK_TRANSACTION_OPTIONS);
 
     return NextResponse.json({ success: true, data });
   } catch (error: any) {
+    if (error instanceof FabricStockError) {
+      return NextResponse.json(fabricStockErrorBody(error), { status: 400 });
+    }
     if (error.code === 'P2025') {
       return NextResponse.json({ error: 'Inward record not found' }, { status: 404 });
     }

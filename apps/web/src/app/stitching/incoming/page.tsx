@@ -20,7 +20,7 @@ import {
   ShieldCheck,
   Scissors,
 } from 'lucide-react';
-import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
+import { TransferDocuments } from '@/components/common/TransferDocuments';
 
 export default function StitchingIncomingPage() {
   const router = useRouter();
@@ -333,11 +333,7 @@ export default function StitchingIncomingPage() {
 
                   {/* ACTION FOOTER */}
                   <div className="pt-3 border-t border-neutral-200 flex items-center justify-between gap-2 flex-wrap">
-                    <DocumentActionButtons
-                      challan={ch}
-                      program={ch.program}
-                      size="xs"
-                    />
+                    <TransferDocuments challan={ch} size="xs" />
 
                     {isIssued ? (
                       <button
@@ -385,6 +381,8 @@ export default function StitchingIncomingPage() {
                 <X className="w-5 h-5" />
               </button>
             </div>
+
+            <TransferDocuments challan={selectedChallan} size="xs" autoLoad />
 
             {receiveError && (
               <div className="p-3 rounded-xl bg-danger-500/10 border border-danger-500/30 text-danger-600 text-xs flex items-center gap-2">

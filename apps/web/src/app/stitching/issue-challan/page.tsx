@@ -22,6 +22,7 @@ import {
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import BarcodeStickerCard from '@/components/BarcodeStickerCard';
 import { ColorFabricMeasurementTable, createDepartmentInOutTracking } from '@/components/ColorFabricMeasurementTable';
+import { ChallanNumberField, challanNumberClientError } from '@/components/challan/ChallanNumberField';
 
 function StitchingIssueChallanContent() {
   const router = useRouter();
@@ -35,6 +36,8 @@ function StitchingIssueChallanContent() {
   const [selectedSheetForView, setSelectedSheetForView] = useState<any | null>(null);
   const [generatedChallan, setGeneratedChallan] = useState<any | null>(null);
 
+  const [challanNumber, setChallanNumber] = useState('');
+  const [challanNumberError, setChallanNumberError] = useState<string | null>(null);
   const [targetDepartment, setTargetDepartment] = useState('FINISHING');
   const [priority, setPriority] = useState('NORMAL');
   const [remarks, setRemarks] = useState(
@@ -151,6 +154,13 @@ function StitchingIssueChallanContent() {
       return;
     }
 
+    const numberError = challanNumberClientError(challanNumber);
+    setChallanNumberError(numberError);
+    if (numberError) {
+      document.getElementById('issue-challan-number')?.focus();
+      return;
+    }
+
     if (new Set(items.map((item) => item.uom)).size > 1) {
       alert('Use the same unit for every quantity in one challan.');
       return;
@@ -176,6 +186,7 @@ function StitchingIssueChallanContent() {
       setLoading(true);
 
       const payload = {
+        challanNumber: challanNumber.trim(),
         parentChallanId: selectedJob.id,
         programId: selectedJob.programId,
         toDepartment: targetDepartment,
@@ -202,10 +213,16 @@ function StitchingIssueChallanContent() {
 
       const json = await res.json();
       if (!res.ok) {
+        if (json.field === 'challanNumber') {
+          setChallanNumberError(json.error || 'Challan Number is not valid.');
+          document.getElementById('issue-challan-number')?.focus();
+          return;
+        }
         throw new Error(json.error || 'Failed to issue handover challan');
       }
 
       setGeneratedChallan(json.data);
+      setChallanNumber('');
     } catch (err: any) {
       alert(err.message || 'Error creating handover challan');
     } finally {
@@ -312,6 +329,17 @@ function StitchingIssueChallanContent() {
               <PackageCheck className="w-4 h-4 text-accent-700" />
               <span>2. Production Routing & Destination</span>
             </h3>
+
+            <ChallanNumberField
+              id="issue-challan-number"
+              className="max-w-xs"
+              value={challanNumber}
+              onChange={(value) => {
+                setChallanNumber(value);
+                if (challanNumberError) setChallanNumberError(null);
+              }}
+              error={challanNumberError}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
               <div>

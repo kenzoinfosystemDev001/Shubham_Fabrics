@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { ChallanNumberField, challanNumberClientError } from '@/components/challan/ChallanNumberField';
 import {
   Kanban,
   RefreshCw,
@@ -170,6 +171,7 @@ export default function DyeingFloorBoardPage() {
 
   // Issue Challan Form State
   const [challanForm, setChallanForm] = useState({
+    challanNumber: '',
     quantityToSend: 0,
     color: '',
     remarks: '',
@@ -178,6 +180,7 @@ export default function DyeingFloorBoardPage() {
   });
   const [issuingChallan, setIssuingChallan] = useState(false);
   const [challanError, setChallanError] = useState<string | null>(null);
+  const [challanNumberError, setChallanNumberError] = useState<string | null>(null);
   const [issuedSuccessChallan, setIssuedSuccessChallan] = useState<{ id: string; challanNumber: string } | null>(null);
 
   const fetchFloorBoard = async () => {
@@ -258,19 +261,25 @@ export default function DyeingFloorBoardPage() {
     setSelectedOrderForChallan(order);
     const available = Math.max(0, order.dyedQuantity - order.sentToQc1Quantity);
     setChallanForm({
+      challanNumber: '',
       quantityToSend: available,
-      color: order.dyedColor || order.targetColor || '',
+      // Only the recorded actual shade; the target colour is shown as a placeholder, not saved as dyed.
+      color: order.dyedColor || '',
       remarks: `Dyeing completed lot for QC inspection. Ref: ${order.orderNumber}`,
       vehicleNumber: '',
       driverName: '',
     });
     setChallanError(null);
+    setChallanNumberError(null);
     setIssuedSuccessChallan(null);
   };
 
   const handleChallanSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedOrderForChallan) return;
+    const numberError = challanNumberClientError(challanForm.challanNumber);
+    setChallanNumberError(numberError);
+    if (numberError) return;
     try {
       setIssuingChallan(true);
       setChallanError(null);
@@ -289,8 +298,9 @@ export default function DyeingFloorBoardPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          challanNumber: challanForm.challanNumber.trim(),
           quantityToSend: qty,
-          color: challanForm.color,
+          color: challanForm.color.trim() || undefined,
           remarks: challanForm.remarks,
           vehicleNumber: challanForm.vehicleNumber,
           driverName: challanForm.driverName,
@@ -299,6 +309,10 @@ export default function DyeingFloorBoardPage() {
 
       const resJson = await res.json();
       if (!res.ok) {
+        if (resJson.field === 'challanNumber') {
+          setChallanNumberError(resJson.error || 'Challan Number is not valid.');
+          return;
+        }
         throw new Error(resJson.error || 'Failed to issue Challan to QC1');
       }
 
@@ -306,6 +320,7 @@ export default function DyeingFloorBoardPage() {
         id: resJson.data.challan.id,
         challanNumber: resJson.data.challan.challanNumber,
       });
+      setChallanForm((prev) => ({ ...prev, challanNumber: '' }));
 
       await fetchFloorBoard();
     } catch (err: any) {
@@ -799,6 +814,16 @@ export default function DyeingFloorBoardPage() {
                   </div>
                 </div>
 
+                <ChallanNumberField
+                  compact
+                  value={challanForm.challanNumber}
+                  onChange={(value) => {
+                    setChallanForm((prev) => ({ ...prev, challanNumber: value }));
+                    if (challanNumberError) setChallanNumberError(null);
+                  }}
+                  error={challanNumberError}
+                />
+
                 {/* QUANTITY TO SEND INPUT */}
                 <div>
                   <div className="flex items-center justify-between mb-1">
@@ -838,6 +863,7 @@ export default function DyeingFloorBoardPage() {
                       type="text"
                       value={challanForm.color}
                       onChange={(e) => setChallanForm({ ...challanForm, color: e.target.value })}
+                      placeholder={selectedOrderForChallan.targetColor ? `Target: ${selectedOrderForChallan.targetColor}` : ''}
                       className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-xs font-semibold text-neutral-900 focus:outline-hidden focus:ring-2 focus:ring-brand-500"
                     />
                   </div>
@@ -884,7 +910,7 @@ export default function DyeingFloorBoardPage() {
                   className="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-semibold transition disabled:opacity-50 inline-flex items-center gap-1.5 shadow-xs"
                 >
                   {issuingChallan ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-                  <span>Generate &amp; Issue Challan to QC1</span>
+                  <span>Issue Challan to QC1</span>
                 </button>
               </div>
             </form>

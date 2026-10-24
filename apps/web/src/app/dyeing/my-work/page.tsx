@@ -42,6 +42,9 @@ import {
 } from '@/lib/download-challan';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
+import { ChallanNumberField, newSubmissionKey } from '@/components/challan/ChallanNumberField';
+import { DyeingInstructions } from '@/components/dyeing/DyeingInstructions';
+import { TransferDocuments } from '@/components/common/TransferDocuments';
 import {
   ColorFabricMeasurementTable,
   ChallanItemData,
@@ -110,6 +113,7 @@ interface DyeingOrder {
     status: string;
     issuedDate: string;
     remarks?: string | null;
+    items?: any[];
   };
   qc1Challan?: {
     id: string;
@@ -145,6 +149,8 @@ export default function DyeingMyWorkPage() {
   // FORM STATE: Dyeing Dept -> QC1 (as specified in handwritten sketch)
   // ==============================================================
   const [challanNumber, setChallanNumber] = useState('');
+  const [challanNumberError, setChallanNumberError] = useState<string | null>(null);
+  const [submissionKey, setSubmissionKey] = useState(newSubmissionKey);
   const [challanDate, setChallanDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [sourceDept] = useState('Dyeing Department');
   const [destDept] = useState('QC1');
@@ -225,17 +231,11 @@ export default function DyeingMyWorkPage() {
     }
   };
 
-  // Fetch Next Challan Number for Dyeing -> QC1
-  const loadNextChallanNumber = async () => {
-    try {
-      const res = await fetch('/api/challans/next-number?department=DYEING');
-      const data = await res.json();
-      if (data?.nextNumber) {
-        setChallanNumber(data.nextNumber);
-      }
-    } catch (e) {
-      console.warn('Failed to fetch next dyeing challan number', e);
-    }
+  // Each new challan starts with a blank number typed by the Dyeing incharge.
+  const resetChallanNumber = () => {
+    setChallanNumber('');
+    setChallanNumberError(null);
+    setSubmissionKey(newSubmissionKey());
   };
 
   // Fetch Orders
@@ -294,7 +294,7 @@ export default function DyeingMyWorkPage() {
 
   useEffect(() => {
     fetchOrders();
-    loadNextChallanNumber();
+    resetChallanNumber();
   }, [statusFilter, priorityFilter]);
 
   // Synchronize form reference fields when an order / production sheet is selected
@@ -327,7 +327,7 @@ export default function DyeingMyWorkPage() {
   // Switch to Create Challan tab with a specific order pre-loaded
   const handleStartCreateChallan = (order: DyeingOrder) => {
     selectOrderForForm(order);
-    loadNextChallanNumber();
+    resetChallanNumber();
     setActiveTab('create-challan');
     setFormError('');
     setCreatedChallanSuccess(null);
@@ -343,9 +343,11 @@ export default function DyeingMyWorkPage() {
     }
 
     if (!challanNumber.trim()) {
-      setFormError('Please provide a Challan Number.');
+      setChallanNumberError('Challan Number is required.');
+      setFormError('Enter the Challan Number.');
       return;
     }
+    setChallanNumberError(null);
 
     // Validate ColorFabricMeasurementTable items
     const validItems = items.filter(
@@ -380,13 +382,14 @@ export default function DyeingMyWorkPage() {
         uom: item.unit || selectedOrder.uom || 'MTR',
         fabricCode: item.fabric || selectedOrder.fabricName || 'FABRIC',
         colour: item.color || null,
-        shade: item.requiredDyeColor || null,
+        requiredDyeColor: item.requiredDyeColor || null,
         actualDyedColor: item.actualDyedColor || null,
         rollNumber: item.rollNumber || null,
         remarks: item.remarks || null,
       }));
 
       const payload = {
+        idempotencyKey: submissionKey,
         challanNumber: challanNumber.trim(),
         challanType: 'DYEING_TO_QC1',
         programId: selectedOrder.programId,
@@ -415,6 +418,7 @@ export default function DyeingMyWorkPage() {
 
       const data = await res.json();
       if (!res.ok) {
+        if (data.field === 'challanNumber') setChallanNumberError(data.error);
         throw new Error(data.error || 'Failed to dispatch Challan to QC1');
       }
 
@@ -446,7 +450,7 @@ export default function DyeingMyWorkPage() {
     setSelectedOrderForUpdate(order);
     setUpdateForm({
       dyedQuantity: order.dyedQuantity,
-      dyedColor: order.dyedColor || order.targetColor,
+      dyedColor: order.dyedColor || '',
       colorCode: order.colorCode || '',
       status: order.status,
       machineNumber: order.machineNumber || '',
@@ -510,7 +514,7 @@ export default function DyeingMyWorkPage() {
             <button
               onClick={() => {
                 fetchOrders();
-                loadNextChallanNumber();
+                resetChallanNumber();
               }}
               disabled={loading}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-lg text-xs font-semibold transition"
@@ -552,7 +556,7 @@ export default function DyeingMyWorkPage() {
             type="button"
             onClick={() => {
               setActiveTab('create-challan');
-              loadNextChallanNumber();
+              resetChallanNumber();
             }}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer ${
               activeTab === 'create-challan'
@@ -707,7 +711,7 @@ export default function DyeingMyWorkPage() {
                         </td>
                       </tr>
                     ) : (
-                      orders.map((order) => (
+                      orders.flatMap((order) => [
                         <tr key={order.id} className="hover:bg-neutral-50/80 transition group">
                           {/* SHEET & CHALLAN */}
                           <td className="py-3.5 px-4">
@@ -811,12 +815,12 @@ export default function DyeingMyWorkPage() {
                                 </button>
                               )}
 
-                              {/* COMPLETE DOCUMENT ACTIONS: PRODUCTION SHEET, CHALLAN & WILCOM */}
-                              <DocumentActionButtons
-                                program={order.program}
-                                challan={order.inboundChallan || (order.qc1Challan ? { ...order.qc1Challan, program: order.program } : null)}
-                                size="xs"
-                              />
+                              {/* DOCUMENTS OF THE RECEIVED CHALLAN: PRODUCTION SHEET, CHALLAN & WILCOM */}
+                              {order.inboundChallanId || order.inboundChallan?.id ? (
+                                <TransferDocuments challanId={order.inboundChallanId || order.inboundChallan?.id} size="xs" />
+                              ) : (
+                                <DocumentActionButtons program={order.program} size="xs" />
+                              )}
 
                               {/* RECORD DYEING PROGRESS */}
                               <button
@@ -840,8 +844,17 @@ export default function DyeingMyWorkPage() {
                               </button>
                             </div>
                           </td>
-                        </tr>
-                      ))
+                        </tr>,
+                        <tr key={`${order.id}-instructions`} className="bg-neutral-50/60">
+                          <td colSpan={9} className="px-4 pb-3 pt-0">
+                            <DyeingInstructions
+                              challan={order.inboundChallan}
+                              program={order.program}
+                              dyedColor={order.dyedColor}
+                            />
+                          </td>
+                        </tr>,
+                      ])
                     )}
                   </tbody>
                 </table>
@@ -937,7 +950,7 @@ export default function DyeingMyWorkPage() {
                     type="button"
                     onClick={() => {
                       setCreatedChallanSuccess(null);
-                      loadNextChallanNumber();
+                      resetChallanNumber();
                     }}
                     className="flex items-center gap-1.5 px-4 py-2 bg-brand-700 hover:bg-brand-800 text-white text-xs font-bold rounded-lg shadow-xs transition ml-auto"
                   >
@@ -988,12 +1001,15 @@ export default function DyeingMyWorkPage() {
                       Challan Number <span className="text-danger-600">*</span>
                     </label>
                     <div className="sm:col-span-2 max-w-lg">
-                      <input
-                        type="text"
+                      <ChallanNumberField
+                        label="Challan Number"
+                        hideLabel
                         value={challanNumber}
-                        onChange={(e) => setChallanNumber(e.target.value)}
-                        required
-                        className="w-full text-xs font-mono font-bold text-neutral-900 border border-neutral-300 rounded-lg px-3 py-2 bg-neutral-50 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+                        onChange={(value) => {
+                          setChallanNumber(value);
+                          setChallanNumberError(null);
+                        }}
+                        error={challanNumberError}
                       />
                     </div>
                   </div>
@@ -1369,10 +1385,11 @@ export default function DyeingMyWorkPage() {
 
                 <div>
                   <label className="block font-bold text-neutral-700 mb-1">
-                    Dyed Color
+                    Actual Dyed Shade
                   </label>
                   <input
                     type="text"
+                    placeholder={`Required: ${selectedOrderForUpdate.targetColor}`}
                     value={updateForm.dyedColor}
                     onChange={(e) => setUpdateForm({ ...updateForm, dyedColor: e.target.value })}
                     className="w-full text-xs border border-neutral-300 rounded-lg px-3 py-2 bg-white"

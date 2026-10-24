@@ -20,6 +20,7 @@ import {
   ShieldCheck,
   Scissors,
 } from 'lucide-react';
+import { TransferDocuments } from '@/components/common/TransferDocuments';
 
 export default function FinishingIncomingPage() {
   const router = useRouter();
@@ -347,6 +348,9 @@ export default function FinishingIncomingPage() {
                     </div>
                   </div>
 
+                  {/* Documents of this challan: production sheet & challan */}
+                  <TransferDocuments challan={ch} size="xs" />
+
                   {/* Action Buttons */}
                   <div className="pt-2 flex items-center justify-between gap-2 border-t border-neutral-200">
                     {ch.program && (
@@ -400,6 +404,8 @@ export default function FinishingIncomingPage() {
                   <X className="w-5 h-5" />
                 </button>
               </div>
+
+              <TransferDocuments challan={selectedChallan} size="xs" autoLoad />
 
               {receiveSuccess ? (
                 <div className="py-6 text-center text-accent-700 space-y-2">

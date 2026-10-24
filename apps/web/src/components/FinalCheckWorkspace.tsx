@@ -13,6 +13,8 @@ import {
   Play,
   Pause,
 } from 'lucide-react';
+import { TransferDocuments } from '@/components/common/TransferDocuments';
+import { ChallanNumberField, challanNumberClientError } from '@/components/challan/ChallanNumberField';
 
 type FinalCheckSection = 'incoming' | 'queue' | 'issue-challan' | 'floor-board' | 'reports';
 type WorkflowAction = 'receive' | 'start' | 'hold' | 'resume' | 'inspect' | 'handover';
@@ -162,6 +164,9 @@ export function FinalCheckWorkspace({ section }: { section: FinalCheckSection })
   const [handoverQuantity, setHandoverQuantity] = useState('');
   const [holdReason, setHoldReason] = useState('');
   const [inspection, setInspection] = useState<InspectionForm>(INITIAL_INSPECTION);
+  // Handover challan number, or the defective-shelf challan number when recording rejects.
+  const [actionChallanNumber, setActionChallanNumber] = useState('');
+  const [challanNumberError, setChallanNumberError] = useState<string | null>(null);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => setDebouncedSearch(search.trim()), 300);
@@ -247,7 +252,9 @@ export function FinalCheckWorkspace({ section }: { section: FinalCheckSection })
     setReceivedQuantity(String(quantityOf(job)));
     setHandoverQuantity(String(Math.max(0, Number(job.availableToHandover ?? job.fabricOut ?? job.fabricIn ?? quantityOf(job)))));
     setHoldReason('');
-    const total = Number(job.productionLogs?.[0]?.balanceQuantity ?? job.fabricIn ?? quantityOf(job));
+    setActionChallanNumber('');
+    setChallanNumberError(null);
+    const total =Number(job.productionLogs?.[0]?.balanceQuantity ?? job.fabricIn ?? quantityOf(job));
     setInspection({ ...INITIAL_INSPECTION, acceptedQuantity: String(total) });
   };
 
@@ -261,6 +268,18 @@ export function FinalCheckWorkspace({ section }: { section: FinalCheckSection })
   const submitAction = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!actionJob || !action) return;
+    const needsChallanNumber = action === 'handover'
+      || (action === 'inspect' && Number(inspection.rejectedQuantity) > 0);
+    if (needsChallanNumber) {
+      const numberError = challanNumberClientError(
+        actionChallanNumber,
+        action === 'handover' ? 'Challan Number' : 'Defective shelf challan number',
+      );
+      setChallanNumberError(numberError);
+      if (numberError) return;
+    } else {
+      setChallanNumberError(null);
+    }
     setBusyAction(true);
     setFormError('');
     setNotice('');
@@ -329,12 +348,14 @@ export function FinalCheckWorkspace({ section }: { section: FinalCheckSection })
             defectReason: inspection.defectReason,
             reworkReason: inspection.reworkReason,
             notes: inspection.notes,
+            ...(rejectedQuantity > 0 ? { rejectChallanNumber: actionChallanNumber.trim() } : {}),
           };
           break;
         }
         case 'handover':
           endpoint = '/api/final-check/issue-challan';
           body = {
+            challanNumber: actionChallanNumber.trim(),
             parentChallanId: actionJob.id,
             items: [{ quantity: Number(handoverQuantity), uom: actionJob.items[0]?.uom || 'PCS' }],
           };
@@ -348,8 +369,13 @@ export function FinalCheckWorkspace({ section }: { section: FinalCheckSection })
       });
       const result = await response.json();
       if (!response.ok || result.success === false) {
+        if (result.field === 'challanNumber' || result.field === 'rejectChallanNumber') {
+          setChallanNumberError(result.error || 'Challan Number is not valid.');
+          return;
+        }
         throw new Error(result.error || result.message || 'Final QC action could not be completed.');
       }
+      setActionChallanNumber('');
       setNotice(result.message || `${action[0].toUpperCase()}${action.slice(1)} completed for ${actionJob.challanNumber}.`);
       setActionJob(null);
       setAction(null);
@@ -407,9 +433,10 @@ export function FinalCheckWorkspace({ section }: { section: FinalCheckSection })
             </p>
             <p className="mt-1 text-xs text-neutral-500">{qty.toLocaleString()} pcs · {job.program?.buyerName || job.program?.clientName || 'Buyer not set'}</p>
           </div>
-          {actions.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {actions.map(({ label, action: nextAction, icon: Icon }) => (
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Production sheet & the challan received into Final Check */}
+            <TransferDocuments challanId={job.id} size="xs" />
+            {actions.length > 0 && actions.map(({ label, action: nextAction, icon: Icon }) => (
                 <button
                   type="button"
                   key={nextAction}
@@ -420,8 +447,7 @@ export function FinalCheckWorkspace({ section }: { section: FinalCheckSection })
                   {label}
                 </button>
               ))}
-            </div>
-          )}
+          </div>
         </div>
       </article>
     );
@@ -668,6 +694,19 @@ export function FinalCheckWorkspace({ section }: { section: FinalCheckSection })
                       Defect reason (required when rejected quantity is above zero)
                       <input value={inspection.defectReason} onChange={(event) => setInspection((current) => ({ ...current, defectReason: event.target.value }))} className="mt-1 w-full rounded-lg border border-neutral-200 bg-canvas px-3 py-2 text-sm text-neutral-900" />
                     </label>
+                    {Number(inspection.rejectedQuantity) > 0 && (
+                      <ChallanNumberField
+                        compact
+                        id="final-check-reject-challan-number"
+                        label="Defective shelf challan number"
+                        value={actionChallanNumber}
+                        onChange={(value) => {
+                          setActionChallanNumber(value);
+                          if (challanNumberError) setChallanNumberError(null);
+                        }}
+                        error={challanNumberError}
+                      />
+                    )}
                     <label className="block text-xs font-medium text-neutral-700">
                       Rework reason (required when rework quantity is above zero)
                       <input value={inspection.reworkReason} onChange={(event) => setInspection((current) => ({ ...current, reworkReason: event.target.value }))} className="mt-1 w-full rounded-lg border border-neutral-200 bg-canvas px-3 py-2 text-sm text-neutral-900" />
@@ -683,6 +722,16 @@ export function FinalCheckWorkspace({ section }: { section: FinalCheckSection })
                     <p className="rounded-lg border border-accent-500/20 bg-accent-400/5 p-3 text-xs text-neutral-700">
                       Destination: <strong className="text-accent-700">Packing</strong>. Quantity may not exceed accepted balance not yet handed over.
                     </p>
+                    <ChallanNumberField
+                      compact
+                      id="final-check-handover-challan-number"
+                      value={actionChallanNumber}
+                      onChange={(value) => {
+                        setActionChallanNumber(value);
+                        if (challanNumberError) setChallanNumberError(null);
+                      }}
+                      error={challanNumberError}
+                    />
                     <label className="block text-sm text-neutral-700">
                       Accepted quantity to transfer
                       <input type="number" min="1" max={Number(actionJob.availableToHandover ?? actionJob.fabricOut ?? 0)} required value={handoverQuantity} onChange={(event) => setHandoverQuantity(event.target.value)} className="mt-1 w-full rounded-lg border border-neutral-200 bg-canvas px-3 py-2 text-neutral-900" />

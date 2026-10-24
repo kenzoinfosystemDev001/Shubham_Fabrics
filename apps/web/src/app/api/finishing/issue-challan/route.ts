@@ -4,6 +4,11 @@ import { buildDepartmentTrackingData } from '@/lib/challan-tracking';
 import { STANDARD_FACTORY_ROUTE } from '@subham/config';
 import { DepartmentCode } from '@subham/types';
 import { requireDepartment } from '@/lib/auth/department-access';
+import {
+  assertChallanNumbersAvailable,
+  challanNumberErrorResponse,
+  requireChallanNumber,
+} from '@/lib/challan-number-server';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,11 +21,13 @@ class HandoverError extends Error {
 export async function POST(request: Request) {
   const { user: authUser, response: authResponse } = await requireDepartment(request, 'FINISHING');
   if (!authUser) return authResponse;
+  let challanNumber = '';
   try {
     const body = await request.json().catch(() => null);
     if (!body || typeof body !== 'object' || Array.isArray(body)) {
       return NextResponse.json({ error: 'A valid handover request body is required.' }, { status: 400 });
     }
+    challanNumber = requireChallanNumber(body.challanNumber);
 
     const {
       parentChallanId,
@@ -116,7 +123,7 @@ export async function POST(request: Request) {
     const actor = { id: authUser.id };
 
     const actorId = actor.id;
-    const challanNumber = `CH-FN-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
+    await assertChallanNumbersAvailable(prisma, [{ value: challanNumber }]);
 
     const newChallan = await prisma.$transaction(async (tx) => {
       const claim = await tx.challan.updateMany({
@@ -255,6 +262,8 @@ export async function POST(request: Request) {
       data: newChallan,
     });
   } catch (error: any) {
+    const numberResponse = challanNumberErrorResponse(error, challanNumber);
+    if (numberResponse) return numberResponse;
     if (error instanceof HandoverError) {
       return NextResponse.json({ error: error.message }, { status: error.status });
     }

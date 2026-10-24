@@ -3,6 +3,13 @@ import { prisma } from '@subham/database';
 import { requireUser } from '@/lib/auth/require-user';
 import { canUpdateChallan } from '@/lib/auth/department-access';
 
+import {
+  FabricStockError,
+  STOCK_TRANSACTION_OPTIONS,
+  fabricStockErrorBody,
+  syncChallanStock,
+} from '@/lib/fabric-stock-ledger';
+
 export const dynamic = 'force-dynamic';
 
 export async function PATCH(
@@ -106,6 +113,11 @@ export async function PATCH(
         },
       });
 
+      // Cancelling (or reinstating) a Fabric Store challan returns (or re-issues) its stock.
+      if (status && status !== existing.status) {
+        await syncChallanStock(tx, id, authUser.id);
+      }
+
       // Log ChallanEvent if status changed
       if (status && status !== existing.status) {
         const actor = { id: authUser.id };
@@ -175,10 +187,13 @@ export async function PATCH(
       }
 
       return ch;
-    }, isDyeingReceive ? { maxWait: 15000, timeout: 30000 } : undefined);
+    }, isDyeingReceive || status ? STOCK_TRANSACTION_OPTIONS : undefined);
 
     return NextResponse.json(updated);
   } catch (error: any) {
+    if (error instanceof FabricStockError) {
+      return NextResponse.json(fabricStockErrorBody(error), { status: 400 });
+    }
     console.error('Error updating challan status:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to update challan status' },

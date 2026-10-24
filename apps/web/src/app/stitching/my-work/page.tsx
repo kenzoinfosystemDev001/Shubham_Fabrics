@@ -30,7 +30,7 @@ import {
   Pause,
   Play,
 } from 'lucide-react';
-import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
+import { TransferDocuments } from '@/components/common/TransferDocuments';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 
 function StitchingWorkstationContent() {
@@ -479,11 +479,7 @@ function StitchingWorkstationContent() {
                     </div>
 
                     <div className="pt-2 border-t border-neutral-200" onClick={(e) => e.stopPropagation()}>
-                      <DocumentActionButtons
-                        challan={j}
-                        program={j.program}
-                        size="xs"
-                      />
+                      <TransferDocuments challan={j} size="xs" />
                     </div>
                   </div>
                 );
@@ -512,11 +508,7 @@ function StitchingWorkstationContent() {
                   </div>
 
                   <div className="flex items-center gap-2 flex-wrap">
-                    <DocumentActionButtons
-                      challan={selectedJob}
-                      program={selectedJob.program}
-                      size="sm"
-                    />
+                    <TransferDocuments challan={selectedJob} size="sm" autoLoad />
 
                     <Link
                       href={`/stitching/workspace/${selectedJob.id}`}

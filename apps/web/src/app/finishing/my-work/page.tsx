@@ -30,6 +30,7 @@ import {
   Play,
 } from 'lucide-react';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
+import { TransferDocuments } from '@/components/common/TransferDocuments';
 
 function FinishingWorkstationContent() {
   const searchParams = useSearchParams();
@@ -559,19 +560,9 @@ function FinishingWorkstationContent() {
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  {selectedJob.program && (
-                    <button
-                      onClick={() => {
-                        setTechSheetProgram(selectedJob.program);
-                        setShowTechSheet(true);
-                      }}
-                      className="px-3 py-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-900 text-xs font-semibold flex items-center gap-1.5 transition"
-                    >
-                      <FileText className="w-3.5 h-3.5 text-brand-600" />
-                      <span>Production Sheet</span>
-                    </button>
-                  )}
+                <div className="flex items-center gap-2 flex-wrap">
+                  {/* Production sheet & received challan */}
+                  <TransferDocuments challan={selectedJob} size="sm" autoLoad />
 
                   <Link
                     href={`/finishing/workspace/${selectedJob.id}`}

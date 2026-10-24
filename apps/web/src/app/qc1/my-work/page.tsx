@@ -41,7 +41,24 @@ import {
   downloadChallanHtml, 
   printChallan 
 } from '@/lib/download-challan';
-import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
+import { TransferDocuments } from '@/components/common/TransferDocuments';
+import { ChallanNumberField, challanNumberClientError } from '@/components/challan/ChallanNumberField';
+
+type Qc1ChallanNumberField = 'passChallanNumber' | 'reworkChallanNumber' | 'rejectChallanNumber';
+const EMPTY_QC1_CHALLAN_NUMBERS: Record<Qc1ChallanNumberField, string> = {
+  passChallanNumber: '',
+  reworkChallanNumber: '',
+  rejectChallanNumber: '',
+};
+
+/** Challans the QC1 inspect route will create for these quantities (mirrors the server rule). */
+function qc1NeededChallanNumbers(form: { result: string; quantityPassed: string; quantityRework: string; quantityFailed: string }) {
+  const needed: Array<{ field: Qc1ChallanNumberField; label: string }> = [];
+  if (form.result === 'PASS' && Number(form.quantityPassed || 0) > 0) needed.push({ field: 'passChallanNumber', label: 'Embroidery challan number' });
+  if (Number(form.quantityRework || 0) > 0) needed.push({ field: 'reworkChallanNumber', label: 'Rework challan number' });
+  if (Number(form.quantityFailed || 0) > 0) needed.push({ field: 'rejectChallanNumber', label: 'Defective shelf challan number' });
+  return needed;
+}
 
 interface QC1Challan {
   id: string;
@@ -126,6 +143,8 @@ export default function QC1MyWorkPage() {
   const [submittingInspection, setSubmittingInspection] = useState(false);
   const [inspectionError, setInspectionError] = useState<string | null>(null);
   const [inspectionSuccess, setInspectionSuccess] = useState<any | null>(null);
+  const [challanNumbers, setChallanNumbers] = useState(EMPTY_QC1_CHALLAN_NUMBERS);
+  const [challanNumberErrors, setChallanNumberErrors] = useState<Partial<Record<Qc1ChallanNumberField, string>>>({});
 
   // Receiving state
   const [receivingId, setReceivingId] = useState<string | null>(null);
@@ -228,6 +247,8 @@ export default function QC1MyWorkPage() {
     setSelectedChallanForInspect(challan);
     setInspectionError(null);
     setInspectionSuccess(null);
+    setChallanNumbers(EMPTY_QC1_CHALLAN_NUMBERS);
+    setChallanNumberErrors({});
     const initialQty = challan.totalSentQuantity || 0;
     setInspectionForm({
       quantityInspected: String(initialQty),
@@ -309,6 +330,22 @@ export default function QC1MyWorkPage() {
       return;
     }
 
+    // Manual challan numbers for each challan this inspection will create
+    const neededNumbers = qc1NeededChallanNumbers(inspectionForm);
+    const numberErrors: Partial<Record<Qc1ChallanNumberField, string>> = {};
+    for (const { field, label } of neededNumbers) {
+      const msg = challanNumberClientError(challanNumbers[field], label);
+      if (msg) numberErrors[field] = msg;
+    }
+    setChallanNumberErrors(numberErrors);
+    if (Object.keys(numberErrors).length > 0) {
+      setInspectionError(Object.values(numberErrors)[0] || 'Enter the challan numbers.');
+      setSubmittingInspection(false);
+      return;
+    }
+    const typedNumbers: Partial<Record<Qc1ChallanNumberField, string>> = {};
+    for (const { field } of neededNumbers) typedNumbers[field] = challanNumbers[field].trim();
+
     try {
       const payload = {
         quantityInspected: qInspected,
@@ -323,6 +360,7 @@ export default function QC1MyWorkPage() {
         holdReason: inspectionForm.holdReason,
         remarks: inspectionForm.remarks,
         inspectorId: currentUser?.id,
+        ...typedNumbers,
         defects:
           qFailed > 0 || qRework > 0
             ? [
@@ -343,10 +381,15 @@ export default function QC1MyWorkPage() {
 
       const resJson = await res.json();
       if (!res.ok) {
+        if (resJson.field && resJson.field in EMPTY_QC1_CHALLAN_NUMBERS) {
+          setChallanNumberErrors({ [resJson.field as Qc1ChallanNumberField]: resJson.error });
+        }
         throw new Error(resJson.error || 'Failed to record QC1 inspection.');
       }
 
       setInspectionSuccess(resJson.data);
+      setChallanNumbers(EMPTY_QC1_CHALLAN_NUMBERS);
+      setChallanNumberErrors({});
       setSubmittingInspection(false);
       if (typeof window !== 'undefined') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -747,7 +790,7 @@ export default function QC1MyWorkPage() {
                         <td className="py-3 px-4 text-right">
                           <div className="flex items-center justify-end gap-1 flex-wrap">
                             {/* COMPLETE DOCUMENT ACTIONS: PRODUCTION SHEET, CHALLAN & WILCOM */}
-                            <DocumentActionButtons program={challan.program} challan={challan} size="xs" />
+                            <TransferDocuments challan={challan} size="xs" />
 
                             {/* RECEIVE MATERIAL BUTTON (If status === 'ISSUED') */}
                             {isIssued && (
@@ -1428,6 +1471,11 @@ export default function QC1MyWorkPage() {
                           <p className="text-[11px] text-accent-800 mt-0.5">
                             Passed Yardage: <strong>{inspectionSuccess.productionTransaction?.goodQuantity || 0} {selectedChallanForInspect.uom}</strong>. The lot is approved for downstream manufacturing (Cutting Floor).
                           </p>
+                          {inspectionSuccess.passForwardChallan && (
+                            <span className="font-mono font-bold text-sm text-accent-900 block mt-1">
+                              Embroidery Challan: {inspectionSuccess.passForwardChallan.challanNumber}
+                            </span>
+                          )}
                         </div>
                       )}
 
@@ -1833,6 +1881,25 @@ export default function QC1MyWorkPage() {
                           </button>
                         </div>
                       </div>
+
+                      {/* MANUAL CHALLAN NUMBERS FOR GENERATED CHALLANS */}
+                      {qc1NeededChallanNumbers(inspectionForm).length > 0 && (
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+                          {qc1NeededChallanNumbers(inspectionForm).map(({ field, label }) => (
+                            <ChallanNumberField
+                              key={field}
+                              compact
+                              label={label}
+                              value={challanNumbers[field]}
+                              onChange={(v) => {
+                                setChallanNumbers((prev) => ({ ...prev, [field]: v }));
+                                setChallanNumberErrors((prev) => ({ ...prev, [field]: undefined }));
+                              }}
+                              error={challanNumberErrors[field]}
+                            />
+                          ))}
+                        </div>
+                      )}
 
                       {/* REMARKS INPUT FOR CHOSEN OUTCOME */}
                       <div className="space-y-1.5 pt-1">

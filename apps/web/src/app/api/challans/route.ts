@@ -4,6 +4,53 @@ import { prisma } from '@subham/database';
 import { syncInboundChallansToDyeingOrders } from '@/lib/dyeing-sync';
 import { requireUser } from '@/lib/auth/require-user';
 import { userBelongsToDepartment } from '@/lib/auth/department-access';
+import {
+  assertChallanNumbersAvailable,
+  challanNumberErrorResponse,
+  requireChallanNumber,
+} from '@/lib/challan-number-server';
+import {
+  FabricStockError,
+  STOCK_TRANSACTION_OPTIONS,
+  fabricStockErrorBody,
+  syncChallanStock,
+} from '@/lib/fabric-stock-ledger';
+import { storeDyeingItemFields } from '@/lib/dyeing-instructions.mjs';
+
+const CHALLAN_CREATE_ENDPOINT = 'POST /api/challans';
+
+function loadCreatedChallan(id: string) {
+  return prisma.challan.findUnique({
+    where: { id },
+    include: {
+      program: true,
+      items: true,
+      createdBy: {
+        select: {
+          id: true,
+          username: true,
+          fullName: true,
+        },
+      },
+      dyeingInboundOrders: true,
+    },
+  });
+}
+
+/**
+ * The challan created by an earlier request with the same idempotency key, if any. The key is
+ * recorded in the same transaction as the challan, so a concurrent duplicate that loses the race
+ * on the challan number finds it here once the winner commits.
+ */
+async function replayIdempotentRequest(key: string | null) {
+  if (!key) return null;
+  const record = await prisma.idempotencyRecord.findUnique({ where: { key } });
+  if (!record || record.endpoint !== CHALLAN_CREATE_ENDPOINT) return null;
+  const { challanId } = JSON.parse(record.responseBody) as { challanId?: string };
+  const challan = challanId ? await loadCreatedChallan(challanId) : null;
+  if (!challan) return null;
+  return NextResponse.json(challan, { status: record.statusCode, headers: { 'Idempotent-Replay': 'true' } });
+}
 
 export const dynamic = 'force-dynamic';
 
@@ -142,8 +189,19 @@ function parseSafeDate(val: any, fallback?: Date | null): Date | null {
 export async function POST(request: Request) {
   const { user: authUser, response: authResponse } = await requireUser(request);
   if (!authUser) return authResponse;
+  let challanNumber = '';
+  let idempotencyKey: string | null = null;
   try {
     const body = await request.json();
+
+    // A retried or double-submitted request returns the challan the first one created.
+    const rawKey = request.headers.get('Idempotency-Key') || body.idempotencyKey;
+    idempotencyKey = rawKey ? `${CHALLAN_CREATE_ENDPOINT}:${authUser.id}:${String(rawKey).slice(0, 128)}` : null;
+    const replay = await replayIdempotentRequest(idempotencyKey);
+    if (replay) return replay;
+
+    // The challan number is typed by the issuing department and saved exactly as entered.
+    challanNumber = requireChallanNumber(body.challanNumber);
 
     // 1. The issuing user is always the signed-in user
     const actorId = authUser.id;
@@ -166,11 +224,10 @@ export async function POST(request: Request) {
       if (prog) {
         resolvedProgramId = prog.id;
       } else {
-        const firstProg = await prisma.program.findFirst({
-          select: { id: true },
-        });
-
-        if (firstProg) resolvedProgramId = firstProg.id;
+        return NextResponse.json(
+          { error: `Production sheet ${resolvedProgramId} was not found.` },
+          { status: 400 }
+        );
       }
     } else {
       const firstProg = await prisma.program.findFirst({
@@ -271,41 +328,8 @@ export async function POST(request: Request) {
       }
     }
 
-    // 4. Resolve unique challan number
-    const year = new Date().getFullYear();
-
-    const deptPrefixCode =
-      fromDept === 'PROGRAMMING'
-        ? 'PRG'
-        : fromDept === 'STORE'
-          ? 'STR'
-          : fromDept === 'DYEING'
-            ? 'DYE'
-            : fromDept;
-
-    const prefix = `CH-${deptPrefixCode}-${year}-`;
-
-    let challanNumber = body.challanNumber;
-
-    if (!challanNumber) {
-      const count = await prisma.challan.count({
-        where: {
-          challanNumber: { startsWith: prefix },
-        },
-      });
-
-      challanNumber = `${prefix}${String(count + 1).padStart(5, '0')}`;
-    }
-
-    // Collision check
-    const existingChallan = await prisma.challan.findUnique({
-      where: { challanNumber },
-      select: { id: true },
-    });
-
-    if (existingChallan) {
-      challanNumber = `${prefix}${Date.now().toString().slice(-5)}`;
-    }
+    // 4. The typed challan number must not be used by another challan (any letter case).
+    await assertChallanNumbersAvailable(prisma, [{ value: challanNumber }]);
 
     // 5. Auto-Detection of Fabric / Pieces In from Previous Department
     let detectedFabricIn: number | null = null;
@@ -414,6 +438,7 @@ export async function POST(request: Request) {
 
     // 6. Transactional challan creation
     const isDyeingToQc1Challan = fromDept === 'DYEING' && toDept === 'QC1';
+    const isStoreOutward = (fromDept === 'STORE' || fromDept.includes('FABRIC')) && toDept !== 'STORE';
     const created = await prisma.$transaction(async (tx) => {
       const challan = await tx.challan.create({
         data: {
@@ -492,9 +517,10 @@ export async function POST(request: Request) {
           ];
 
       for (const item of rawItems) {
+        // Current colour/shade and the colour Dyeing must achieve are kept apart, per line.
+        const colourFields = storeDyeingItemFields(item);
         const itemRemarks = [
           item.remarks,
-          item.requiredDyeQuantity ? `Req Dye Qty: ${item.requiredDyeQuantity}` : null,
           item.actualDyedColor ? `Actual Dyed Color: ${item.actualDyedColor}` : null,
           item.fabricProcessingStatus ? `Status: ${item.fabricProcessingStatus}` : null,
         ].filter(Boolean).join(' · ');
@@ -510,13 +536,21 @@ export async function POST(request: Request) {
             quantity: Number(item.quantity ?? item.measurement ?? 1),
             uom: item.uom || item.unit || fabricUnit || 'MTR',
             fabricCode: item.fabricCode || item.fabric || null,
-            colour: item.colour || item.color || null,
-            shade: item.shade || item.requiredDyeColor || null,
+            colour: colourFields.colour,
+            shade: colourFields.shade,
+            requiredColour: colourFields.requiredColour,
+            requiredQuantity: colourFields.requiredQuantity,
             size: item.size || null,
             rollNumber: item.rollNumber || null,
             remarks: itemRemarks || null,
           },
         });
+      }
+
+      // Fabric Store issues deduct their lines from stock (matching fabric, colour and unit) and
+      // post the movement to the ledger; insufficient stock rolls the whole challan back.
+      if (isStoreOutward) {
+        await syncChallanStock(tx, challan.id, actorId);
       }
 
       // Update linked program status
@@ -529,8 +563,20 @@ export async function POST(request: Request) {
         console.warn('Program status update skipped:', progErr);
       }
 
+      if (idempotencyKey) {
+        await tx.idempotencyRecord.create({
+          data: {
+            key: idempotencyKey,
+            endpoint: CHALLAN_CREATE_ENDPOINT,
+            method: 'POST',
+            statusCode: 201,
+            responseBody: JSON.stringify({ challanId: challan.id }),
+          },
+        });
+      }
+
       return challan;
-    }, isDyeingToQc1Challan ? { maxWait: 15000, timeout: 30000 } : undefined);
+    }, isDyeingToQc1Challan || isStoreOutward ? STOCK_TRANSACTION_OPTIONS : undefined);
 
     // If dispatched to Dyeing, immediately sync to DyeingOrders
     // 6. Sync inbound challans to DyeingOrders once when sent to Dyeing
@@ -543,24 +589,18 @@ export async function POST(request: Request) {
     }
 
     // 7. Return the complete challan
-    const fullChallan = await prisma.challan.findUnique({
-      where: { id: created.id },
-      include: {
-        program: true,
-        items: true,
-        createdBy: {
-          select: {
-            id: true,
-            username: true,
-            fullName: true,
-          },
-        },
-        dyeingInboundOrders: true,
-      },
-    });
+    const fullChallan = await loadCreatedChallan(created.id);
 
     return NextResponse.json(fullChallan, { status: 201 });
   } catch (error: any) {
+    if (error instanceof FabricStockError) {
+      return NextResponse.json(fabricStockErrorBody(error), { status: 400 });
+    }
+    // A concurrent duplicate of this same submission lost the race: return the winner's challan.
+    const replay = await replayIdempotentRequest(idempotencyKey).catch(() => null);
+    if (replay) return replay;
+    const numberResponse = challanNumberErrorResponse(error, challanNumber);
+    if (numberResponse) return numberResponse;
     console.error('Error creating challan:', error);
 
     return NextResponse.json(

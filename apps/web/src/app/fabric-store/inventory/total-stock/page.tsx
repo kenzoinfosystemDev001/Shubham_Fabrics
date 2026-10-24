@@ -64,10 +64,12 @@ interface StockItem {
   sNo: number;
   itemName: string;
   fabricType: 'UNDYED' | 'DYED' | 'KORA';
+  colour?: string | null;
   unit: string;
   totalInward: number;
   totalOutward: number;
   balance: number;
+  shortfall?: number;
   inwardCount: number;
   outwardCount: number;
   lastActivity: string;
@@ -81,6 +83,7 @@ interface OutwardHistoryItem {
   sourceDepartment?: string;
   destination?: string;
   itemName: string;
+  colour?: string | null;
   quantity: number;
   unit: string;
   fabricType: string;
@@ -405,8 +408,14 @@ function TotalStockContent() {
                   <th className="border-r-[1.5px] border-neutral-200 px-4 py-2 font-black">
                     ITEM NAME (FABRIC DESCRIPTION)
                   </th>
+                  <th className="border-r-[1.5px] border-neutral-200 px-3 py-2 font-black w-32">
+                    COLOUR
+                  </th>
                   <th className="border-r-[1.5px] border-neutral-200 px-3 py-2 font-black text-center w-28">
                     CATEGORY
+                  </th>
+                  <th className="border-r-[1.5px] border-neutral-200 px-3 py-2 font-black text-center w-16">
+                    UNIT
                   </th>
                   <th className="border-r-[1.5px] border-neutral-200 px-4 py-2 font-black text-right w-32">
                     TOTAL INWARD
@@ -431,7 +440,7 @@ function TotalStockContent() {
               <tbody className="divide-y divide-neutral-200">
                 {items.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="px-4 py-12 text-center text-neutral-500 space-y-2">
+                    <td colSpan={11} className="px-4 py-12 text-center text-neutral-500 space-y-2">
                       <Boxes className="w-8 h-8 mx-auto text-neutral-700" />
                       <div className="text-sm font-bold text-neutral-700">No stock records found</div>
                       <p className="text-xs text-neutral-500">
@@ -443,12 +452,15 @@ function TotalStockContent() {
                   items.map((item, index) => {
                     const isUndyed = item.fabricType === 'UNDYED' || (item.fabricType as string) === 'KORA';
                     return (
-                      <tr key={`${item.itemName}-${item.fabricType}-${item.unit}`} className="hover:bg-neutral-50 transition h-10">
+                      <tr key={`${item.itemName}-${item.fabricType}-${item.colour || ''}-${item.unit}`} className="hover:bg-neutral-50 transition h-10">
                         <td className="border-r-[1.5px] border-neutral-200 px-3 py-2 text-center font-bold font-mono text-neutral-700">
                           {item.sNo ?? index + 1}
                         </td>
                         <td className="border-r-[1.5px] border-neutral-200 px-4 py-2 font-bold text-neutral-900">
                           {item.itemName}
+                        </td>
+                        <td className="border-r-[1.5px] border-neutral-200 px-3 py-2 text-neutral-900">
+                          {item.colour || <span className="text-neutral-500 italic">Not recorded</span>}
                         </td>
                         <td className="border-r-[1.5px] border-neutral-200 px-3 py-2 text-center">
                           <span
@@ -461,6 +473,9 @@ function TotalStockContent() {
                             {isUndyed ? 'UNDYED' : 'DYED'}
                           </span>
                         </td>
+                        <td className="border-r-[1.5px] border-neutral-200 px-3 py-2 text-center font-mono font-bold text-neutral-900">
+                          {item.unit}
+                        </td>
                         <td className="border-r-[1.5px] border-neutral-200 px-4 py-2 text-right font-bold text-neutral-900">
                           {item.totalInward.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                           <span className="text-[10px] text-neutral-500 ml-1">{item.unit}</span>
@@ -472,6 +487,11 @@ function TotalStockContent() {
                         <td className="border-r-[1.5px] border-neutral-200 px-4 py-2 text-right font-black text-sm text-brand-900 bg-brand-50/50">
                           {item.balance.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
                           <span className="text-xs font-bold text-brand-700 ml-1">{item.unit}</span>
+                          {item.shortfall ? (
+                            <span className="block text-[10px] font-bold text-danger-700" title="Older issues exceed the recorded inward quantity">
+                              Short {item.shortfall.toLocaleString('en-IN', { maximumFractionDigits: 2 })} {item.unit}
+                            </span>
+                          ) : null}
                         </td>
                         <td className="border-r-[1.5px] border-neutral-200 px-3 py-2 text-center">
                           {item.balance > 0 ? (
@@ -527,6 +547,7 @@ function TotalStockContent() {
                   <th className="px-4 py-2 font-bold">DATE</th>
                   <th className="px-4 py-2 font-bold">CHALLAN</th>
                   <th className="px-4 py-2 font-bold">FABRIC</th>
+                  <th className="px-4 py-2 font-bold">COLOUR</th>
                   <th className="px-4 py-2 font-bold">FROM</th>
                   <th className="px-4 py-2 font-bold">TO</th>
                   <th className="px-4 py-2 font-bold text-right">QUANTITY</th>
@@ -534,12 +555,13 @@ function TotalStockContent() {
               </thead>
               <tbody className="divide-y divide-neutral-200">
                 {outwardHistory.length === 0 ? (
-                  <tr><td colSpan={6} className="px-4 py-8 text-center text-neutral-500">No outward challans found</td></tr>
+                  <tr><td colSpan={7} className="px-4 py-8 text-center text-neutral-500">No outward challans found</td></tr>
                 ) : outwardHistory.map((entry) => (
                   <tr key={entry.id} className="hover:bg-neutral-50">
                     <td className="px-4 py-2 whitespace-nowrap">{formatDate(entry.date)}</td>
                     <td className="px-4 py-2 font-semibold">{entry.challanNumber || '—'}</td>
                     <td className="px-4 py-2">{entry.itemName}</td>
+                    <td className="px-4 py-2">{entry.colour || '—'}</td>
                     <td className="px-4 py-2">{entry.sourceDepartment || '—'}</td>
                     <td className="px-4 py-2">{entry.destination || '—'}</td>
                     <td className="px-4 py-2 text-right font-bold">{Number(entry.quantity).toLocaleString('en-IN', { maximumFractionDigits: 2 })} {entry.unit}</td>

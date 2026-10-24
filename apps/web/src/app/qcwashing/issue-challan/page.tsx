@@ -19,6 +19,7 @@ import {
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import BarcodeStickerCard from '@/components/BarcodeStickerCard';
 import { ColorFabricMeasurementTable, createDepartmentInOutTracking } from '@/components/ColorFabricMeasurementTable';
+import { ChallanNumberField, newSubmissionKey } from '@/components/challan/ChallanNumberField';
 
 export default function QCWashingIssueChallanPage() {
   const router = useRouter();
@@ -28,6 +29,9 @@ export default function QCWashingIssueChallanPage() {
   const [selectedSheetForView, setSelectedSheetForView] = useState<any | null>(null);
   const [generatedChallan, setGeneratedChallan] = useState<any | null>(null);
   const [challanNumber, setChallanNumber] = useState('');
+  const [challanNumberError, setChallanNumberError] = useState<string | null>(null);
+  // One key per challan form fill, so a retried or double-clicked submit cannot create two challans.
+  const [submissionKey, setSubmissionKey] = useState(newSubmissionKey);
   const [toDepartment, setToDepartment] = useState('RECUTTING');
   const [priority, setPriority] = useState('NORMAL');
   const [remarks, setRemarks] = useState('QC Washing Verified & Approved pieces handover to Recutting Section for embroidery precision cutting.');
@@ -53,14 +57,7 @@ export default function QCWashingIssueChallanPage() {
   useEffect(() => {
     const init = async () => {
       try {
-        const [numRes, progRes] = await Promise.all([
-          fetch('/api/challans/next-number?department=QC3'),
-          fetch('/api/programs'),
-        ]);
-        if (numRes.ok) {
-          const numJson = await numRes.json();
-          setChallanNumber(numJson.nextNumber);
-        }
+        const progRes = await fetch('/api/programs');
         if (progRes.ok) {
           const progJson = await progRes.json();
           const list = Array.isArray(progJson) ? progJson : progJson.data || [];
@@ -119,11 +116,18 @@ export default function QCWashingIssueChallanPage() {
       return;
     }
 
+    if (!challanNumber.trim()) {
+      setChallanNumberError('Challan Number is required.');
+      return;
+    }
+    setChallanNumberError(null);
+
     try {
       setLoading(true);
 
       const payload = {
-        challanNumber,
+        idempotencyKey: submissionKey,
+        challanNumber: challanNumber.trim(),
         challanType: 'REGULAR',
         programId: selectedProgram.id,
         fromDepartment: 'QC3',
@@ -147,10 +151,13 @@ export default function QCWashingIssueChallanPage() {
 
       const data = await res.json();
       if (!res.ok) {
+        if (data.field === 'challanNumber') setChallanNumberError(data.error);
         throw new Error(data.error || 'Failed to issue challan');
       }
 
       setGeneratedChallan(data.data || data);
+      setChallanNumber('');
+      setSubmissionKey(newSubmissionKey());
     } catch (err: any) {
       alert(`Error issuing challan: ${err.message}`);
     } finally {
@@ -196,16 +203,14 @@ export default function QCWashingIssueChallanPage() {
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-neutral-200 p-6 shadow-xs space-y-6">
           {/* 1. Header Details */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label className="text-xs font-bold text-neutral-700 block mb-1">Challan Number *</label>
-              <input
-                type="text"
-                required
-                value={challanNumber}
-                onChange={(e) => setChallanNumber(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-neutral-200 text-xs font-mono font-bold bg-neutral-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/40"
-              />
-            </div>
+            <ChallanNumberField
+              value={challanNumber}
+              onChange={(value) => {
+                setChallanNumber(value);
+                setChallanNumberError(null);
+              }}
+              error={challanNumberError}
+            />
 
             <div>
               <label className="text-xs font-bold text-neutral-700 block mb-1">To Department *</label>

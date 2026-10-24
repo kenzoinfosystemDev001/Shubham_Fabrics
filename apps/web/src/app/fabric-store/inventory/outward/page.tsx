@@ -69,6 +69,7 @@ export default function OutwardStockPage() {
     challanNumber: '',
     designNumber: '',
     itemName: '',
+    colour: '',
     issueQty: '',
     unit: 'MTR',
     avgPerPcs: '',
@@ -136,6 +137,7 @@ export default function OutwardStockPage() {
         challanNumber: '',
         designNumber: '',
         itemName: '',
+        colour: '',
         issueQty: '',
         unit: 'MTR',
         avgPerPcs: '',
@@ -598,6 +600,18 @@ export default function OutwardStockPage() {
                     value={formData.itemName}
                     onChange={(e) => setFormData((prev) => ({ ...prev, itemName: e.target.value }))}
                     placeholder="e.g. Cotton 60x60 Cambric"
+                    className="w-full h-10 px-3 border-[1.5px] border-neutral-200 rounded-lg text-xs font-bold text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-black uppercase text-neutral-700 mb-1">
+                    COLOUR
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.colour}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, colour: e.target.value }))}
+                    placeholder="Colour issued from stock"
                     className="w-full h-10 px-3 border-[1.5px] border-neutral-200 rounded-lg text-xs font-bold text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white"
                   />
                 </div>

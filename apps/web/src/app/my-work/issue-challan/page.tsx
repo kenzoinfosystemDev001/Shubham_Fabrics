@@ -28,6 +28,7 @@ import {
 } from '@/components/ColorFabricMeasurementTable';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { printProductionSheet, downloadProductionSheetHtml } from '@/lib/download-production-sheet';
+import { ChallanNumberField, newSubmissionKey } from '@/components/challan/ChallanNumberField';
 
 function getWilcomDesignEntries(program: any): Array<{ styleName?: string; category?: string; wilcomDesignNumber: string }> {
   let metadata: any = {};
@@ -66,6 +67,9 @@ function IssueChallanContent() {
 
   // Form fields per Master Development Prompt Section 5
   const [challanNumber, setChallanNumber] = useState('');
+  const [challanNumberError, setChallanNumberError] = useState<string | null>(null);
+  // One key per challan form fill, so a retried or double-clicked submit cannot create two challans.
+  const [submissionKey, setSubmissionKey] = useState(newSubmissionKey);
   const [challanDate, setChallanDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [sourceDept] = useState('Programming Department');
   const [destinationDept] = useState('Fabric Store');
@@ -100,23 +104,14 @@ function IssueChallanContent() {
 
   const wilcomDesignEntries = selectedProgram ? getWilcomDesignEntries(selectedProgram) : [];
 
-  // Load programs and next Challan number
+  // Load programs
   useEffect(() => {
     const init = async () => {
       try {
         setFetchingChallanNo(true);
-        const [programsList, nextNoRes] = await Promise.all([
-          api.getPrograms().catch(() => []),
-          fetch('/api/challans/next-number?department=PROGRAMMING').then(r => r.json()).catch(() => ({})),
-        ]);
+        const programsList = await api.getPrograms().catch(() => []);
 
         setPrograms(programsList || []);
-        if (nextNoRes.nextNumber) {
-          setChallanNumber(nextNoRes.nextNumber);
-        } else {
-          const year = new Date().getFullYear();
-          setChallanNumber(`CH-PRG-${year}-${String(Date.now()).slice(-5)}`);
-        }
 
         // If preselected program provided via query param
         if (preselectedProgramId && programsList.length > 0) {
@@ -197,9 +192,11 @@ function IssueChallanContent() {
     }
 
     if (!challanNumber.trim()) {
+      setChallanNumberError('Challan Number is required.');
       setError('Challan Number is required.');
       return;
     }
+    setChallanNumberError(null);
 
     if (items.length === 0) {
       setError('Please add at least one fabric item in COLOR / FABRIC / MEASUREMENT.');
@@ -231,6 +228,7 @@ function IssueChallanContent() {
     setLoading(true);
     try {
       const payload = {
+        idempotencyKey: submissionKey,
         challanNumber: challanNumber.trim(),
         challanType: 'INTER_DEPARTMENT',
         programId: selectedProgram.id,
@@ -272,6 +270,7 @@ function IssueChallanContent() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } catch (err: any) {
+      if (/challan number/i.test(err.message || '')) setChallanNumberError(err.message);
       setError(err.message || 'Failed to issue Challan.');
       if (typeof window !== 'undefined') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -407,6 +406,9 @@ function IssueChallanContent() {
                   onClick={() => {
                     setIssuedChallan(null);
                     setSelectedProgram(null);
+                    setChallanNumber('');
+                    setChallanNumberError(null);
+                    setSubmissionKey(newSubmissionKey());
                     setItems([createBlankChallanItem('PROGRAMMING_STORE')]);
                     router.push('/my-work/issue-challan');
                   }}
@@ -516,18 +518,14 @@ function IssueChallanContent() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
                 {/* Challan Number */}
-                <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-1">
-                    Challan Number <span className="text-danger-600">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={challanNumber}
-                    onChange={(e) => setChallanNumber(e.target.value)}
-                    className="w-full px-3 py-2 bg-neutral-50 border border-neutral-300 rounded-lg font-mono font-bold text-neutral-900 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-500/40"
-                  />
-                </div>
+                <ChallanNumberField
+                  value={challanNumber}
+                  onChange={(value) => {
+                    setChallanNumber(value);
+                    setChallanNumberError(null);
+                  }}
+                  error={challanNumberError}
+                />
 
                 {/* Challan Date */}
                 <div>

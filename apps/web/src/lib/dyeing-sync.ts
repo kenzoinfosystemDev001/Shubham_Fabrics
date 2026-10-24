@@ -1,5 +1,6 @@
 
 import { prisma } from '@subham/database';
+import { mapChallanItemsToDyeingLines, summarizeTargetColour } from '@/lib/dyeing-instructions.mjs';
 
 /**
  * Automatically sync incoming Fabric Store challans to DyeingOrders.
@@ -116,11 +117,16 @@ export async function syncInboundChallansToDyeingOrders() {
 
         const fabricType = challan.program?.fabricType || null;
 
-        const targetColor =
+        // Each challan line keeps its own required colour (read from ChallanItem on the Dyeing
+        // screen); the order's targetColor only summarizes them. Challans without required
+        // colours keep the value orders always had.
+        const targetColor = summarizeTargetColour(
+          mapChallanItemsToDyeingLines(challan),
           primaryItem?.colour ||
-          primaryItem?.shade ||
-          challan.program?.fabricColor ||
-          'Standard';
+            primaryItem?.shade ||
+            challan.program?.fabricColor ||
+            'Standard',
+        );
 
         // 5. Generate the next available dyeing order number.
         const latestOrder = await prisma.dyeingOrder.findFirst({

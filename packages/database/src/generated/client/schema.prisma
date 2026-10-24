@@ -688,24 +688,26 @@ model Challan {
 }
 
 model ChallanItem {
-  id              String  @id @default(uuid())
-  challanId       String
-  challan         Challan @relation(fields: [challanId], references: [id], onDelete: Cascade)
-  itemDescription String
-  fabricCode      String?
-  colour          String?
-  shade           String?
-  size            String?
-  unitType        String
-  rollNumber      String?
-  lotNumber       String?
-  bundleNumber    String?
-  barcode         String?
-  quantity        Float
-  grossWeightKg   Float?
-  netWeightKg     Float?
-  uom             String
-  remarks         String?
+  id               String  @id @default(uuid())
+  challanId        String
+  challan          Challan @relation(fields: [challanId], references: [id], onDelete: Cascade)
+  itemDescription  String
+  fabricCode       String?
+  colour           String? // current fabric colour as issued
+  shade            String? // current shade as issued
+  requiredColour   String? // colour Dyeing must achieve (Store -> Dyeing lines); null when not specified
+  requiredQuantity Float? // quantity to dye in this line's uom; null when not specified
+  size             String?
+  unitType         String
+  rollNumber       String?
+  lotNumber        String?
+  bundleNumber     String?
+  barcode          String?
+  quantity         Float
+  grossWeightKg    Float?
+  netWeightKg      Float?
+  uom              String
+  remarks          String?
 
   sourceLotId    String?
   sourceRollId   String?
@@ -830,9 +832,11 @@ model StockLedgerEntry {
   actor          User     @relation(fields: [actorId], references: [id])
   balanceAfter   Float
   notes          String?
+  idempotencyKey String?  @unique // one ledger movement per (document, line, revision); retries cannot double-post
   createdAt      DateTime @default(now())
 
   @@index([departmentCode, itemCode])
+  @@index([referenceType, referenceId])
   @@index([batchNumber])
   @@index([lotNumber])
   @@index([rollNumber])
@@ -1424,7 +1428,8 @@ model FabricInward {
   billDate      DateTime // Bill Date
   receivingDate DateTime // Date received in store
   billQty       Float // Quantity
-  unit          String   @default("MTR") // "MTR" or "PCS"
+  unit          String   @default("MTR") // "MTR" or "PCS"; never converted
+  colour        String? // null on entries recorded before colour tracking
   supplierName  String?
   remarks       String?
   createdAt     DateTime @default(now())
@@ -1445,6 +1450,7 @@ model FabricOutward {
   itemName      String
   issueQty      Float // meters or units issued
   unit          String   @default("MTR")
+  colour        String?
   avgPerPcs     Float? // avg fabric per pcs
   issuePcsQty   Float? // pcs quantity
   byOrderName   String? // by order name / client name

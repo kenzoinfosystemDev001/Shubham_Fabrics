@@ -32,8 +32,24 @@ import {
   Send
 } from 'lucide-react';
 import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
+import { TransferDocuments } from '@/components/common/TransferDocuments';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import BarcodeStickerCard from '@/components/BarcodeStickerCard';
+import { ChallanNumberField, challanNumberClientError, newSubmissionKey } from '@/components/challan/ChallanNumberField';
+
+type Qc2ChallanNumberField = 'reworkChallanNumber' | 'rejectChallanNumber';
+const EMPTY_QC2_CHALLAN_NUMBERS: Record<Qc2ChallanNumberField, string> = {
+  reworkChallanNumber: '',
+  rejectChallanNumber: '',
+};
+
+/** Challans the QC2 inspect route will create for these quantities (mirrors the server rule). */
+function qc2NeededChallanNumbers(form: { quantityRework: string; quantityFailed: string }) {
+  const needed: Array<{ field: Qc2ChallanNumberField; label: string }> = [];
+  if (Number(form.quantityRework || 0) > 0) needed.push({ field: 'reworkChallanNumber', label: 'Rework challan number' });
+  if (Number(form.quantityFailed || 0) > 0) needed.push({ field: 'rejectChallanNumber', label: 'Defective shelf challan number' });
+  return needed;
+}
 
 interface QC2Challan {
   id: string;
@@ -113,6 +129,23 @@ export default function QC2MyWorkPage() {
   const [selectedDefects, setSelectedDefects] = useState<Record<string, number>>({});
   const [submittingInspection, setSubmittingInspection] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [challanNumbers, setChallanNumbers] = useState(EMPTY_QC2_CHALLAN_NUMBERS);
+  const [challanNumberErrors, setChallanNumberErrors] = useState<Partial<Record<Qc2ChallanNumberField, string>>>({});
+
+  // Issue-to-Washing form (manual challan number)
+  const [washingChallanNumber, setWashingChallanNumber] = useState('');
+  const [washingChallanNumberError, setWashingChallanNumberError] = useState<string | null>(null);
+  const [washingIssueError, setWashingIssueError] = useState<string | null>(null);
+  const [washingIdempotencyKey, setWashingIdempotencyKey] = useState('');
+  const [submittingWashingIssue, setSubmittingWashingIssue] = useState(false);
+
+  const openIssueToWashing = (challan: QC2Challan) => {
+    setIssuingToWashing(challan);
+    setWashingChallanNumber('');
+    setWashingChallanNumberError(null);
+    setWashingIssueError(null);
+    setWashingIdempotencyKey(newSubmissionKey());
+  };
 
   const DEFECT_CATEGORIES = [
     { id: 'NEEDLE_HOLES', label: 'Needle Holes / Piercing' },
@@ -182,12 +215,21 @@ export default function QC2MyWorkPage() {
   }, [searchParams]);
 
   const handleIssueToWashing = async (challan: QC2Challan) => {
+    const numberError = challanNumberClientError(washingChallanNumber, 'Washing challan number');
+    if (numberError) {
+      setWashingChallanNumberError(numberError);
+      return;
+    }
+    setSubmittingWashingIssue(true);
+    setWashingIssueError(null);
     try {
       const goodQty = challan.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
       const res = await fetch('/api/challans', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          challanNumber: washingChallanNumber.trim(),
+          idempotencyKey: washingIdempotencyKey,
           challanType: 'REGULAR',
           programId: challan.programId,
           fromDepartment: 'QC2',
@@ -208,14 +250,22 @@ export default function QC2MyWorkPage() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
+        setIssuingToWashing(null);
+        setWashingChallanNumber('');
         setWashingChallanModal(data.data);
         setToastMessage(`Challan ${data.data.challanNumber} issued to Washing Department successfully!`);
         loadData();
       } else {
+        if (data.field === 'challanNumber') {
+          setWashingChallanNumberError(data.error || 'Invalid challan number.');
+          return;
+        }
         throw new Error(data.error || 'Failed to issue challan to Washing');
       }
     } catch (err: any) {
-      alert(`Error issuing to Washing: ${err.message}`);
+      setWashingIssueError(`Error issuing to Washing: ${err.message}`);
+    } finally {
+      setSubmittingWashingIssue(false);
     }
   };
 
@@ -279,6 +329,8 @@ export default function QC2MyWorkPage() {
       remarks: '',
     });
     setSelectedDefects({});
+    setChallanNumbers(EMPTY_QC2_CHALLAN_NUMBERS);
+    setChallanNumberErrors({});
   };
 
   // Handle live recalculation when user changes Passed or Failed
@@ -363,6 +415,18 @@ export default function QC2MyWorkPage() {
       return;
     }
 
+    // Manual challan numbers for each challan this inspection will create
+    const neededNumbers = qc2NeededChallanNumbers(inspectionForm);
+    const numberErrors: Partial<Record<Qc2ChallanNumberField, string>> = {};
+    for (const { field, label } of neededNumbers) {
+      const msg = challanNumberClientError(challanNumbers[field], label);
+      if (msg) numberErrors[field] = msg;
+    }
+    setChallanNumberErrors(numberErrors);
+    if (Object.keys(numberErrors).length > 0) return;
+    const typedNumbers: Partial<Record<Qc2ChallanNumberField, string>> = {};
+    for (const { field } of neededNumbers) typedNumbers[field] = challanNumbers[field].trim();
+
     try {
       setSubmittingInspection(true);
 
@@ -384,6 +448,7 @@ export default function QC2MyWorkPage() {
         reworkReason: inspectionForm.reworkReason,
         remarks: inspectionForm.remarks,
         inspectorId: currentUser?.id,
+        ...typedNumbers,
       };
 
       const res = await fetch(`/api/qc2/challans/${selectedChallanForInspect.id}/inspect`, {
@@ -394,9 +459,15 @@ export default function QC2MyWorkPage() {
 
       const json = await res.json();
       if (!res.ok) {
+        if (json.field && json.field in EMPTY_QC2_CHALLAN_NUMBERS) {
+          setChallanNumberErrors({ [json.field as Qc2ChallanNumberField]: json.error });
+          return;
+        }
         throw new Error(json.error || 'Failed to submit inspection');
       }
 
+      setChallanNumbers(EMPTY_QC2_CHALLAN_NUMBERS);
+      setChallanNumberErrors({});
       setSelectedChallanForInspect(null);
       setInspectionResultModal(json.data);
       loadData();
@@ -697,7 +768,7 @@ export default function QC2MyWorkPage() {
 
                               {c.status === 'QC_APPROVED' && (
                                 <button
-                                  onClick={() => handleIssueToWashing(c)}
+                                  onClick={() => openIssueToWashing(c)}
                                   className="px-2.5 py-1 bg-brand-600 hover:bg-brand-700 text-white rounded text-[11px] font-semibold transition shadow-2xs flex items-center gap-1"
                                   title="Issue Handover Challan to Washing Department"
                                 >
@@ -706,11 +777,7 @@ export default function QC2MyWorkPage() {
                                 </button>
                               )}
 
-                              <DocumentActionButtons
-                                challan={c}
-                                program={c.program}
-                                size="xs"
-                              />
+                              <TransferDocuments challan={c} size="xs" />
                             </div>
                           </td>
                         </tr>
@@ -1175,6 +1242,25 @@ export default function QC2MyWorkPage() {
                 </div>
               )}
 
+              {/* MANUAL CHALLAN NUMBERS FOR GENERATED CHALLANS */}
+              {qc2NeededChallanNumbers(inspectionForm).length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {qc2NeededChallanNumbers(inspectionForm).map(({ field, label }) => (
+                    <ChallanNumberField
+                      key={field}
+                      compact
+                      label={label}
+                      value={challanNumbers[field]}
+                      onChange={(v) => {
+                        setChallanNumbers((prev) => ({ ...prev, [field]: v }));
+                        setChallanNumberErrors((prev) => ({ ...prev, [field]: undefined }));
+                      }}
+                      error={challanNumberErrors[field]}
+                    />
+                  ))}
+                </div>
+              )}
+
               {/* OVERALL REMARKS */}
               <div>
                 <label className="block text-xs font-semibold text-neutral-700 mb-1">
@@ -1350,6 +1436,70 @@ export default function QC2MyWorkPage() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* MODAL: ISSUE HANDOVER CHALLAN TO WASHING */}
+      {issuingToWashing && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-900/70 backdrop-blur-xs animate-in fade-in">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleIssueToWashing(issuingToWashing);
+            }}
+            className="relative w-full max-w-sm bg-white rounded-2xl p-5 shadow-2xl border border-neutral-200 text-neutral-900 space-y-3"
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-neutral-900 flex items-center gap-2">
+                <Waves className="w-4 h-4 text-brand-700" />
+                Issue to Washing
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIssuingToWashing(null)}
+                className="p-1 rounded text-neutral-500 hover:text-neutral-700"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-[11px] text-neutral-600">
+              Sheet{' '}
+              <span className="font-mono font-bold">
+                {issuingToWashing.program?.programSerialNo || issuingToWashing.program?.programNumber || '—'}
+              </span>{' '}
+              ·{' '}
+              {issuingToWashing.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0)} PCS
+            </p>
+            <ChallanNumberField
+              compact
+              label="Washing challan number"
+              value={washingChallanNumber}
+              onChange={(v) => {
+                setWashingChallanNumber(v);
+                setWashingChallanNumberError(null);
+              }}
+              error={washingChallanNumberError}
+            />
+            {washingIssueError && (
+              <p className="text-[11px] font-semibold text-danger-700">{washingIssueError}</p>
+            )}
+            <div className="flex justify-end gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => setIssuingToWashing(null)}
+                className="px-3 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-semibold text-xs rounded-lg transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={submittingWashingIssue}
+                className="px-4 py-1.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-lg shadow-xs transition disabled:opacity-50"
+              >
+                {submittingWashingIssue ? 'Issuing...' : 'Issue Challan'}
+              </button>
+            </div>
+          </form>
         </div>
       )}
 

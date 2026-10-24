@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
+import {
+  assertChallanNumbersAvailable,
+  challanNumberErrorResponse,
+  requireChallanNumberSet,
+} from '@/lib/challan-number-server';
 
 export const dynamic = 'force-dynamic';
 
@@ -179,6 +184,17 @@ export async function POST(
       }
     }
 
+    // 3b. Manual challan numbers for every challan this inspection creates
+    const numberEntries: Array<{ field: string; label: string; value: unknown }> = [];
+    if (qRework > 0) numberEntries.push({ field: 'reworkChallanNumber', label: 'Rework challan number', value: body.reworkChallanNumber });
+    if (qFailed > 0) numberEntries.push({ field: 'rejectChallanNumber', label: 'Defective shelf challan number', value: body.rejectChallanNumber });
+    if (normalizedResult === 'PASS' && qPassed > 0) numberEntries.push({ field: 'passChallanNumber', label: 'Embroidery challan number', value: body.passChallanNumber });
+    const typedNumbers = requireChallanNumberSet(numberEntries);
+    await assertChallanNumbersAvailable(
+      prisma,
+      Object.entries(typedNumbers).map(([field, value]) => ({ field, value })),
+    );
+
     // 4. Resolve Authenticated Inspector
     const actorUser = { id: authUser.id, fullName: authUser.fullName, username: authUser.username };
     const actorId = actorUser?.id || '';
@@ -285,12 +301,7 @@ export async function POST(
         // E. Return Rework yardage to Dyeing Department if rework quantity > 0 (Rule 5)
         let reworkReturnChallan = null;
         if (qRework > 0) {
-          const year = new Date().getFullYear();
-          const retPrefix = `CH-RET-QC1-${year}-`;
-          const retCount = await tx.challan.count({
-            where: { challanNumber: { startsWith: retPrefix } },
-          });
-          const returnChallanNumber = `${retPrefix}${String(retCount + 1).padStart(5, '0')}`;
+          const returnChallanNumber = typedNumbers.reworkChallanNumber;
 
           reworkReturnChallan = await tx.challan.create({
             data: {
@@ -326,12 +337,7 @@ export async function POST(
         // E.2 Return Rejected / Defective yardage to Fabric Store Defective Shelf if failed quantity > 0 (Rule 6)
         let rejectReturnChallan = null;
         if (qFailed > 0) {
-          const year = new Date().getFullYear();
-          const rejPrefix = `CH-REJ-QC1-${year}-`;
-          const rejCount = await tx.challan.count({
-            where: { challanNumber: { startsWith: rejPrefix } },
-          });
-          const rejectChallanNumber = `${rejPrefix}${String(rejCount + 1).padStart(5, '0')}`;
+          const rejectChallanNumber = typedNumbers.rejectChallanNumber;
 
           rejectReturnChallan = await tx.challan.create({
             data: {
@@ -375,12 +381,7 @@ export async function POST(
         // E.3 Forward Passed yardage to Embroidery Department if result is PASS (Rule 7)
         let passForwardChallan = null;
         if (normalizedResult === 'PASS' && qPassed > 0) {
-          const year = new Date().getFullYear();
-          const fwdPrefix = `CH-EMB-QC1-${year}-`;
-          const fwdCount = await tx.challan.count({
-            where: { challanNumber: { startsWith: fwdPrefix } },
-          });
-          const passChallanNumber = `${fwdPrefix}${String(fwdCount + 1).padStart(5, '0')}`;
+          const passChallanNumber = typedNumbers.passChallanNumber;
 
           passForwardChallan = await tx.challan.create({
             data: {
@@ -517,6 +518,8 @@ export async function POST(
       data: transactionResult,
     });
   } catch (error: any) {
+    const numberResponse = challanNumberErrorResponse(error);
+    if (numberResponse) return numberResponse;
     console.error('Error completing QC1 inspection:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to complete QC1 inspection.' },

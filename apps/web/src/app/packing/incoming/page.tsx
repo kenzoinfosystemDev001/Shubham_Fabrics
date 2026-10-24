@@ -17,6 +17,7 @@ import {
   Filter,
 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { TransferDocuments } from '@/components/common/TransferDocuments';
 
 interface IncomingChallan {
   id: string;
@@ -303,17 +304,8 @@ export default function PackingIncomingPage() {
                           <span className="text-[11px] text-neutral-500 block truncate max-w-[200px]">
                             {ch.program?.buyerName || ch.program?.clientName || 'N/A'}
                           </span>
-                          {ch.program?.id && (
-                            <Link
-                              href={`/programs/${ch.program.id}`}
-                              target="_blank"
-                              className="inline-flex items-center gap-1 text-[10px] text-accent-700 hover:text-accent-700 mt-1"
-                            >
-                              <FileText className="w-3 h-3" />
-                              View Production Sheet
-                              <ExternalLink className="w-2.5 h-2.5" />
-                            </Link>
-                          )}
+                          {/* Production sheet & this received challan */}
+                          <TransferDocuments challan={ch} size="xs" className="mt-1" />
                         </td>
 
                         {/* From Department */}
@@ -454,6 +446,8 @@ export default function PackingIncomingPage() {
                   ✕
                 </button>
               </div>
+
+              <TransferDocuments challan={activeChallan} size="xs" autoLoad />
 
               {/* Source Info */}
               <div className="rounded-lg bg-canvas p-3 border border-neutral-200 text-xs space-y-1">

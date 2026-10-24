@@ -2,6 +2,12 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
 import {
+  FabricStockError,
+  STOCK_TRANSACTION_OPTIONS,
+  fabricStockErrorBody,
+  syncManualOutwardStock,
+} from '@/lib/fabric-stock-ledger';
+import {
   cleanFabricName,
   getChallanItemFabricType,
   normalizeFabricStockType,
@@ -316,6 +322,7 @@ export async function POST(request: Request) {
       remarks,
       destination = 'OTHER',
       fabricType = 'DYED',
+      colour,
     } = body;
 
     if (!itemName || issueQty === undefined) {
@@ -329,14 +336,22 @@ export async function POST(request: Request) {
 
     const normalizedType = (fabricType === 'KORA' || fabricType === 'UNDYED') ? 'UNDYED' : 'DYED';
 
-    const outward = await (prisma as any).fabricOutward.create({
+    const normalizedUnit = String(unit).toUpperCase();
+    if (!['MTR', 'PCS'].includes(normalizedUnit)) {
+      return NextResponse.json({ error: 'unit must be MTR or PCS' }, { status: 400 });
+    }
+
+    // Deducts from the matching fabric, colour and unit; refused when stock would go negative.
+    const outward = await prisma.$transaction(async (tx) => {
+      const row = await tx.fabricOutward.create({
       data: {
         date: new Date(date),
         challanNumber: challanNumber ? String(challanNumber).trim() : null,
         designNumber: designNumber ? String(designNumber).trim() : null,
         itemName: String(itemName).trim(),
         issueQty: qty,
-        unit: unit.toUpperCase() === 'PCS' ? 'PCS' : 'MTR',
+        unit: normalizedUnit,
+        colour: colour ? String(colour).trim() : null,
         avgPerPcs: avgPerPcs ? parseFloat(avgPerPcs) : null,
         issuePcsQty: issuePcsQty ? parseFloat(issuePcsQty) : null,
         byOrderName: byOrderName ? String(byOrderName).trim() : null,
@@ -344,10 +359,16 @@ export async function POST(request: Request) {
         destination: String(destination).toUpperCase(),
         fabricType: normalizedType,
       },
-    });
+      });
+      await syncManualOutwardStock(tx, row.id, authUser.id);
+      return row;
+    }, STOCK_TRANSACTION_OPTIONS);
 
     return NextResponse.json({ success: true, data: outward }, { status: 201 });
   } catch (error: any) {
+    if (error instanceof FabricStockError) {
+      return NextResponse.json(fabricStockErrorBody(error), { status: 400 });
+    }
     console.error('Error recording outward fabric issue:', error);
     return NextResponse.json({ error: error.message || 'Failed to record outward stock' }, { status: 500 });
   }

@@ -33,7 +33,7 @@ import {
   downloadChallanHtml, 
   printChallan 
 } from '@/lib/download-challan';
-import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
+import { TransferDocuments } from '@/components/common/TransferDocuments';
 
 export default function EmbroideryIncomingChallansPage() {
   const [loading, setLoading] = useState(true);
@@ -468,7 +468,7 @@ export default function EmbroideryIncomingChallansPage() {
                       </button>
 
                       {/* COMPLETE DOCUMENT ACTIONS: PRODUCTION SHEET, CHALLAN & WILCOM */}
-                      <DocumentActionButtons program={ch.program} challan={ch} size="sm" />
+                      <TransferDocuments challan={ch} size="sm" />
                     </div>
 
                     <div className="flex items-center gap-2 flex-wrap">
@@ -536,6 +536,7 @@ export default function EmbroideryIncomingChallansPage() {
             </div>
 
             <div className="space-y-3 text-xs">
+              <TransferDocuments challan={inspectModalChallan} size="xs" autoLoad />
               <div className="p-3 bg-neutral-50 border border-neutral-200 rounded-xl grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div>
                   <span className="text-neutral-500 text-[10px] block">Source Dept</span>

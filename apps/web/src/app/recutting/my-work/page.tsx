@@ -29,7 +29,7 @@ import {
   Eye,
   Download,
 } from 'lucide-react';
-import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
+import { TransferDocuments } from '@/components/common/TransferDocuments';
 import { ProductionSheetPrintModal } from '@/components/production-sheet/ProductionSheetPrintModal';
 import { 
   downloadProductionSheetHtml, 
@@ -573,11 +573,7 @@ function RecuttingWorkstationContent() {
 
                             {/* 1-CLICK ACTIONS */}
                             <div className="mt-2" onClick={(e) => e.stopPropagation()}>
-                              <DocumentActionButtons
-                                challan={job}
-                                program={job.program}
-                                size="xs"
-                              />
+                              <TransferDocuments challan={job} size="xs" />
                             </div>
                           </div>
 
@@ -649,11 +645,7 @@ function RecuttingWorkstationContent() {
                     </div>
 
                     <div className="flex items-center gap-2 flex-wrap">
-                      <DocumentActionButtons
-                        challan={selectedJob}
-                        program={selectedJob.program}
-                        size="sm"
-                      />
+                      <TransferDocuments challan={selectedJob} size="sm" autoLoad />
                       <Link
                         href={`/recutting/workspace/${selectedJob.id}`}
                         className="px-3 py-1.5 bg-danger-50 hover:bg-danger-100 text-danger-700 rounded-lg text-xs font-bold transition flex items-center gap-1.5 border border-danger-200"

@@ -31,6 +31,7 @@ import {
   Maximize2,
 } from 'lucide-react';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
+import { TransferDocuments } from '@/components/common/TransferDocuments';
 
 function SteamPressWorkstationContent() {
   const searchParams = useSearchParams();
@@ -535,16 +536,8 @@ function SteamPressWorkstationContent() {
                   </div>
 
                   <div className="flex items-center gap-2 flex-wrap">
-                    {/* View Tech Sheet */}
-                    {selectedJob.program && (
-                      <button
-                        onClick={() => openTechSheet(selectedJob.program)}
-                        className="px-3 py-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-900 text-xs font-semibold border border-neutral-200 transition flex items-center gap-1.5"
-                      >
-                        <FileText className="w-3.5 h-3.5 text-brand-600" />
-                        <span>Production Sheet</span>
-                      </button>
-                    )}
+                    {/* Production sheet & received challan */}
+                    <TransferDocuments challan={selectedJob} size="sm" autoLoad />
 
                     {/* Dedicated Focus Workspace Link */}
                     <Link

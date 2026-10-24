@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
+import {
+  assertChallanNumbersAvailable,
+  challanNumberErrorResponse,
+  requireChallanNumberSet,
+} from '@/lib/challan-number-server';
 
 export const dynamic = 'force-dynamic';
 
@@ -178,6 +183,16 @@ export async function POST(
       );
     }
 
+    // 3b. Manual challan numbers for every challan this inspection creates
+    const numberEntries: Array<{ field: string; label: string; value: unknown }> = [];
+    if (qRework > 0) numberEntries.push({ field: 'reworkChallanNumber', label: 'Rework challan number', value: body.reworkChallanNumber });
+    if (qFailed > 0) numberEntries.push({ field: 'rejectChallanNumber', label: 'Defective shelf challan number', value: body.rejectChallanNumber });
+    const typedNumbers = requireChallanNumberSet(numberEntries);
+    await assertChallanNumbersAvailable(
+      prisma,
+      Object.entries(typedNumbers).map(([field, value]) => ({ field, value })),
+    );
+
     // 4. Resolve Actor
     const actorUser = { id: authUser.id, fullName: authUser.fullName, username: authUser.username };
     const actorId = actorUser?.id || '';
@@ -313,12 +328,7 @@ export async function POST(
       // E. Return Rework pieces to Thread Cutting Department if rework quantity > 0
       let reworkReturnChallan = null;
       if (qRework > 0) {
-        const year = new Date().getFullYear();
-        const retPrefix = `CH-RET-QC2-${year}-`;
-        const retCount = await tx.challan.count({
-          where: { challanNumber: { startsWith: retPrefix } },
-        });
-        const returnChallanNumber = `${retPrefix}${String(retCount + 1).padStart(5, '0')}`;
+        const returnChallanNumber = typedNumbers.reworkChallanNumber;
 
         reworkReturnChallan = await tx.challan.create({
           data: {
@@ -354,12 +364,7 @@ export async function POST(
       // F. USER REQUIREMENT: IF THERE IS REJECTION IT WILL GO TO DEFECTED SHELF DIRECTLY
       let rejectReturnChallan = null;
       if (qFailed > 0) {
-        const year = new Date().getFullYear();
-        const rejPrefix = `CH-REJ-QC2-${year}-`;
-        const rejCount = await tx.challan.count({
-          where: { challanNumber: { startsWith: rejPrefix } },
-        });
-        const rejectChallanNumber = `${rejPrefix}${String(rejCount + 1).padStart(5, '0')}`;
+        const rejectChallanNumber = typedNumbers.rejectChallanNumber;
 
         rejectReturnChallan = await tx.challan.create({
           data: {
@@ -444,6 +449,8 @@ export async function POST(
       },
     });
   } catch (error: any) {
+    const numberResponse = challanNumberErrorResponse(error);
+    if (numberResponse) return numberResponse;
     console.error('Error submitting QC2 inspection:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to submit QC2 inspection' },

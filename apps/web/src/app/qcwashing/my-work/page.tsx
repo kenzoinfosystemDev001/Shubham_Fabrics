@@ -36,8 +36,24 @@ import {
   Scale
 } from 'lucide-react';
 import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
+import { TransferDocuments } from '@/components/common/TransferDocuments';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { downloadChallanHtml, printChallan } from '@/lib/download-challan';
+import { ChallanNumberField, challanNumberClientError, newSubmissionKey } from '@/components/challan/ChallanNumberField';
+
+type QcwChallanNumberField = 'rejectChallanNumber' | 'reworkChallanNumber';
+const EMPTY_QCW_CHALLAN_NUMBERS: Record<QcwChallanNumberField, string> = {
+  rejectChallanNumber: '',
+  reworkChallanNumber: '',
+};
+
+/** Challans the QC Washing inspect route will create for these quantities (mirrors the server rule). */
+function qcwNeededChallanNumbers(form: { quantityFailed: string; quantityRework: string }) {
+  const needed: Array<{ field: QcwChallanNumberField; label: string }> = [];
+  if (Number(form.quantityFailed || 0) > 0) needed.push({ field: 'rejectChallanNumber', label: 'Defective shelf challan number' });
+  if (Number(form.quantityRework || 0) > 0) needed.push({ field: 'reworkChallanNumber', label: 'Rework challan number' });
+  return needed;
+}
 import { downloadProductionSheetHtml, printProductionSheet } from '@/lib/download-production-sheet';
 
 interface QCWashingChallan {
@@ -169,6 +185,22 @@ export default function QCWashingMyWorkPage() {
 
   const [submittingAction, setSubmittingAction] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [challanNumbers, setChallanNumbers] = useState(EMPTY_QCW_CHALLAN_NUMBERS);
+  const [challanNumberErrors, setChallanNumberErrors] = useState<Partial<Record<QcwChallanNumberField, string>>>({});
+
+  // Issue-to-Finishing form (manual challan number)
+  const [finishingChallanNumber, setFinishingChallanNumber] = useState('');
+  const [finishingChallanNumberError, setFinishingChallanNumberError] = useState<string | null>(null);
+  const [finishingIssueError, setFinishingIssueError] = useState<string | null>(null);
+  const [finishingIdempotencyKey, setFinishingIdempotencyKey] = useState('');
+
+  const openIssueToFinishing = (challan: QCWashingChallan) => {
+    setIssuingToFinishing(challan);
+    setFinishingChallanNumber('');
+    setFinishingChallanNumberError(null);
+    setFinishingIssueError(null);
+    setFinishingIdempotencyKey(newSubmissionKey());
+  };
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -347,6 +379,8 @@ export default function QCWashingMyWorkPage() {
       ],
     });
 
+    setChallanNumbers(EMPTY_QCW_CHALLAN_NUMBERS);
+    setChallanNumberErrors({});
     setSelectedChallanForInspect(challan);
   };
 
@@ -407,10 +441,23 @@ export default function QCWashingMyWorkPage() {
     e.preventDefault();
     if (!selectedChallanForInspect) return;
 
+    // Manual challan numbers for each challan this inspection will create
+    const neededNumbers = qcwNeededChallanNumbers(inspectionForm);
+    const numberErrors: Partial<Record<QcwChallanNumberField, string>> = {};
+    for (const { field, label } of neededNumbers) {
+      const msg = challanNumberClientError(challanNumbers[field], label);
+      if (msg) numberErrors[field] = msg;
+    }
+    setChallanNumberErrors(numberErrors);
+    if (Object.keys(numberErrors).length > 0) return;
+    const typedNumbers: Partial<Record<QcwChallanNumberField, string>> = {};
+    for (const { field } of neededNumbers) typedNumbers[field] = challanNumbers[field].trim();
+
     try {
       setSubmittingAction(true);
 
       const payload = {
+        ...typedNumbers,
         quantityInspected: Number(inspectionForm.quantityInspected),
         quantityPassed: Number(inspectionForm.quantityPassed),
         quantityFailed: Number(inspectionForm.quantityFailed),
@@ -434,12 +481,24 @@ export default function QCWashingMyWorkPage() {
 
       const data = await res.json();
       if (!res.ok || !data.success) {
+        if (data.field && data.field in EMPTY_QCW_CHALLAN_NUMBERS) {
+          setChallanNumberErrors({ [data.field as QcwChallanNumberField]: data.error });
+          return;
+        }
         throw new Error(data.error || 'Failed to submit inspection.');
       }
 
+      setChallanNumbers(EMPTY_QCW_CHALLAN_NUMBERS);
+      setChallanNumberErrors({});
       setSelectedChallanForInspect(null);
       setInspectionResultModal(data);
-      showToast(`Verification completed! Status: ${data.data.status}`);
+      const createdNumbers = [
+        data.defectiveReturn?.challanNumber ? `Defective challan ${data.defectiveReturn.challanNumber}` : null,
+        data.reworkChallan?.challanNumber ? `Rework challan ${data.reworkChallan.challanNumber}` : null,
+      ].filter(Boolean);
+      showToast(
+        `Verification completed! Status: ${data.data.status}${createdNumbers.length ? `. ${createdNumbers.join(', ')}` : ''}`
+      );
       loadData(false);
     } catch (err: any) {
       alert(`Error submitting inspection: ${err.message}`);
@@ -450,20 +509,23 @@ export default function QCWashingMyWorkPage() {
 
   // Action: Issue Handover Challan to Finishing
   const handleIssueToFinishing = async (challan: QCWashingChallan) => {
+    const numberError = challanNumberClientError(finishingChallanNumber, 'Finishing challan number');
+    if (numberError) {
+      setFinishingChallanNumberError(numberError);
+      return;
+    }
+    setFinishingIssueError(null);
     try {
       setSubmittingAction(true);
       const goodQty = challan.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
       const barcode = challan.items?.[0]?.barcode || `QCW-${new Date().getFullYear()}-0001`;
 
-      const numRes = await fetch('/api/challans/next-number?department=QC3');
-      const numData = await numRes.json();
-      const challanNumber = numData.nextNumber || `CH-QC3-${new Date().getFullYear()}-00001`;
-
       const res = await fetch('/api/challans', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          challanNumber,
+          challanNumber: finishingChallanNumber.trim(),
+          idempotencyKey: finishingIdempotencyKey,
           challanType: 'REGULAR',
           programId: challan.programId,
           fromDepartment: 'QC3',
@@ -487,6 +549,10 @@ export default function QCWashingMyWorkPage() {
 
       const data = await res.json();
       if (!res.ok || !data.success) {
+        if (data.field === 'challanNumber') {
+          setFinishingChallanNumberError(data.error || 'Invalid challan number.');
+          return;
+        }
         throw new Error(data.error || 'Failed to issue challan to Finishing.');
       }
 
@@ -497,11 +563,13 @@ export default function QCWashingMyWorkPage() {
         body: JSON.stringify({ status: 'HANDED_OVER' }),
       }).catch(() => {});
 
+      setIssuingToFinishing(null);
+      setFinishingChallanNumber('');
       setFinishingChallanModal(data.data);
       showToast(`Challan ${data.data.challanNumber} issued to Finishing Section successfully!`);
       loadData(false);
     } catch (err: any) {
-      alert(`Error issuing to Finishing: ${err.message}`);
+      setFinishingIssueError(`Error issuing to Finishing: ${err.message}`);
     } finally {
       setSubmittingAction(false);
     }
@@ -829,7 +897,7 @@ export default function QCWashingMyWorkPage() {
                                   {/* HANDOVER TO FINISHING BUTTON */}
                                   {isApproved && (
                                     <button
-                                      onClick={() => handleIssueToFinishing(c)}
+                                      onClick={() => openIssueToFinishing(c)}
                                       disabled={submittingAction}
                                       className="px-2.5 py-1 bg-brand-600 hover:bg-brand-700 text-white rounded text-[11px] font-bold flex items-center gap-1 transition shadow-2xs"
                                       title="Issue Handover Challan to Finishing"
@@ -840,11 +908,7 @@ export default function QCWashingMyWorkPage() {
                                   )}
                                 </div>
 
-                                <DocumentActionButtons
-                                  challan={c}
-                                  program={c.program}
-                                  size="xs"
-                                />
+                                <TransferDocuments challan={c} size="xs" />
                               </div>
                             </td>
                           </tr>
@@ -1268,6 +1332,25 @@ export default function QCWashingMyWorkPage() {
                 </div>
               )}
 
+              {/* Manual challan numbers for generated challans */}
+              {qcwNeededChallanNumbers(inspectionForm).length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {qcwNeededChallanNumbers(inspectionForm).map(({ field, label }) => (
+                    <ChallanNumberField
+                      key={field}
+                      compact
+                      label={label}
+                      value={challanNumbers[field]}
+                      onChange={(v) => {
+                        setChallanNumbers((prev) => ({ ...prev, [field]: v }));
+                        setChallanNumberErrors((prev) => ({ ...prev, [field]: undefined }));
+                      }}
+                      error={challanNumberErrors[field]}
+                    />
+                  ))}
+                </div>
+              )}
+
               {/* General Remarks */}
               <div>
                 <label className="text-[11px] font-bold text-neutral-700 block mb-1">
@@ -1301,6 +1384,70 @@ export default function QCWashingMyWorkPage() {
               </div>
             </form>
           </div>
+        </div>
+      )}
+
+      {/* ISSUE TO FINISHING FORM */}
+      {issuingToFinishing && (
+        <div className="fixed inset-0 z-50 bg-neutral-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleIssueToFinishing(issuingToFinishing);
+            }}
+            className="bg-white rounded-2xl shadow-2xl border border-neutral-200 max-w-sm w-full p-5 space-y-3"
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-neutral-900 flex items-center gap-2">
+                <PackageCheck className="w-4 h-4 text-brand-700" />
+                Issue to Finishing
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIssuingToFinishing(null)}
+                className="p-1 rounded text-neutral-500 hover:text-neutral-700"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-[11px] text-neutral-600">
+              Sheet{' '}
+              <span className="font-mono font-bold">
+                {issuingToFinishing.program?.programSerialNo || issuingToFinishing.program?.programNumber || '—'}
+              </span>{' '}
+              ·{' '}
+              {issuingToFinishing.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0)} PCS
+            </p>
+            <ChallanNumberField
+              compact
+              label="Finishing challan number"
+              value={finishingChallanNumber}
+              onChange={(v) => {
+                setFinishingChallanNumber(v);
+                setFinishingChallanNumberError(null);
+              }}
+              error={finishingChallanNumberError}
+            />
+            {finishingIssueError && (
+              <p className="text-[11px] font-semibold text-danger-700">{finishingIssueError}</p>
+            )}
+            <div className="flex justify-end gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => setIssuingToFinishing(null)}
+                className="px-3 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-xl text-xs font-bold transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={submittingAction}
+                className="px-4 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold transition shadow-sm disabled:opacity-50"
+              >
+                {submittingAction ? 'Issuing...' : 'Issue Challan'}
+              </button>
+            </div>
+          </form>
         </div>
       )}
 
