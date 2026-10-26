@@ -17,6 +17,7 @@ import {
   X,
   Boxes,
   Pencil,
+  FileSpreadsheet,
 } from 'lucide-react';
 
 interface InwardItem {
@@ -105,9 +106,20 @@ export default function InwardStockPage() {
     }
   };
 
+  // A receipt link opens this page filtered to that import (?search=FSR-...).
+  const [searchReady, setSearchReady] = useState(false);
   useEffect(() => {
-    loadData();
-  }, [typeFilter]);
+    try {
+      const initial = new URLSearchParams(window.location.search).get('search');
+      if (initial) setSearch(initial);
+    } catch {}
+    setSearchReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (searchReady) loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [typeFilter, searchReady]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -243,6 +255,13 @@ export default function InwardStockPage() {
           </div>
 
           <div className="flex items-center gap-2.5">
+            <Link
+              href="/fabric-store/inventory/import"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-brand-300 text-brand-800 hover:bg-brand-50 rounded-lg text-xs font-bold"
+            >
+              <FileSpreadsheet className="w-4 h-4" />
+              <span>Import Fabric Stock</span>
+            </Link>
             <button
               onClick={() => {
                 setEditingItemId(null);

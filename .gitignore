@@ -54,3 +54,4 @@ mocks/
 *.mock.*
 *.backup
 *.tmp*
+.next-*/
