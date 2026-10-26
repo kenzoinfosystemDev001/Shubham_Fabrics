@@ -21,6 +21,9 @@ interface HistoryRow {
 }
 
 const PAGE_SIZE = 20;
+// Excel, CSV, PDF bills and photos / scans; the server reads the fabric lines from each.
+const ACCEPTED_EXTENSIONS = ['xlsx', 'xls', 'ods', 'csv', 'tsv', 'txt', 'pdf', 'jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'tif', 'tiff'];
+const ACCEPT_ATTRIBUTE = ACCEPTED_EXTENSIONS.map((e) => `.${e}`).join(',');
 
 export default function FabricStockImportPage() {
   const router = useRouter();
@@ -57,10 +60,9 @@ export default function FabricStockImportPage() {
 
   const chooseFile = (next: File | null) => {
     setUploadError(null);
-    if (next && !next.name.toLowerCase().endsWith('.xlsx')) {
-      setUploadError(next.name.toLowerCase().endsWith('.xls')
-        ? 'Old .xls workbooks are not supported. Open the file in Excel and save it as .xlsx.'
-        : 'Choose an Excel .xlsx workbook.');
+    const ext = next?.name.toLowerCase().split('.').pop() || '';
+    if (next && !ACCEPTED_EXTENSIONS.includes(ext)) {
+      setUploadError('Choose an Excel file (.xlsx, .xls), a CSV, a PDF, or a photo (JPG, PNG) of the bill or stock sheet.');
       setFile(null);
       return;
     }
@@ -110,7 +112,7 @@ export default function FabricStockImportPage() {
                 <FileSpreadsheet className="w-5 h-5 text-brand-700" />
                 Import Fabric Stock
               </h1>
-              <p className="text-[11px] text-neutral-500">Receive fabric from an Excel workbook. Stock changes only after review and confirmation.</p>
+              <p className="text-[11px] text-neutral-500">Receive fabric from a bill or stock sheet (Excel, CSV, PDF or photo). Stock changes only after review and confirmation.</p>
             </div>
           </div>
           <a
@@ -130,7 +132,7 @@ export default function FabricStockImportPage() {
             <input
               ref={inputRef}
               type="file"
-              accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              accept={ACCEPT_ATTRIBUTE}
               onChange={(e) => chooseFile(e.target.files?.[0] || null)}
               className="text-xs file:mr-3 file:px-3 file:py-1.5 file:rounded-md file:border file:border-neutral-300 file:bg-neutral-50 file:text-xs file:font-semibold file:text-neutral-800 hover:file:bg-neutral-100"
             />
@@ -141,7 +143,7 @@ export default function FabricStockImportPage() {
               className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold disabled:opacity-50"
             >
               {uploading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
-              {uploading ? 'Uploading and reading...' : 'Upload and read workbook'}
+              {uploading ? 'Uploading and reading...' : 'Upload and read file'}
             </button>
           </div>
           {file && !uploadError && (
@@ -156,8 +158,8 @@ export default function FabricStockImportPage() {
             </div>
           )}
           <p className="text-[10px] text-neutral-500">
-            .xlsx only, up to {IMPORT_LIMITS.maxFileBytes / 1048576} MB, {IMPORT_LIMITS.maxSheets} sheets and {IMPORT_LIMITS.maxRowsPerSheet} rows per sheet.
-            Images embedded in the workbook (scanned invoices) are kept with the import as evidence; they are not read automatically.
+            Excel (.xlsx, .xls), CSV, PDF or a photo of the bill, up to {IMPORT_LIMITS.maxFileBytes / 1048576} MB and {IMPORT_LIMITS.maxRowsPerSheet} lines.
+            Fabric, quantity and unit, type, colour, supplier, bill no., bill date and received date are read from the file automatically; check them before confirming.
           </p>
         </section>
 

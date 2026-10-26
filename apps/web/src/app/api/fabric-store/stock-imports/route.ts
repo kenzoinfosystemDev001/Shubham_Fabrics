@@ -5,7 +5,8 @@ import { IMPORT_LIMITS } from '@/lib/fabric-stock-import/workbook-guard.mjs';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
-export const maxDuration = 60;
+// Reading a PDF or photo with the document reader can take a couple of minutes.
+export const maxDuration = 300;
 
 // GET /api/fabric-store/stock-imports?page=1&pageSize=20 - import history, newest first
 export async function GET(request: Request) {
@@ -17,7 +18,7 @@ export async function GET(request: Request) {
   });
 }
 
-// POST /api/fabric-store/stock-imports (multipart, field "file") - upload a workbook
+// POST /api/fabric-store/stock-imports (multipart, field "file") - upload a stock document (Excel, CSV, PDF or photo)
 export async function POST(request: Request) {
   return withStoreUser(request, async (user) => {
     const declared = Number(request.headers.get('content-length') || 0);
@@ -28,10 +29,10 @@ export async function POST(request: Request) {
     try {
       form = await request.formData();
     } catch {
-      throw new StockImportError('Upload the workbook as multipart form data in a field named "file".', 400, 'BAD_UPLOAD');
+      throw new StockImportError('Upload the file as multipart form data in a field named "file".', 400, 'BAD_UPLOAD');
     }
     const file = form.get('file');
-    if (!file || typeof file === 'string') throw new StockImportError('Choose an .xlsx file to upload.', 400, 'NO_FILE');
+    if (!file || typeof file === 'string') throw new StockImportError('Choose a file to upload.', 400, 'NO_FILE');
     if (file.size > IMPORT_LIMITS.maxFileBytes) {
       throw new StockImportError(`The file is larger than ${IMPORT_LIMITS.maxFileBytes / 1048576} MB.`, 413, 'TOO_LARGE');
     }
