@@ -2,7 +2,7 @@
 // the app needs, each ONCE: applied files are recorded in the "_manual_migrations" table, so later runs only
 // check that table. A file is applied again only if its contents change (every file is re-runnable).
 //
-// Runs automatically before the web app starts (apps/web "predev" / "prestart", with --soft), so a newly
+// Runs automatically when the web app starts (apps/web/src/instrumentation.ts, with --soft), so a newly
 // added migration reaches the database without anyone having to remember a command. It can also be run by
 // hand from the Shubham_Fabrics folder:  node scripts/apply-appearance-migrations.js
 //
