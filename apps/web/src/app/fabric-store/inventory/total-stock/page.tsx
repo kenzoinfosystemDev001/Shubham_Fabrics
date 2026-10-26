@@ -8,15 +8,10 @@ import {
   Layers,
   RefreshCw,
   Search,
-  Filter,
   ArrowDownToLine,
   Send,
   AlertTriangle,
   ArrowRight,
-  TrendingDown,
-  TrendingUp,
-  CheckCircle2,
-  ExternalLink,
 } from 'lucide-react';
 
 interface StockSummary {
@@ -178,353 +173,230 @@ function TotalStockContent() {
     ? summary.defectiveStockByUnit
     : { PCS: summary.defectiveStockPcs };
 
-  return (
-    <div className="min-h-screen bg-brand-50 pb-16">
-      {/* HEADER */}
-      <header className="bg-white border-b border-neutral-200 sticky top-0 z-30 px-4 sm:px-8 py-3.5 shadow-2xs">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-brand-700">
-                FABRIC STORE
-              </span>
-              <span className="text-neutral-700">/</span>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">
-                INVENTORY
-              </span>
-            </div>
-            <h1 className="text-lg font-bold text-neutral-900 flex items-center gap-2">
-              <Boxes className="w-5 h-5 text-brand-600" />
-              <span>TOTAL STOCK: DYED &amp; UNDYED</span>
-            </h1>
-            <p className="text-[11px] text-neutral-500 mt-0.5">
-              Live in-store inventory &middot; Automatically updates when fabric arrives in Inward or when Challans are issued for Dyeing / other processes
-            </p>
-          </div>
+  const fmt = (n: number) => n.toLocaleString('en-IN', { maximumFractionDigits: 2 });
 
-          <div className="flex flex-wrap items-center gap-2.5">
-            <Link
-              href="/fabric-store/inventory/inward"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold shadow-xs transition"
-            >
-              <ArrowDownToLine className="w-3.5 h-3.5" />
-              <span>Inward Fabric</span>
-            </Link>
-            <Link
-              href="/fabric-store/inventory/outward"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold shadow-xs transition"
-            >
-              <Send className="w-3.5 h-3.5" />
-              <span>Outward Stock</span>
-            </Link>
+  const stockCards = [
+    { label: 'All Stock', data: summary.overall, tone: 'bg-brand-50 text-brand-700', icon: Boxes },
+    { label: 'Undyed', data: undyedData, tone: 'bg-accent-100 text-neutral-900', icon: Layers },
+    { label: 'Dyed', data: summary.dyed, tone: 'bg-brand-50 text-brand-700', icon: Layers },
+  ];
+
+  const tabs = [
+    { id: 'ALL', label: 'All' },
+    { id: 'UNDYED', label: 'Undyed' },
+    { id: 'DYED', label: 'Dyed' },
+  ] as const;
+
+  const panel = 'bg-white border border-neutral-200 rounded-2xl shadow-xs overflow-hidden';
+  const th = 'py-3 px-4 whitespace-nowrap';
+
+  return (
+    <div className="min-h-screen bg-canvas pb-16">
+      {/* HEADER */}
+      <header className="bg-white/90 backdrop-blur border-b border-neutral-200 sticky top-0 z-30 px-4 sm:px-8 py-4">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <h1 className="text-xl font-bold text-neutral-900">Total Stock</h1>
+          <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={loadData}
               disabled={loading}
-              className="p-2 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition"
-              title="Refresh Stock Balance"
+              className="p-2 text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg border border-neutral-200 transition"
+              title="Refresh"
+              aria-label="Refresh"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             </button>
+            <Link
+              href="/fabric-store/inventory/inward"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-lg shadow-xs transition"
+            >
+              <ArrowDownToLine className="w-4 h-4" />
+              <span>Inward</span>
+            </Link>
+            <Link
+              href="/fabric-store/inventory/outward"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-brand-50 text-brand-800 border border-brand-300 text-xs font-semibold rounded-lg transition"
+            >
+              <Send className="w-4 h-4" />
+              <span>Outward</span>
+            </Link>
           </div>
         </div>
       </header>
 
       <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
-        {/* SUMMARY TILES - THREE FIELDS: OVERALL, 1. UNDYED, 2. DYED (+ DEFECTIVE) */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          {/* Tile 1: OVERALL AVAILABLE STOCK */}
-          <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-2xs">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-brand-700 block">
-              TOTAL IN-STORE STOCK
-            </span>
-            <div className="text-2xl font-black text-neutral-900 mt-1">
-              {summary.overall.availableBalanceMeters.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-              <span className="text-xs font-semibold text-brand-700 ml-1">MTR</span>
+        {/* SUMMARY */}
+        <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {stockCards.map((card) => (
+            <div key={card.label} className="bg-white border border-neutral-200 rounded-2xl p-4 sm:p-5 shadow-xs">
+              <div className="flex items-center gap-2.5">
+                <span className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${card.tone}`}>
+                  <card.icon className="w-4 h-4" />
+                </span>
+                <span className="text-xs font-semibold text-neutral-600">{card.label}</span>
+              </div>
+              <p className="mt-3 text-2xl font-bold text-neutral-900 tabular-nums leading-none">
+                {fmt(card.data.availableBalanceMeters)}
+                <span className="text-xs font-semibold text-neutral-500 ml-1">MTR</span>
+              </p>
+              <p className="mt-2 text-[11px] text-neutral-500 tabular-nums">
+                <span className="text-neutral-700 font-medium">+{fmt(card.data.totalInwardMeters)}</span> in
+                <span className="mx-1.5 text-neutral-300">|</span>
+                <span className="text-neutral-700 font-medium">−{fmt(card.data.totalOutwardMeters)}</span> out
+                {card.data.availableBalancePcs > 0 && (
+                  <>
+                    <span className="mx-1.5 text-neutral-300">|</span>
+                    {fmt(card.data.availableBalancePcs)} PCS
+                  </>
+                )}
+              </p>
             </div>
-            <div className="flex items-center gap-2 text-[10px] text-neutral-500 mt-1 font-medium">
-              <span className="text-accent-800 font-bold">+{summary.overall.totalInwardMeters.toFixed(0)} In</span>
-              <span>&middot;</span>
-              <span className="text-danger-700 font-bold">-{summary.overall.totalOutwardMeters.toFixed(0)} Out</span>
-            </div>
-            <div className="text-[10px] text-neutral-500 mt-1 font-medium">
-              {summary.overall.availableBalancePcs.toLocaleString('en-IN')} PCS available
-            </div>
-          </div>
+          ))}
 
-          {/* Tile 2: 1. UNDYED STOCK */}
-          <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-2xs">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block">
-                1. UNDYED STOCK
-              </span>
-              <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-accent-100 text-accent-800">
-                UNDYED
-              </span>
-            </div>
-            <div className="text-2xl font-black text-neutral-900 mt-1">
-              {undyedData.availableBalanceMeters.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-              <span className="text-xs font-semibold text-accent-800 ml-1">MTR</span>
-            </div>
-            <div className="flex items-center gap-2 text-[10px] text-neutral-500 mt-1 font-medium">
-              <span className="text-accent-800 font-bold">+{undyedData.totalInwardMeters.toFixed(0)} In</span>
-              <span>&middot;</span>
-              <span className="text-danger-700 font-bold">-{undyedData.totalOutwardMeters.toFixed(0)} Dispatched</span>
-            </div>
-            <div className="text-[10px] text-neutral-500 mt-1 font-medium">
-              {undyedData.availableBalancePcs.toLocaleString('en-IN')} PCS available
-            </div>
-          </div>
-
-          {/* Tile 3: 2. DYED STOCK */}
-          <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-2xs">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-brand-700 block">
-                2. DYED STOCK
-              </span>
-              <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-brand-100 text-brand-900">
-                DYED
-              </span>
-            </div>
-            <div className="text-2xl font-black text-brand-900 mt-1">
-              {summary.dyed.availableBalanceMeters.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-              <span className="text-xs font-semibold text-brand-700 ml-1">MTR</span>
-            </div>
-            <div className="flex items-center gap-2 text-[10px] text-neutral-500 mt-1 font-medium">
-              <span className="text-accent-800 font-bold">+{summary.dyed.totalInwardMeters.toFixed(0)} In</span>
-              <span>&middot;</span>
-              <span className="text-danger-700 font-bold">-{summary.dyed.totalOutwardMeters.toFixed(0)} Dispatched</span>
-            </div>
-            <div className="text-[10px] text-neutral-500 mt-1 font-medium">
-              {summary.dyed.availableBalancePcs.toLocaleString('en-IN')} PCS available
-            </div>
-          </div>
-
-          {/* Tile 4: DEFECTIVE QUARANTINED SHELF */}
           <Link
             href="/fabric-store/inventory/defected-shelf"
-            className="bg-white p-4 rounded-xl border border-danger-200 hover:border-danger-300 shadow-2xs transition group"
+            className="group bg-white border border-neutral-200 hover:border-danger-300 rounded-2xl p-4 sm:p-5 shadow-xs transition"
           >
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-danger-700 block">
-                DEFECTIVE SHELF
+            <div className="flex items-center gap-2.5">
+              <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-danger-50 text-danger-600">
+                <AlertTriangle className="w-4 h-4" />
               </span>
-              <ExternalLink className="w-3.5 h-3.5 text-danger-600 group-hover:text-danger-700 transition" />
+              <span className="flex-1 text-xs font-semibold text-neutral-600">Defective Shelf</span>
+              <ArrowRight className="w-3.5 h-3.5 text-neutral-400 group-hover:text-danger-600 transition" />
             </div>
-            <div className="text-2xl font-black text-danger-900 mt-1">
-              {Object.entries(defectiveStockByUnit)
-                .map(([unit, quantity]) => (
-                  <span key={unit} className="mr-2">
-                    {quantity.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                    <span className="text-xs font-semibold text-danger-700 ml-1">{unit}</span>
-                  </span>
-                ))}
-            </div>
-            <span className="text-[10px] text-danger-700 mt-0.5 block">
-              DEF-SHELF-STORE Quarantined
-            </span>
+            <p className="mt-3 text-2xl font-bold text-neutral-900 tabular-nums leading-none">
+              {Object.entries(defectiveStockByUnit).map(([unit, quantity]) => (
+                <span key={unit} className="mr-2">
+                  {fmt(quantity)}
+                  <span className="text-xs font-semibold text-neutral-500 ml-1">{unit}</span>
+                </span>
+              ))}
+            </p>
           </Link>
-        </div>
+        </section>
 
-        {/* CONTROLS: TABS & SEARCH */}
-        <div className="bg-white p-3.5 rounded-xl border border-neutral-200 shadow-2xs flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs font-bold text-neutral-500 mr-1 flex items-center gap-1">
-              <Filter className="w-3.5 h-3.5" />
-              <span>Category:</span>
-            </span>
-            <button
-              type="button"
-              onClick={() => setTypeFilter('ALL')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                typeFilter === 'ALL'
-                  ? 'bg-brand-600 text-white'
-                  : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-700'
-              }`}
-            >
-              All Fabric Stock
-            </button>
-            <button
-              type="button"
-              onClick={() => setTypeFilter('UNDYED')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                typeFilter === 'UNDYED'
-                  ? 'bg-accent-500 text-neutral-900'
-                  : 'bg-accent-50 hover:bg-accent-100 text-accent-800 border border-accent-200'
-              }`}
-            >
-              1. UNDYED
-            </button>
-            <button
-              type="button"
-              onClick={() => setTypeFilter('DYED')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                typeFilter === 'DYED'
-                  ? 'bg-brand-700 text-white'
-                  : 'bg-brand-50 hover:bg-brand-100 text-brand-900 border border-brand-200'
-              }`}
-            >
-              2. DYED
-            </button>
-          </div>
+        {/* STOCK TABLE */}
+        <section className={panel}>
+          <div className="px-5 py-4 border-b border-neutral-200 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <h2 className="text-sm font-bold text-neutral-900">Stock</h2>
+              <span className="text-[11px] font-semibold tabular-nums bg-neutral-100 text-neutral-600 px-2 py-0.5 rounded-full">
+                {items.length}
+              </span>
+              <div role="tablist" aria-label="Category" className="inline-flex p-0.5 bg-neutral-100 rounded-lg ml-1">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={typeFilter === tab.id}
+                    onClick={() => setTypeFilter(tab.id)}
+                    className={`px-3 py-1 rounded-md text-xs font-semibold transition cursor-pointer ${
+                      typeFilter === tab.id ? 'bg-white text-brand-800 shadow-xs' : 'text-neutral-500 hover:text-neutral-900'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-          <form onSubmit={handleSearchSubmit} className="flex items-center gap-2">
-            <div className="relative">
-              <Search className="w-3.5 h-3.5 text-neutral-500 absolute left-2.5 top-1/2 -translate-y-1/2" />
+            <form onSubmit={handleSearchSubmit} className="relative">
+              <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search Fabric Description..."
-                className="pl-8 pr-3 py-1.5 border border-neutral-300 rounded-lg text-xs w-48 sm:w-64 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white"
+                placeholder="Search fabric"
+                aria-label="Search fabric"
+                className="h-9 w-full md:w-64 pl-9 pr-3 bg-white border border-neutral-200 rounded-lg text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition"
               />
-            </div>
-            <button
-              type="submit"
-              className="px-3 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 text-xs font-bold rounded-lg border border-neutral-300 transition"
-            >
-              Search
-            </button>
-          </form>
-        </div>
-
-        {/* TOTAL STOCK TABLE */}
-        <div className="bg-white rounded-xl border-[1.5px] border-neutral-200 shadow-xs overflow-hidden">
-          <div className="px-5 py-3 border-b-[1.5px] border-neutral-200 bg-neutral-50 flex items-center justify-between">
-            <span className="font-black text-xs uppercase tracking-wider text-neutral-900">
-              TOTAL STOCK TABLE: DYED &amp; UNDYED ({items.length} FABRIC ITEMS)
-            </span>
-            <span className="text-[11px] font-semibold text-neutral-500">
-              Available Balance = Total Inward &minus; Total Outward (Challans Issued)
-            </span>
+            </form>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left text-xs">
-              <thead>
-                <tr className="bg-neutral-100 border-b-[1.5px] border-neutral-200 text-neutral-900">
-                  <th className="border-r-[1.5px] border-neutral-200 px-3 py-2 font-black text-center w-14">
-                    S.NO
-                  </th>
-                  <th className="border-r-[1.5px] border-neutral-200 px-4 py-2 font-black">
-                    ITEM NAME (FABRIC DESCRIPTION)
-                  </th>
-                  <th className="border-r-[1.5px] border-neutral-200 px-3 py-2 font-black w-32">
-                    COLOUR
-                  </th>
-                  <th className="border-r-[1.5px] border-neutral-200 px-3 py-2 font-black text-center w-28">
-                    CATEGORY
-                  </th>
-                  <th className="border-r-[1.5px] border-neutral-200 px-3 py-2 font-black text-center w-16">
-                    UNIT
-                  </th>
-                  <th className="border-r-[1.5px] border-neutral-200 px-4 py-2 font-black text-right w-32">
-                    TOTAL INWARD
-                  </th>
-                  <th className="border-r-[1.5px] border-neutral-200 px-4 py-2 font-black text-right w-32">
-                    TOTAL OUTWARD
-                  </th>
-                  <th className="border-r-[1.5px] border-neutral-200 px-4 py-2 font-black text-right w-36 bg-brand-50/50">
-                    AVAILABLE IN STORE
-                  </th>
-                  <th className="border-r-[1.5px] border-neutral-200 px-3 py-2 font-black text-center w-28">
-                    STATUS
-                  </th>
-                  <th className="border-r-[1.5px] border-neutral-200 px-3 py-2 font-black text-center w-32">
-                    LAST MOVEMENT
-                  </th>
-                  <th className="px-3 py-2 font-black text-center w-32">
-                    ACTIONS
+            <table className="w-full text-left text-sm">
+              <thead className="bg-neutral-50 border-b border-neutral-200 text-[11px] font-semibold uppercase tracking-wide text-neutral-500">
+                <tr>
+                  <th className={`${th} w-12`}>#</th>
+                  <th className={th}>Fabric</th>
+                  <th className={th}>Colour</th>
+                  <th className={th}>Category</th>
+                  <th className={`${th} text-right`}>Inward</th>
+                  <th className={`${th} text-right`}>Outward</th>
+                  <th className={`${th} text-right`}>Available</th>
+                  <th className={th}>Status</th>
+                  <th className={th}>Last Movement</th>
+                  <th className={th}>
+                    <span className="sr-only">Action</span>
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-200">
+              <tbody className="divide-y divide-neutral-100">
                 {items.length === 0 ? (
                   <tr>
-                    <td colSpan={11} className="px-4 py-12 text-center text-neutral-500 space-y-2">
-                      <Boxes className="w-8 h-8 mx-auto text-neutral-700" />
-                      <div className="text-sm font-bold text-neutral-700">No stock records found</div>
-                      <p className="text-xs text-neutral-500">
-                        Receive fabric in Inward Stock to establish initial inventory balance.
-                      </p>
+                    <td colSpan={10} className="px-4 py-14 text-center">
+                      <Boxes className="w-8 h-8 mx-auto text-neutral-300" />
+                      <p className="text-sm font-medium text-neutral-500 mt-3">{loading ? 'Loading…' : 'No stock yet'}</p>
                     </td>
                   </tr>
                 ) : (
                   items.map((item, index) => {
                     const isUndyed = item.fabricType === 'UNDYED' || (item.fabricType as string) === 'KORA';
                     return (
-                      <tr key={`${item.itemName}-${item.fabricType}-${item.colour || ''}-${item.unit}`} className="hover:bg-neutral-50 transition h-10">
-                        <td className="border-r-[1.5px] border-neutral-200 px-3 py-2 text-center font-bold font-mono text-neutral-700">
-                          {item.sNo ?? index + 1}
-                        </td>
-                        <td className="border-r-[1.5px] border-neutral-200 px-4 py-2 font-bold text-neutral-900">
-                          {item.itemName}
-                        </td>
-                        <td className="border-r-[1.5px] border-neutral-200 px-3 py-2 text-neutral-900">
-                          {item.colour || <span className="text-neutral-500 italic">Not recorded</span>}
-                        </td>
-                        <td className="border-r-[1.5px] border-neutral-200 px-3 py-2 text-center">
+                      <tr
+                        key={`${item.itemName}-${item.fabricType}-${item.colour || ''}-${item.unit}`}
+                        className="hover:bg-neutral-50/60 transition"
+                      >
+                        <td className="py-3 px-4 text-xs font-semibold text-neutral-400 tabular-nums">{item.sNo ?? index + 1}</td>
+                        <td className="py-3 px-4 font-semibold text-neutral-900">{item.itemName}</td>
+                        <td className="py-3 px-4 text-neutral-700">{item.colour || <span className="text-neutral-400">—</span>}</td>
+                        <td className="py-3 px-4">
                           <span
-                            className={`inline-block px-2 py-0.5 rounded text-[10px] font-black tracking-wider uppercase ${
-                              isUndyed
-                                ? 'bg-accent-100 text-accent-800 border border-accent-300'
-                                : 'bg-brand-100 text-brand-900 border border-brand-300'
+                            className={`inline-flex px-2 py-0.5 rounded-md text-[11px] font-semibold ${
+                              isUndyed ? 'bg-accent-100 text-neutral-900' : 'bg-brand-50 text-brand-800'
                             }`}
                           >
-                            {isUndyed ? 'UNDYED' : 'DYED'}
+                            {isUndyed ? 'Undyed' : 'Dyed'}
                           </span>
                         </td>
-                        <td className="border-r-[1.5px] border-neutral-200 px-3 py-2 text-center font-mono font-bold text-neutral-900">
-                          {item.unit}
+                        <td className="py-3 px-4 text-right tabular-nums text-neutral-700 whitespace-nowrap">
+                          {fmt(item.totalInward)} <span className="text-[11px] text-neutral-400">{item.unit}</span>
                         </td>
-                        <td className="border-r-[1.5px] border-neutral-200 px-4 py-2 text-right font-bold text-neutral-900">
-                          {item.totalInward.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                          <span className="text-[10px] text-neutral-500 ml-1">{item.unit}</span>
+                        <td className="py-3 px-4 text-right tabular-nums text-neutral-700 whitespace-nowrap">
+                          {fmt(item.totalOutward)} <span className="text-[11px] text-neutral-400">{item.unit}</span>
                         </td>
-                        <td className="border-r-[1.5px] border-neutral-200 px-4 py-2 text-right font-bold text-neutral-900">
-                          {item.totalOutward.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                          <span className="text-[10px] text-neutral-500 ml-1">{item.unit}</span>
-                        </td>
-                        <td className="border-r-[1.5px] border-neutral-200 px-4 py-2 text-right font-black text-sm text-brand-900 bg-brand-50/50">
-                          {item.balance.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                          <span className="text-xs font-bold text-brand-700 ml-1">{item.unit}</span>
+                        <td className="py-3 px-4 text-right tabular-nums whitespace-nowrap">
+                          <span className="font-bold text-brand-900">{fmt(item.balance)}</span>{' '}
+                          <span className="text-[11px] font-semibold text-brand-700">{item.unit}</span>
                           {item.shortfall ? (
-                            <span className="block text-[10px] font-bold text-danger-700" title="Older issues exceed the recorded inward quantity">
-                              Short {item.shortfall.toLocaleString('en-IN', { maximumFractionDigits: 2 })} {item.unit}
+                            <span className="block text-[11px] font-semibold text-danger-700" title="Older issues exceed the recorded inward quantity">
+                              Short {fmt(item.shortfall)} {item.unit}
                             </span>
                           ) : null}
                         </td>
-                        <td className="border-r-[1.5px] border-neutral-200 px-3 py-2 text-center">
+                        <td className="py-3 px-4">
                           {item.balance > 0 ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-black bg-accent-100 text-accent-800 border border-accent-300">
-                              IN STOCK
+                            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-900">
+                              <span className="w-1.5 h-1.5 rounded-full bg-accent-500" />
+                              In stock
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-black bg-neutral-100 text-neutral-600 border border-neutral-300">
-                              EXHAUSTED
+                            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-500">
+                              <span className="w-1.5 h-1.5 rounded-full bg-neutral-300" />
+                              Exhausted
                             </span>
                           )}
                         </td>
-                        <td className="border-r-[1.5px] border-neutral-200 px-3 py-2 text-center text-neutral-600 font-medium">
-                          {formatDate(item.lastActivity)}
-                        </td>
-                        <td className="px-3 py-2 text-center">
-                          {isUndyed ? (
-                            <Link
-                              href="/fabric-store/my-work/challan-to-dyeing"
-                              className="inline-flex items-center gap-1 text-[11px] font-bold text-brand-700 hover:text-brand-900 hover:underline"
-                            >
-                              <span>Issue Dyeing</span>
-                              <ArrowRight className="w-3 h-3" />
-                            </Link>
-                          ) : (
-                            <Link
-                              href="/fabric-store/my-work/challan-to-embroidery"
-                              className="inline-flex items-center gap-1 text-[11px] font-bold text-accent-800 hover:text-accent-800 hover:underline"
-                            >
-                              <span>Issue Emb.</span>
-                              <ArrowRight className="w-3 h-3" />
-                            </Link>
-                          )}
+                        <td className="py-3 px-4 text-xs text-neutral-500 whitespace-nowrap">{formatDate(item.lastActivity)}</td>
+                        <td className="py-3 px-4 text-right whitespace-nowrap">
+                          <Link
+                            href={isUndyed ? '/fabric-store/my-work/challan-to-dyeing' : '/fabric-store/my-work/challan-to-embroidery'}
+                            className="inline-flex items-center gap-1 text-xs font-semibold text-brand-700 hover:text-brand-900"
+                          >
+                            <span>{isUndyed ? 'To Dyeing' : 'To Embroidery'}</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </Link>
                         </td>
                       </tr>
                     );
@@ -533,40 +405,51 @@ function TotalStockContent() {
               </tbody>
             </table>
           </div>
-        </div>
+        </section>
 
-        <section className="bg-white rounded-xl border-[1.5px] border-neutral-200 shadow-xs overflow-hidden">
-          <div className="px-5 py-3 border-b-[1.5px] border-neutral-200 bg-neutral-50 flex items-center justify-between">
-            <h2 className="font-black text-xs uppercase tracking-wider text-neutral-900">Fabric Outward History</h2>
-            <span className="text-[11px] font-semibold text-neutral-500">{outwardHistory.length} issued entries</span>
+        {/* OUTWARD HISTORY */}
+        <section className={panel}>
+          <div className="px-5 py-4 border-b border-neutral-200 flex items-center gap-3">
+            <h2 className="text-sm font-bold text-neutral-900">Outward History</h2>
+            <span className="text-[11px] font-semibold tabular-nums bg-neutral-100 text-neutral-600 px-2 py-0.5 rounded-full">
+              {outwardHistory.length}
+            </span>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left text-xs">
-              <thead>
-                <tr className="bg-neutral-100 border-b border-neutral-300 text-neutral-700">
-                  <th className="px-4 py-2 font-bold">DATE</th>
-                  <th className="px-4 py-2 font-bold">CHALLAN</th>
-                  <th className="px-4 py-2 font-bold">FABRIC</th>
-                  <th className="px-4 py-2 font-bold">COLOUR</th>
-                  <th className="px-4 py-2 font-bold">FROM</th>
-                  <th className="px-4 py-2 font-bold">TO</th>
-                  <th className="px-4 py-2 font-bold text-right">QUANTITY</th>
+            <table className="w-full text-left text-sm">
+              <thead className="bg-neutral-50 border-b border-neutral-200 text-[11px] font-semibold uppercase tracking-wide text-neutral-500">
+                <tr>
+                  <th className={th}>Date</th>
+                  <th className={th}>Challan</th>
+                  <th className={th}>Fabric</th>
+                  <th className={th}>Colour</th>
+                  <th className={th}>From</th>
+                  <th className={th}>To</th>
+                  <th className={`${th} text-right`}>Quantity</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-200">
+              <tbody className="divide-y divide-neutral-100">
                 {outwardHistory.length === 0 ? (
-                  <tr><td colSpan={7} className="px-4 py-8 text-center text-neutral-500">No outward challans found</td></tr>
-                ) : outwardHistory.map((entry) => (
-                  <tr key={entry.id} className="hover:bg-neutral-50">
-                    <td className="px-4 py-2 whitespace-nowrap">{formatDate(entry.date)}</td>
-                    <td className="px-4 py-2 font-semibold">{entry.challanNumber || '—'}</td>
-                    <td className="px-4 py-2">{entry.itemName}</td>
-                    <td className="px-4 py-2">{entry.colour || '—'}</td>
-                    <td className="px-4 py-2">{entry.sourceDepartment || '—'}</td>
-                    <td className="px-4 py-2">{entry.destination || '—'}</td>
-                    <td className="px-4 py-2 text-right font-bold">{Number(entry.quantity).toLocaleString('en-IN', { maximumFractionDigits: 2 })} {entry.unit}</td>
+                  <tr>
+                    <td colSpan={7} className="px-4 py-10 text-center text-sm font-medium text-neutral-500">
+                      No outward entries yet
+                    </td>
                   </tr>
-                ))}
+                ) : (
+                  outwardHistory.map((entry) => (
+                    <tr key={entry.id} className="hover:bg-neutral-50/60 transition">
+                      <td className="py-3 px-4 text-xs text-neutral-500 whitespace-nowrap">{formatDate(entry.date)}</td>
+                      <td className="py-3 px-4 font-mono text-xs font-semibold text-brand-800">{entry.challanNumber || '—'}</td>
+                      <td className="py-3 px-4 text-neutral-900">{entry.itemName}</td>
+                      <td className="py-3 px-4 text-neutral-700">{entry.colour || '—'}</td>
+                      <td className="py-3 px-4 text-neutral-700">{entry.sourceDepartment || '—'}</td>
+                      <td className="py-3 px-4 text-neutral-700">{entry.destination || '—'}</td>
+                      <td className="py-3 px-4 text-right font-semibold tabular-nums whitespace-nowrap">
+                        {fmt(Number(entry.quantity))} <span className="text-[11px] text-neutral-400">{entry.unit}</span>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -578,7 +461,7 @@ function TotalStockContent() {
 
 export default function TotalStockPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-brand-50 flex items-center justify-center text-xs text-neutral-500">Loading Total Stock Balance...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-canvas flex items-center justify-center text-sm text-neutral-500">Loading…</div>}>
       <TotalStockContent />
     </Suspense>
   );

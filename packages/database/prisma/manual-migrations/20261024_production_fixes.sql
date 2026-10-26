@@ -2,24 +2,25 @@
 -- historical challans, inward entries and ledger rows keep their values (new columns stay NULL).
 -- Generated with: prisma migrate diff --from-schema-datamodel <feature/deadline-alerts schema> --to-schema-datamodel prisma/schema.prisma --script
 -- Apply with: npx prisma db execute --schema prisma/schema.prisma --file prisma/manual-migrations/20261024_production_fixes.sql
--- Requires approval for the shared Neon DB.
+-- Re-runnable: every statement is skipped when its object already exists.
+-- Also applied by: node scripts/apply-appearance-migrations.js
 
 -- AlterTable
-ALTER TABLE "ChallanItem" ADD COLUMN     "requiredColour" TEXT,
-ADD COLUMN     "requiredQuantity" DOUBLE PRECISION;
+ALTER TABLE "ChallanItem" ADD COLUMN IF NOT EXISTS "requiredColour" TEXT,
+ADD COLUMN IF NOT EXISTS "requiredQuantity" DOUBLE PRECISION;
 
 -- AlterTable
-ALTER TABLE "StockLedgerEntry" ADD COLUMN     "idempotencyKey" TEXT;
+ALTER TABLE "StockLedgerEntry" ADD COLUMN IF NOT EXISTS "idempotencyKey" TEXT;
 
 -- AlterTable
-ALTER TABLE "FabricInward" ADD COLUMN     "colour" TEXT;
+ALTER TABLE "FabricInward" ADD COLUMN IF NOT EXISTS "colour" TEXT;
 
 -- AlterTable
-ALTER TABLE "FabricOutward" ADD COLUMN     "colour" TEXT;
+ALTER TABLE "FabricOutward" ADD COLUMN IF NOT EXISTS "colour" TEXT;
 
 -- CreateIndex
-CREATE UNIQUE INDEX "StockLedgerEntry_idempotencyKey_key" ON "StockLedgerEntry"("idempotencyKey");
+CREATE UNIQUE INDEX IF NOT EXISTS "StockLedgerEntry_idempotencyKey_key" ON "StockLedgerEntry"("idempotencyKey");
 
 -- CreateIndex
-CREATE INDEX "StockLedgerEntry_referenceType_referenceId_idx" ON "StockLedgerEntry"("referenceType", "referenceId");
+CREATE INDEX IF NOT EXISTS "StockLedgerEntry_referenceType_referenceId_idx" ON "StockLedgerEntry"("referenceType", "referenceId");
 

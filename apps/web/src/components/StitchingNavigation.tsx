@@ -4,20 +4,15 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  LayoutDashboard,
-  Kanban,
   LogOut,
   Menu,
   X,
-  Shirt,
-  Send,
-  ArrowDownLeft,
-  BarChart3,
-  CheckCircle,
+  Shirt
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { isAdminUser } from '@/lib/rbac';
 import { DepartmentSwitcher } from '@/components/DepartmentSwitcher';
+import { SidebarDepartmentArt } from '@/components/SidebarDepartmentArt';
 import { InstallAppButton } from '@/components/InstallAppButton';
 
 export function StitchingNavigation() {
@@ -138,6 +133,9 @@ export function StitchingNavigation() {
           mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
+        {/* SIDEBAR TEXTILE BACKGROUND (one image for all departments, Admin > Sidebar Image) */}
+        <SidebarDepartmentArt />
+
         {/* BRANDING */}
         <div className="p-4 border-b border-neutral-200 bg-white flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -163,7 +161,7 @@ export function StitchingNavigation() {
         </div>
 
         {/* DEPARTMENT TITLE & WORKSPACE SWITCHER */}
-        <div className="relative px-3 pt-3 pb-2.5 border-b border-neutral-200 bg-white">
+        <div className="relative px-3 pt-3 pb-2.5 border-b border-neutral-200 bg-white [&:not(:has(button))]:hidden">
           <div className="relative z-10">
             <DepartmentSwitcher
               currentDepartmentName="Stitching & Assembly"
@@ -177,67 +175,71 @@ export function StitchingNavigation() {
         <nav className="flex-1 px-3 space-y-1 overflow-y-auto pt-2">
           {/* 1. Dashboard */}
           <Link
-            href="/stitching"
+            href="C:/Users/PiyushSharma/AppData/Local/Programs/Git/stitching"
             onClick={() => setMobileOpen(false)}
-            className={linkClass('/stitching', true)}
+            className={linkClass('C:/Users/PiyushSharma/AppData/Local/Programs/Git/stitching', true)}
           >
-            <LayoutDashboard className="w-4 h-4 shrink-0" />
             <span>Dashboard</span>
           </Link>
 
-          {/* 2. Incoming Challans */}
+          {/* 2. My Work */}
+          <div>
+            <div
+              className={`px-3 py-2.5 text-xs font-semibold ${
+                pathname.startsWith('C:/Users/PiyushSharma/AppData/Local/Programs/Git/stitching/my-work') ? 'text-neutral-900' : 'text-neutral-700'
+              }`}
+            >
+              My Work
+            </div>
+            <div className="ml-4 pl-3 border-l border-neutral-200 space-y-0.5 mb-1">
+              {[
+                { href: '/stitching/my-work/incoming', label: 'Incoming Challans' },
+                { href: '/stitching/my-work/received', label: 'Received Material' },
+                { href: '/stitching/my-work/process', label: 'Stitching Production' },
+                { href: '/stitching/my-work/progress', label: 'Production Progress' },
+                { href: '/stitching/my-work/issue-challan', label: 'Issue Challan to Finishing' },
+              ].map((item) => {
+                const active = pathname === item.href || pathname.startsWith(item.href + '/');
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileOpen(false)}
+                    aria-current={active ? 'page' : undefined}
+                    className={`flex items-center px-2.5 py-2 rounded-lg text-[11px] font-medium transition ${
+                      active
+                        ? 'bg-brand-50 text-brand-800 border-l-2 border-brand-500 pl-2'
+                        : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 3. Stitching History */}
           <Link
-            href="/stitching/incoming"
+            href="C:/Users/PiyushSharma/AppData/Local/Programs/Git/stitching/history"
             onClick={() => setMobileOpen(false)}
-            className={linkClass('/stitching/incoming', false)}
+            className={linkClass('C:/Users/PiyushSharma/AppData/Local/Programs/Git/stitching/history', true)}
           >
-            <ArrowDownLeft className="w-4 h-4 shrink-0" />
-            <span>Incoming (Recutting)</span>
+            <span>Stitching History</span>
           </Link>
 
-          {/* 3. My Work / Work Queue */}
+          {/* 4. Floor Board */}
           <Link
-            href="/stitching/my-work"
+            href="C:/Users/PiyushSharma/AppData/Local/Programs/Git/stitching/floor-board"
             onClick={() => setMobileOpen(false)}
-            className={linkClass('/stitching/my-work', false)}
+            className={linkClass('C:/Users/PiyushSharma/AppData/Local/Programs/Git/stitching/floor-board', true)}
           >
-            <Shirt className="w-4 h-4 shrink-0" />
-            <span>Stitching Floor</span>
-          </Link>
-
-          {/* 4. Issue Challan / Finishing Handover */}
-          <Link
-            href="/stitching/issue-challan"
-            onClick={() => setMobileOpen(false)}
-            className={linkClass('/stitching/issue-challan', false)}
-          >
-            <Send className="w-4 h-4 shrink-0" />
-            <span>Issue Challan</span>
-          </Link>
-
-          {/* 5. Floor Board */}
-          <Link
-            href="/stitching/floor-board"
-            onClick={() => setMobileOpen(false)}
-            className={linkClass('/stitching/floor-board', true)}
-          >
-            <Kanban className="w-4 h-4 shrink-0" />
             <span>Floor Board</span>
-          </Link>
-
-          {/* 6. Reports & Analytics */}
-          <Link
-            href="/stitching/reports"
-            onClick={() => setMobileOpen(false)}
-            className={linkClass('/stitching/reports', false)}
-          >
-            <BarChart3 className="w-4 h-4 shrink-0" />
-            <span>Efficiency & Yield</span>
           </Link>
         </nav>
 
         {/* FOOTER USER STATUS */}
-        <div className="p-3 border-t border-neutral-200 bg-white">
+        <div className="p-3 border-t border-neutral-200 bg-white/75 backdrop-blur-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-8 h-8 rounded-full bg-brand-50 border border-neutral-200 flex items-center justify-center shrink-0">
@@ -253,14 +255,14 @@ export function StitchingNavigation() {
               </div>
             </div>
 
-            <button
-              onClick={handleSignOut}
-              className="p-1.5 rounded-lg text-neutral-500 hover:text-danger-600 hover:bg-neutral-100 transition"
-              title="Sign Out"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
           </div>
+          <button
+            onClick={handleSignOut}
+            className="mt-3 w-full flex items-center justify-center gap-2 px-3 py-2 bg-white hover:bg-danger-50 hover:text-danger-800 hover:border-danger-500/60 border border-neutral-200 rounded-lg text-xs text-neutral-900 transition shadow-xs"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Sign Out</span>
+          </button>
         </div>
       </aside>
     </>

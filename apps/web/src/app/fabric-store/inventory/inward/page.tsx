@@ -7,7 +7,6 @@ import {
   Plus,
   RefreshCw,
   Search,
-  Filter,
   Layers,
   Calendar,
   FileText,
@@ -17,7 +16,9 @@ import {
   X,
   Boxes,
   Pencil,
+  UploadCloud,
 } from 'lucide-react';
+import StockImportModal from '@/components/fabric-store/StockImportModal';
 
 interface InwardItem {
   id: string;
@@ -77,6 +78,7 @@ export default function InwardStockPage() {
   const [typeFilter, setTypeFilter] = useState<'ALL' | 'UNDYED' | 'DYED' | 'KORA'>('ALL');
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
@@ -218,50 +220,59 @@ export default function InwardStockPage() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-brand-50 pb-16">
-      {/* HEADER */}
-      <header className="bg-white border-b border-neutral-200 sticky top-0 z-30 px-4 sm:px-8 py-3.5 shadow-2xs">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-brand-700">
-                FABRIC STORE
-              </span>
-              <span className="text-neutral-700">/</span>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">
-                INVENTORY
-              </span>
-            </div>
-            <h1 className="text-lg font-bold text-neutral-900 flex items-center gap-2">
-              <ArrowDownToLine className="w-5 h-5 text-accent-700" />
-              <span>Inward Stock</span>
-            </h1>
-            <p className="text-[11px] text-neutral-500 mt-0.5">
-              Any new fabric arrives in store that should be in Inward stock
-            </p>
-          </div>
+  const fmt = (n: number) => n.toLocaleString('en-IN', { maximumFractionDigits: 2 });
 
-          <div className="flex items-center gap-2.5">
-            <button
-              onClick={() => {
-                setEditingItemId(null);
-                setFormError('');
-                setFormData(createEmptyFormData());
-                setModalOpen(true);
-              }}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold shadow-xs transition cursor-pointer"
-            >
-              <Plus className="w-4 h-4" />
-              <span>New Fabric Arrival</span>
-            </button>
+  const summaryCards = [
+    { label: 'Total Inward', value: summary.totalMeters, unit: 'MTR', tone: 'bg-brand-50 text-brand-700', icon: ArrowDownToLine, note: `${summary.totalEntries} entries` },
+    { label: 'Undyed', value: summary.undyedMeters || summary.koraMeters || 0, unit: 'MTR', tone: 'bg-accent-100 text-neutral-900', icon: Layers },
+    { label: 'Dyed', value: summary.dyedMeters, unit: 'MTR', tone: 'bg-brand-50 text-brand-700', icon: Layers },
+    { label: 'Pieces', value: summary.totalPcs, unit: 'PCS', tone: 'bg-neutral-100 text-neutral-700', icon: Boxes },
+  ];
+
+  const tabs = [
+    { id: 'ALL', label: 'All' },
+    { id: 'UNDYED', label: 'Undyed' },
+    { id: 'DYED', label: 'Dyed' },
+  ] as const;
+
+  const th = 'py-3 px-4 whitespace-nowrap';
+
+  const openNewArrival = () => {
+    setEditingItemId(null);
+    setFormError('');
+    setFormData(createEmptyFormData());
+    setModalOpen(true);
+  };
+
+  return (
+    <div className="min-h-screen bg-canvas pb-16">
+      {/* HEADER */}
+      <header className="bg-white/90 backdrop-blur border-b border-neutral-200 sticky top-0 z-30 px-4 sm:px-8 py-4">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <h1 className="text-xl font-bold text-neutral-900">Inward Stock</h1>
+          <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={loadData}
               disabled={loading}
-              className="p-2 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition"
-              title="Refresh Inward Stock"
+              className="p-2 text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg border border-neutral-200 transition"
+              title="Refresh"
+              aria-label="Refresh"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            </button>
+            <button
+              onClick={() => setImportOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-accent-300 hover:bg-accent-400 text-neutral-900 text-xs font-semibold rounded-lg shadow-xs border border-accent-500/40 transition cursor-pointer"
+            >
+              <UploadCloud className="w-4 h-4" />
+              <span>Upload Stock Sheet</span>
+            </button>
+            <button
+              onClick={openNewArrival}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-lg shadow-xs transition cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>New Fabric Arrival</span>
             </button>
           </div>
         </div>
@@ -270,259 +281,158 @@ export default function InwardStockPage() {
       <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
         {/* SUCCESS NOTIFICATION */}
         {successMsg && (
-          <div className="p-3.5 bg-accent-50 border border-accent-200 rounded-xl text-xs text-accent-800 flex items-center gap-2.5 shadow-xs">
+          <div className="px-4 py-3 bg-white border border-accent-300 rounded-xl text-sm text-neutral-900 flex items-center gap-2.5 shadow-xs">
             <CheckCircle2 className="w-4 h-4 text-accent-700 shrink-0" />
-            <span className="font-semibold">{successMsg}</span>
+            <span className="font-medium">{successMsg}</span>
           </div>
         )}
 
-        {/* SUMMARY TILES */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-2xs">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block">
-              TOTAL INWARD (METERS)
-            </span>
-            <div className="text-2xl font-black text-neutral-900 mt-1">
-              {summary.totalMeters.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-              <span className="text-xs font-semibold text-neutral-500 ml-1">MTR</span>
+        {/* SUMMARY */}
+        <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {summaryCards.map((card) => (
+            <div key={card.label} className="bg-white border border-neutral-200 rounded-2xl p-4 sm:p-5 shadow-xs">
+              <div className="flex items-center gap-2.5">
+                <span className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${card.tone}`}>
+                  <card.icon className="w-4 h-4" />
+                </span>
+                <span className="text-xs font-semibold text-neutral-600">{card.label}</span>
+              </div>
+              <p className="mt-3 text-2xl font-bold text-neutral-900 tabular-nums leading-none">
+                {fmt(card.value)}
+                <span className="text-xs font-semibold text-neutral-500 ml-1">{card.unit}</span>
+              </p>
+              {card.note && <p className="mt-2 text-[11px] text-neutral-500">{card.note}</p>}
             </div>
-            <span className="text-[10px] text-neutral-500 mt-0.5 block">
-              {summary.totalEntries} arrival records received
-            </span>
-          </div>
+          ))}
+        </section>
 
-          <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-2xs">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-700 block">
-                1. UNDYED RECEIVED
+        {/* INWARD TABLE */}
+        <section className="bg-white border border-neutral-200 rounded-2xl shadow-xs overflow-hidden">
+          <div className="px-5 py-4 border-b border-neutral-200 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <h2 className="text-sm font-bold text-neutral-900">Entries</h2>
+              <span className="text-[11px] font-semibold tabular-nums bg-neutral-100 text-neutral-600 px-2 py-0.5 rounded-full">
+                {items.length}
               </span>
-              <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-accent-100 text-accent-800">
-                UNDYED
-              </span>
+              <div role="tablist" aria-label="Type" className="inline-flex p-0.5 bg-neutral-100 rounded-lg ml-1">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={typeFilter === tab.id}
+                    onClick={() => setTypeFilter(tab.id)}
+                    className={`px-3 py-1 rounded-md text-xs font-semibold transition cursor-pointer ${
+                      typeFilter === tab.id ? 'bg-white text-brand-800 shadow-xs' : 'text-neutral-500 hover:text-neutral-900'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="text-2xl font-black text-neutral-900 mt-1">
-              {(summary.undyedMeters || summary.koraMeters || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-              <span className="text-xs font-semibold text-accent-800 ml-1">MTR</span>
-            </div>
-            <span className="text-[10px] text-accent-800 mt-0.5 block">
-              Raw undyed fabric for dyeing
-            </span>
-          </div>
 
-          <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-2xs">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-brand-700 block">
-                2. DYED RECEIVED
-              </span>
-              <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-brand-100 text-brand-900">
-                DYED
-              </span>
-            </div>
-            <div className="text-2xl font-black text-brand-900 mt-1">
-              {summary.dyedMeters.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-              <span className="text-xs font-semibold text-brand-700 ml-1">MTR</span>
-            </div>
-            <span className="text-[10px] text-brand-700 mt-0.5 block">
-              Pre-dyed / direct store lots
-            </span>
-          </div>
-
-          <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-2xs">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-brand-700 block">
-              TOTAL INWARD (PIECES)
-            </span>
-            <div className="text-2xl font-black text-brand-900 mt-1">
-              {summary.totalPcs.toLocaleString('en-IN')}
-              <span className="text-xs font-semibold text-brand-700 ml-1">PCS</span>
-            </div>
-            <span className="text-[10px] text-brand-700 mt-0.5 block">
-              Piece-unit based fabric items
-            </span>
-          </div>
-        </div>
-
-        {/* CONTROLS: FILTER BUTTONS & SEARCH */}
-        <div className="bg-white p-3.5 rounded-xl border border-neutral-200 shadow-2xs flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs font-bold text-neutral-500 mr-1 flex items-center gap-1">
-              <Filter className="w-3.5 h-3.5" />
-              <span>Type:</span>
-            </span>
-            <button
-              type="button"
-              onClick={() => setTypeFilter('ALL')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                typeFilter === 'ALL'
-                  ? 'bg-brand-600 text-white'
-                  : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-700'
-              }`}
-            >
-              All Inward
-            </button>
-            <button
-              type="button"
-              onClick={() => setTypeFilter('UNDYED')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                typeFilter === 'UNDYED'
-                  ? 'bg-accent-500 text-neutral-900'
-                  : 'bg-accent-50 hover:bg-accent-100 text-accent-800 border border-accent-200'
-              }`}
-            >
-              1. UNDYED
-            </button>
-            <button
-              type="button"
-              onClick={() => setTypeFilter('DYED')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                typeFilter === 'DYED'
-                  ? 'bg-brand-700 text-white'
-                  : 'bg-brand-50 hover:bg-brand-100 text-brand-900 border border-brand-200'
-              }`}
-            >
-              2. DYED
-            </button>
-          </div>
-
-          <form onSubmit={handleSearchSubmit} className="flex items-center gap-2">
-            <div className="relative">
-              <Search className="w-3.5 h-3.5 text-neutral-500 absolute left-2.5 top-1/2 -translate-y-1/2" />
+            <form onSubmit={handleSearchSubmit} className="relative">
+              <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search Item, Colour, Bill No..."
-                className="pl-8 pr-3 py-1.5 border border-neutral-300 rounded-lg text-xs w-48 sm:w-64 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white"
+                placeholder="Search fabric, colour or bill no."
+                aria-label="Search inward entries"
+                className="h-9 w-full md:w-72 pl-9 pr-3 bg-white border border-neutral-200 rounded-lg text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition"
               />
-            </div>
-            <button
-              type="submit"
-              className="px-3 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 text-xs font-bold rounded-lg border border-neutral-300 transition"
-            >
-              Search
-            </button>
-          </form>
-        </div>
-
-        {/* INWARD STOCK TABLE (Matches user's handwritten fields exactly) */}
-        <div className="bg-white rounded-xl border-[1.5px] border-neutral-200 shadow-xs overflow-hidden">
-          <div className="px-5 py-3 border-b-[1.5px] border-neutral-200 bg-neutral-50 flex items-center justify-between">
-            <span className="font-black text-xs uppercase tracking-wider text-neutral-900">
-              INWARD STOCK TABLE ({items.length} ENTRIES)
-            </span>
-            <span className="text-[11px] font-semibold text-neutral-500">
-              Real-time store receiving ledger
-            </span>
+            </form>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left text-xs">
-              <thead>
-                <tr className="bg-neutral-100 border-b-[1.5px] border-neutral-200 text-neutral-900">
-                  <th className="border-r-[1.5px] border-neutral-200 px-3 py-2 font-black text-center w-14">
-                    S.NO
-                  </th>
-                  <th className="border-r-[1.5px] border-neutral-200 px-3 py-2 font-black w-28 text-center">
-                    ENTRY TYPE
-                  </th>
-                  <th className="border-r-[1.5px] border-neutral-200 px-4 py-2 font-black">
-                    ITEM NAME
-                  </th>
-                  <th className="border-r-[1.5px] border-neutral-200 px-3 py-2 font-black w-28">
-                    COLOUR
-                  </th>
-                  <th className="border-r-[1.5px] border-neutral-200 px-3 py-2 font-black w-32">
-                    BILL NO.
-                  </th>
-                  <th className="border-r-[1.5px] border-neutral-200 px-3 py-2 font-black w-28 text-center">
-                    BILL DATE
-                  </th>
-                  <th className="border-r-[1.5px] border-neutral-200 px-3 py-2 font-black w-32 text-center">
-                    RECEIVING DATE
-                  </th>
-                  <th className="border-r-[1.5px] border-neutral-200 px-4 py-2 font-black w-36 text-right">
-                    BILL QTY (MTR/PCS)
-                  </th>
-                  <th className="px-4 py-2 font-black">
-                    SUPPLIER / REMARKS
-                  </th>
-                  <th className="px-3 py-2 font-black text-center w-20">
-                    ACTION
+            <table className="w-full text-left text-sm">
+              <thead className="bg-neutral-50 border-b border-neutral-200 text-[11px] font-semibold uppercase tracking-wide text-neutral-500">
+                <tr>
+                  <th className={`${th} w-12`}>#</th>
+                  <th className={th}>Type</th>
+                  <th className={th}>Fabric</th>
+                  <th className={th}>Colour</th>
+                  <th className={th}>Bill No.</th>
+                  <th className={th}>Bill Date</th>
+                  <th className={th}>Received</th>
+                  <th className={`${th} text-right`}>Quantity</th>
+                  <th className={th}>Supplier</th>
+                  <th className={th}>
+                    <span className="sr-only">Edit</span>
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-200">
+              <tbody className="divide-y divide-neutral-100">
                 {items.length === 0 ? (
                   <tr>
-                    <td colSpan={10} className="px-4 py-12 text-center text-neutral-500 space-y-2">
-                      <ArrowDownToLine className="w-8 h-8 mx-auto text-neutral-700" />
-                      <div className="text-sm font-bold text-neutral-700">No inward records found</div>
-                      <p className="text-xs text-neutral-500">
-                        Click &ldquo;+ New Fabric Arrival&rdquo; above to log the first arriving fabric lot.
-                      </p>
+                    <td colSpan={10} className="px-4 py-14 text-center">
+                      <ArrowDownToLine className="w-8 h-8 mx-auto text-neutral-300" />
+                      <p className="text-sm font-medium text-neutral-500 mt-3">{loading ? 'Loading…' : 'No inward entries yet'}</p>
                     </td>
                   </tr>
                 ) : (
-                  items.map((item, index) => (
-                    <tr key={item.id} className="hover:bg-brand-50/40 transition h-10">
-                      <td className="border-r-[1.5px] border-neutral-200 px-3 py-2 text-center font-bold font-mono text-neutral-700">
-                        {item.sNo ?? index + 1}
-                      </td>
-                      <td className="border-r-[1.5px] border-neutral-200 px-3 py-2 text-center">
-                        <span
-                          className={`inline-block px-2 py-0.5 rounded text-[10px] font-black tracking-wider uppercase ${
-                            item.entryType === 'UNDYED' || item.entryType === 'KORA'
-                              ? 'bg-accent-100 text-accent-800 border border-accent-300'
-                              : 'bg-brand-100 text-brand-900 border border-brand-300'
-                          }`}
-                        >
-                          {item.entryType === 'UNDYED' || item.entryType === 'KORA' ? 'UNDYED' : 'DYED'}
-                        </span>
-                      </td>
-                      <td className="border-r-[1.5px] border-neutral-200 px-4 py-2 font-bold text-neutral-900">
-                        {item.itemName}
-                      </td>
-                      <td className="border-r-[1.5px] border-neutral-200 px-3 py-2 text-neutral-900">
-                        {item.colour || <span className="text-neutral-500 italic">Not recorded</span>}
-                      </td>
-                      <td className="border-r-[1.5px] border-neutral-200 px-3 py-2 font-mono font-bold text-neutral-900">
-                        {item.billNo}
-                      </td>
-                      <td className="border-r-[1.5px] border-neutral-200 px-3 py-2 text-center font-medium text-neutral-700">
-                        {formatDate(item.billDate)}
-                      </td>
-                      <td className="border-r-[1.5px] border-neutral-200 px-3 py-2 text-center font-bold text-brand-900">
-                        {formatDate(item.receivingDate)}
-                      </td>
-                      <td className="border-r-[1.5px] border-neutral-200 px-4 py-2 text-right font-black text-sm text-neutral-900">
-                        {Number(item.billQty).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-                        <span className="text-xs font-bold text-neutral-500 ml-1">
-                          {item.unit || 'MTR'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-2 text-neutral-600 text-xs">
-                        <div className="font-semibold text-neutral-900">{item.supplierName || '—'}</div>
-                        {item.remarks && <div className="text-[11px] text-neutral-500 truncate max-w-xs">{item.remarks}</div>}
-                      </td>
-                      <td className="px-3 py-2 text-center">
-                        <button
-                          type="button"
-                          onClick={() => handleEditInward(item)}
-                          aria-label={`Edit inward record ${item.billNo}`}
-                          title="Edit inward record"
-                          className="inline-flex items-center gap-1 rounded-md border border-brand-200 px-2 py-1 text-[11px] font-bold text-brand-800 hover:bg-brand-50 transition"
-                        >
-                          <Pencil className="w-3 h-3" />
-                          Edit
-                        </button>
-                      </td>
-                    </tr>
-                  ))
+                  items.map((item, index) => {
+                    const isUndyed = item.entryType === 'UNDYED' || item.entryType === 'KORA';
+                    return (
+                      <tr key={item.id} className="hover:bg-neutral-50/60 transition">
+                        <td className="py-3 px-4 text-xs font-semibold text-neutral-400 tabular-nums">{item.sNo ?? index + 1}</td>
+                        <td className="py-3 px-4">
+                          <span
+                            className={`inline-flex px-2 py-0.5 rounded-md text-[11px] font-semibold ${
+                              isUndyed ? 'bg-accent-100 text-neutral-900' : 'bg-brand-50 text-brand-800'
+                            }`}
+                          >
+                            {isUndyed ? 'Undyed' : 'Dyed'}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 font-semibold text-neutral-900">{item.itemName}</td>
+                        <td className="py-3 px-4 text-neutral-700">{item.colour || <span className="text-neutral-400">—</span>}</td>
+                        <td className="py-3 px-4 font-mono text-xs font-semibold text-neutral-900">{item.billNo}</td>
+                        <td className="py-3 px-4 text-xs text-neutral-500 whitespace-nowrap">{formatDate(item.billDate)}</td>
+                        <td className="py-3 px-4 text-xs text-neutral-700 whitespace-nowrap">{formatDate(item.receivingDate)}</td>
+                        <td className="py-3 px-4 text-right tabular-nums whitespace-nowrap">
+                          <span className="font-bold text-neutral-900">{fmt(Number(item.billQty))}</span>{' '}
+                          <span className="text-[11px] font-semibold text-neutral-400">{item.unit || 'MTR'}</span>
+                        </td>
+                        <td className="py-3 px-4">
+                          <div className="text-neutral-900">{item.supplierName || <span className="text-neutral-400">—</span>}</div>
+                          {item.remarks && <div className="text-[11px] text-neutral-500 truncate max-w-[14rem]">{item.remarks}</div>}
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          <button
+                            type="button"
+                            onClick={() => handleEditInward(item)}
+                            aria-label={`Edit inward record ${item.billNo}`}
+                            title="Edit"
+                            className="p-2 text-neutral-400 hover:text-brand-700 hover:bg-brand-50 rounded-lg transition cursor-pointer"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>
           </div>
-        </div>
+        </section>
       </main>
+
+      <StockImportModal
+        open={importOpen}
+        onClose={() => {
+          setImportOpen(false);
+          loadData();
+        }}
+        onImported={(message) => {
+          setSuccessMsg(message);
+          loadData();
+          setTimeout(() => setSuccessMsg(''), 6000);
+        }}
+        onManualEntry={openNewArrival}
+      />
 
       {/* MODAL: CREATE OR EDIT FABRIC ARRIVAL */}
       {modalOpen && (

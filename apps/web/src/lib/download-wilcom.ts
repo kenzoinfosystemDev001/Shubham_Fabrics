@@ -526,7 +526,7 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
         Download Wilcom ${filterCategory === 'ALL' ? '' : filterCategory + ' '}Sheet
       </button>
       <button class="btn btn-outline" onclick="window.close()">
-        ✕ Close
+        Close
       </button>
     </div>
   </div>

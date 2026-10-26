@@ -9,15 +9,15 @@ declare global {
 }
 
 /**
- * Optimizes the PostgreSQL connection URL for Neon Serverless / PgBouncer connection pooling.
- * Automatically injects pgbouncer=true, connection_limit, and timeouts to prevent dropped connections.
+ * Adds connection pool size and timeouts to the PostgreSQL URL (each only when the URL does not set it).
+ *
+ * pgbouncer=true is deliberately NOT added for Neon's pooler: Neon's PgBouncer supports prepared
+ * statements, and the flag makes Prisma re-prepare every statement. Measured against this database
+ * (2026-10-26): ~1,500 ms per simple query with the flag, ~280 ms (one network round trip) without.
+ * A URL that sets pgbouncer=true itself is left as it is.
  */
 export function formatDatabaseUrl(rawUrl: string): string {
   let url = rawUrl;
-  if (url.includes('-pooler') && !url.includes('pgbouncer=true')) {
-    const separator = url.includes('?') ? '&' : '?';
-    url = `${url}${separator}pgbouncer=true`;
-  }
   if (!url.includes('connect_timeout=')) {
     const separator = url.includes('?') ? '&' : '?';
     url = `${url}${separator}connect_timeout=30`;

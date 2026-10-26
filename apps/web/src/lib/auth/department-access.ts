@@ -61,9 +61,20 @@ export const DEPARTMENT_ACCESS = {
     codes: ['FINAL_CHECK', 'FINAL CHECK', 'FINAL_QC', 'FINAL-CHECK'],
     roles: ['FINAL_CHECK_INSPECTOR', 'FINAL_CHECK_SUPERVISOR', 'FINAL_QC_INSPECTOR'],
   },
-  PACKING: {
-    codes: ['PACKING', 'PACK', 'FOLDING', 'FINISHED_GOODS'],
-    roles: ['PACKING_SUPERVISOR', 'PACKING_OPERATOR', 'PACKING_INCHARGE', 'STORE_SUPERVISOR'],
+  // Inventory includes Packing (a module of Inventory, not a department). The PACKING codes and roles
+  // are the earlier "Packing & Inventory" department's, moved to INVENTORY by
+  // manual-migrations/20261026_inventory_department.sql; they stay recognised for rows not yet moved.
+  INVENTORY: {
+    codes: ['INVENTORY', 'PACKING', 'PACK', 'FOLDING', 'FINISHED_GOODS'],
+    roles: [
+      'INVENTORY_SUPERVISOR',
+      'INVENTORY_OPERATOR',
+      'INVENTORY_INCHARGE',
+      'PACKING_SUPERVISOR',
+      'PACKING_OPERATOR',
+      'PACKING_INCHARGE',
+      'STORE_SUPERVISOR',
+    ],
   },
 } as const;
 

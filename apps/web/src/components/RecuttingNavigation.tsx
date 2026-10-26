@@ -4,22 +4,15 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  LayoutDashboard,
-  Briefcase,
-  Kanban,
   LogOut,
   UserCircle,
   Menu,
-  X,
-  Scissors,
-  FileText,
-  Send,
-  ArrowDownLeft,
-  BarChart3,
+  X
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { isAdminUser } from '@/lib/rbac';
 import { DepartmentSwitcher } from '@/components/DepartmentSwitcher';
+import { SidebarDepartmentArt } from '@/components/SidebarDepartmentArt';
 import { InstallAppButton } from '@/components/InstallAppButton';
 
 export function RecuttingNavigation() {
@@ -109,7 +102,7 @@ export function RecuttingNavigation() {
             </div>
             <div>
               <span className="text-xs font-bold text-neutral-900 tracking-wide block leading-none">SHUBHAM FABRICS</span>
-              <span className="text-[9px] font-bold text-danger-600 tracking-wider uppercase block">RECUTTING DEPT</span>
+              <span className="text-[9px] font-bold text-brand-700 tracking-wider uppercase block">RECUTTING DEPT</span>
             </div>
           </div>
         </div>
@@ -140,6 +133,9 @@ export function RecuttingNavigation() {
           mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
+        {/* SIDEBAR TEXTILE BACKGROUND (one image for all departments, Admin > Sidebar Image) */}
+        <SidebarDepartmentArt />
+
         {/* BRANDING */}
         <div className="p-4 border-b border-neutral-200 bg-white flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -152,7 +148,6 @@ export function RecuttingNavigation() {
             </div>
             <div className="min-w-0">
               <span className="text-xs font-bold tracking-[0.14em] text-neutral-900 truncate block">SHUBHAM FABRICS</span>
-              <span className="text-[10px] font-medium tracking-[0.18em] text-danger-600 block truncate">RECUTTING DEPT</span>
             </div>
           </div>
 
@@ -165,7 +160,7 @@ export function RecuttingNavigation() {
         </div>
 
         {/* DEPARTMENT TITLE & WORKSPACE SWITCHER */}
-        <div className="relative px-3 pt-3 pb-2.5 border-b border-neutral-200 bg-white">
+        <div className="relative px-3 pt-3 pb-2.5 border-b border-neutral-200 bg-white [&:not(:has(button))]:hidden">
           <div className="relative z-10">
             <DepartmentSwitcher
               currentDepartmentName="Recutting"
@@ -179,77 +174,72 @@ export function RecuttingNavigation() {
         <nav className="flex-1 px-3 space-y-1 overflow-y-auto pt-2">
           {/* 1. Dashboard */}
           <Link
-            href="/recutting"
+            href="C:/Users/PiyushSharma/AppData/Local/Programs/Git/recutting"
             onClick={() => setMobileOpen(false)}
-            className={linkClass('/recutting', true)}
+            className={linkClass('C:/Users/PiyushSharma/AppData/Local/Programs/Git/recutting', true)}
           >
-            <LayoutDashboard className="w-4 h-4 shrink-0" />
             <span>Dashboard</span>
           </Link>
 
-          {/* 2. Incoming Challans */}
+          {/* 2. My Work */}
+          <div>
+            <div
+              className={`px-3 py-2.5 text-xs font-semibold ${
+                pathname.startsWith('C:/Users/PiyushSharma/AppData/Local/Programs/Git/recutting/my-work') ? 'text-neutral-900' : 'text-neutral-700'
+              }`}
+            >
+              My Work
+            </div>
+            <div className="ml-4 pl-3 border-l border-neutral-200 space-y-0.5 mb-1">
+              {[
+                { href: '/recutting/my-work/incoming', label: 'Incoming Challans' },
+                { href: '/recutting/my-work/received', label: 'Received Fabric' },
+                { href: '/recutting/my-work/allocation', label: 'Fabric Allocation & Recutting' },
+                { href: '/recutting/my-work/allocation-history', label: 'Allocation History' },
+                { href: '/recutting/my-work/issue-challan', label: 'Generate Stitching Challan' },
+                { href: '/recutting/my-work/issued-challans', label: 'Issued Challans' },
+              ].map((item) => {
+                const active = pathname === item.href || pathname.startsWith(item.href + '/');
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileOpen(false)}
+                    aria-current={active ? 'page' : undefined}
+                    className={`flex items-center px-2.5 py-2 rounded-lg text-[11px] font-medium transition ${
+                      active
+                        ? 'bg-brand-50 text-brand-800 border-l-2 border-brand-500 pl-2'
+                        : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 3. Recutting History */}
           <Link
-            href="/recutting/incoming"
+            href="C:/Users/PiyushSharma/AppData/Local/Programs/Git/recutting/history"
             onClick={() => setMobileOpen(false)}
-            className={linkClass('/recutting/incoming', false)}
+            className={linkClass('C:/Users/PiyushSharma/AppData/Local/Programs/Git/recutting/history', true)}
           >
-            <ArrowDownLeft className="w-4 h-4 shrink-0" />
-            <span>Incoming (QC3)</span>
+            <span>Recutting History</span>
           </Link>
 
-          {/* 3. My Work / Work Queue */}
+          {/* 4. Floor Board */}
           <Link
-            href="/recutting/my-work"
+            href="C:/Users/PiyushSharma/AppData/Local/Programs/Git/recutting/floor-board"
             onClick={() => setMobileOpen(false)}
-            className={linkClass('/recutting/my-work', false)}
+            className={linkClass('C:/Users/PiyushSharma/AppData/Local/Programs/Git/recutting/floor-board', true)}
           >
-            <Scissors className="w-4 h-4 shrink-0" />
-            <span>Cutting Queue</span>
-          </Link>
-
-          {/* 4. Issue Challan / Stitching Handover */}
-          <Link
-            href="/recutting/issue-challan"
-            onClick={() => setMobileOpen(false)}
-            className={linkClass('/recutting/issue-challan', false)}
-          >
-            <Send className="w-4 h-4 shrink-0" />
-            <span>Issue Challan</span>
-          </Link>
-
-          {/* 5. Floor Board */}
-          <Link
-            href="/recutting/floor-board"
-            onClick={() => setMobileOpen(false)}
-            className={linkClass('/recutting/floor-board', true)}
-          >
-            <Kanban className="w-4 h-4 shrink-0" />
             <span>Floor Board</span>
-          </Link>
-
-          {/* 6. Reports & Scrap */}
-          <Link
-            href="/recutting/reports"
-            onClick={() => setMobileOpen(false)}
-            className={linkClass('/recutting/reports', true)}
-          >
-            <BarChart3 className="w-4 h-4 shrink-0" />
-            <span>Reports & Scrap</span>
-          </Link>
-
-          {/* 7. Production Sheets */}
-          <Link
-            href="/recutting/my-work?tab=PRODUCTION_SHEETS"
-            onClick={() => setMobileOpen(false)}
-            className={linkClass('/recutting/my-work?tab=PRODUCTION_SHEETS', false)}
-          >
-            <FileText className="w-4 h-4 shrink-0" />
-            <span>Production Sheets</span>
           </Link>
         </nav>
 
         {/* USER & SIGN OUT FOOTER */}
-        <div className="p-4 border-t border-neutral-200 bg-white">
+        <div className="p-4 border-t border-neutral-200 bg-white/75 backdrop-blur-sm">
           <div className="flex items-center gap-3 mb-3">
             <UserCircle className="w-8 h-8 text-danger-600" />
             <div className="flex-1 min-w-0">

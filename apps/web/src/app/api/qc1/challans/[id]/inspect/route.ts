@@ -415,6 +415,8 @@ export async function POST(
               unitType: 'ROLL',
               quantity: qPassed,
               uom,
+              // Passed QC after dyeing: this line is dyed fabric.
+              fabricProcessingStatus: 'DYED',
               remarks: `Inspected & Passed by QC1 Gate. Approved for Embroidery: ${effectiveRemark}`,
             },
           });

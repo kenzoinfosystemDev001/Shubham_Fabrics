@@ -4,8 +4,8 @@
 ### 1. Complete Genealogy Chain
 ```mermaid
 flowchart TD
-    PRG[Program / Production Sheet] --> QC3[QC Washing]
-    QC3 --> RC[Recutting]
+    PRG[Program / Production Sheet] --> WQC[Washing QC]
+    WQC --> RC[Recutting]
     RC --> ST[Stitching]
     ST --> FN[Finishing]
     FN -->|parentChallanId| SP[Steam Press]

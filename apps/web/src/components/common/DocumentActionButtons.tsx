@@ -9,7 +9,8 @@ import {
 } from 'lucide-react';
 import { 
   downloadProductionSheetHtml, 
-  printProductionSheet 
+  printProductionSheet,
+  productionSheetCategoriesForViewer,
 } from '@/lib/download-production-sheet';
 import { 
   downloadChallanHtml, 
@@ -41,10 +42,17 @@ export function DocumentActionButtons({
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isChallanOpen, setIsChallanOpen] = useState(false);
   const [isWilcomOpen, setIsWilcomOpen] = useState(false);
-  const wilcomCategory = 'TOP';
+  // Every Wilcom sheet of the production (the preview can still filter by category).
+  const wilcomCategory = 'ALL';
 
   const activeProgram = program || challan?.program;
   const activeChallan = challan;
+  // A production can have any number of Production Sheets; the count is known once the full sheet is loaded.
+  const sheetCount = activeProgram?.metadataJson
+    ? productionSheetCategoriesForViewer(activeProgram).length
+    : typeof activeProgram?.sheetCount === 'number'
+    ? activeProgram.sheetCount
+    : null;
 
   if (!activeProgram && !activeChallan) {
     return null;
@@ -65,16 +73,16 @@ export function DocumentActionButtons({
               type="button"
               onClick={() => setIsSheetOpen(true)}
               className={`inline-flex items-center gap-1 ${padClass} ${textClass} font-bold text-brand-900 hover:bg-brand-100 transition cursor-pointer`}
-              title="View Master Production Sheet Form"
+              title="View the Production Sheets"
             >
               <FileText className={`${iconSize} text-brand-700`} />
-              {showLabels && <span>Sheet</span>}
+              {showLabels && <span>{sheetCount && sheetCount > 1 ? `Sheets (${sheetCount})` : 'Sheet'}</span>}
             </button>
             <button
               type="button"
               onClick={() => void downloadProductionSheetHtml(activeProgram)}
               className={`p-1 text-brand-700 hover:text-brand-900 hover:bg-brand-100 border-l border-brand-200/80 transition cursor-pointer`}
-              title="Download Master Production Sheet (HTML/PDF)"
+              title="Download all Production Sheets (HTML/PDF)"
             >
               <Download className={iconSize} />
             </button>
@@ -82,7 +90,7 @@ export function DocumentActionButtons({
               type="button"
               onClick={() => printProductionSheet(activeProgram)}
               className={`p-1 text-brand-700 hover:text-brand-900 hover:bg-brand-100 border-l border-brand-200/80 transition cursor-pointer`}
-              title="Print Master Production Sheet (A4 Traveler)"
+              title="Print all Production Sheets (A4)"
             >
               <Printer className={iconSize} />
             </button>
@@ -136,7 +144,7 @@ export function DocumentActionButtons({
               type="button"
               onClick={() => void downloadWilcomFormHtml(activeProgram)}
               className={`p-1 text-brand-700 hover:text-brand-900 hover:bg-brand-100 border-l border-brand-200/80 transition cursor-pointer`}
-              title="Download Wilcom Form with Design Artwork & Offline Images"
+              title="Download all Wilcom sheets with design artwork"
             >
               <Download className={iconSize} />
             </button>
@@ -144,7 +152,7 @@ export function DocumentActionButtons({
               type="button"
               onClick={() => printWilcomForm(activeProgram)}
               className={`p-1 text-brand-700 hover:text-brand-900 hover:bg-brand-100 border-l border-brand-200/80 transition cursor-pointer`}
-              title="Print Wilcom Form (A4)"
+              title="Print all Wilcom sheets (A4)"
             >
               <Printer className={iconSize} />
             </button>

@@ -51,6 +51,26 @@ module.exports = {
       ringColor: {
         DEFAULT: 'rgb(var(--brand-500) / 0.5)',
       },
+      // Elevation scale: light from above, soft ink-tinted shadows (each step = a tight contact
+      // shadow + a wider ambient one). `2xs`/`xs` are also the names already used in the markup.
+      boxShadow: {
+        '2xs': '0 1px 2px 0 rgb(37 35 42 / 0.05)',
+        xs: '0 1px 2px 0 rgb(37 35 42 / 0.06), 0 2px 6px -2px rgb(37 35 42 / 0.08)',
+        sm: '0 1px 2px 0 rgb(37 35 42 / 0.06), 0 4px 10px -3px rgb(37 35 42 / 0.10)',
+        DEFAULT: '0 1px 3px 0 rgb(37 35 42 / 0.07), 0 6px 14px -4px rgb(37 35 42 / 0.12)',
+        md: '0 2px 4px -1px rgb(37 35 42 / 0.07), 0 10px 20px -6px rgb(37 35 42 / 0.14)',
+        lg: '0 4px 8px -2px rgb(37 35 42 / 0.08), 0 16px 32px -10px rgb(37 35 42 / 0.18)',
+        xl: '0 6px 12px -4px rgb(37 35 42 / 0.10), 0 24px 44px -14px rgb(37 35 42 / 0.22)',
+        '2xl': '0 10px 20px -8px rgb(37 35 42 / 0.12), 0 36px 64px -18px rgb(37 35 42 / 0.28)',
+        inner: 'inset 0 1px 2px 0 rgb(37 35 42 / 0.06)',
+      },
+      dropShadow: {
+        xs: '0 1px 1px rgb(255 255 255 / 0.6)',
+      },
+      backdropBlur: {
+        '2xs': '1px',
+        xs: '2px',
+      },
     },
   },
   plugins: [],

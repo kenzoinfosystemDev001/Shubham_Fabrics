@@ -1,11 +1,11 @@
 # Standard Operating Procedure (SOP-01)
-## Raw Material Inward, Roll Verification & 4-Point Inspection Gate (QC1)
+## Raw Material Inward, Roll Verification & 4-Point Inspection Gate (Dyeing QC)
 
 ### 1. Purpose
 To ensure that all raw fabric received from dye-houses or fabric mills is rigorously accounted for by weight, length, roll number, and quality grading before being accepted into store inventory or issued to the cutting section.
 
 ### 2. Scope
-Applies to the Raw Material Store, Dyeing Unit, and Fabric Quality Gate (QC1) within Subham Fabrics.
+Applies to the Raw Material Store, Dyeing Unit, and Fabric Quality Gate (Dyeing QC) within Subham Fabrics.
 
 ### 3. Step-by-Step Procedure
 1. **Physical Unloading & Gate Pass Verification**:
@@ -15,7 +15,7 @@ Applies to the Raw Material Store, Dyeing Unit, and Fabric Quality Gate (QC1) wi
    - Individual roll barcode tag (`ROL-XXXX-NNN`) is affixed.
 3. **Draft Inward Challan Generation**:
    - Store supervisor initiates inward challan `CH-STR-YYYY-NNNNNN` with fabric code, color, shade lot, gross weight, and net weight.
-4. **4-Point Fabric Inspection (QC1)**:
+4. **4-Point Fabric Inspection (Dyeing QC)**:
    - Minimum 10% sample rolls inspected per lot on 45° inspection table.
    - Defects scored:
      - Flaw up to 3 inches: 1 Point

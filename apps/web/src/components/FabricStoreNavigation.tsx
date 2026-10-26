@@ -4,29 +4,17 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  LayoutDashboard,
-  Briefcase,
-  PackageCheck,
-  ClipboardCheck,
-  ArrowDownToLine,
   ChevronDown,
   ChevronRight,
   LogOut,
   UserCircle,
-  Boxes,
-  Layers,
-  BookOpen,
-  ListChecks,
-  Kanban,
-  Building2,
-  Send,
-  AlertTriangle,
   Menu,
   X
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { isAdminUser } from '@/lib/rbac';
 import { DepartmentSwitcher } from '@/components/DepartmentSwitcher';
+import { SidebarDepartmentArt } from '@/components/SidebarDepartmentArt';
 
 export function FabricStoreNavigation() {
   const pathname = usePathname();
@@ -68,7 +56,7 @@ export function FabricStoreNavigation() {
 
     // Auto-expand sections based on current path
     if (pathname.includes('/fabric-store/my-work')) setMyWorkOpen(true);
-    if (pathname.includes('/fabric-store/inventory/inward') || pathname.includes('/fabric-store/inventory/outward')) setInventoryOpen(true);
+    if (pathname.includes('/fabric-store/inventory/inward')) setInventoryOpen(true);
     if (pathname.includes('/fabric-store/inventory/total-stock')) setTotalStockOpen(true);
     // Close mobile drawer on navigation
     setMobileOpen(false);
@@ -119,7 +107,7 @@ export function FabricStoreNavigation() {
   );
 
   const myWorkActive = pathname.includes('/fabric-store/my-work');
-  const inventoryActive = pathname.includes('/fabric-store/inventory/inward') || pathname.includes('/fabric-store/inventory/outward');
+  const inventoryActive = pathname.includes('/fabric-store/inventory/inward');
   const totalStockActive = pathname.includes('/fabric-store/inventory/total-stock');
 
   return (
@@ -172,6 +160,9 @@ export function FabricStoreNavigation() {
           mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
+        {/* SIDEBAR TEXTILE BACKGROUND (one image for all departments, Admin > Sidebar Image) */}
+        <SidebarDepartmentArt />
+
         {/* BRANDING WITH OFFICIAL IMG 3 LOGO */}
         <div className="p-4 border-b border-neutral-200 bg-white flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -184,7 +175,6 @@ export function FabricStoreNavigation() {
             </div>
             <div className="min-w-0">
               <span className="text-xs font-bold tracking-[0.14em] text-neutral-900 truncate block">SHUBHAM FABRICS</span>
-              <span className="text-[10px] font-medium tracking-[0.18em] text-brand-700 block truncate">MES ENTERPRISE</span>
             </div>
           </div>
 
@@ -198,7 +188,7 @@ export function FabricStoreNavigation() {
         </div>
 
         {/* DEPARTMENT TITLE & WORKSPACE SWITCHER */}
-        <div className="relative px-3 pt-3 pb-2.5 border-b border-neutral-200 bg-white">
+        <div className="relative px-3 pt-3 pb-2.5 border-b border-neutral-200 bg-white [&:not(:has(button))]:hidden">
           <div className="relative z-10">
             <DepartmentSwitcher
               currentDepartmentName="Store Department"
@@ -217,14 +207,12 @@ export function FabricStoreNavigation() {
             onClick={() => setMobileOpen(false)}
             className={linkClass('/fabric-store', true)}
           >
-            <LayoutDashboard className="w-4 h-4 text-neutral-500" />
             <span>Dashboard</span>
           </Link>
 
           {/* 2. My Work */}
           <div>
-            <div className="flex items-center gap-3 px-3 py-2">
-              <Briefcase className="w-4 h-4 text-neutral-500" />
+            <div>
               <div className="flex-1">
                 {sectionHeader('My Work', myWorkOpen, () => setMyWorkOpen(!myWorkOpen), myWorkActive)}
               </div>
@@ -236,7 +224,6 @@ export function FabricStoreNavigation() {
                   onClick={() => setMobileOpen(false)}
                   className={subLinkClass('/fabric-store/my-work/incoming-challans')}
                 >
-                  <PackageCheck className="w-3.5 h-3.5 shrink-0" />
                   <span>Incoming Challans</span>
                 </Link>
                 <Link
@@ -244,7 +231,6 @@ export function FabricStoreNavigation() {
                   onClick={() => setMobileOpen(false)}
                   className={subLinkClass('/fabric-store/my-work/challan-to-dyeing')}
                 >
-                  <Send className="w-3.5 h-3.5 shrink-0" />
                   <span>Store to Dyeing (Challan)</span>
                 </Link>
                 <Link
@@ -252,7 +238,6 @@ export function FabricStoreNavigation() {
                   onClick={() => setMobileOpen(false)}
                   className={subLinkClass('/fabric-store/my-work/challan-to-embroidery')}
                 >
-                  <Send className="w-3.5 h-3.5 shrink-0" />
                   <span>Store to Embroidery (Challan)</span>
                 </Link>
               </div>
@@ -265,14 +250,12 @@ export function FabricStoreNavigation() {
             onClick={() => setMobileOpen(false)}
             className={linkClass('/fabric-store/floor-board', true)}
           >
-            <Kanban className="w-4 h-4 text-neutral-500" />
             <span>Floor Board</span>
           </Link>
 
-          {/* 4. Inventory (Inward Stock & Outward Stock) */}
+          {/* 4. Inventory (Inward Stock) */}
           <div>
-            <div className="flex items-center gap-3 px-3 py-2">
-              <Boxes className="w-4 h-4 text-neutral-500" />
+            <div>
               <div className="flex-1">
                 {sectionHeader('Inventory', inventoryOpen, () => setInventoryOpen(!inventoryOpen), inventoryActive)}
               </div>
@@ -284,35 +267,33 @@ export function FabricStoreNavigation() {
                   onClick={() => setMobileOpen(false)}
                   className={subLinkClass('/fabric-store/inventory/inward')}
                 >
-                  <ArrowDownToLine className="w-3.5 h-3.5 shrink-0" />
                   <span>Inward Stock</span>
-                </Link>
-                <Link
-                  href="/fabric-store/inventory/outward"
-                  onClick={() => setMobileOpen(false)}
-                  className={subLinkClass('/fabric-store/inventory/outward')}
-                >
-                  <Send className="w-3.5 h-3.5 shrink-0" />
-                  <span>Outward Stock</span>
                 </Link>
               </div>
             )}
           </div>
 
-          {/* 5. Defective Shelf */}
+          {/* 5. Outward Stock (top level, outside Inventory) */}
+          <Link
+            href="/fabric-store/inventory/outward"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/fabric-store/inventory/outward')}
+          >
+            <span>Outward Stock</span>
+          </Link>
+
+          {/* 6. Defective Shelf */}
           <Link
             href="/fabric-store/inventory/defected-shelf"
             onClick={() => setMobileOpen(false)}
             className={linkClass('/fabric-store/inventory/defected-shelf')}
           >
-            <AlertTriangle className="w-4 h-4 shrink-0" />
             <span>Defective Shelf</span>
           </Link>
 
-          {/* 6. Total Stock (UNDYED & DYED) */}
+          {/* 7. Total Stock (UNDYED & DYED) */}
           <div>
-            <div className="flex items-center gap-3 px-3 py-2">
-              <Layers className="w-4 h-4 shrink-0" />
+            <div>
               <div className="flex-1">
                 {sectionHeader('Total Stock', totalStockOpen, () => setTotalStockOpen(!totalStockOpen), totalStockActive)}
               </div>
@@ -324,7 +305,6 @@ export function FabricStoreNavigation() {
                   onClick={() => setMobileOpen(false)}
                   className={subLinkClass('/fabric-store/inventory/total-stock', true)}
                 >
-                  <Boxes className="w-3.5 h-3.5 shrink-0" />
                   <span>All Stock Balance</span>
                 </Link>
                 <Link
@@ -350,7 +330,7 @@ export function FabricStoreNavigation() {
         </nav>
 
         {/* USER & SIGN OUT */}
-        <div className="p-4 border-t border-neutral-200 bg-white">
+        <div className="p-4 border-t border-neutral-200 bg-white/75 backdrop-blur-sm">
           <div className="flex items-center gap-3 mb-3">
             <UserCircle className="w-8 h-8 text-brand-700" />
             <div className="flex-1 min-w-0">

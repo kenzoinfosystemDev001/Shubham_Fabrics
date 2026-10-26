@@ -4,18 +4,15 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  LayoutDashboard,
-  Briefcase,
-  Kanban,
   LogOut,
   UserCircle,
   Menu,
-  X,
-  Droplet
+  X
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { isAdminUser } from '@/lib/rbac';
 import { DepartmentSwitcher } from '@/components/DepartmentSwitcher';
+import { SidebarDepartmentArt } from '@/components/SidebarDepartmentArt';
 
 export function DyeingNavigation() {
   const pathname = usePathname();
@@ -129,6 +126,9 @@ export function DyeingNavigation() {
           mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
+        {/* SIDEBAR TEXTILE BACKGROUND (one image for all departments, Admin > Sidebar Image) */}
+        <SidebarDepartmentArt />
+
         {/* BRANDING WITH OFFICIAL IMG 3 LOGO */}
         <div className="p-4 border-b border-neutral-200 bg-white flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -141,7 +141,6 @@ export function DyeingNavigation() {
             </div>
             <div className="min-w-0">
               <span className="text-xs font-bold tracking-[0.14em] text-neutral-900 truncate block">SHUBHAM FABRICS</span>
-              <span className="text-[10px] font-medium tracking-[0.18em] text-brand-700 block truncate">MES ENTERPRISE</span>
             </div>
           </div>
 
@@ -155,7 +154,7 @@ export function DyeingNavigation() {
         </div>
 
         {/* DEPARTMENT TITLE & WORKSPACE SWITCHER */}
-        <div className="relative px-3 pt-3 pb-2.5 border-b border-neutral-200 bg-white">
+        <div className="relative px-3 pt-3 pb-2.5 border-b border-neutral-200 bg-white [&:not(:has(button))]:hidden">
           <div className="relative z-10">
             <DepartmentSwitcher
               currentDepartmentName="Dyeing Department"
@@ -173,61 +172,66 @@ export function DyeingNavigation() {
             onClick={() => setMobileOpen(false)}
             className={linkClass('/dyeing', true)}
           >
-            <LayoutDashboard className="w-4 h-4 shrink-0" />
             <span>Dashboard</span>
           </Link>
 
           {/* 2. My Work */}
           <div>
-            <Link
-              href="/dyeing/my-work"
-              onClick={() => setMobileOpen(false)}
-              className={linkClass('/dyeing/my-work', false)}
+            <div
+              className={`px-3 py-2.5 text-xs font-semibold ${
+                pathname.startsWith('/dyeing/my-work') ? 'text-neutral-900' : 'text-neutral-700'
+              }`}
             >
-              <Briefcase className="w-4 h-4 shrink-0" />
-              <span>My Work</span>
-            </Link>
-
-            {/* Sublinks matching handwritten sheet */}
-            <div className="ml-7 pl-2.5 border-l border-neutral-200 space-y-0.5 my-1">
-              <Link
-                href="/dyeing/my-work?tab=incoming"
-                onClick={() => setMobileOpen(false)}
-                className={`flex items-center gap-2 px-2 py-1.5 rounded text-[11px] font-medium transition ${
-                  pathname === '/dyeing/my-work'
-                    ? 'text-brand-700 hover:text-neutral-900 hover:bg-neutral-100'
-                    : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100'
-                }`}
-              >
-                <span>Incoming Challans</span>
-              </Link>
-              <Link
-                href="/dyeing/my-work?tab=create-challan"
-                onClick={() => setMobileOpen(false)}
-                className={`flex items-center gap-2 px-2 py-1.5 rounded text-[11px] font-medium transition ${
-                  pathname === '/dyeing/my-work'
-                    ? 'text-brand-700 hover:text-neutral-900 hover:bg-neutral-100'
-                    : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100'
-                }`}
-              >
-                <span>Create Challan to QC1</span>
-              </Link>
+              My Work
+            </div>
+            <div className="ml-4 pl-3 border-l border-neutral-200 space-y-0.5 mb-1">
+              {[
+                { href: '/dyeing/my-work/incoming', label: 'Incoming Challans' },
+                { href: '/dyeing/my-work/received', label: 'Received Fabric' },
+                { href: '/dyeing/my-work/process', label: 'Dyeing Process' },
+                { href: '/dyeing/my-work/issue-challan', label: 'Issue Challan to Dyeing QC' },
+              ].map((item) => {
+                const active = pathname === item.href || pathname.startsWith(item.href + '/');
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileOpen(false)}
+                    aria-current={active ? 'page' : undefined}
+                    className={`flex items-center px-2.5 py-2 rounded-lg text-[11px] font-medium transition ${
+                      active
+                        ? 'bg-brand-50 text-brand-800 border-l-2 border-brand-500 pl-2'
+                        : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
             </div>
           </div>
 
-          {/* 3. Floor Board */}
+          {/* 3. Dyeing History */}
+          <Link
+            href="/dyeing/history"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/dyeing/history', true)}
+          >
+            <span>Dyeing History</span>
+          </Link>
+
+          {/* 4. Floor Board */}
           <Link
             href="/dyeing/floor-board"
             onClick={() => setMobileOpen(false)}
             className={linkClass('/dyeing/floor-board', true)}
           >
-            <Kanban className="w-4 h-4 shrink-0" />
             <span>Floor Board</span>
           </Link>
         </nav>
 
         {/* USER & SIGN OUT FOOTER */}
-        <div className="p-4 border-t border-neutral-200 bg-white">
+        <div className="p-4 border-t border-neutral-200 bg-white/75 backdrop-blur-sm">
           <div className="flex items-center gap-3 mb-3">
             <UserCircle className="w-8 h-8 text-brand-700" />
             <div className="flex-1 min-w-0">

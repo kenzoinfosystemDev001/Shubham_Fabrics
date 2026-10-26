@@ -16,6 +16,7 @@ export interface AuthenticatedUser {
   id: string;
   username: string;
   fullName: string;
+  email: string;
   /** Department code stored on the user record. */
   departmentCode: string | null;
   /** Role codes from the database, upper-cased. */
@@ -57,20 +58,23 @@ export async function getSessionUser(request: Request): Promise<AuthenticatedUse
   const claims = await verifySessionToken(token);
   if (!claims) return null;
 
-  const user = await prisma.user.findUnique({
-    where: { id: claims.sub },
-    include: { userRoles: { include: { role: { select: { code: true } } } } },
-  });
+  // Runs on every API request. The user and their role codes are read in parallel (the role filter
+  // is a subquery), so the check costs one database round trip instead of three sequential ones.
+  const [user, roleRows] = await Promise.all([
+    prisma.user.findUnique({ where: { id: claims.sub } }),
+    prisma.role.findMany({ where: { userRoles: { some: { userId: claims.sub } } }, select: { code: true } }),
+  ]);
   if (!user || !user.isActive) return null;
 
   // Role and department are recomputed from the database on every request, so an admin's
   // changes (new department, removed admin role) apply immediately, not at the next login.
-  const roles = user.userRoles.map(({ role }) => role.code.toUpperCase());
-  const current = buildSessionUser(user);
+  const roles = roleRows.map(({ code }) => code.toUpperCase());
+  const current = buildSessionUser({ ...user, userRoles: roleRows.map((role) => ({ role })) });
   return {
     id: user.id,
     username: user.username,
     fullName: user.fullName,
+    email: user.email,
     departmentCode: user.departmentCode,
     roles,
     sessionRole: current.role,
@@ -81,7 +85,7 @@ export async function getSessionUser(request: Request): Promise<AuthenticatedUse
 
 /**
  * Route-handler guard. Usage:
- *   const { user, response } = await requireUser(request, { departments: ['PACKING'] });
+ *   const { user, response } = await requireUser(request, { departments: ['INVENTORY'] });
  *   if (!user) return response;
  */
 export async function requireUser(request: Request, options: RequireUserOptions = {}): Promise<RequireUserResult> {

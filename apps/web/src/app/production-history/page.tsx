@@ -28,6 +28,17 @@ import {
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
+import { departmentName } from '@/lib/workflow-views';
+
+/** A challan's quantity per unit from its lines, e.g. "120 MTR · 40 PCS" (units are never added together). */
+function challanQuantity(challan: any) {
+  const totals: Record<string, number> = {};
+  for (const item of challan.items || []) totals[item.uom || 'PCS'] = (totals[item.uom || 'PCS'] || 0) + (Number(item.quantity) || 0);
+  const parts = Object.entries(totals)
+    .filter(([, q]) => q > 0)
+    .map(([u, q]) => `${q.toLocaleString('en-IN', { maximumFractionDigits: 2 })} ${u}`);
+  return parts.length ? parts.join(' · ') : '—';
+}
 
 export default function ProductionHistoryPage() {
   const router = useRouter();
@@ -473,7 +484,7 @@ export default function ProductionHistoryPage() {
                             <span>Challans Lifecycle Trail for {prog.programSerialNo || prog.programNumber}</span>
                           </span>
                           <span className="text-[11px] text-neutral-500">
-                            Flow: Programming $\rightarrow$ Fabric Store $\rightarrow$ Dyeing $\rightarrow$ QC1
+                            Every challan issued for this production, newest first
                           </span>
                         </div>
 
@@ -486,7 +497,7 @@ export default function ProductionHistoryPage() {
                                   href={`/my-work/issue-challan?programId=${prog.id}`}
                                   className="text-brand-700 hover:underline font-semibold"
                                 >
-                                  Click here to issue the first Challan $\rightarrow$
+                                  Issue the first challan →
                                 </Link>
                               </div>
                             )}
@@ -509,18 +520,18 @@ export default function ProductionHistoryPage() {
                                 <div className="text-[11px] text-neutral-600 flex items-center justify-between">
                                   <span>Route:</span>
                                   <span className="font-medium text-neutral-900">
-                                    {c.sourceDepartment} $\rightarrow$ {c.destinationDepartment}
+                                    {departmentName(c.fromDepartment)} → {departmentName(c.toDepartment)}
                                   </span>
                                 </div>
                                 <div className="text-[11px] text-neutral-600 flex items-center justify-between">
                                   <span>Quantity:</span>
                                   <span className="font-mono font-semibold text-neutral-900">
-                                    {c.totalQuantity || '—'}
+                                    {challanQuantity(c)}
                                   </span>
                                 </div>
                                 <div className="text-[11px] text-neutral-600 flex items-center justify-between">
                                   <span>Date:</span>
-                                  <span>{c.challanDate ? new Date(c.challanDate).toLocaleDateString() : '—'}</span>
+                                  <span>{c.issuedDate ? new Date(c.issuedDate).toLocaleDateString('en-GB') : '—'}</span>
                                 </div>
                                 <div className="pt-2 border-t border-neutral-100 flex items-center justify-end">
                                   <DocumentActionButtons

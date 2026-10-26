@@ -94,6 +94,11 @@ export async function DELETE(
             data: { parentChallanId: null },
           });
 
+          // Department work items (and their transfers) belong to these challans/this program.
+          await tx.departmentWorkItem.deleteMany({
+            where: { OR: [{ programId: id }, { inboundChallanId: { in: challanIds } }] },
+          });
+
           // Unlink DyeingOrder references to these challans
           await tx.dyeingOrder.updateMany({
             where: {
@@ -162,7 +167,8 @@ export async function DELETE(
           });
         }
 
-        // 3. Delete DyeingOrders for this program
+        // 3. Delete department work items and DyeingOrders for this program
+        await tx.departmentWorkItem.deleteMany({ where: { programId: id } });
         await tx.dyeingOrder.deleteMany({
           where: { programId: id },
         });

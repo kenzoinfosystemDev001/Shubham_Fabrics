@@ -4,23 +4,15 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  LayoutDashboard,
-  Briefcase,
-  Kanban,
   LogOut,
   UserCircle,
   Menu,
-  X,
-  Scissors,
-  CheckCircle2,
-  FileText,
-  Clock,
-  Layers,
-  ArrowRight
+  X
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { isAdminUser } from '@/lib/rbac';
 import { DepartmentSwitcher } from '@/components/DepartmentSwitcher';
+import { SidebarDepartmentArt } from '@/components/SidebarDepartmentArt';
 
 export function EmbroideryNavigation() {
   const pathname = usePathname();
@@ -132,6 +124,9 @@ export function EmbroideryNavigation() {
           mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
+        {/* SIDEBAR TEXTILE BACKGROUND (one image for all departments, Admin > Sidebar Image) */}
+        <SidebarDepartmentArt />
+
         {/* BRANDING HEADER */}
         <div className="p-4 border-b border-neutral-200 bg-white flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -146,9 +141,6 @@ export function EmbroideryNavigation() {
               <span className="text-xs font-bold tracking-[0.14em] text-neutral-900 truncate block">
                 SHUBHAM FABRICS
               </span>
-              <span className="text-[10px] font-medium tracking-[0.18em] text-brand-700 block truncate">
-                MES ENTERPRISE
-              </span>
             </div>
           </div>
 
@@ -161,7 +153,7 @@ export function EmbroideryNavigation() {
         </div>
 
         {/* DEPARTMENT TITLE & WORKSPACE SWITCHER */}
-        <div className="relative px-3 pt-3 pb-2.5 border-b border-neutral-200 bg-white">
+        <div className="relative px-3 pt-3 pb-2.5 border-b border-neutral-200 bg-white [&:not(:has(button))]:hidden">
           <div className="relative z-10">
             <DepartmentSwitcher
               currentDepartmentName="Embroidery Department"
@@ -179,43 +171,66 @@ export function EmbroideryNavigation() {
             onClick={() => setMobileOpen(false)}
             className={linkClass('/embroidery', true)}
           >
-            <LayoutDashboard className="w-4 h-4 shrink-0" />
             <span>Dashboard</span>
           </Link>
 
           {/* 2. My Work */}
+          <div>
+            <div
+              className={`px-3 py-2.5 text-xs font-semibold ${
+                pathname.startsWith('/embroidery/my-work') ? 'text-neutral-900' : 'text-neutral-700'
+              }`}
+            >
+              My Work
+            </div>
+            <div className="ml-4 pl-3 border-l border-neutral-200 space-y-0.5 mb-1">
+              {[
+                { href: '/embroidery/my-work/incoming', label: 'Incoming Challans' },
+                { href: '/embroidery/my-work/received', label: 'Received Fabric' },
+                { href: '/embroidery/my-work/process', label: 'Embroidery Process' },
+                { href: '/embroidery/my-work/issue-challan', label: 'Issue Challan to Thread Cutting' },
+              ].map((item) => {
+                const active = pathname === item.href || pathname.startsWith(item.href + '/');
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileOpen(false)}
+                    aria-current={active ? 'page' : undefined}
+                    className={`flex items-center px-2.5 py-2 rounded-lg text-[11px] font-medium transition ${
+                      active
+                        ? 'bg-brand-50 text-brand-800 border-l-2 border-brand-500 pl-2'
+                        : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 3. Embroidery History */}
           <Link
-            href="/embroidery/my-work"
+            href="/embroidery/history"
             onClick={() => setMobileOpen(false)}
-            className={linkClass('/embroidery/my-work', false)}
+            className={linkClass('/embroidery/history', true)}
           >
-            <Briefcase className="w-4 h-4 shrink-0" />
-            <span>My Work</span>
+            <span>Embroidery History</span>
           </Link>
 
-          {/* 3. Floor Board */}
+          {/* 4. Floor Board */}
           <Link
             href="/embroidery/floor-board"
             onClick={() => setMobileOpen(false)}
             className={linkClass('/embroidery/floor-board', true)}
           >
-            <Kanban className="w-4 h-4 shrink-0" />
             <span>Floor Board</span>
-          </Link>
-
-          {/* 4. Incoming Challans */}
-          <Link
-            href="/embroidery/incoming-challans"
-            onClick={() => setMobileOpen(false)}
-            className={linkClass('/embroidery/incoming-challans', false)}
-          >
-            <Layers className="w-4 h-4 shrink-0" />
-            <span>Incoming Challans</span>
           </Link>
         </nav>
 
         {/* USER & SIGN OUT FOOTER */}
-        <div className="p-4 border-t border-neutral-200 bg-white">
+        <div className="p-4 border-t border-neutral-200 bg-white/75 backdrop-blur-sm">
           <div className="flex items-center gap-3 mb-3">
             <UserCircle className="w-8 h-8 text-brand-700" />
             <div className="flex-1 min-w-0">

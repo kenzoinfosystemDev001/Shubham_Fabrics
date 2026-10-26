@@ -61,8 +61,17 @@ export function shapeProgramSheet(program: any, viewer: AuthenticatedUser | null
   // Role/department access restriction: ONLY Programming and Admin can see clientCode
   const isAuthorized = !!viewer && canViewClientCode(viewer);
 
+  let metadataJson = program.metadataJson;
+  if (!isAuthorized && clientCode && metadataJson) {
+    try {
+      const { clientCode: _hidden, ...rest } = JSON.parse(metadataJson);
+      metadataJson = JSON.stringify(rest);
+    } catch {}
+  }
+
   return {
     ...program,
+    metadataJson,
     wilcomDesignPhoto: wilcomDesignPhoto || program.wilcomDesignPhoto,
     wilcomEntries,
     items,
