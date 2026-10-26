@@ -8,6 +8,11 @@
 //
 // Flags:  --soft   never fail the caller (prints the problem and exits 0, so the app still starts)
 //         --force  apply every file again
+//         --vercel-production  run only in a Vercel production build (VERCEL_ENV=production) and skip
+//                  everywhere else. apps/web "prebuild" uses it, so a production deploy applies its
+//                  migrations before the new code goes live; preview builds of unmerged branches never
+//                  change the shared database. A failure fails the build, so code never ships ahead of
+//                  its database.
 //
 // All files are additive and re-runnable except 20261026_inventory_department.sql, which moves records from
 // the department code PACKING to INVENTORY (see that file; it applies all-or-nothing).
@@ -34,11 +39,18 @@ const MIGRATIONS = [
   '20261026_inventory_packing.sql',
   '20261026_inventory_department.sql',
   '20261026_stock_imports.sql',
+  '20261026_grn_unit.sql',
+  '20261026_mtr_pcs_per_item.sql',
 ];
 
 const args = new Set(process.argv.slice(2));
 const SOFT = args.has('--soft');
 const FORCE = args.has('--force');
+
+if (args.has('--vercel-production') && process.env.VERCEL_ENV !== 'production') {
+  console.log(`[migrations] Skipped: not a Vercel production build (VERCEL_ENV=${process.env.VERCEL_ENV || 'unset'}).`);
+  process.exit(0);
+}
 
 function fail(message) {
   console.error(`\n[migrations] ${message}`);
