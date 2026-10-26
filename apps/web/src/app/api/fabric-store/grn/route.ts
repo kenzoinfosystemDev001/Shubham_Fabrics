@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
+import { normalizeStockUnit } from '@/lib/fabric-stock';
 
 export const dynamic = 'force-dynamic';
 
@@ -103,10 +104,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'At least one roll entry is required' }, { status: 400 });
     }
 
-    // Validate roll entries
-    for (const r of rollInputs) {
+    // Validate roll entries: each roll has its own quantity and unit (MTR or PCS, never converted).
+    for (const [index, r] of rollInputs.entries()) {
       if (!r.length || isNaN(parseFloat(r.length)) || parseFloat(r.length) <= 0) {
-        return NextResponse.json({ error: `Invalid roll length: ${r.length}` }, { status: 400 });
+        return NextResponse.json({ error: `Roll #${index + 1}: quantity must be greater than zero.` }, { status: 400 });
+      }
+      if (!normalizeStockUnit(r.unit)) {
+        return NextResponse.json({ error: `Roll #${index + 1}: choose the unit (MTR or PCS).` }, { status: 400 });
       }
     }
 
@@ -124,11 +128,11 @@ export async function POST(request: Request) {
       : 1;
     const batchNumber = `${batchPrefix}${String(nextBatchSeq).padStart(4, '0')}`;
 
-    // Calculate totals
-    const totalMeters = rollInputs.reduce(
-      (sum: number, r: any) => sum + parseFloat(r.length),
-      0
-    );
+    // Totals per unit; meters and pieces are never added together.
+    const totalOf = (unit: 'MTR' | 'PCS') =>
+      rollInputs.filter((r: any) => normalizeStockUnit(r.unit) === unit).reduce((sum: number, r: any) => sum + parseFloat(r.length), 0);
+    const totalMeters = totalOf('MTR');
+    const totalPieces = totalOf('PCS');
 
     const result = await prisma.$transaction(async (tx) => {
       // 1. Create FabricBatch
@@ -142,6 +146,7 @@ export async function POST(request: Request) {
           programId: programId || null,
           totalRolls: rollInputs.length,
           totalMeters,
+          totalPieces,
           status: 'PARTIALLY_RECEIVED',
           createdById: actor.id,
         },
@@ -170,6 +175,7 @@ export async function POST(request: Request) {
           receivedAt: new Date(),
           totalRollsReceived: rollInputs.length,
           totalMetersReceived: totalMeters,
+          totalPiecesReceived: totalPieces,
           status: 'DRAFT',
           remarks: remarks || null,
         },
@@ -204,6 +210,7 @@ export async function POST(request: Request) {
             rollNumber,
             batchId: batch.id,
             length: parseFloat(rollInput.length),
+            unit: normalizeStockUnit(rollInput.unit)!,
             width: rollInput.width ? parseFloat(rollInput.width) : null,
             weight: rollInput.weight ? parseFloat(rollInput.weight) : null,
             status: 'RECEIVED',
@@ -232,6 +239,7 @@ export async function POST(request: Request) {
             batchId: batch.id,
             transactionType: 'RECEIPT',
             quantity: parseFloat(rollInput.length),
+            uom: normalizeStockUnit(rollInput.unit)!,
             referenceType: 'GRN',
             referenceId: grn.id,
             transactedById: actor.id,

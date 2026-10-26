@@ -47,19 +47,21 @@ model User {
   recutsApproved     RecutRequest[]          @relation("RecutApprover")
 
   // Fabric Store back-relations
-  fabricBatchesCreated FabricBatch[]            @relation("FabricBatchCreator")
-  grnReceived          MaterialReceipt[]        @relation("GRNReceiver")
-  fabricRollsInspected FabricStoreRoll[]        @relation("FabricRollQCInspector")
-  fabricQCInspections  FabricQCInspection[]     @relation("FabricQCInspector")
-  fabricLedgerEntries  FabricStockLedger[]      @relation("FabricLedgerTransactor")
-  dyeingOrdersIncharge DyeingOrder[]            @relation("DyeingInchargeUser")
-  dyeingOrdersReceived DyeingOrder[]            @relation("DyeingReceiver")
-  dyeingColorReviews   DyeingOrder[]            @relation("DyeingColorReviewer")
-  dyeingQcTransfers    DyeingQcTransfer[]       @relation("DyeingQcTransferCreator")
-  workItemsReceived    DepartmentWorkItem[]     @relation("WorkItemReceiver")
-  workTransfers        DepartmentWorkTransfer[] @relation("WorkTransferCreator")
-  workInspections      WorkItemInspection[]     @relation("WorkItemInspector")
-  workAllocations      WorkItemAllocation[]     @relation("AllocationCreator")
+  fabricBatchesCreated  FabricBatch[]            @relation("FabricBatchCreator")
+  grnReceived           MaterialReceipt[]        @relation("GRNReceiver")
+  fabricRollsInspected  FabricStoreRoll[]        @relation("FabricRollQCInspector")
+  fabricQCInspections   FabricQCInspection[]     @relation("FabricQCInspector")
+  fabricLedgerEntries   FabricStockLedger[]      @relation("FabricLedgerTransactor")
+  dyeingOrdersIncharge  DyeingOrder[]            @relation("DyeingInchargeUser")
+  dyeingOrdersReceived  DyeingOrder[]            @relation("DyeingReceiver")
+  dyeingColorReviews    DyeingOrder[]            @relation("DyeingColorReviewer")
+  dyeingQcTransfers     DyeingQcTransfer[]       @relation("DyeingQcTransferCreator")
+  workItemsReceived     DepartmentWorkItem[]     @relation("WorkItemReceiver")
+  workTransfers         DepartmentWorkTransfer[] @relation("WorkTransferCreator")
+  workInspections       WorkItemInspection[]     @relation("WorkItemInspector")
+  workAllocations       WorkItemAllocation[]     @relation("AllocationCreator")
+  packingAllocations    PackingAllocation[]      @relation("PackingAllocationCreator")
+  garmentImagesUploaded GarmentImage[]           @relation("GarmentImageUploader")
 
   // Smart Deadline Alerts
   deadlineAlertDismissals DeadlineAlertDismissal[]
@@ -478,6 +480,7 @@ model Program {
   dyeingOrders        DyeingOrder[]
   deadlineAlerts      DeadlineAlert[]
   departmentWorkItems DepartmentWorkItem[]
+  garmentImages       GarmentImage[]
 
   @@index([programNumber])
   @@index([status])
@@ -1255,7 +1258,8 @@ model FabricBatch {
   colorCode         String?
   colorName         String?
   totalRolls        Int               @default(0)
-  totalMeters       Decimal           @default(0) @db.Decimal(10, 2)
+  totalMeters       Decimal           @default(0) @db.Decimal(10, 2) // rolls received in MTR
+  totalPieces       Decimal           @default(0) @db.Decimal(10, 2) // rolls received in PCS; never added to meters
   status            FabricBatchStatus @default(PENDING_RECEIPT)
   receivedAt        DateTime?
   createdById       String
@@ -1297,7 +1301,8 @@ model FabricStoreRoll {
   batch             FabricBatch        @relation(fields: [batchId], references: [id])
   locationId        String?
   location          InventoryLocation? @relation("RollLocation", fields: [locationId], references: [id])
-  length            Decimal            @db.Decimal(10, 2) // meters
+  length            Decimal            @db.Decimal(10, 2) // quantity of the roll, in `unit`
+  unit              String             @default("MTR") // MTR or PCS; never converted
   width             Decimal?           @db.Decimal(10, 2) // cm
   weight            Decimal?           @db.Decimal(10, 3) // kg
   status            FabricRollStatus   @default(RECEIVED)
@@ -1342,7 +1347,8 @@ model MaterialReceipt {
   vehicleNumber       String?
   supplierName        String
   totalRollsReceived  Int         @default(0)
-  totalMetersReceived Decimal     @default(0) @db.Decimal(10, 2)
+  totalMetersReceived Decimal     @default(0) @db.Decimal(10, 2) // rolls received in MTR
+  totalPiecesReceived Decimal     @default(0) @db.Decimal(10, 2) // rolls received in PCS
   status              GRNStatus   @default(DRAFT)
   remarks             String?
   createdAt           DateTime    @default(now())
@@ -1418,7 +1424,8 @@ model FabricStockLedger {
   batchId         String
   batch           FabricBatch          @relation(fields: [batchId], references: [id])
   transactionType StockTransactionType
-  quantity        Decimal              @db.Decimal(10, 2) // meters moved
+  quantity        Decimal              @db.Decimal(10, 2) // quantity moved, in `uom`
+  uom             String               @default("MTR") // MTR or PCS, the roll's unit
   referenceType   String // "GRN", "ISSUE_CHALLAN", "RETURN_CHALLAN", "QC_HOLD"
   referenceId     String // the relevant document ID
   fromLocationId  String?
@@ -1586,11 +1593,12 @@ model DepartmentWorkItem {
   lastTransferredAt      DateTime?
   remarks                String?
 
-  transfers   DepartmentWorkTransfer[]
-  inspections WorkItemInspection[]
-  allocations WorkItemAllocation[]
-  createdAt   DateTime                 @default(now())
-  updatedAt   DateTime                 @updatedAt
+  transfers          DepartmentWorkTransfer[]
+  inspections        WorkItemInspection[]
+  allocations        WorkItemAllocation[]
+  packingAllocations PackingAllocation[]
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
 
   @@unique([departmentCode, inboundChallanItemId])
   @@index([departmentCode, status])
@@ -1780,4 +1788,65 @@ model DeadlineAlertDismissal {
 
   @@index([alertId, userId])
   @@index([userId, dismissedAt])
+}
+
+// Inventory: part of a received finished-garment line (DepartmentWorkItem, department INVENTORY)
+// sent for packing, in whole pieces. The line keeps the totals: takenQuantity = sent for packing
+// (net of returns), processedQuantity = packed. Every change is also posted to StockLedgerEntry.
+model PackingAllocation {
+  id               String             @id @default(uuid())
+  packingNumber    String             @unique // e.g. PKG-2026-0001
+  workItemId       String
+  workItem         DepartmentWorkItem @relation(fields: [workItemId], references: [id], onDelete: Cascade)
+  quantity         Int // pieces sent for packing
+  packedQuantity   Int                @default(0)
+  returnedQuantity Int                @default(0) // sent back to inventory unpacked
+  status           String             @default("SENT_FOR_PACKING") // SENT_FOR_PACKING, PACKING_IN_PROGRESS, PARTIALLY_PACKED, PACKING_COMPLETED, CANCELLED
+  priority         String             @default("NORMAL")
+  packingDate      DateTime
+  remarks          String?
+  createdById      String
+  createdBy        User               @relation("PackingAllocationCreator", fields: [createdById], references: [id])
+  startedAt        DateTime?
+  completedAt      DateTime?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  @@index([workItemId])
+  @@index([status])
+}
+
+// Complete-garment photo for one design (Production Sheet) and garment category, optionally one
+// style. Kept apart from Wilcom and fabric photos. Stored like DepartmentImage: Cloudinary when
+// configured, otherwise the bytes in imageData. Replacing bumps version (the image route's ETag).
+model GarmentImage {
+  id              String   @id @default(uuid())
+  programId       String
+  program         Program  @relation(fields: [programId], references: [id], onDelete: Cascade)
+  garmentCategory String // TOP | BOTTOM | DUPATTA | OTHERS, or "" when the line has none
+  styleRef        String   @default("") // "" = the whole category
+  storageProvider String // CLOUDINARY | DATABASE
+  storageKey      String?
+  imageUrl        String?
+  imageData       Bytes?
+  mimeType        String
+  fileName        String
+  fileSize        Int
+  version         Int      @default(1)
+  uploadedById    String?
+  uploadedBy      User?    @relation("GarmentImageUploader", fields: [uploadedById], references: [id], onDelete: SetNull)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([programId, garmentCategory, styleRef])
+}
+
+// Manual migrations already applied (scripts/apply-appearance-migrations.js, run before the web app starts).
+// Created by that script; kept here so prisma db push never treats the table as unknown.
+model ManualMigration {
+  name      String   @id
+  checksum  String
+  appliedAt DateTime @default(now())
+
+  @@map("_manual_migrations")
 }

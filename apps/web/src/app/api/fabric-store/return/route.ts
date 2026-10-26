@@ -82,6 +82,7 @@ export async function POST(request: Request) {
             batchId: roll.batchId,
             transactionType: 'RETURN',
             quantity: roll.length,
+            uom: roll.unit,
             referenceType: 'RETURN_CHALLAN',
             referenceId: roll.id,
             transactedById: actor.id,

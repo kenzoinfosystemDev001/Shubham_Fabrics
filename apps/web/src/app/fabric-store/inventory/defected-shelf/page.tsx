@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { addToUnitTotals, formatUnitTotals, unitTotals } from '@/lib/fabric-stock';
 import Link from 'next/link';
 import {
   AlertTriangle,
@@ -219,10 +220,10 @@ export default function DefectedShelfPage() {
     });
   }, [rolls, filterRollStatus, search]);
 
-  const totalLength = rolls.reduce((acc, r) => acc + (parseFloat(r.length) || 0), 0);
+  const totalQuarantined = rolls.reduce((totals, r) => addToUnitTotals(totals, r.unit || 'MTR', parseFloat(r.length) || 0), unitTotals());
   const holdCount = rolls.filter((r) => r.status === 'QC_HOLD' || r.qcStatus === 'ON_HOLD').length;
   const rejectedCount = rolls.filter((r) => r.status === 'QC_REJECTED' || r.qcStatus === 'FAILED').length;
-  const factoryTotalPieces = masterData?.summary?.factoryTotalDefectivePieces || 0;
+  const factoryTotals = masterData?.summary?.factoryTotalsByUnit || {};
   const deptStats = masterData?.summary?.departmentStats || {};
 
   const handleActionSubmit = async (e: React.FormEvent) => {
@@ -352,7 +353,7 @@ export default function DefectedShelfPage() {
               <ShieldAlert className="w-4 h-4" />
             </div>
             <p className="text-2xl font-bold text-danger-700 mt-1">
-              {loading ? '…' : `${factoryTotalPieces} PCS`}
+              {loading ? '…' : formatUnitTotals(factoryTotals)}
             </p>
             <span className="text-[10px] text-neutral-500">
               Recorded across all 6 department shelves
@@ -368,7 +369,7 @@ export default function DefectedShelfPage() {
               <Archive className="w-4 h-4 text-neutral-600" />
             </div>
             <p className="text-2xl font-bold text-neutral-900 mt-1">
-              {loading ? '…' : totalLength.toFixed(1)} <span className="text-sm font-normal text-neutral-500">m</span>
+              {loading ? '…' : formatUnitTotals(totalQuarantined)}
             </p>
             <span className="text-[10px] text-neutral-500">
               {rolls.length} rolls on DEF-SHELF-STORE
@@ -789,7 +790,7 @@ export default function DefectedShelfPage() {
                         <th className="py-3 px-4">Roll Number</th>
                         <th className="py-3 px-4">Batch Number</th>
                         <th className="py-3 px-4">Fabric Details</th>
-                        <th className="py-3 px-4">Length</th>
+                        <th className="py-3 px-4">Quantity</th>
                         <th className="py-3 px-4">Shelf / Bay Slot</th>
                         <th className="py-3 px-4">Status</th>
                         <th className="py-3 px-4">Defect Reason / QC Notes</th>
@@ -814,7 +815,7 @@ export default function DefectedShelfPage() {
                             </span>
                           </td>
                           <td className="py-3.5 px-4 font-mono font-bold text-neutral-900">
-                            {parseFloat(roll.length).toFixed(2)} m
+                            {parseFloat(roll.length).toFixed(2)} {roll.unit || 'MTR'}
                           </td>
                           <td className="py-3.5 px-4">
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-danger-100/80 text-danger-800 border border-danger-200">
@@ -1085,9 +1086,9 @@ export default function DefectedShelfPage() {
                   </span>
                 </div>
                 <div>
-                  <span className="text-neutral-500">Meters: </span>
+                  <span className="text-neutral-500">Quantity: </span>
                   <span className="font-mono font-bold text-neutral-900">
-                    {parseFloat(selectedRoll.length).toFixed(2)} m
+                    {parseFloat(selectedRoll.length).toFixed(2)} {selectedRoll.unit || 'MTR'}
                   </span>
                 </div>
                 {selectedRoll.qcRemarks && (

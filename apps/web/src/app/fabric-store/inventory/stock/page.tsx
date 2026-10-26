@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Boxes, RefreshCw, Eye, Layers, Filter, AlertTriangle, X } from 'lucide-react';
 import { DepartmentStockView } from '@/components/DepartmentStockView';
+import { formatUnitTotals } from '@/lib/fabric-stock';
 
 export default function InventoryStockPage() {
   const [activeView, setActiveView] = useState<'balance' | 'batches'>('balance');
@@ -201,7 +202,7 @@ export default function InventoryStockPage() {
                     <th className="py-3 px-4">Color</th>
                     <th className="py-3 px-4">Program Ref</th>
                     <th className="py-3 px-4">Total Rolls</th>
-                    <th className="py-3 px-4">Total Meters</th>
+                    <th className="py-3 px-4">Total Quantity</th>
                     <th className="py-3 px-4">Status</th>
                     <th className="py-3 px-4 text-right">Action</th>
                   </tr>
@@ -222,7 +223,7 @@ export default function InventoryStockPage() {
                         {batch.totalRolls}
                       </td>
                       <td className="py-3.5 px-4 font-mono font-semibold text-neutral-900">
-                        {parseFloat(batch.totalMeters).toFixed(2)} m
+                        {formatUnitTotals({ MTR: parseFloat(batch.totalMeters) || 0, PCS: parseFloat(batch.totalPieces) || 0 })}
                       </td>
                       <td className="py-3.5 px-4">{statusBadge(batch.status)}</td>
                       <td className="py-3.5 px-4 text-right space-x-2">
@@ -287,8 +288,8 @@ export default function InventoryStockPage() {
                   <span className="font-mono font-bold text-neutral-900">{selectedBatch.rolls?.length || 0}</span>
                 </div>
                 <div>
-                  <span className="text-neutral-500 text-[10px] font-bold uppercase block">Total Meters</span>
-                  <span className="font-mono font-bold text-brand-800">{parseFloat(selectedBatch.totalMeters).toFixed(2)} m</span>
+                  <span className="text-neutral-500 text-[10px] font-bold uppercase block">Total Quantity</span>
+                  <span className="font-mono font-bold text-brand-800">{formatUnitTotals({ MTR: parseFloat(selectedBatch.totalMeters) || 0, PCS: parseFloat(selectedBatch.totalPieces) || 0 })}</span>
                 </div>
               </div>
 
@@ -300,7 +301,7 @@ export default function InventoryStockPage() {
                     <thead className="bg-neutral-50 text-neutral-600 font-semibold border-b border-neutral-200 sticky top-0">
                       <tr>
                         <th className="py-2 px-3">Roll #</th>
-                        <th className="py-2 px-3">Length</th>
+                        <th className="py-2 px-3">Quantity</th>
                         <th className="py-2 px-3">Width</th>
                         <th className="py-2 px-3">Status</th>
                         <th className="py-2 px-3">QC Status</th>
@@ -311,7 +312,7 @@ export default function InventoryStockPage() {
                       {selectedBatch.rolls?.map((r: any) => (
                         <tr key={r.id}>
                           <td className="py-2 px-3 font-mono font-bold text-neutral-900">{r.rollNumber}</td>
-                          <td className="py-2 px-3 font-mono">{parseFloat(r.length).toFixed(2)} m</td>
+                          <td className="py-2 px-3 font-mono">{parseFloat(r.length).toFixed(2)} {r.unit || 'MTR'}</td>
                           <td className="py-2 px-3 font-mono">{r.width ? `${r.width} cm` : '—'}</td>
                           <td className="py-2 px-3 font-semibold">{r.status}</td>
                           <td className="py-2 px-3">{r.qcStatus}</td>

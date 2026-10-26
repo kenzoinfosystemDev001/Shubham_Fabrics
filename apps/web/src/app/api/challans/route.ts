@@ -17,6 +17,7 @@ import {
   syncChallanStock,
 } from '@/lib/fabric-stock-ledger';
 import { storeDyeingItemFields } from '@/lib/dyeing-instructions.mjs';
+import { normalizeStockUnit } from '@/lib/fabric-stock';
 
 const CHALLAN_CREATE_ENDPOINT = 'POST /api/challans';
 
@@ -320,27 +321,23 @@ export async function POST(request: Request) {
 
     if (isMovingOutFromStore || isBypassingToProcessing) {
       const { checkFabricStoreAvailability } = await import('@/lib/fabric-availability');
-      const firstItemWithUnit = Array.isArray(body.items)
-        ? body.items.find((item: any) => item?.uom || item?.unit)
-        : undefined;
-      const requestedUnit = String(
-        firstItemWithUnit?.uom ||
-        firstItemWithUnit?.unit ||
-        body.fabricUnit ||
-        ''
-      ).toUpperCase();
-      const unitOverride = requestedUnit === 'MTR' || requestedUnit === 'PCS'
-        ? requestedUnit
-        : undefined;
-      const availability = await checkFabricStoreAvailability(resolvedProgramId, unitOverride);
-      if (!availability.isAvailable) {
-        return NextResponse.json(
-          {
-            error: `Fabric is not available in Fabric Store for Program ${availability.programSerialNo || resolvedProgramId}. ${availability.message}`,
-            fabricAvailability: availability,
-          },
-          { status: 400 }
-        );
+      // Checked for every unit this challan moves (MTR and PCS are separate stock).
+      const itemUnitsRequested = (Array.isArray(body.items) ? body.items : []).map((item: any) => normalizeStockUnit(item?.uom ?? item?.unit));
+      const requestedUnits: Array<'MTR' | 'PCS' | undefined> = Array.from(
+        new Set(itemUnitsRequested.filter((unit: 'MTR' | 'PCS' | null): unit is 'MTR' | 'PCS' => Boolean(unit))),
+      );
+      if (requestedUnits.length === 0) requestedUnits.push(normalizeStockUnit(body.fabricUnit) || undefined);
+      for (const unitOverride of requestedUnits) {
+        const availability = await checkFabricStoreAvailability(resolvedProgramId, unitOverride);
+        if (!availability.isAvailable) {
+          return NextResponse.json(
+            {
+              error: `Fabric is not available in Fabric Store for Program ${availability.programSerialNo || resolvedProgramId}. ${availability.message}`,
+              fabricAvailability: availability,
+            },
+            { status: 400 }
+          );
+        }
       }
     }
 
@@ -385,37 +382,40 @@ export async function POST(request: Request) {
       }
     }
 
-    const rawItemsSum = (Array.isArray(body.items) ? body.items : []).reduce(
-      (sum: number, it: any) => sum + (Number(it.quantity ?? it.measurement) || 0),
-      0
-    );
+    // Every line has its own quantity (greater than zero) and its own unit, MTR or PCS. A challan may carry
+    // both units; they are never added together or converted.
+    const bodyItems: any[] = Array.isArray(body.items) ? body.items : [];
+    for (const [index, item] of bodyItems.entries()) {
+      const quantity = Number(item?.quantity ?? item?.measurement);
+      if (!Number.isFinite(quantity) || quantity <= 0) {
+        return NextResponse.json({ error: `Item ${index + 1}: enter a quantity greater than zero.` }, { status: 400 });
+      }
+      if (!normalizeStockUnit(item?.uom ?? item?.unit)) {
+        return NextResponse.json({ error: `Item ${index + 1}: choose the unit (MTR or PCS).` }, { status: 400 });
+      }
+    }
+    const itemUnits = Array.from(new Set(bodyItems.map((item) => normalizeStockUnit(item?.uom ?? item?.unit)!)));
 
     const isFabricStoreIssue = fromDept === 'STORE' &&
       (body.challanType === 'STORE_TO_DYEING' || body.challanType === 'STORE_TO_EMBROIDERY');
-    const storeItemUnits = isFabricStoreIssue
-      ? new Set((Array.isArray(body.items) ? body.items : [])
-          .map((item: any) => String(item?.uom || item?.unit || body.fabricUnit || 'MTR').toUpperCase()))
-      : new Set<string>();
-    if (isFabricStoreIssue && storeItemUnits.size > 1) {
-      return NextResponse.json({ error: 'Use one stock unit (MTR or PCS) for every item in a Fabric Store challan.' }, { status: 400 });
-    }
-    const storeItemUnit = storeItemUnits.values().next().value as string | undefined;
-    if (isFabricStoreIssue && storeItemUnit && !['MTR', 'PCS'].includes(storeItemUnit)) {
-      return NextResponse.json({ error: 'Fabric Store challan items must use MTR or PCS.' }, { status: 400 });
-    }
 
     const defectivePieces = Number(body.defectivePieces || 0);
-    const fabricUnit = (isFabricStoreIssue && storeItemUnit) || body.fabricUnit || detectedUnit || body.uom || 'MTR';
-    const hasMeasuredStoreItems = isFabricStoreIssue && Boolean(storeItemUnit) && rawItemsSum > 0;
-
-    if (
-      isFabricStoreIssue &&
-      defectivePieces > 0 &&
-      body.fabricUnit &&
-      String(body.fabricUnit).toUpperCase() !== fabricUnit
-    ) {
-      return NextResponse.json({ error: 'The defective quantity unit must match the challan item unit.' }, { status: 400 });
+    // The challan's own unit: the unit its In / Defective / Out figures are counted in.
+    const requestedFabricUnit = normalizeStockUnit(body.fabricUnit);
+    if (defectivePieces > 0 && itemUnits.length > 0 && requestedFabricUnit && !itemUnits.includes(requestedFabricUnit)) {
+      return NextResponse.json({ error: 'The defective quantity unit must be the unit of one of the challan items.' }, { status: 400 });
     }
+    const fabricUnit =
+      (requestedFabricUnit && (itemUnits.length === 0 || itemUnits.includes(requestedFabricUnit)) ? requestedFabricUnit : null) ||
+      itemUnits[0] ||
+      normalizeStockUnit(detectedUnit) ||
+      normalizeStockUnit(body.uom) ||
+      'MTR';
+    // Lines in the challan's unit only; lines in the other unit are kept on their own lines.
+    const rawItemsSum = bodyItems
+      .filter((item) => normalizeStockUnit(item?.uom ?? item?.unit) === fabricUnit)
+      .reduce((sum: number, it: any) => sum + (Number(it.quantity ?? it.measurement) || 0), 0);
+    const hasMeasuredStoreItems = isFabricStoreIssue && rawItemsSum > 0;
 
     const fabricIn = hasMeasuredStoreItems
       ? rawItemsSum + defectivePieces
@@ -550,7 +550,7 @@ export async function POST(request: Request) {
               `${item.fabric || item.fabricCode || 'Fabric'} — ${item.colour || item.color || 'Standard'}`,
             unitType: item.unitType || 'ROLL',
             quantity: Number(item.quantity ?? item.measurement ?? 1),
-            uom: item.uom || item.unit || fabricUnit || 'MTR',
+            uom: normalizeStockUnit(item.uom ?? item.unit) || fabricUnit,
             fabricCode: item.fabricCode || item.fabric || null,
             colour: colourFields.colour,
             shade: colourFields.shade,

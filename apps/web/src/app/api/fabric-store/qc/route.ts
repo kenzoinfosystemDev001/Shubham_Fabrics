@@ -169,6 +169,7 @@ export async function POST(request: Request) {
           batchId: roll.batchId,
           transactionType: transactionTypeMap[result] as any,
           quantity: roll.length,
+          uom: roll.unit,
           referenceType: 'QC_INSPECTION',
           referenceId: qci.id,
           transactedById: actor.id,

@@ -1,158 +1,127 @@
-import { createHash } from 'crypto';
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
 import { apiErrorResponse } from '@/lib/api-errors';
-import { MAX_IMPORT_FILE_BYTES, inwardDuplicateKey, safeFileName, sniffImportFile } from '@/lib/stock-import-rules.mjs';
-import { ImportFileError, ImportServiceError, readExcel, readPhoto } from '@/lib/stock-import-server';
-import { importSummary, uploaderNames } from '@/lib/stock-import-records';
+import {
+  FabricStockError,
+  STOCK_TRANSACTION_OPTIONS,
+  fabricStockErrorBody,
+  lockFabricStock,
+  postNewInwardStock,
+} from '@/lib/fabric-stock-ledger';
+import { MAX_IMPORT_FILE_BYTES, inwardDuplicateKey, safeFileName, sniffImportFile, validateConfirmRows } from '@/lib/stock-import-rules.mjs';
+import { ImportFileError, readExcel } from '@/lib/stock-import-server';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
-// Reading a handwritten page can take a minute or two.
-export const maxDuration = 300;
-
-// GET /api/fabric-store/inward/import - upload history (newest first), without the files themselves.
-export async function GET(request: Request) {
-  const { user, response } = await requireDepartment(request, 'STORE');
-  if (!user) return response;
-  try {
-    const imports = await prisma.stockImport.findMany({
-      orderBy: { uploadedAt: 'desc' },
-      take: 50,
-      select: {
-        id: true,
-        source: true,
-        fileName: true,
-        fileSize: true,
-        status: true,
-        rowCount: true,
-        engine: true,
-        uploadedById: true,
-        uploadedAt: true,
-        confirmedById: true,
-        confirmedAt: true,
-        addedCount: true,
-        skippedCount: true,
-      },
-    });
-    const names = await uploaderNames(imports.flatMap((i) => [i.uploadedById, i.confirmedById]));
-    return NextResponse.json({ data: imports.map((i) => importSummary(i, names)) });
-  } catch (error) {
-    return apiErrorResponse(error, 'Failed to load the upload history.');
-  }
-}
 
 /**
- * POST /api/fabric-store/inward/import - multipart "file": a JPG/PNG photo or scan, or an .xlsx/.xls
- * workbook (10 MB at most). Reads the stock rows and keeps the file for audit. Nothing is added to stock
- * here; the rows come back for review and are added only by .../import/:id/confirm.
+ * POST /api/fabric-store/inward/import — multipart: file (.xlsx / .xls, 10 MB at most), entryType
+ * (UNDYED | DYED), receivingDate (YYYY-MM-DD, default today).
+ *
+ * Reads the stock sheet and adds every complete row to Inward Stock as its own entry, with its own unit
+ * (MTR or PCS, never converted), through the same stock ledger as a manual arrival — all in one
+ * transaction, so a failure adds nothing. Rows that are incomplete, or already in Inward Stock (same bill,
+ * fabric, colour, quantity and unit, e.g. the same file uploaded twice), are skipped with the reason.
  */
 export async function POST(request: Request) {
   const { user, response } = await requireDepartment(request, 'STORE');
   if (!user) return response;
 
-  const declared = Number(request.headers.get('content-length') || 0);
-  if (declared > MAX_IMPORT_FILE_BYTES + 64 * 1024) {
-    return NextResponse.json({ error: 'The file is larger than 10 MB. Upload a smaller photo or split the workbook.' }, { status: 413 });
+  if (Number(request.headers.get('content-length') || 0) > MAX_IMPORT_FILE_BYTES + 64 * 1024) {
+    return NextResponse.json({ error: 'The file is larger than 10 MB. Split the workbook and upload each part.' }, { status: 413 });
   }
-
-  let file: File | null = null;
+  let form: FormData;
   try {
-    const form = await request.formData();
-    const value = form.get('file');
-    file = value instanceof File ? value : null;
+    form = await request.formData();
   } catch {
-    return NextResponse.json({ error: 'Upload the file as form data in a field named "file".' }, { status: 400 });
+    return NextResponse.json({ error: 'Upload the Excel file as form data in a field named "file".' }, { status: 400 });
   }
-  if (!file || file.size === 0) return NextResponse.json({ error: 'Choose a photo, scan or Excel file to upload.' }, { status: 400 });
+  const value = form.get('file');
+  const file = value instanceof File ? value : null;
+  if (!file || file.size === 0) return NextResponse.json({ error: 'Choose an Excel file (.xlsx or .xls) to upload.' }, { status: 400 });
   if (file.size > MAX_IMPORT_FILE_BYTES) {
-    return NextResponse.json({ error: 'The file is larger than 10 MB. Upload a smaller photo or split the workbook.' }, { status: 413 });
+    return NextResponse.json({ error: 'The file is larger than 10 MB. Split the workbook and upload each part.' }, { status: 413 });
   }
-
   const bytes = Buffer.from(await file.arrayBuffer());
   const fileName = safeFileName(file.name);
-  const kind = sniffImportFile(bytes, fileName);
-  if (!kind) {
-    return NextResponse.json(
-      { error: 'Only JPG, JPEG or PNG photos/scans and Excel files (.xlsx, .xls) can be uploaded, and the file must really be of that type.' },
-      { status: 415 },
-    );
+  if (!sniffImportFile(bytes, fileName)) {
+    return NextResponse.json({ error: 'Only Excel files (.xlsx or .xls) can be uploaded, and the file must really be an Excel workbook.' }, { status: 415 });
   }
-  const fileHash = createHash('sha256').update(bytes).digest('hex');
+
+  let sheet;
+  try {
+    sheet = readExcel(bytes);
+  } catch (error) {
+    if (error instanceof ImportFileError) return NextResponse.json({ error: error.message }, { status: 422 });
+    throw error;
+  }
+
+  const entryType = String(form.get('entryType') || 'UNDYED');
+  const receivingDate = String(form.get('receivingDate') || '') || new Date().toISOString().slice(0, 10);
+  const base = { entryType, receivingDate, header: sheet.header };
+  const settings = validateConfirmRows({ ...base, rows: [{ rowNo: 0, itemName: 'x', quantity: 1, unit: 'MTR', billNo: 'x', billDate: '2000-01-01' }] });
+  if (settings.errors.length) return NextResponse.json({ error: settings.errors.join(' ') }, { status: 400 });
+
+  // Each row is checked on its own: complete rows are added, the rest are listed with the reason.
+  const skipped: Array<{ rowNo: number; source: string; itemName: string | null; reason: string }> = [];
+  const lines: Array<ReturnType<typeof validateConfirmRows>['lines'][number] & { source: string }> = [];
+  for (const row of sheet.rows) {
+    const check = validateConfirmRows({ ...base, rows: [row] });
+    if (check.errors.length) {
+      skipped.push({ rowNo: row.rowNo, source: row.source, itemName: row.itemName, reason: check.errors[0].replace(/^Row \d+: /, '') });
+    } else {
+      lines.push({ ...check.lines[0], source: row.source });
+    }
+  }
 
   try {
-    const previous = await prisma.stockImport.findFirst({
-      where: { fileHash, status: { in: ['CONFIRMED', 'EXTRACTED'] } },
-      orderBy: [{ confirmedAt: { sort: 'desc', nulls: 'last' } }, { uploadedAt: 'desc' }],
-      select: { id: true, fileName: true, status: true, uploadedAt: true, uploadedById: true, confirmedAt: true, confirmedById: true, addedCount: true, skippedCount: true, rowCount: true, source: true, fileSize: true, engine: true },
-    });
+    const added = await prisma.$transaction(async (tx) => {
+      await lockFabricStock(tx);
+      const billNos = [...new Set(lines.map((line) => line.billNo))];
+      const existing = billNos.length
+        ? await tx.fabricInward.findMany({
+            where: { OR: billNos.map((billNo) => ({ billNo: { equals: billNo, mode: 'insensitive' as const } })) },
+            select: { sNo: true, billNo: true, itemName: true, colour: true, billQty: true, unit: true },
+          })
+        : [];
+      const inStock = new Map<string, number>();
+      for (const row of existing) if (!inStock.has(inwardDuplicateKey(row))) inStock.set(inwardDuplicateKey(row), row.sNo);
+      const toAdd = lines.filter((line) => {
+        const sNo = inStock.get(inwardDuplicateKey(line));
+        if (sNo === undefined) return true;
+        skipped.push({ rowNo: line.rowNo, source: line.source, itemName: line.itemName, reason: `already in Inward Stock (entry #${sNo})` });
+        return false;
+      });
+      if (toAdd.length === 0) return [];
+      const created = await tx.fabricInward.createManyAndReturn({
+        data: toAdd.map((line) => ({
+          entryType: settings.entryType,
+          itemName: line.itemName,
+          colour: line.colour,
+          billNo: line.billNo,
+          billDate: line.billDate!,
+          receivingDate: settings.receivingDate!,
+          billQty: line.billQty,
+          unit: line.unit!,
+          supplierName: line.supplierName,
+          remarks: line.remarks,
+        })),
+      });
+      created.sort((a, b) => a.sNo - b.sNo);
+      await postNewInwardStock(tx, created, user.id);
+      return created;
+    }, STOCK_TRANSACTION_OPTIONS);
 
-    let extraction;
-    try {
-      extraction = kind.source === 'EXCEL' ? readExcel(bytes) : await readPhoto(bytes);
-    } catch (error) {
-      if (error instanceof ImportFileError) {
-        // Kept for the audit trail: who uploaded what, and why it could not be read.
-        await prisma.stockImport.create({
-          data: {
-            source: kind.source,
-            fileName,
-            mimeType: kind.mimeType,
-            fileSize: bytes.length,
-            fileHash,
-            fileData: bytes,
-            status: 'FAILED',
-            extractedJson: { error: error.message },
-            uploadedById: user.id,
-          },
-        });
-        return NextResponse.json({ error: error.message }, { status: 422 });
-      }
-      if (error instanceof ImportServiceError) return NextResponse.json({ error: error.message }, { status: error.status });
-      throw error;
+    const totals = { MTR: 0, PCS: 0 };
+    for (const row of added) {
+      const unit = row.unit === 'PCS' ? 'PCS' : 'MTR';
+      totals[unit] = Math.round((totals[unit] + row.billQty) * 1000) / 1000;
     }
-
-    const record = await prisma.stockImport.create({
-      data: {
-        source: kind.source,
-        fileName,
-        mimeType: kind.mimeType,
-        fileSize: bytes.length,
-        fileHash,
-        fileData: bytes,
-        status: 'EXTRACTED',
-        extractedJson: JSON.parse(JSON.stringify(extraction)),
-        rowCount: extraction.rows.length,
-        engine: extraction.engine,
-        uploadedById: user.id,
-      },
-      select: { id: true, source: true, fileName: true, fileSize: true, status: true, rowCount: true, engine: true, uploadedById: true, uploadedAt: true, confirmedById: true, confirmedAt: true, addedCount: true, skippedCount: true },
-    });
-
-    // Inward entries already recorded for these bills, so the review can flag rows that are already in stock.
-    const billNos = [...new Set([extraction.header.billNo, ...extraction.rows.map((r) => r.billNo)].filter((b): b is string => Boolean(b)))];
-    const existing = billNos.length
-      ? await prisma.fabricInward.findMany({
-          where: { OR: billNos.map((billNo) => ({ billNo: { equals: billNo, mode: 'insensitive' as const } })) },
-          select: { sNo: true, billNo: true, itemName: true, colour: true, billQty: true, unit: true },
-          take: 2000,
-        })
-      : [];
-
-    const names = await uploaderNames([record.uploadedById, previous?.uploadedById, previous?.confirmedById]);
-    return NextResponse.json(
-      {
-        import: importSummary(record, names),
-        header: extraction.header,
-        rows: extraction.rows,
-        notes: extraction.notes,
-        duplicateOf: previous ? importSummary(previous, names) : null,
-        existing: existing.map((row) => ({ key: inwardDuplicateKey(row), sNo: row.sNo })),
-      },
-      { status: 201 },
-    );
+    skipped.sort((a, b) => a.rowNo - b.rowNo);
+    return NextResponse.json({ fileName, added: added.length, totals, skipped, notes: sheet.notes }, { status: added.length ? 201 : 200 });
   } catch (error) {
-    return apiErrorResponse(error, 'The file could not be read. Try again.', 'Stock sheet import failed:');
+    if (error instanceof FabricStockError) return NextResponse.json(fabricStockErrorBody(error), { status: 400 });
+    return apiErrorResponse(error, 'The stock sheet could not be added. Nothing was saved; try again.', 'Stock sheet import failed:');
   }
 }

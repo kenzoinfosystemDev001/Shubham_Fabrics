@@ -20,6 +20,10 @@ import {
   Truck,
   Check,
 } from 'lucide-react';
+import { formatUnitTotals } from '@/lib/fabric-stock';
+
+/** Any quantity in any unit. */
+const hasQuantity = (totals: Record<string, number> | null | undefined) => Object.values(totals || {}).some((q) => Number(q) > 0);
 
 interface DepartmentStockViewProps {
   department: 'STORE' | 'DYEING' | 'QC1' | 'EMBROIDERY' | 'THREAD_CUTTING' | 'QC2' | 'WASHING' | 'QC3' | 'PROGRAMMING';
@@ -85,13 +89,14 @@ export function DepartmentStockView({
     }
   };
 
+  // Quantities are per unit ({ MTR, PCS }); meters and pieces are never added together.
   const summary = data?.summary || {
-    totalReceived: 0,
-    pendingInTransit: 0,
+    totalReceived: {},
+    pendingInTransit: {},
     pendingBatches: 0,
-    totalDispatched: 0,
-    totalDefective: 0,
-    currentStockOnHand: 0,
+    totalDispatched: {},
+    totalDefective: {},
+    currentStockOnHand: {},
     activeWip: 0,
     activeBatches: 0,
     unit: 'MTR',
@@ -168,7 +173,7 @@ export function DepartmentStockView({
       </div>
 
       {/* IN-TRANSIT NOTIFICATION BANNER IF MATERIAL IS WAITING FOR RECEIPT */}
-      {summary.pendingInTransit > 0 && (
+      {hasQuantity(summary.pendingInTransit) && (
         <div className="p-4 bg-accent-50 border border-accent-300 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-accent-800 shadow-xs">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-accent-100 border border-accent-200 flex items-center justify-center shrink-0">
@@ -176,7 +181,7 @@ export function DepartmentStockView({
             </div>
             <div>
               <div className="font-bold text-xs">
-                {summary.pendingInTransit} {summary.unit} Incoming In-Transit ({summary.pendingBatches} Challan{summary.pendingBatches === 1 ? '' : 's'})
+                {formatUnitTotals(summary.pendingInTransit)} Incoming In-Transit ({summary.pendingBatches} Challan{summary.pendingBatches === 1 ? '' : 's'})
               </div>
               <p className="text-[11px] text-accent-800 mt-0.5">
                 Material has moved to this department. Click <strong>Receive Material</strong> on the lot below to officially update on-hand stock.
@@ -202,23 +207,23 @@ export function DepartmentStockView({
             <CheckCircle2 className="w-4 h-4 text-brand-600" />
           </div>
           <div className="text-2xl font-bold font-mono text-brand-900">
-            {summary.totalReceived} <span className="text-xs font-sans font-medium text-brand-700">{summary.unit}</span>
+            {formatUnitTotals(summary.totalReceived)}
           </div>
           <p className="text-[10px] text-brand-600">Accepted onto floor</p>
         </div>
 
         {/* 2. In-Transit / Pending Inward */}
         <div className={`p-4 rounded-xl space-y-1 border transition ${
-          summary.pendingInTransit > 0
+          hasQuantity(summary.pendingInTransit)
             ? 'bg-accent-50 border-accent-300 shadow-xs'
             : 'bg-neutral-50 border-neutral-200'
         }`}>
           <div className="flex items-center justify-between text-accent-800">
             <span className="text-[10px] font-bold uppercase tracking-wider">In-Transit</span>
-            <Truck className={`w-4 h-4 ${summary.pendingInTransit > 0 ? 'text-accent-700 animate-pulse' : 'text-neutral-500'}`} />
+            <Truck className={`w-4 h-4 ${hasQuantity(summary.pendingInTransit) ? 'text-accent-700 animate-pulse' : 'text-neutral-500'}`} />
           </div>
           <div className="text-2xl font-bold font-mono text-neutral-900">
-            {summary.pendingInTransit} <span className="text-xs font-sans font-medium text-accent-800">{summary.unit}</span>
+            {formatUnitTotals(summary.pendingInTransit)}
           </div>
           <p className="text-[10px] text-accent-800">
             {summary.pendingBatches} Challan{summary.pendingBatches === 1 ? '' : 's'} awaiting receive
@@ -244,7 +249,7 @@ export function DepartmentStockView({
             <ArrowUpRight className="w-4 h-4 text-accent-700" />
           </div>
           <div className="text-2xl font-bold font-mono text-neutral-900">
-            {summary.totalDispatched} <span className="text-xs font-sans font-medium text-accent-800">{summary.unit}</span>
+            {formatUnitTotals(summary.totalDispatched)}
           </div>
           <p className="text-[10px] text-accent-700">Moved downstream</p>
         </div>
@@ -256,7 +261,7 @@ export function DepartmentStockView({
             <AlertTriangle className="w-4 h-4 text-danger-600" />
           </div>
           <div className="text-2xl font-bold font-mono text-danger-900">
-            {summary.totalDefective} <span className="text-xs font-sans font-medium text-danger-700">{summary.unit}</span>
+            {formatUnitTotals(summary.totalDefective)}
           </div>
           <p className="text-[10px] text-danger-700 font-mono truncate" title={summary.shelfCode}>
             On {summary.shelfCode}
@@ -270,7 +275,7 @@ export function DepartmentStockView({
             <Package className="w-4 h-4 text-accent-700" />
           </div>
           <div className="text-2xl font-bold font-mono text-neutral-900">
-            {summary.currentStockOnHand} <span className="text-xs font-sans font-medium text-neutral-700">{summary.unit}</span>
+            {formatUnitTotals(summary.currentStockOnHand)}
           </div>
           <p className="text-[10px] text-neutral-500">Physical floor stock</p>
         </div>
@@ -322,9 +327,9 @@ export function DepartmentStockView({
                 <th className="py-2.5 px-3">Challan / Program #</th>
                 <th className="py-2.5 px-3">Client &amp; Style</th>
                 <th className="py-2.5 px-3">Fabric &amp; Shade</th>
-                <th className="py-2.5 px-3 text-right">Inflow ({summary.unit})</th>
-                <th className="py-2.5 px-3 text-right">Defective ({summary.unit})</th>
-                <th className="py-2.5 px-3 text-right">Outflow ({summary.unit})</th>
+                <th className="py-2.5 px-3 text-right">Inflow</th>
+                <th className="py-2.5 px-3 text-right">Defective</th>
+                <th className="py-2.5 px-3 text-right">Outflow</th>
                 <th className="py-2.5 px-3 text-right font-bold">On-Hand Stock</th>
                 <th className="py-2.5 px-3 text-center">Receipt Status</th>
                 <th className="py-2.5 px-3 text-right">Action</th>
@@ -333,7 +338,7 @@ export function DepartmentStockView({
             <tbody className="divide-y divide-neutral-100">
               {filteredInventory.map((item, idx) => (
                 <tr
-                  key={item.id || idx}
+                  key={`${item.id || idx}-${item.uom}`}
                   className={`transition ${!item.isReceived ? 'bg-accent-50/40 hover:bg-accent-50/70' : 'hover:bg-neutral-50/80'}`}
                 >
                   <td className="py-3 px-3 font-mono">
@@ -357,18 +362,18 @@ export function DepartmentStockView({
                     <span className="text-[10px] text-neutral-500">{item.color}</span>
                   </td>
                   <td className="py-3 px-3 text-right font-mono font-bold text-brand-700">
-                    {item.quantityIn}
+                    {item.quantityIn} {item.uom}
                   </td>
                   <td className="py-3 px-3 text-right font-mono text-danger-700">
                     {item.defectiveQuantity > 0 ? (
-                      <span className="font-bold">-{item.defectiveQuantity}</span>
+                      <span className="font-bold">-{item.defectiveQuantity} {item.uom}</span>
                     ) : (
                       <span className="text-neutral-500">0</span>
                     )}
                   </td>
                   <td className="py-3 px-3 text-right font-mono text-accent-800">
                     {item.quantityOut > 0 ? (
-                      <span>{item.quantityOut}</span>
+                      <span>{item.quantityOut} {item.uom}</span>
                     ) : (
                       <span className="text-neutral-500">0</span>
                     )}

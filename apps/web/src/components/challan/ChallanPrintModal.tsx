@@ -19,6 +19,7 @@ import { extractRootWilcomPhoto } from '@/lib/download-wilcom';
 import { useProgramDocument } from '@/hooks/useProgramDocument';
 import { FinishedGarmentList, useGarmentImages } from '@/components/workflow/FinishedGarments';
 import { isFinishedGoodsChallan } from '@/lib/finished-garments.mjs';
+import { lineTotals } from '@/lib/fabric-stock';
 
 interface ChallanPrintModalProps {
   challan: any;
@@ -100,8 +101,11 @@ export function ChallanPrintModal({
   const toLabel = deptLabels[toDept] || toDept;
 
   const items: ChallanItem[] = Array.isArray(challan.items) ? challan.items : [];
-  const totalQuantity = items.reduce((sum, it) => sum + (Number(it.quantity) || 0), 0);
-  const uom = items[0]?.uom || 'PCS';
+  // Lines may be in MTR and PCS; totals are per unit and never added together.
+  const itemTotals = lineTotals(items as any[], challan.fabricUnit || 'PCS');
+  const uom = itemTotals.single?.unit || challan.fabricUnit || 'PCS';
+  const totalQuantity = itemTotals.single ? itemTotals.single.quantity : itemTotals.totals[challan.fabricUnit] || 0;
+  const totalText = items.length > 0 ? itemTotals.label : `${challan.fabricOut || challan.fabricIn || 0} ${uom}`;
 
   const defectivePieces = challan.defectivePieces ?? 0;
   const fabricUnit = challan.fabricUnit || uom;
@@ -326,7 +330,7 @@ export function ChallanPrintModal({
               <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-neutral-700">
                 <span>ITEMS / MATERIALS</span>
                 <span className="font-mono text-xs text-neutral-900">
-                  Total: {totalQuantity || challan.fabricOut || challan.fabricIn || 0} {uom}
+                  Total: {totalText}
                 </span>
               </div>
               <div className="overflow-x-auto">
@@ -368,9 +372,9 @@ export function ChallanPrintModal({
                         TOTAL QUANTITY:
                       </td>
                       <td className="border-[1.5px] border-neutral-200 p-1 text-right font-mono text-sm font-black">
-                        {totalQuantity || challan.fabricOut || challan.fabricIn || 0}
+                        {itemTotals.single || items.length === 0 ? totalQuantity || challan.fabricOut || challan.fabricIn || 0 : totalText}
                       </td>
-                      <td className="border-[1.5px] border-neutral-200 p-1 text-center font-black">{uom}</td>
+                      <td className="border-[1.5px] border-neutral-200 p-1 text-center font-black">{itemTotals.single || items.length === 0 ? uom : ''}</td>
                     </tr>
                   </tbody>
                 </table>

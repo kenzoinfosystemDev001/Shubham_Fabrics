@@ -115,6 +115,7 @@ export async function POST(request: Request) {
             batchId: roll.batchId,
             transactionType: 'ISSUE',
             quantity: roll.length,
+            uom: roll.unit,
             referenceType: 'ISSUE_CHALLAN',
             referenceId: programId,
             fromLocationId: roll.locationId || null,

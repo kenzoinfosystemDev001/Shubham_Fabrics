@@ -13,10 +13,12 @@ import {
   AlertCircle,
   Layers,
 } from 'lucide-react';
+import { addToUnitTotals, formatUnitTotals, unitTotals } from '@/lib/fabric-stock';
 
 interface RollRow {
   id: string;
   length: string;
+  unit: '' | 'MTR' | 'PCS';
   width: string;
   weight: string;
   remarks: string;
@@ -44,7 +46,7 @@ function CreateGRNContent() {
 
   // Dynamic rolls
   const [rolls, setRolls] = useState<RollRow[]>([
-    { id: '1', length: '', width: '', weight: '', remarks: '' },
+    { id: '1', length: '', unit: '', width: '', weight: '', remarks: '' },
   ]);
 
   useEffect(() => {
@@ -86,6 +88,7 @@ function CreateGRNContent() {
       {
         id: String(Date.now() + Math.random()),
         length: '',
+        unit: rolls[rolls.length - 1]?.unit || '',
         width: '',
         weight: '',
         remarks: '',
@@ -99,15 +102,14 @@ function CreateGRNContent() {
   };
 
   const updateRoll = (index: number, field: keyof RollRow, value: string) => {
-    const updated = [...rolls];
-    updated[index][field] = value;
-    setRolls(updated);
+    setRolls(rolls.map((r, i) => (i === index ? { ...r, [field]: value } : r)));
   };
 
-  const totalMeters = rolls.reduce((acc, r) => {
+  // Meters and pieces are totalled separately, never added together.
+  const totalQuantity = rolls.reduce((acc, r) => {
     const val = parseFloat(r.length);
-    return acc + (isNaN(val) ? 0 : val);
-  }, 0);
+    return r.unit && !isNaN(val) ? addToUnitTotals(acc, r.unit, val) : acc;
+  }, unitTotals());
 
   const totalWeight = rolls.reduce((acc, r) => {
     const val = parseFloat(r.weight);
@@ -131,7 +133,11 @@ function CreateGRNContent() {
     for (let i = 0; i < rolls.length; i++) {
       const len = parseFloat(rolls[i].length);
       if (!rolls[i].length || isNaN(len) || len <= 0) {
-        setError(`Roll #${i + 1} has an invalid or missing length (meters).`);
+        setError(`Roll #${i + 1}: enter a quantity greater than zero.`);
+        return;
+      }
+      if (!rolls[i].unit) {
+        setError(`Roll #${i + 1}: choose the unit (MTR or PCS).`);
         return;
       }
     }
@@ -149,6 +155,7 @@ function CreateGRNContent() {
         programId: programId || null,
         rolls: rolls.map((r) => ({
           length: parseFloat(r.length),
+          unit: r.unit,
           width: r.width ? parseFloat(r.width) : null,
           weight: r.weight ? parseFloat(r.weight) : null,
           remarks: r.remarks || null,
@@ -346,7 +353,8 @@ function CreateGRNContent() {
                 <thead className="bg-neutral-50 text-neutral-700 font-semibold border-b border-neutral-200">
                   <tr>
                     <th className="py-2.5 px-3 w-16">#</th>
-                    <th className="py-2.5 px-3">Length (Meters) *</th>
+                    <th className="py-2.5 px-3">Quantity *</th>
+                    <th className="py-2.5 px-3">Unit *</th>
                     <th className="py-2.5 px-3">Width (cm)</th>
                     <th className="py-2.5 px-3">Weight (kg)</th>
                     <th className="py-2.5 px-3">Roll Remarks</th>
@@ -369,6 +377,19 @@ function CreateGRNContent() {
                           onChange={(e) => updateRoll(idx, 'length', e.target.value)}
                           className="w-36 text-xs border border-neutral-300 rounded px-2.5 py-1.5 font-mono focus:ring-1 focus:ring-brand-500"
                         />
+                      </td>
+                      <td className="py-2.5 px-3">
+                        <select
+                          required
+                          value={roll.unit}
+                          onChange={(e) => updateRoll(idx, 'unit', e.target.value)}
+                          aria-label={`Roll ${idx + 1} unit`}
+                          className="w-24 text-xs border border-neutral-300 rounded px-2 py-1.5 font-bold bg-white focus:ring-1 focus:ring-brand-500"
+                        >
+                          <option value="">Select</option>
+                          <option value="MTR">MTR</option>
+                          <option value="PCS">PCS</option>
+                        </select>
                       </td>
                       <td className="py-2.5 px-3">
                         <input
@@ -421,9 +442,9 @@ function CreateGRNContent() {
                 Total Rolls: <strong className="text-brand-900 font-bold">{rolls.length}</strong>
               </span>
               <span className="font-semibold text-neutral-700">
-                Total Measured Length:{' '}
+                Total Quantity:{' '}
                 <strong className="text-brand-900 font-mono font-bold">
-                  {totalMeters.toFixed(2)} m
+                  {formatUnitTotals(totalQuantity)}
                 </strong>
               </span>
               <span className="font-semibold text-neutral-700">

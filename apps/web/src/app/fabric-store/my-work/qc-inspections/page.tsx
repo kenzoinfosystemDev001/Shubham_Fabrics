@@ -114,7 +114,7 @@ export default function QCInspectionsQueuePage() {
                     <th className="py-3 px-4">Batch Number</th>
                     <th className="py-3 px-4">Fabric Type &amp; Details</th>
                     <th className="py-3 px-4">Color</th>
-                    <th className="py-3 px-4">Length</th>
+                    <th className="py-3 px-4">Quantity</th>
                     <th className="py-3 px-4">Width</th>
                     <th className="py-3 px-4">Weight</th>
                     <th className="py-3 px-4">Inward Date</th>
@@ -143,7 +143,7 @@ export default function QCInspectionsQueuePage() {
                         {roll.batch?.colorName || '—'}
                       </td>
                       <td className="py-3.5 px-4 font-mono font-bold text-neutral-900">
-                        {parseFloat(roll.length).toFixed(2)} m
+                        {parseFloat(roll.length).toFixed(2)} {roll.unit || 'MTR'}
                       </td>
                       <td className="py-3.5 px-4 font-mono text-neutral-600">
                         {roll.width ? `${roll.width} cm` : '—'}

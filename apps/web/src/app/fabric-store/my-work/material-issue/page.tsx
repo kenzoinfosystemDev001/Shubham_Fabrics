@@ -4,6 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { ArrowUpFromLine, RefreshCw, CheckCircle2, Layers, AlertCircle, Send } from 'lucide-react';
+import { addToUnitTotals, formatUnitTotals, unitTotals } from '@/lib/fabric-stock';
 
 function MaterialIssueContent() {
   const searchParams = useSearchParams();
@@ -81,9 +82,9 @@ function MaterialIssueContent() {
   });
 
   const selectedRollsData = rolls.filter((r) => selectedRollIds.includes(r.id));
-  const totalSelectedMeters = selectedRollsData.reduce(
-    (sum, r) => sum + parseFloat(r.length || '0'),
-    0
+  const totalSelected = selectedRollsData.reduce(
+    (totals, r) => addToUnitTotals(totals, r.unit || 'MTR', parseFloat(r.length || '0')),
+    unitTotals()
   );
 
   const handleIssueSubmit = async (e: React.FormEvent) => {
@@ -270,7 +271,7 @@ function MaterialIssueContent() {
                     <th className="py-3 px-4">Batch Number</th>
                     <th className="py-3 px-4">Fabric Type &amp; Description</th>
                     <th className="py-3 px-4">Color</th>
-                    <th className="py-3 px-4">Length</th>
+                    <th className="py-3 px-4">Quantity</th>
                     <th className="py-3 px-4">Location</th>
                     <th className="py-3 px-4">QC Status</th>
                   </tr>
@@ -312,7 +313,7 @@ function MaterialIssueContent() {
                           {roll.batch?.colorName || 'Natural'}
                         </td>
                         <td className="py-3.5 px-4 font-mono font-bold text-neutral-900">
-                          {parseFloat(roll.length).toFixed(2)} m
+                          {parseFloat(roll.length).toFixed(2)} {roll.unit || 'MTR'}
                         </td>
                         <td className="py-3.5 px-4 font-mono text-neutral-600">
                           {roll.location?.locationCode || 'UNASSIGNED'}
@@ -341,9 +342,9 @@ function MaterialIssueContent() {
               <span className="text-base font-bold text-brand-600">{selectedRollIds.length} rolls</span>
             </div>
             <div>
-              <span className="text-neutral-500 block text-[10px] uppercase font-bold">Total Meters</span>
+              <span className="text-neutral-500 block text-[10px] uppercase font-bold">Total Quantity</span>
               <span className="text-base font-bold font-mono text-accent-700">
-                {totalSelectedMeters.toFixed(2)} m
+                {formatUnitTotals(totalSelected)}
               </span>
             </div>
           </div>

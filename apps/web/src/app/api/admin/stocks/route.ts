@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import { requireUser } from '@/lib/auth/require-user';
+import { addToUnitTotals, unitTotals } from '@/lib/fabric-stock';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,7 +9,7 @@ export async function GET(request: Request) {
   const { user: authUser, response: authResponse } = await requireUser(request, { admin: true });
   if (!authUser) return authResponse;
   try {
-    const [rolls, batches, totalStockAggr] = await Promise.all([
+    const [rolls, batches, totalStockAggr, quantityByUnit] = await Promise.all([
       prisma.fabricStoreRoll.findMany({
         take: 100,
         include: {
@@ -22,10 +23,14 @@ export async function GET(request: Request) {
         orderBy: { createdAt: 'desc' },
       }),
       prisma.fabricStoreRoll.aggregate({
-        _sum: { length: true, weight: true },
+        _sum: { weight: true },
         _count: { _all: true },
       }),
+      // Roll quantities per unit: meters and pieces are never added together.
+      prisma.fabricStoreRoll.groupBy({ by: ['unit'], _sum: { length: true } }),
     ]);
+    const totalsByUnit = unitTotals();
+    for (const row of quantityByUnit) addToUnitTotals(totalsByUnit, row.unit, Number(row._sum.length || 0));
 
     const formattedRolls = rolls.map((r) => ({
       id: r.id,
@@ -33,7 +38,8 @@ export async function GET(request: Request) {
       batchNumber: r.batch?.batchNumber || '—',
       fabricName: r.batch?.fabricDescription || 'Standard Knit',
       color: r.batch?.colorName || 'Natural',
-      lengthMeters: Number(r.length || 0),
+      quantity: Number(r.length || 0),
+      unit: r.unit,
       netWeightKg: Number(r.weight || 0),
       status: r.status,
       qcStatus: r.qcStatus,
@@ -42,7 +48,7 @@ export async function GET(request: Request) {
     return NextResponse.json({
       summary: {
         totalRolls: totalStockAggr._count?._all || 0,
-        totalMeters: Number(totalStockAggr._sum?.length || 0),
+        totalsByUnit,
         totalWeightKg: Number(totalStockAggr._sum?.weight || 0),
       },
       rolls: formattedRolls,

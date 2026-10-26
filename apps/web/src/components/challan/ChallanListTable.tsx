@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { lineTotals } from '@/lib/fabric-stock';
 import Link from 'next/link';
 import { 
   FileText, 
@@ -54,9 +55,8 @@ export function ChallanListTable({
             </thead>
             <tbody className="divide-y divide-neutral-100">
               {challans.map((challan: any) => {
-                const totalQty = Array.isArray(challan.items)
-                  ? challan.items.reduce((acc: number, it: any) => acc + (Number(it.quantity) || 0), 0)
-                  : 0;
+                // Per unit: a challan may carry MTR and PCS lines.
+                const totalQty = lineTotals(Array.isArray(challan.items) ? challan.items : [], challan.fabricUnit || 'MTR').label;
 
                 return (
                   <tr key={challan.id} className="hover:bg-neutral-50/80 transition">
@@ -84,7 +84,7 @@ export function ChallanListTable({
                     </td>
                     <td className="p-2.5 font-medium text-neutral-700">
                       {challan.items?.length || 0} items
-                      {totalQty > 0 && <span className="font-mono text-neutral-500 ml-1">({totalQty} pcs)</span>}
+                      {totalQty !== '0' && <span className="font-mono text-neutral-500 ml-1">({totalQty})</span>}
                     </td>
                     <td className="p-2.5">
                       <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold ${

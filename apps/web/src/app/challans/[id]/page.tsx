@@ -48,6 +48,7 @@ import {
 } from '@/lib/download-challan';
 import { FinishedGarmentList, useGarmentImages } from '@/components/workflow/FinishedGarments';
 import { isFinishedGoodsChallan } from '@/lib/finished-garments.mjs';
+import { lineTotals } from '@/lib/fabric-stock';
 
 export default function ChallanDetailPage() {
   const { id } = useParams() as { id: string };
@@ -204,10 +205,8 @@ export default function ChallanDetailPage() {
 
   const deptDisplay = challan ? (deptLabels[challan.fromDepartment] || challan.fromDepartment || 'PRODUCTION') : 'PRODUCTION';
 
-  const totalPieces = challan ? (challan.items || []).reduce(
-    (sum: number, it: any) => sum + (Number(it.quantity) || 0),
-    0
-  ) : 0;
+  // Lines may be in MTR and PCS; the total is per unit and never added together.
+  const itemTotals = lineTotals(challan?.items || [], challan?.fabricUnit || 'PCS');
 
   const barcodeStickerParams: BarcodeStickerParams | null = challan ? {
     challanNumber: challan.challanNumber,
@@ -218,8 +217,8 @@ export default function ChallanDetailPage() {
     programSerialNo: challan.program?.programSerialNo || challan.program?.programNumber || '—',
     clientName: challan.program?.clientName || challan.program?.buyerName || 'Standard Client',
     mainStyle: challan.program?.mainStyle || challan.program?.styleCode || '—',
-    totalQuantity: totalPieces,
-    uom: challan.items?.[0]?.uom || 'PCS',
+    totalQuantity: itemTotals.single ? itemTotals.single.quantity : itemTotals.label,
+    uom: itemTotals.single ? itemTotals.single.unit : '',
     date: challan.createdAt ? new Date(challan.createdAt).toLocaleDateString('en-IN') : new Date().toLocaleDateString('en-IN')
   } : null;
 
@@ -774,10 +773,10 @@ export default function ChallanDetailPage() {
                               : 'Total Material Quantity:'}
                           </td>
                           <td className="py-2.5 px-4 text-right font-mono text-sm font-black text-neutral-900">
-                            {totalQuantity}
+                            {itemTotals.single ? totalQuantity : itemTotals.label}
                           </td>
                           <td className="py-2.5 px-4 font-bold text-neutral-700">
-                            {challan.items?.[0]?.uom || 'PCS'}
+                            {itemTotals.single ? itemTotals.single.unit : ''}
                           </td>
                         </tr>
                       </tfoot>

@@ -202,10 +202,6 @@ function IssueChallanContent() {
       setError('Please add at least one fabric item in COLOR / FABRIC / MEASUREMENT.');
       return;
     }
-    if (new Set(items.map((item) => item.unit)).size > 1) {
-      setError('Use the same unit for every quantity in one challan.');
-      return;
-    }
 
     // Validate item rows
     for (let i = 0; i < items.length; i++) {
@@ -221,6 +217,10 @@ function IssueChallanContent() {
       const qtyNum = parseFloat(String(it.measurement));
       if (isNaN(qtyNum) || qtyNum <= 0) {
         setError(`Item #${i + 1}: Measurement / Quantity must be a positive number.`);
+        return;
+      }
+      if (it.unit !== 'MTR' && it.unit !== 'PCS') {
+        setError(`Item #${i + 1}: choose the unit (MTR or PCS).`);
         return;
       }
     }
@@ -242,7 +242,7 @@ function IssueChallanContent() {
         defectiveShelfLocation: tracking.defectiveShelfLocation,
         defectReason: tracking.defectReason,
         fabricOut: tracking.fabricOut,
-        fabricUnit: items[0]?.unit || tracking.fabricUnit,
+        fabricUnit: items.some((it) => it.unit === tracking.fabricUnit) ? tracking.fabricUnit : items[0]?.unit,
         detectedFromDepartment: 'PROGRAMMING',
         remarks: [
           remarks,
@@ -256,8 +256,9 @@ function IssueChallanContent() {
           .join(' | '),
         items: items.map((it) => ({
           itemDescription: `${it.fabric} (${it.color})`,
-          quantity: parseFloat(String(it.measurement)) || tracking.fabricOut || 1,
-          uom: it.unit || tracking.fabricUnit || 'MTR',
+          quantity: parseFloat(String(it.measurement)),
+          // Each line keeps its own unit; MTR and PCS lines may share a challan.
+          uom: it.unit,
           colour: it.color,
           fabricCode: it.fabric,
           remarks: it.remarks || null,

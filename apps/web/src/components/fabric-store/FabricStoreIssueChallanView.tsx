@@ -39,6 +39,7 @@ import {
   createBlankChallanItem,
   DepartmentInOutTracking,
 } from '@/components/ColorFabricMeasurementTable';
+import { addToUnitTotals, formatUnitTotals, unitTotals } from '@/lib/fabric-stock';
 
 interface FabricStoreIssueChallanViewProps {
   fixedTarget?: 'DYEING' | 'EMBROIDERY';
@@ -274,16 +275,26 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
       setError('Please enter at least one item in the Color / Fabric / Measurement table.');
       return;
     }
-    if (new Set(validItems.map((item) => item.unit)).size > 1) {
-      setError('Use the same unit for every quantity in one challan.');
+    if (validItems.some((item) => item.unit !== 'MTR' && item.unit !== 'PCS')) {
+      setError('Choose the unit (MTR or PCS) for every challan item.');
       return;
     }
 
-    const issueUnit: 'MTR' | 'PCS' = validItems[0].unit === 'PCS' ? 'PCS' : 'MTR';
-    const issueQuantity = validItems.reduce((sum, item) => sum + Number(item.measurement), 0);
-    // The API also checks availability against this exact unit before creating the challan.
+    // Each line keeps its own unit; MTR and PCS lines may share a challan and are never added together.
+    // The challan's In / Defective / Out accounting is in one unit: the defective unit when a line uses it.
+    const itemUnits = Array.from(new Set(validItems.map((item) => (item.unit === 'PCS' ? 'PCS' : 'MTR'))));
+    const issueUnit: 'MTR' | 'PCS' = itemUnits.includes(storeTracking.fabricUnit) ? storeTracking.fabricUnit : itemUnits[0];
+    const issueQuantity = validItems
+      .filter((item) => (item.unit === 'PCS' ? 'PCS' : 'MTR') === issueUnit)
+      .reduce((sum, item) => sum + Number(item.measurement), 0);
+    const issueTotals = validItems.reduce(
+      (totals, item) => addToUnitTotals(totals, item.unit === 'PCS' ? 'PCS' : 'MTR', Number(item.measurement)),
+      unitTotals(),
+    );
+    // The API also checks availability for every unit before creating the challan.
     if (
-      fabricAvailability?.requiredUnit === issueUnit &&
+      fabricAvailability &&
+      itemUnits.includes(fabricAvailability.requiredUnit) &&
       !fabricAvailability.isAvailable
     ) {
       setError(
@@ -307,7 +318,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
         itemDescription: `${item.fabric || 'Fabric'} — ${item.color || 'Standard'}`,
         unitType: 'ROLL',
         quantity: Number(item.measurement),
-        uom: issueUnit,
+        uom: item.unit === 'PCS' ? 'PCS' : 'MTR',
         fabricCode: item.fabric || selectedProgram.fabricName || 'FABRIC',
         // Current colour and the colour Dyeing must achieve are stored separately per line.
         colour: item.color || null,
@@ -322,7 +333,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
         storeInchargeName ? `Store Incharge: ${storeInchargeName}` : null,
         storeInchargeContact ? `Contact: ${storeInchargeContact}` : null,
         designNumber ? `Design #: ${designNumber}` : null,
-        `Accounting: In: ${challanFabricIn} ${issueUnit} | Defective Cut: ${challanDefectiveQuantity} ${issueUnit} (${storeTracking.defectiveShelfLocation}) | Out to ${destinationDepartment}: ${issueQuantity} ${issueUnit}`,
+        `Accounting: In: ${challanFabricIn} ${issueUnit} | Defective Cut: ${challanDefectiveQuantity} ${issueUnit} (${storeTracking.defectiveShelfLocation}) | Out to ${destinationDepartment}: ${formatUnitTotals(issueTotals)}`,
       ]
         .filter(Boolean)
         .join(' · ');

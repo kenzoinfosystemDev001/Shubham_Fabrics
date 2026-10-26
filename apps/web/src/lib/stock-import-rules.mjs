@@ -1,9 +1,9 @@
-// Rules for the Fabric Store "Upload Stock Sheet" import: recognising the file, reading Excel columns,
-// cleaning values read from a photo, review warnings and validating the rows a user confirms.
+// Rules for the Fabric Store "Upload Stock Sheet" Excel import: recognising the file, reading Excel
+// columns and values, and validating each row before it is added to Inward Stock.
 // Plain JavaScript so node:test scripts can load it without a TypeScript build.
 //
-// Values are never invented: anything that cannot be read stays empty and is flagged for the user.
-// Units are kept exactly as found (MTR or PCS); a row with no clear unit must be chosen by hand.
+// Values are never invented: a row with anything missing or unclear (no fabric, no valid quantity, no
+// MTR/PCS unit, no bill no./date) is skipped with the reason. Units are kept exactly as found.
 import { normalizeStockUnit } from './fabric-stock-rules.mjs';
 
 export const MAX_IMPORT_FILE_BYTES = 10 * 1024 * 1024;
@@ -43,14 +43,12 @@ export const FIELD_LABELS = {
 const startsWith = (bytes, signature) => signature.every((b, i) => bytes[i] === b);
 
 /**
- * The kind of an uploaded file, from its first bytes (the extension must agree): JPEG/PNG photos and
- * scans, .xlsx and .xls workbooks. Returns null for anything else.
+ * The kind of an uploaded file, from its first bytes (the extension must agree): .xlsx and .xls
+ * workbooks. Returns null for anything else.
  */
 export function sniffImportFile(bytes, fileName) {
   const ext = String(fileName || '').toLowerCase().match(/\.([a-z0-9]+)$/)?.[1] || '';
   if (!bytes || bytes.length < 8) return null;
-  if (startsWith(bytes, [0xff, 0xd8, 0xff]) && ['jpg', 'jpeg'].includes(ext)) return { source: 'IMAGE', mimeType: 'image/jpeg' };
-  if (startsWith(bytes, [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]) && ext === 'png') return { source: 'IMAGE', mimeType: 'image/png' };
   // A password-protected .xlsx is stored as an OLE file; it is accepted here so the reader can say why it cannot open it.
   const ole = startsWith(bytes, [0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1]);
   if ((startsWith(bytes, [0x50, 0x4b, 0x03, 0x04]) || ole) && ext === 'xlsx') {
@@ -279,82 +277,6 @@ export function rowsFromSheet(matrix, sheetName) {
 }
 
 // ---------------------------------------------------------------------------
-// Photo results (Claude vision)
-// ---------------------------------------------------------------------------
-
-const CONFIDENCE = new Set(['high', 'medium', 'low']);
-
-function field(value) {
-  if (!value || typeof value !== 'object') return { value: null, confidence: 'low' };
-  return {
-    value: cleanText(value.value),
-    confidence: CONFIDENCE.has(value.confidence) ? value.confidence : 'low',
-  };
-}
-
-/**
- * Turns the structured reply from the photo reader into review rows. Every value and its confidence is
- * kept as read; quantities and dates are parsed here (never by the model) so a bad reading stays empty.
- */
-export function rowsFromVision(result) {
-  const doc = result?.document || {};
-  const header = {
-    supplierName: field(doc.supplierName),
-    billNo: field(doc.billNo),
-    billDate: field(doc.billDate),
-  };
-  const rows = [];
-  for (const item of Array.isArray(result?.rows) ? result.rows.slice(0, MAX_IMPORT_ROWS) : []) {
-    const f = {};
-    for (const name of ['itemName', 'fabricCode', 'colour', 'dyeColour', 'quantity', 'unit', 'supplierName', 'billNo', 'billDate', 'remarks']) {
-      f[name] = field(item?.[name]);
-    }
-    const qty = parseQuantity(f.quantity.value);
-    const unit = normalizeStockUnit(f.unit.value || '') || qty.unit;
-    const billDate = parseSheetDate(f.billDate.value);
-    const confidence = {};
-    for (const [name, value] of Object.entries(f)) if (value.value !== null) confidence[name] = value.confidence;
-    // A value that could not be parsed is as good as unread.
-    if (f.quantity.value !== null && qty.value === null) confidence.quantity = 'low';
-    if (f.unit.value !== null && !unit) confidence.unit = 'low';
-    if (f.billDate.value !== null && !billDate) confidence.billDate = 'low';
-    const values = Object.values(f).filter((v) => v.value !== null);
-    if (values.length === 0) continue;
-    rows.push({
-      rowNo: rows.length + 1,
-      source: `Line ${rows.length + 1}`,
-      itemName: f.itemName.value,
-      fabricCode: f.fabricCode.value,
-      colour: f.colour.value,
-      dyeColour: f.dyeColour.value,
-      quantity: qty.value,
-      quantityText: f.quantity.value,
-      unit,
-      unitText: f.unit.value,
-      supplierName: f.supplierName.value,
-      billNo: f.billNo.value,
-      billDate,
-      billDateText: billDate ? null : f.billDate.value,
-      remarks: f.remarks.value,
-      confidence,
-      unreadable: Array.isArray(item?.unreadableFields) ? item.unreadableFields.filter((x) => IMPORT_FIELDS.includes(x)) : [],
-    });
-  }
-  return {
-    header: {
-      supplierName: header.supplierName.value,
-      billNo: header.billNo.value,
-      billDate: parseSheetDate(header.billDate.value),
-      billDateText: header.billDate.value && !parseSheetDate(header.billDate.value) ? header.billDate.value : null,
-      confidence: Object.fromEntries(Object.entries(header).filter(([, v]) => v.value !== null).map(([k, v]) => [k, v.confidence])),
-    },
-    rows,
-    readable: doc.readable !== false,
-    problem: cleanText(doc.problem),
-  };
-}
-
-// ---------------------------------------------------------------------------
 // Header shared by the rows
 // ---------------------------------------------------------------------------
 
@@ -362,63 +284,6 @@ export function rowsFromVision(result) {
 export function commonValue(rows, name) {
   const values = new Set(rows.map((row) => row[name]).filter(Boolean).map((v) => String(v)));
   return values.size === 1 ? [...values][0] : null;
-}
-
-// ---------------------------------------------------------------------------
-// Review warnings
-// ---------------------------------------------------------------------------
-
-export function sameLineKey(row, header = {}) {
-  return [
-    row.billNo || header.billNo || '',
-    row.itemName || '',
-    row.fabricCode || '',
-    row.colour || '',
-    row.quantity ?? '',
-    row.unit || '',
-  ]
-    .map((v) => String(v).trim().toLowerCase().replace(/\s+/g, ' '))
-    .join('|');
-}
-
-/**
- * Problems a person should look at before confirming, per row. `blocking` problems must be fixed (no
- * fabric, no valid quantity, no unit, no bill no./date); the others are warnings.
- */
-export function reviewRow(row, header = {}) {
-  const blocking = [];
-  const warnings = [];
-  if (!cleanText(row.itemName)) blocking.push('Fabric name is missing.');
-  if (!(Number(row.quantity) > 0)) {
-    blocking.push(row.quantityText ? `Quantity "${row.quantityText}" is not a valid number.` : 'Quantity is missing.');
-  }
-  if (!normalizeStockUnit(row.unit || '')) {
-    blocking.push(row.unitText ? `Unit "${row.unitText}" is not MTR or PCS — choose one.` : 'Unit is missing — choose MTR or PCS.');
-  }
-  if (!cleanText(row.billNo) && !cleanText(header.billNo)) blocking.push('Challan / bill no. is missing.');
-  if (!row.billDate && !header.billDate) {
-    blocking.push(row.billDateText ? `Date "${row.billDateText}" is not a valid date.` : 'Challan / bill date is missing.');
-  }
-  for (const [name, level] of Object.entries(row.confidence || {})) {
-    if (level === 'low') warnings.push(`${FIELD_LABELS[name] || name} was hard to read — check it.`);
-  }
-  for (const name of row.unreadable || []) {
-    if (!row[name]) warnings.push(`${FIELD_LABELS[name] || name} could not be read.`);
-  }
-  return { blocking, warnings };
-}
-
-/** Rows that look identical to an earlier row of the same file: rowNo -> earlier rowNo. */
-export function repeatedRows(rows, header = {}) {
-  const first = new Map();
-  const repeats = new Map();
-  for (const row of rows) {
-    if (!row.itemName || !(Number(row.quantity) > 0)) continue;
-    const key = sameLineKey(row, header);
-    if (first.has(key)) repeats.set(row.rowNo, first.get(key));
-    else first.set(key, row.rowNo);
-  }
-  return repeats;
 }
 
 // ---------------------------------------------------------------------------

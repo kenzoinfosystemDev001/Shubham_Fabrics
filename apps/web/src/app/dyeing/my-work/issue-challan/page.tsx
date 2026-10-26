@@ -22,6 +22,7 @@ import {
   sheetRef,
 } from '@/components/dyeing/DyeingUi';
 import { availableForQc, needsColorReview } from '@/lib/dyeing-workflow.mjs';
+import { lineTotals } from '@/lib/fabric-stock';
 
 const READY = ['DYED', 'READY_FOR_QC1', 'PARTIALLY_SENT_TO_QC1'];
 
@@ -363,7 +364,7 @@ function IssueChallanContent() {
                       {(c.items || []).map((i: any) => i.colour || i.itemDescription).join(', ') || '—'}
                     </td>
                     <td className="py-3 px-3 text-right tabular-nums whitespace-nowrap">
-                      {fmtQty((c.items || []).reduce((s: number, i: any) => s + (Number(i.quantity) || 0), 0), c.items?.[0]?.uom)}
+                      {lineTotals(c.items || [], c.fabricUnit || 'MTR').label}
                     </td>
                     <td className="py-3 px-3 text-xs">{String(c.status || '').replace(/_/g, ' ')}</td>
                     <td className="py-3 px-3 text-right"><DocumentsButton programId={c.programId} challanId={c.id} /></td>

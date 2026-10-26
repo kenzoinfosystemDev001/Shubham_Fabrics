@@ -26,6 +26,7 @@ import { destinationName, workPath, type TransferKind, type WorkflowView } from 
 import { GarmentTag } from '@/components/recutting/RecuttingUi';
 import { GarmentImageUpload, GarmentThumb, useGarmentImages } from '@/components/workflow/FinishedGarments';
 import { groupGarments, imageFor } from '@/lib/finished-garments.mjs';
+import { lineTotals } from '@/lib/fabric-stock';
 
 const AVAILABLE_LABEL: Record<TransferKind, string> = { PASS: 'Available', REJECT: 'Rejected', REWORK: 'For Rework' };
 
@@ -514,7 +515,7 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
                           ))}
                         </td>
                         <td className="py-3 px-3 text-right tabular-nums whitespace-nowrap">
-                          {fmtQty((c.items || []).reduce((s: number, i: any) => s + (Number(i.quantity) || 0), 0), c.items?.[0]?.uom)}
+                          {lineTotals(c.items || [], c.fabricUnit || 'MTR').label}
                         </td>
                       </>
                     )}

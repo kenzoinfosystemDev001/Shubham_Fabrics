@@ -11,6 +11,7 @@ import {
   PackageCheck,
 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { formatUnitTotals } from '@/lib/fabric-stock';
 import { DeadlineAlertsPanel } from '@/components/alerts/DeadlineAlertsPanel';
 
 export default function QC1Dashboard() {
@@ -61,12 +62,12 @@ export default function QC1Dashboard() {
     failed: 0,
     rework: 0,
     hold: 0,
-    totalQuantityReceived: 0,
-    totalQuantityInspected: 0,
-    passedQuantity: 0,
-    failedQuantity: 0,
-    reworkQuantity: 0,
-    holdQuantity: 0,
+    totalQuantityReceived: {},
+    totalQuantityInspected: {},
+    passedQuantity: {},
+    failedQuantity: {},
+    reworkQuantity: {},
+    holdQuantity: {},
   };
 
   const priorityWork = data?.priorityWork || [];
@@ -159,16 +160,16 @@ export default function QC1Dashboard() {
           ))}
         </section>
 
-        {/* QUANTITIES (MTR) */}
+        {/* QUANTITIES (per unit: MTR and PCS are never added together) */}
         <section className={panel}>
           <div className={panelHeader}>
-            <h2 className="text-sm font-bold text-neutral-900">Quantities (MTR)</h2>
+            <h2 className="text-sm font-bold text-neutral-900">Quantities</h2>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
             {quantityStats.map((s) => (
               <div key={s.label} className="px-5 py-4">
                 <p className={`text-xl font-bold tabular-nums leading-none ${s.tone}`}>
-                  {Number(s.value || 0).toLocaleString()}
+                  {typeof s.value === 'number' ? s.value.toLocaleString() : formatUnitTotals(s.value)}
                 </p>
                 <p className="text-xs font-medium text-neutral-500 mt-2">{s.label}</p>
               </div>

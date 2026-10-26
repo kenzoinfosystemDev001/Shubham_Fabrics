@@ -374,11 +374,6 @@ export type PackingAllocation = $Result.DefaultSelection<Prisma.$PackingAllocati
  */
 export type GarmentImage = $Result.DefaultSelection<Prisma.$GarmentImagePayload>
 /**
- * Model StockImport
- * 
- */
-export type StockImport = $Result.DefaultSelection<Prisma.$StockImportPayload>
-/**
  * Model ManualMigration
  * 
  */
@@ -1349,16 +1344,6 @@ export class PrismaClient<
   get garmentImage(): Prisma.GarmentImageDelegate<ExtArgs, ClientOptions>;
 
   /**
-   * `prisma.stockImport`: Exposes CRUD operations for the **StockImport** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more StockImports
-    * const stockImports = await prisma.stockImport.findMany()
-    * ```
-    */
-  get stockImport(): Prisma.StockImportDelegate<ExtArgs, ClientOptions>;
-
-  /**
    * `prisma.manualMigration`: Exposes CRUD operations for the **ManualMigration** model.
     * Example usage:
     * ```ts
@@ -1880,7 +1865,6 @@ export namespace Prisma {
     DeadlineAlertDismissal: 'DeadlineAlertDismissal',
     PackingAllocation: 'PackingAllocation',
     GarmentImage: 'GarmentImage',
-    StockImport: 'StockImport',
     ManualMigration: 'ManualMigration'
   };
 
@@ -1900,7 +1884,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "role" | "permission" | "rolePermission" | "userRole" | "department" | "workCenter" | "machine" | "shift" | "supplier" | "customer" | "item" | "fabric" | "trim" | "design" | "colour" | "size" | "operation" | "defectCode" | "program" | "programFabric" | "programColour" | "programSize" | "programSpecification" | "programBOM" | "programRoute" | "programRouteStep" | "attachment" | "departmentImage" | "brandingAsset" | "appSetting" | "auditLog" | "challan" | "challanItem" | "productionTransaction" | "qualityInspection" | "defectLog" | "inventoryStock" | "challanEvent" | "stockLedgerEntry" | "fabricRoll" | "bundle" | "carton" | "cartonBundle" | "dispatchOrder" | "dispatchCarton" | "defectRecord" | "reworkTransaction" | "recutRequest" | "qualityInspectionParameter" | "idempotencyRecord" | "notification" | "integrityScanResult" | "inventoryLocation" | "fabricBatch" | "fabricStoreRoll" | "materialReceipt" | "materialReceiptItem" | "fabricQCInspection" | "fabricStockLedger" | "dyeingOrder" | "dyeingQcTransfer" | "departmentWorkItem" | "departmentWorkTransfer" | "workItemAllocation" | "workItemInspection" | "fabricInward" | "fabricOutward" | "deadlineAlert" | "deadlineAlertDismissal" | "packingAllocation" | "garmentImage" | "stockImport" | "manualMigration"
+      modelProps: "user" | "role" | "permission" | "rolePermission" | "userRole" | "department" | "workCenter" | "machine" | "shift" | "supplier" | "customer" | "item" | "fabric" | "trim" | "design" | "colour" | "size" | "operation" | "defectCode" | "program" | "programFabric" | "programColour" | "programSize" | "programSpecification" | "programBOM" | "programRoute" | "programRouteStep" | "attachment" | "departmentImage" | "brandingAsset" | "appSetting" | "auditLog" | "challan" | "challanItem" | "productionTransaction" | "qualityInspection" | "defectLog" | "inventoryStock" | "challanEvent" | "stockLedgerEntry" | "fabricRoll" | "bundle" | "carton" | "cartonBundle" | "dispatchOrder" | "dispatchCarton" | "defectRecord" | "reworkTransaction" | "recutRequest" | "qualityInspectionParameter" | "idempotencyRecord" | "notification" | "integrityScanResult" | "inventoryLocation" | "fabricBatch" | "fabricStoreRoll" | "materialReceipt" | "materialReceiptItem" | "fabricQCInspection" | "fabricStockLedger" | "dyeingOrder" | "dyeingQcTransfer" | "departmentWorkItem" | "departmentWorkTransfer" | "workItemAllocation" | "workItemInspection" | "fabricInward" | "fabricOutward" | "deadlineAlert" | "deadlineAlertDismissal" | "packingAllocation" | "garmentImage" | "manualMigration"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -7232,80 +7216,6 @@ export namespace Prisma {
           }
         }
       }
-      StockImport: {
-        payload: Prisma.$StockImportPayload<ExtArgs>
-        fields: Prisma.StockImportFieldRefs
-        operations: {
-          findUnique: {
-            args: Prisma.StockImportFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StockImportPayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.StockImportFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StockImportPayload>
-          }
-          findFirst: {
-            args: Prisma.StockImportFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StockImportPayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.StockImportFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StockImportPayload>
-          }
-          findMany: {
-            args: Prisma.StockImportFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StockImportPayload>[]
-          }
-          create: {
-            args: Prisma.StockImportCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StockImportPayload>
-          }
-          createMany: {
-            args: Prisma.StockImportCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          createManyAndReturn: {
-            args: Prisma.StockImportCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StockImportPayload>[]
-          }
-          delete: {
-            args: Prisma.StockImportDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StockImportPayload>
-          }
-          update: {
-            args: Prisma.StockImportUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StockImportPayload>
-          }
-          deleteMany: {
-            args: Prisma.StockImportDeleteManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateMany: {
-            args: Prisma.StockImportUpdateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateManyAndReturn: {
-            args: Prisma.StockImportUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StockImportPayload>[]
-          }
-          upsert: {
-            args: Prisma.StockImportUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$StockImportPayload>
-          }
-          aggregate: {
-            args: Prisma.StockImportAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateStockImport>
-          }
-          groupBy: {
-            args: Prisma.StockImportGroupByArgs<ExtArgs>
-            result: $Utils.Optional<StockImportGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.StockImportCountArgs<ExtArgs>
-            result: $Utils.Optional<StockImportCountAggregateOutputType> | number
-          }
-        }
-      }
       ManualMigration: {
         payload: Prisma.$ManualMigrationPayload<ExtArgs>
         fields: Prisma.ManualMigrationFieldRefs
@@ -7548,7 +7458,6 @@ export namespace Prisma {
     deadlineAlertDismissal?: DeadlineAlertDismissalOmit
     packingAllocation?: PackingAllocationOmit
     garmentImage?: GarmentImageOmit
-    stockImport?: StockImportOmit
     manualMigration?: ManualMigrationOmit
   }
 
@@ -76571,11 +76480,13 @@ export namespace Prisma {
   export type FabricBatchAvgAggregateOutputType = {
     totalRolls: number | null
     totalMeters: Decimal | null
+    totalPieces: Decimal | null
   }
 
   export type FabricBatchSumAggregateOutputType = {
     totalRolls: number | null
     totalMeters: Decimal | null
+    totalPieces: Decimal | null
   }
 
   export type FabricBatchMinAggregateOutputType = {
@@ -76589,6 +76500,7 @@ export namespace Prisma {
     colorName: string | null
     totalRolls: number | null
     totalMeters: Decimal | null
+    totalPieces: Decimal | null
     status: $Enums.FabricBatchStatus | null
     receivedAt: Date | null
     createdById: string | null
@@ -76607,6 +76519,7 @@ export namespace Prisma {
     colorName: string | null
     totalRolls: number | null
     totalMeters: Decimal | null
+    totalPieces: Decimal | null
     status: $Enums.FabricBatchStatus | null
     receivedAt: Date | null
     createdById: string | null
@@ -76625,6 +76538,7 @@ export namespace Prisma {
     colorName: number
     totalRolls: number
     totalMeters: number
+    totalPieces: number
     status: number
     receivedAt: number
     createdById: number
@@ -76637,11 +76551,13 @@ export namespace Prisma {
   export type FabricBatchAvgAggregateInputType = {
     totalRolls?: true
     totalMeters?: true
+    totalPieces?: true
   }
 
   export type FabricBatchSumAggregateInputType = {
     totalRolls?: true
     totalMeters?: true
+    totalPieces?: true
   }
 
   export type FabricBatchMinAggregateInputType = {
@@ -76655,6 +76571,7 @@ export namespace Prisma {
     colorName?: true
     totalRolls?: true
     totalMeters?: true
+    totalPieces?: true
     status?: true
     receivedAt?: true
     createdById?: true
@@ -76673,6 +76590,7 @@ export namespace Prisma {
     colorName?: true
     totalRolls?: true
     totalMeters?: true
+    totalPieces?: true
     status?: true
     receivedAt?: true
     createdById?: true
@@ -76691,6 +76609,7 @@ export namespace Prisma {
     colorName?: true
     totalRolls?: true
     totalMeters?: true
+    totalPieces?: true
     status?: true
     receivedAt?: true
     createdById?: true
@@ -76796,6 +76715,7 @@ export namespace Prisma {
     colorName: string | null
     totalRolls: number
     totalMeters: Decimal
+    totalPieces: Decimal
     status: $Enums.FabricBatchStatus
     receivedAt: Date | null
     createdById: string
@@ -76833,6 +76753,7 @@ export namespace Prisma {
     colorName?: boolean
     totalRolls?: boolean
     totalMeters?: boolean
+    totalPieces?: boolean
     status?: boolean
     receivedAt?: boolean
     createdById?: boolean
@@ -76857,6 +76778,7 @@ export namespace Prisma {
     colorName?: boolean
     totalRolls?: boolean
     totalMeters?: boolean
+    totalPieces?: boolean
     status?: boolean
     receivedAt?: boolean
     createdById?: boolean
@@ -76877,6 +76799,7 @@ export namespace Prisma {
     colorName?: boolean
     totalRolls?: boolean
     totalMeters?: boolean
+    totalPieces?: boolean
     status?: boolean
     receivedAt?: boolean
     createdById?: boolean
@@ -76897,6 +76820,7 @@ export namespace Prisma {
     colorName?: boolean
     totalRolls?: boolean
     totalMeters?: boolean
+    totalPieces?: boolean
     status?: boolean
     receivedAt?: boolean
     createdById?: boolean
@@ -76904,7 +76828,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type FabricBatchOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "batchNumber" | "programId" | "supplierId" | "fabricType" | "fabricDescription" | "colorCode" | "colorName" | "totalRolls" | "totalMeters" | "status" | "receivedAt" | "createdById" | "createdAt" | "updatedAt", ExtArgs["result"]["fabricBatch"]>
+  export type FabricBatchOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "batchNumber" | "programId" | "supplierId" | "fabricType" | "fabricDescription" | "colorCode" | "colorName" | "totalRolls" | "totalMeters" | "totalPieces" | "status" | "receivedAt" | "createdById" | "createdAt" | "updatedAt", ExtArgs["result"]["fabricBatch"]>
   export type FabricBatchInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     program?: boolean | FabricBatch$programArgs<ExtArgs>
     createdBy?: boolean | UserDefaultArgs<ExtArgs>
@@ -76942,6 +76866,7 @@ export namespace Prisma {
       colorName: string | null
       totalRolls: number
       totalMeters: Prisma.Decimal
+      totalPieces: Prisma.Decimal
       status: $Enums.FabricBatchStatus
       receivedAt: Date | null
       createdById: string
@@ -77385,6 +77310,7 @@ export namespace Prisma {
     readonly colorName: FieldRef<"FabricBatch", 'String'>
     readonly totalRolls: FieldRef<"FabricBatch", 'Int'>
     readonly totalMeters: FieldRef<"FabricBatch", 'Decimal'>
+    readonly totalPieces: FieldRef<"FabricBatch", 'Decimal'>
     readonly status: FieldRef<"FabricBatch", 'FabricBatchStatus'>
     readonly receivedAt: FieldRef<"FabricBatch", 'DateTime'>
     readonly createdById: FieldRef<"FabricBatch", 'String'>
@@ -77925,6 +77851,7 @@ export namespace Prisma {
     batchId: string | null
     locationId: string | null
     length: Decimal | null
+    unit: string | null
     width: Decimal | null
     weight: Decimal | null
     status: $Enums.FabricRollStatus | null
@@ -77944,6 +77871,7 @@ export namespace Prisma {
     batchId: string | null
     locationId: string | null
     length: Decimal | null
+    unit: string | null
     width: Decimal | null
     weight: Decimal | null
     status: $Enums.FabricRollStatus | null
@@ -77963,6 +77891,7 @@ export namespace Prisma {
     batchId: number
     locationId: number
     length: number
+    unit: number
     width: number
     weight: number
     status: number
@@ -77996,6 +77925,7 @@ export namespace Prisma {
     batchId?: true
     locationId?: true
     length?: true
+    unit?: true
     width?: true
     weight?: true
     status?: true
@@ -78015,6 +77945,7 @@ export namespace Prisma {
     batchId?: true
     locationId?: true
     length?: true
+    unit?: true
     width?: true
     weight?: true
     status?: true
@@ -78034,6 +77965,7 @@ export namespace Prisma {
     batchId?: true
     locationId?: true
     length?: true
+    unit?: true
     width?: true
     weight?: true
     status?: true
@@ -78140,6 +78072,7 @@ export namespace Prisma {
     batchId: string
     locationId: string | null
     length: Decimal
+    unit: string
     width: Decimal | null
     weight: Decimal | null
     status: $Enums.FabricRollStatus
@@ -78178,6 +78111,7 @@ export namespace Prisma {
     batchId?: boolean
     locationId?: boolean
     length?: boolean
+    unit?: boolean
     width?: boolean
     weight?: boolean
     status?: boolean
@@ -78205,6 +78139,7 @@ export namespace Prisma {
     batchId?: boolean
     locationId?: boolean
     length?: boolean
+    unit?: boolean
     width?: boolean
     weight?: boolean
     status?: boolean
@@ -78228,6 +78163,7 @@ export namespace Prisma {
     batchId?: boolean
     locationId?: boolean
     length?: boolean
+    unit?: boolean
     width?: boolean
     weight?: boolean
     status?: boolean
@@ -78251,6 +78187,7 @@ export namespace Prisma {
     batchId?: boolean
     locationId?: boolean
     length?: boolean
+    unit?: boolean
     width?: boolean
     weight?: boolean
     status?: boolean
@@ -78264,7 +78201,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type FabricStoreRollOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "rollNumber" | "batchId" | "locationId" | "length" | "width" | "weight" | "status" | "qcStatus" | "qcInspectedById" | "qcInspectedAt" | "qcRemarks" | "programIssuedToId" | "issuedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["fabricStoreRoll"]>
+  export type FabricStoreRollOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "rollNumber" | "batchId" | "locationId" | "length" | "unit" | "width" | "weight" | "status" | "qcStatus" | "qcInspectedById" | "qcInspectedAt" | "qcRemarks" | "programIssuedToId" | "issuedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["fabricStoreRoll"]>
   export type FabricStoreRollInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     batch?: boolean | FabricBatchDefaultArgs<ExtArgs>
     location?: boolean | FabricStoreRoll$locationArgs<ExtArgs>
@@ -78305,6 +78242,7 @@ export namespace Prisma {
       batchId: string
       locationId: string | null
       length: Prisma.Decimal
+      unit: string
       width: Prisma.Decimal | null
       weight: Prisma.Decimal | null
       status: $Enums.FabricRollStatus
@@ -78751,6 +78689,7 @@ export namespace Prisma {
     readonly batchId: FieldRef<"FabricStoreRoll", 'String'>
     readonly locationId: FieldRef<"FabricStoreRoll", 'String'>
     readonly length: FieldRef<"FabricStoreRoll", 'Decimal'>
+    readonly unit: FieldRef<"FabricStoreRoll", 'String'>
     readonly width: FieldRef<"FabricStoreRoll", 'Decimal'>
     readonly weight: FieldRef<"FabricStoreRoll", 'Decimal'>
     readonly status: FieldRef<"FabricStoreRoll", 'FabricRollStatus'>
@@ -79320,11 +79259,13 @@ export namespace Prisma {
   export type MaterialReceiptAvgAggregateOutputType = {
     totalRollsReceived: number | null
     totalMetersReceived: Decimal | null
+    totalPiecesReceived: Decimal | null
   }
 
   export type MaterialReceiptSumAggregateOutputType = {
     totalRollsReceived: number | null
     totalMetersReceived: Decimal | null
+    totalPiecesReceived: Decimal | null
   }
 
   export type MaterialReceiptMinAggregateOutputType = {
@@ -79338,6 +79279,7 @@ export namespace Prisma {
     supplierName: string | null
     totalRollsReceived: number | null
     totalMetersReceived: Decimal | null
+    totalPiecesReceived: Decimal | null
     status: $Enums.GRNStatus | null
     remarks: string | null
     createdAt: Date | null
@@ -79355,6 +79297,7 @@ export namespace Prisma {
     supplierName: string | null
     totalRollsReceived: number | null
     totalMetersReceived: Decimal | null
+    totalPiecesReceived: Decimal | null
     status: $Enums.GRNStatus | null
     remarks: string | null
     createdAt: Date | null
@@ -79372,6 +79315,7 @@ export namespace Prisma {
     supplierName: number
     totalRollsReceived: number
     totalMetersReceived: number
+    totalPiecesReceived: number
     status: number
     remarks: number
     createdAt: number
@@ -79383,11 +79327,13 @@ export namespace Prisma {
   export type MaterialReceiptAvgAggregateInputType = {
     totalRollsReceived?: true
     totalMetersReceived?: true
+    totalPiecesReceived?: true
   }
 
   export type MaterialReceiptSumAggregateInputType = {
     totalRollsReceived?: true
     totalMetersReceived?: true
+    totalPiecesReceived?: true
   }
 
   export type MaterialReceiptMinAggregateInputType = {
@@ -79401,6 +79347,7 @@ export namespace Prisma {
     supplierName?: true
     totalRollsReceived?: true
     totalMetersReceived?: true
+    totalPiecesReceived?: true
     status?: true
     remarks?: true
     createdAt?: true
@@ -79418,6 +79365,7 @@ export namespace Prisma {
     supplierName?: true
     totalRollsReceived?: true
     totalMetersReceived?: true
+    totalPiecesReceived?: true
     status?: true
     remarks?: true
     createdAt?: true
@@ -79435,6 +79383,7 @@ export namespace Prisma {
     supplierName?: true
     totalRollsReceived?: true
     totalMetersReceived?: true
+    totalPiecesReceived?: true
     status?: true
     remarks?: true
     createdAt?: true
@@ -79539,6 +79488,7 @@ export namespace Prisma {
     supplierName: string
     totalRollsReceived: number
     totalMetersReceived: Decimal
+    totalPiecesReceived: Decimal
     status: $Enums.GRNStatus
     remarks: string | null
     createdAt: Date
@@ -79575,6 +79525,7 @@ export namespace Prisma {
     supplierName?: boolean
     totalRollsReceived?: boolean
     totalMetersReceived?: boolean
+    totalPiecesReceived?: boolean
     status?: boolean
     remarks?: boolean
     createdAt?: boolean
@@ -79596,6 +79547,7 @@ export namespace Prisma {
     supplierName?: boolean
     totalRollsReceived?: boolean
     totalMetersReceived?: boolean
+    totalPiecesReceived?: boolean
     status?: boolean
     remarks?: boolean
     createdAt?: boolean
@@ -79615,6 +79567,7 @@ export namespace Prisma {
     supplierName?: boolean
     totalRollsReceived?: boolean
     totalMetersReceived?: boolean
+    totalPiecesReceived?: boolean
     status?: boolean
     remarks?: boolean
     createdAt?: boolean
@@ -79634,13 +79587,14 @@ export namespace Prisma {
     supplierName?: boolean
     totalRollsReceived?: boolean
     totalMetersReceived?: boolean
+    totalPiecesReceived?: boolean
     status?: boolean
     remarks?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type MaterialReceiptOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "grnNumber" | "batchId" | "challanId" | "receivedById" | "receivedAt" | "vehicleNumber" | "supplierName" | "totalRollsReceived" | "totalMetersReceived" | "status" | "remarks" | "createdAt" | "updatedAt", ExtArgs["result"]["materialReceipt"]>
+  export type MaterialReceiptOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "grnNumber" | "batchId" | "challanId" | "receivedById" | "receivedAt" | "vehicleNumber" | "supplierName" | "totalRollsReceived" | "totalMetersReceived" | "totalPiecesReceived" | "status" | "remarks" | "createdAt" | "updatedAt", ExtArgs["result"]["materialReceipt"]>
   export type MaterialReceiptInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     batch?: boolean | FabricBatchDefaultArgs<ExtArgs>
     receivedBy?: boolean | UserDefaultArgs<ExtArgs>
@@ -79674,6 +79628,7 @@ export namespace Prisma {
       supplierName: string
       totalRollsReceived: number
       totalMetersReceived: Prisma.Decimal
+      totalPiecesReceived: Prisma.Decimal
       status: $Enums.GRNStatus
       remarks: string | null
       createdAt: Date
@@ -80114,6 +80069,7 @@ export namespace Prisma {
     readonly supplierName: FieldRef<"MaterialReceipt", 'String'>
     readonly totalRollsReceived: FieldRef<"MaterialReceipt", 'Int'>
     readonly totalMetersReceived: FieldRef<"MaterialReceipt", 'Decimal'>
+    readonly totalPiecesReceived: FieldRef<"MaterialReceipt", 'Decimal'>
     readonly status: FieldRef<"MaterialReceipt", 'GRNStatus'>
     readonly remarks: FieldRef<"MaterialReceipt", 'String'>
     readonly createdAt: FieldRef<"MaterialReceipt", 'DateTime'>
@@ -82840,6 +82796,7 @@ export namespace Prisma {
     batchId: string | null
     transactionType: $Enums.StockTransactionType | null
     quantity: Decimal | null
+    uom: string | null
     referenceType: string | null
     referenceId: string | null
     fromLocationId: string | null
@@ -82857,6 +82814,7 @@ export namespace Prisma {
     batchId: string | null
     transactionType: $Enums.StockTransactionType | null
     quantity: Decimal | null
+    uom: string | null
     referenceType: string | null
     referenceId: string | null
     fromLocationId: string | null
@@ -82874,6 +82832,7 @@ export namespace Prisma {
     batchId: number
     transactionType: number
     quantity: number
+    uom: number
     referenceType: number
     referenceId: number
     fromLocationId: number
@@ -82901,6 +82860,7 @@ export namespace Prisma {
     batchId?: true
     transactionType?: true
     quantity?: true
+    uom?: true
     referenceType?: true
     referenceId?: true
     fromLocationId?: true
@@ -82918,6 +82878,7 @@ export namespace Prisma {
     batchId?: true
     transactionType?: true
     quantity?: true
+    uom?: true
     referenceType?: true
     referenceId?: true
     fromLocationId?: true
@@ -82935,6 +82896,7 @@ export namespace Prisma {
     batchId?: true
     transactionType?: true
     quantity?: true
+    uom?: true
     referenceType?: true
     referenceId?: true
     fromLocationId?: true
@@ -83039,6 +83001,7 @@ export namespace Prisma {
     batchId: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal
+    uom: string
     referenceType: string
     referenceId: string
     fromLocationId: string | null
@@ -83075,6 +83038,7 @@ export namespace Prisma {
     batchId?: boolean
     transactionType?: boolean
     quantity?: boolean
+    uom?: boolean
     referenceType?: boolean
     referenceId?: boolean
     fromLocationId?: boolean
@@ -83097,6 +83061,7 @@ export namespace Prisma {
     batchId?: boolean
     transactionType?: boolean
     quantity?: boolean
+    uom?: boolean
     referenceType?: boolean
     referenceId?: boolean
     fromLocationId?: boolean
@@ -83119,6 +83084,7 @@ export namespace Prisma {
     batchId?: boolean
     transactionType?: boolean
     quantity?: boolean
+    uom?: boolean
     referenceType?: boolean
     referenceId?: boolean
     fromLocationId?: boolean
@@ -83141,6 +83107,7 @@ export namespace Prisma {
     batchId?: boolean
     transactionType?: boolean
     quantity?: boolean
+    uom?: boolean
     referenceType?: boolean
     referenceId?: boolean
     fromLocationId?: boolean
@@ -83151,7 +83118,7 @@ export namespace Prisma {
     createdAt?: boolean
   }
 
-  export type FabricStockLedgerOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "entryNumber" | "rollId" | "batchId" | "transactionType" | "quantity" | "referenceType" | "referenceId" | "fromLocationId" | "toLocationId" | "transactedById" | "transactedAt" | "remarks" | "createdAt", ExtArgs["result"]["fabricStockLedger"]>
+  export type FabricStockLedgerOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "entryNumber" | "rollId" | "batchId" | "transactionType" | "quantity" | "uom" | "referenceType" | "referenceId" | "fromLocationId" | "toLocationId" | "transactedById" | "transactedAt" | "remarks" | "createdAt", ExtArgs["result"]["fabricStockLedger"]>
   export type FabricStockLedgerInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     roll?: boolean | FabricStoreRollDefaultArgs<ExtArgs>
     batch?: boolean | FabricBatchDefaultArgs<ExtArgs>
@@ -83190,6 +83157,7 @@ export namespace Prisma {
       batchId: string
       transactionType: $Enums.StockTransactionType
       quantity: Prisma.Decimal
+      uom: string
       referenceType: string
       referenceId: string
       fromLocationId: string | null
@@ -83632,6 +83600,7 @@ export namespace Prisma {
     readonly batchId: FieldRef<"FabricStockLedger", 'String'>
     readonly transactionType: FieldRef<"FabricStockLedger", 'StockTransactionType'>
     readonly quantity: FieldRef<"FabricStockLedger", 'Decimal'>
+    readonly uom: FieldRef<"FabricStockLedger", 'String'>
     readonly referenceType: FieldRef<"FabricStockLedger", 'String'>
     readonly referenceId: FieldRef<"FabricStockLedger", 'String'>
     readonly fromLocationId: FieldRef<"FabricStockLedger", 'String'>
@@ -99856,1243 +99825,6 @@ export namespace Prisma {
 
 
   /**
-   * Model StockImport
-   */
-
-  export type AggregateStockImport = {
-    _count: StockImportCountAggregateOutputType | null
-    _avg: StockImportAvgAggregateOutputType | null
-    _sum: StockImportSumAggregateOutputType | null
-    _min: StockImportMinAggregateOutputType | null
-    _max: StockImportMaxAggregateOutputType | null
-  }
-
-  export type StockImportAvgAggregateOutputType = {
-    fileSize: number | null
-    rowCount: number | null
-    addedCount: number | null
-    skippedCount: number | null
-  }
-
-  export type StockImportSumAggregateOutputType = {
-    fileSize: number | null
-    rowCount: number | null
-    addedCount: number | null
-    skippedCount: number | null
-  }
-
-  export type StockImportMinAggregateOutputType = {
-    id: string | null
-    source: string | null
-    fileName: string | null
-    mimeType: string | null
-    fileSize: number | null
-    fileHash: string | null
-    fileData: Bytes | null
-    status: string | null
-    rowCount: number | null
-    engine: string | null
-    uploadedById: string | null
-    uploadedAt: Date | null
-    confirmKey: string | null
-    confirmedById: string | null
-    confirmedAt: Date | null
-    addedCount: number | null
-    skippedCount: number | null
-    updatedAt: Date | null
-  }
-
-  export type StockImportMaxAggregateOutputType = {
-    id: string | null
-    source: string | null
-    fileName: string | null
-    mimeType: string | null
-    fileSize: number | null
-    fileHash: string | null
-    fileData: Bytes | null
-    status: string | null
-    rowCount: number | null
-    engine: string | null
-    uploadedById: string | null
-    uploadedAt: Date | null
-    confirmKey: string | null
-    confirmedById: string | null
-    confirmedAt: Date | null
-    addedCount: number | null
-    skippedCount: number | null
-    updatedAt: Date | null
-  }
-
-  export type StockImportCountAggregateOutputType = {
-    id: number
-    source: number
-    fileName: number
-    mimeType: number
-    fileSize: number
-    fileHash: number
-    fileData: number
-    status: number
-    extractedJson: number
-    rowCount: number
-    engine: number
-    uploadedById: number
-    uploadedAt: number
-    confirmKey: number
-    confirmedById: number
-    confirmedAt: number
-    confirmedJson: number
-    resultJson: number
-    addedCount: number
-    skippedCount: number
-    updatedAt: number
-    _all: number
-  }
-
-
-  export type StockImportAvgAggregateInputType = {
-    fileSize?: true
-    rowCount?: true
-    addedCount?: true
-    skippedCount?: true
-  }
-
-  export type StockImportSumAggregateInputType = {
-    fileSize?: true
-    rowCount?: true
-    addedCount?: true
-    skippedCount?: true
-  }
-
-  export type StockImportMinAggregateInputType = {
-    id?: true
-    source?: true
-    fileName?: true
-    mimeType?: true
-    fileSize?: true
-    fileHash?: true
-    fileData?: true
-    status?: true
-    rowCount?: true
-    engine?: true
-    uploadedById?: true
-    uploadedAt?: true
-    confirmKey?: true
-    confirmedById?: true
-    confirmedAt?: true
-    addedCount?: true
-    skippedCount?: true
-    updatedAt?: true
-  }
-
-  export type StockImportMaxAggregateInputType = {
-    id?: true
-    source?: true
-    fileName?: true
-    mimeType?: true
-    fileSize?: true
-    fileHash?: true
-    fileData?: true
-    status?: true
-    rowCount?: true
-    engine?: true
-    uploadedById?: true
-    uploadedAt?: true
-    confirmKey?: true
-    confirmedById?: true
-    confirmedAt?: true
-    addedCount?: true
-    skippedCount?: true
-    updatedAt?: true
-  }
-
-  export type StockImportCountAggregateInputType = {
-    id?: true
-    source?: true
-    fileName?: true
-    mimeType?: true
-    fileSize?: true
-    fileHash?: true
-    fileData?: true
-    status?: true
-    extractedJson?: true
-    rowCount?: true
-    engine?: true
-    uploadedById?: true
-    uploadedAt?: true
-    confirmKey?: true
-    confirmedById?: true
-    confirmedAt?: true
-    confirmedJson?: true
-    resultJson?: true
-    addedCount?: true
-    skippedCount?: true
-    updatedAt?: true
-    _all?: true
-  }
-
-  export type StockImportAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which StockImport to aggregate.
-     */
-    where?: StockImportWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of StockImports to fetch.
-     */
-    orderBy?: StockImportOrderByWithRelationInput | StockImportOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: StockImportWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` StockImports from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` StockImports.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned StockImports
-    **/
-    _count?: true | StockImportCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to average
-    **/
-    _avg?: StockImportAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: StockImportSumAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: StockImportMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: StockImportMaxAggregateInputType
-  }
-
-  export type GetStockImportAggregateType<T extends StockImportAggregateArgs> = {
-        [P in keyof T & keyof AggregateStockImport]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregateStockImport[P]>
-      : GetScalarType<T[P], AggregateStockImport[P]>
-  }
-
-
-
-
-  export type StockImportGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: StockImportWhereInput
-    orderBy?: StockImportOrderByWithAggregationInput | StockImportOrderByWithAggregationInput[]
-    by: StockImportScalarFieldEnum[] | StockImportScalarFieldEnum
-    having?: StockImportScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: StockImportCountAggregateInputType | true
-    _avg?: StockImportAvgAggregateInputType
-    _sum?: StockImportSumAggregateInputType
-    _min?: StockImportMinAggregateInputType
-    _max?: StockImportMaxAggregateInputType
-  }
-
-  export type StockImportGroupByOutputType = {
-    id: string
-    source: string
-    fileName: string
-    mimeType: string
-    fileSize: number
-    fileHash: string
-    fileData: Bytes
-    status: string
-    extractedJson: JsonValue | null
-    rowCount: number
-    engine: string | null
-    uploadedById: string
-    uploadedAt: Date
-    confirmKey: string | null
-    confirmedById: string | null
-    confirmedAt: Date | null
-    confirmedJson: JsonValue | null
-    resultJson: JsonValue | null
-    addedCount: number
-    skippedCount: number
-    updatedAt: Date
-    _count: StockImportCountAggregateOutputType | null
-    _avg: StockImportAvgAggregateOutputType | null
-    _sum: StockImportSumAggregateOutputType | null
-    _min: StockImportMinAggregateOutputType | null
-    _max: StockImportMaxAggregateOutputType | null
-  }
-
-  type GetStockImportGroupByPayload<T extends StockImportGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickEnumerable<StockImportGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof StockImportGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], StockImportGroupByOutputType[P]>
-            : GetScalarType<T[P], StockImportGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type StockImportSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    source?: boolean
-    fileName?: boolean
-    mimeType?: boolean
-    fileSize?: boolean
-    fileHash?: boolean
-    fileData?: boolean
-    status?: boolean
-    extractedJson?: boolean
-    rowCount?: boolean
-    engine?: boolean
-    uploadedById?: boolean
-    uploadedAt?: boolean
-    confirmKey?: boolean
-    confirmedById?: boolean
-    confirmedAt?: boolean
-    confirmedJson?: boolean
-    resultJson?: boolean
-    addedCount?: boolean
-    skippedCount?: boolean
-    updatedAt?: boolean
-  }, ExtArgs["result"]["stockImport"]>
-
-  export type StockImportSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    source?: boolean
-    fileName?: boolean
-    mimeType?: boolean
-    fileSize?: boolean
-    fileHash?: boolean
-    fileData?: boolean
-    status?: boolean
-    extractedJson?: boolean
-    rowCount?: boolean
-    engine?: boolean
-    uploadedById?: boolean
-    uploadedAt?: boolean
-    confirmKey?: boolean
-    confirmedById?: boolean
-    confirmedAt?: boolean
-    confirmedJson?: boolean
-    resultJson?: boolean
-    addedCount?: boolean
-    skippedCount?: boolean
-    updatedAt?: boolean
-  }, ExtArgs["result"]["stockImport"]>
-
-  export type StockImportSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    source?: boolean
-    fileName?: boolean
-    mimeType?: boolean
-    fileSize?: boolean
-    fileHash?: boolean
-    fileData?: boolean
-    status?: boolean
-    extractedJson?: boolean
-    rowCount?: boolean
-    engine?: boolean
-    uploadedById?: boolean
-    uploadedAt?: boolean
-    confirmKey?: boolean
-    confirmedById?: boolean
-    confirmedAt?: boolean
-    confirmedJson?: boolean
-    resultJson?: boolean
-    addedCount?: boolean
-    skippedCount?: boolean
-    updatedAt?: boolean
-  }, ExtArgs["result"]["stockImport"]>
-
-  export type StockImportSelectScalar = {
-    id?: boolean
-    source?: boolean
-    fileName?: boolean
-    mimeType?: boolean
-    fileSize?: boolean
-    fileHash?: boolean
-    fileData?: boolean
-    status?: boolean
-    extractedJson?: boolean
-    rowCount?: boolean
-    engine?: boolean
-    uploadedById?: boolean
-    uploadedAt?: boolean
-    confirmKey?: boolean
-    confirmedById?: boolean
-    confirmedAt?: boolean
-    confirmedJson?: boolean
-    resultJson?: boolean
-    addedCount?: boolean
-    skippedCount?: boolean
-    updatedAt?: boolean
-  }
-
-  export type StockImportOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "source" | "fileName" | "mimeType" | "fileSize" | "fileHash" | "fileData" | "status" | "extractedJson" | "rowCount" | "engine" | "uploadedById" | "uploadedAt" | "confirmKey" | "confirmedById" | "confirmedAt" | "confirmedJson" | "resultJson" | "addedCount" | "skippedCount" | "updatedAt", ExtArgs["result"]["stockImport"]>
-
-  export type $StockImportPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "StockImport"
-    objects: {}
-    scalars: $Extensions.GetPayloadResult<{
-      id: string
-      source: string
-      fileName: string
-      mimeType: string
-      fileSize: number
-      fileHash: string
-      fileData: Prisma.Bytes
-      status: string
-      extractedJson: Prisma.JsonValue | null
-      rowCount: number
-      engine: string | null
-      uploadedById: string
-      uploadedAt: Date
-      confirmKey: string | null
-      confirmedById: string | null
-      confirmedAt: Date | null
-      confirmedJson: Prisma.JsonValue | null
-      resultJson: Prisma.JsonValue | null
-      addedCount: number
-      skippedCount: number
-      updatedAt: Date
-    }, ExtArgs["result"]["stockImport"]>
-    composites: {}
-  }
-
-  type StockImportGetPayload<S extends boolean | null | undefined | StockImportDefaultArgs> = $Result.GetResult<Prisma.$StockImportPayload, S>
-
-  type StockImportCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<StockImportFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: StockImportCountAggregateInputType | true
-    }
-
-  export interface StockImportDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['StockImport'], meta: { name: 'StockImport' } }
-    /**
-     * Find zero or one StockImport that matches the filter.
-     * @param {StockImportFindUniqueArgs} args - Arguments to find a StockImport
-     * @example
-     * // Get one StockImport
-     * const stockImport = await prisma.stockImport.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUnique<T extends StockImportFindUniqueArgs>(args: SelectSubset<T, StockImportFindUniqueArgs<ExtArgs>>): Prisma__StockImportClient<$Result.GetResult<Prisma.$StockImportPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find one StockImport that matches the filter or throw an error with `error.code='P2025'`
-     * if no matches were found.
-     * @param {StockImportFindUniqueOrThrowArgs} args - Arguments to find a StockImport
-     * @example
-     * // Get one StockImport
-     * const stockImport = await prisma.stockImport.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUniqueOrThrow<T extends StockImportFindUniqueOrThrowArgs>(args: SelectSubset<T, StockImportFindUniqueOrThrowArgs<ExtArgs>>): Prisma__StockImportClient<$Result.GetResult<Prisma.$StockImportPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first StockImport that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {StockImportFindFirstArgs} args - Arguments to find a StockImport
-     * @example
-     * // Get one StockImport
-     * const stockImport = await prisma.stockImport.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirst<T extends StockImportFindFirstArgs>(args?: SelectSubset<T, StockImportFindFirstArgs<ExtArgs>>): Prisma__StockImportClient<$Result.GetResult<Prisma.$StockImportPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first StockImport that matches the filter or
-     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {StockImportFindFirstOrThrowArgs} args - Arguments to find a StockImport
-     * @example
-     * // Get one StockImport
-     * const stockImport = await prisma.stockImport.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirstOrThrow<T extends StockImportFindFirstOrThrowArgs>(args?: SelectSubset<T, StockImportFindFirstOrThrowArgs<ExtArgs>>): Prisma__StockImportClient<$Result.GetResult<Prisma.$StockImportPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find zero or more StockImports that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {StockImportFindManyArgs} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all StockImports
-     * const stockImports = await prisma.stockImport.findMany()
-     * 
-     * // Get first 10 StockImports
-     * const stockImports = await prisma.stockImport.findMany({ take: 10 })
-     * 
-     * // Only select the `id`
-     * const stockImportWithIdOnly = await prisma.stockImport.findMany({ select: { id: true } })
-     * 
-     */
-    findMany<T extends StockImportFindManyArgs>(args?: SelectSubset<T, StockImportFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StockImportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
-
-    /**
-     * Create a StockImport.
-     * @param {StockImportCreateArgs} args - Arguments to create a StockImport.
-     * @example
-     * // Create one StockImport
-     * const StockImport = await prisma.stockImport.create({
-     *   data: {
-     *     // ... data to create a StockImport
-     *   }
-     * })
-     * 
-     */
-    create<T extends StockImportCreateArgs>(args: SelectSubset<T, StockImportCreateArgs<ExtArgs>>): Prisma__StockImportClient<$Result.GetResult<Prisma.$StockImportPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Create many StockImports.
-     * @param {StockImportCreateManyArgs} args - Arguments to create many StockImports.
-     * @example
-     * // Create many StockImports
-     * const stockImport = await prisma.stockImport.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends StockImportCreateManyArgs>(args?: SelectSubset<T, StockImportCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create many StockImports and returns the data saved in the database.
-     * @param {StockImportCreateManyAndReturnArgs} args - Arguments to create many StockImports.
-     * @example
-     * // Create many StockImports
-     * const stockImport = await prisma.stockImport.createManyAndReturn({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Create many StockImports and only return the `id`
-     * const stockImportWithIdOnly = await prisma.stockImport.createManyAndReturn({
-     *   select: { id: true },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    createManyAndReturn<T extends StockImportCreateManyAndReturnArgs>(args?: SelectSubset<T, StockImportCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StockImportPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Delete a StockImport.
-     * @param {StockImportDeleteArgs} args - Arguments to delete one StockImport.
-     * @example
-     * // Delete one StockImport
-     * const StockImport = await prisma.stockImport.delete({
-     *   where: {
-     *     // ... filter to delete one StockImport
-     *   }
-     * })
-     * 
-     */
-    delete<T extends StockImportDeleteArgs>(args: SelectSubset<T, StockImportDeleteArgs<ExtArgs>>): Prisma__StockImportClient<$Result.GetResult<Prisma.$StockImportPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Update one StockImport.
-     * @param {StockImportUpdateArgs} args - Arguments to update one StockImport.
-     * @example
-     * // Update one StockImport
-     * const stockImport = await prisma.stockImport.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    update<T extends StockImportUpdateArgs>(args: SelectSubset<T, StockImportUpdateArgs<ExtArgs>>): Prisma__StockImportClient<$Result.GetResult<Prisma.$StockImportPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Delete zero or more StockImports.
-     * @param {StockImportDeleteManyArgs} args - Arguments to filter StockImports to delete.
-     * @example
-     * // Delete a few StockImports
-     * const { count } = await prisma.stockImport.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-     */
-    deleteMany<T extends StockImportDeleteManyArgs>(args?: SelectSubset<T, StockImportDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more StockImports.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {StockImportUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many StockImports
-     * const stockImport = await prisma.stockImport.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    updateMany<T extends StockImportUpdateManyArgs>(args: SelectSubset<T, StockImportUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more StockImports and returns the data updated in the database.
-     * @param {StockImportUpdateManyAndReturnArgs} args - Arguments to update many StockImports.
-     * @example
-     * // Update many StockImports
-     * const stockImport = await prisma.stockImport.updateManyAndReturn({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Update zero or more StockImports and only return the `id`
-     * const stockImportWithIdOnly = await prisma.stockImport.updateManyAndReturn({
-     *   select: { id: true },
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    updateManyAndReturn<T extends StockImportUpdateManyAndReturnArgs>(args: SelectSubset<T, StockImportUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StockImportPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Create or update one StockImport.
-     * @param {StockImportUpsertArgs} args - Arguments to update or create a StockImport.
-     * @example
-     * // Update or create a StockImport
-     * const stockImport = await prisma.stockImport.upsert({
-     *   create: {
-     *     // ... data to create a StockImport
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the StockImport we want to update
-     *   }
-     * })
-     */
-    upsert<T extends StockImportUpsertArgs>(args: SelectSubset<T, StockImportUpsertArgs<ExtArgs>>): Prisma__StockImportClient<$Result.GetResult<Prisma.$StockImportPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-
-    /**
-     * Count the number of StockImports.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {StockImportCountArgs} args - Arguments to filter StockImports to count.
-     * @example
-     * // Count the number of StockImports
-     * const count = await prisma.stockImport.count({
-     *   where: {
-     *     // ... the filter for the StockImports we want to count
-     *   }
-     * })
-    **/
-    count<T extends StockImportCountArgs>(
-      args?: Subset<T, StockImportCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], StockImportCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a StockImport.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {StockImportAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends StockImportAggregateArgs>(args: Subset<T, StockImportAggregateArgs>): Prisma.PrismaPromise<GetStockImportAggregateType<T>>
-
-    /**
-     * Group by StockImport.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {StockImportGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends StockImportGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: StockImportGroupByArgs['orderBy'] }
-        : { orderBy?: StockImportGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends MaybeTupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, StockImportGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetStockImportGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the StockImport model
-   */
-  readonly fields: StockImportFieldRefs;
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for StockImport.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export interface Prisma__StockImportClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
-    readonly [Symbol.toStringTag]: "PrismaPromise"
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-  }
-
-
-
-
-  /**
-   * Fields of the StockImport model
-   */
-  interface StockImportFieldRefs {
-    readonly id: FieldRef<"StockImport", 'String'>
-    readonly source: FieldRef<"StockImport", 'String'>
-    readonly fileName: FieldRef<"StockImport", 'String'>
-    readonly mimeType: FieldRef<"StockImport", 'String'>
-    readonly fileSize: FieldRef<"StockImport", 'Int'>
-    readonly fileHash: FieldRef<"StockImport", 'String'>
-    readonly fileData: FieldRef<"StockImport", 'Bytes'>
-    readonly status: FieldRef<"StockImport", 'String'>
-    readonly extractedJson: FieldRef<"StockImport", 'Json'>
-    readonly rowCount: FieldRef<"StockImport", 'Int'>
-    readonly engine: FieldRef<"StockImport", 'String'>
-    readonly uploadedById: FieldRef<"StockImport", 'String'>
-    readonly uploadedAt: FieldRef<"StockImport", 'DateTime'>
-    readonly confirmKey: FieldRef<"StockImport", 'String'>
-    readonly confirmedById: FieldRef<"StockImport", 'String'>
-    readonly confirmedAt: FieldRef<"StockImport", 'DateTime'>
-    readonly confirmedJson: FieldRef<"StockImport", 'Json'>
-    readonly resultJson: FieldRef<"StockImport", 'Json'>
-    readonly addedCount: FieldRef<"StockImport", 'Int'>
-    readonly skippedCount: FieldRef<"StockImport", 'Int'>
-    readonly updatedAt: FieldRef<"StockImport", 'DateTime'>
-  }
-    
-
-  // Custom InputTypes
-  /**
-   * StockImport findUnique
-   */
-  export type StockImportFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StockImport
-     */
-    select?: StockImportSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StockImport
-     */
-    omit?: StockImportOmit<ExtArgs> | null
-    /**
-     * Filter, which StockImport to fetch.
-     */
-    where: StockImportWhereUniqueInput
-  }
-
-  /**
-   * StockImport findUniqueOrThrow
-   */
-  export type StockImportFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StockImport
-     */
-    select?: StockImportSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StockImport
-     */
-    omit?: StockImportOmit<ExtArgs> | null
-    /**
-     * Filter, which StockImport to fetch.
-     */
-    where: StockImportWhereUniqueInput
-  }
-
-  /**
-   * StockImport findFirst
-   */
-  export type StockImportFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StockImport
-     */
-    select?: StockImportSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StockImport
-     */
-    omit?: StockImportOmit<ExtArgs> | null
-    /**
-     * Filter, which StockImport to fetch.
-     */
-    where?: StockImportWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of StockImports to fetch.
-     */
-    orderBy?: StockImportOrderByWithRelationInput | StockImportOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for StockImports.
-     */
-    cursor?: StockImportWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` StockImports from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` StockImports.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of StockImports.
-     */
-    distinct?: StockImportScalarFieldEnum | StockImportScalarFieldEnum[]
-  }
-
-  /**
-   * StockImport findFirstOrThrow
-   */
-  export type StockImportFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StockImport
-     */
-    select?: StockImportSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StockImport
-     */
-    omit?: StockImportOmit<ExtArgs> | null
-    /**
-     * Filter, which StockImport to fetch.
-     */
-    where?: StockImportWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of StockImports to fetch.
-     */
-    orderBy?: StockImportOrderByWithRelationInput | StockImportOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for StockImports.
-     */
-    cursor?: StockImportWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` StockImports from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` StockImports.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of StockImports.
-     */
-    distinct?: StockImportScalarFieldEnum | StockImportScalarFieldEnum[]
-  }
-
-  /**
-   * StockImport findMany
-   */
-  export type StockImportFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StockImport
-     */
-    select?: StockImportSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StockImport
-     */
-    omit?: StockImportOmit<ExtArgs> | null
-    /**
-     * Filter, which StockImports to fetch.
-     */
-    where?: StockImportWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of StockImports to fetch.
-     */
-    orderBy?: StockImportOrderByWithRelationInput | StockImportOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing StockImports.
-     */
-    cursor?: StockImportWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` StockImports from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` StockImports.
-     */
-    skip?: number
-    distinct?: StockImportScalarFieldEnum | StockImportScalarFieldEnum[]
-  }
-
-  /**
-   * StockImport create
-   */
-  export type StockImportCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StockImport
-     */
-    select?: StockImportSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StockImport
-     */
-    omit?: StockImportOmit<ExtArgs> | null
-    /**
-     * The data needed to create a StockImport.
-     */
-    data: XOR<StockImportCreateInput, StockImportUncheckedCreateInput>
-  }
-
-  /**
-   * StockImport createMany
-   */
-  export type StockImportCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many StockImports.
-     */
-    data: StockImportCreateManyInput | StockImportCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * StockImport createManyAndReturn
-   */
-  export type StockImportCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StockImport
-     */
-    select?: StockImportSelectCreateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the StockImport
-     */
-    omit?: StockImportOmit<ExtArgs> | null
-    /**
-     * The data used to create many StockImports.
-     */
-    data: StockImportCreateManyInput | StockImportCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * StockImport update
-   */
-  export type StockImportUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StockImport
-     */
-    select?: StockImportSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StockImport
-     */
-    omit?: StockImportOmit<ExtArgs> | null
-    /**
-     * The data needed to update a StockImport.
-     */
-    data: XOR<StockImportUpdateInput, StockImportUncheckedUpdateInput>
-    /**
-     * Choose, which StockImport to update.
-     */
-    where: StockImportWhereUniqueInput
-  }
-
-  /**
-   * StockImport updateMany
-   */
-  export type StockImportUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update StockImports.
-     */
-    data: XOR<StockImportUpdateManyMutationInput, StockImportUncheckedUpdateManyInput>
-    /**
-     * Filter which StockImports to update
-     */
-    where?: StockImportWhereInput
-    /**
-     * Limit how many StockImports to update.
-     */
-    limit?: number
-  }
-
-  /**
-   * StockImport updateManyAndReturn
-   */
-  export type StockImportUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StockImport
-     */
-    select?: StockImportSelectUpdateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the StockImport
-     */
-    omit?: StockImportOmit<ExtArgs> | null
-    /**
-     * The data used to update StockImports.
-     */
-    data: XOR<StockImportUpdateManyMutationInput, StockImportUncheckedUpdateManyInput>
-    /**
-     * Filter which StockImports to update
-     */
-    where?: StockImportWhereInput
-    /**
-     * Limit how many StockImports to update.
-     */
-    limit?: number
-  }
-
-  /**
-   * StockImport upsert
-   */
-  export type StockImportUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StockImport
-     */
-    select?: StockImportSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StockImport
-     */
-    omit?: StockImportOmit<ExtArgs> | null
-    /**
-     * The filter to search for the StockImport to update in case it exists.
-     */
-    where: StockImportWhereUniqueInput
-    /**
-     * In case the StockImport found by the `where` argument doesn't exist, create a new StockImport with this data.
-     */
-    create: XOR<StockImportCreateInput, StockImportUncheckedCreateInput>
-    /**
-     * In case the StockImport was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<StockImportUpdateInput, StockImportUncheckedUpdateInput>
-  }
-
-  /**
-   * StockImport delete
-   */
-  export type StockImportDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StockImport
-     */
-    select?: StockImportSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StockImport
-     */
-    omit?: StockImportOmit<ExtArgs> | null
-    /**
-     * Filter which StockImport to delete.
-     */
-    where: StockImportWhereUniqueInput
-  }
-
-  /**
-   * StockImport deleteMany
-   */
-  export type StockImportDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which StockImports to delete
-     */
-    where?: StockImportWhereInput
-    /**
-     * Limit how many StockImports to delete.
-     */
-    limit?: number
-  }
-
-  /**
-   * StockImport without action
-   */
-  export type StockImportDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the StockImport
-     */
-    select?: StockImportSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the StockImport
-     */
-    omit?: StockImportOmit<ExtArgs> | null
-  }
-
-
-  /**
    * Model ManualMigration
    */
 
@@ -103065,6 +101797,7 @@ export namespace Prisma {
     colorName: 'colorName',
     totalRolls: 'totalRolls',
     totalMeters: 'totalMeters',
+    totalPieces: 'totalPieces',
     status: 'status',
     receivedAt: 'receivedAt',
     createdById: 'createdById',
@@ -103081,6 +101814,7 @@ export namespace Prisma {
     batchId: 'batchId',
     locationId: 'locationId',
     length: 'length',
+    unit: 'unit',
     width: 'width',
     weight: 'weight',
     status: 'status',
@@ -103108,6 +101842,7 @@ export namespace Prisma {
     supplierName: 'supplierName',
     totalRollsReceived: 'totalRollsReceived',
     totalMetersReceived: 'totalMetersReceived',
+    totalPiecesReceived: 'totalPiecesReceived',
     status: 'status',
     remarks: 'remarks',
     createdAt: 'createdAt',
@@ -103153,6 +101888,7 @@ export namespace Prisma {
     batchId: 'batchId',
     transactionType: 'transactionType',
     quantity: 'quantity',
+    uom: 'uom',
     referenceType: 'referenceType',
     referenceId: 'referenceId',
     fromLocationId: 'fromLocationId',
@@ -103455,33 +102191,6 @@ export namespace Prisma {
   };
 
   export type GarmentImageScalarFieldEnum = (typeof GarmentImageScalarFieldEnum)[keyof typeof GarmentImageScalarFieldEnum]
-
-
-  export const StockImportScalarFieldEnum: {
-    id: 'id',
-    source: 'source',
-    fileName: 'fileName',
-    mimeType: 'mimeType',
-    fileSize: 'fileSize',
-    fileHash: 'fileHash',
-    fileData: 'fileData',
-    status: 'status',
-    extractedJson: 'extractedJson',
-    rowCount: 'rowCount',
-    engine: 'engine',
-    uploadedById: 'uploadedById',
-    uploadedAt: 'uploadedAt',
-    confirmKey: 'confirmKey',
-    confirmedById: 'confirmedById',
-    confirmedAt: 'confirmedAt',
-    confirmedJson: 'confirmedJson',
-    resultJson: 'resultJson',
-    addedCount: 'addedCount',
-    skippedCount: 'skippedCount',
-    updatedAt: 'updatedAt'
-  };
-
-  export type StockImportScalarFieldEnum = (typeof StockImportScalarFieldEnum)[keyof typeof StockImportScalarFieldEnum]
 
 
   export const ManualMigrationScalarFieldEnum: {
@@ -109169,6 +107878,7 @@ export namespace Prisma {
     colorName?: StringNullableFilter<"FabricBatch"> | string | null
     totalRolls?: IntFilter<"FabricBatch"> | number
     totalMeters?: DecimalFilter<"FabricBatch"> | Decimal | DecimalJsLike | number | string
+    totalPieces?: DecimalFilter<"FabricBatch"> | Decimal | DecimalJsLike | number | string
     status?: EnumFabricBatchStatusFilter<"FabricBatch"> | $Enums.FabricBatchStatus
     receivedAt?: DateTimeNullableFilter<"FabricBatch"> | Date | string | null
     createdById?: StringFilter<"FabricBatch"> | string
@@ -109192,6 +107902,7 @@ export namespace Prisma {
     colorName?: SortOrderInput | SortOrder
     totalRolls?: SortOrder
     totalMeters?: SortOrder
+    totalPieces?: SortOrder
     status?: SortOrder
     receivedAt?: SortOrderInput | SortOrder
     createdById?: SortOrder
@@ -109218,6 +107929,7 @@ export namespace Prisma {
     colorName?: StringNullableFilter<"FabricBatch"> | string | null
     totalRolls?: IntFilter<"FabricBatch"> | number
     totalMeters?: DecimalFilter<"FabricBatch"> | Decimal | DecimalJsLike | number | string
+    totalPieces?: DecimalFilter<"FabricBatch"> | Decimal | DecimalJsLike | number | string
     status?: EnumFabricBatchStatusFilter<"FabricBatch"> | $Enums.FabricBatchStatus
     receivedAt?: DateTimeNullableFilter<"FabricBatch"> | Date | string | null
     createdById?: StringFilter<"FabricBatch"> | string
@@ -109241,6 +107953,7 @@ export namespace Prisma {
     colorName?: SortOrderInput | SortOrder
     totalRolls?: SortOrder
     totalMeters?: SortOrder
+    totalPieces?: SortOrder
     status?: SortOrder
     receivedAt?: SortOrderInput | SortOrder
     createdById?: SortOrder
@@ -109267,6 +107980,7 @@ export namespace Prisma {
     colorName?: StringNullableWithAggregatesFilter<"FabricBatch"> | string | null
     totalRolls?: IntWithAggregatesFilter<"FabricBatch"> | number
     totalMeters?: DecimalWithAggregatesFilter<"FabricBatch"> | Decimal | DecimalJsLike | number | string
+    totalPieces?: DecimalWithAggregatesFilter<"FabricBatch"> | Decimal | DecimalJsLike | number | string
     status?: EnumFabricBatchStatusWithAggregatesFilter<"FabricBatch"> | $Enums.FabricBatchStatus
     receivedAt?: DateTimeNullableWithAggregatesFilter<"FabricBatch"> | Date | string | null
     createdById?: StringWithAggregatesFilter<"FabricBatch"> | string
@@ -109283,6 +107997,7 @@ export namespace Prisma {
     batchId?: StringFilter<"FabricStoreRoll"> | string
     locationId?: StringNullableFilter<"FabricStoreRoll"> | string | null
     length?: DecimalFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string
+    unit?: StringFilter<"FabricStoreRoll"> | string
     width?: DecimalNullableFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string | null
     weight?: DecimalNullableFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFilter<"FabricStoreRoll"> | $Enums.FabricRollStatus
@@ -109309,6 +108024,7 @@ export namespace Prisma {
     batchId?: SortOrder
     locationId?: SortOrderInput | SortOrder
     length?: SortOrder
+    unit?: SortOrder
     width?: SortOrderInput | SortOrder
     weight?: SortOrderInput | SortOrder
     status?: SortOrder
@@ -109338,6 +108054,7 @@ export namespace Prisma {
     batchId?: StringFilter<"FabricStoreRoll"> | string
     locationId?: StringNullableFilter<"FabricStoreRoll"> | string | null
     length?: DecimalFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string
+    unit?: StringFilter<"FabricStoreRoll"> | string
     width?: DecimalNullableFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string | null
     weight?: DecimalNullableFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFilter<"FabricStoreRoll"> | $Enums.FabricRollStatus
@@ -109364,6 +108081,7 @@ export namespace Prisma {
     batchId?: SortOrder
     locationId?: SortOrderInput | SortOrder
     length?: SortOrder
+    unit?: SortOrder
     width?: SortOrderInput | SortOrder
     weight?: SortOrderInput | SortOrder
     status?: SortOrder
@@ -109391,6 +108109,7 @@ export namespace Prisma {
     batchId?: StringWithAggregatesFilter<"FabricStoreRoll"> | string
     locationId?: StringNullableWithAggregatesFilter<"FabricStoreRoll"> | string | null
     length?: DecimalWithAggregatesFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string
+    unit?: StringWithAggregatesFilter<"FabricStoreRoll"> | string
     width?: DecimalNullableWithAggregatesFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string | null
     weight?: DecimalNullableWithAggregatesFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusWithAggregatesFilter<"FabricStoreRoll"> | $Enums.FabricRollStatus
@@ -109418,6 +108137,7 @@ export namespace Prisma {
     supplierName?: StringFilter<"MaterialReceipt"> | string
     totalRollsReceived?: IntFilter<"MaterialReceipt"> | number
     totalMetersReceived?: DecimalFilter<"MaterialReceipt"> | Decimal | DecimalJsLike | number | string
+    totalPiecesReceived?: DecimalFilter<"MaterialReceipt"> | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFilter<"MaterialReceipt"> | $Enums.GRNStatus
     remarks?: StringNullableFilter<"MaterialReceipt"> | string | null
     createdAt?: DateTimeFilter<"MaterialReceipt"> | Date | string
@@ -109438,6 +108158,7 @@ export namespace Prisma {
     supplierName?: SortOrder
     totalRollsReceived?: SortOrder
     totalMetersReceived?: SortOrder
+    totalPiecesReceived?: SortOrder
     status?: SortOrder
     remarks?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -109461,6 +108182,7 @@ export namespace Prisma {
     supplierName?: StringFilter<"MaterialReceipt"> | string
     totalRollsReceived?: IntFilter<"MaterialReceipt"> | number
     totalMetersReceived?: DecimalFilter<"MaterialReceipt"> | Decimal | DecimalJsLike | number | string
+    totalPiecesReceived?: DecimalFilter<"MaterialReceipt"> | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFilter<"MaterialReceipt"> | $Enums.GRNStatus
     remarks?: StringNullableFilter<"MaterialReceipt"> | string | null
     createdAt?: DateTimeFilter<"MaterialReceipt"> | Date | string
@@ -109481,6 +108203,7 @@ export namespace Prisma {
     supplierName?: SortOrder
     totalRollsReceived?: SortOrder
     totalMetersReceived?: SortOrder
+    totalPiecesReceived?: SortOrder
     status?: SortOrder
     remarks?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -109506,6 +108229,7 @@ export namespace Prisma {
     supplierName?: StringWithAggregatesFilter<"MaterialReceipt"> | string
     totalRollsReceived?: IntWithAggregatesFilter<"MaterialReceipt"> | number
     totalMetersReceived?: DecimalWithAggregatesFilter<"MaterialReceipt"> | Decimal | DecimalJsLike | number | string
+    totalPiecesReceived?: DecimalWithAggregatesFilter<"MaterialReceipt"> | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusWithAggregatesFilter<"MaterialReceipt"> | $Enums.GRNStatus
     remarks?: StringNullableWithAggregatesFilter<"MaterialReceipt"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"MaterialReceipt"> | Date | string
@@ -109675,6 +108399,7 @@ export namespace Prisma {
     batchId?: StringFilter<"FabricStockLedger"> | string
     transactionType?: EnumStockTransactionTypeFilter<"FabricStockLedger"> | $Enums.StockTransactionType
     quantity?: DecimalFilter<"FabricStockLedger"> | Decimal | DecimalJsLike | number | string
+    uom?: StringFilter<"FabricStockLedger"> | string
     referenceType?: StringFilter<"FabricStockLedger"> | string
     referenceId?: StringFilter<"FabricStockLedger"> | string
     fromLocationId?: StringNullableFilter<"FabricStockLedger"> | string | null
@@ -109697,6 +108422,7 @@ export namespace Prisma {
     batchId?: SortOrder
     transactionType?: SortOrder
     quantity?: SortOrder
+    uom?: SortOrder
     referenceType?: SortOrder
     referenceId?: SortOrder
     fromLocationId?: SortOrderInput | SortOrder
@@ -109722,6 +108448,7 @@ export namespace Prisma {
     batchId?: StringFilter<"FabricStockLedger"> | string
     transactionType?: EnumStockTransactionTypeFilter<"FabricStockLedger"> | $Enums.StockTransactionType
     quantity?: DecimalFilter<"FabricStockLedger"> | Decimal | DecimalJsLike | number | string
+    uom?: StringFilter<"FabricStockLedger"> | string
     referenceType?: StringFilter<"FabricStockLedger"> | string
     referenceId?: StringFilter<"FabricStockLedger"> | string
     fromLocationId?: StringNullableFilter<"FabricStockLedger"> | string | null
@@ -109744,6 +108471,7 @@ export namespace Prisma {
     batchId?: SortOrder
     transactionType?: SortOrder
     quantity?: SortOrder
+    uom?: SortOrder
     referenceType?: SortOrder
     referenceId?: SortOrder
     fromLocationId?: SortOrderInput | SortOrder
@@ -109769,6 +108497,7 @@ export namespace Prisma {
     batchId?: StringWithAggregatesFilter<"FabricStockLedger"> | string
     transactionType?: EnumStockTransactionTypeWithAggregatesFilter<"FabricStockLedger"> | $Enums.StockTransactionType
     quantity?: DecimalWithAggregatesFilter<"FabricStockLedger"> | Decimal | DecimalJsLike | number | string
+    uom?: StringWithAggregatesFilter<"FabricStockLedger"> | string
     referenceType?: StringWithAggregatesFilter<"FabricStockLedger"> | string
     referenceId?: StringWithAggregatesFilter<"FabricStockLedger"> | string
     fromLocationId?: StringNullableWithAggregatesFilter<"FabricStockLedger"> | string | null
@@ -111337,140 +110066,6 @@ export namespace Prisma {
     uploadedById?: StringNullableWithAggregatesFilter<"GarmentImage"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"GarmentImage"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"GarmentImage"> | Date | string
-  }
-
-  export type StockImportWhereInput = {
-    AND?: StockImportWhereInput | StockImportWhereInput[]
-    OR?: StockImportWhereInput[]
-    NOT?: StockImportWhereInput | StockImportWhereInput[]
-    id?: StringFilter<"StockImport"> | string
-    source?: StringFilter<"StockImport"> | string
-    fileName?: StringFilter<"StockImport"> | string
-    mimeType?: StringFilter<"StockImport"> | string
-    fileSize?: IntFilter<"StockImport"> | number
-    fileHash?: StringFilter<"StockImport"> | string
-    fileData?: BytesFilter<"StockImport"> | Bytes
-    status?: StringFilter<"StockImport"> | string
-    extractedJson?: JsonNullableFilter<"StockImport">
-    rowCount?: IntFilter<"StockImport"> | number
-    engine?: StringNullableFilter<"StockImport"> | string | null
-    uploadedById?: StringFilter<"StockImport"> | string
-    uploadedAt?: DateTimeFilter<"StockImport"> | Date | string
-    confirmKey?: StringNullableFilter<"StockImport"> | string | null
-    confirmedById?: StringNullableFilter<"StockImport"> | string | null
-    confirmedAt?: DateTimeNullableFilter<"StockImport"> | Date | string | null
-    confirmedJson?: JsonNullableFilter<"StockImport">
-    resultJson?: JsonNullableFilter<"StockImport">
-    addedCount?: IntFilter<"StockImport"> | number
-    skippedCount?: IntFilter<"StockImport"> | number
-    updatedAt?: DateTimeFilter<"StockImport"> | Date | string
-  }
-
-  export type StockImportOrderByWithRelationInput = {
-    id?: SortOrder
-    source?: SortOrder
-    fileName?: SortOrder
-    mimeType?: SortOrder
-    fileSize?: SortOrder
-    fileHash?: SortOrder
-    fileData?: SortOrder
-    status?: SortOrder
-    extractedJson?: SortOrderInput | SortOrder
-    rowCount?: SortOrder
-    engine?: SortOrderInput | SortOrder
-    uploadedById?: SortOrder
-    uploadedAt?: SortOrder
-    confirmKey?: SortOrderInput | SortOrder
-    confirmedById?: SortOrderInput | SortOrder
-    confirmedAt?: SortOrderInput | SortOrder
-    confirmedJson?: SortOrderInput | SortOrder
-    resultJson?: SortOrderInput | SortOrder
-    addedCount?: SortOrder
-    skippedCount?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type StockImportWhereUniqueInput = Prisma.AtLeast<{
-    id?: string
-    confirmKey?: string
-    AND?: StockImportWhereInput | StockImportWhereInput[]
-    OR?: StockImportWhereInput[]
-    NOT?: StockImportWhereInput | StockImportWhereInput[]
-    source?: StringFilter<"StockImport"> | string
-    fileName?: StringFilter<"StockImport"> | string
-    mimeType?: StringFilter<"StockImport"> | string
-    fileSize?: IntFilter<"StockImport"> | number
-    fileHash?: StringFilter<"StockImport"> | string
-    fileData?: BytesFilter<"StockImport"> | Bytes
-    status?: StringFilter<"StockImport"> | string
-    extractedJson?: JsonNullableFilter<"StockImport">
-    rowCount?: IntFilter<"StockImport"> | number
-    engine?: StringNullableFilter<"StockImport"> | string | null
-    uploadedById?: StringFilter<"StockImport"> | string
-    uploadedAt?: DateTimeFilter<"StockImport"> | Date | string
-    confirmedById?: StringNullableFilter<"StockImport"> | string | null
-    confirmedAt?: DateTimeNullableFilter<"StockImport"> | Date | string | null
-    confirmedJson?: JsonNullableFilter<"StockImport">
-    resultJson?: JsonNullableFilter<"StockImport">
-    addedCount?: IntFilter<"StockImport"> | number
-    skippedCount?: IntFilter<"StockImport"> | number
-    updatedAt?: DateTimeFilter<"StockImport"> | Date | string
-  }, "id" | "confirmKey">
-
-  export type StockImportOrderByWithAggregationInput = {
-    id?: SortOrder
-    source?: SortOrder
-    fileName?: SortOrder
-    mimeType?: SortOrder
-    fileSize?: SortOrder
-    fileHash?: SortOrder
-    fileData?: SortOrder
-    status?: SortOrder
-    extractedJson?: SortOrderInput | SortOrder
-    rowCount?: SortOrder
-    engine?: SortOrderInput | SortOrder
-    uploadedById?: SortOrder
-    uploadedAt?: SortOrder
-    confirmKey?: SortOrderInput | SortOrder
-    confirmedById?: SortOrderInput | SortOrder
-    confirmedAt?: SortOrderInput | SortOrder
-    confirmedJson?: SortOrderInput | SortOrder
-    resultJson?: SortOrderInput | SortOrder
-    addedCount?: SortOrder
-    skippedCount?: SortOrder
-    updatedAt?: SortOrder
-    _count?: StockImportCountOrderByAggregateInput
-    _avg?: StockImportAvgOrderByAggregateInput
-    _max?: StockImportMaxOrderByAggregateInput
-    _min?: StockImportMinOrderByAggregateInput
-    _sum?: StockImportSumOrderByAggregateInput
-  }
-
-  export type StockImportScalarWhereWithAggregatesInput = {
-    AND?: StockImportScalarWhereWithAggregatesInput | StockImportScalarWhereWithAggregatesInput[]
-    OR?: StockImportScalarWhereWithAggregatesInput[]
-    NOT?: StockImportScalarWhereWithAggregatesInput | StockImportScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"StockImport"> | string
-    source?: StringWithAggregatesFilter<"StockImport"> | string
-    fileName?: StringWithAggregatesFilter<"StockImport"> | string
-    mimeType?: StringWithAggregatesFilter<"StockImport"> | string
-    fileSize?: IntWithAggregatesFilter<"StockImport"> | number
-    fileHash?: StringWithAggregatesFilter<"StockImport"> | string
-    fileData?: BytesWithAggregatesFilter<"StockImport"> | Bytes
-    status?: StringWithAggregatesFilter<"StockImport"> | string
-    extractedJson?: JsonNullableWithAggregatesFilter<"StockImport">
-    rowCount?: IntWithAggregatesFilter<"StockImport"> | number
-    engine?: StringNullableWithAggregatesFilter<"StockImport"> | string | null
-    uploadedById?: StringWithAggregatesFilter<"StockImport"> | string
-    uploadedAt?: DateTimeWithAggregatesFilter<"StockImport"> | Date | string
-    confirmKey?: StringNullableWithAggregatesFilter<"StockImport"> | string | null
-    confirmedById?: StringNullableWithAggregatesFilter<"StockImport"> | string | null
-    confirmedAt?: DateTimeNullableWithAggregatesFilter<"StockImport"> | Date | string | null
-    confirmedJson?: JsonNullableWithAggregatesFilter<"StockImport">
-    resultJson?: JsonNullableWithAggregatesFilter<"StockImport">
-    addedCount?: IntWithAggregatesFilter<"StockImport"> | number
-    skippedCount?: IntWithAggregatesFilter<"StockImport"> | number
-    updatedAt?: DateTimeWithAggregatesFilter<"StockImport"> | Date | string
   }
 
   export type ManualMigrationWhereInput = {
@@ -117611,6 +116206,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
+    totalPieces?: Decimal | DecimalJsLike | number | string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdAt?: Date | string
@@ -117633,6 +116229,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
+    totalPieces?: Decimal | DecimalJsLike | number | string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdById: string
@@ -117653,6 +116250,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -117675,6 +116273,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -117696,6 +116295,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
+    totalPieces?: Decimal | DecimalJsLike | number | string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdById: string
@@ -117713,6 +116313,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -117730,6 +116331,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -117741,6 +116343,7 @@ export namespace Prisma {
     id?: string
     rollNumber: string
     length: Decimal | DecimalJsLike | number | string
+    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -117765,6 +116368,7 @@ export namespace Prisma {
     batchId: string
     locationId?: string | null
     length: Decimal | DecimalJsLike | number | string
+    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -117785,6 +116389,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     rollNumber?: StringFieldUpdateOperationsInput | string
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -117809,6 +116414,7 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     locationId?: NullableStringFieldUpdateOperationsInput | string | null
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -117831,6 +116437,7 @@ export namespace Prisma {
     batchId: string
     locationId?: string | null
     length: Decimal | DecimalJsLike | number | string
+    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -117848,6 +116455,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     rollNumber?: StringFieldUpdateOperationsInput | string
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -117865,6 +116473,7 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     locationId?: NullableStringFieldUpdateOperationsInput | string | null
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -117887,6 +116496,7 @@ export namespace Prisma {
     supplierName: string
     totalRollsReceived?: number
     totalMetersReceived?: Decimal | DecimalJsLike | number | string
+    totalPiecesReceived?: Decimal | DecimalJsLike | number | string
     status?: $Enums.GRNStatus
     remarks?: string | null
     createdAt?: Date | string
@@ -117907,6 +116517,7 @@ export namespace Prisma {
     supplierName: string
     totalRollsReceived?: number
     totalMetersReceived?: Decimal | DecimalJsLike | number | string
+    totalPiecesReceived?: Decimal | DecimalJsLike | number | string
     status?: $Enums.GRNStatus
     remarks?: string | null
     createdAt?: Date | string
@@ -117923,6 +116534,7 @@ export namespace Prisma {
     supplierName?: StringFieldUpdateOperationsInput | string
     totalRollsReceived?: IntFieldUpdateOperationsInput | number
     totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPiecesReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -117943,6 +116555,7 @@ export namespace Prisma {
     supplierName?: StringFieldUpdateOperationsInput | string
     totalRollsReceived?: IntFieldUpdateOperationsInput | number
     totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPiecesReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -117961,6 +116574,7 @@ export namespace Prisma {
     supplierName: string
     totalRollsReceived?: number
     totalMetersReceived?: Decimal | DecimalJsLike | number | string
+    totalPiecesReceived?: Decimal | DecimalJsLike | number | string
     status?: $Enums.GRNStatus
     remarks?: string | null
     createdAt?: Date | string
@@ -117976,6 +116590,7 @@ export namespace Prisma {
     supplierName?: StringFieldUpdateOperationsInput | string
     totalRollsReceived?: IntFieldUpdateOperationsInput | number
     totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPiecesReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -117993,6 +116608,7 @@ export namespace Prisma {
     supplierName?: StringFieldUpdateOperationsInput | string
     totalRollsReceived?: IntFieldUpdateOperationsInput | number
     totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPiecesReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -118161,6 +116777,7 @@ export namespace Prisma {
     entryNumber: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
+    uom?: string
     referenceType: string
     referenceId: string
     transactedAt: Date | string
@@ -118180,6 +116797,7 @@ export namespace Prisma {
     batchId: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
+    uom?: string
     referenceType: string
     referenceId: string
     fromLocationId?: string | null
@@ -118195,6 +116813,7 @@ export namespace Prisma {
     entryNumber?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -118214,6 +116833,7 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -118231,6 +116851,7 @@ export namespace Prisma {
     batchId: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
+    uom?: string
     referenceType: string
     referenceId: string
     fromLocationId?: string | null
@@ -118246,6 +116867,7 @@ export namespace Prisma {
     entryNumber?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -118260,6 +116882,7 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -120058,174 +118681,6 @@ export namespace Prisma {
     version?: IntFieldUpdateOperationsInput | number
     uploadedById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type StockImportCreateInput = {
-    id?: string
-    source: string
-    fileName: string
-    mimeType: string
-    fileSize: number
-    fileHash: string
-    fileData: Bytes
-    status?: string
-    extractedJson?: NullableJsonNullValueInput | InputJsonValue
-    rowCount?: number
-    engine?: string | null
-    uploadedById: string
-    uploadedAt?: Date | string
-    confirmKey?: string | null
-    confirmedById?: string | null
-    confirmedAt?: Date | string | null
-    confirmedJson?: NullableJsonNullValueInput | InputJsonValue
-    resultJson?: NullableJsonNullValueInput | InputJsonValue
-    addedCount?: number
-    skippedCount?: number
-    updatedAt?: Date | string
-  }
-
-  export type StockImportUncheckedCreateInput = {
-    id?: string
-    source: string
-    fileName: string
-    mimeType: string
-    fileSize: number
-    fileHash: string
-    fileData: Bytes
-    status?: string
-    extractedJson?: NullableJsonNullValueInput | InputJsonValue
-    rowCount?: number
-    engine?: string | null
-    uploadedById: string
-    uploadedAt?: Date | string
-    confirmKey?: string | null
-    confirmedById?: string | null
-    confirmedAt?: Date | string | null
-    confirmedJson?: NullableJsonNullValueInput | InputJsonValue
-    resultJson?: NullableJsonNullValueInput | InputJsonValue
-    addedCount?: number
-    skippedCount?: number
-    updatedAt?: Date | string
-  }
-
-  export type StockImportUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    source?: StringFieldUpdateOperationsInput | string
-    fileName?: StringFieldUpdateOperationsInput | string
-    mimeType?: StringFieldUpdateOperationsInput | string
-    fileSize?: IntFieldUpdateOperationsInput | number
-    fileHash?: StringFieldUpdateOperationsInput | string
-    fileData?: BytesFieldUpdateOperationsInput | Bytes
-    status?: StringFieldUpdateOperationsInput | string
-    extractedJson?: NullableJsonNullValueInput | InputJsonValue
-    rowCount?: IntFieldUpdateOperationsInput | number
-    engine?: NullableStringFieldUpdateOperationsInput | string | null
-    uploadedById?: StringFieldUpdateOperationsInput | string
-    uploadedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    confirmKey?: NullableStringFieldUpdateOperationsInput | string | null
-    confirmedById?: NullableStringFieldUpdateOperationsInput | string | null
-    confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    confirmedJson?: NullableJsonNullValueInput | InputJsonValue
-    resultJson?: NullableJsonNullValueInput | InputJsonValue
-    addedCount?: IntFieldUpdateOperationsInput | number
-    skippedCount?: IntFieldUpdateOperationsInput | number
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type StockImportUncheckedUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    source?: StringFieldUpdateOperationsInput | string
-    fileName?: StringFieldUpdateOperationsInput | string
-    mimeType?: StringFieldUpdateOperationsInput | string
-    fileSize?: IntFieldUpdateOperationsInput | number
-    fileHash?: StringFieldUpdateOperationsInput | string
-    fileData?: BytesFieldUpdateOperationsInput | Bytes
-    status?: StringFieldUpdateOperationsInput | string
-    extractedJson?: NullableJsonNullValueInput | InputJsonValue
-    rowCount?: IntFieldUpdateOperationsInput | number
-    engine?: NullableStringFieldUpdateOperationsInput | string | null
-    uploadedById?: StringFieldUpdateOperationsInput | string
-    uploadedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    confirmKey?: NullableStringFieldUpdateOperationsInput | string | null
-    confirmedById?: NullableStringFieldUpdateOperationsInput | string | null
-    confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    confirmedJson?: NullableJsonNullValueInput | InputJsonValue
-    resultJson?: NullableJsonNullValueInput | InputJsonValue
-    addedCount?: IntFieldUpdateOperationsInput | number
-    skippedCount?: IntFieldUpdateOperationsInput | number
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type StockImportCreateManyInput = {
-    id?: string
-    source: string
-    fileName: string
-    mimeType: string
-    fileSize: number
-    fileHash: string
-    fileData: Bytes
-    status?: string
-    extractedJson?: NullableJsonNullValueInput | InputJsonValue
-    rowCount?: number
-    engine?: string | null
-    uploadedById: string
-    uploadedAt?: Date | string
-    confirmKey?: string | null
-    confirmedById?: string | null
-    confirmedAt?: Date | string | null
-    confirmedJson?: NullableJsonNullValueInput | InputJsonValue
-    resultJson?: NullableJsonNullValueInput | InputJsonValue
-    addedCount?: number
-    skippedCount?: number
-    updatedAt?: Date | string
-  }
-
-  export type StockImportUpdateManyMutationInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    source?: StringFieldUpdateOperationsInput | string
-    fileName?: StringFieldUpdateOperationsInput | string
-    mimeType?: StringFieldUpdateOperationsInput | string
-    fileSize?: IntFieldUpdateOperationsInput | number
-    fileHash?: StringFieldUpdateOperationsInput | string
-    fileData?: BytesFieldUpdateOperationsInput | Bytes
-    status?: StringFieldUpdateOperationsInput | string
-    extractedJson?: NullableJsonNullValueInput | InputJsonValue
-    rowCount?: IntFieldUpdateOperationsInput | number
-    engine?: NullableStringFieldUpdateOperationsInput | string | null
-    uploadedById?: StringFieldUpdateOperationsInput | string
-    uploadedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    confirmKey?: NullableStringFieldUpdateOperationsInput | string | null
-    confirmedById?: NullableStringFieldUpdateOperationsInput | string | null
-    confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    confirmedJson?: NullableJsonNullValueInput | InputJsonValue
-    resultJson?: NullableJsonNullValueInput | InputJsonValue
-    addedCount?: IntFieldUpdateOperationsInput | number
-    skippedCount?: IntFieldUpdateOperationsInput | number
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type StockImportUncheckedUpdateManyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    source?: StringFieldUpdateOperationsInput | string
-    fileName?: StringFieldUpdateOperationsInput | string
-    mimeType?: StringFieldUpdateOperationsInput | string
-    fileSize?: IntFieldUpdateOperationsInput | number
-    fileHash?: StringFieldUpdateOperationsInput | string
-    fileData?: BytesFieldUpdateOperationsInput | Bytes
-    status?: StringFieldUpdateOperationsInput | string
-    extractedJson?: NullableJsonNullValueInput | InputJsonValue
-    rowCount?: IntFieldUpdateOperationsInput | number
-    engine?: NullableStringFieldUpdateOperationsInput | string | null
-    uploadedById?: StringFieldUpdateOperationsInput | string
-    uploadedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    confirmKey?: NullableStringFieldUpdateOperationsInput | string | null
-    confirmedById?: NullableStringFieldUpdateOperationsInput | string | null
-    confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    confirmedJson?: NullableJsonNullValueInput | InputJsonValue
-    resultJson?: NullableJsonNullValueInput | InputJsonValue
-    addedCount?: IntFieldUpdateOperationsInput | number
-    skippedCount?: IntFieldUpdateOperationsInput | number
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -124156,6 +122611,7 @@ export namespace Prisma {
     colorName?: SortOrder
     totalRolls?: SortOrder
     totalMeters?: SortOrder
+    totalPieces?: SortOrder
     status?: SortOrder
     receivedAt?: SortOrder
     createdById?: SortOrder
@@ -124166,6 +122622,7 @@ export namespace Prisma {
   export type FabricBatchAvgOrderByAggregateInput = {
     totalRolls?: SortOrder
     totalMeters?: SortOrder
+    totalPieces?: SortOrder
   }
 
   export type FabricBatchMaxOrderByAggregateInput = {
@@ -124179,6 +122636,7 @@ export namespace Prisma {
     colorName?: SortOrder
     totalRolls?: SortOrder
     totalMeters?: SortOrder
+    totalPieces?: SortOrder
     status?: SortOrder
     receivedAt?: SortOrder
     createdById?: SortOrder
@@ -124197,6 +122655,7 @@ export namespace Prisma {
     colorName?: SortOrder
     totalRolls?: SortOrder
     totalMeters?: SortOrder
+    totalPieces?: SortOrder
     status?: SortOrder
     receivedAt?: SortOrder
     createdById?: SortOrder
@@ -124207,6 +122666,7 @@ export namespace Prisma {
   export type FabricBatchSumOrderByAggregateInput = {
     totalRolls?: SortOrder
     totalMeters?: SortOrder
+    totalPieces?: SortOrder
   }
 
   export type DecimalWithAggregatesFilter<$PrismaModel = never> = {
@@ -124286,6 +122746,7 @@ export namespace Prisma {
     batchId?: SortOrder
     locationId?: SortOrder
     length?: SortOrder
+    unit?: SortOrder
     width?: SortOrder
     weight?: SortOrder
     status?: SortOrder
@@ -124311,6 +122772,7 @@ export namespace Prisma {
     batchId?: SortOrder
     locationId?: SortOrder
     length?: SortOrder
+    unit?: SortOrder
     width?: SortOrder
     weight?: SortOrder
     status?: SortOrder
@@ -124330,6 +122792,7 @@ export namespace Prisma {
     batchId?: SortOrder
     locationId?: SortOrder
     length?: SortOrder
+    unit?: SortOrder
     width?: SortOrder
     weight?: SortOrder
     status?: SortOrder
@@ -124403,6 +122866,7 @@ export namespace Prisma {
     supplierName?: SortOrder
     totalRollsReceived?: SortOrder
     totalMetersReceived?: SortOrder
+    totalPiecesReceived?: SortOrder
     status?: SortOrder
     remarks?: SortOrder
     createdAt?: SortOrder
@@ -124412,6 +122876,7 @@ export namespace Prisma {
   export type MaterialReceiptAvgOrderByAggregateInput = {
     totalRollsReceived?: SortOrder
     totalMetersReceived?: SortOrder
+    totalPiecesReceived?: SortOrder
   }
 
   export type MaterialReceiptMaxOrderByAggregateInput = {
@@ -124425,6 +122890,7 @@ export namespace Prisma {
     supplierName?: SortOrder
     totalRollsReceived?: SortOrder
     totalMetersReceived?: SortOrder
+    totalPiecesReceived?: SortOrder
     status?: SortOrder
     remarks?: SortOrder
     createdAt?: SortOrder
@@ -124442,6 +122908,7 @@ export namespace Prisma {
     supplierName?: SortOrder
     totalRollsReceived?: SortOrder
     totalMetersReceived?: SortOrder
+    totalPiecesReceived?: SortOrder
     status?: SortOrder
     remarks?: SortOrder
     createdAt?: SortOrder
@@ -124451,6 +122918,7 @@ export namespace Prisma {
   export type MaterialReceiptSumOrderByAggregateInput = {
     totalRollsReceived?: SortOrder
     totalMetersReceived?: SortOrder
+    totalPiecesReceived?: SortOrder
   }
 
   export type EnumGRNStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -124647,6 +123115,7 @@ export namespace Prisma {
     batchId?: SortOrder
     transactionType?: SortOrder
     quantity?: SortOrder
+    uom?: SortOrder
     referenceType?: SortOrder
     referenceId?: SortOrder
     fromLocationId?: SortOrder
@@ -124668,6 +123137,7 @@ export namespace Prisma {
     batchId?: SortOrder
     transactionType?: SortOrder
     quantity?: SortOrder
+    uom?: SortOrder
     referenceType?: SortOrder
     referenceId?: SortOrder
     fromLocationId?: SortOrder
@@ -124685,6 +123155,7 @@ export namespace Prisma {
     batchId?: SortOrder
     transactionType?: SortOrder
     quantity?: SortOrder
+    uom?: SortOrder
     referenceType?: SortOrder
     referenceId?: SortOrder
     fromLocationId?: SortOrder
@@ -125656,103 +124127,6 @@ export namespace Prisma {
   export type GarmentImageSumOrderByAggregateInput = {
     fileSize?: SortOrder
     version?: SortOrder
-  }
-
-  export type BytesFilter<$PrismaModel = never> = {
-    equals?: Bytes | BytesFieldRefInput<$PrismaModel>
-    in?: Bytes[] | ListBytesFieldRefInput<$PrismaModel>
-    notIn?: Bytes[] | ListBytesFieldRefInput<$PrismaModel>
-    not?: NestedBytesFilter<$PrismaModel> | Bytes
-  }
-
-  export type StockImportCountOrderByAggregateInput = {
-    id?: SortOrder
-    source?: SortOrder
-    fileName?: SortOrder
-    mimeType?: SortOrder
-    fileSize?: SortOrder
-    fileHash?: SortOrder
-    fileData?: SortOrder
-    status?: SortOrder
-    extractedJson?: SortOrder
-    rowCount?: SortOrder
-    engine?: SortOrder
-    uploadedById?: SortOrder
-    uploadedAt?: SortOrder
-    confirmKey?: SortOrder
-    confirmedById?: SortOrder
-    confirmedAt?: SortOrder
-    confirmedJson?: SortOrder
-    resultJson?: SortOrder
-    addedCount?: SortOrder
-    skippedCount?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type StockImportAvgOrderByAggregateInput = {
-    fileSize?: SortOrder
-    rowCount?: SortOrder
-    addedCount?: SortOrder
-    skippedCount?: SortOrder
-  }
-
-  export type StockImportMaxOrderByAggregateInput = {
-    id?: SortOrder
-    source?: SortOrder
-    fileName?: SortOrder
-    mimeType?: SortOrder
-    fileSize?: SortOrder
-    fileHash?: SortOrder
-    fileData?: SortOrder
-    status?: SortOrder
-    rowCount?: SortOrder
-    engine?: SortOrder
-    uploadedById?: SortOrder
-    uploadedAt?: SortOrder
-    confirmKey?: SortOrder
-    confirmedById?: SortOrder
-    confirmedAt?: SortOrder
-    addedCount?: SortOrder
-    skippedCount?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type StockImportMinOrderByAggregateInput = {
-    id?: SortOrder
-    source?: SortOrder
-    fileName?: SortOrder
-    mimeType?: SortOrder
-    fileSize?: SortOrder
-    fileHash?: SortOrder
-    fileData?: SortOrder
-    status?: SortOrder
-    rowCount?: SortOrder
-    engine?: SortOrder
-    uploadedById?: SortOrder
-    uploadedAt?: SortOrder
-    confirmKey?: SortOrder
-    confirmedById?: SortOrder
-    confirmedAt?: SortOrder
-    addedCount?: SortOrder
-    skippedCount?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type StockImportSumOrderByAggregateInput = {
-    fileSize?: SortOrder
-    rowCount?: SortOrder
-    addedCount?: SortOrder
-    skippedCount?: SortOrder
-  }
-
-  export type BytesWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Bytes | BytesFieldRefInput<$PrismaModel>
-    in?: Bytes[] | ListBytesFieldRefInput<$PrismaModel>
-    notIn?: Bytes[] | ListBytesFieldRefInput<$PrismaModel>
-    not?: NestedBytesWithAggregatesFilter<$PrismaModel> | Bytes
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBytesFilter<$PrismaModel>
-    _max?: NestedBytesFilter<$PrismaModel>
   }
 
   export type ManualMigrationCountOrderByAggregateInput = {
@@ -133148,10 +131522,6 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutGarmentImagesUploadedInput, UserUpdateWithoutGarmentImagesUploadedInput>, UserUncheckedUpdateWithoutGarmentImagesUploadedInput>
   }
 
-  export type BytesFieldUpdateOperationsInput = {
-    set?: Bytes
-  }
-
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -133636,23 +132006,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumStockTransactionTypeFilter<$PrismaModel>
     _max?: NestedEnumStockTransactionTypeFilter<$PrismaModel>
-  }
-
-  export type NestedBytesFilter<$PrismaModel = never> = {
-    equals?: Bytes | BytesFieldRefInput<$PrismaModel>
-    in?: Bytes[] | ListBytesFieldRefInput<$PrismaModel>
-    notIn?: Bytes[] | ListBytesFieldRefInput<$PrismaModel>
-    not?: NestedBytesFilter<$PrismaModel> | Bytes
-  }
-
-  export type NestedBytesWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Bytes | BytesFieldRefInput<$PrismaModel>
-    in?: Bytes[] | ListBytesFieldRefInput<$PrismaModel>
-    notIn?: Bytes[] | ListBytesFieldRefInput<$PrismaModel>
-    not?: NestedBytesWithAggregatesFilter<$PrismaModel> | Bytes
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBytesFilter<$PrismaModel>
-    _max?: NestedBytesFilter<$PrismaModel>
   }
 
   export type UserRoleCreateWithoutUserInput = {
@@ -134939,6 +133292,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
+    totalPieces?: Decimal | DecimalJsLike | number | string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdAt?: Date | string
@@ -134960,6 +133314,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
+    totalPieces?: Decimal | DecimalJsLike | number | string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdAt?: Date | string
@@ -134988,6 +133343,7 @@ export namespace Prisma {
     supplierName: string
     totalRollsReceived?: number
     totalMetersReceived?: Decimal | DecimalJsLike | number | string
+    totalPiecesReceived?: Decimal | DecimalJsLike | number | string
     status?: $Enums.GRNStatus
     remarks?: string | null
     createdAt?: Date | string
@@ -135006,6 +133362,7 @@ export namespace Prisma {
     supplierName: string
     totalRollsReceived?: number
     totalMetersReceived?: Decimal | DecimalJsLike | number | string
+    totalPiecesReceived?: Decimal | DecimalJsLike | number | string
     status?: $Enums.GRNStatus
     remarks?: string | null
     createdAt?: Date | string
@@ -135027,6 +133384,7 @@ export namespace Prisma {
     id?: string
     rollNumber: string
     length: Decimal | DecimalJsLike | number | string
+    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -135050,6 +133408,7 @@ export namespace Prisma {
     batchId: string
     locationId?: string | null
     length: Decimal | DecimalJsLike | number | string
+    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -135114,6 +133473,7 @@ export namespace Prisma {
     entryNumber: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
+    uom?: string
     referenceType: string
     referenceId: string
     transactedAt: Date | string
@@ -135132,6 +133492,7 @@ export namespace Prisma {
     batchId: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
+    uom?: string
     referenceType: string
     referenceId: string
     fromLocationId?: string | null
@@ -136531,6 +134892,7 @@ export namespace Prisma {
     colorName?: StringNullableFilter<"FabricBatch"> | string | null
     totalRolls?: IntFilter<"FabricBatch"> | number
     totalMeters?: DecimalFilter<"FabricBatch"> | Decimal | DecimalJsLike | number | string
+    totalPieces?: DecimalFilter<"FabricBatch"> | Decimal | DecimalJsLike | number | string
     status?: EnumFabricBatchStatusFilter<"FabricBatch"> | $Enums.FabricBatchStatus
     receivedAt?: DateTimeNullableFilter<"FabricBatch"> | Date | string | null
     createdById?: StringFilter<"FabricBatch"> | string
@@ -136568,6 +134930,7 @@ export namespace Prisma {
     supplierName?: StringFilter<"MaterialReceipt"> | string
     totalRollsReceived?: IntFilter<"MaterialReceipt"> | number
     totalMetersReceived?: DecimalFilter<"MaterialReceipt"> | Decimal | DecimalJsLike | number | string
+    totalPiecesReceived?: DecimalFilter<"MaterialReceipt"> | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFilter<"MaterialReceipt"> | $Enums.GRNStatus
     remarks?: StringNullableFilter<"MaterialReceipt"> | string | null
     createdAt?: DateTimeFilter<"MaterialReceipt"> | Date | string
@@ -136599,6 +134962,7 @@ export namespace Prisma {
     batchId?: StringFilter<"FabricStoreRoll"> | string
     locationId?: StringNullableFilter<"FabricStoreRoll"> | string | null
     length?: DecimalFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string
+    unit?: StringFilter<"FabricStoreRoll"> | string
     width?: DecimalNullableFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string | null
     weight?: DecimalNullableFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFilter<"FabricStoreRoll"> | $Enums.FabricRollStatus
@@ -136670,6 +135034,7 @@ export namespace Prisma {
     batchId?: StringFilter<"FabricStockLedger"> | string
     transactionType?: EnumStockTransactionTypeFilter<"FabricStockLedger"> | $Enums.StockTransactionType
     quantity?: DecimalFilter<"FabricStockLedger"> | Decimal | DecimalJsLike | number | string
+    uom?: StringFilter<"FabricStockLedger"> | string
     referenceType?: StringFilter<"FabricStockLedger"> | string
     referenceId?: StringFilter<"FabricStockLedger"> | string
     fromLocationId?: StringNullableFilter<"FabricStockLedger"> | string | null
@@ -141074,6 +139439,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
+    totalPieces?: Decimal | DecimalJsLike | number | string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdAt?: Date | string
@@ -141094,6 +139460,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
+    totalPieces?: Decimal | DecimalJsLike | number | string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdById: string
@@ -141118,6 +139485,7 @@ export namespace Prisma {
     id?: string
     rollNumber: string
     length: Decimal | DecimalJsLike | number | string
+    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -141141,6 +139509,7 @@ export namespace Prisma {
     batchId: string
     locationId?: string | null
     length: Decimal | DecimalJsLike | number | string
+    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -156226,6 +154595,7 @@ export namespace Prisma {
     id?: string
     rollNumber: string
     length: Decimal | DecimalJsLike | number | string
+    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -156248,6 +154618,7 @@ export namespace Prisma {
     rollNumber: string
     batchId: string
     length: Decimal | DecimalJsLike | number | string
+    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -156279,6 +154650,7 @@ export namespace Prisma {
     entryNumber: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
+    uom?: string
     referenceType: string
     referenceId: string
     transactedAt: Date | string
@@ -156297,6 +154669,7 @@ export namespace Prisma {
     batchId: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
+    uom?: string
     referenceType: string
     referenceId: string
     toLocationId?: string | null
@@ -156321,6 +154694,7 @@ export namespace Prisma {
     entryNumber: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
+    uom?: string
     referenceType: string
     referenceId: string
     transactedAt: Date | string
@@ -156339,6 +154713,7 @@ export namespace Prisma {
     batchId: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
+    uom?: string
     referenceType: string
     referenceId: string
     fromLocationId?: string | null
@@ -156674,6 +155049,7 @@ export namespace Prisma {
     id?: string
     rollNumber: string
     length: Decimal | DecimalJsLike | number | string
+    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -156696,6 +155072,7 @@ export namespace Prisma {
     rollNumber: string
     locationId?: string | null
     length: Decimal | DecimalJsLike | number | string
+    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -156731,6 +155108,7 @@ export namespace Prisma {
     supplierName: string
     totalRollsReceived?: number
     totalMetersReceived?: Decimal | DecimalJsLike | number | string
+    totalPiecesReceived?: Decimal | DecimalJsLike | number | string
     status?: $Enums.GRNStatus
     remarks?: string | null
     createdAt?: Date | string
@@ -156749,6 +155127,7 @@ export namespace Prisma {
     supplierName: string
     totalRollsReceived?: number
     totalMetersReceived?: Decimal | DecimalJsLike | number | string
+    totalPiecesReceived?: Decimal | DecimalJsLike | number | string
     status?: $Enums.GRNStatus
     remarks?: string | null
     createdAt?: Date | string
@@ -156771,6 +155150,7 @@ export namespace Prisma {
     entryNumber: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
+    uom?: string
     referenceType: string
     referenceId: string
     transactedAt: Date | string
@@ -156788,6 +155168,7 @@ export namespace Prisma {
     rollId: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
+    uom?: string
     referenceType: string
     referenceId: string
     fromLocationId?: string | null
@@ -157142,6 +155523,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
+    totalPieces?: Decimal | DecimalJsLike | number | string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdAt?: Date | string
@@ -157163,6 +155545,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
+    totalPieces?: Decimal | DecimalJsLike | number | string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdById: string
@@ -157537,6 +155920,7 @@ export namespace Prisma {
     entryNumber: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
+    uom?: string
     referenceType: string
     referenceId: string
     transactedAt: Date | string
@@ -157554,6 +155938,7 @@ export namespace Prisma {
     batchId: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
+    uom?: string
     referenceType: string
     referenceId: string
     fromLocationId?: string | null
@@ -157595,6 +155980,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -157616,6 +156002,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -158007,6 +156394,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
+    totalPieces?: Decimal | DecimalJsLike | number | string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdAt?: Date | string
@@ -158028,6 +156416,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
+    totalPieces?: Decimal | DecimalJsLike | number | string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdById: string
@@ -158192,6 +156581,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -158213,6 +156603,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -158354,6 +156745,7 @@ export namespace Prisma {
     supplierName: string
     totalRollsReceived?: number
     totalMetersReceived?: Decimal | DecimalJsLike | number | string
+    totalPiecesReceived?: Decimal | DecimalJsLike | number | string
     status?: $Enums.GRNStatus
     remarks?: string | null
     createdAt?: Date | string
@@ -158373,6 +156765,7 @@ export namespace Prisma {
     supplierName: string
     totalRollsReceived?: number
     totalMetersReceived?: Decimal | DecimalJsLike | number | string
+    totalPiecesReceived?: Decimal | DecimalJsLike | number | string
     status?: $Enums.GRNStatus
     remarks?: string | null
     createdAt?: Date | string
@@ -158388,6 +156781,7 @@ export namespace Prisma {
     id?: string
     rollNumber: string
     length: Decimal | DecimalJsLike | number | string
+    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -158411,6 +156805,7 @@ export namespace Prisma {
     batchId: string
     locationId?: string | null
     length: Decimal | DecimalJsLike | number | string
+    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -158451,6 +156846,7 @@ export namespace Prisma {
     supplierName?: StringFieldUpdateOperationsInput | string
     totalRollsReceived?: IntFieldUpdateOperationsInput | number
     totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPiecesReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -158470,6 +156866,7 @@ export namespace Prisma {
     supplierName?: StringFieldUpdateOperationsInput | string
     totalRollsReceived?: IntFieldUpdateOperationsInput | number
     totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPiecesReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -158491,6 +156888,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     rollNumber?: StringFieldUpdateOperationsInput | string
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -158514,6 +156912,7 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     locationId?: NullableStringFieldUpdateOperationsInput | string | null
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -158533,6 +156932,7 @@ export namespace Prisma {
     id?: string
     rollNumber: string
     length: Decimal | DecimalJsLike | number | string
+    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -158556,6 +156956,7 @@ export namespace Prisma {
     batchId: string
     locationId?: string | null
     length: Decimal | DecimalJsLike | number | string
+    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -158692,6 +157093,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     rollNumber?: StringFieldUpdateOperationsInput | string
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -158715,6 +157117,7 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     locationId?: NullableStringFieldUpdateOperationsInput | string | null
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -158841,6 +157244,7 @@ export namespace Prisma {
     id?: string
     rollNumber: string
     length: Decimal | DecimalJsLike | number | string
+    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -158864,6 +157268,7 @@ export namespace Prisma {
     batchId: string
     locationId?: string | null
     length: Decimal | DecimalJsLike | number | string
+    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -158894,6 +157299,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
+    totalPieces?: Decimal | DecimalJsLike | number | string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdAt?: Date | string
@@ -158915,6 +157321,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
+    totalPieces?: Decimal | DecimalJsLike | number | string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdById: string
@@ -159103,6 +157510,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     rollNumber?: StringFieldUpdateOperationsInput | string
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -159126,6 +157534,7 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     locationId?: NullableStringFieldUpdateOperationsInput | string | null
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -159162,6 +157571,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -159183,6 +157593,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -166672,6 +165083,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
+    totalPieces?: Decimal | DecimalJsLike | number | string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdAt?: Date | string
@@ -166688,6 +165100,7 @@ export namespace Prisma {
     supplierName: string
     totalRollsReceived?: number
     totalMetersReceived?: Decimal | DecimalJsLike | number | string
+    totalPiecesReceived?: Decimal | DecimalJsLike | number | string
     status?: $Enums.GRNStatus
     remarks?: string | null
     createdAt?: Date | string
@@ -166700,6 +165113,7 @@ export namespace Prisma {
     batchId: string
     locationId?: string | null
     length: Decimal | DecimalJsLike | number | string
+    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -166731,6 +165145,7 @@ export namespace Prisma {
     batchId: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
+    uom?: string
     referenceType: string
     referenceId: string
     fromLocationId?: string | null
@@ -168569,6 +166984,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -168590,6 +167006,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -168610,6 +167027,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -168625,6 +167043,7 @@ export namespace Prisma {
     supplierName?: StringFieldUpdateOperationsInput | string
     totalRollsReceived?: IntFieldUpdateOperationsInput | number
     totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPiecesReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -168643,6 +167062,7 @@ export namespace Prisma {
     supplierName?: StringFieldUpdateOperationsInput | string
     totalRollsReceived?: IntFieldUpdateOperationsInput | number
     totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPiecesReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -168660,6 +167080,7 @@ export namespace Prisma {
     supplierName?: StringFieldUpdateOperationsInput | string
     totalRollsReceived?: IntFieldUpdateOperationsInput | number
     totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPiecesReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -168670,6 +167091,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     rollNumber?: StringFieldUpdateOperationsInput | string
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -168693,6 +167115,7 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     locationId?: NullableStringFieldUpdateOperationsInput | string | null
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -168714,6 +167137,7 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     locationId?: NullableStringFieldUpdateOperationsInput | string | null
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -168767,6 +167191,7 @@ export namespace Prisma {
     entryNumber?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -168785,6 +167210,7 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -168801,6 +167227,7 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -171855,6 +170282,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
+    totalPieces?: Decimal | DecimalJsLike | number | string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdById: string
@@ -171868,6 +170296,7 @@ export namespace Prisma {
     batchId: string
     locationId?: string | null
     length: Decimal | DecimalJsLike | number | string
+    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -172842,6 +171271,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -172862,6 +171292,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -172882,6 +171313,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -172893,6 +171325,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     rollNumber?: StringFieldUpdateOperationsInput | string
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -172916,6 +171349,7 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     locationId?: NullableStringFieldUpdateOperationsInput | string | null
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -172937,6 +171371,7 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     locationId?: NullableStringFieldUpdateOperationsInput | string | null
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -175356,6 +173791,7 @@ export namespace Prisma {
     rollNumber: string
     batchId: string
     length: Decimal | DecimalJsLike | number | string
+    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -175376,6 +173812,7 @@ export namespace Prisma {
     batchId: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
+    uom?: string
     referenceType: string
     referenceId: string
     toLocationId?: string | null
@@ -175392,6 +173829,7 @@ export namespace Prisma {
     batchId: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
+    uom?: string
     referenceType: string
     referenceId: string
     fromLocationId?: string | null
@@ -175405,6 +173843,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     rollNumber?: StringFieldUpdateOperationsInput | string
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -175427,6 +173866,7 @@ export namespace Prisma {
     rollNumber?: StringFieldUpdateOperationsInput | string
     batchId?: StringFieldUpdateOperationsInput | string
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -175448,6 +173888,7 @@ export namespace Prisma {
     rollNumber?: StringFieldUpdateOperationsInput | string
     batchId?: StringFieldUpdateOperationsInput | string
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -175466,6 +173907,7 @@ export namespace Prisma {
     entryNumber?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -175484,6 +173926,7 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     toLocationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -175500,6 +173943,7 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     toLocationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -175514,6 +173958,7 @@ export namespace Prisma {
     entryNumber?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -175532,6 +173977,7 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -175548,6 +173994,7 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -175562,6 +174009,7 @@ export namespace Prisma {
     rollNumber: string
     locationId?: string | null
     length: Decimal | DecimalJsLike | number | string
+    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -175585,6 +174033,7 @@ export namespace Prisma {
     supplierName: string
     totalRollsReceived?: number
     totalMetersReceived?: Decimal | DecimalJsLike | number | string
+    totalPiecesReceived?: Decimal | DecimalJsLike | number | string
     status?: $Enums.GRNStatus
     remarks?: string | null
     createdAt?: Date | string
@@ -175597,6 +174046,7 @@ export namespace Prisma {
     rollId: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
+    uom?: string
     referenceType: string
     referenceId: string
     fromLocationId?: string | null
@@ -175611,6 +174061,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     rollNumber?: StringFieldUpdateOperationsInput | string
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -175633,6 +174084,7 @@ export namespace Prisma {
     rollNumber?: StringFieldUpdateOperationsInput | string
     locationId?: NullableStringFieldUpdateOperationsInput | string | null
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -175654,6 +174106,7 @@ export namespace Prisma {
     rollNumber?: StringFieldUpdateOperationsInput | string
     locationId?: NullableStringFieldUpdateOperationsInput | string | null
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -175676,6 +174129,7 @@ export namespace Prisma {
     supplierName?: StringFieldUpdateOperationsInput | string
     totalRollsReceived?: IntFieldUpdateOperationsInput | number
     totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPiecesReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -175694,6 +174148,7 @@ export namespace Prisma {
     supplierName?: StringFieldUpdateOperationsInput | string
     totalRollsReceived?: IntFieldUpdateOperationsInput | number
     totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPiecesReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -175711,6 +174166,7 @@ export namespace Prisma {
     supplierName?: StringFieldUpdateOperationsInput | string
     totalRollsReceived?: IntFieldUpdateOperationsInput | number
     totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    totalPiecesReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -175722,6 +174178,7 @@ export namespace Prisma {
     entryNumber?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -175739,6 +174196,7 @@ export namespace Prisma {
     rollId?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -175755,6 +174213,7 @@ export namespace Prisma {
     rollId?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -175792,6 +174251,7 @@ export namespace Prisma {
     batchId: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
+    uom?: string
     referenceType: string
     referenceId: string
     fromLocationId?: string | null
@@ -175870,6 +174330,7 @@ export namespace Prisma {
     entryNumber?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -175887,6 +174348,7 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -175903,6 +174365,7 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null

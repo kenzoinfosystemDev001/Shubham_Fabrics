@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { addToUnitTotals, unitTotals } from '@/lib/fabric-stock';
 
 export const dynamic = 'force-dynamic';
 
@@ -238,6 +239,8 @@ export async function GET(request: Request) {
     };
 
     let factoryTotalDefectivePieces = 0;
+    // Factory totals per unit: meters and pieces are never added together.
+    const factoryTotalsByUnit = unitTotals();
 
     for (const ch of allDefectChallans) {
       const pcs = ch.defectivePieces || ch.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
@@ -255,12 +258,11 @@ export async function GET(request: Request) {
         addDepartmentDefect('STORE', quantity, unit);
       }
       factoryTotalDefectivePieces += quantity;
+      addToUnitTotals(factoryTotalsByUnit, unit, quantity);
     }
 
-    const totalQuarantinedMeters = rolls.reduce(
-      (sum, r) => sum + (Number(r.length) || 0),
-      0
-    );
+    const quarantinedByUnit = rolls.reduce((totals, r) => addToUnitTotals(totals, r.unit, Number(r.length) || 0), unitTotals());
+    const totalQuarantinedMeters = quarantinedByUnit.MTR || 0;
 
     return NextResponse.json({
       success: true,
@@ -273,6 +275,8 @@ export async function GET(request: Request) {
         summary: {
           factoryTotalDefectivePieces,
           factoryTotalQuarantinedMeters: Number(totalQuarantinedMeters.toFixed(2)),
+          factoryTotalsByUnit,
+          quarantinedByUnit,
           totalDefectedRolls: rolls.length,
           totalIncidents: allDefectChallans.length + rolls.length,
           departmentStats,

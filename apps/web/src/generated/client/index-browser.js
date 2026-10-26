@@ -949,6 +949,7 @@ exports.Prisma.FabricBatchScalarFieldEnum = {
   colorName: 'colorName',
   totalRolls: 'totalRolls',
   totalMeters: 'totalMeters',
+  totalPieces: 'totalPieces',
   status: 'status',
   receivedAt: 'receivedAt',
   createdById: 'createdById',
@@ -962,6 +963,7 @@ exports.Prisma.FabricStoreRollScalarFieldEnum = {
   batchId: 'batchId',
   locationId: 'locationId',
   length: 'length',
+  unit: 'unit',
   width: 'width',
   weight: 'weight',
   status: 'status',
@@ -986,6 +988,7 @@ exports.Prisma.MaterialReceiptScalarFieldEnum = {
   supplierName: 'supplierName',
   totalRollsReceived: 'totalRollsReceived',
   totalMetersReceived: 'totalMetersReceived',
+  totalPiecesReceived: 'totalPiecesReceived',
   status: 'status',
   remarks: 'remarks',
   createdAt: 'createdAt',
@@ -1022,6 +1025,7 @@ exports.Prisma.FabricStockLedgerScalarFieldEnum = {
   batchId: 'batchId',
   transactionType: 'transactionType',
   quantity: 'quantity',
+  uom: 'uom',
   referenceType: 'referenceType',
   referenceId: 'referenceId',
   fromLocationId: 'fromLocationId',
@@ -1251,6 +1255,48 @@ exports.Prisma.DeadlineAlertDismissalScalarFieldEnum = {
   dismissedAt: 'dismissedAt'
 };
 
+exports.Prisma.PackingAllocationScalarFieldEnum = {
+  id: 'id',
+  packingNumber: 'packingNumber',
+  workItemId: 'workItemId',
+  quantity: 'quantity',
+  packedQuantity: 'packedQuantity',
+  returnedQuantity: 'returnedQuantity',
+  status: 'status',
+  priority: 'priority',
+  packingDate: 'packingDate',
+  remarks: 'remarks',
+  createdById: 'createdById',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.GarmentImageScalarFieldEnum = {
+  id: 'id',
+  programId: 'programId',
+  garmentCategory: 'garmentCategory',
+  styleRef: 'styleRef',
+  storageProvider: 'storageProvider',
+  storageKey: 'storageKey',
+  imageUrl: 'imageUrl',
+  imageData: 'imageData',
+  mimeType: 'mimeType',
+  fileName: 'fileName',
+  fileSize: 'fileSize',
+  version: 'version',
+  uploadedById: 'uploadedById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ManualMigrationScalarFieldEnum = {
+  name: 'name',
+  checksum: 'checksum',
+  appliedAt: 'appliedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1415,7 +1461,10 @@ exports.Prisma.ModelName = {
   FabricInward: 'FabricInward',
   FabricOutward: 'FabricOutward',
   DeadlineAlert: 'DeadlineAlert',
-  DeadlineAlertDismissal: 'DeadlineAlertDismissal'
+  DeadlineAlertDismissal: 'DeadlineAlertDismissal',
+  PackingAllocation: 'PackingAllocation',
+  GarmentImage: 'GarmentImage',
+  ManualMigration: 'ManualMigration'
 };
 
 /**

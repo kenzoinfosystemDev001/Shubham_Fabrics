@@ -1258,7 +1258,8 @@ model FabricBatch {
   colorCode         String?
   colorName         String?
   totalRolls        Int               @default(0)
-  totalMeters       Decimal           @default(0) @db.Decimal(10, 2)
+  totalMeters       Decimal           @default(0) @db.Decimal(10, 2) // rolls received in MTR
+  totalPieces       Decimal           @default(0) @db.Decimal(10, 2) // rolls received in PCS; never added to meters
   status            FabricBatchStatus @default(PENDING_RECEIPT)
   receivedAt        DateTime?
   createdById       String
@@ -1300,7 +1301,8 @@ model FabricStoreRoll {
   batch             FabricBatch        @relation(fields: [batchId], references: [id])
   locationId        String?
   location          InventoryLocation? @relation("RollLocation", fields: [locationId], references: [id])
-  length            Decimal            @db.Decimal(10, 2) // meters
+  length            Decimal            @db.Decimal(10, 2) // quantity of the roll, in `unit`
+  unit              String             @default("MTR") // MTR or PCS; never converted
   width             Decimal?           @db.Decimal(10, 2) // cm
   weight            Decimal?           @db.Decimal(10, 3) // kg
   status            FabricRollStatus   @default(RECEIVED)
@@ -1345,7 +1347,8 @@ model MaterialReceipt {
   vehicleNumber       String?
   supplierName        String
   totalRollsReceived  Int         @default(0)
-  totalMetersReceived Decimal     @default(0) @db.Decimal(10, 2)
+  totalMetersReceived Decimal     @default(0) @db.Decimal(10, 2) // rolls received in MTR
+  totalPiecesReceived Decimal     @default(0) @db.Decimal(10, 2) // rolls received in PCS
   status              GRNStatus   @default(DRAFT)
   remarks             String?
   createdAt           DateTime    @default(now())
@@ -1421,7 +1424,8 @@ model FabricStockLedger {
   batchId         String
   batch           FabricBatch          @relation(fields: [batchId], references: [id])
   transactionType StockTransactionType
-  quantity        Decimal              @db.Decimal(10, 2) // meters moved
+  quantity        Decimal              @db.Decimal(10, 2) // quantity moved, in `uom`
+  uom             String               @default("MTR") // MTR or PCS, the roll's unit
   referenceType   String // "GRN", "ISSUE_CHALLAN", "RETURN_CHALLAN", "QC_HOLD"
   referenceId     String // the relevant document ID
   fromLocationId  String?
@@ -1835,36 +1839,6 @@ model GarmentImage {
   updatedAt       DateTime @updatedAt
 
   @@unique([programId, garmentCategory, styleRef])
-}
-
-// Fabric Store "Upload Stock Sheet" (photo, scan or Excel). Audit record of one uploaded file: the original
-// bytes, the rows read from it, and - once a user confirmed the reviewed rows - who confirmed and which
-// FabricInward rows were created. Unconfirmed imports never touch stock.
-model StockImport {
-  id            String    @id @default(uuid())
-  source        String // IMAGE or EXCEL
-  fileName      String
-  mimeType      String
-  fileSize      Int
-  fileHash      String // sha256 of the file; the same file uploaded again is flagged
-  fileData      Bytes
-  status        String    @default("EXTRACTED") // EXTRACTED | CONFIRMED | DISCARDED
-  extractedJson Json? // rows and header exactly as read, with confidence and warnings
-  rowCount      Int       @default(0)
-  engine        String? // e.g. claude-opus-5-5, sheetjs
-  uploadedById  String
-  uploadedAt    DateTime  @default(now())
-  confirmKey    String?   @unique // idempotency key of the confirm request; a retry returns the same result
-  confirmedById String?
-  confirmedAt   DateTime?
-  confirmedJson Json? // rows as the user confirmed them
-  resultJson    Json? // created inward ids and skipped rows with reasons
-  addedCount    Int       @default(0)
-  skippedCount  Int       @default(0)
-  updatedAt     DateTime  @updatedAt
-
-  @@index([fileHash])
-  @@index([uploadedAt])
 }
 
 // Manual migrations already applied (scripts/apply-appearance-migrations.js, run before the web app starts).

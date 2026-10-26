@@ -130,14 +130,16 @@ export async function checkFabricStoreAvailability(
     select: {
       id: true,
       length: true,
+      unit: true,
       rollNumber: true,
     },
   });
 
-  const rollStockMeters = matchingRolls.reduce(
-    (sum, r) => sum + (Number(r.length) || 0),
-    0
-  );
+  // Each roll is counted in its own unit; meters and pieces are never added together.
+  const rollStockOf = (unit: 'MTR' | 'PCS') =>
+    matchingRolls.filter((r) => (r.unit || 'MTR') === unit).reduce((sum, r) => sum + (Number(r.length) || 0), 0);
+  const rollStockMeters = rollStockOf('MTR');
+  const rollStockPcs = rollStockOf('PCS');
 
   // 2. Check FabricInward stock entries
   let inwardStockMeters = 0;
@@ -225,7 +227,7 @@ export async function checkFabricStoreAvailability(
   }
 
   const totalStoreStockMeters = Math.round((rollStockMeters + inwardStockMeters) * 100) / 100;
-  const totalStoreStockPcs = Math.round(inwardStockPcs * 100) / 100;
+  const totalStoreStockPcs = Math.round((rollStockPcs + inwardStockPcs) * 100) / 100;
   const availableStock = requiredUnit === 'PCS' ? totalStoreStockPcs : totalStoreStockMeters;
 
   // 3. Parse Metadata for Store Incharge verification
@@ -271,7 +273,7 @@ export async function checkFabricStoreAvailability(
     message = `Fabric availability verified by Fabric Store Incharge. Production sheet is cleared to move to ${destDept}.`;
   } else if (
     fabricColorAvailable === 'IN_STOCK' &&
-    ((requiredUnit === 'MTR' && matchingRolls.length > 0) || matchingInwardEntryCount > 0)
+    (matchingRolls.some((r) => (r.unit || 'MTR') === requiredUnit) || matchingInwardEntryCount > 0)
   ) {
     isAvailable = true;
     statusLabel = 'AVAILABLE';

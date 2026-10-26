@@ -1,7 +1,7 @@
 // Production fixes tests: manual challan numbers, Fabric Store stock in meters and pieces
 // (pure rules plus the real ledger service against an in-memory Prisma stand-in), and the
 // Fabric Store -> Dyeing instruction lines, and the Upload Stock Sheet rules (file types, Excel
-// columns, quantities, dates, review warnings, confirm validation), and finished-garment challans
+// columns, quantities, dates, row validation), and finished-garment challans
 // (Finishing onward: garment name and image only). Touches no database.
 // Run: node --test scripts/test-production-fixes.mjs
 import assert from 'node:assert/strict';
@@ -123,6 +123,25 @@ test('one inward entry with several fabrics and colours keeps each line in its o
 
   const blank = stock.resolveIssueBucket(book, { fabric: 'Rayon', type: 'DYED', colour: '', unit: 'MTR' });
   assert.equal(blank.ok, false, 'a blank colour is ambiguous when the fabric is stocked in several colours');
+});
+
+test('stock totals are kept per unit: meters and pieces are never added together', () => {
+  const totals = stock.unitTotals();
+  stock.addToUnitTotals(totals, 'mtr', 30);
+  stock.addToUnitTotals(totals, 'Pieces', 10);
+  stock.addToUnitTotals(totals, 'MTR', 25.5);
+  assert.deepEqual(totals, { MTR: 55.5, PCS: 10 });
+  assert.equal(stock.formatUnitTotals(totals), '55.5 MTR · 10 PCS');
+  assert.equal(stock.formatUnitTotals(stock.unitTotals()), '0');
+  assert.equal(stock.formatUnitTotals({ MTR: 0, PCS: 4 }), '4 PCS', 'a unit with nothing is left out');
+  assert.equal(stock.formatUnitTotals(stock.addToUnitTotals(stock.unitTotals(), 'ROLL', 2)), '2 ROLL', 'an unknown unit is never counted as meters or pieces');
+
+  // A challan with Pink 30 MTR, Red 10 PCS, Blue 25 MTR: each line keeps its unit.
+  const mixed = stock.lineTotals([{ quantity: 30, uom: 'MTR' }, { quantity: 10, uom: 'PCS' }, { quantity: 25, uom: 'MTR' }]);
+  assert.deepEqual([mixed.totals, mixed.single, mixed.label], [{ MTR: 55, PCS: 10 }, null, '55 MTR · 10 PCS']);
+  const single = stock.lineTotals([{ quantity: 12, uom: 'PCS' }, { quantity: 8, uom: 'PCS' }]);
+  assert.deepEqual(single.single, { quantity: 20, unit: 'PCS' });
+  assert.deepEqual(stock.lineTotals([], 'MTR').single, { quantity: 0, unit: 'MTR' });
 });
 
 test('stock recorded before colour tracking serves coloured issues of that fabric and unit', () => {
@@ -583,10 +602,8 @@ test('production sheets: print / download without a category carries every sheet
 
 const fileHead = (...b) => Uint8Array.from([...b, ...new Array(16).fill(0)]);
 
-test('rules: only real JPG/PNG/XLSX/XLS files are accepted, and the extension must agree', () => {
-  assert.equal(stockImport.sniffImportFile(fileHead(0xff, 0xd8, 0xff, 0xe0), 'a.JPG').source, 'IMAGE');
-  assert.equal(stockImport.sniffImportFile(fileHead(0xff, 0xd8, 0xff, 0xe0), 'a.jpeg').mimeType, 'image/jpeg');
-  assert.equal(stockImport.sniffImportFile(fileHead(0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a), 'scan.png').mimeType, 'image/png');
+test('rules: only real XLSX/XLS files are accepted, and the extension must agree', () => {
+  assert.equal(stockImport.sniffImportFile(fileHead(0xff, 0xd8, 0xff, 0xe0), 'a.jpg'), null, 'photos are not imported');
   assert.equal(stockImport.sniffImportFile(fileHead(0x50, 0x4b, 0x03, 0x04), 'stock.xlsx').source, 'EXCEL');
   assert.equal(stockImport.sniffImportFile(fileHead(0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1), 'old.xls').source, 'EXCEL');
   assert.equal(stockImport.sniffImportFile(fileHead(0x50, 0x4b, 0x03, 0x04), 'evil.png'), null, 'a zip named .png');
@@ -661,45 +678,6 @@ test('rules: a sheet with no fabric/quantity headings is refused; a missing unit
   assert.deepEqual([read.rows[0].itemName, read.rows[0].quantity, read.rows[0].unit], ['Georgette', 10, null]);
   const pcs = stockImport.rowsFromSheet([['Quality', 'Pieces'], ['Lining', 7]], 'S');
   assert.equal(pcs.rows[0].unit, 'PCS', 'a Pieces column means PCS');
-});
-
-test('rules: photo readings keep their confidence; nothing unreadable is filled in', () => {
-  const f = (value, confidence = 'high') => ({ value, confidence });
-  const empty = { itemName: f(null, 'low'), fabricCode: f(null), colour: f(null), dyeColour: f(null), quantity: f(null), unit: f(null), supplierName: f(null), billNo: f(null), billDate: f(null), remarks: f(null), unreadableFields: [] };
-  const read = stockImport.rowsFromVision({
-    document: { readable: true, problem: null, supplierName: f('Arvind Mills'), billNo: f('A/77', 'medium'), billDate: f('6/10/26') },
-    rows: [
-      { ...empty, itemName: f('Muslin'), colour: f('Peach', 'medium'), quantity: f('12O', 'medium'), unit: f('Mtrs') },
-      { ...empty, itemName: f('Muslin'), colour: f('Mint'), quantity: f('30'), unit: f('yards') },
-      { ...empty, itemName: f('Lining'), quantity: f('25'), unit: f(null, 'low'), unreadableFields: ['unit', 'colour', 'bogus'] },
-      empty,
-    ],
-  });
-  assert.deepEqual(read.header, { supplierName: 'Arvind Mills', billNo: 'A/77', billDate: '2026-10-06', billDateText: null, confidence: { supplierName: 'high', billNo: 'medium', billDate: 'high' } });
-  assert.equal(read.rows.length, 3, 'a line with nothing read is dropped');
-  const [a, b, c] = read.rows;
-  assert.deepEqual([a.quantity, a.quantityText, a.unit, a.confidence.quantity, a.confidence.colour], [null, '12O', 'MTR', 'low', 'medium']);
-  assert.deepEqual([b.quantity, b.unit, b.unitText, b.confidence.unit], [30, null, 'yards', 'low']);
-  assert.deepEqual([c.unit, c.colour, c.unreadable], [null, null, ['unit', 'colour']]);
-  assert.equal(stockImport.rowsFromVision({ document: { readable: false, problem: 'Too blurred' }, rows: [] }).readable, false);
-  assert.deepEqual(stockImport.rowsFromVision(null).rows, []);
-});
-
-test('rules: review flags what must be fixed and what should be checked', () => {
-  const ok = { rowNo: 1, itemName: 'Rayon', quantity: 10, unit: 'MTR', billNo: 'B1', billDate: '2026-10-01', confidence: {} };
-  assert.deepEqual(stockImport.reviewRow(ok), { blocking: [], warnings: [] });
-  const bad = stockImport.reviewRow({ rowNo: 2, itemName: '', quantity: null, quantityText: '12O', unit: null, unitText: 'yards', billNo: '', billDate: null, billDateText: '31/02', confidence: { colour: 'low' }, unreadable: ['remarks'] });
-  assert.deepEqual(bad.blocking, [
-    'Fabric name is missing.',
-    'Quantity "12O" is not a valid number.',
-    'Unit "yards" is not MTR or PCS — choose one.',
-    'Challan / bill no. is missing.',
-    'Date "31/02" is not a valid date.',
-  ]);
-  assert.deepEqual(bad.warnings, ['Colour was hard to read — check it.', 'Remarks could not be read.']);
-  assert.deepEqual(stockImport.reviewRow({ ...ok, billNo: null, billDate: null }, { billNo: 'H-1', billDate: '2026-10-02' }).blocking, [], 'header values cover the row');
-  const repeats = stockImport.repeatedRows([ok, { ...ok, rowNo: 2 }, { ...ok, rowNo: 3, colour: 'Red' }, { ...ok, rowNo: 4 }]);
-  assert.deepEqual([...repeats], [[2, 1], [4, 1]]);
 });
 
 test('rules: confirm validation checks every row, keeps units, and puts code and dye colour in remarks', () => {

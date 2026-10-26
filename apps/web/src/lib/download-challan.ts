@@ -14,6 +14,7 @@ import { loadProgramDocument } from '@/lib/program-document';
 import { extractRootWilcomPhoto, prepareWilcomImages } from '@/lib/download-wilcom';
 import { generateProductionSheetHtml } from '@/lib/download-production-sheet';
 import { garmentImageUrl, groupGarments, imageFor, isFinishedGoodsChallan } from '@/lib/finished-garments.mjs';
+import { lineTotals } from '@/lib/fabric-stock';
 
 /** A finished garment as printed on the challan: its name and image (a data URL, so the file works offline). */
 export interface PrintedGarment {
@@ -111,8 +112,11 @@ export function generateChallanHtml(challan: any): string {
 
   // Items
   const items: ChallanItem[] = Array.isArray(challan.items) ? challan.items : [];
-  const totalQuantity = items.reduce((sum, it) => sum + (Number(it.quantity) || 0), 0);
-  const uom = items[0]?.uom || 'PCS';
+  // Lines may be in MTR and PCS; totals are per unit and never added together.
+  const itemTotals = lineTotals(items, challan.fabricUnit || 'PCS');
+  const uom = itemTotals.single?.unit || challan.fabricUnit || 'PCS';
+  const totalQuantity = itemTotals.single ? itemTotals.single.quantity : itemTotals.totals[challan.fabricUnit] || 0;
+  const totalText = items.length > 0 ? itemTotals.label : `${challan.fabricOut || challan.fabricIn || 0} ${uom}`;
   // Finished garments (Finishing onward): name and image only; the Production Sheet pages follow.
   const garments: PrintedGarment[] | null = Array.isArray(challan.finishedGarments) ? challan.finishedGarments : null;
   const attachedSheets: { styles: string; html: string } | null = challan.attachedSheets || null;
@@ -672,7 +676,7 @@ export function generateChallanHtml(challan: any): string {
     <div class="table-container">
       <div class="table-title">
         <span>ITEMS / MATERIALS</span>
-        <span style="font-family: monospace; font-size: 11px;">Total: ${totalQuantity || challan.fabricOut || challan.fabricIn || 0} ${uom}</span>
+        <span style="font-family: monospace; font-size: 11px;">Total: ${totalText}</span>
       </div>
       <table>
         <thead>
@@ -710,9 +714,9 @@ export function generateChallanHtml(challan: any): string {
               TOTAL QUANTITY:
             </td>
             <td class="num" style="font-size: 13px; font-weight: 900;">
-              ${totalQuantity || challan.fabricOut || challan.fabricIn || 0}
+              ${itemTotals.single || items.length === 0 ? totalQuantity || challan.fabricOut || challan.fabricIn || 0 : totalText}
             </td>
-            <td style="text-align: center; font-weight: 900;">${uom}</td>
+            <td style="text-align: center; font-weight: 900;">${itemTotals.single || items.length === 0 ? uom : ''}</td>
           </tr>
         </tbody>
       </table>

@@ -949,6 +949,7 @@ exports.Prisma.FabricBatchScalarFieldEnum = {
   colorName: 'colorName',
   totalRolls: 'totalRolls',
   totalMeters: 'totalMeters',
+  totalPieces: 'totalPieces',
   status: 'status',
   receivedAt: 'receivedAt',
   createdById: 'createdById',
@@ -962,6 +963,7 @@ exports.Prisma.FabricStoreRollScalarFieldEnum = {
   batchId: 'batchId',
   locationId: 'locationId',
   length: 'length',
+  unit: 'unit',
   width: 'width',
   weight: 'weight',
   status: 'status',
@@ -986,6 +988,7 @@ exports.Prisma.MaterialReceiptScalarFieldEnum = {
   supplierName: 'supplierName',
   totalRollsReceived: 'totalRollsReceived',
   totalMetersReceived: 'totalMetersReceived',
+  totalPiecesReceived: 'totalPiecesReceived',
   status: 'status',
   remarks: 'remarks',
   createdAt: 'createdAt',
@@ -1022,6 +1025,7 @@ exports.Prisma.FabricStockLedgerScalarFieldEnum = {
   batchId: 'batchId',
   transactionType: 'transactionType',
   quantity: 'quantity',
+  uom: 'uom',
   referenceType: 'referenceType',
   referenceId: 'referenceId',
   fromLocationId: 'fromLocationId',
@@ -1287,30 +1291,6 @@ exports.Prisma.GarmentImageScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
-exports.Prisma.StockImportScalarFieldEnum = {
-  id: 'id',
-  source: 'source',
-  fileName: 'fileName',
-  mimeType: 'mimeType',
-  fileSize: 'fileSize',
-  fileHash: 'fileHash',
-  fileData: 'fileData',
-  status: 'status',
-  extractedJson: 'extractedJson',
-  rowCount: 'rowCount',
-  engine: 'engine',
-  uploadedById: 'uploadedById',
-  uploadedAt: 'uploadedAt',
-  confirmKey: 'confirmKey',
-  confirmedById: 'confirmedById',
-  confirmedAt: 'confirmedAt',
-  confirmedJson: 'confirmedJson',
-  resultJson: 'resultJson',
-  addedCount: 'addedCount',
-  skippedCount: 'skippedCount',
-  updatedAt: 'updatedAt'
-};
-
 exports.Prisma.ManualMigrationScalarFieldEnum = {
   name: 'name',
   checksum: 'checksum',
@@ -1484,7 +1464,6 @@ exports.Prisma.ModelName = {
   DeadlineAlertDismissal: 'DeadlineAlertDismissal',
   PackingAllocation: 'PackingAllocation',
   GarmentImage: 'GarmentImage',
-  StockImport: 'StockImport',
   ManualMigration: 'ManualMigration'
 };
 
