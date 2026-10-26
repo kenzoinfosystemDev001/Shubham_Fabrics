@@ -9,7 +9,8 @@ import {
 } from 'lucide-react';
 import { 
   downloadProductionSheetHtml, 
-  printProductionSheet 
+  printProductionSheet,
+  productionSheetCategoriesForViewer,
 } from '@/lib/download-production-sheet';
 import { 
   downloadChallanHtml, 
@@ -41,10 +42,17 @@ export function DocumentActionButtons({
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isChallanOpen, setIsChallanOpen] = useState(false);
   const [isWilcomOpen, setIsWilcomOpen] = useState(false);
-  const wilcomCategory = 'TOP';
+  // Every Wilcom sheet of the production (the preview can still filter by category).
+  const wilcomCategory = 'ALL';
 
   const activeProgram = program || challan?.program;
   const activeChallan = challan;
+  // A production can have any number of Production Sheets; the count is known once the full sheet is loaded.
+  const sheetCount = activeProgram?.metadataJson
+    ? productionSheetCategoriesForViewer(activeProgram).length
+    : typeof activeProgram?.sheetCount === 'number'
+    ? activeProgram.sheetCount
+    : null;
 
   if (!activeProgram && !activeChallan) {
     return null;
@@ -60,29 +68,29 @@ export function DocumentActionButtons({
         
         {/* 1. PRODUCTION SHEET ACTIONS */}
         {activeProgram && (
-          <div className="inline-flex items-center bg-blue-50/80 border border-blue-200/90 rounded-md overflow-hidden shadow-2xs">
+          <div className="inline-flex items-center bg-brand-50/80 border border-brand-200/90 rounded-md overflow-hidden shadow-2xs">
             <button
               type="button"
               onClick={() => setIsSheetOpen(true)}
-              className={`inline-flex items-center gap-1 ${padClass} ${textClass} font-bold text-blue-900 hover:bg-blue-100 transition cursor-pointer`}
-              title="View Master Production Sheet Form"
+              className={`inline-flex items-center gap-1 ${padClass} ${textClass} font-bold text-brand-900 hover:bg-brand-100 transition cursor-pointer`}
+              title="View the Production Sheets"
             >
-              <FileText className={`${iconSize} text-blue-700`} />
-              {showLabels && <span>Sheet</span>}
+              <FileText className={`${iconSize} text-brand-700`} />
+              {showLabels && <span>{sheetCount && sheetCount > 1 ? `Sheets (${sheetCount})` : 'Sheet'}</span>}
             </button>
             <button
               type="button"
-              onClick={() => void downloadProductionSheetHtml(activeProgram, 'ALL')}
-              className={`p-1 text-blue-700 hover:text-blue-950 hover:bg-blue-100 border-l border-blue-200/80 transition cursor-pointer`}
-              title="Download Production Sheet (all forwarded TOP / BOTTOM / DUPATTA sheets)"
+              onClick={() => void downloadProductionSheetHtml(activeProgram)}
+              className={`p-1 text-brand-700 hover:text-brand-900 hover:bg-brand-100 border-l border-brand-200/80 transition cursor-pointer`}
+              title="Download all Production Sheets (HTML/PDF)"
             >
               <Download className={iconSize} />
             </button>
             <button
               type="button"
-              onClick={() => printProductionSheet(activeProgram, 'ALL')}
-              className={`p-1 text-blue-700 hover:text-blue-950 hover:bg-blue-100 border-l border-blue-200/80 transition cursor-pointer`}
-              title="Print Production Sheet (all forwarded TOP / BOTTOM / DUPATTA sheets)"
+              onClick={() => printProductionSheet(activeProgram)}
+              className={`p-1 text-brand-700 hover:text-brand-900 hover:bg-brand-100 border-l border-brand-200/80 transition cursor-pointer`}
+              title="Print all Production Sheets (A4)"
             >
               <Printer className={iconSize} />
             </button>
@@ -91,20 +99,20 @@ export function DocumentActionButtons({
 
         {/* 2. CHALLAN ACTIONS */}
         {activeChallan && (
-          <div className="inline-flex items-center bg-emerald-50/80 border border-emerald-200/90 rounded-md overflow-hidden shadow-2xs">
+          <div className="inline-flex items-center bg-accent-50/80 border border-accent-200/90 rounded-md overflow-hidden shadow-2xs">
             <button
               type="button"
               onClick={() => setIsChallanOpen(true)}
-              className={`inline-flex items-center gap-1 ${padClass} ${textClass} font-bold text-emerald-900 hover:bg-emerald-100 transition cursor-pointer`}
+              className={`inline-flex items-center gap-1 ${padClass} ${textClass} font-bold text-accent-800 hover:bg-accent-100 transition cursor-pointer`}
               title="View Department Transfer Challan Slip"
             >
-              <FileText className={`${iconSize} text-emerald-700`} />
+              <FileText className={`${iconSize} text-accent-800`} />
               {showLabels && <span>Challan</span>}
             </button>
             <button
               type="button"
               onClick={() => void downloadChallanHtml(activeChallan)}
-              className={`p-1 text-emerald-700 hover:text-emerald-950 hover:bg-emerald-100 border-l border-emerald-200/80 transition cursor-pointer`}
+              className={`p-1 text-accent-800 hover:text-accent-800 hover:bg-accent-100 border-l border-accent-200/80 transition cursor-pointer`}
               title="Download Department Transfer Challan Form with Barcode"
             >
               <Download className={iconSize} />
@@ -112,7 +120,7 @@ export function DocumentActionButtons({
             <button
               type="button"
               onClick={() => printChallan(activeChallan)}
-              className={`p-1 text-emerald-700 hover:text-emerald-950 hover:bg-emerald-100 border-l border-emerald-200/80 transition cursor-pointer`}
+              className={`p-1 text-accent-800 hover:text-accent-800 hover:bg-accent-100 border-l border-accent-200/80 transition cursor-pointer`}
               title="Print Department Transfer Challan Slip"
             >
               <Printer className={iconSize} />
@@ -122,29 +130,29 @@ export function DocumentActionButtons({
 
         {/* 3. WILCOM SPECIFICATION ACTIONS */}
         {activeProgram && (
-          <div className="inline-flex items-center bg-purple-50/80 border border-purple-200/90 rounded-md overflow-hidden shadow-2xs">
+          <div className="inline-flex items-center bg-brand-50/80 border border-brand-200/90 rounded-md overflow-hidden shadow-2xs">
             <button
               type="button"
               onClick={() => setIsWilcomOpen(true)}
-              className={`inline-flex items-center gap-1 ${padClass} ${textClass} font-bold text-purple-900 hover:bg-purple-100 transition cursor-pointer`}
+              className={`inline-flex items-center gap-1 ${padClass} ${textClass} font-bold text-brand-900 hover:bg-brand-100 transition cursor-pointer`}
               title="View Wilcom Embroidery Specification Form"
             >
-              <Sparkles className={`${iconSize} text-purple-700`} />
+              <Sparkles className={`${iconSize} text-brand-700`} />
               {showLabels && <span>Wilcom</span>}
             </button>
             <button
               type="button"
               onClick={() => void downloadWilcomFormHtml(activeProgram)}
-              className={`p-1 text-purple-700 hover:text-purple-950 hover:bg-purple-100 border-l border-purple-200/80 transition cursor-pointer`}
-              title="Download Wilcom Form with Design Artwork & Offline Images"
+              className={`p-1 text-brand-700 hover:text-brand-900 hover:bg-brand-100 border-l border-brand-200/80 transition cursor-pointer`}
+              title="Download all Wilcom sheets with design artwork"
             >
               <Download className={iconSize} />
             </button>
             <button
               type="button"
               onClick={() => printWilcomForm(activeProgram)}
-              className={`p-1 text-purple-700 hover:text-purple-950 hover:bg-purple-100 border-l border-purple-200/80 transition cursor-pointer`}
-              title="Print Wilcom Form (A4)"
+              className={`p-1 text-brand-700 hover:text-brand-900 hover:bg-brand-100 border-l border-brand-200/80 transition cursor-pointer`}
+              title="Print all Wilcom sheets (A4)"
             >
               <Printer className={iconSize} />
             </button>

@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
-import { loadFabricStockLedger, lockFabricStoreStock, recordStockMovements, resolveStockActorId } from '@/lib/fabric-stock-ledger';
+import { requireDepartment } from '@/lib/auth/department-access';
+import {
+  FabricStockError,
+  STOCK_TRANSACTION_OPTIONS,
+  fabricStockErrorBody,
+  syncManualOutwardStock,
+} from '@/lib/fabric-stock-ledger';
 import {
   cleanFabricName,
-  describeFabricStockShortages,
-  findFabricStockShortages,
   getChallanItemFabricType,
   normalizeFabricStockType,
 } from '@/lib/fabric-stock';
@@ -13,6 +17,8 @@ export const dynamic = 'force-dynamic';
 
 // GET /api/fabric-store/outward - list all outward fabric stock entries (auto from challans + manual)
 export async function GET(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE');
+  if (!authUser) return authResponse;
   try {
     const { searchParams } = new URL(request.url);
     const rawFilter = searchParams.get('fabricType')?.toUpperCase(); // "UNDYED" | "KORA" | "DYED" | "ALL"
@@ -299,6 +305,8 @@ export async function GET(request: Request) {
 
 // POST /api/fabric-store/outward - manually record outward fabric issue
 export async function POST(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE');
+  if (!authUser) return authResponse;
   try {
     const body = await request.json();
     const {
@@ -306,7 +314,6 @@ export async function POST(request: Request) {
       challanNumber,
       designNumber,
       itemName,
-      color,
       issueQty,
       unit = 'MTR',
       avgPerPcs,
@@ -315,6 +322,7 @@ export async function POST(request: Request) {
       remarks,
       destination = 'OTHER',
       fabricType = 'DYED',
+      colour,
     } = body;
 
     if (!itemName || issueQty === undefined) {
@@ -328,61 +336,38 @@ export async function POST(request: Request) {
 
     const normalizedType = (fabricType === 'KORA' || fabricType === 'UNDYED') ? 'UNDYED' : 'DYED';
 
-    const normalizedUnit = String(unit).toUpperCase() === 'PCS' ? 'PCS' : 'MTR';
-    const referenceNumber = challanNumber ? String(challanNumber).trim() : null;
-    const actorId = await resolveStockActorId(request);
+    const normalizedUnit = String(unit).toUpperCase();
+    if (!['MTR', 'PCS'].includes(normalizedUnit)) {
+      return NextResponse.json({ error: 'unit must be MTR or PCS' }, { status: 400 });
+    }
 
+    // Deducts from the matching fabric, colour and unit; refused when stock would go negative.
     const outward = await prisma.$transaction(async (tx) => {
-      await lockFabricStoreStock(tx);
-      const ledger = await loadFabricStockLedger(tx);
-      // Only a row mirroring a Fabric Store challan the ledger already counts is exempt from deduction.
-      const mirrorsChallan = referenceNumber
-        ? ledger.countedChallanNumbers.has(referenceNumber.toLowerCase())
-        : false;
-      const issueColor = color ? String(color).trim() : '';
-      const line = { name: String(itemName).trim(), type: normalizedType as 'UNDYED' | 'DYED', color: issueColor, unit: normalizedUnit };
-      if (!mirrorsChallan) {
-        const shortages = findFabricStockShortages(ledger, [{ ...line, quantity: qty }]);
-        if (shortages.length > 0) {
-          throw Object.assign(new Error(`Insufficient Fabric Store stock. ${describeFabricStockShortages(shortages)}.`), { code: 'STOCK_SHORTAGE', shortages });
-        }
-      }
-
-      const created = await tx.fabricOutward.create({
-        data: {
-          date: new Date(date),
-          challanNumber: referenceNumber,
-          designNumber: designNumber ? String(designNumber).trim() : null,
-          itemName: String(itemName).trim(),
-          color: issueColor || null,
-          issueQty: qty,
-          unit: normalizedUnit,
-          avgPerPcs: avgPerPcs ? parseFloat(avgPerPcs) : null,
-          issuePcsQty: issuePcsQty ? parseFloat(issuePcsQty) : null,
-          byOrderName: byOrderName ? String(byOrderName).trim() : null,
-          remarks: remarks ? String(remarks).trim() : null,
-          destination: String(destination).toUpperCase(),
-          fabricType: normalizedType,
-        },
+      const row = await tx.fabricOutward.create({
+      data: {
+        date: new Date(date),
+        challanNumber: challanNumber ? String(challanNumber).trim() : null,
+        designNumber: designNumber ? String(designNumber).trim() : null,
+        itemName: String(itemName).trim(),
+        issueQty: qty,
+        unit: normalizedUnit,
+        colour: colour ? String(colour).trim() : null,
+        avgPerPcs: avgPerPcs ? parseFloat(avgPerPcs) : null,
+        issuePcsQty: issuePcsQty ? parseFloat(issuePcsQty) : null,
+        byOrderName: byOrderName ? String(byOrderName).trim() : null,
+        remarks: remarks ? String(remarks).trim() : null,
+        destination: String(destination).toUpperCase(),
+        fabricType: normalizedType,
+      },
       });
-
-      if (!mirrorsChallan && actorId) {
-        await recordStockMovements(tx, await loadFabricStockLedger(tx), actorId, [{
-          entryType: 'ISSUE',
-          line,
-          quantity: -qty,
-          referenceType: 'FABRIC_OUTWARD',
-          referenceId: created.id,
-          notes: referenceNumber ? `Manual outward (ref ${referenceNumber})` : 'Manual outward',
-        }]);
-      }
-      return created;
-    }, { maxWait: 15000, timeout: 30000 });
+      await syncManualOutwardStock(tx, row.id, authUser.id);
+      return row;
+    }, STOCK_TRANSACTION_OPTIONS);
 
     return NextResponse.json({ success: true, data: outward }, { status: 201 });
   } catch (error: any) {
-    if (error?.code === 'STOCK_SHORTAGE') {
-      return NextResponse.json({ error: error.message, stockShortages: error.shortages }, { status: 400 });
+    if (error instanceof FabricStockError) {
+      return NextResponse.json(fabricStockErrorBody(error), { status: 400 });
     }
     console.error('Error recording outward fabric issue:', error);
     return NextResponse.json({ error: error.message || 'Failed to record outward stock' }, { status: 500 });

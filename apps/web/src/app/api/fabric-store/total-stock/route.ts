@@ -1,19 +1,24 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
-import { loadFabricStockLedger } from '@/lib/fabric-stock-ledger';
+import { requireDepartment } from '@/lib/auth/department-access';
+import { cleanFabricName, normalizeFabricStockType } from '@/lib/fabric-stock';
+import { isChallanMirror, loadStockBook } from '@/lib/fabric-stock-ledger';
+import { challanStockLines, roundQty, summarizeBuckets } from '@/lib/fabric-stock-rules.mjs';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE', 'PROGRAMMING');
+  if (!authUser) return authResponse;
   try {
     const { searchParams } = new URL(request.url);
     const filterType = searchParams.get('type')?.toUpperCase(); // "UNDYED" | "KORA" | "DYED" | "ALL"
     const search = searchParams.get('search');
 
-    // 1. Inward minus Fabric Store challans and manual outward, per fabric + type + colour + unit.
-    const ledger = await loadFabricStockLedger();
+    // 1. Stock per fabric, type, colour and unit (meters and pieces are separate buckets).
+    const { book, storeChallans, manualOutwards } = await loadStockBook(prisma);
 
-    // 2. Fetch Store shelf defect records and defective-return challans.
+    // 4. Fetch Store shelf defect records and defective-return challans.
     const defectiveRecords = await prisma.defectRecord.findMany({
       where: {
         departmentCode: 'STORE',
@@ -51,25 +56,64 @@ export async function GET(request: Request) {
     }
     const defectiveTotal = defectiveStockByUnit.PCS || 0;
 
-    const allItems = Array.from(ledger.rows.values()).sort((a, b) =>
-      a.itemName.localeCompare(b.itemName) || a.color.localeCompare(b.color) || a.unit.localeCompare(b.unit)
-    );
+    // 2. Dated outward register: active Fabric Store challans and manual outward rows.
+    const outwardHistory: Array<Record<string, any>> = [];
+    const challanNumbers = new Set(storeChallans.map((challan) => challan.challanNumber.trim().toLowerCase()));
+    for (const ch of storeChallans) {
+      if (['DRAFT', 'CANCELLED'].includes(ch.status)) continue;
+      for (const line of challanStockLines(ch)) {
+        outwardHistory.push({
+          id: `challan-${ch.id}-${line.itemId || outwardHistory.length}`,
+          date: ch.issuedDate || ch.createdAt,
+          challanNumber: ch.challanNumber,
+          sourceDepartment: ch.fromDepartment,
+          destination: ch.toDepartment,
+          itemName: cleanFabricName(line.fabric) || line.fabric,
+          colour: line.colour,
+          quantity: line.quantity,
+          unit: String(line.unit).toUpperCase(),
+          fabricType: line.type,
+        });
+      }
+    }
+    for (const outw of manualOutwards) {
+      if (isChallanMirror(outw, challanNumbers) || !(Number(outw.issueQty) > 0)) continue;
+      outwardHistory.push({
+        id: `manual-${outw.id}`,
+        date: outw.date || outw.createdAt,
+        challanNumber: outw.challanNumber || '—',
+        sourceDepartment: 'STORE',
+        destination: outw.destination || '—',
+        itemName: cleanFabricName(outw.itemName) || outw.itemName,
+        colour: outw.colour,
+        quantity: Number(outw.issueQty),
+        unit: String(outw.unit || 'MTR').toUpperCase(),
+        fabricType: normalizeFabricStockType(outw.fabricType),
+      });
+    }
 
-    // 3. Calculate final balances (meters and pieces stay separate rows)
-    let items = allItems.map((it, idx) => ({
-      sNo: idx + 1,
-      itemName: it.itemName,
-      fabricType: it.fabricType,
-      color: it.color,
-      unit: it.unit,
-      totalInward: it.totalInward,
-      totalOutward: it.totalOutward,
-      balance: Math.max(0, it.rawBalance),
-      inwardCount: it.inwardCount,
-      outwardCount: it.outwardCount,
-      lastActivity: it.lastActivity,
-      status: it.rawBalance > 0 ? ('IN_STOCK' as const) : ('OUT_OF_STOCK' as const),
-    }));
+    // 3. Final balances, one row per bucket; never combined across units.
+    const buckets = Array.from(book.buckets.values()).sort((a, b) =>
+      a.itemName.localeCompare(b.itemName) || a.unit.localeCompare(b.unit) || String(a.colour || '').localeCompare(String(b.colour || '')),
+    );
+    let items = buckets.map((it, idx) => {
+      const balance = roundQty(it.totalInward - it.totalOutward);
+      return {
+        sNo: idx + 1,
+        itemName: it.itemName,
+        fabricType: it.fabricType,
+        colour: it.colour,
+        unit: it.unit,
+        totalInward: it.totalInward,
+        totalOutward: it.totalOutward,
+        balance: Math.max(0, balance),
+        shortfall: balance < 0 ? roundQty(-balance) : 0,
+        inwardCount: it.inwardCount,
+        outwardCount: it.outwardCount,
+        lastActivity: it.lastActivity,
+        status: balance > 0 ? ('IN_STOCK' as const) : ('OUT_OF_STOCK' as const),
+      };
+    });
 
     // Filter by type if provided (support both UNDYED and KORA)
     if (filterType && filterType !== 'ALL') {
@@ -80,36 +124,26 @@ export async function GET(request: Request) {
     // Filter by search query
     if (search) {
       const q = search.toLowerCase();
-      items = items.filter((it) => it.itemName.toLowerCase().includes(q) || it.color.toLowerCase().includes(q));
+      items = items.filter((it) => it.itemName.toLowerCase().includes(q) || String(it.colour || '').toLowerCase().includes(q));
     }
 
     // High level summary
+    const allItems = Array.from(book.buckets.values());
     const undyedItems = allItems.filter((i) => i.fabricType === 'UNDYED');
     const dyedItems = allItems.filter((i) => i.fabricType === 'DYED');
-
-    const summarizeItems = (stockItems: typeof allItems) => ({
-      totalInwardMeters: stockItems.filter((i) => i.unit === 'MTR').reduce((s, i) => s + i.totalInward, 0),
-      totalOutwardMeters: stockItems.filter((i) => i.unit === 'MTR').reduce((s, i) => s + i.totalOutward, 0),
-      availableBalanceMeters: stockItems.filter((i) => i.unit === 'MTR').reduce((s, i) => s + Math.max(0, i.rawBalance), 0),
-      totalInwardPcs: stockItems.filter((i) => i.unit === 'PCS').reduce((s, i) => s + i.totalInward, 0),
-      totalOutwardPcs: stockItems.filter((i) => i.unit === 'PCS').reduce((s, i) => s + i.totalOutward, 0),
-      availableBalancePcs: stockItems.filter((i) => i.unit === 'PCS').reduce((s, i) => s + Math.max(0, i.rawBalance), 0),
-      itemCount: stockItems.length,
-    });
-
     const summary = {
-      overall: summarizeItems(allItems),
-      undyed: summarizeItems(undyedItems),
-      kora: summarizeItems(undyedItems), // backwards-compatibility alias for undyed
-      dyed: summarizeItems(dyedItems),
+      overall: summarizeBuckets(allItems),
+      undyed: summarizeBuckets(undyedItems),
+      kora: summarizeBuckets(undyedItems), // backwards-compatibility alias for undyed
+      dyed: summarizeBuckets(dyedItems),
       defectiveStockPcs: defectiveTotal,
       defectiveStockByUnit,
     };
 
     const normalizedSearch = search?.trim().toLowerCase();
-    const filteredOutwardHistory = ledger.outwardHistory
+    const filteredOutwardHistory = outwardHistory
       .filter((row) => !filterType || filterType === 'ALL' || row.fabricType === ((filterType === 'KORA') ? 'UNDYED' : filterType))
-      .filter((row) => !normalizedSearch || [row.itemName, row.color, row.challanNumber, row.destination, row.sourceDepartment]
+      .filter((row) => !normalizedSearch || [row.itemName, row.colour, row.challanNumber, row.destination, row.sourceDepartment]
         .some((value) => String(value || '').toLowerCase().includes(normalizedSearch)))
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 

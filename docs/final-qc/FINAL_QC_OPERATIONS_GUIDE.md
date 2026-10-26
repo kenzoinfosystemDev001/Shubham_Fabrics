@@ -2,7 +2,7 @@
 
 ## Access
 
-Use the Final QC quick-login station or sign in with an active account assigned to Final QC. The department routes are under `/final-qc`; the workspace refreshes from the database periodically and on tab focus. The quick-login station's seeded credential is for local development only and must not be used as a production credential.
+Use the Final QC quick-login station or sign in with an active account assigned to Final QC. The department routes are under `/final-check`; the workspace refreshes from the database periodically and on tab focus. The quick-login station's seeded credential is for local development only and must not be used as a production credential.
 
 ## Daily workflow
 
@@ -15,7 +15,7 @@ Use the Final QC quick-login station or sign in with an active account assigned 
 
 ## Defect and rework handling
 
-Rejected garments are recorded with an `OPEN` defect record and a defective-return Challan to `DEF-SHELF-FINAL-QC`. They are not automatically marked as scrap. Rework is recorded with its reason and status `REWORK`; no rework destination is currently configured, so operators must coordinate disposition with a supervisor instead of assuming an automatic return route.
+Rejected garments are recorded with an `OPEN` defect record and a defective-return Challan to `DEF-SHELF-FINAL-CHECK`. They are not automatically marked as scrap. Rework is recorded with its reason and status `REWORK`; no rework destination is currently configured, so operators must coordinate disposition with a supervisor instead of assuming an automatic return route.
 
 ## Error recovery
 

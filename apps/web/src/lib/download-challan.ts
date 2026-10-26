@@ -10,49 +10,28 @@
 
 import { generateCode128SvgBars } from '@/lib/barcode';
 import { getCurrentUser, canViewClientCode } from '@/lib/rbac';
-import { loadChallanDocument } from '@/lib/program-document';
+import { loadProgramDocument } from '@/lib/program-document';
 import { extractRootWilcomPhoto, prepareWilcomImages } from '@/lib/download-wilcom';
+import { generateProductionSheetHtml } from '@/lib/download-production-sheet';
+import { garmentImageUrl, groupGarments, imageFor, isFinishedGoodsChallan } from '@/lib/finished-garments.mjs';
+
+/** A finished garment as printed on the challan: its name and image (a data URL, so the file works offline). */
+export interface PrintedGarment {
+  name: string;
+  image: string | null;
+}
+
+const escapeHtml = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
 export interface ChallanItem {
   id?: string;
   itemDescription?: string;
-  fabricCode?: string | null;
-  colour?: string | null;
-  shade?: string | null;
-  requiredDyeColor?: string | null;
-  requiredDyeQuantity?: number | null;
+  colour?: string;
   quantity?: number | string;
   uom?: string;
   rollNumber?: string;
   lotNumber?: string;
   remarks?: string;
-}
-
-/** Per-unit totals ("30 MTR + 15 PCS"); meters and pieces are never added together. */
-export function summarizeQuantitiesByUnit(items: ChallanItem[]): Array<{ unit: string; quantity: number }> {
-  const totals = new Map<string, number>();
-  for (const it of items) {
-    const unit = String(it.uom || 'PCS').toUpperCase();
-    totals.set(unit, (totals.get(unit) || 0) + (Number(it.quantity) || 0));
-  }
-  return Array.from(totals.entries()).map(([unit, quantity]) => ({ unit, quantity: Math.round(quantity * 1000) / 1000 }));
-}
-
-export function formatQuantitiesByUnit(items: ChallanItem[], challan?: any): string {
-  const totals = summarizeQuantitiesByUnit(items);
-  if (totals.length > 0) return totals.map((t) => `${t.quantity} ${t.unit}`).join(' + ');
-  const headerQty = challan?.fabricOut ?? challan?.fabricIn;
-  return headerQty !== null && headerQty !== undefined && challan?.fabricUnit && challan.fabricUnit !== 'MIXED'
-    ? `${headerQty} ${challan.fabricUnit}`
-    : '—';
-}
-
-/** Which optional colour columns a challan's items actually use. */
-export function getChallanColorColumns(items: ChallanItem[]) {
-  return {
-    hasRequiredDyeColor: items.some((it) => Boolean(it.requiredDyeColor)),
-    hasResultShade: items.some((it) => Boolean(it.shade)),
-  };
 }
 
 export function generateChallanHtml(challan: any): string {
@@ -93,15 +72,20 @@ export function generateChallanHtml(challan: any): string {
     STORE: 'FABRIC STORE',
     FABRIC_STORE: 'FABRIC STORE',
     DYEING: 'DYEING DEPARTMENT',
-    DYEING_QC: 'DYEING QC',
+    QC1: 'QC1 (QUALITY CHECK 1)',
     EMBROIDERY: 'EMBROIDERY DEPARTMENT',
     THREAD_CUTTING: 'THREAD CUTTING DEPARTMENT',
     CUTTING: 'CUTTING DEPARTMENT',
-    RECUTTING: 'RECUTTING WORKSTATION',
-    THREADCUT_QC: 'THREADCUT QC',
+    RECUTTING: 'RECUTTING DEPARTMENT',
+    STITCHING: 'STITCHING DEPARTMENT',
+    QC2: 'THREADCUT QC',
     WASHING: 'WASHING DEPARTMENT',
-    WASHING_QC: 'WASHING QC',
+    QCWASHING: 'WASHING QC',
+    QC3: 'WASHING QC',
     FINISHING: 'FINISHING DEPARTMENT',
+    STEAM_PRESS: 'STEAM PRESS DEPARTMENT',
+    FINAL_CHECK: 'FINAL QC',
+    INVENTORY: 'INVENTORY',
     PACKING: 'PACKING & DISPATCH',
     PROGRAMMING: 'PROGRAMMING & PLANNING'
   };
@@ -113,23 +97,25 @@ export function generateChallanHtml(challan: any): string {
   let voucherTitle = `${fromLabel} → ${toLabel}`;
   if (fromDept === 'STORE' && (toDept === 'DYEING' || toDept.includes('DYE'))) {
     voucherTitle = 'FABRIC STORE → DYEING MATERIAL DISPATCH CHALLAN';
-  } else if (fromDept === 'DYEING' || toDept === 'DYEING_QC' || challanNo.startsWith('CH-DYE-')) {
-    voucherTitle = 'DYEING → DYEING QC INSPECTION CHALLAN';
-  } else if (fromDept === 'THREAD_CUTTING' && toDept === 'THREADCUT_QC') {
+  } else if (fromDept === 'DYEING' || toDept === 'QC1' || challanNo.startsWith('CH-DYE-')) {
+    voucherTitle = 'DYEING → QC1 QUALITY INSPECTION CHALLAN';
+  } else if (fromDept === 'THREAD_CUTTING' && toDept === 'QC2') {
     voucherTitle = 'THREAD CUTTING → THREADCUT QC INSPECTION CHALLAN';
-  } else if (fromDept === 'THREADCUT_QC' && toDept === 'WASHING') {
+  } else if (fromDept === 'QC2' && toDept === 'WASHING') {
     voucherTitle = 'THREADCUT QC → WASHING DEPARTMENT TRANSFER CHALLAN';
-  } else if (fromDept === 'WASHING' && toDept === 'WASHING_QC') {
+  } else if (fromDept === 'WASHING' && (toDept === 'QCWASHING' || toDept === 'QC3')) {
     voucherTitle = 'WASHING → WASHING QC INSPECTION CHALLAN';
+  } else if (fromDept === 'RECUTTING' && toDept === 'STITCHING') {
+    voucherTitle = 'RECUTTING TO STITCHING CATEGORY / STYLE CHALLAN';
   }
 
   // Items
   const items: ChallanItem[] = Array.isArray(challan.items) ? challan.items : [];
   const totalQuantity = items.reduce((sum, it) => sum + (Number(it.quantity) || 0), 0);
   const uom = items[0]?.uom || 'PCS';
-  const quantityTotalsLabel = formatQuantitiesByUnit(items, challan);
-  const { hasRequiredDyeColor, hasResultShade } = getChallanColorColumns(items);
-  const itemColumnCount = 4 + (hasRequiredDyeColor ? 2 : 0) + (hasResultShade ? 1 : 0);
+  // Finished garments (Finishing onward): name and image only; the Production Sheet pages follow.
+  const garments: PrintedGarment[] | null = Array.isArray(challan.finishedGarments) ? challan.finishedGarments : null;
+  const attachedSheets: { styles: string; html: string } | null = challan.attachedSheets || null;
 
   // Ledger calculation
   const fabricIn = challan.fabricIn ?? (challan.parentChallan?.fabricOut || totalQuantity);
@@ -164,8 +150,8 @@ export function generateChallanHtml(challan: any): string {
       print-color-adjust: exact !important;
     }
     body {
-      background-color: #F1EFF4;
-      color: #25232A;
+      background-color: #f1eff4;
+      color: #25232a;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       padding: 16px;
       font-size: 12px;
@@ -174,7 +160,7 @@ export function generateChallanHtml(challan: any): string {
     .no-print-bar {
       max-width: 820px;
       margin: 0 auto 16px auto;
-      background: #25232A;
+      background: #25232a;
       color: #ffffff;
       padding: 12px 20px;
       border-radius: 8px;
@@ -206,15 +192,16 @@ export function generateChallanHtml(challan: any): string {
       transition: background 0.15s;
     }
     .btn-print {
-      background: #7D44A8;
+      background: #8e55c4;
       color: #ffffff;
     }
-    .btn-print:hover { background: #663889; }
+    .btn-print:hover { background: #7442a6; }
     .btn-download {
-      background: #423F48;
-      color: #ffffff;
+      background: #ffffff;
+      color: #7442a6;
+      border: 1px solid #8e55c4;
     }
-    .btn-download:hover { background: #302D35; }
+    .btn-download:hover { background: #f7f1fc; }
 
     /* CHALLAN SHEET CONTAINER */
     .challan-container {
@@ -255,8 +242,8 @@ export function generateChallanHtml(challan: any): string {
       display: inline-block;
       margin-top: 4px;
       padding: 2px 6px;
-      background: #F1EFF4;
-      border: 1px solid #D3CED8;
+      background: #f1eff4;
+      border: 1px solid #d3ced8;
       color: #000000;
       font-size: 10px;
       font-weight: 800;
@@ -274,7 +261,7 @@ export function generateChallanHtml(challan: any): string {
     .barcode-svg-wrap {
       background: #ffffff;
       padding: 4px;
-      border: 1px solid #D3CED8;
+      border: 1px solid #d3ced8;
       border-radius: 4px;
       display: inline-block;
       margin-bottom: 4px;
@@ -284,12 +271,12 @@ export function generateChallanHtml(challan: any): string {
       font-size: 13px;
       font-weight: 800;
       letter-spacing: 1px;
-      color: #25232A;
+      color: #25232a;
     }
     .design-tag {
       font-size: 10px;
       font-weight: 700;
-      color: #57545E;
+      color: #57545e;
       margin-top: 2px;
     }
 
@@ -298,7 +285,7 @@ export function generateChallanHtml(challan: any): string {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 8px;
-      background: #F8F7FA;
+      background: #f8f7fa;
       border: 1.5px solid #000000;
       padding: 8px 12px;
       margin-bottom: 8px;
@@ -311,7 +298,7 @@ export function generateChallanHtml(challan: any): string {
       font-size: 9px;
       font-weight: 900;
       text-transform: uppercase;
-      color: #57545E;
+      color: #57545e;
       letter-spacing: 0.5px;
       margin-bottom: 1px;
     }
@@ -323,8 +310,9 @@ export function generateChallanHtml(challan: any): string {
 
     /* FLOW AUDIT LEDGER */
     .flow-ledger {
-      background: #25232A;
-      color: #ffffff;
+      background: #ffffff;
+      color: #000000;
+      border: 1.5px solid #000000;
       border-radius: 6px;
       padding: 12px 14px;
       margin-bottom: 14px;
@@ -333,14 +321,14 @@ export function generateChallanHtml(challan: any): string {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid #423F48;
+      border-bottom: 1px solid #000000;
       padding-bottom: 6px;
       margin-bottom: 8px;
       font-size: 10px;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 1px;
-      color: #E6FF47;
+      color: #000000;
     }
     .flow-grid {
       display: grid;
@@ -348,38 +336,38 @@ export function generateChallanHtml(challan: any): string {
       gap: 10px;
     }
     .flow-card {
-      background: #302D35;
-      border: 1px solid #423F48;
+      background: #ffffff;
+      border: 1px solid #6b6872;
       border-radius: 4px;
       padding: 8px 10px;
     }
     .flow-card.defect {
-      background: #3A0E07;
-      border-color: #922614;
+      background: #ffffff;
+      border: 2px dashed #c93a22;
     }
     .flow-card.out {
-      background: #2B3300;
-      border-color: #465300;
+      background: #ffffff;
+      border: 2px solid #000000;
     }
     .flow-card-label {
       font-size: 9px;
       font-weight: 700;
       text-transform: uppercase;
-      color: #A19CA8;
+      color: #43404a;
     }
-    .flow-card.defect .flow-card-label { color: #FFA493; }
-    .flow-card.out .flow-card-label { color: #E6FF47; }
+    .flow-card.defect .flow-card-label { color: #a52e1a; }
+    .flow-card.out .flow-card-label { color: #000000; }
     .flow-card-val {
       font-family: monospace;
       font-size: 16px;
       font-weight: 900;
       margin-top: 2px;
     }
-    .flow-card.defect .flow-card-val { color: #FFCBC0; }
-    .flow-card.out .flow-card-val { color: #EEFF8A; }
+    .flow-card.defect .flow-card-val { color: #a52e1a; }
+    .flow-card.out .flow-card-val { color: #000000; }
     .flow-card-sub {
       font-size: 9px;
-      color: #D3CED8;
+      color: #43404a;
       margin-top: 2px;
       white-space: nowrap;
       overflow: hidden;
@@ -395,46 +383,81 @@ export function generateChallanHtml(challan: any): string {
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 1px;
-      color: #423F48;
+      color: #43404a;
       margin-bottom: 6px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    table {
+    .challan-container table {
       width: 100%;
       border-collapse: collapse;
       font-size: 11px;
     }
-    th, td {
-      border: 1.5px solid #D3CED8;
+    .challan-container th, .challan-container td {
+      border: 1.5px solid #d3ced8;
       padding: 6px 10px;
       text-align: left;
     }
-    th {
-      background: #F1EFF4;
+    .challan-container th {
+      background: #f1eff4;
       font-weight: 800;
       text-transform: uppercase;
       font-size: 9px;
-      color: #57545E;
+      color: #57545e;
       letter-spacing: 0.5px;
     }
-    td.num {
+    .challan-container td.num {
       text-align: right;
       font-family: monospace;
       font-weight: 700;
     }
-    tr.totals-row td {
-      background: #F8F7FA;
+    .challan-container tr.totals-row td {
+      background: #f8f7fa;
       font-weight: 800;
       font-size: 11px;
-      border-top: 2px solid #25232A;
+      border-top: 2px solid #25232a;
+    }
+
+    /* FINISHED GARMENTS */
+    .garment-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .garment-card {
+      border: 1.5px solid #000000;
+      border-radius: 6px;
+      padding: 8px;
+      text-align: center;
+      break-inside: avoid;
+    }
+    .garment-card img, .garment-card .no-image {
+      width: 100%;
+      height: 150px;
+      object-fit: contain;
+      background: #f8f7fa;
+      border-radius: 4px;
+    }
+    .garment-card .no-image {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: #6b6872;
+      border: 1px dashed #b8b2bf;
+    }
+    .garment-name {
+      margin-top: 6px;
+      font-size: 12px;
+      font-weight: 900;
+      color: #000000;
     }
 
     /* PRODUCTION SHEET ATTACHMENT CARD */
     .sheet-ref-card {
-      background: #F9F5FD;
-      border: 1.5px dashed #9455C0;
+      background: #ffffff;
+      border: 1.5px dashed #000000;
       border-radius: 6px;
       padding: 10px 14px;
       margin-bottom: 14px;
@@ -445,13 +468,13 @@ export function generateChallanHtml(challan: any): string {
     .sheet-ref-title {
       font-size: 11px;
       font-weight: 800;
-      color: #663889;
+      color: #000000;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
     .sheet-ref-sub {
       font-size: 10px;
-      color: #4F2C6B;
+      color: #000000;
       margin-top: 2px;
     }
 
@@ -462,22 +485,22 @@ export function generateChallanHtml(challan: any): string {
       grid-template-columns: 1fr 1fr;
       gap: 32px;
       padding-top: 14px;
-      border-top: 1.5px solid #E5E1E8;
+      border-top: 1.5px solid #e5e1e8;
     }
     .sign-box {
-      border-top: 1.5px dashed #6B6872;
+      border-top: 1.5px dashed #6b6872;
       padding-top: 8px;
       text-align: center;
     }
     .sign-title {
       font-weight: 800;
       font-size: 11px;
-      color: #25232A;
+      color: #25232a;
       text-transform: uppercase;
     }
     .sign-sub {
       font-size: 9px;
-      color: #6B6872;
+      color: #6b6872;
       margin-top: 2px;
     }
 
@@ -485,12 +508,12 @@ export function generateChallanHtml(challan: any): string {
     .footer-notice {
       margin-top: 14px;
       padding-top: 10px;
-      border-top: 1px solid #E5E1E8;
+      border-top: 1px solid #e5e1e8;
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-size: 9px;
-      color: #6B6872;
+      color: #6b6872;
       font-family: monospace;
     }
 
@@ -511,6 +534,12 @@ export function generateChallanHtml(challan: any): string {
       }
     }
   </style>
+  ${attachedSheets ? `<style>${attachedSheets.styles}</style>
+  <style>
+    /* The challan keeps its own type over the Production Sheet's page styles, and the sheets start on a new page. */
+    .challan-container { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 400; letter-spacing: normal; line-height: 1.4; color: #25232a; margin-bottom: 20px; }
+    .challan-page-break { break-after: page; page-break-after: always; }
+  </style>` : ''}
 </head>
 <body>
 
@@ -518,21 +547,21 @@ export function generateChallanHtml(challan: any): string {
   <div class="no-print-bar">
     <div>
       <h3>MATERIAL DISPATCH CHALLAN · ${challanNo}</h3>
-      <span style="font-size: 10px; color: #A19CA8; font-family: monospace;">
+      <span style="font-size: 10px; color: #8f8a96; font-family: monospace;">
         Shubham Fabrics India Pvt. Ltd. · ${fromDept} → ${toDept}
       </span>
     </div>
     <div class="btn-group">
       <button class="btn btn-print" onclick="window.print()">
-        🖨️ Print Slip
+        Print Slip
       </button>
       <button class="btn btn-download" onclick="window.downloadSelf()">
-        💾 Save HTML
+        Save HTML
       </button>
     </div>
   </div>
 
-  <div class="challan-container" id="challan-document">
+  <div class="challan-container${attachedSheets ? ' challan-page-break' : ''}" id="challan-document">
     
     <!-- TOP HEADER -->
     <div class="company-header">
@@ -620,60 +649,74 @@ export function generateChallanHtml(challan: any): string {
     ` : ''}
 
     ${defectivePieces > 0 ? `
-    <div style="border: 1.5px solid #922614; background: #FFF5F2; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; font-size: 11px; font-weight: bold; color: #922614;">
+    <div style="border: 1.5px solid #a52e1a; background: #fff4f2; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; font-size: 11px; font-weight: bold; color: #a52e1a;">
       DEFECTIVE CUT (TO SHELF): ${defectivePieces} ${fabricUnit} [Location: ${defectiveShelf}]${defectReason ? ` &middot; Reason: ${defectReason}` : ''}
     </div>
     ` : ''}
 
     <!-- TRANSFERRED ITEMS TABLE -->
+    ${garments ? `
+    <div class="table-container">
+      <div class="table-title">
+        <span>FINISHED GARMENTS</span>
+        <span>${garments.length} garment${garments.length === 1 ? '' : 's'}${attachedSheets ? ' &middot; Production Sheet attached' : ''}</span>
+      </div>
+      <div class="garment-grid">
+        ${garments.map((g) => `
+        <div class="garment-card">
+          ${g.image ? `<img src="${g.image}" alt="${escapeHtml(g.name)}">` : '<div class="no-image">No image</div>'}
+          <div class="garment-name">${escapeHtml(g.name)}</div>
+        </div>`).join('')}
+      </div>
+    </div>` : `
     <div class="table-container">
       <div class="table-title">
         <span>ITEMS / MATERIALS</span>
-        <span style="font-family: monospace; font-size: 11px;">Total: ${quantityTotalsLabel}</span>
+        <span style="font-family: monospace; font-size: 11px;">Total: ${totalQuantity || challan.fabricOut || challan.fabricIn || 0} ${uom}</span>
       </div>
       <table>
         <thead>
           <tr>
             <th style="width: 35px; text-align: center;">#</th>
             <th>ITEM DESCRIPTION</th>
-            <th style="width: 120px;">${hasRequiredDyeColor ? 'CURRENT COLOR / SHADE' : 'COLOR / SHADE'}</th>
-            ${hasRequiredDyeColor ? '<th style="width: 120px;">REQUIRED DYEING COLOR</th>' : ''}
-            ${hasRequiredDyeColor ? '<th style="width: 80px; text-align: right;">QTY TO DYE</th>' : ''}
-            ${hasResultShade ? '<th style="width: 110px;">RESULT SHADE</th>' : ''}
-            <th style="width: 110px;">ROLL / LOT #</th>
-            <th style="width: 80px; text-align: right;">QUANTITY</th>
-            <th style="width: 55px; text-align: center;">UOM</th>
+            <th style="width: 140px;">COLOR / SHADE</th>
+            <th style="width: 120px;">ROLL / LOT #</th>
+            <th style="width: 90px; text-align: right;">QUANTITY</th>
+            <th style="width: 60px; text-align: center;">UOM</th>
           </tr>
         </thead>
         <tbody>
           ${items.length > 0 ? items.map((it, idx) => `
             <tr>
               <td style="text-align: center; font-family: monospace;">${idx + 1}</td>
-              <td style="font-weight: 700;">${it.itemDescription || it.fabricCode || fabricName || 'Fabric Lot'}</td>
-              <td>${it.colour || '—'}</td>
-              ${hasRequiredDyeColor ? `<td style="font-weight: 800;">${it.requiredDyeColor || '—'}</td>` : ''}
-              ${hasRequiredDyeColor ? `<td class="num">${it.requiredDyeColor ? `${it.requiredDyeQuantity ?? it.quantity ?? 0} ${it.uom || uom}` : '—'}</td>` : ''}
-              ${hasResultShade ? `<td>${it.shade || '—'}</td>` : ''}
+              <td style="font-weight: 700;">${it.itemDescription || fabricName || styleCode || 'Fabric Lot'}</td>
+              <td>${it.colour || prog.fabricColor || 'Standard'}</td>
               <td style="font-family: monospace;">${it.rollNumber || it.lotNumber || '—'}</td>
               <td class="num">${it.quantity || 0}</td>
               <td style="text-align: center;">${it.uom || uom}</td>
             </tr>
           `).join('') : `
             <tr>
-              <td colspan="${itemColumnCount + 2}" style="text-align: center; font-style: italic;">No line items were recorded on this challan.${challan.fabricOut ?? challan.fabricIn ? ` Header quantity: ${quantityTotalsLabel}.` : ''}</td>
+              <td style="text-align: center; font-family: monospace;">1</td>
+              <td style="font-weight: 700;">${fabricName || styleCode || 'Production Material'}</td>
+              <td>${prog.fabricColor || 'Standard'}</td>
+              <td style="font-family: monospace;">—</td>
+              <td class="num">${totalQuantity || challan.fabricOut || challan.fabricIn || 0}</td>
+              <td style="text-align: center;">${uom}</td>
             </tr>
           `}
           <tr class="totals-row">
-            <td colspan="${itemColumnCount}" style="text-align: right; text-transform: uppercase; font-size: 10px; font-weight: 900;">
+            <td colspan="4" style="text-align: right; text-transform: uppercase; font-size: 10px; font-weight: 900;">
               TOTAL QUANTITY:
             </td>
-            <td colspan="2" class="num" style="font-size: 13px; font-weight: 900;">
-              ${quantityTotalsLabel}
+            <td class="num" style="font-size: 13px; font-weight: 900;">
+              ${totalQuantity || challan.fabricOut || challan.fabricIn || 0}
             </td>
+            <td style="text-align: center; font-weight: 900;">${uom}</td>
           </tr>
         </tbody>
       </table>
-    </div>
+    </div>`}
 
 
     <!-- DUAL PHYSICAL HANDOVER AUTHORIZATION SIGNATURES -->
@@ -693,10 +736,11 @@ export function generateChallanHtml(challan: any): string {
     <!-- FOOTER -->
     <div class="footer-notice">
       <span>SHUBHAM FABRICS INDIA PVT. LTD. &middot; MES SHOP-FLOOR LOGISTICS</span>
-      <span>CHALLAN ID: ${challan.id || challanNo} &middot; PAGE 1 OF 1</span>
+      <span>CHALLAN ID: ${challan.id || challanNo}${attachedSheets ? '' : ' &middot; PAGE 1 OF 1'}</span>
     </div>
 
   </div>
+  ${attachedSheets ? attachedSheets.html : ''}
 
   <script>
     window.downloadSelf = function() {
@@ -715,17 +759,68 @@ export function generateChallanHtml(challan: any): string {
 </html>`;
 }
 
+/** An image fetched as a data URL (so a saved challan shows it offline); its address when that fails. */
+async function imageAsDataUrl(url: string): Promise<string | null> {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const blob = await res.blob();
+    return await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result));
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return typeof window !== 'undefined' ? new URL(url, window.location.origin).href : url;
+  }
+}
+
+/** The finished garments of a challan, each once, with its image. */
+async function printedGarments(challan: any): Promise<PrintedGarment[]> {
+  const programId = challan.programId || challan.program?.id;
+  const groups = groupGarments((challan.items || []).map((i: any) => ({ ...i, programId: i.programId || programId })));
+  let images: any[] = [];
+  if (programId) {
+    const res = await fetch(`/api/garment-images?programIds=${encodeURIComponent(programId)}`).catch(() => null);
+    const body = res && res.ok ? await res.json().catch(() => ({})) : {};
+    images = body.data || [];
+  }
+  return Promise.all(
+    groups.map(async (g) => {
+      const url = garmentImageUrl(imageFor(images, g.items[0]));
+      return { name: g.name, image: url ? await imageAsDataUrl(url) : null };
+    }),
+  );
+}
+
+/** The Production Sheet pages of the program, to print after the challan. */
+function productionSheetPages(program: any): { styles: string; html: string } | null {
+  if (typeof DOMParser === 'undefined') return null;
+  const doc = new DOMParser().parseFromString(generateProductionSheetHtml(program, 'ALL'), 'text/html');
+  const html = Array.from(doc.querySelectorAll('.sheet-wrapper')).map((el) => el.outerHTML).join('\n');
+  if (!html) return null;
+  return { styles: Array.from(doc.querySelectorAll('style')).map((s) => s.textContent || '').join('\n'), html };
+}
+
+/**
+ * The challan with everything its document shows: the full program and, for finished garments
+ * (Finishing onward), each garment's name and image and the Production Sheet pages.
+ */
+async function completeChallanFor(challan: any) {
+  const program = await prepareWilcomImages(await loadProgramDocument(challan.program || { id: challan.programId }));
+  const complete = { ...challan, program };
+  if (!isFinishedGoodsChallan(challan)) return complete;
+  return { ...complete, finishedGarments: await printedGarments(complete), attachedSheets: productionSheetPages(program) };
+}
+
 /**
  * Downloads Challan as an offline, standalone self-contained HTML file
  */
 export async function downloadChallanHtml(challan: any): Promise<void> {
   if (!challan) return;
   try {
-    const loaded = await loadChallanDocument(challan);
-    const completeChallan = {
-      ...loaded,
-      program: loaded.program ? await prepareWilcomImages(loaded.program) : loaded.program,
-    };
+    const completeChallan = await completeChallanFor(challan);
     const html = generateChallanHtml(completeChallan);
     const challanNo = (completeChallan.challanNumber || 'CHALLAN').replace(/[^a-zA-Z0-9_-]/g, '_');
     const fromDept = (completeChallan.fromDepartment || 'FROM').replace(/[^a-zA-Z0-9_-]/g, '_');
@@ -755,11 +850,7 @@ export function printChallan(challan: any): void {
   if (printWindow) {
     void (async () => {
       try {
-        const loaded = await loadChallanDocument(challan);
-        const completeChallan = {
-          ...loaded,
-          program: loaded.program ? await prepareWilcomImages(loaded.program) : loaded.program,
-        };
+        const completeChallan = await completeChallanFor(challan);
         printWindow.document.open();
         printWindow.document.write(generateChallanHtml(completeChallan));
         printWindow.document.close();

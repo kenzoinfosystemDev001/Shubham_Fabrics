@@ -1,13 +1,13 @@
 # FINAL QUALITY CONTROL (FINAL QC) API CONTRACT
 ## Shubham Fabrics MES | Backend REST Endpoint Specifications
 
-Base Path: `/api/final-qc`
+Base Path: `/api/final-check`
 
 ---
 
 ## 1. DASHBOARD & QUEUE ENDPOINTS
 
-### `GET /api/final-qc/dashboard`
+### `GET /api/final-check/dashboard`
 Returns live KPI metrics and queue counts.
 - **Response**:
   ```json
@@ -30,10 +30,10 @@ Returns live KPI metrics and queue counts.
   }
   ```
 
-### `GET /api/final-qc/incoming`
+### `GET /api/final-check/incoming`
 Returns Challans issued to Final QC awaiting physical acknowledgment (`status: 'ISSUED'`).
 
-### `POST /api/final-qc/challans/[id]/receive`
+### `POST /api/final-check/challans/[id]/receive`
 Acknowledges physical bundle receipt and count verification.
 - **Request Body**:
   ```json
@@ -48,17 +48,17 @@ Acknowledges physical bundle receipt and count verification.
   - `receivedQuantity <= issuedQuantity`.
 - **Transitions**: Conditionally changes `ISSUED` to `RECEIVED` (or `ON_HOLD` when a shortage is explicitly held), logs `ChallanEvent`, and returns `409` when another action already changed the record.
 
-### `GET /api/final-qc/queue`
+### `GET /api/final-check/queue`
 Returns Final QC jobs with linked program, items, recent production transactions, inspections/defects, and outgoing challans. Available handover quantity is accepted output minus prior normal downstream transfers.
 
-### `GET /api/final-qc/jobs/[id]`
+### `GET /api/final-check/jobs/[id]`
 Returns single job details including linked Production Sheet (`Program`), events, defect records, and prior inspections.
 
 ---
 
 ## 2. INSPECTION & WORKFLOW EXECUTION
 
-### `POST /api/final-qc/jobs/[id]/start`
+### `POST /api/final-check/jobs/[id]/start`
 Allocates inspection table and inspector.
 - **Request Body**:
   ```json
@@ -70,7 +70,7 @@ Allocates inspection table and inspector.
   ```
 - **Transitions**: Updates Challan status to `'IN_PROCESS'`.
 
-### `POST /api/final-qc/jobs/[id]/inspect`
+### `POST /api/final-check/jobs/[id]/inspect`
 Submits authoritative inspection results, parameter checkpoints, defect categorization, and output quantity reconciliation. Inspector/operator identity comes from the authenticated session.
 - **Request Body**:
   ```json
@@ -97,20 +97,20 @@ Submits authoritative inspection results, parameter checkpoints, defect categori
   - All five checkpoints and the overall result are required.
 - **Database Operations**:
   - Creates `QualityInspection`, `QualityInspectionParameter` records, `DefectLog` records.
-  - Creates `ProductionTransaction` (`departmentCode: 'FINAL_QC'`).
+  - Creates `ProductionTransaction` (`departmentCode: 'FINAL_CHECK'`).
   - Creates `DefectRecord` with `OPEN` disposition for rejected pieces; it does not automatically classify them as scrap.
   - Tracks accepted output cumulatively in `fabricOut`.
   - Routes rejected pieces to the Final QC defective shelf and records rework without inventing a downstream route.
   - Conditionally claims the `IN_PROCESS` state to prevent duplicate concurrent submissions.
 
-### `POST /api/final-qc/jobs/[id]/hold` & `POST /api/final-qc/jobs/[id]/resume`
+### `POST /api/final-check/jobs/[id]/hold` & `POST /api/final-check/jobs/[id]/resume`
 Places job on hold for supervisor review or resumes it.
 
 ---
 
 ## 3. DOWNSTREAM HANDOVER & REPORTING
 
-### `POST /api/final-qc/issue-challan`
+### `POST /api/final-check/issue-challan`
 Generates outgoing handover Challan to the next stage from `STANDARD_FACTORY_ROUTE` (currently `PACKING`).
 - **Request Body**:
   ```json
@@ -135,12 +135,12 @@ Generates outgoing handover Challan to the next stage from `STANDARD_FACTORY_ROU
 - **Guards**: Each item count is a positive whole number; requested transfer cannot exceed accepted quantity minus previous normal downstream transfers. A client-supplied destination must match configured routing.
 - **Outputs**: Creates an audited child Challan with a unique `CH-FQC-...` identifier. Code-128 image generation is not implemented.
 
-### `GET /api/final-qc/floor-board`
+### `GET /api/final-check/floor-board`
 Returns 4-lane live Kanban board:
 1. `INCOMING`
 2. `IN_INSPECTION`
 3. `SUPERVISOR_REVIEW`
 4. `READY_FOR_DISPATCH`
 
-### `GET /api/final-qc/reports`
+### `GET /api/final-check/reports`
 Returns database-derived inspection totals, yield, defect summary, style metrics, and transaction history for the requested reporting period.

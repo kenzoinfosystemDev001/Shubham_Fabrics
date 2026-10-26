@@ -4,22 +4,15 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  LayoutDashboard,
-  Briefcase,
-  Kanban,
   LogOut,
   UserCircle,
   Menu,
-  X,
-  Scissors,
-  CheckCircle2,
-  Layers,
-  ArrowRight
+  X
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { isAdminUser } from '@/lib/rbac';
 import { DepartmentSwitcher } from '@/components/DepartmentSwitcher';
-import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
+import { SidebarDepartmentArt } from '@/components/SidebarDepartmentArt';
 
 export function ThreadCuttingNavigation() {
   const pathname = usePathname();
@@ -43,7 +36,7 @@ export function ThreadCuttingNavigation() {
     }
     const syncUser = async () => {
       try {
-        if (api.getToken()) {
+        if (api.hasSession()) {
           const profile = await api.getProfile();
           if (profile) {
             setCurrentUser(profile);
@@ -76,25 +69,25 @@ export function ThreadCuttingNavigation() {
     const active = exact ? pathname === href : pathname.startsWith(href);
     return `flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition ${
       active
-        ? 'bg-ink-800 text-white border-l-2 border-lavender-400 pl-2.5 shadow-xs'
-        : 'text-slate-300 hover:bg-slate-800/60 hover:text-white'
+        ? 'bg-brand-50 text-brand-800 border-l-2 border-brand-500 pl-2.5'
+        : 'text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900'
     }`;
   };
 
   return (
     <>
       {/* MOBILE TOP BAR */}
-      <div className="md:hidden sticky top-0 z-40 bg-ink-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between shadow-sm">
+      <div className="md:hidden sticky top-0 z-40 bg-white border-b border-neutral-200 px-4 py-3 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setMobileOpen(true)}
-            className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition"
+            className="p-1.5 rounded-lg text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 transition"
             aria-label="Open Navigation Menu"
           >
             <Menu className="w-6 h-6" />
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-white p-0.5 border border-lavender-500/40 flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-white p-0.5 border border-neutral-200 flex items-center justify-center shrink-0">
               <img
                 src="/shubham-logo.jpg"
                 alt="Shubham Fabrics"
@@ -102,15 +95,15 @@ export function ThreadCuttingNavigation() {
               />
             </div>
             <div>
-              <span className="text-xs font-bold text-white tracking-wide block leading-none">SHUBHAM FABRICS</span>
-              <span className="text-[9px] font-bold text-lavender-400 tracking-wider uppercase block">THREAD CUTTING</span>
+              <span className="text-xs font-bold text-neutral-900 tracking-wide block leading-none">SHUBHAM FABRICS</span>
+              <span className="text-[9px] font-bold text-brand-700 tracking-wider uppercase block">THREAD CUTTING</span>
             </div>
           </div>
         </div>
 
         <button
           onClick={handleSignOut}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"
+          className="p-1.5 rounded-lg text-neutral-500 hover:text-danger-600 hover:bg-neutral-100 transition"
           title="Sign Out"
         >
           <LogOut className="w-4 h-4" />
@@ -121,26 +114,23 @@ export function ThreadCuttingNavigation() {
       {mobileOpen && (
         <div
           onClick={() => setMobileOpen(false)}
-          className="md:hidden fixed inset-0 bg-black/60 backdrop-blur-xs z-50 transition-opacity"
+          className="md:hidden fixed inset-0 bg-neutral-900/60 z-50 transition-opacity"
         />
       )}
 
       {/* SIDEBAR ASIDE */}
       <aside
-        style={{
-          backgroundImage: `linear-gradient(to bottom, rgba(37, 35, 42, 0.40), rgba(24, 22, 28, 0.60)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-        }}
-        className={`fixed inset-y-0 left-0 z-50 w-72 md:w-64 text-slate-100 flex flex-col border-r border-slate-700/80 select-none transform transition-transform duration-300 ease-in-out shadow-2xl backdrop-blur-xs ${
+        className={`bg-white fixed inset-y-0 left-0 z-50 w-72 md:w-64 text-neutral-900 flex flex-col border-r border-neutral-200 select-none transform transition-transform duration-300 ease-in-out ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
+        {/* SIDEBAR TEXTILE BACKGROUND (one image for all departments, Admin > Sidebar Image) */}
+        <SidebarDepartmentArt />
+
         {/* BRANDING HEADER */}
-        <div className="p-4 border-b border-slate-700/60 bg-slate-950/40 backdrop-blur-sm flex items-center justify-between">
+        <div className="p-4 border-b border-neutral-200 bg-white flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-white p-0.5 border border-lavender-500/40 flex items-center justify-center shadow-sm overflow-hidden shrink-0">
+            <div className="w-10 h-10 rounded-lg bg-white p-0.5 border border-neutral-200 flex items-center justify-center shadow-sm overflow-hidden shrink-0">
               <img
                 src="/shubham-logo.jpg"
                 alt="Shubham Fabrics Logo"
@@ -148,10 +138,10 @@ export function ThreadCuttingNavigation() {
               />
             </div>
             <div className="min-w-0">
-              <span className="text-xs font-bold tracking-[0.14em] text-white truncate block">
+              <span className="text-xs font-bold tracking-[0.14em] text-neutral-900 truncate block">
                 SHUBHAM FABRICS
               </span>
-              <span className="text-[10px] font-medium tracking-[0.18em] text-lavender-400 block truncate">
+              <span className="text-[10px] font-medium tracking-[0.18em] text-brand-700 block truncate">
                 THREAD CUTTING
               </span>
             </div>
@@ -159,14 +149,14 @@ export function ThreadCuttingNavigation() {
 
           <button
             onClick={() => setMobileOpen(false)}
-            className="md:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            className="md:hidden p-1.5 rounded-lg text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 transition"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* DEPARTMENT TITLE & WORKSPACE SWITCHER */}
-        <div className="relative px-3 pt-3 pb-2.5 border-b border-slate-700/60 bg-slate-950/20 backdrop-blur-xs">
+        <div className="relative px-3 pt-3 pb-2.5 border-b border-neutral-200 bg-white [&:not(:has(button))]:hidden">
           <div className="relative z-10">
             <DepartmentSwitcher
               currentDepartmentName="Thread Cutting Department"
@@ -184,40 +174,73 @@ export function ThreadCuttingNavigation() {
             onClick={() => setMobileOpen(false)}
             className={linkClass('/thread-cutting', true)}
           >
-            <LayoutDashboard className="w-4 h-4 text-lavender-400" />
             <span>Dashboard</span>
           </Link>
 
           {/* 2. My Work */}
+          <div>
+            <div
+              className={`px-3 py-2.5 text-xs font-semibold ${
+                pathname.startsWith('/thread-cutting/my-work') ? 'text-neutral-900' : 'text-neutral-700'
+              }`}
+            >
+              My Work
+            </div>
+            <div className="ml-4 pl-3 border-l border-neutral-200 space-y-0.5 mb-1">
+              {[
+                { href: '/thread-cutting/my-work/incoming', label: 'Incoming Challans' },
+                { href: '/thread-cutting/my-work/received', label: 'Received Fabric' },
+                { href: '/thread-cutting/my-work/process', label: 'Thread Cutting Process' },
+                { href: '/thread-cutting/my-work/issue-challan', label: 'Issue Challan to Threadcut QC' },
+              ].map((item) => {
+                const active = pathname === item.href || pathname.startsWith(item.href + '/');
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileOpen(false)}
+                    aria-current={active ? 'page' : undefined}
+                    className={`flex items-center px-2.5 py-2 rounded-lg text-[11px] font-medium transition ${
+                      active
+                        ? 'bg-brand-50 text-brand-800 border-l-2 border-brand-500 pl-2'
+                        : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 3. Thread Cutting History */}
           <Link
-            href="/thread-cutting/my-work"
+            href="/thread-cutting/history"
             onClick={() => setMobileOpen(false)}
-            className={linkClass('/thread-cutting/my-work', false)}
+            className={linkClass('/thread-cutting/history', true)}
           >
-            <Briefcase className="w-4 h-4 text-blue-400" />
-            <span>My Work</span>
+            <span>Thread Cutting History</span>
           </Link>
 
-          {/* 3. Floor Board */}
+          {/* 4. Floor Board */}
           <Link
             href="/thread-cutting/floor-board"
             onClick={() => setMobileOpen(false)}
             className={linkClass('/thread-cutting/floor-board', true)}
           >
-            <Kanban className="w-4 h-4 text-amber-400" />
             <span>Floor Board</span>
           </Link>
         </nav>
 
         {/* USER & SIGN OUT FOOTER */}
-        <div className="p-4 border-t border-slate-700/60 bg-slate-950/50 backdrop-blur-md">
+        <div className="p-4 border-t border-neutral-200 bg-white/75 backdrop-blur-sm">
           <div className="flex items-center gap-3 mb-3">
-            <UserCircle className="w-8 h-8 text-lavender-400/90" />
+            <UserCircle className="w-8 h-8 text-brand-700" />
             <div className="flex-1 min-w-0">
-              <span className="text-xs font-semibold text-white truncate block drop-shadow-xs">
+              <span className="text-xs font-semibold text-neutral-900 truncate block drop-shadow-xs">
                 {currentUser.fullName || (isAdmin ? 'System Administrator' : 'Thread Cutting Incharge')}
               </span>
-              <span className="text-[10px] text-lavender-400/90 tracking-wide uppercase font-mono block">
+              <span className="text-[10px] text-brand-700 tracking-wide uppercase font-mono block">
                 {isAdmin ? 'SYSTEM ADMIN' : 'THREAD CUTTING INCHARGE'}
               </span>
             </div>
@@ -225,7 +248,7 @@ export function ThreadCuttingNavigation() {
 
           <button
             onClick={handleSignOut}
-            className="w-full flex items-center justify-center gap-2 py-2 px-3 text-xs font-semibold text-rose-300 hover:text-white bg-rose-500/10 hover:bg-rose-600/30 border border-rose-500/20 hover:border-rose-500/40 rounded-lg transition"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-white hover:bg-danger-50 hover:text-danger-800 hover:border-danger-500/60 border border-neutral-200 rounded-lg text-xs text-neutral-900 transition shadow-xs"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Sign Out</span>

@@ -173,7 +173,6 @@ exports.Prisma.DepartmentScalarFieldEnum = {
   sequenceOrder: 'sequenceOrder',
   description: 'description',
   isActive: 'isActive',
-  inchargeUserId: 'inchargeUserId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -519,6 +518,50 @@ exports.Prisma.AttachmentScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.DepartmentImageScalarFieldEnum = {
+  id: 'id',
+  departmentId: 'departmentId',
+  storageProvider: 'storageProvider',
+  storageKey: 'storageKey',
+  imageUrl: 'imageUrl',
+  imageData: 'imageData',
+  mimeType: 'mimeType',
+  fileName: 'fileName',
+  fileSize: 'fileSize',
+  altText: 'altText',
+  isActive: 'isActive',
+  version: 'version',
+  uploadedById: 'uploadedById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.BrandingAssetScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  storageProvider: 'storageProvider',
+  storageKey: 'storageKey',
+  imageUrl: 'imageUrl',
+  imageData: 'imageData',
+  mimeType: 'mimeType',
+  fileName: 'fileName',
+  fileSize: 'fileSize',
+  altText: 'altText',
+  isActive: 'isActive',
+  version: 'version',
+  uploadedById: 'uploadedById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.AppSettingScalarFieldEnum = {
+  key: 'key',
+  value: 'value',
+  updatedById: 'updatedById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.AuditLogScalarFieldEnum = {
   id: 'id',
   actorId: 'actorId',
@@ -543,7 +586,6 @@ exports.Prisma.ChallanScalarFieldEnum = {
   status: 'status',
   priority: 'priority',
   issuedDate: 'issuedDate',
-  deliveryDate: 'deliveryDate',
   receivedDate: 'receivedDate',
   completedDate: 'completedDate',
   createdById: 'createdById',
@@ -570,8 +612,11 @@ exports.Prisma.ChallanItemScalarFieldEnum = {
   fabricCode: 'fabricCode',
   colour: 'colour',
   shade: 'shade',
-  requiredDyeColor: 'requiredDyeColor',
-  requiredDyeQuantity: 'requiredDyeQuantity',
+  requiredColour: 'requiredColour',
+  requiredQuantity: 'requiredQuantity',
+  fabricProcessingStatus: 'fabricProcessingStatus',
+  garmentCategory: 'garmentCategory',
+  styleRef: 'styleRef',
   size: 'size',
   unitType: 'unitType',
   rollNumber: 'rollNumber',
@@ -681,6 +726,7 @@ exports.Prisma.StockLedgerEntryScalarFieldEnum = {
   actorId: 'actorId',
   balanceAfter: 'balanceAfter',
   notes: 'notes',
+  idempotencyKey: 'idempotencyKey',
   createdAt: 'createdAt'
 };
 
@@ -785,14 +831,8 @@ exports.Prisma.DefectRecordScalarFieldEnum = {
   id: 'id',
   defectCode: 'defectCode',
   programId: 'programId',
-  productionSheetNumber: 'productionSheetNumber',
   challanId: 'challanId',
   departmentCode: 'departmentCode',
-  shelfCode: 'shelfCode',
-  color: 'color',
-  fabricType: 'fabricType',
-  quantityUnit: 'quantityUnit',
-  responsibleIncharge: 'responsibleIncharge',
   bundleId: 'bundleId',
   itemDescription: 'itemDescription',
   severity: 'severity',
@@ -802,8 +842,6 @@ exports.Prisma.DefectRecordScalarFieldEnum = {
   status: 'status',
   resolutionNotes: 'resolutionNotes',
   resolvedAt: 'resolvedAt',
-  shelfRemovedAt: 'shelfRemovedAt',
-  shelfRemovalReason: 'shelfRemovalReason',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -1004,27 +1042,139 @@ exports.Prisma.DyeingOrderScalarFieldEnum = {
   priority: 'priority',
   fabricName: 'fabricName',
   fabricType: 'fabricType',
-  currentColor: 'currentColor',
   targetColor: 'targetColor',
   dyedColor: 'dyedColor',
   colorCode: 'colorCode',
   requiredQuantity: 'requiredQuantity',
   dyedQuantity: 'dyedQuantity',
   undyedQuantity: 'undyedQuantity',
-  readyForDyeingQcQuantity: 'readyForDyeingQcQuantity',
-  sentToDyeingQcQuantity: 'sentToDyeingQcQuantity',
+  readyForQc1Quantity: 'readyForQc1Quantity',
+  sentToQc1Quantity: 'sentToQc1Quantity',
   uom: 'uom',
+  receivedQuantity: 'receivedQuantity',
+  receivedAt: 'receivedAt',
+  receivedById: 'receivedById',
+  receiptRemarks: 'receiptRemarks',
+  expectedCompletionDate: 'expectedCompletionDate',
+  colorMismatch: 'colorMismatch',
+  colorReviewNote: 'colorReviewNote',
+  colorReviewedById: 'colorReviewedById',
+  colorReviewedAt: 'colorReviewedAt',
   inchargeId: 'inchargeId',
   inchargeName: 'inchargeName',
   batchNumber: 'batchNumber',
   machineNumber: 'machineNumber',
   processRemarks: 'processRemarks',
-  dyeingQcChallanId: 'dyeingQcChallanId',
+  qc1ChallanId: 'qc1ChallanId',
   startedAt: 'startedAt',
   completedAt: 'completedAt',
-  sentToDyeingQcAt: 'sentToDyeingQcAt',
+  sentToQc1At: 'sentToQc1At',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DyeingQcTransferScalarFieldEnum = {
+  id: 'id',
+  dyeingOrderId: 'dyeingOrderId',
+  challanId: 'challanId',
+  challanItemId: 'challanItemId',
+  quantity: 'quantity',
+  uom: 'uom',
+  actualDyedColor: 'actualDyedColor',
+  createdById: 'createdById',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.DepartmentWorkItemScalarFieldEnum = {
+  id: 'id',
+  departmentCode: 'departmentCode',
+  itemNumber: 'itemNumber',
+  programId: 'programId',
+  inboundChallanId: 'inboundChallanId',
+  inboundChallanItemId: 'inboundChallanItemId',
+  sourceDepartment: 'sourceDepartment',
+  fabricName: 'fabricName',
+  colour: 'colour',
+  fabricProcessingStatus: 'fabricProcessingStatus',
+  fabricStatusSource: 'fabricStatusSource',
+  status: 'status',
+  priority: 'priority',
+  uom: 'uom',
+  expectedQuantity: 'expectedQuantity',
+  receivedQuantity: 'receivedQuantity',
+  processedQuantity: 'processedQuantity',
+  transferredQuantity: 'transferredQuantity',
+  garmentCategory: 'garmentCategory',
+  styleRef: 'styleRef',
+  sourceAllocationId: 'sourceAllocationId',
+  sourceWorkItemId: 'sourceWorkItemId',
+  takenQuantity: 'takenQuantity',
+  defectQuantity: 'defectQuantity',
+  passedQuantity: 'passedQuantity',
+  rejectedQuantity: 'rejectedQuantity',
+  reworkQuantity: 'reworkQuantity',
+  rejectSentQuantity: 'rejectSentQuantity',
+  reworkSentQuantity: 'reworkSentQuantity',
+  receivedAt: 'receivedAt',
+  receivedById: 'receivedById',
+  receiptRemarks: 'receiptRemarks',
+  expectedCompletionDate: 'expectedCompletionDate',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  lastTransferredAt: 'lastTransferredAt',
+  remarks: 'remarks',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DepartmentWorkTransferScalarFieldEnum = {
+  id: 'id',
+  workItemId: 'workItemId',
+  challanId: 'challanId',
+  challanItemId: 'challanItemId',
+  quantity: 'quantity',
+  uom: 'uom',
+  fabricProcessingStatus: 'fabricProcessingStatus',
+  kind: 'kind',
+  allocationId: 'allocationId',
+  createdById: 'createdById',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.WorkItemAllocationScalarFieldEnum = {
+  id: 'id',
+  allocationNumber: 'allocationNumber',
+  workItemId: 'workItemId',
+  category: 'category',
+  otherName: 'otherName',
+  styleRef: 'styleRef',
+  allocatedQuantity: 'allocatedQuantity',
+  allocatedUom: 'allocatedUom',
+  cutQuantity: 'cutQuantity',
+  cutUom: 'cutUom',
+  transferredQuantity: 'transferredQuantity',
+  status: 'status',
+  remarks: 'remarks',
+  createdById: 'createdById',
+  cancelledAt: 'cancelledAt',
+  cancelReason: 'cancelReason',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.WorkItemInspectionScalarFieldEnum = {
+  id: 'id',
+  workItemId: 'workItemId',
+  inspectedQuantity: 'inspectedQuantity',
+  passQuantity: 'passQuantity',
+  rejectQuantity: 'rejectQuantity',
+  reworkQuantity: 'reworkQuantity',
+  uom: 'uom',
+  rejectReason: 'rejectReason',
+  reworkReason: 'reworkReason',
+  remarks: 'remarks',
+  inspectorId: 'inspectorId',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.FabricInwardScalarFieldEnum = {
@@ -1032,12 +1182,12 @@ exports.Prisma.FabricInwardScalarFieldEnum = {
   sNo: 'sNo',
   entryType: 'entryType',
   itemName: 'itemName',
-  color: 'color',
   billNo: 'billNo',
   billDate: 'billDate',
   receivingDate: 'receivingDate',
   billQty: 'billQty',
   unit: 'unit',
+  colour: 'colour',
   supplierName: 'supplierName',
   remarks: 'remarks',
   createdAt: 'createdAt',
@@ -1052,9 +1202,9 @@ exports.Prisma.FabricOutwardScalarFieldEnum = {
   challanId: 'challanId',
   designNumber: 'designNumber',
   itemName: 'itemName',
-  color: 'color',
   issueQty: 'issueQty',
   unit: 'unit',
+  colour: 'colour',
   avgPerPcs: 'avgPerPcs',
   issuePcsQty: 'issuePcsQty',
   byOrderName: 'byOrderName',
@@ -1067,22 +1217,31 @@ exports.Prisma.FabricOutwardScalarFieldEnum = {
 
 exports.Prisma.DeadlineAlertScalarFieldEnum = {
   id: 'id',
-  dedupeKey: 'dedupeKey',
+  dedupKey: 'dedupKey',
   departmentCode: 'departmentCode',
-  taskType: 'taskType',
-  taskId: 'taskId',
-  challanId: 'challanId',
+  entityType: 'entityType',
+  entityId: 'entityId',
   programId: 'programId',
-  assignedUserId: 'assignedUserId',
-  stage: 'stage',
+  challanId: 'challanId',
+  alertType: 'alertType',
+  thresholdDays: 'thresholdDays',
   severity: 'severity',
   deadlineAt: 'deadlineAt',
-  deadlineSource: 'deadlineSource',
+  deadlineDay: 'deadlineDay',
+  timeZone: 'timeZone',
+  workStatus: 'workStatus',
+  taskLabel: 'taskLabel',
+  productionSheetId: 'productionSheetId',
+  designNumber: 'designNumber',
+  challanNumber: 'challanNumber',
+  recipientDepartments: 'recipientDepartments',
   status: 'status',
-  resolutionReason: 'resolutionReason',
-  createdAt: 'createdAt',
+  resolvedReason: 'resolvedReason',
+  activatedAt: 'activatedAt',
   lastEvaluatedAt: 'lastEvaluatedAt',
-  resolvedAt: 'resolvedAt'
+  resolvedAt: 'resolvedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.DeadlineAlertDismissalScalarFieldEnum = {
@@ -1092,9 +1251,79 @@ exports.Prisma.DeadlineAlertDismissalScalarFieldEnum = {
   dismissedAt: 'dismissedAt'
 };
 
+exports.Prisma.PackingAllocationScalarFieldEnum = {
+  id: 'id',
+  packingNumber: 'packingNumber',
+  workItemId: 'workItemId',
+  quantity: 'quantity',
+  packedQuantity: 'packedQuantity',
+  returnedQuantity: 'returnedQuantity',
+  status: 'status',
+  priority: 'priority',
+  packingDate: 'packingDate',
+  remarks: 'remarks',
+  createdById: 'createdById',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.GarmentImageScalarFieldEnum = {
+  id: 'id',
+  programId: 'programId',
+  garmentCategory: 'garmentCategory',
+  styleRef: 'styleRef',
+  storageProvider: 'storageProvider',
+  storageKey: 'storageKey',
+  imageUrl: 'imageUrl',
+  imageData: 'imageData',
+  mimeType: 'mimeType',
+  fileName: 'fileName',
+  fileSize: 'fileSize',
+  version: 'version',
+  uploadedById: 'uploadedById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.StockImportScalarFieldEnum = {
+  id: 'id',
+  source: 'source',
+  fileName: 'fileName',
+  mimeType: 'mimeType',
+  fileSize: 'fileSize',
+  fileHash: 'fileHash',
+  fileData: 'fileData',
+  status: 'status',
+  extractedJson: 'extractedJson',
+  rowCount: 'rowCount',
+  engine: 'engine',
+  uploadedById: 'uploadedById',
+  uploadedAt: 'uploadedAt',
+  confirmKey: 'confirmKey',
+  confirmedById: 'confirmedById',
+  confirmedAt: 'confirmedAt',
+  confirmedJson: 'confirmedJson',
+  resultJson: 'resultJson',
+  addedCount: 'addedCount',
+  skippedCount: 'skippedCount',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ManualMigrationScalarFieldEnum = {
+  name: 'name',
+  checksum: 'checksum',
+  appliedAt: 'appliedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.NullableJsonNullValueInput = {
@@ -1211,6 +1440,9 @@ exports.Prisma.ModelName = {
   ProgramRoute: 'ProgramRoute',
   ProgramRouteStep: 'ProgramRouteStep',
   Attachment: 'Attachment',
+  DepartmentImage: 'DepartmentImage',
+  BrandingAsset: 'BrandingAsset',
+  AppSetting: 'AppSetting',
   AuditLog: 'AuditLog',
   Challan: 'Challan',
   ChallanItem: 'ChallanItem',
@@ -1241,10 +1473,19 @@ exports.Prisma.ModelName = {
   FabricQCInspection: 'FabricQCInspection',
   FabricStockLedger: 'FabricStockLedger',
   DyeingOrder: 'DyeingOrder',
+  DyeingQcTransfer: 'DyeingQcTransfer',
+  DepartmentWorkItem: 'DepartmentWorkItem',
+  DepartmentWorkTransfer: 'DepartmentWorkTransfer',
+  WorkItemAllocation: 'WorkItemAllocation',
+  WorkItemInspection: 'WorkItemInspection',
   FabricInward: 'FabricInward',
   FabricOutward: 'FabricOutward',
   DeadlineAlert: 'DeadlineAlert',
-  DeadlineAlertDismissal: 'DeadlineAlertDismissal'
+  DeadlineAlertDismissal: 'DeadlineAlertDismissal',
+  PackingAllocation: 'PackingAllocation',
+  GarmentImage: 'GarmentImage',
+  StockImport: 'StockImport',
+  ManualMigration: 'ManualMigration'
 };
 
 /**

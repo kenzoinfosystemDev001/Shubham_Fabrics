@@ -1,128 +1,70 @@
 import { NextResponse } from 'next/server';
-import crypto from 'crypto';
+import { getCloudinaryCredentials, uploadImageToCloudinary } from '@/lib/cloudinary';
+import { sniffDepartmentImageType } from '@/lib/department-images';
+import { requireUser } from '@/lib/auth/require-user';
 
 export const dynamic = 'force-dynamic';
 
-function getCloudinaryCredentials() {
-  let cloudName =
-    process.env.CLOUDINARY_CLOUD_NAME ||
-    process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-  let apiKey = process.env.CLOUDINARY_API_KEY;
-  let apiSecret = process.env.CLOUDINARY_API_SECRET;
-  let source = 'none';
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+const ROOT_FOLDER = 'shubham-fabrics';
 
-  if (cloudName && apiKey && apiSecret) {
-    source = 'individual_vars';
-  } else if (process.env.CLOUDINARY_URL) {
-    try {
-      // Format: cloudinary://<api_key>:<api_secret>@<cloud_name>
-      const cldUrl = new URL(process.env.CLOUDINARY_URL);
-      apiKey = decodeURIComponent(cldUrl.username);
-      apiSecret = decodeURIComponent(cldUrl.password);
-      cloudName = cldUrl.hostname;
-      source = 'cloudinary_url';
-    } catch (e) {
-      console.warn('Failed to parse CLOUDINARY_URL environment variable:', e);
-    }
-  }
-
-  return {
-    cloudName,
-    apiKey,
-    apiSecret,
-    isConfigured: Boolean(cloudName && apiKey && apiSecret),
-    source,
-  };
-}
-
-/**
- * Diagnostic GET endpoint to check Cloudinary connection status.
- */
-export async function GET() {
+/** Diagnostic: whether Cloudinary is configured (administrators only; it describes server setup). */
+export async function GET(request: Request) {
+  const { user, response } = await requireUser(request, { admin: true });
+  if (!user) return response;
   const creds = getCloudinaryCredentials();
-
   return NextResponse.json({
     status: creds.isConfigured ? 'CONNECTED' : 'NOT_CONFIGURED',
     isConfigured: creds.isConfigured,
     configurationSource: creds.source,
     cloudName: creds.cloudName || null,
-    hasApiKey: Boolean(creds.apiKey),
-    hasApiSecret: Boolean(creds.apiSecret),
     message: creds.isConfigured
       ? `Cloudinary is configured for cloud '${creds.cloudName}'. Uploads will be delivered to Cloudinary CDN.`
       : 'Cloudinary credentials are not set. Uploads will fall back to local Base64 data URLs instead of Cloudinary.',
-    requiredEnvVars: [
-      'CLOUDINARY_CLOUD_NAME (or NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME)',
-      'CLOUDINARY_API_KEY',
-      'CLOUDINARY_API_SECRET',
-      'OR single CLOUDINARY_URL=cloudinary://<api_key>:<api_secret>@<cloud_name>',
-    ],
   });
 }
 
+/**
+ * POST multipart { file, folder? } — an image (JPG, PNG or WebP, checked from its content, up to 10 MB)
+ * stored on Cloudinary under shubham-fabrics/…, or returned as a data URL when Cloudinary is not set up.
+ */
 export async function POST(request: Request) {
+  const { user, response } = await requireUser(request);
+  if (!user) return response;
   try {
     const formData = await request.formData();
-    const file = formData.get('file') as File | null;
-    const folder = (formData.get('folder') as string) || 'shubham-fabrics';
-
-    if (!file) {
+    const file = formData.get('file');
+    if (!file || typeof file === 'string') {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
-
-    const { cloudName, apiKey, apiSecret, isConfigured } = getCloudinaryCredentials();
-
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    const base64Data = `data:${file.type || 'image/jpeg'};base64,${buffer.toString('base64')}`;
-
-    if (isConfigured && cloudName && apiKey && apiSecret) {
-      const timestamp = Math.round(Date.now() / 1000);
-      const stringToSign = `folder=${folder}&timestamp=${timestamp}${apiSecret}`;
-      const signature = crypto.createHash('sha1').update(stringToSign).digest('hex');
-
-      const cldForm = new FormData();
-      cldForm.append('file', base64Data);
-      cldForm.append('api_key', apiKey);
-      cldForm.append('timestamp', timestamp.toString());
-      cldForm.append('signature', signature);
-      cldForm.append('folder', folder);
-
-      const cldRes = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-        method: 'POST',
-        body: cldForm,
-      });
-
-      if (cldRes.ok) {
-        const cldData = await cldRes.json();
-        return NextResponse.json({
-          url: cldData.secure_url || cldData.url,
-          publicId: cldData.public_id,
-          width: cldData.width,
-          height: cldData.height,
-          format: cldData.format,
-          isCloudinary: true,
-        });
-      }
-
-      const errText = await cldRes.text().catch(() => '');
-      console.warn('Cloudinary upload returned non-200 error, falling back to base64:', errText);
-    } else {
-      console.warn('Cloudinary credentials missing, falling back to local base64 data URL.');
+    if (file.size > MAX_UPLOAD_BYTES) {
+      return NextResponse.json({ error: 'Image must be 10 MB or smaller.' }, { status: 400 });
+    }
+    // Only folders inside the app's own Cloudinary folder; a bare name (e.g. "production-sheets") goes under it.
+    let requested = String(formData.get('folder') || ROOT_FOLDER).trim().toLowerCase();
+    if (/^[a-z0-9_-]{1,40}$/.test(requested) && requested !== ROOT_FOLDER) requested = `${ROOT_FOLDER}/${requested}`;
+    if (requested !== ROOT_FOLDER && !/^shubham-fabrics(\/[a-z0-9_-]{1,40}){1,3}$/.test(requested)) {
+      return NextResponse.json({ error: 'Invalid upload folder.' }, { status: 400 });
     }
 
-    // Graceful fallback to persistent base64 data URL
-    return NextResponse.json({
-      url: base64Data,
-      publicId: `upload_${Date.now()}`,
-      isFallback: true,
-      isCloudinary: false,
-    });
-  } catch (error: any) {
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    const mimeType = sniffDepartmentImageType(bytes);
+    if (!mimeType) {
+      return NextResponse.json({ error: 'Only JPG, PNG or WebP images are allowed.' }, { status: 400 });
+    }
+    const dataUri = `data:${mimeType};base64,${Buffer.from(bytes).toString('base64')}`;
+
+    try {
+      const uploaded = await uploadImageToCloudinary(dataUri, requested);
+      if (uploaded) {
+        return NextResponse.json({ url: uploaded.url, publicId: uploaded.publicId, isCloudinary: true });
+      }
+    } catch (error) {
+      console.warn('Cloudinary upload failed, returning the image as a data URL:', error);
+    }
+    return NextResponse.json({ url: dataUri, publicId: `upload_${Date.now()}`, isFallback: true, isCloudinary: false });
+  } catch (error) {
     console.error('Upload handler error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Image upload failed' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Image upload failed' }, { status: 500 });
   }
 }

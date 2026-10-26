@@ -4,6 +4,7 @@ import { Manrope } from 'next/font/google';
 // @ts-ignore -- Next.js resolves global CSS imports at build time.
 import './globals.css';
 import { Navigation } from '@/components/Navigation';
+import { AppBackground } from '@/components/AppBackground';
 import { ThemeProvider } from '@/components/ThemeContext';
 import { DepartmentGuard } from '@/components/DepartmentGuard';
 
@@ -20,7 +21,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: 'cover',
-  themeColor: '#7D44A8',
+  themeColor: '#8E55C4',
 };
 
 export const metadata: Metadata = {
@@ -52,6 +53,7 @@ export default function RootLayout({
     <html lang="en" className={manrope.variable} suppressHydrationWarning>
       <body className={`${manrope.className} min-h-screen flex flex-col font-sans antialiased`} suppressHydrationWarning>
         <ThemeProvider>
+          <AppBackground />
           <Navigation />
           <DepartmentGuard>
             <main className="flex-1 min-h-screen flex flex-col">

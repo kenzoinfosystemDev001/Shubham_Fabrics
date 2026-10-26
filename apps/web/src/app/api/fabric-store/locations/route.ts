@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
 // GET /api/fabric-store/locations
-export async function GET() {
+export async function GET(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE');
+  if (!authUser) return authResponse;
   try {
     const locations = await prisma.inventoryLocation.findMany({
       where: { isActive: true },
@@ -21,6 +24,8 @@ export async function GET() {
 
 // POST /api/fabric-store/locations
 export async function POST(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE');
+  if (!authUser) return authResponse;
   try {
     const body = await request.json();
     const { locationCode, locationName, locationType } = body;

@@ -5,14 +5,14 @@
 The **Steam Press Department** (`STEAM_PRESS`) serves as a critical bridge between garment finishing and final quality inspection:
 $$\text{Finishing (FINISHING)} \longrightarrow \text{Steam Press (STEAM\_PRESS)} \longrightarrow \text{Final QC (FINAL\_CHECK)}$$
 
-Steam Press receives stitched, trimmed, and pre-checked garments, executes high-temperature steam ironing and crease setting, verifies piece quantities, performs quick visual check for steam scorch/burns or residual moisture, reconciles output, and issues an outgoing Challan to **Final Quality Check** (`FINAL_QC`).
+Steam Press receives stitched, trimmed, and pre-checked garments, executes high-temperature steam ironing and crease setting, verifies piece quantities, performs quick visual check for steam scorch/burns or residual moisture, reconciles output, and issues an outgoing Challan to **Final Quality Check** (`FINAL_CHECK`).
 
 ### 2. Architectural Findings & Component Reuse
 1. **Challan Engine**:
    - Reuses `Challan` with `ChallanItem` and `ChallanEvent`.
    - Inward Challans arrive with `toDepartment: { in: ['STEAM_PRESS', 'STEAM_PRESSING', 'PRESSING'] }`.
-   - Outward Challans are issued with `fromDepartment: 'STEAM_PRESS'` and `toDepartment: 'FINAL_QC'`.
-   - Outward Challans preserve `parentChallanId` to maintain the complete multi-department genealogical chain back to `STITCHING`, `RECUTTING`, `WASHING_QC`, and the root `Program`.
+   - Outward Challans are issued with `fromDepartment: 'STEAM_PRESS'` and `toDepartment: 'FINAL_CHECK'`.
+   - Outward Challans preserve `parentChallanId` to maintain the complete multi-department genealogical chain back to `STITCHING`, `RECUTTING`, `QC_WASHING`, and the root `Program`.
 
 2. **Production Sheet Association**:
    - Reuses `Program` (Production Sheet) without copying or mutating original design/order records.

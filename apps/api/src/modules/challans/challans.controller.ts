@@ -1,19 +1,10 @@
-import { Controller, Get, Post, Patch, Param, Body, Query, UseGuards, BadRequestException } from '@nestjs/common';
-import { z, ZodTypeAny } from 'zod';
+import { Controller, Get, Post, Patch, Param, Body, Query, UseGuards } from '@nestjs/common';
 import { ChallansService } from './challans.service';
-import { CreateChallanSchema, ChallanActionSchema, ChallanStatusUpdateSchema } from '@subham/validation';
+import { CreateChallanSchema } from '@subham/validation';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { DepartmentCode, UserSession } from '@subham/types';
-
-function parseOrBadRequest<S extends ZodTypeAny>(schema: S, body: unknown): z.output<S> {
-  const result = schema.safeParse(body);
-  if (!result.success) {
-    throw new BadRequestException(result.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; '));
-  }
-  return result.data;
-}
+import { ChallanStatus, DepartmentCode } from '@subham/types';
 
 @Controller('challans')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -55,32 +46,31 @@ export class ChallansController {
   }
 
   @Post()
-  async createChallan(@Body() body: unknown, @CurrentUser() actor: UserSession) {
-    const validated = parseOrBadRequest(CreateChallanSchema, body);
-    return this.challansService.create(validated, actor);
+  async createChallan(@Body() body: any, @CurrentUser('id') actorId: string) {
+    const validated = CreateChallanSchema.parse(body);
+    return this.challansService.create(validated, actorId);
   }
 
   @Patch(':id/status')
   async updateStatus(
     @Param('id') id: string,
-    @Body() body: unknown,
-    @CurrentUser() actor: UserSession,
+    @Body('status') status: ChallanStatus,
+    @Body('notes') notes: string,
+    @CurrentUser('id') actorId: string,
   ) {
-    const { status, notes } = parseOrBadRequest(ChallanStatusUpdateSchema, body);
-    return this.challansService.transitionStatus(id, status, actor, notes);
+    return this.challansService.transitionStatus(id, status, actorId, notes);
   }
 
   @Post(':id/action')
   async executeAction(
     @Param('id') id: string,
-    @Body() body: unknown,
-    @CurrentUser() actor: UserSession,
+    @Body() body: any,
+    @CurrentUser('id') actorId: string,
   ) {
-    const parsed = parseOrBadRequest(ChallanActionSchema, body);
-    return this.challansService.executeAction(id, parsed.action, actor, {
-      reason: parsed.reason,
-      notes: parsed.notes,
-      metadata: parsed.metadata,
+    return this.challansService.executeAction(id, body.action, actorId, {
+      reason: body.reason,
+      notes: body.notes,
+      metadata: body.metadata,
     });
   }
 }

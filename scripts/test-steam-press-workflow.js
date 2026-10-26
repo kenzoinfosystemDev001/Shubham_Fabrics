@@ -275,8 +275,8 @@ async function run() {
     });
     console.log(`  ✓ Quality audit passed: Status transitioned to '${inspectedChallan.status}'\n`);
 
-    // SCENARIO 10: Issue Outgoing Handover Challan to Final QC (FINAL_QC)
-    console.log('▶ [Scenario 10] Generating Outgoing Handover Challan to Final QC (FINAL_QC)...');
+    // SCENARIO 10: Issue Outgoing Handover Challan to Final QC (FINAL_CHECK)
+    console.log('▶ [Scenario 10] Generating Outgoing Handover Challan to Final QC (FINAL_CHECK)...');
     const count = await prisma.challan.count({ where: { fromDepartment: 'STEAM_PRESS' } });
     const challanNumber = `CH-SP-${String(count + 1).padStart(4, '0')}-${Date.now().toString().slice(-4)}`;
 
@@ -288,7 +288,7 @@ async function run() {
           programId: program.id,
           parentChallanId: inspectedChallan.id,
           fromDepartment: 'STEAM_PRESS',
-          toDepartment: 'FINAL_QC',
+          toDepartment: 'FINAL_CHECK',
           status: 'ISSUED',
           priority: 'NORMAL',
           issuedDate: new Date(),
@@ -352,22 +352,22 @@ async function run() {
 
     // SCENARIO 11: Final QC Verification
     console.log('▶ [Scenario 11] Verifying Downstream Visibility in Final QC...');
-    const finalQcUser = await prisma.user.findFirst({
+    const finalCheckUser = await prisma.user.findFirst({
       where: {
-        OR: [{ username: 'finalcheck' }, { departmentCode: 'FINAL_QC' }],
+        OR: [{ username: 'finalcheck' }, { departmentCode: 'FINAL_CHECK' }],
       },
     });
 
-    if (finalQcUser) {
-      const pendingForFinalQC = await prisma.challan.findMany({
+    if (finalCheckUser) {
+      const pendingForFinalCheck = await prisma.challan.findMany({
         where: {
-          toDepartment: 'FINAL_QC',
+          toDepartment: 'FINAL_CHECK',
           status: 'ISSUED',
         },
       });
-      const found = pendingForFinalQC.some((c) => c.id === outgoingChallan.id);
+      const found = pendingForFinalCheck.some((c) => c.id === outgoingChallan.id);
       if (found) {
-        console.log(`  ✓ Final QC user '${finalQcUser.username}' can view outgoing Steam Press challan ${outgoingChallan.challanNumber}`);
+        console.log(`  ✓ Final QC user '${finalCheckUser.username}' can view outgoing Steam Press challan ${outgoingChallan.challanNumber}`);
       } else {
         throw new Error('Outgoing challan not visible to Final QC!');
       }

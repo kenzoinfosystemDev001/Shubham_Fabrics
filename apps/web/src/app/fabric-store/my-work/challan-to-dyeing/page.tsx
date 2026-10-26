@@ -5,7 +5,7 @@ import { FabricStoreIssueChallanView } from '@/components/fabric-store/FabricSto
 
 export default function ChallanToDyeingPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-ink-50 flex items-center justify-center text-xs text-slate-500">Loading Challan to Dyeing...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-brand-50 flex items-center justify-center text-xs text-neutral-500">Loading Challan to Dyeing...</div>}>
       <FabricStoreIssueChallanView fixedTarget="DYEING" />
     </Suspense>
   );

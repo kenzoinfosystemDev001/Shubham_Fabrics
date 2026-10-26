@@ -8,20 +8,16 @@ declare global {
   var __prismaClient: PrismaClient | undefined;
 }
 
-// Base Neon cloud connection string
-const NEON_DATABASE_URL =
-  'postgresql://neondb_owner:npg_3h1GKCDxtAeX@ep-jolly-tree-b5ebsnbj-pooler.c-7.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require';
-
 /**
- * Optimizes the PostgreSQL connection URL for Neon Serverless / PgBouncer connection pooling.
- * Automatically injects pgbouncer=true, connection_limit, and timeouts to prevent dropped connections.
+ * Adds connection pool size and timeouts to the PostgreSQL URL (each only when the URL does not set it).
+ *
+ * pgbouncer=true is deliberately NOT added for Neon's pooler: Neon's PgBouncer supports prepared
+ * statements, and the flag makes Prisma re-prepare every statement. Measured against this database
+ * (2026-10-26): ~1,500 ms per simple query with the flag, ~280 ms (one network round trip) without.
+ * A URL that sets pgbouncer=true itself is left as it is.
  */
 export function formatDatabaseUrl(rawUrl: string): string {
   let url = rawUrl;
-  if (url.includes('-pooler') && !url.includes('pgbouncer=true')) {
-    const separator = url.includes('?') ? '&' : '?';
-    url = `${url}${separator}pgbouncer=true`;
-  }
   if (!url.includes('connect_timeout=')) {
     const separator = url.includes('?') ? '&' : '?';
     url = `${url}${separator}connect_timeout=30`;
@@ -37,9 +33,11 @@ export function formatDatabaseUrl(rawUrl: string): string {
   return url;
 }
 
-const dbUrl = formatDatabaseUrl(process.env.DATABASE_URL || NEON_DATABASE_URL);
-if (!process.env.DATABASE_URL) {
-  process.env.DATABASE_URL = dbUrl;
+// DATABASE_URL must come from the environment. There is deliberately no fallback:
+// a missing variable must fail loudly instead of silently connecting to another database.
+const dbUrl = process.env.DATABASE_URL ? formatDatabaseUrl(process.env.DATABASE_URL) : undefined;
+if (!dbUrl) {
+  console.error('[database] DATABASE_URL is not set. Database queries will fail until it is configured.');
 }
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefined };
@@ -47,7 +45,7 @@ const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefi
 export function getPrismaClient(): PrismaClient {
   if (!globalForPrisma.prisma) {
     const client = new PrismaClient({
-      datasources: { db: { url: dbUrl } },
+      ...(dbUrl ? { datasources: { db: { url: dbUrl } } } : {}),
       log: [
         { emit: 'event', level: 'error' },
         { emit: 'event', level: 'warn' },

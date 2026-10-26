@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
-import { requireAdmin } from '@/lib/admin-auth';
+import { requireUser } from '@/lib/auth/require-user';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
-  const auth = await requireAdmin(request);
-  if (!auth.actor) return auth.response;
+  const { user: authUser, response: authResponse } = await requireUser(request, { admin: true });
+  if (!authUser) return authResponse;
   try {
     const fabrics = await prisma.fabric.findMany({
       include: {
@@ -25,8 +25,8 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const auth = await requireAdmin(request);
-  if (!auth.actor) return auth.response;
+  const { user: authUser, response: authResponse } = await requireUser(request, { admin: true });
+  if (!authUser) return authResponse;
   try {
     const body = await request.json();
     const name = (body.name || '').trim();

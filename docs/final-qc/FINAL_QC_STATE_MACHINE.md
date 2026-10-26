@@ -33,7 +33,7 @@ stateDiagram-v2
 
 | State | Definition | Permitted Next States | Guard Conditions |
 | :--- | :--- | :--- | :--- |
-| **`ISSUED`** | Challan created upstream addressed to `FINAL_QC`. | `RECEIVED`, `ON_HOLD` | Awaiting physical receipt by Final QC user. |
+| **`ISSUED`** | Challan created upstream addressed to `FINAL_CHECK`. | `RECEIVED`, `ON_HOLD` | Awaiting physical receipt by Final QC user. |
 | **`RECEIVED`** | Physical bundle count verified on inspection floor. | `IN_PROCESS`, `ON_HOLD` | $Received \le Issued$. Discrepancies logged. |
 | **`IN_PROCESS`** | Active quality inspection in progress at QC table. | `QC_APPROVED`, `QC_REJECTED`, `REWORK_REQUESTED`, `ON_HOLD` | Workstation assigned. Inspector identity comes from the authenticated session. |
 | **`ON_HOLD`** | Paused due to measurement deviation or spec clarification. | `IN_PROCESS` | Reason documented. Requires supervisor clearance. |

@@ -46,6 +46,8 @@ export function WilcomDesignModal({
   const [designNumber, setDesignNumber] = useState('');
   const [photoUrl, setPhotoUrl] = useState('');
   const [remarks, setRemarks] = useState('');
+  const [dragging, setDragging] = useState(false);
+  const fileInput = React.useRef<HTMLInputElement>(null);
 
   // Synchronize state when modal opens or active category changes
   React.useEffect(() => {
@@ -68,8 +70,19 @@ export function WilcomDesignModal({
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    try {
+      if (file) await processPhoto(file);
+    } finally {
+      e.target.value = '';
+    }
+  };
 
+  /** Same handling for a picked or a dropped file. */
+  const processPhoto = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      alert('Please choose an image file');
+      return;
+    }
     if (file.size > 15 * 1024 * 1024) {
       alert('Photo must be less than 15MB');
       return;
@@ -119,8 +132,6 @@ export function WilcomDesignModal({
       setEditingId(entry.id);
     } catch (error) {
       alert(error instanceof Error ? error.message : 'Failed to read image file');
-    } finally {
-      e.target.value = '';
     }
   };
 
@@ -215,321 +226,323 @@ export function WilcomDesignModal({
     resetForm();
   };
 
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-white overflow-hidden"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <div className="bg-white w-full h-full flex flex-col overflow-hidden animate-in fade-in duration-200">
-        
-        {/* MODAL HEADER */}
-        <div className="px-7 py-4 border-b border-slate-200 flex items-center justify-between bg-white shrink-0">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-lavender-800 shadow-2xs">
-              <Sparkles className="w-7 h-7 text-lavender-800" />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold text-slate-900 tracking-tight">
-                Wilcom Sheet
-              </h2>
-            </div>
-          </div>
+  const categoryLabel = (c: string) => STANDARD_LABEL[c] || c;
+  const counts = wilcomEntries.reduce<Record<string, number>>((acc, e) => {
+    acc[e.category] = (acc[e.category] || 0) + 1;
+    return acc;
+  }, {});
+  const selectedChip = isCustomCategory ? 'OTHER' : category;
+  const chooseCategory = (val: string) => {
+    if (val === 'OTHER') {
+      setIsCustomCategory(true);
+      setCategory('OTHER');
+      setCustomCategory(defaultStyleName);
+    } else {
+      setIsCustomCategory(false);
+      setCategory(val as GarmentCategory);
+      setCustomCategory('');
+    }
+  };
 
-          <div className="flex items-center gap-3">
-            <span className="px-4 py-2 bg-slate-100 border border-slate-200 rounded-full text-sm font-semibold text-slate-700">
-              {wilcomEntries.length} {wilcomEntries.length === 1 ? 'Design' : 'Designs'}
-            </span>
-            <button
-              type="button"
-              onClick={onClose}
-              className="p-2 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition cursor-pointer"
-              title="Close modal"
-            >
-              <X className="w-7 h-7" />
-            </button>
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col bg-canvas overflow-hidden" role="dialog" aria-modal="true" aria-label="Wilcom Sheet">
+      {/* HEADER */}
+      <header className="sticky top-0 z-10 px-4 sm:px-8 py-4 bg-white/90 backdrop-blur border-b border-neutral-200 flex items-center justify-between gap-4 shrink-0">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-11 h-11 rounded-xl bg-brand-50 border border-brand-100 flex items-center justify-center shrink-0">
+            <Sparkles className="w-5 h-5 text-brand-600" />
+          </div>
+          <div className="min-w-0">
+            <h2 className="text-lg font-bold text-neutral-900 leading-tight">Wilcom Sheet</h2>
+            <p className="text-xs text-neutral-500 truncate">Embroidery designs and artwork for this Production Sheet</p>
           </div>
         </div>
+        <div className="flex items-center gap-2">
+          <span className="hidden sm:inline-flex px-3 py-1 rounded-full bg-neutral-100 text-xs font-semibold text-neutral-700 tabular-nums">
+            {wilcomEntries.length} {wilcomEntries.length === 1 ? 'design' : 'designs'}
+          </span>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-2 text-neutral-500 hover:text-neutral-900 rounded-lg hover:bg-neutral-100 transition cursor-pointer"
+            aria-label="Close Wilcom Sheet"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+      </header>
 
-        {/* MODAL CONTENT */}
-        <div className="px-7 py-8 overflow-y-auto space-y-8 flex-1 bg-slate-50/50">
-          
-          {/* ENTRY FORM */}
-          <div className="bg-white border border-slate-200 rounded-2xl p-7 shadow-xs space-y-6">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <h3 className="text-base font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2">
-                <Plus className="w-5 h-5 text-lavender-800" />
-                <span>{editingId ? 'Edit Design' : 'Add Design'}</span>
+      {/* BODY: form on the left, attached designs on the right */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-7xl mx-auto p-4 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* DESIGN FORM */}
+          <section className={`lg:col-span-5 lg:sticky lg:top-6 bg-white border rounded-2xl shadow-xs overflow-hidden ${editingId ? 'border-brand-300' : 'border-neutral-200'}`}>
+            <div className="px-5 py-4 border-b border-neutral-200 flex items-center justify-between gap-3">
+              <h3 className="text-sm font-bold text-neutral-900 flex items-center gap-2">
+                {editingId ? <Edit3 className="w-4 h-4 text-brand-600" /> : <Plus className="w-4 h-4 text-brand-600" />}
+                <span>{editingId ? 'Edit Design' : 'Add a Design'}</span>
               </h3>
               {editingId && (
-                <button
-                  type="button"
-                  onClick={resetForm}
-                  className="text-sm font-semibold text-slate-500 hover:text-slate-800 underline cursor-pointer"
-                >
-                  Cancel Edit
+                <button type="button" onClick={resetForm} className="text-xs font-semibold text-neutral-500 hover:text-neutral-900 cursor-pointer">
+                  Cancel edit
                 </button>
               )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-6 text-sm">
+            <div className="p-5 space-y-5">
               {/* Category */}
               <div>
-                <div className="flex items-center justify-between gap-2 mb-2">
-                  <label className="block text-sm font-bold text-slate-700 uppercase">
-                    Category *
-                  </label>
-                  {isCustomCategory && (
+                <span className="block text-xs font-semibold text-neutral-600 mb-2">
+                  Category <span className="text-danger-600">*</span>
+                </span>
+                <div role="radiogroup" aria-label="Category" className="grid grid-cols-4 gap-1.5 p-1 bg-neutral-100 rounded-xl">
+                  {CATEGORY_CHIPS.map((c) => (
                     <button
+                      key={c.value}
                       type="button"
-                      onClick={() => {
-                        setIsCustomCategory(false);
-                        setCategory('TOP');
-                        setCustomCategory('');
-                      }}
-                      className="text-xs font-semibold text-slate-500 hover:text-slate-800 underline cursor-pointer whitespace-nowrap"
+                      role="radio"
+                      aria-checked={selectedChip === c.value}
+                      onClick={() => chooseCategory(c.value)}
+                      className={`py-2 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                        selectedChip === c.value ? 'bg-white text-brand-800 shadow-xs' : 'text-neutral-600 hover:text-neutral-900'
+                      }`}
                     >
-                      Standard (Top/Bottom/Dupatta)
+                      {c.label}
                     </button>
-                  )}
+                  ))}
                 </div>
-                <select
-                  value={isCustomCategory ? 'OTHER' : category}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    if (val === 'OTHER') {
-                      setIsCustomCategory(true);
-                      setCategory('OTHER');
-                      setCustomCategory(defaultStyleName);
-                    } else {
-                      setIsCustomCategory(false);
-                      setCategory(val as GarmentCategory);
-                      setCustomCategory('');
-                    }
-                  }}
-                  className="w-full h-12 px-4 rounded-xl border border-slate-300 bg-white font-medium text-base text-slate-900 focus:border-lavender-800 focus:ring-2 focus:ring-lavender-800/20 focus:outline-none"
-                >
-                  <option value="TOP">Top</option>
-                  <option value="BOTTOM">Bottom</option>
-                  <option value="DUPATTA">Dupatta</option>
-                  <option value="OTHER">Other (Enter Custom Name)</option>
-                </select>
-
                 {isCustomCategory && (
-                  <div className="mt-4 space-y-2 animate-in fade-in duration-150">
-                    <label className="block text-sm font-bold text-slate-700 uppercase">
-                      Category Name *
-                    </label>
+                  <label className="block mt-3">
+                    <span className="block text-xs font-semibold text-neutral-600 mb-1.5">
+                      Category name <span className="text-danger-600">*</span>
+                    </span>
                     <input
                       type="text"
                       value={customCategory}
                       onChange={(e) => setCustomCategory(e.target.value)}
-                      placeholder="ENTER CATEGORY NAME (E.G. KOTI, JACKET, BELT, SLEEVE)"
-                      className="w-full h-12 px-4 rounded-xl border border-slate-300 bg-white font-medium text-base text-slate-900 placeholder:text-slate-400 focus:border-lavender-800 focus:outline-none focus:ring-2 focus:ring-lavender-800/30 shadow-2xs"
+                      placeholder="e.g. Koti, Jacket, Belt, Sleeve"
+                      className={FIELD_CLASS}
                       autoFocus
                     />
-                  </div>
-                )}
-              </div>
-
-              {/* Style Name / Part */}
-              <div>
-                <label className="block text-sm font-bold text-slate-700 uppercase mb-2">
-                  Style Name / Part
-                </label>
-                <input
-                  type="text"
-                  value={styleName}
-                  onChange={(e) => setStyleName(e.target.value)}
-                  placeholder=""
-                  className="w-full h-12 px-4 rounded-xl border border-slate-300 bg-white text-base font-medium text-slate-900 focus:border-lavender-800 focus:ring-2 focus:ring-lavender-800/20 focus:outline-none"
-                />
-              </div>
-
-              {/* Wilcom Design Number */}
-              <div>
-                <label className="block text-sm font-bold text-slate-700 uppercase mb-2">
-                  Design Number
-                </label>
-                <input
-                  type="text"
-                  value={designNumber}
-                  onChange={(e) => setDesignNumber(e.target.value)}
-                  placeholder=""
-                  className="w-full h-12 px-4 rounded-xl border border-slate-300 bg-white font-mono font-bold text-base uppercase text-slate-900 focus:border-lavender-800 focus:ring-2 focus:ring-lavender-800/20 focus:outline-none"
-                />
-              </div>
-
-              {/* Artwork Photo Upload */}
-              <div className="sm:col-span-3">
-                <label className="block text-sm font-bold text-slate-700 uppercase mb-2">
-                  Artwork Photo
-                </label>
-                <div className="flex items-center gap-3">
-                  <label className="inline-flex items-center gap-3 px-5 py-3 rounded-xl border border-dashed border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-700 cursor-pointer font-semibold text-base transition shadow-2xs">
-                    <Upload className="w-5 h-5 text-slate-600" />
-                    <span>Upload Photo</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handlePhotoUpload}
-                      className="hidden"
-                    />
                   </label>
-                  {photoUrl && (
-                    <button
-                      type="button"
-                      onClick={() => setPhotoUrl('')}
-                      className="text-sm font-semibold text-rose-600 hover:text-rose-800 underline cursor-pointer"
-                    >
-                      Remove Photo
-                    </button>
-                  )}
-                </div>
-
-                {photoUrl && (
-                  <div className="mt-2.5 flex items-center gap-2.5">
-                    <img
-                      src={photoUrl}
-                      alt="Wilcom preview"
-                      className="w-14 h-14 object-contain rounded-lg border border-slate-200 bg-white shadow-2xs p-1"
-                    />
-                    <span className="text-xs text-emerald-700 font-semibold flex items-center gap-1">
-                      <Check className="w-3.5 h-3.5" />
-                      Photo Ready
-                    </span>
-                  </div>
                 )}
               </div>
 
-              {/* Remarks */}
-              <div className="sm:col-span-3">
-                <label className="block text-sm font-bold text-slate-700 uppercase mb-2">
-                  Notes / Instructions
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <label className="block">
+                  <span className="block text-xs font-semibold text-neutral-600 mb-1.5">Style name / part</span>
+                  <input type="text" value={styleName} onChange={(e) => setStyleName(e.target.value)} className={FIELD_CLASS} />
                 </label>
-                <input
-                  type="text"
-                  value={remarks}
-                  onChange={(e) => setRemarks(e.target.value)}
-                  placeholder=""
-                  className="w-full h-12 px-4 rounded-xl border border-slate-300 bg-white text-base text-slate-900 focus:border-lavender-800 focus:ring-2 focus:ring-lavender-800/20 focus:outline-none"
-                />
+                <label className="block">
+                  <span className="block text-xs font-semibold text-neutral-600 mb-1.5">Design number</span>
+                  <input
+                    type="text"
+                    value={designNumber}
+                    onChange={(e) => setDesignNumber(e.target.value)}
+                    className={`${FIELD_CLASS} font-mono font-semibold uppercase`}
+                  />
+                </label>
               </div>
-            </div>
 
-            <div className="flex justify-end pt-2">
+              {/* Artwork */}
+              <div>
+                <span className="block text-xs font-semibold text-neutral-600 mb-1.5">Artwork photo</span>
+                <input ref={fileInput} type="file" accept="image/*" onChange={handlePhotoUpload} className="sr-only" aria-label="Artwork photo" />
+                {photoUrl ? (
+                  <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-3 flex items-center gap-4">
+                    <div className="w-28 h-28 rounded-lg bg-white border border-neutral-200 flex items-center justify-center overflow-hidden shrink-0">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={photoUrl} alt="Artwork preview" className="max-w-full max-h-full object-contain" />
+                    </div>
+                    <div className="space-y-2">
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-brand-800">
+                        <Check className="w-3.5 h-3.5" />
+                        Photo attached
+                      </span>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => fileInput.current?.click()}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-neutral-200 hover:bg-neutral-50 rounded-lg text-xs font-semibold text-neutral-700 cursor-pointer"
+                        >
+                          <Upload className="w-3.5 h-3.5" />
+                          Replace
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setPhotoUrl('')}
+                          className="px-3 py-1.5 rounded-lg text-xs font-semibold text-danger-700 hover:bg-danger-50 cursor-pointer"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => fileInput.current?.click()}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      setDragging(true);
+                    }}
+                    onDragLeave={() => setDragging(false)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setDragging(false);
+                      const file = e.dataTransfer.files?.[0];
+                      if (file) void processPhoto(file);
+                    }}
+                    className={`w-full rounded-xl border-2 border-dashed px-4 py-7 flex flex-col items-center gap-2 text-center transition cursor-pointer ${
+                      dragging ? 'border-brand-500 bg-brand-50' : 'border-neutral-300 bg-neutral-50 hover:border-brand-300 hover:bg-brand-50/40'
+                    }`}
+                  >
+                    <span className="w-10 h-10 rounded-full bg-white border border-neutral-200 flex items-center justify-center">
+                      <Upload className="w-4 h-4 text-brand-600" />
+                    </span>
+                    <span className="text-sm font-semibold text-neutral-800">Upload artwork</span>
+                    <span className="text-xs text-neutral-500">Click or drop an image here (up to 15 MB)</span>
+                  </button>
+                )}
+              </div>
+
+              <label className="block">
+                <span className="block text-xs font-semibold text-neutral-600 mb-1.5">Notes / instructions</span>
+                <textarea value={remarks} onChange={(e) => setRemarks(e.target.value)} rows={3} className={`${FIELD_CLASS} h-auto py-2.5 resize-y`} />
+              </label>
+
               <button
                 type="button"
                 onClick={handleSaveCurrent}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-lavender-800 hover:bg-lavender-900 text-white rounded-xl text-base font-bold shadow-xs transition cursor-pointer"
+                className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-bold shadow-xs transition cursor-pointer"
               >
-                <Check className="w-5 h-5" />
+                <Check className="w-4 h-4" />
                 <span>{editingId ? 'Update Design' : 'Add Design'}</span>
               </button>
             </div>
-          </div>
+          </section>
 
-          {/* LIST OF CURRENT ENTRIES */}
-          <div className="space-y-4">
-            <h3 className="text-base font-bold uppercase tracking-wider text-slate-800">
-              Attached Designs ({wilcomEntries.length})
+          {/* ATTACHED DESIGNS */}
+          <section className="lg:col-span-7 space-y-4">
+            <h3 className="text-sm font-bold text-neutral-900 flex items-center gap-2">
+              Attached Designs
+              <span className="text-[11px] font-semibold tabular-nums bg-neutral-100 text-neutral-600 px-2 py-0.5 rounded-full">{wilcomEntries.length}</span>
             </h3>
 
             {wilcomEntries.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {wilcomEntries.map((entry, idx) => (
-                  <div
-                    key={entry.id || idx}
-                    className="p-3.5 rounded-xl border border-slate-200 bg-white flex items-start justify-between gap-3 shadow-2xs hover:border-slate-300 transition"
-                  >
-                    <div className="flex items-start gap-3 min-w-0 flex-1">
-                      <div className="w-12 h-12 rounded-lg border border-slate-200 bg-slate-50 flex items-center justify-center shrink-0 overflow-hidden">
+                {wilcomEntries.map((entry, idx) => {
+                  const editing = editingId === entry.id;
+                  return (
+                    <article
+                      key={entry.id || idx}
+                      className={`bg-white border rounded-2xl overflow-hidden shadow-xs transition ${
+                        editing ? 'border-brand-500 ring-2 ring-brand-500/20' : 'border-neutral-200 hover:border-brand-300 hover:shadow-sm'
+                      }`}
+                    >
+                      <div className="aspect-[4/3] bg-neutral-50 border-b border-neutral-200 flex items-center justify-center overflow-hidden">
                         {entry.photoUrl ? (
-                          <img
-                            src={entry.photoUrl}
-                            alt={entry.wilcomDesignNumber}
-                            className="w-full h-full object-contain"
-                          />
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={entry.photoUrl} alt={`Artwork ${entry.wilcomDesignNumber}`} className="max-w-full max-h-full object-contain p-2" />
                         ) : (
-                          <ImageIcon className="w-5 h-5 text-slate-400" />
-                        )}
-                      </div>
-
-                      <div className="min-w-0 flex-1 space-y-1 text-xs">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase text-white ${
-                            entry.category === 'TOP'
-                              ? 'bg-lavender-800'
-                              : entry.category === 'BOTTOM'
-                                ? 'bg-lavender-700'
-                                : entry.category === 'DUPATTA'
-                                  ? 'bg-lavender-700'
-                                  : 'bg-slate-700'
-                          }`}>
-                            {entry.category}
+                          <span className="flex flex-col items-center gap-1 text-neutral-400">
+                            <ImageIcon className="w-6 h-6" />
+                            <span className="text-[11px]">No artwork photo</span>
                           </span>
-                          {entry.styleName && (
-                            <span className="font-semibold text-slate-900 truncate">
-                              {entry.styleName}
-                            </span>
-                          )}
-                        </div>
-                        <div className="font-mono font-bold text-slate-900 text-xs">
-                          {entry.wilcomDesignNumber}
-                        </div>
-                        {entry.remarks && (
-                          <p className="text-[11px] text-slate-500 truncate">
-                            {entry.remarks}
-                          </p>
                         )}
                       </div>
-                    </div>
-
-                    <div className="flex items-center gap-1 shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => handleEdit(entry)}
-                        className="p-1.5 text-slate-400 hover:text-lavender-800 hover:bg-slate-100 rounded-lg cursor-pointer transition"
-                        title="Edit design"
-                      >
-                        <Edit3 className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(entry.id)}
-                        className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg cursor-pointer transition"
-                        title="Delete design"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                      <div className="p-4 space-y-2">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0 space-y-1">
+                            <span className={`inline-flex px-2 py-0.5 rounded-md text-[11px] font-bold uppercase ${CATEGORY_TONE[entry.category] || 'bg-neutral-100 text-neutral-700'}`}>
+                              {categoryLabel(entry.category)}
+                            </span>
+                            <p className="font-mono text-sm font-bold text-neutral-900 truncate">{entry.wilcomDesignNumber}</p>
+                            {entry.styleName && <p className="text-xs text-neutral-700 truncate">{entry.styleName}</p>}
+                          </div>
+                          <div className="flex items-center gap-0.5 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => handleEdit(entry)}
+                              className="p-1.5 text-neutral-500 hover:text-brand-700 hover:bg-brand-50 rounded-lg cursor-pointer transition"
+                              title="Edit design"
+                              aria-label={`Edit ${entry.wilcomDesignNumber}`}
+                            >
+                              <Edit3 className="w-4 h-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDelete(entry.id)}
+                              className="p-1.5 text-neutral-500 hover:text-danger-600 hover:bg-danger-50 rounded-lg cursor-pointer transition"
+                              title="Delete design"
+                              aria-label={`Delete ${entry.wilcomDesignNumber}`}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                        {entry.remarks && <p className="text-xs text-neutral-500 line-clamp-2">{entry.remarks}</p>}
+                        {editing && <p className="text-[11px] font-semibold text-brand-700">Editing in the form</p>}
+                      </div>
+                    </article>
+                  );
+                })}
               </div>
             ) : (
-              <div className="p-8 text-center border border-dashed border-slate-200 rounded-xl bg-white text-slate-400 text-xs">
-                No Wilcom designs added yet.
+              <div className="bg-white border-2 border-dashed border-neutral-200 rounded-2xl px-6 py-16 flex flex-col items-center text-center gap-2">
+                <span className="w-12 h-12 rounded-full bg-brand-50 flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-brand-600" />
+                </span>
+                <p className="text-sm font-semibold text-neutral-800">No Wilcom designs yet</p>
+                <p className="text-xs text-neutral-500 max-w-xs">
+                  Add each embroidery design with its category, design number and artwork. They appear here and on the printed Wilcom sheet.
+                </p>
               </div>
             )}
-          </div>
+          </section>
         </div>
-
-        {/* MODAL FOOTER */}
-        <div className="px-7 py-5 border-t border-slate-200 bg-white flex items-center justify-between shrink-0">
-          <div className="text-base font-medium text-slate-500">
-            {wilcomEntries.length} {wilcomEntries.length === 1 ? 'design' : 'designs'}
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-6 py-3 bg-lavender-800 hover:bg-lavender-900 text-white rounded-xl text-base font-bold transition shadow-xs cursor-pointer"
-          >
-            Done
-          </button>
-        </div>
-
       </div>
+
+      {/* FOOTER */}
+      <footer className="px-4 sm:px-8 py-3.5 bg-white border-t border-neutral-200 flex items-center justify-between gap-4 shrink-0">
+        <div className="flex flex-wrap items-center gap-1.5 text-xs text-neutral-600">
+          {wilcomEntries.length === 0 ? (
+            <span>No designs attached</span>
+          ) : (
+            Object.entries(counts).map(([cat, n]) => (
+              <span key={cat} className={`inline-flex px-2 py-0.5 rounded-md font-semibold ${CATEGORY_TONE[cat] || 'bg-neutral-100 text-neutral-700'}`}>
+                {categoryLabel(cat)} · {n}
+              </span>
+            ))
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          className="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-bold transition shadow-xs cursor-pointer"
+        >
+          Done
+        </button>
+      </footer>
     </div>
   );
 }
+
+const FIELD_CLASS =
+  'w-full h-11 px-3.5 rounded-xl border border-neutral-200 bg-white text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none transition';
+
+const CATEGORY_CHIPS = [
+  { value: 'TOP', label: 'Top' },
+  { value: 'BOTTOM', label: 'Bottom' },
+  { value: 'DUPATTA', label: 'Dupatta' },
+  { value: 'OTHER', label: 'Other' },
+];
+
+const STANDARD_LABEL: Record<string, string> = { TOP: 'Top', BOTTOM: 'Bottom', DUPATTA: 'Dupatta', OTHER: 'Other' };
+
+// Readable tones (the old Top badge was dark text on dark lavender).
+const CATEGORY_TONE: Record<string, string> = {
+  TOP: 'bg-brand-100 text-brand-800',
+  BOTTOM: 'bg-accent-100 text-neutral-900',
+  DUPATTA: 'bg-brand-50 text-brand-700 ring-1 ring-brand-200',
+};

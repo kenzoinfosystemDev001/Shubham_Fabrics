@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,6 +9,8 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE');
+  if (!authUser) return authResponse;
   try {
     const { id } = await params;
     const body = await request.json();
@@ -34,9 +37,11 @@ export async function PATCH(
 
 // DELETE /api/fabric-store/locations/[id] → soft delete
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE');
+  if (!authUser) return authResponse;
   try {
     const { id } = await params;
     await prisma.inventoryLocation.update({

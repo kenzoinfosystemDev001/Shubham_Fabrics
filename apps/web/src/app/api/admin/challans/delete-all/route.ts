@@ -1,19 +1,16 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
-import { auditAdminAction, readReason, reasonRequiredResponse, requireAdmin } from '@/lib/admin-auth';
+import { destructiveAdminActionsDisabled, requireUser } from '@/lib/auth/require-user';
+
+import { STOCK_REFERENCE, STORE_STOCK_DEPARTMENT } from '@/lib/fabric-stock-ledger';
 
 export const dynamic = 'force-dynamic';
 
 export async function DELETE(request: Request) {
-  const auth = await requireAdmin(request);
-  if (!auth.actor) return auth.response;
-  const body = await request.json().catch(() => ({}));
-  // Irreversible bulk wipe: the admin must type the confirmation phrase and give a reason.
-  if (String(body?.confirm || '').trim() !== 'DELETE ALL CHALLANS') {
-    return NextResponse.json({ error: 'Type "DELETE ALL CHALLANS" to confirm.', field: 'confirm' }, { status: 400 });
-  }
-  const reason = readReason(body);
-  if (!reason) return reasonRequiredResponse();
+  const { user: authUser, response: authResponse } = await requireUser(request, { admin: true });
+  if (!authUser) return authResponse;
+  const disabledResponse = destructiveAdminActionsDisabled();
+  if (disabledResponse) return disabledResponse;
   try {
     await prisma.$transaction(
       async (tx) => {
@@ -22,9 +19,12 @@ export async function DELETE(request: Request) {
           data: { parentChallanId: null },
         });
 
-        // 2. Unlink Challans from Dyeing Orders
+        // 2. Department work items are derived from challans: remove them with the challans.
+        await tx.departmentWorkItem.deleteMany({});
+
+        // Unlink Challans from Dyeing Orders
         await tx.dyeingOrder.updateMany({
-          data: { inboundChallanId: null, dyeingQcChallanId: null },
+          data: { inboundChallanId: null, qc1ChallanId: null },
         });
 
         // 3. Delete production logs referencing challans
@@ -39,17 +39,21 @@ export async function DELETE(request: Request) {
         await tx.defectRecord.deleteMany({});
 
         // 5. Delete challan line items and tracking events
-        // Deadline alerts reference challans and programs; clear them with the data they describe.
-        await tx.deadlineAlertDismissal.deleteMany({});
-        await tx.deadlineAlert.deleteMany({});
         await tx.challanItem.deleteMany({});
         await tx.challanEvent.deleteMany({});
 
+        // 6. Delete challan audit logs
+        await tx.auditLog.deleteMany({
+          where: { entity: 'Challan' },
+        });
+
+        // Fabric Store ledger postings of the deleted challans; their stock returns to the store.
+        await tx.stockLedgerEntry.deleteMany({
+          where: { departmentCode: STORE_STOCK_DEPARTMENT, referenceType: STOCK_REFERENCE.CHALLAN },
+        });
 
         // 7. Permanently delete ALL Challans from PostgreSQL
         await tx.challan.deleteMany({});
-
-        await auditAdminAction(request, auth.actor.id, 'ALL_CHALLANS_DELETED', 'System', 'ALL_CHALLANS_DELETED', { after: { reason } }, tx);
       },
       { maxWait: 20000, timeout: 60000 }
     );

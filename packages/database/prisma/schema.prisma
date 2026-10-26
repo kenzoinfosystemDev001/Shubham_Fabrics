@@ -53,11 +53,22 @@ model User {
   fabricQCInspections  FabricQCInspection[] @relation("FabricQCInspector")
   fabricLedgerEntries  FabricStockLedger[]  @relation("FabricLedgerTransactor")
   dyeingOrdersIncharge DyeingOrder[]        @relation("DyeingInchargeUser")
+  dyeingOrdersReceived DyeingOrder[]        @relation("DyeingReceiver")
+  dyeingColorReviews   DyeingOrder[]        @relation("DyeingColorReviewer")
+  dyeingQcTransfers    DyeingQcTransfer[]   @relation("DyeingQcTransferCreator")
+  workItemsReceived    DepartmentWorkItem[] @relation("WorkItemReceiver")
+  workTransfers        DepartmentWorkTransfer[] @relation("WorkTransferCreator")
+  workInspections      WorkItemInspection[] @relation("WorkItemInspector")
+  workAllocations      WorkItemAllocation[] @relation("AllocationCreator")
+  packingAllocations   PackingAllocation[]  @relation("PackingAllocationCreator")
+  garmentImagesUploaded GarmentImage[]      @relation("GarmentImageUploader")
 
-  // Smart deadline alerts
-  deadlineAlertsAssigned  DeadlineAlert[]          @relation("DeadlineAlertAssignee")
+  // Smart Deadline Alerts
   deadlineAlertDismissals DeadlineAlertDismissal[]
-  departmentsInCharge     Department[]             @relation("DepartmentIncharge")
+
+  // Sidebar department images
+  departmentImagesUploaded DepartmentImage[] @relation("DepartmentImageUploader")
+  brandingAssetsUploaded   BrandingAsset[]   @relation("BrandingAssetUploader")
 
   @@index([username])
   @@index([email])
@@ -120,13 +131,11 @@ model UserRole {
 
 model Department {
   id            String       @id @default(uuid())
-  code          String       @unique // STORE, DYEING, DYEING_QC, THREADCUT_QC, WASHING_QC, FINAL_QC, etc.
+  code          String       @unique // STORE, DYEING, QC1, CUTTING, etc.
   name          String
   sequenceOrder Int
   description   String?
   isActive      Boolean      @default(true)
-  inchargeUserId String?     // Department incharge, assigned by Admin
-  incharge      User?        @relation("DepartmentIncharge", fields: [inchargeUserId], references: [id], onDelete: SetNull)
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
 
@@ -135,6 +144,7 @@ model Department {
   defectCodes   DefectCode[]
   fromChallans  Challan[]    @relation("FromDepartment")
   toChallans    Challan[]    @relation("ToDepartment")
+  sidebarImage  DepartmentImage?
 
   @@index([code])
 }
@@ -472,6 +482,8 @@ model Program {
 
   @@index([programNumber])
   @@index([status])
+  departmentWorkItems DepartmentWorkItem[]
+  garmentImages       GarmentImage[]
 }
 
 model ProgramFabric {
@@ -609,6 +621,61 @@ model Attachment {
   createdAt    DateTime @default(now())
 }
 
+// Sidebar artwork for a department. One row per department (unique departmentId);
+// replacing the image updates the row and bumps `version`, which the image route uses as its ETag.
+// The file lives on Cloudinary when it is configured (imageUrl + storageKey), otherwise in imageData.
+model DepartmentImage {
+  id              String     @id @default(uuid())
+  departmentId    String     @unique
+  department      Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  storageProvider String     // CLOUDINARY | DATABASE
+  storageKey      String?    // Cloudinary public_id
+  imageUrl        String?    // Cloudinary secure_url
+  imageData       Bytes?     // Raw bytes when storageProvider = DATABASE
+  mimeType        String     // image/jpeg | image/png | image/webp
+  fileName        String
+  fileSize        Int
+  altText         String
+  isActive        Boolean    @default(true)
+  version         Int        @default(1)
+  uploadedById    String?
+  uploadedBy      User?      @relation("DepartmentImageUploader", fields: [uploadedById], references: [id], onDelete: SetNull)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  @@index([isActive])
+}
+
+// Admin-managed branding images keyed by slot (e.g. LOGIN_BACKGROUND). One row per slot;
+// replacing bumps `version` (the image route's ETag). Same storage rules as DepartmentImage.
+model BrandingAsset {
+  id              String   @id @default(uuid())
+  key             String   @unique // LOGIN_BACKGROUND
+  storageProvider String   // CLOUDINARY | DATABASE
+  storageKey      String?  // Cloudinary public_id
+  imageUrl        String?  // Cloudinary secure_url
+  imageData       Bytes?   // Raw bytes when storageProvider = DATABASE
+  mimeType        String
+  fileName        String
+  fileSize        Int
+  altText         String
+  isActive        Boolean  @default(true)
+  version         Int      @default(1)
+  uploadedById    String?
+  uploadedBy      User?    @relation("BrandingAssetUploader", fields: [uploadedById], references: [id], onDelete: SetNull)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// Small admin-managed application settings keyed by name (e.g. APP_BACKGROUND_ENABLED).
+model AppSetting {
+  key         String   @id
+  value       Json
+  updatedById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 model AuditLog {
   id          String   @id @default(uuid())
   actorId     String
@@ -650,7 +717,6 @@ model Challan {
   priority        String    @default("NORMAL")
 
   issuedDate      DateTime?
-  deliveryDate    DateTime? // Delivery deadline entered on the challan by the issuing department
   receivedDate    DateTime?
   completedDate   DateTime?
 
@@ -686,7 +752,12 @@ model Challan {
 
   // Dyeing back-relations
   dyeingInboundOrders DyeingOrder[] @relation("DyeingInboundChallan")
-  dyeingQcOrders      DyeingOrder[] @relation("DyeingQcChallan")
+  dyeingQc1Orders     DyeingOrder[] @relation("DyeingQc1Challan")
+  dyeingQcTransfers   DyeingQcTransfer[] @relation("DyeingQcTransferChallan")
+  workItemsInbound    DepartmentWorkItem[] @relation("WorkItemInboundChallan")
+  workTransfers       DepartmentWorkTransfer[] @relation("WorkTransferChallan")
+
+  // Smart Deadline Alerts
   deadlineAlerts      DeadlineAlert[]
 }
 
@@ -696,10 +767,13 @@ model ChallanItem {
   challan         Challan  @relation(fields: [challanId], references: [id], onDelete: Cascade)
   itemDescription String
   fabricCode      String?
-  colour          String?  // Current fabric colour / shade as it leaves the issuing department
-  shade           String?  // Resulting / observed shade (e.g. actual dyed shade). Never the dyeing instruction.
-  requiredDyeColor    String? // Colour the fabric must be dyed to (Fabric Store -> Dyeing instruction)
-  requiredDyeQuantity Float?  // Quantity of this line that must be dyed, in `uom`
+  colour          String?  // current fabric colour as issued
+  shade           String?  // current shade as issued
+  requiredColour  String?  // colour Dyeing must achieve (Store -> Dyeing lines); null when not specified
+  requiredQuantity Float?  // quantity to dye in this line's uom; null when not specified
+  fabricProcessingStatus String? // DYED | UNDYED for this line; null on lines recorded before it existed
+  garmentCategory String?  // TOP | BOTTOM | DUPATTA | OTHERS (Recutting -> Stitching lines)
+  styleRef        String?  // style / sub-style the line is to be stitched as
   size            String?
   unitType        String
   rollNumber      String?
@@ -835,9 +909,11 @@ model StockLedgerEntry {
   actor          User     @relation(fields: [actorId], references: [id])
   balanceAfter   Float
   notes          String?
+  idempotencyKey String?  @unique // one ledger movement per (document, line, revision); retries cannot double-post
   createdAt      DateTime @default(now())
 
   @@index([departmentCode, itemCode])
+  @@index([referenceType, referenceId])
   @@index([batchNumber])
   @@index([lotNumber])
   @@index([rollNumber])
@@ -987,34 +1063,26 @@ model DispatchCarton {
 }
 
 model DefectRecord {
-  id                    String              @id @default(uuid())
-  defectCode            String              // e.g. DEF-ST-01
-  programId             String
-  program               Program             @relation(fields: [programId], references: [id])
-  productionSheetNumber String?
-  challanId             String?
-  challan               Challan?            @relation(fields: [challanId], references: [id])
-  departmentCode        String
-  shelfCode             String?
-  color                 String?
-  fabricType            String?
-  quantityUnit          String              @default("PCS")
-  responsibleIncharge   String?
-  bundleId              String?
-  bundle                Bundle?             @relation(fields: [bundleId], references: [id])
-  itemDescription       String
-  severity              String              // MINOR, MAJOR, CRITICAL
-  quantity              Float
-  reason                String
-  detectedById          String
-  detectedBy            User                @relation("DefectDetector", fields: [detectedById], references: [id])
-  status                String              @default("OPEN") // OPEN, UNDER_REVIEW, REWORK, RE-CUT, SCRAP, RELEASED, CLOSED
-  resolutionNotes       String?
-  resolvedAt            DateTime?
-  shelfRemovedAt        DateTime?
-  shelfRemovalReason    String?
-  createdAt             DateTime            @default(now())
-  updatedAt             DateTime            @updatedAt
+  id              String              @id @default(uuid())
+  defectCode      String              // e.g. DEF-ST-01
+  programId       String
+  program         Program             @relation(fields: [programId], references: [id])
+  challanId       String?
+  challan         Challan?            @relation(fields: [challanId], references: [id])
+  departmentCode  String
+  bundleId        String?
+  bundle          Bundle?             @relation(fields: [bundleId], references: [id])
+  itemDescription String
+  severity        String              // MINOR, MAJOR, CRITICAL
+  quantity        Int
+  reason          String
+  detectedById    String
+  detectedBy      User                @relation("DefectDetector", fields: [detectedById], references: [id])
+  status          String              @default("OPEN") // OPEN, UNDER_REVIEW, REWORK, RE-CUT, SCRAP, RELEASED, CLOSED
+  resolutionNotes String?
+  resolvedAt      DateTime?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
 
   reworks         ReworkTransaction[]
   recutRequests   RecutRequest[]
@@ -1023,7 +1091,6 @@ model DefectRecord {
   @@index([programId])
   @@index([departmentCode])
   @@index([status])
-  @@index([shelfCode, shelfRemovedAt, createdAt])
 }
 
 model ReworkTransaction {
@@ -1385,24 +1452,43 @@ model DyeingOrder {
   program              Program    @relation(fields: [programId], references: [id])
   inboundChallanId     String?
   inboundChallan       Challan?   @relation("DyeingInboundChallan", fields: [inboundChallanId], references: [id])
-  inboundChallanItemId String?    @unique // One dyeing order per inbound challan line (required colour + quantity)
+  // One order per Store -> Dyeing challan line (null on orders created before per-line tracking).
+  inboundChallanItemId String?    @unique
 
-  status               String     @default("RECEIVED") // RECEIVED, IN_DYEING, PARTIALLY_DYED, DYED, READY_FOR_DYEING_QC, SENT_TO_DYEING_QC
+  // AWAITING_RECEIPT, RECEIVED, IN_DYEING, PARTIALLY_DYED, DYED, READY_FOR_QC1, PARTIALLY_SENT_TO_QC1, SENT_TO_QC1
+  status               String     @default("RECEIVED")
   priority             String     @default("NORMAL")   // LOW, NORMAL, HIGH, URGENT
 
   fabricName           String
   fabricType           String?
-  currentColor         String?    // Fabric colour / shade before dyeing
-  targetColor          String     // Required dyeing colour (instruction from Fabric Store)
-  dyedColor            String?    // Actual resulting shade recorded by Dyeing
+  targetColor          String
+  dyedColor            String?
   colorCode            String?
 
   requiredQuantity     Float
   dyedQuantity         Float      @default(0)
   undyedQuantity       Float      @default(0)
-  readyForDyeingQcQuantity Float  @default(0) @map("readyForQc1Quantity")
-  sentToDyeingQcQuantity Float    @default(0) @map("sentToQc1Quantity")
+  readyForQc1Quantity  Float      @default(0)
+  sentToQc1Quantity    Float      @default(0)
   uom                  String     @default("MTR")
+
+  // Receipt: what physically arrived (null until received; legacy orders received before this existed).
+  receivedQuantity     Float?
+  receivedAt           DateTime?
+  receivedById         String?
+  receivedBy           User?      @relation("DyeingReceiver", fields: [receivedById], references: [id])
+  receiptRemarks       String?
+
+  expectedCompletionDate DateTime?
+
+  // Actual dyed colour differs from the required colour: must be reviewed before transfer to QC.
+  colorMismatch        Boolean    @default(false)
+  colorReviewNote      String?
+  colorReviewedById    String?
+  colorReviewedBy      User?      @relation("DyeingColorReviewer", fields: [colorReviewedById], references: [id])
+  colorReviewedAt      DateTime?
+
+  qcTransfers          DyeingQcTransfer[]
 
   inchargeId           String?
   incharge             User?      @relation("DyeingInchargeUser", fields: [inchargeId], references: [id])
@@ -1412,12 +1498,12 @@ model DyeingOrder {
   machineNumber        String?
   processRemarks       String?
 
-  dyeingQcChallanId    String?    @map("qc1ChallanId")
-  dyeingQcChallan      Challan?   @relation("DyeingQcChallan", fields: [dyeingQcChallanId], references: [id])
+  qc1ChallanId         String?
+  qc1Challan           Challan?   @relation("DyeingQc1Challan", fields: [qc1ChallanId], references: [id])
 
   startedAt            DateTime?
   completedAt          DateTime?
-  sentToDyeingQcAt     DateTime?  @map("sentToQc1At")
+  sentToQc1At          DateTime?
 
   createdAt            DateTime   @default(now())
   updatedAt            DateTime   @updatedAt
@@ -1425,7 +1511,169 @@ model DyeingOrder {
   @@index([programId])
   @@index([status])
   @@index([orderNumber])
+}
+
+// One row per quantity of a DyeingOrder sent to Dyeing QC on a Dyeing -> QC1 challan line.
+// Partial transfers create several rows; the order's sentToQc1Quantity is their sum.
+model DyeingQcTransfer {
+  id              String      @id @default(uuid())
+  dyeingOrderId   String
+  dyeingOrder     DyeingOrder @relation(fields: [dyeingOrderId], references: [id], onDelete: Cascade)
+  challanId       String
+  challan         Challan     @relation("DyeingQcTransferChallan", fields: [challanId], references: [id], onDelete: Cascade)
+  challanItemId   String      @unique
+  quantity        Float
+  uom             String
+  actualDyedColor String?
+  createdById     String
+  createdBy       User        @relation("DyeingQcTransferCreator", fields: [createdById], references: [id])
+  createdAt       DateTime    @default(now())
+
+  @@index([dyeingOrderId])
+  @@index([challanId])
+}
+
+// One incoming challan line as work in a downstream department (Embroidery now; Thread Cutting and
+// later departments reuse it). Quantities only move forward: expected -> received -> processed ->
+// transferred, so nothing is counted twice.
+model DepartmentWorkItem {
+  id                     String    @id @default(uuid())
+  departmentCode         String    // EMBROIDERY, THREAD_CUTTING ...
+  itemNumber             String    @unique // e.g. EMB-2026-0001
+  programId              String
+  program                Program   @relation(fields: [programId], references: [id])
+  inboundChallanId       String
+  inboundChallan         Challan   @relation("WorkItemInboundChallan", fields: [inboundChallanId], references: [id])
+  inboundChallanItemId   String
+  sourceDepartment       String    // department that sent the line (STORE, QC1 ...)
+
+  fabricName             String
+  colour                 String?
+  fabricProcessingStatus String    // DYED | UNDYED, from the validated route
+  fabricStatusSource     String    @default("ROUTE") // ROUTE | CORRECTED (admin correction, audited)
+
+  status                 String    @default("AWAITING_RECEIPT") // AWAITING_RECEIPT, RECEIVED, IN_PROGRESS, COMPLETED, READY_FOR_TRANSFER, PARTIALLY_TRANSFERRED, TRANSFERRED
+  priority               String    @default("NORMAL")
+  uom                    String
+  expectedQuantity       Float
+  receivedQuantity       Float?
+  processedQuantity      Float     @default(0) // QC departments: inspected
+  transferredQuantity    Float     @default(0) // QC departments: PASS sent onward
+  // Garment lines (Stitching onward): category and style from the Recutting allocation.
+  garmentCategory        String?   // TOP | BOTTOM | DUPATTA | OTHERS
+  styleRef               String?
+  sourceAllocationId     String?
+  sourceAllocation       WorkItemAllocation? @relation("WorkItemSourceAllocation", fields: [sourceAllocationId], references: [id], onDelete: SetNull)
+  // The previous department's line this one was issued from (e.g. the Stitching line a Finishing line came from).
+  sourceWorkItemId       String?
+  sourceWorkItem         DepartmentWorkItem?  @relation("WorkItemSource", fields: [sourceWorkItemId], references: [id], onDelete: SetNull)
+  downstreamWorkItems    DepartmentWorkItem[] @relation("WorkItemSource")
+  // Production departments that take work onto the floor (Stitching): taken in, and defective
+  // (kept apart from good processedQuantity; recorded as DefectRecord).
+  takenQuantity          Float     @default(0)
+  defectQuantity         Float     @default(0)
+  // QC departments only: inspection outcomes, and how much of each has left on a challan.
+  passedQuantity         Float     @default(0)
+  rejectedQuantity       Float     @default(0)
+  reworkQuantity         Float     @default(0)
+  rejectSentQuantity     Float     @default(0)
+  reworkSentQuantity     Float     @default(0)
+
+  receivedAt             DateTime?
+  receivedById           String?
+  receivedBy             User?     @relation("WorkItemReceiver", fields: [receivedById], references: [id])
+  receiptRemarks         String?
+  expectedCompletionDate DateTime?
+  startedAt              DateTime?
+  completedAt            DateTime?
+  lastTransferredAt      DateTime?
+  remarks                String?
+
+  transfers              DepartmentWorkTransfer[]
+  inspections            WorkItemInspection[]
+  allocations            WorkItemAllocation[]
+  packingAllocations     PackingAllocation[]
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  @@unique([departmentCode, inboundChallanItemId])
+  @@index([departmentCode, status])
+  @@index([programId])
   @@index([inboundChallanId])
+}
+
+// A quantity of a work item sent to the next department on one outgoing challan line.
+model DepartmentWorkTransfer {
+  id                     String             @id @default(uuid())
+  workItemId             String
+  workItem               DepartmentWorkItem @relation(fields: [workItemId], references: [id], onDelete: Cascade)
+  challanId              String
+  challan                Challan            @relation("WorkTransferChallan", fields: [challanId], references: [id], onDelete: Cascade)
+  challanItemId          String             @unique
+  quantity               Float
+  uom                    String
+  fabricProcessingStatus String
+  kind                   String             @default("PASS") // PASS (next department) | REJECT (defective shelf) | REWORK (back for rework)
+  allocationId           String?            // Recutting: the category/style allocation this line was issued from
+  allocation             WorkItemAllocation? @relation(fields: [allocationId], references: [id])
+  createdById            String
+  createdBy              User               @relation("WorkTransferCreator", fields: [createdById], references: [id])
+  createdAt              DateTime           @default(now())
+
+  @@index([workItemId])
+  @@index([challanId])
+}
+
+// Recutting: part of a received line allocated to a garment category and style. allocatedQuantity
+// uses the line's unit and comes out of its received balance; cutQuantity is what was actually cut,
+// in its own unit (MTR or PCS, never converted automatically), and is what Stitching may receive.
+model WorkItemAllocation {
+  id                  String             @id @default(uuid())
+  allocationNumber    String             @unique // e.g. RCA-2026-0001
+  workItemId          String
+  workItem            DepartmentWorkItem @relation(fields: [workItemId], references: [id], onDelete: Cascade)
+  category            String             // TOP | BOTTOM | DUPATTA | OTHERS
+  otherName           String?            // OTHERS: the item / category name
+  styleRef            String?
+  allocatedQuantity   Float              // in the work item's uom
+  allocatedUom        String
+  cutQuantity         Float              @default(0) // in cutUom
+  cutUom              String             // MTR | PCS
+  transferredQuantity Float              @default(0) // in cutUom, sent to Stitching
+  status              String             @default("ALLOCATED") // ALLOCATED, CUT, PARTIALLY_TRANSFERRED, TRANSFERRED, CANCELLED
+  remarks             String?
+  createdById         String
+  createdBy           User               @relation("AllocationCreator", fields: [createdById], references: [id])
+  cancelledAt         DateTime?
+  cancelReason        String?
+  transfers           DepartmentWorkTransfer[]
+  downstreamItems     DepartmentWorkItem[] @relation("WorkItemSourceAllocation")
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  @@index([workItemId])
+  @@index([category])
+}
+
+// One inspection batch of a QC department work item. Batches add up: the item's inspected, passed,
+// rejected and rework quantities are the sums of its batches, so no quantity is inspected twice.
+model WorkItemInspection {
+  id                String             @id @default(uuid())
+  workItemId        String
+  workItem          DepartmentWorkItem @relation(fields: [workItemId], references: [id], onDelete: Cascade)
+  inspectedQuantity Float
+  passQuantity      Float              @default(0)
+  rejectQuantity    Float              @default(0)
+  reworkQuantity    Float              @default(0)
+  uom               String
+  rejectReason      String?
+  reworkReason      String?
+  remarks           String?
+  inspectorId       String
+  inspector         User               @relation("WorkItemInspector", fields: [inspectorId], references: [id])
+  createdAt         DateTime           @default(now())
+
+  @@index([workItemId])
 }
 
 // ==========================================
@@ -1437,12 +1685,12 @@ model FabricInward {
   sNo           Int       @default(autoincrement())
   entryType     String    // "KORA" or "DYED"
   itemName      String    // e.g. "Cotton 60x60 Cambric"
-  color         String?   // Fabric colour / shade received (null on entries recorded before colour tracking)
   billNo        String    // Supplier bill / invoice number
   billDate      DateTime  // Bill Date
   receivingDate DateTime  // Date received in store
   billQty       Float     // Quantity
-  unit          String    @default("MTR") // "MTR" or "PCS"
+  unit          String    @default("MTR") // "MTR" or "PCS"; never converted
+  colour        String?   // null on entries recorded before colour tracking
   supplierName  String?
   remarks       String?
   createdAt     DateTime  @default(now())
@@ -1461,9 +1709,9 @@ model FabricOutward {
   challanId     String?
   designNumber  String?
   itemName      String
-  color         String?   // Fabric colour issued (null on records made before colour tracking)
   issueQty      Float     // meters or units issued
   unit          String    @default("MTR")
+  colour        String?
   avgPerPcs     Float?    // avg fabric per pcs
   issuePcsQty   Float?    // pcs quantity
   byOrderName   String?   // by order name / client name
@@ -1482,46 +1730,149 @@ model FabricOutward {
 // 19. SMART DEADLINE ALERTS
 // ==========================================
 
-// One row per task, deadline day and threshold stage (dedupeKey), so the same condition is
-// never raised twice. Alerts are resolved or superseded, never deleted.
+// One row per (department, task, stage, deadline day). Rows are never deleted: an alert is
+// resolved when the task closes, the deadline moves or the next stage starts.
 model DeadlineAlert {
-  id               String    @id @default(uuid())
-  dedupeKey        String    @unique // <dept>:<taskType>:<taskId>:<deadline YYYY-MM-DD>:<stage>
-  departmentCode   String
-  taskType         String    // e.g. DYEING_ORDER
-  taskId           String
-  challanId        String?
-  challan          Challan?  @relation(fields: [challanId], references: [id], onDelete: SetNull)
-  programId        String?
-  program          Program?  @relation(fields: [programId], references: [id], onDelete: SetNull)
-  assignedUserId   String?
-  assignedUser     User?     @relation("DeadlineAlertAssignee", fields: [assignedUserId], references: [id], onDelete: SetNull)
-  stage            String    // D7, D3, D1, DUE_TODAY, OVERDUE
-  severity         String    // UPCOMING, HIGH, CRITICAL
-  deadlineAt       DateTime  // snapshot of the delivery date the alert was raised for
-  deadlineSource   String    // e.g. CHALLAN_DELIVERY_DATE
-  status           String    @default("ACTIVE") // ACTIVE, SUPERSEDED, RESOLVED
-  resolutionReason String?   // TASK_CLOSED, STAGE_ADVANCED, DEADLINE_CHANGED, NOT_DUE
-  createdAt        DateTime  @default(now())
-  lastEvaluatedAt  DateTime  @default(now())
-  resolvedAt       DateTime?
+  id                   String    @id @default(uuid())
+  dedupKey             String    @unique // DEPT:ENTITY_TYPE:ENTITY_ID:STAGE:DEADLINE_DAY
+  departmentCode       String    // DYEING, QC1, EMBROIDERY, THREAD_CUTTING ...
+  entityType           String    // DYEING_ORDER, CHALLAN
+  entityId             String
+  programId            String?
+  program              Program?  @relation(fields: [programId], references: [id])
+  challanId            String?
+  challan              Challan?  @relation(fields: [challanId], references: [id])
 
-  dismissals       DeadlineAlertDismissal[]
+  alertType            String    // DUE_SOON, DUE_TODAY, OVERDUE
+  thresholdDays        Int?      // 7, 3, 1 for DUE_SOON; 0 for DUE_TODAY; null for OVERDUE
+  severity             String    // INFO, WARNING, CRITICAL
+
+  deadlineAt           DateTime  // Snapshot of the delivery date the alert was raised for
+  deadlineDay          String    // Factory-local calendar day of deadlineAt (YYYY-MM-DD)
+  timeZone             String    // Factory time zone used for deadlineDay
+  workStatus           String    // Task status at the last evaluation
+  taskLabel            String    // e.g. "Dyeing DYE-2026-0007"
+  productionSheetId    String?   // Program serial / number snapshot
+  designNumber         String?
+  challanNumber        String?
+  recipientDepartments String[]  // Departments whose members see the alert (admins always do)
+
+  status               String    @default("ACTIVE") // ACTIVE, RESOLVED
+  resolvedReason       String?   // COMPLETED, CANCELLED, CLOSED, DEADLINE_CHANGED, SUPERSEDED, NO_LONGER_DUE
+  activatedAt          DateTime  @default(now()) // Last time the alert became active; earlier dismissals no longer apply
+  lastEvaluatedAt      DateTime  @default(now())
+  resolvedAt           DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  dismissals           DeadlineAlertDismissal[]
 
   @@index([departmentCode, status])
-  @@index([taskType, taskId, status])
+  @@index([entityType, entityId, status])
+  @@index([programId])
   @@index([challanId])
 }
 
-// Per-user dismissal: hides an alert from that user's active list only.
+// Per-user dismissal history. Dismissing never changes the task, challan, dates or quantities.
 model DeadlineAlertDismissal {
   id          String        @id @default(uuid())
   alertId     String
-  alert       DeadlineAlert @relation(fields: [alertId], references: [id], onDelete: Restrict)
+  alert       DeadlineAlert @relation(fields: [alertId], references: [id])
   userId      String
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User          @relation(fields: [userId], references: [id])
   dismissedAt DateTime      @default(now())
 
-  @@unique([alertId, userId])
+  @@index([alertId, userId])
   @@index([userId, dismissedAt])
+}
+
+// Inventory: part of a received finished-garment line (DepartmentWorkItem, department INVENTORY)
+// sent for packing, in whole pieces. The line keeps the totals: takenQuantity = sent for packing
+// (net of returns), processedQuantity = packed. Every change is also posted to StockLedgerEntry.
+model PackingAllocation {
+  id               String             @id @default(uuid())
+  packingNumber    String             @unique // e.g. PKG-2026-0001
+  workItemId       String
+  workItem         DepartmentWorkItem @relation(fields: [workItemId], references: [id], onDelete: Cascade)
+  quantity         Int                // pieces sent for packing
+  packedQuantity   Int                @default(0)
+  returnedQuantity Int                @default(0) // sent back to inventory unpacked
+  status           String             @default("SENT_FOR_PACKING") // SENT_FOR_PACKING, PACKING_IN_PROGRESS, PARTIALLY_PACKED, PACKING_COMPLETED, CANCELLED
+  priority         String             @default("NORMAL")
+  packingDate      DateTime
+  remarks          String?
+  createdById      String
+  createdBy        User               @relation("PackingAllocationCreator", fields: [createdById], references: [id])
+  startedAt        DateTime?
+  completedAt      DateTime?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  @@index([workItemId])
+  @@index([status])
+}
+
+// Complete-garment photo for one design (Production Sheet) and garment category, optionally one
+// style. Kept apart from Wilcom and fabric photos. Stored like DepartmentImage: Cloudinary when
+// configured, otherwise the bytes in imageData. Replacing bumps version (the image route's ETag).
+model GarmentImage {
+  id              String   @id @default(uuid())
+  programId       String
+  program         Program  @relation(fields: [programId], references: [id], onDelete: Cascade)
+  garmentCategory String   // TOP | BOTTOM | DUPATTA | OTHERS, or "" when the line has none
+  styleRef        String   @default("") // "" = the whole category
+  storageProvider String   // CLOUDINARY | DATABASE
+  storageKey      String?
+  imageUrl        String?
+  imageData       Bytes?
+  mimeType        String
+  fileName        String
+  fileSize        Int
+  version         Int      @default(1)
+  uploadedById    String?
+  uploadedBy      User?    @relation("GarmentImageUploader", fields: [uploadedById], references: [id], onDelete: SetNull)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([programId, garmentCategory, styleRef])
+}
+
+// Fabric Store "Upload Stock Sheet" (photo, scan or Excel). Audit record of one uploaded file: the original
+// bytes, the rows read from it, and - once a user confirmed the reviewed rows - who confirmed and which
+// FabricInward rows were created. Unconfirmed imports never touch stock.
+model StockImport {
+  id            String    @id @default(uuid())
+  source        String    // IMAGE or EXCEL
+  fileName      String
+  mimeType      String
+  fileSize      Int
+  fileHash      String    // sha256 of the file; the same file uploaded again is flagged
+  fileData      Bytes
+  status        String    @default("EXTRACTED") // EXTRACTED | CONFIRMED | DISCARDED
+  extractedJson Json?     // rows and header exactly as read, with confidence and warnings
+  rowCount      Int       @default(0)
+  engine        String?   // e.g. claude-opus-5-5, sheetjs
+  uploadedById  String
+  uploadedAt    DateTime  @default(now())
+  confirmKey    String?   @unique // idempotency key of the confirm request; a retry returns the same result
+  confirmedById String?
+  confirmedAt   DateTime?
+  confirmedJson Json?     // rows as the user confirmed them
+  resultJson    Json?     // created inward ids and skipped rows with reasons
+  addedCount    Int       @default(0)
+  skippedCount  Int       @default(0)
+  updatedAt     DateTime  @updatedAt
+
+  @@index([fileHash])
+  @@index([uploadedAt])
+}
+
+// Manual migrations already applied (scripts/apply-appearance-migrations.js, run before the web app starts).
+// Created by that script; kept here so prisma db push never treats the table as unknown.
+model ManualMigration {
+  name      String   @id
+  checksum  String
+  appliedAt DateTime @default(now())
+
+  @@map("_manual_migrations")
 }

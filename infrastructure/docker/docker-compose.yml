@@ -7,7 +7,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: mes_user
-      POSTGRES_PASSWORD: MesSecret2026!
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in the environment}
       POSTGRES_DB: subham_mes
     ports:
       - "5432:5432"
@@ -45,11 +45,11 @@ services:
       redis:
         condition: service_healthy
     environment:
-      DATABASE_URL: "postgresql://mes_user:MesSecret2026!@postgres:5432/subham_mes?schema=public"
+      DATABASE_URL: "postgresql://mes_user:${POSTGRES_PASSWORD}@postgres:5432/subham_mes?schema=public"
       REDIS_HOST: "redis"
       REDIS_PORT: 6379
       PORT: 3001
-      JWT_SECRET: "SubhamFabricsEnterpriseMESSecretKey2026SuperSecure_NoLeaks"
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in the environment}
       JWT_EXPIRES_IN: "8h"
     ports:
       - "3001:3001"
@@ -64,6 +64,8 @@ services:
       - api
     environment:
       NEXT_PUBLIC_API_URL: "http://api:3001/api"
+      DATABASE_URL: "postgresql://mes_user:${POSTGRES_PASSWORD}@postgres:5432/subham_mes?schema=public"
+      AUTH_SECRET: ${AUTH_SECRET:?Set AUTH_SECRET in the environment}
       PORT: 3000
     ports:
       - "3000:3000"

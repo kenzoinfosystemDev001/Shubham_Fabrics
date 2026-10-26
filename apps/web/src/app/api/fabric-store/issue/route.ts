@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
 
 // GET /api/fabric-store/issue — list issued rolls
-export async function GET() {
+export async function GET(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE');
+  if (!authUser) return authResponse;
   try {
     const issuedRolls = await prisma.fabricStoreRoll.findMany({
       where: { status: 'ISSUED' },
@@ -30,6 +33,8 @@ export async function GET() {
 
 // POST /api/fabric-store/issue — issue rolls to a program
 export async function POST(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE');
+  if (!authUser) return authResponse;
   try {
     const body = await request.json();
     const { rollIds, programId, remarks } = body;
@@ -42,12 +47,7 @@ export async function POST(request: Request) {
     }
 
     // Resolve actor
-    const actor = await prisma.user.findFirst({
-      where: { OR: [{ username: 'admin' }, { username: 'store_mgr' }, { username: 'jitender' }] },
-    });
-    if (!actor) {
-      return NextResponse.json({ error: 'No authorized user found' }, { status: 401 });
-    }
+    const actor = { id: authUser.id };
 
     // Validate program exists
     const program = await prisma.program.findUnique({ where: { id: programId } });

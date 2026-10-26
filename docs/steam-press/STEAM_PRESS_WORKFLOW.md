@@ -42,7 +42,7 @@ flowchart LR
 
 5. **Issue Outgoing Handover Challan to Final QC**:
    - Operator opens `/steam-press/issue-challan?jobId=[id]`.
-   - Target department defaults to `FINAL_QC` (Final Quality Check).
+   - Target department defaults to `FINAL_CHECK` (Final Quality Check).
    - Validates requested quantity $\le$ unissued good balance.
    - Creates outgoing Challan `CH-SP-XXXX-XXXX` with Code-128 barcode sticker.
    - Status of parent job transitions to `HANDED_OVER`.

@@ -18,8 +18,7 @@
     "lint": "npm run lint --workspaces --if-present",
     "db:generate": "npm run generate --workspace=@subham/database",
     "db:push": "npm run push --workspace=@subham/database",
-    "db:seed": "node scripts/setup-core-users.js",
-    "db:migrate-qc": "node scripts/migrate-qc-departments.js"
+    "db:seed": "node scripts/setup-core-users.js"
   },
   "keywords": [
     "mes",

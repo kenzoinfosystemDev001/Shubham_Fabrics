@@ -1,125 +1,141 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import bcrypt from 'bcryptjs';
-import { normalizeRoleCode } from '@subham/types';
-import { auditAdminAction, requireAdmin } from '@/lib/admin-auth';
-import { checkAccountChange, validatePin, type AccountSnapshot } from '@/lib/admin-users';
-import { ACCOUNT_DEPARTMENT_CODES } from '@/lib/departments';
-import { ADMIN_USER_SELECT, formatAdminUser } from '@/lib/admin-users-db';
+import { requireUser } from '@/lib/auth/require-user';
+import { validatePin } from '@/lib/auth/pin';
 
 export const dynamic = 'force-dynamic';
 
-async function loadAccounts(): Promise<AccountSnapshot[]> {
-  const users = await prisma.user.findMany({
-    select: { id: true, isActive: true, departmentCode: true, userRoles: { select: { role: { select: { code: true } } } } },
-  });
-  return users.map((u) => ({
-    id: u.id,
-    isActive: u.isActive,
-    departmentCode: u.departmentCode,
-    roles: u.userRoles.map((ur) => normalizeRoleCode(ur.role.code)),
-  }));
-}
-
-// PATCH /api/admin/users/:id  { fullName?, email?, departmentCode?, roleCodes?, isActive?, pin? }
-export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const auth = await requireAdmin(request);
-  if (!auth.actor) return auth.response;
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { user: authUser, response: authResponse } = await requireUser(request, { admin: true });
+  if (!authUser) return authResponse;
   try {
     const { id } = await params;
-    const body = await request.json();
-    const accounts = await loadAccounts();
-    const target = accounts.find((a) => a.id === id);
-    if (!target) return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    const before = await prisma.user.findUnique({ where: { id }, select: ADMIN_USER_SELECT });
-
-    const data: Record<string, unknown> = {};
-    if (body.fullName !== undefined) {
-      const fullName = String(body.fullName).trim();
-      if (!fullName) return NextResponse.json({ error: 'Full name is required.', field: 'fullName' }, { status: 400 });
-      data.fullName = fullName;
-    }
-    if (body.email !== undefined) {
-      const email = String(body.email).trim().toLowerCase();
-      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return NextResponse.json({ error: 'Enter a valid email address.', field: 'email' }, { status: 400 });
-      data.email = email;
-    }
-    let departmentCode: string | undefined;
-    if (body.departmentCode !== undefined) {
-      departmentCode = String(body.departmentCode).trim().toUpperCase();
-      if (!ACCOUNT_DEPARTMENT_CODES.includes(departmentCode)) return NextResponse.json({ error: 'Select a valid department.', field: 'departmentCode' }, { status: 400 });
-      data.departmentCode = departmentCode;
-    }
-    if (body.isActive !== undefined) data.isActive = Boolean(body.isActive);
-
-    let roleCodes: string[] | undefined;
-    let roleIds: string[] = [];
-    if (body.roleCodes !== undefined) {
-      roleCodes = Array.from(new Set((Array.isArray(body.roleCodes) ? body.roleCodes : []).map((r: unknown) => String(r).trim().toUpperCase()).filter(Boolean))) as string[];
-      if (roleCodes.length === 0) return NextResponse.json({ error: 'Assign at least one role.', field: 'roleCodes' }, { status: 400 });
-      const roles = await prisma.role.findMany({ where: { code: { in: roleCodes } }, select: { id: true, code: true } });
-      const missing = roleCodes.filter((code) => !roles.some((r) => r.code === code));
-      if (missing.length > 0) return NextResponse.json({ error: `Unknown role: ${missing.join(', ')}.`, field: 'roleCodes' }, { status: 400 });
-      if (roleCodes.includes('SUPER_ADMIN') && !target.roles.includes('SUPER_ADMIN') && !auth.actor.roles.includes('SUPER_ADMIN')) {
-        return NextResponse.json({ error: 'Only a Super Admin can grant the Super Admin role.' }, { status: 403 });
-      }
-      roleIds = roles.map((r) => r.id);
-    }
-    if (body.pin !== undefined && body.pin !== '') {
-      const pinError = validatePin(body.pin);
-      if (pinError) return NextResponse.json({ error: pinError, field: 'pin' }, { status: 400 });
-      data.passwordHash = await bcrypt.hash(String(body.pin), 10);
+    if (id === authUser.id) {
+      return NextResponse.json({ error: 'You cannot delete your own account.' }, { status: 400 });
     }
 
-    const blocked = checkAccountChange(
-      { id: auth.actor.id, roles: auth.actor.roles },
-      target,
-      { isActive: data.isActive as boolean | undefined, departmentCode, roles: roleCodes, resetsPin: Boolean(data.passwordHash) },
-      accounts
-    );
-    if (blocked) return NextResponse.json({ error: blocked }, { status: 409 });
-
-    const updated = await prisma.$transaction(async (tx) => {
-      if (Object.keys(data).length > 0) await tx.user.update({ where: { id }, data });
-      if (roleCodes) {
-        await tx.userRole.deleteMany({ where: { userId: id } });
-        await tx.userRole.createMany({ data: roleIds.map((roleId) => ({ userId: id, roleId })) });
-      }
-      const after = await tx.user.findUnique({ where: { id }, select: ADMIN_USER_SELECT });
-      await auditAdminAction(request, auth.actor.id, data.passwordHash ? 'USER_UPDATED_PIN_RESET' : 'USER_UPDATED', 'User', id, {
-        before: before && formatAdminUser(before),
-        after: after && { ...formatAdminUser(after), pinReset: Boolean(data.passwordHash) },
-      }, tx);
-      return after;
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: { id: true, username: true },
     });
 
-    return NextResponse.json({ success: true, user: updated && formatAdminUser(updated) });
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    // Protect root admin from deletion
+    if (user.username === 'admin') {
+      return NextResponse.json(
+        { error: 'Cannot delete the primary System Administrator account.' },
+        { status: 400 }
+      );
+    }
+
+    // Try deleting cascade or deactivate
+    try {
+      await prisma.userRole.deleteMany({ where: { userId: id } });
+      await prisma.user.delete({ where: { id } });
+    } catch {
+      // If referenced in audit or transactions, deactivate instead
+      await prisma.user.update({
+        where: { id },
+        data: { isActive: false },
+      });
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: `User ${user.username} deleted / deactivated successfully.`,
+    });
   } catch (error: any) {
-    if (error?.code === 'P2002') return NextResponse.json({ error: 'That email is already used by another user.', field: 'email' }, { status: 409 });
-    console.error('Error updating user:', error);
-    return NextResponse.json({ error: 'Failed to update user' }, { status: 500 });
+    console.error('Error deleting user:', error);
+    return NextResponse.json(
+      { error: error.message || 'Failed to delete user' },
+      { status: 500 }
+    );
   }
 }
 
-// DELETE /api/admin/users/:id — accounts are deactivated, never erased, so their history stays attributable.
-export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const auth = await requireAdmin(request);
-  if (!auth.actor) return auth.response;
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { user: authUser, response: authResponse } = await requireUser(request, { admin: true });
+  if (!authUser) return authResponse;
   try {
     const { id } = await params;
-    const accounts = await loadAccounts();
-    const target = accounts.find((a) => a.id === id);
-    if (!target) return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    const blocked = checkAccountChange({ id: auth.actor.id, roles: auth.actor.roles }, target, { isActive: false }, accounts);
-    if (blocked) return NextResponse.json({ error: blocked }, { status: 409 });
+    const body = await request.json();
 
-    await prisma.$transaction(async (tx) => {
-      await tx.user.update({ where: { id }, data: { isActive: false } });
-      await auditAdminAction(request, auth.actor.id, 'USER_DEACTIVATED', 'User', id, { before: { isActive: target.isActive }, after: { isActive: false } }, tx);
+    const existing = await prisma.user.findUnique({ where: { id }, select: { id: true } });
+    if (!existing) {
+      return NextResponse.json({ error: 'User not found.' }, { status: 404 });
+    }
+
+    const roleCode = typeof body.roleCode === 'string' ? body.roleCode.trim().toUpperCase() : '';
+    const departmentCode =
+      typeof body.departmentCode === 'string' ? body.departmentCode.trim().toUpperCase() : undefined;
+
+    // An administrator cannot lock themselves out of the admin console.
+    if (id === authUser.id) {
+      if (body.isActive === false) {
+        return NextResponse.json({ error: 'You cannot deactivate your own account.' }, { status: 400 });
+      }
+      if ((roleCode && !['ADMIN', 'SUPER_ADMIN'].includes(roleCode)) || (departmentCode && departmentCode !== 'ADMIN')) {
+        return NextResponse.json({ error: 'You cannot remove administrator access from your own account.' }, { status: 400 });
+      }
+    }
+
+    const dataToUpdate: any = {};
+    if (body.fullName !== undefined) {
+      const fullName = String(body.fullName).trim();
+      if (!fullName) {
+        return NextResponse.json({ error: 'Full name cannot be empty.' }, { status: 400 });
+      }
+      dataToUpdate.fullName = fullName;
+    }
+    if (departmentCode) dataToUpdate.departmentCode = departmentCode;
+    if (body.isActive !== undefined) dataToUpdate.isActive = Boolean(body.isActive);
+
+    if (body.pin) {
+      const pinError = validatePin(body.pin);
+      if (pinError) {
+        return NextResponse.json({ error: pinError }, { status: 400 });
+      }
+      dataToUpdate.passwordHash = await bcrypt.hash(body.pin.trim(), 10);
+    }
+
+    const updated = await prisma.user.update({
+      where: { id },
+      data: dataToUpdate,
+      // Never send the password hash back to the browser.
+      select: { id: true, username: true, fullName: true, email: true, departmentCode: true, isActive: true },
     });
-    return NextResponse.json({ success: true, message: 'User deactivated. Their records and history are kept.' });
+
+    if (roleCode) {
+      const role = await prisma.role.upsert({
+        where: { code: roleCode },
+        update: {},
+        create: { code: roleCode, name: roleCode.replace(/_/g, ' '), isSystem: false },
+      });
+      await prisma.$transaction([
+        prisma.userRole.deleteMany({ where: { userId: id } }),
+        prisma.userRole.create({ data: { userId: id, roleId: role.id } }),
+      ]);
+    }
+
+    return NextResponse.json({
+      success: true,
+      user: updated,
+    });
   } catch (error: any) {
-    console.error('Error deactivating user:', error);
-    return NextResponse.json({ error: 'Failed to deactivate user' }, { status: 500 });
+    console.error('Error updating user:', error);
+    return NextResponse.json(
+      { error: error.message || 'Failed to update user' },
+      { status: 500 }
+    );
   }
 }

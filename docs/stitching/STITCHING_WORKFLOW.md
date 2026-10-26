@@ -2,7 +2,7 @@
 
 **Document Version:** 1.0.0  
 **Department:** Garment Assembly & Stitching (`STITCHING`)  
-**Pipeline Sequence:** $\text{Washing QC} \longrightarrow \text{Recutting (RECUTTING)} \longrightarrow \text{Stitching (STITCHING)} \longrightarrow \text{Finishing (FINISHING)}$  
+**Pipeline Sequence:** $\text{QC Washing (QC3)} \longrightarrow \text{Recutting (RECUTTING)} \longrightarrow \text{Stitching (STITCHING)} \longrightarrow \text{Finishing (FINISHING)}$  
 
 ---
 
@@ -10,7 +10,7 @@
 
 ```mermaid
 flowchart TD
-    A["Washing QC (WASHING_QC)"] -->|"Issued Wash Challan"| B["Recutting Department"]
+    A["QC Washing (QC3)"] -->|"Issued Wash Challan"| B["Recutting Department"]
     B -->|"Precision Cut Output"| C["Recutting Handover Challan"]
     C -->|"Physical Transfer"| D["Stitching Intake Queue (ISSUED)"]
     

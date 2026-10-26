@@ -3,7 +3,7 @@
 **Document Version:** 1.0.0  
 **Department Under Audit:** Garment Assembly & Stitching Section (`STITCHING`)  
 **Upstream Supplier:** Embroidery Recutting Department (`RECUTTING`)  
-**Downstream Consumer:** Next Configured Route (Standard: Finishing & Thread Trimming `FINISHING` / `FINAL_QC`)  
+**Downstream Consumer:** Next Configured Route (Standard: Finishing & Thread Trimming `FINISHING` / `FINAL_CHECK`)  
 **MES Database:** PostgreSQL via Prisma ORM  
 
 ---
@@ -13,7 +13,7 @@
 This audit assesses the integration architecture, current schema capabilities, data flows, and constraints necessary to build a production-grade **Stitching Department** within the Shubham Fabrics Manufacturing Execution System (MES).
 
 The manufacturing pipeline follows the established physical sequence:
-$$\text{Washing QC} \longrightarrow \text{Recutting (RECUTTING)} \longrightarrow \text{Stitching (STITCHING)} \longrightarrow \text{Finishing (FINISHING)}$$
+$$\text{QC Washing (QC3)} \longrightarrow \text{Recutting (RECUTTING)} \longrightarrow \text{Stitching (STITCHING)} \longrightarrow \text{Finishing (FINISHING)}$$
 
 The Stitching Department is responsible for receiving precision-cut and separated embroidered panels and components from Recutting, validating them against the authoritative **Production Sheet** (`Program`), allocating production lines/machines/operators, stitching the components into finished garments or products, executing quality checks, reconciling inputs and outputs, and issuing outgoing Challans to the next configured department.
 
@@ -37,7 +37,7 @@ The Stitching Department is responsible for receiving precision-cut and separate
 ## 3. Workflow Gap Analysis & Requirements
 
 1. **No Hardcoded Next Department**:
-   - Outgoing Challans must resolve the next eligible destination from the production route (`STANDARD_FACTORY_ROUTE` or `Program.metadataJson`), defaulting to `FINISHING` while allowing override if configured for alternative routing (e.g. `BUTTON_ATTACHMENT` or `FINAL_QC`).
+   - Outgoing Challans must resolve the next eligible destination from the production route (`STANDARD_FACTORY_ROUTE` or `Program.metadataJson`), defaulting to `FINISHING` while allowing override if configured for alternative routing (e.g. `BUTTON_ATTACHMENT` or `FINAL_CHECK`).
 2. **Component & Material Reconciliation**:
    - Stitching processes cut panels received from Recutting into assembled garments.
    - Enforce: $\text{Received Cut Panels} = \text{Good Finished Garments} + \text{Rework / Re-stitch} + \text{Scrap / Rejection} + \text{WIP / Unstitched Balance}$.

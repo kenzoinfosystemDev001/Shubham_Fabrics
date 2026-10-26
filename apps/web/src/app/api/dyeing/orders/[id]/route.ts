@@ -1,246 +1,139 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireDepartment } from '@/lib/auth/department-access';
+import { DYEING_ORDER_INCLUDE, TX_OPTIONS, dyeingErrorResponse, parseOptionalDate } from '@/lib/dyeing-server';
+import { remainingToDye, validateProcessUpdate } from '@/lib/dyeing-workflow.mjs';
 
 export const dynamic = 'force-dynamic';
 
 // GET /api/dyeing/orders/[id]
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { user, response } = await requireDepartment(request, 'DYEING');
+  if (!user) return response;
   try {
     const { id } = await params;
+    const order = await prisma.dyeingOrder.findUnique({ where: { id }, include: DYEING_ORDER_INCLUDE });
+    if (!order) return NextResponse.json({ error: 'Dyeing record not found.' }, { status: 404 });
 
-    const order = await prisma.dyeingOrder.findUnique({
-      where: { id },
-      include: {
-        program: {
-          include: {
-            fabrics: true,
-            colours: true,
-            specifications: true,
-            bomItems: true,
-            createdBy: { select: { fullName: true, username: true } },
-            approvedBy: { select: { fullName: true, username: true } },
-          },
-        },
-        inboundChallan: {
-          include: {
-            items: true,
-            createdBy: { select: { fullName: true, username: true } },
-            issuedBy: { select: { fullName: true, username: true } },
-          },
-        },
-        dyeingQcChallan: {
-          include: {
-            items: true,
-            issuedBy: { select: { fullName: true, username: true } },
-          },
-        },
-        incharge: {
-          select: { id: true, fullName: true, username: true, email: true },
-        },
-      },
-    });
-
-    if (!order) {
-      return NextResponse.json({ error: 'Dyeing order not found.' }, { status: 404 });
-    }
-
-    // Also fetch production logs
     const productionLogs = await prisma.productionTransaction.findMany({
-      where: {
-        programId: order.programId,
-        departmentCode: 'DYEING',
-      },
-      include: {
-        operator: { select: { fullName: true, username: true } },
-      },
+      where: { programId: order.programId, departmentCode: 'DYEING' },
+      include: { operator: { select: { fullName: true, username: true } } },
       orderBy: { recordedAt: 'desc' },
+      take: 50,
     });
-
     return NextResponse.json({ data: { ...order, productionLogs } });
-  } catch (error: any) {
-    console.error('Error fetching dyeing order details:', error);
-    return NextResponse.json({ error: error.message || 'Failed to fetch dyeing order' }, { status: 500 });
+  } catch (error) {
+    return dyeingErrorResponse(error, 'Failed to load the dyeing record.');
   }
 }
 
-// PATCH /api/dyeing/orders/[id]
-export async function PATCH(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+/**
+ * PATCH /api/dyeing/orders/[id]
+ * Body (all optional): { status, dyedQuantity, dyedColor, colorCode, colorReviewNote, batchNumber,
+ *   machineNumber, processRemarks, expectedCompletionDate }
+ * dyedQuantity is the cumulative processed quantity. Status moves only through Pending, In Progress,
+ * Completed and Ready for QC; transfers to QC set the "sent" statuses.
+ */
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { user, response } = await requireDepartment(request, 'DYEING');
+  if (!user) return response;
   try {
     const { id } = await params;
-    const body = await request.json();
+    const body = await request.json().catch(() => ({}));
+    const existing = await prisma.dyeingOrder.findUnique({ where: { id } });
+    if (!existing) return NextResponse.json({ error: 'Dyeing record not found.' }, { status: 404 });
 
-    const existingOrder = await prisma.dyeingOrder.findUnique({
-      where: { id },
-      include: { program: true },
-    });
+    const check = validateProcessUpdate(existing, body);
+    if (!check.ok) return NextResponse.json({ error: check.error }, { status: 400 });
 
-    if (!existingOrder) {
-      return NextResponse.json({ error: 'Dyeing order not found.' }, { status: 404 });
+    const expectedCompletionDate = parseOptionalDate(body.expectedCompletionDate);
+    if (body.expectedCompletionDate && expectedCompletionDate === undefined) {
+      return NextResponse.json({ error: 'Expected completion date is not a valid date.' }, { status: 400 });
     }
+    const text = (v: unknown, max = 500) => (v === undefined ? undefined : String(v ?? '').trim().slice(0, max) || null);
+    const now = new Date();
+    const updatedFields = {
+      ...existing,
+      dyedQuantity: check.dyedQuantity,
+    };
 
-    const {
-      dyedQuantity,
-      dyedColor,
-      colorCode,
-      status: requestedStatus,
-      inchargeId,
-      inchargeName,
-      batchNumber,
-      machineNumber,
-      processRemarks,
-    } = body;
-
-    // Validate dyed quantity
-    let newDyedQty = existingOrder.dyedQuantity;
-    if (dyedQuantity !== undefined && dyedQuantity !== null && dyedQuantity !== '') {
-      const parsed = Number(dyedQuantity);
-      if (isNaN(parsed) || parsed < 0) {
-        return NextResponse.json({ error: 'Dyed quantity must be a non-negative number.' }, { status: 400 });
-      }
-      newDyedQty = parsed;
-    }
-
-    // Calculate undyed remaining and ready for Dyeing QC
-    const newUndyedQty = Math.max(0, existingOrder.requiredQuantity - newDyedQty);
-    const newReadyForDyeingQcQty = Math.max(0, newDyedQty - existingOrder.sentToDyeingQcQuantity);
-
-    // Compute automatic status if not explicitly requested
-    let finalStatus = requestedStatus;
-    if (!finalStatus) {
-      if (existingOrder.status === 'SENT_TO_DYEING_QC' && newReadyForDyeingQcQty === 0) {
-        finalStatus = 'SENT_TO_DYEING_QC';
-      } else if (newDyedQty >= existingOrder.requiredQuantity) {
-        finalStatus = 'DYED';
-      } else if (newDyedQty > 0) {
-        finalStatus = 'PARTIALLY_DYED';
-      } else {
-        finalStatus = 'IN_DYEING';
-      }
-    }
-
-    // Resolve Incharge
-    let resolvedInchargeId = inchargeId || existingOrder.inchargeId;
-    let resolvedInchargeName = inchargeName || existingOrder.inchargeName;
-
-    if (inchargeId) {
-      const user = await prisma.user.findUnique({
-        where: { id: inchargeId },
-        select: { id: true, fullName: true, username: true },
+    const order = await prisma.$transaction(async (tx) => {
+      // The record must not have changed since it was read (e.g. a QC transfer in between).
+      const guard = await tx.dyeingOrder.updateMany({
+        where: { id, updatedAt: existing.updatedAt },
+        data: {
+          status: check.status,
+          dyedQuantity: check.dyedQuantity,
+          undyedQuantity: remainingToDye(updatedFields),
+          readyForQc1Quantity: Math.max(0, check.dyedQuantity - existing.sentToQc1Quantity),
+          dyedColor: check.dyedColor,
+          colorMismatch: check.colorMismatch,
+          ...(check.reviewNow
+            ? { colorReviewNote: String(body.colorReviewNote).trim().slice(0, 500), colorReviewedById: user.id, colorReviewedAt: now }
+            : !check.colorMismatch || (body.dyedColor !== undefined && check.dyedColor !== existing.dyedColor)
+            ? { colorReviewNote: null, colorReviewedById: null, colorReviewedAt: null }
+            : {}),
+          ...(body.colorCode !== undefined ? { colorCode: text(body.colorCode, 60) } : {}),
+          ...(body.batchNumber !== undefined ? { batchNumber: text(body.batchNumber, 60) } : {}),
+          ...(body.machineNumber !== undefined ? { machineNumber: text(body.machineNumber, 60) } : {}),
+          ...(body.processRemarks !== undefined ? { processRemarks: text(body.processRemarks) } : {}),
+          ...(expectedCompletionDate !== undefined ? { expectedCompletionDate } : {}),
+          startedAt: existing.startedAt ?? (check.status !== 'RECEIVED' ? now : null),
+          completedAt: ['DYED', 'READY_FOR_QC1', 'PARTIALLY_SENT_TO_QC1'].includes(check.status)
+            ? existing.completedAt ?? now
+            : null,
+        },
       });
-      if (user) {
-        resolvedInchargeId = user.id;
-        resolvedInchargeName = user.fullName || user.username;
+      if (guard.count !== 1) {
+        throw Object.assign(new Error('stale'), { stale: true });
       }
-    }
 
-    // Resolve an actor ID for audit / production log
-    let actorUser = await prisma.user.findFirst({
-      where: {
-        OR: [
-          { id: resolvedInchargeId || '' },
-          { username: 'dyeing' },
-          { departmentCode: 'DYEING' },
-          { username: 'admin' },
-        ],
-      },
-      select: { id: true },
-    });
-    if (!actorUser) {
-      actorUser = await prisma.user.findFirst({ select: { id: true } });
-    }
-
-    // Prefetch fallback challan outside transaction
-    let fallbackChallanId = existingOrder.inboundChallanId;
-    if (!fallbackChallanId) {
-      const ch = await prisma.challan.findFirst({ select: { id: true } });
-      fallbackChallanId = ch?.id || '';
-    }
-
-    // Transactional Update with extended timeout for cloud DB
-    const updated = await prisma.$transaction(
-      async (tx) => {
-        const order = await tx.dyeingOrder.update({
-          where: { id },
+      if (check.dyedQuantity !== existing.dyedQuantity && existing.inboundChallanId) {
+        await tx.productionTransaction.create({
           data: {
-            dyedQuantity: newDyedQty,
-            undyedQuantity: newUndyedQty,
-            readyForDyeingQcQuantity: newReadyForDyeingQcQty,
-            status: finalStatus,
-            dyedColor: dyedColor !== undefined ? dyedColor : existingOrder.dyedColor,
-            colorCode: colorCode !== undefined ? colorCode : existingOrder.colorCode,
-            inchargeId: resolvedInchargeId,
-            inchargeName: resolvedInchargeName,
-            batchNumber: batchNumber !== undefined ? batchNumber : existingOrder.batchNumber,
-            machineNumber: machineNumber !== undefined ? machineNumber : existingOrder.machineNumber,
-            processRemarks: processRemarks !== undefined ? processRemarks : existingOrder.processRemarks,
-            startedAt: existingOrder.startedAt || new Date(),
-            completedAt: ['DYED', 'READY_FOR_DYEING_QC', 'SENT_TO_DYEING_QC'].includes(finalStatus)
-              ? (existingOrder.completedAt || new Date())
-              : null,
-          },
-          include: {
-            program: true,
-            inboundChallan: true,
-            dyeingQcChallan: true,
-            incharge: true,
+            programId: existing.programId,
+            challanId: existing.inboundChallanId,
+            departmentCode: 'DYEING',
+            operationName: 'FABRIC_DYEING',
+            operatorId: user.id,
+            machineId: text(body.machineNumber, 60) ?? existing.machineNumber,
+            inputQuantity: check.dyedQuantity - existing.dyedQuantity,
+            goodQuantity: check.dyedQuantity,
+            balanceQuantity: remainingToDye(updatedFields),
+            unitOfMeasure: existing.uom,
+            notes: `${existing.orderNumber}: processed ${existing.dyedQuantity} -> ${check.dyedQuantity} ${existing.uom}`,
           },
         });
+      }
+      await tx.auditLog.create({
+        data: {
+          actorId: user.id,
+          action: 'DYEING_UPDATE',
+          entity: 'DyeingOrder',
+          entityId: id,
+          beforeState: JSON.stringify({
+            status: existing.status,
+            dyedQuantity: existing.dyedQuantity,
+            dyedColor: existing.dyedColor,
+            expectedCompletionDate: existing.expectedCompletionDate,
+          }),
+          afterState: JSON.stringify({
+            status: check.status,
+            dyedQuantity: check.dyedQuantity,
+            dyedColor: check.dyedColor,
+            colorMismatch: check.colorMismatch,
+            colorReviewNote: check.reviewNow ? body.colorReviewNote : undefined,
+          }),
+        },
+      });
+      return tx.dyeingOrder.findUnique({ where: { id }, include: DYEING_ORDER_INCLUDE });
+    }, TX_OPTIONS);
 
-        // Record Production Transaction for auditability and manufacturing traceability
-        if (dyedQuantity !== undefined && actorUser) {
-          await tx.productionTransaction.create({
-            data: {
-              programId: order.programId,
-              challanId: order.inboundChallanId || fallbackChallanId,
-              departmentCode: 'DYEING',
-              operationName: 'FABRIC_DYEING',
-              operatorId: actorUser.id,
-              machineId: order.machineNumber || null,
-              inputQuantity: order.requiredQuantity,
-              goodQuantity: newDyedQty,
-              balanceQuantity: newUndyedQty,
-              unitOfMeasure: order.uom,
-              notes: processRemarks || `Dyeing progress updated: ${newDyedQty} ${order.uom} dyed (${order.dyedColor || order.targetColor})`,
-            },
-          });
-        }
-
-        // Record Audit Log
-        if (actorUser) {
-          await tx.auditLog.create({
-            data: {
-              action: 'DYEING_UPDATE',
-              entity: 'DyeingOrder',
-              entityId: order.id,
-              actor: {
-                connect: { id: actorUser.id },
-              },
-              afterState: JSON.stringify({
-                orderNumber: order.orderNumber,
-                dyedQuantity: newDyedQty,
-                undyedQuantity: newUndyedQty,
-                status: finalStatus,
-                dyedColor: order.dyedColor,
-                inchargeName: order.inchargeName,
-              }),
-            },
-          });
-        }
-
-        return order;
-      },
-      { maxWait: 15000, timeout: 30000 }
-    );
-
-    return NextResponse.json({ data: updated });
-  } catch (error: any) {
-    console.error('Error updating dyeing order:', error);
-    return NextResponse.json({ error: error.message || 'Failed to update dyeing order' }, { status: 500 });
+    return NextResponse.json({ data: order });
+  } catch (error) {
+    if ((error as { stale?: boolean } | null)?.stale) {
+      return NextResponse.json({ error: 'This record was changed by someone else. Refresh and try again.' }, { status: 409 });
+    }
+    return dyeingErrorResponse(error, 'Failed to update the dyeing record.');
   }
 }

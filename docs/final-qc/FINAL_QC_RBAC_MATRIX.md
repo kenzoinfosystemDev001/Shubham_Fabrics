@@ -1,8 +1,8 @@
 # Final QC RBAC Matrix
 
-Authorization is enforced by `getFinalQCActor` in the Next.js API route handlers. A valid existing MES token must resolve to an active database user. Read and mutation endpoints accept Final QC department membership, recognized Final QC inspector roles, or administrator access.
+Authorization is enforced by `getFinalCheckActor` in the Next.js API route handlers. A valid existing MES token must resolve to an active database user. Read and mutation endpoints accept Final QC department membership, recognized Final QC inspector roles, or administrator access.
 
-| Capability | Final QC department user | `FINAL_QC_INSPECTOR` / `FINAL_QC_INSPECTOR` | Admin / Super Admin | Other department / anonymous |
+| Capability | Final QC department user | `FINAL_CHECK_INSPECTOR` / `FINAL_QC_INSPECTOR` | Admin / Super Admin | Other department / anonymous |
 |---|---:|---:|---:|---:|
 | Open Final QC pages (client route guard) | Yes | Yes | Yes | No |
 | Read incoming, queue, job, dashboard, floor board, and reports | Yes | Yes | Yes | No |

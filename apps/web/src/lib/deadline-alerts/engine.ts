@@ -1,211 +1,333 @@
 import { prisma } from '@subham/database';
-import { getDepartmentAlertConfig, getDepartmentAlertConfigs, getFactoryTimezone } from './config';
-import { compareStages, planDepartmentAlerts, type DeadlineTask } from './plan';
-import { DEADLINE_TASK_PROVIDERS, type DeadlineTaskProvider } from './providers';
+import type { AuthenticatedUser } from '@/lib/auth/require-user';
+import { userBelongsToDepartment, type DepartmentKey } from '@/lib/auth/department-access';
+import { DEADLINE_ALERTS, alertConfigFor, enabledAlertDepartments, type DepartmentAlertConfig } from './config';
+import { loadWorkItems, type WorkItem } from './sources';
+import {
+  alertDedupKey,
+  daysBetween,
+  describeRemaining,
+  evaluateDeadline,
+  factoryDay,
+  liveSeverity,
+  planTaskAlerts,
+} from './rules.mjs';
 
-/** Database access the engine needs; injectable so the engine can be tested without a database. */
-export type AlertStore = Pick<typeof prisma, 'deadlineAlert' | 'deadlineAlertDismissal'>;
-export interface EngineDeps {
-  db?: AlertStore;
-  providers?: Record<string, DeadlineTaskProvider>;
-}
-import { evaluateDeadline, formatRemaining } from './schedule';
+const rules = () => ({
+  timeZone: DEADLINE_ALERTS.timeZone,
+  thresholds: [...DEADLINE_ALERTS.thresholds],
+  warningWithinDays: DEADLINE_ALERTS.warningWithinDays,
+});
 
-/** Departments that are enabled in config AND have a task provider. */
-export function getActiveAlertDepartments(): string[] {
-  return getDepartmentAlertConfigs()
-    .filter((c) => c.enabled && DEADLINE_TASK_PROVIDERS[c.department])
-    .map((c) => c.department);
-}
-
-export function isAlertDepartmentActive(department: string): boolean {
-  return getActiveAlertDepartments().includes(department);
-}
-
-export interface SyncResult {
+export interface ReconcileResult {
   department: string;
-  openTasks: DeadlineTask[];
+  openItems: number;
   created: number;
-  reactivated: number;
-  closed: number;
+  reopened: number;
+  updated: number;
+  resolved: number;
+  missingDeadline: WorkItem[];
+}
+
+interface DesiredAlert {
+  item: WorkItem;
+  key: string;
+  alertType: string;
+  thresholdDays: number | null;
+  severity: string;
+  deadlineDay: string;
+}
+
+function isUniqueViolation(error: unknown) {
+  return typeof error === 'object' && error !== null && (error as { code?: string }).code === 'P2002';
 }
 
 /**
- * Brings one department's alerts in line with its current open work and deadlines.
- * Idempotent: the plan is recomputed from current task status and deadline every time,
- * alerts are keyed by dedupeKey (unique), and only state transitions are written.
+ * Brings one department's alerts in line with its current work. Safe to run any number of
+ * times, concurrently and across retries: every alert is addressed by its dedup key, and a
+ * re-run with unchanged data writes nothing.
  */
-export async function syncDepartmentAlerts(department: string, now: Date = new Date(), deps: EngineDeps = {}): Promise<SyncResult> {
-  const db = deps.db || prisma;
-  const config = getDepartmentAlertConfig(department);
-  const provider = (deps.providers || DEADLINE_TASK_PROVIDERS)[department];
-  if (!config?.enabled || !provider) {
-    return { department, openTasks: [], created: 0, reactivated: 0, closed: 0 };
+export async function reconcileDepartmentAlerts(department: DepartmentKey, now: Date = new Date()): Promise<ReconcileResult> {
+  const config = alertConfigFor(department);
+  const result: ReconcileResult = { department, openItems: 0, created: 0, reopened: 0, updated: 0, resolved: 0, missingDeadline: [] };
+  if (!config?.enabled) return result;
+
+  const [items, activeAlerts] = await Promise.all([
+    loadWorkItems(config.source),
+    prisma.deadlineAlert.findMany({
+      where: { departmentCode: department, status: 'ACTIVE' },
+      select: { id: true, dedupKey: true, entityId: true, deadlineDay: true, workStatus: true, severity: true },
+    }),
+  ]);
+  result.openItems = items.length;
+
+  const activeByEntity = new Map<string, typeof activeAlerts>();
+  for (const alert of activeAlerts) {
+    const list = activeByEntity.get(alert.entityId) || [];
+    list.push(alert);
+    activeByEntity.set(alert.entityId, list);
   }
 
-  const openTasks = await provider();
-  const activeAlerts = await db.deadlineAlert.findMany({
-    where: { departmentCode: department, status: 'ACTIVE' },
-    select: { id: true, dedupeKey: true, taskType: true, taskId: true, deadlineAt: true },
-  });
-  const plan = planDepartmentAlerts(department, openTasks, activeAlerts, now, config.thresholdsDays, getFactoryTimezone());
+  const resolveIds = new Map<string, string>(); // alertId -> reason
+  const desired: DesiredAlert[] = [];
+  const openIds = new Set(items.map((i) => i.entityId));
 
-  let created = 0;
-  let reactivated = 0;
-  if (plan.desired.length > 0) {
-    const result = await db.deadlineAlert.createMany({
-      data: plan.desired.map((d) => ({ ...d, lastEvaluatedAt: now })),
-      skipDuplicates: true,
-    });
-    created = result.count;
-    const keys = plan.desired.map((d) => d.dedupeKey);
-    // A condition that was closed and now holds again (e.g. a deadline moved back) is re-opened,
-    // keeping its existing per-user dismissals.
-    reactivated = (await db.deadlineAlert.updateMany({
-      where: { dedupeKey: { in: keys }, status: { not: 'ACTIVE' } },
-      data: { status: 'ACTIVE', resolvedAt: null, resolutionReason: null, lastEvaluatedAt: now },
-    })).count;
-    await db.deadlineAlert.updateMany({
-      where: { dedupeKey: { in: keys }, status: 'ACTIVE' },
-      data: { lastEvaluatedAt: now },
+  for (const item of items) {
+    const active = activeByEntity.get(item.entityId) || [];
+    if (!item.isOpen) {
+      // Task status looks open but its production sheet or source challan was closed / cancelled.
+      for (const a of active) resolveIds.set(a.id, item.closedReason || 'CLOSED');
+      continue;
+    }
+    if (!item.deadline) {
+      result.missingDeadline.push(item);
+      for (const a of active) resolveIds.set(a.id, 'DEADLINE_CHANGED');
+      continue;
+    }
+    const evaluation = evaluateDeadline(item.deadline, now, rules());
+    if (!evaluation.stage) {
+      for (const a of active) resolveIds.set(a.id, a.deadlineDay !== evaluation.deadlineDay ? 'DEADLINE_CHANGED' : 'NO_LONGER_DUE');
+      continue;
+    }
+    desired.push({
+      item,
+      key: alertDedupKey({ departmentCode: department, entityType: item.entityType, entityId: item.entityId, ...evaluation.stage, deadlineDay: evaluation.deadlineDay }),
+      alertType: evaluation.stage.alertType,
+      thresholdDays: evaluation.stage.thresholdDays,
+      severity: evaluation.stage.severity,
+      deadlineDay: evaluation.deadlineDay as string,
     });
   }
 
-  let closed = 0;
+  // Alerts whose task is no longer in the open list: re-read the task to record why.
+  const goneEntityIds = [...activeByEntity.keys()].filter((id) => !openIds.has(id));
+  if (goneEntityIds.length > 0) {
+    const current = new Map((await loadWorkItems(config.source, goneEntityIds)).map((i) => [i.entityId, i]));
+    for (const entityId of goneEntityIds) {
+      const item = current.get(entityId);
+      if (item?.isOpen) continue; // Re-opened between the two reads; the next run evaluates it.
+      for (const a of activeByEntity.get(entityId) || []) resolveIds.set(a.id, item?.closedReason || 'CLOSED');
+    }
+  }
+
+  const existing = desired.length
+    ? await prisma.deadlineAlert.findMany({
+        where: { dedupKey: { in: desired.map((d) => d.key) } },
+        select: { id: true, dedupKey: true, status: true, workStatus: true, severity: true },
+      })
+    : [];
+  const existingByKey = new Map(existing.map((e) => [e.dedupKey, e]));
+
+  const toCreate: DesiredAlert[] = [];
+  const toReopen: DesiredAlert[] = [];
+  for (const d of desired) {
+    const plan = planTaskAlerts({
+      desiredKey: d.key,
+      existingByKey: existingByKey.get(d.key),
+      activeAlerts: activeByEntity.get(d.item.entityId) || [],
+      deadlineDay: d.deadlineDay,
+    });
+    for (const r of plan.resolve) resolveIds.set(r.id, r.reason);
+    if (plan.action === 'create') toCreate.push(d);
+    if (plan.action === 'reopen') toReopen.push(d);
+    if (plan.action === 'keep') {
+      const e = existingByKey.get(d.key)!;
+      if (e.workStatus !== d.item.workStatus || e.severity !== d.severity) {
+        await prisma.deadlineAlert.updateMany({
+          where: { id: e.id, status: 'ACTIVE' },
+          data: { workStatus: d.item.workStatus, severity: d.severity, lastEvaluatedAt: now },
+        });
+        result.updated++;
+      }
+    }
+  }
+
+  // Resolve first so a task never shows two active alerts.
   const byReason = new Map<string, string[]>();
-  for (const { id, reason } of plan.close) byReason.set(reason, [...(byReason.get(reason) || []), id]);
+  for (const [id, reason] of resolveIds) byReason.set(reason, [...(byReason.get(reason) || []), id]);
   for (const [reason, ids] of byReason) {
-    closed += (await db.deadlineAlert.updateMany({
+    const { count } = await prisma.deadlineAlert.updateMany({
       where: { id: { in: ids }, status: 'ACTIVE' },
-      data: {
-        status: reason === 'TASK_CLOSED' ? 'RESOLVED' : 'SUPERSEDED',
-        resolutionReason: reason,
-        resolvedAt: now,
-        lastEvaluatedAt: now,
-      },
-    })).count;
+      data: { status: 'RESOLVED', resolvedReason: reason, resolvedAt: now, lastEvaluatedAt: now },
+    });
+    result.resolved += count;
   }
 
-  return { department, openTasks, created, reactivated, closed };
+  // Recheck status and deadline right before raising anything new.
+  const pending = [...toCreate, ...toReopen];
+  if (pending.length > 0) {
+    const fresh = new Map((await loadWorkItems(config.source, pending.map((d) => d.item.entityId))).map((i) => [i.entityId, i]));
+    const stillValid = (d: DesiredAlert) => {
+      const f = fresh.get(d.item.entityId);
+      return !!f?.isOpen && !!f.deadline && factoryDay(f.deadline, DEADLINE_ALERTS.timeZone) === d.deadlineDay;
+    };
+
+    for (const d of toCreate.filter(stillValid)) {
+      try {
+        await prisma.deadlineAlert.create({ data: alertData(department, config, d, now) });
+        result.created++;
+      } catch (error) {
+        if (!isUniqueViolation(error)) throw error; // Another run created it first.
+      }
+    }
+    for (const d of toReopen.filter(stillValid)) {
+      const { count } = await prisma.deadlineAlert.updateMany({
+        where: { dedupKey: d.key, status: 'RESOLVED' },
+        data: {
+          ...alertData(department, config, d, now),
+          status: 'ACTIVE',
+          resolvedReason: null,
+          resolvedAt: null,
+          activatedAt: now,
+        },
+      });
+      result.reopened += count;
+    }
+  }
+
+  return result;
 }
 
-/** Runs every active department. Failures are isolated per department and reported. */
-export async function syncAllDeadlineAlerts(now: Date = new Date()) {
-  const results: Array<
-    { department: string; openTaskCount: number; created: number; reactivated: number; closed: number } | { department: string; error: string }
-  > = [];
-  for (const department of getActiveAlertDepartments()) {
+function alertData(department: DepartmentKey, config: DepartmentAlertConfig, d: DesiredAlert, now: Date) {
+  return {
+    dedupKey: d.key,
+    departmentCode: department,
+    entityType: d.item.entityType,
+    entityId: d.item.entityId,
+    programId: d.item.programId,
+    challanId: d.item.challanId,
+    alertType: d.alertType,
+    thresholdDays: d.thresholdDays,
+    severity: d.severity,
+    deadlineAt: d.item.deadline as Date,
+    deadlineDay: d.deadlineDay,
+    timeZone: DEADLINE_ALERTS.timeZone,
+    workStatus: d.item.workStatus,
+    taskLabel: d.item.taskLabel,
+    productionSheetId: d.item.productionSheetId,
+    designNumber: d.item.designNumber,
+    challanNumber: d.item.challanNumber,
+    recipientDepartments: [...config.recipients],
+    lastEvaluatedAt: now,
+  };
+}
+
+/** Runs every enabled department; one department failing does not stop the others. */
+export async function reconcileAllDepartments(now: Date = new Date()) {
+  const results: Array<Omit<ReconcileResult, 'missingDeadline'> & { missingDeadline: number; error?: string }> = [];
+  for (const department of enabledAlertDepartments()) {
     try {
-      const { openTasks, ...summary } = await syncDepartmentAlerts(department, now);
-      results.push({ ...summary, openTaskCount: openTasks.length });
-    } catch (error) {
-      console.error(`[deadline-alerts] Sync failed for ${department}:`, error);
-      results.push({ department, error: error instanceof Error ? error.message : String(error) });
+      const r = await reconcileDepartmentAlerts(department, now);
+      results.push({ ...r, missingDeadline: r.missingDeadline.length });
+    } catch (error: any) {
+      console.error(`Deadline alerts: reconcile failed for ${department}:`, error);
+      results.push({ department, openItems: 0, created: 0, reopened: 0, updated: 0, resolved: 0, missingDeadline: 0, error: error?.message || 'failed' });
     }
   }
   return results;
 }
 
-export interface AlertViewItem {
+export interface AlertView {
   id: string;
-  stage: string;
   severity: string;
-  deadlineAt: string;
-  deadlineDate: string;
-  remaining: string;
+  alertType: string;
+  thresholdDays: number | null;
   daysRemaining: number;
-  challanNumber: string | null;
-  productionSheetNumber: string | null;
+  remainingLabel: string;
+  productionSheetId: string | null;
   designNumber: string | null;
-  process: string;
-  status: string;
-  viewUrl: string;
-  dismissedAt: string | null;
+  challanNumber: string | null;
+  taskLabel: string;
+  deadlineAt: string;
+  deadlineDay: string;
+  workStatus: string;
+  workHref: string;
+  /** Dismissed by this user. Overdue alerts stay listed (as acknowledged) even when dismissed. */
+  dismissed: boolean;
+}
+
+/** True when the user may see a department's alerts: admins, or members of any recipient department. */
+export function canSeeDepartmentAlerts(user: AuthenticatedUser, config: DepartmentAlertConfig) {
+  return config.recipients.some((key) => userBelongsToDepartment(user, key));
+}
+
+/** Active alerts for one department as this user sees them, most urgent first. */
+export async function listAlertsForUser(user: AuthenticatedUser, department: DepartmentKey, now: Date = new Date()) {
+  const config = alertConfigFor(department);
+  if (!config?.enabled) return { alerts: [] as AlertView[], visibleCount: 0, overdueCount: 0 };
+
+  const alerts = await prisma.deadlineAlert.findMany({
+    where: { departmentCode: department, status: 'ACTIVE' },
+    include: { dismissals: { where: { userId: user.id }, orderBy: { dismissedAt: 'desc' }, take: 1 } },
+    orderBy: { deadlineAt: 'asc' },
+  });
+
+  const today = factoryDay(now, DEADLINE_ALERTS.timeZone);
+  const views: AlertView[] = [];
+  for (const alert of alerts) {
+    const daysRemaining = daysBetween(today, alert.deadlineDay);
+    const lastDismissal = alert.dismissals[0];
+    const dismissed = !!lastDismissal && lastDismissal.dismissedAt >= alert.activatedAt;
+    if (dismissed && daysRemaining >= 0) continue;
+    views.push({
+      id: alert.id,
+      severity: liveSeverity(daysRemaining, alert.severity),
+      alertType: daysRemaining < 0 ? 'OVERDUE' : alert.alertType,
+      thresholdDays: alert.thresholdDays,
+      daysRemaining,
+      remainingLabel: describeRemaining(daysRemaining),
+      productionSheetId: alert.productionSheetId,
+      designNumber: alert.designNumber,
+      challanNumber: alert.challanNumber,
+      taskLabel: alert.taskLabel,
+      deadlineAt: alert.deadlineAt.toISOString(),
+      deadlineDay: alert.deadlineDay,
+      workStatus: alert.workStatus,
+      workHref: config.workHref({ entityId: alert.entityId, challanId: alert.challanId, programId: alert.programId }),
+      dismissed,
+    });
+  }
+  // Undismissed first, then by how close (or how late) the deadline is.
+  views.sort((a, b) => Number(a.dismissed) - Number(b.dismissed) || a.daysRemaining - b.daysRemaining);
+
+  return {
+    alerts: views,
+    visibleCount: views.filter((v) => !v.dismissed).length,
+    overdueCount: views.filter((v) => v.daysRemaining < 0).length,
+  };
 }
 
 /**
- * The alert panel for one user: their active (not dismissed) alerts, their dismissal history,
- * and work that is overdue regardless of dismissal, plus how much open work has no deadline.
+ * Records that this user dismissed an alert. Writes only the dismissal history (and an audit
+ * entry); the task, challan, dates and quantities are never touched. Idempotent.
  */
-export async function getDepartmentAlertView(department: string, userId: string, now: Date = new Date(), deps: EngineDeps = {}) {
-  const db = deps.db || prisma;
-  const { openTasks } = await syncDepartmentAlerts(department, now, deps);
-  const timeZone = getFactoryTimezone();
-  const config = getDepartmentAlertConfig(department);
-  const tasksByKey = new Map(openTasks.map((t) => [`${t.taskType}:${t.taskId}`, t]));
-
-  const toItem = (alert: { id: string; stage: string; severity: string; deadlineAt: Date; taskType: string; taskId: string }, dismissedAt: Date | null): AlertViewItem | null => {
-    const task = tasksByKey.get(`${alert.taskType}:${alert.taskId}`);
-    if (!task) return null;
-    const evaluation = evaluateDeadline(alert.deadlineAt, now, config?.thresholdsDays, timeZone);
-    return {
-      id: alert.id,
-      stage: alert.stage,
-      severity: alert.severity,
-      deadlineAt: alert.deadlineAt.toISOString(),
-      deadlineDate: evaluation.deadlineDate,
-      remaining: formatRemaining(evaluation.msRemaining),
-      daysRemaining: evaluation.daysRemaining,
-      challanNumber: task.challanNumber,
-      productionSheetNumber: task.productionSheetNumber,
-      designNumber: task.designNumber,
-      process: task.process,
-      status: task.status,
-      viewUrl: task.viewUrl,
-      dismissedAt: dismissedAt ? dismissedAt.toISOString() : null,
-    };
-  };
-
-  const active = await db.deadlineAlert.findMany({
-    where: { departmentCode: department, status: 'ACTIVE' },
-    include: { dismissals: { where: { userId }, select: { dismissedAt: true } } },
+export async function dismissAlertForUser(user: AuthenticatedUser, alertId: string) {
+  const alert = await prisma.deadlineAlert.findUnique({
+    where: { id: alertId },
+    select: { id: true, departmentCode: true, status: true, activatedAt: true, dedupKey: true },
   });
-  const alerts = active
-    .filter((a) => a.dismissals.length === 0)
-    .map((a) => toItem(a, null))
-    .filter((a): a is AlertViewItem => Boolean(a))
-    .sort((a, b) => compareStages(a.stage, b.stage) || a.daysRemaining - b.daysRemaining);
+  const config = alert ? alertConfigFor(alert.departmentCode) : null;
+  if (!alert || !config || !canSeeDepartmentAlerts(user, config)) return { status: 404 as const };
 
-  const dismissedRows = await db.deadlineAlertDismissal.findMany({
-    where: { userId, alert: { departmentCode: department } },
-    include: { alert: true },
+  const current = await prisma.deadlineAlertDismissal.findFirst({
+    where: { alertId, userId: user.id, dismissedAt: { gte: alert.activatedAt } },
     orderBy: { dismissedAt: 'desc' },
-    take: 20,
   });
-  const dismissed = dismissedRows.map((row) => {
-    const task = tasksByKey.get(`${row.alert.taskType}:${row.alert.taskId}`);
-    return {
-      id: row.alert.id,
-      stage: row.alert.stage,
-      severity: row.alert.severity,
-      alertStatus: row.alert.status,
-      deadlineAt: row.alert.deadlineAt.toISOString(),
-      dismissedAt: row.dismissedAt.toISOString(),
-      challanNumber: task?.challanNumber || null,
-      process: task?.process || null,
-      viewUrl: task?.viewUrl || null,
-    };
+  if (current) return { status: 200 as const, dismissal: current };
+
+  const dismissal = await prisma.$transaction(async (tx) => {
+    // Same clock as activatedAt (set by the engine), so "dismissed since activation" compares like with like.
+    const created = await tx.deadlineAlertDismissal.create({ data: { alertId, userId: user.id, dismissedAt: new Date() } });
+    await tx.auditLog.create({
+      data: {
+        actorId: user.id,
+        action: 'DEADLINE_ALERT_DISMISSED',
+        entity: 'DeadlineAlert',
+        entityId: alertId,
+        afterState: JSON.stringify({ dedupKey: alert.dedupKey, dismissedAt: created.dismissedAt }),
+      },
+    });
+    return created;
   });
-
-  // Overdue stays visible even when its alert was dismissed.
-  const overdueWork = openTasks
-    .filter((t) => t.deadline && evaluateDeadline(t.deadline, now, config?.thresholdsDays, timeZone).stage === 'OVERDUE')
-    .map((t) => ({
-      taskId: t.taskId,
-      challanNumber: t.challanNumber,
-      process: t.process,
-      remaining: formatRemaining(evaluateDeadline(t.deadline as Date, now, config?.thresholdsDays, timeZone).msRemaining),
-      viewUrl: t.viewUrl,
-    }));
-
-  return {
-    department,
-    timeZone,
-    thresholdsDays: config?.thresholdsDays || [],
-    alerts,
-    dismissed,
-    overdueWork,
-    missingDeadlineCount: openTasks.filter((t) => !t.deadline).length,
-    openTaskCount: openTasks.length,
-  };
+  return { status: 201 as const, dismissal };
 }

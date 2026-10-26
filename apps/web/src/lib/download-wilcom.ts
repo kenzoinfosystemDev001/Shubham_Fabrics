@@ -18,58 +18,6 @@ export interface WilcomEntry {
   createdAt?: string;
 }
 
-export function resolveWilcomMainStyle(program: any, providedMeta?: any): string {
-  let meta = providedMeta;
-  if (!meta && program?.metadataJson) {
-    try {
-      meta = typeof program.metadataJson === 'string' ? JSON.parse(program.metadataJson) : program.metadataJson;
-    } catch {
-      meta = null;
-    }
-  }
-
-  const designNumber = String(
-    program?.designNumber || program?.designName || program?.wilcomDesignNumber || meta?.wilcomDesignNumber || ''
-  ).trim().toLowerCase();
-  const isDesignNumber = (value: string) => Boolean(designNumber && value.trim().toLowerCase() === designNumber);
-  const rootStyleCandidates = [
-    program?.mainStyle,
-    program?.topName,
-    meta?.mainStyle,
-    meta?.topName,
-    program?.styleCode,
-    meta?.styleCode,
-  ].map((candidate) => String(candidate || '').trim())
-    .filter((value) => value && value !== '—' && !isDesignNumber(value));
-  const components = meta?.components;
-  if (components && typeof components === 'object') {
-    const componentRows = Object.entries(components) as Array<[string, any]>;
-    const primaryCategory = String(program?.primaryCategory || meta?.primaryCategory || '').trim().toLowerCase();
-    const categoryFromRoot = componentRows.find(([category, component]) => {
-      const categoryNames = [category, component?.category]
-        .map((value) => String(value || '').trim().toLowerCase())
-        .filter(Boolean);
-      return rootStyleCandidates.some((value) => categoryNames.includes(value.toLowerCase()));
-    });
-    const primary = componentRows.find(([category]) => category.toLowerCase() === primaryCategory)
-      || categoryFromRoot
-      || componentRows.find(([, component]) => component?.enabled !== false)
-      || componentRows[0];
-
-    if (primary) {
-      const [category, component] = primary;
-      const styleName = String(component?.styleName || '').trim();
-      if (styleName && !isDesignNumber(styleName)) return styleName;
-      const componentCategory = String(component?.category || category).trim();
-      return (componentCategory.toUpperCase() === 'OTHER' ? 'INPUT' : componentCategory) || '—';
-    }
-  }
-
-  if (rootStyleCandidates.length > 0) return rootStyleCandidates[0];
-
-  return '—';
-}
-
 /**
  * Resizes and compresses an uploaded image file into an optimized JPEG Data URL.
  * Prevents massive payloads (e.g. 10MB phone photos) from choking memory, network, or printing.
@@ -260,7 +208,7 @@ export async function prepareWilcomImages(program: any) {
     }
 
     const designNo = preparedProgram.designNumber || preparedProgram.designName || '—';
-    const mainStyle = resolveWilcomMainStyle(preparedProgram, meta);
+    const mainStyle = preparedProgram.mainStyle || preparedProgram.topName || meta?.mainStyle || meta?.topName || '—';
     const subStyle = preparedProgram.subStyle || preparedProgram.styleCode || meta?.subStyle || meta?.style || '—';
 
     if (entries.length === 0) {
@@ -315,7 +263,7 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
     } catch {}
   }
 
-  const mainStyle = resolveWilcomMainStyle(program, meta);
+  const mainStyle = program.mainStyle || program.topName || meta?.mainStyle || meta?.topName || '—';
   const subStyle = program.subStyle || program.styleCode || meta?.subStyle || meta?.style || '—';
 
   const rootWilcomPhoto = extractRootWilcomPhoto(program, meta);
@@ -383,7 +331,7 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
       print-color-adjust: exact !important;
     }
     body {
-      background-color: #F1EFF4;
+      background-color: #f1eff4;
       color: #000000;
       font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
       padding: 16px;
@@ -395,7 +343,7 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #25232A;
+      background: #25232a;
       color: #ffffff;
       padding: 8px 16px;
       border-radius: 6px;
@@ -412,8 +360,8 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
       font-weight: 700;
       border: none;
     }
-    .btn-primary { background: #7D44A8; color: #ffffff; }
-    .btn-outline { background: #423F48; color: #ffffff; }
+    .btn-primary { background: #8e55c4; color: #ffffff; }
+    .btn-outline { background: #43404a; color: #ffffff; }
     .card-wrapper {
       max-width: 200mm;
       min-height: 275mm;
@@ -438,7 +386,7 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
       font-size: 16px;
       font-weight: 900;
       letter-spacing: 0.15em;
-      color: #663889;
+      color: #7442a6;
       margin-top: 4px;
       text-transform: uppercase;
     }
@@ -449,10 +397,10 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
       border: 1.5px solid #000;
       padding: 10px;
       margin-bottom: 16px;
-      background: #F8F7FA;
+      background: #f8f7fa;
     }
     .meta-item { display: flex; flex-direction: column; }
-    .meta-label { font-size: 10px; font-weight: 900; text-transform: uppercase; color: #57545E; }
+    .meta-label { font-size: 10px; font-weight: 900; text-transform: uppercase; color: #57545e; }
     .meta-val {
       min-width: 0;
       font-size: 12px;
@@ -480,7 +428,7 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
       align-items: center;
       flex-wrap: wrap;
       gap: 8px;
-      border-bottom: 1px solid #D3CED8;
+      border-bottom: 1px solid #d3ced8;
       padding-bottom: 8px;
       margin-bottom: 10px;
     }
@@ -492,11 +440,11 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
       color: #ffffff;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      background: #423F48;
+      background: #43404a;
     }
-    .cat-TOP { background: #4F2C6B; }
-    .cat-BOTTOM { background: #7D44A8; }
-    .cat-DUPATTA { background: #57545E; }
+    .cat-TOP { background: #25232a; }
+    .cat-BOTTOM { background: #25232a; }
+    .cat-DUPATTA { background: #25232a; }
     .wilcom-no {
       max-width: 58%;
       font-size: 12px;
@@ -504,7 +452,7 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
       font-family: monospace;
       line-height: 1.25;
       letter-spacing: 0.02em;
-      color: #3B2152;
+      color: #000000;
       text-align: right;
       white-space: normal;
       overflow-wrap: anywhere;
@@ -519,12 +467,12 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
     .photo-box {
       width: 160px;
       height: 160px;
-      border: 1.5px solid #D3CED8;
+      border: 1.5px solid #d3ced8;
       border-radius: 4px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #F8F7FA;
+      background: #f8f7fa;
       overflow: hidden;
     }
     .photo-box img {
@@ -547,7 +495,7 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
     .info-key {
       font-weight: 800;
       min-width: 90px;
-      color: #423F48;
+      color: #43404a;
     }
     .info-val {
       min-width: 0;
@@ -572,13 +520,13 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
     </div>
     <div style="display: flex; gap: 8px;">
       <button class="btn btn-primary" onclick="window.print()">
-        🖨️ Print Wilcom ${filterCategory === 'ALL' ? '' : filterCategory + ' '}Sheet (A4)
+        Print Wilcom ${filterCategory === 'ALL' ? '' : filterCategory + ' '}Sheet (A4)
       </button>
-      <button class="btn btn-primary" style="background: #423F48;" onclick="window.downloadSelf()">
-        💾 Download Wilcom ${filterCategory === 'ALL' ? '' : filterCategory + ' '}Sheet
+      <button class="btn btn-primary" style="background: #8e55c4;" onclick="window.downloadSelf()">
+        Download Wilcom ${filterCategory === 'ALL' ? '' : filterCategory + ' '}Sheet
       </button>
       <button class="btn btn-outline" onclick="window.close()">
-        ✕ Close
+        Close
       </button>
     </div>
   </div>
@@ -609,7 +557,7 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
     </div>
 
     ${finalEntries.length === 0 ? `
-      <div style="padding: 40px; text-align: center; border: 2px dashed #A19CA8; border-radius: 6px; color: #6B6872; font-weight: 700;">
+      <div style="padding: 40px; text-align: center; border: 2px dashed #8f8a96; border-radius: 6px; color: #6b6872; font-weight: 700;">
         No Wilcom embroidery designs recorded for ${filterCategory === 'ALL' ? 'this production order' : filterCategory}.
       </div>
     ` : `
@@ -630,7 +578,7 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
                 ${entry.photoUrl ? `
                   <img src="${entry.photoUrl}" alt="${entry.wilcomDesignNumber || 'Wilcom Artwork'}" />
                 ` : `
-                  <span style="font-size: 11px; font-weight: 700; color: #A19CA8; text-align: center; padding: 12px;">
+                  <span style="font-size: 11px; font-weight: 700; color: #8f8a96; text-align: center; padding: 12px;">
                     No Artwork Photo
                   </span>
                 `}

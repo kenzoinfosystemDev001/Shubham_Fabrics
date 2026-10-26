@@ -5,7 +5,7 @@
 From the repository root:
 
 ```powershell
-node --test scripts/test-final-qc-rules.mjs
+node --test scripts/test-final-check-rules.mjs
 npx tsc --noEmit -p apps/web/tsconfig.json
 npm run build --workspace=@subham/web
 ```
@@ -14,11 +14,11 @@ The production build runs workspace prebuild scripts and may refresh generated P
 
 ## API areas
 
-- Queue and dashboard: `apps/web/src/app/api/final-qc/`
+- Queue and dashboard: `apps/web/src/app/api/final-check/`
 - Workflow actions: `challans/[id]/receive`, `jobs/[id]/start`, `jobs/[id]/hold`, `jobs/[id]/resume`, `jobs/[id]/inspect`
 - Handover: `issue-challan`
-- Shared access checks: `apps/web/src/lib/final-qc-auth.ts`
-- Shared quantity and decision rules: `apps/web/src/lib/final-qc-rules.mjs`
+- Shared access checks: `apps/web/src/lib/final-check-auth.ts`
+- Shared quantity and decision rules: `apps/web/src/lib/final-check-rules.mjs`
 
 ## Integration safety
 

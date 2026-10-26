@@ -14,8 +14,7 @@ import {
   GarmentCategory,
   printWilcomForm, 
   downloadWilcomFormHtml,
-  extractRootWilcomPhoto,
-  resolveWilcomMainStyle
+  extractRootWilcomPhoto
 } from '@/lib/download-wilcom';
 import { FileText } from 'lucide-react';
 import { useProgramDocument } from '@/hooks/useProgramDocument';
@@ -56,7 +55,7 @@ export function WilcomPrintModal({
 
   const serialNo = program?.programSerialNo || program?.programNumber || '—';
   const designNo = program?.designNumber || program?.designName || '—';
-  const mainStyleVal = resolveWilcomMainStyle(program, meta);
+  const mainStyleVal = program?.mainStyle || program?.topName || meta?.mainStyle || meta?.topName || '—';
   const styleVal = program?.subStyle || program?.styleCode || meta?.subStyle || meta?.style || '—';
 
   // Build initial entries
@@ -133,20 +132,20 @@ export function WilcomPrintModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-2 sm:p-4 overflow-y-auto">
-      <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-4xl max-h-[96vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-900/60 backdrop-blur-xs p-2 sm:p-4 overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-2xl border border-neutral-200 w-full max-w-4xl max-h-[96vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         
         {/* MODAL HEADER */}
-        <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-white">
+        <div className="px-6 py-4 border-b border-neutral-200 flex items-center justify-between bg-white">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-lavender-800 shadow-2xs">
-              <Sparkles className="w-5 h-5 text-lavender-800" />
+            <div className="w-10 h-10 rounded-xl bg-neutral-100 border border-neutral-200 flex items-center justify-center text-brand-600 shadow-2xs">
+              <Sparkles className="w-5 h-5 text-brand-600" />
             </div>
             <div>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">
                 Wilcom {filterCategory === 'ALL' ? '' : `${filterCategory} `}Specifications
               </div>
-              <h2 className="text-base font-bold text-slate-900 tracking-tight">
+              <h2 className="text-base font-bold text-neutral-900 tracking-tight">
                 Design {designNo}
               </h2>
             </div>
@@ -157,9 +156,9 @@ export function WilcomPrintModal({
               <button
                 type="button"
                 onClick={onViewSheet}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-lg text-xs font-bold border border-blue-200 transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-800 rounded-lg text-xs font-bold border border-brand-200 transition cursor-pointer"
               >
-                <FileText className="w-3.5 h-3.5 text-blue-700" />
+                <FileText className="w-3.5 h-3.5 text-brand-700" />
                 <span>View Sheet</span>
               </button>
             )}
@@ -167,9 +166,9 @@ export function WilcomPrintModal({
               <button
                 type="button"
                 onClick={onViewChallan}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-lg text-xs font-bold border border-emerald-200 transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent-50 hover:bg-accent-100 text-accent-800 rounded-lg text-xs font-bold border border-accent-200 transition cursor-pointer"
               >
-                <FileText className="w-3.5 h-3.5 text-emerald-700" />
+                <FileText className="w-3.5 h-3.5 text-accent-800" />
                 <span>View Challan</span>
               </button>
             )}
@@ -177,7 +176,7 @@ export function WilcomPrintModal({
               type="button"
               onClick={handlePrint}
               disabled={loading}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-lavender-800 hover:bg-lavender-900 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer disabled:cursor-wait"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer disabled:cursor-wait"
             >
               <Printer className="w-3.5 h-3.5" />
               <span>Print Wilcom {filterCategory === 'ALL' ? '' : `${filterCategory} `}Sheet</span>
@@ -186,7 +185,7 @@ export function WilcomPrintModal({
               type="button"
               onClick={handleDownload}
               disabled={loading}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-800 hover:bg-black disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer disabled:cursor-wait"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer disabled:cursor-wait"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Download Wilcom {filterCategory === 'ALL' ? '' : `${filterCategory} `}Sheet</span>
@@ -194,7 +193,7 @@ export function WilcomPrintModal({
             <button
               type="button"
               onClick={onClose}
-              className="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition cursor-pointer"
+              className="p-2 text-neutral-500 hover:text-neutral-600 rounded-lg hover:bg-neutral-100 transition cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -202,15 +201,15 @@ export function WilcomPrintModal({
         </div>
 
         {(loading || error) && (
-          <div className={`px-6 py-2 text-xs ${error ? 'bg-rose-50 text-rose-800' : 'bg-blue-50 text-blue-800'}`}>
+          <div className={`px-6 py-2 text-xs ${error ? 'bg-danger-50 text-danger-800' : 'bg-brand-50 text-brand-800'}`}>
             {error || 'Loading Wilcom artwork and production details…'}
           </div>
         )}
 
         {/* CATEGORY FILTER BAR */}
-        <div className="px-6 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-2 overflow-x-auto">
+        <div className="px-6 py-2.5 bg-neutral-50 border-b border-neutral-200 flex items-center justify-between gap-2 overflow-x-auto">
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-xs font-semibold text-slate-500 mr-1">Filter:</span>
+            <span className="text-xs font-semibold text-neutral-500 mr-1">Filter:</span>
             {(() => {
               const standardCats = ['ALL', 'TOP', 'BOTTOM', 'DUPATTA'];
               const customCats = entries
@@ -229,15 +228,15 @@ export function WilcomPrintModal({
                     onClick={() => setFilterCategory(cat)}
                     className={`px-3 py-1 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer ${
                       filterCategory === cat
-                        ? 'bg-lavender-800 text-white shadow-xs'
-                        : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
+                        ? 'bg-brand-600 text-white shadow-xs'
+                        : 'bg-white text-neutral-700 hover:bg-neutral-100 border border-neutral-200'
                     }`}
                   >
                     <span>{cat === 'ALL' ? 'All' : cat}</span>
                     <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
                       filterCategory === cat
-                        ? 'bg-white/20 text-white'
-                        : 'bg-slate-100 text-slate-700'
+                        ? 'bg-neutral-100 text-neutral-900'
+                        : 'bg-neutral-100 text-neutral-700'
                     }`}>
                       {count}
                     </span>
@@ -247,80 +246,80 @@ export function WilcomPrintModal({
             })()}
           </div>
 
-          <div className="text-xs text-slate-500 font-medium">
+          <div className="text-xs text-neutral-500 font-medium">
             {filteredEntries.length} {filteredEntries.length === 1 ? 'Design' : 'Designs'}
           </div>
         </div>
 
         {/* PREVIEW CONTAINER */}
-        <div className="p-4 sm:p-6 overflow-y-auto bg-slate-100/80 flex-1">
-          <div className="max-w-[760px] mx-auto bg-white p-6 sm:p-8 rounded-xl shadow-xs border border-slate-300 text-slate-900 font-sans space-y-4">
+        <div className="p-4 sm:p-6 overflow-y-auto bg-neutral-100/80 flex-1">
+          <div className="max-w-[760px] mx-auto bg-white p-6 sm:p-8 rounded-xl shadow-xs border border-neutral-300 text-neutral-900 font-sans space-y-4">
             
             {/* Header */}
-            <div className="text-center border-b-2 border-slate-900 pb-3">
-              <div className="text-sm font-black tracking-wider uppercase text-slate-800">
+            <div className="text-center border-b-2 border-neutral-200 pb-3">
+              <div className="text-sm font-black tracking-wider uppercase text-neutral-900">
                 SHUBHAM FABRICS INDIA PVT. LTD.
               </div>
-              <div className="text-lg font-black tracking-widest uppercase text-lavender-800 mt-1">
+              <div className="text-lg font-black tracking-widest uppercase text-brand-600 mt-1">
                 WILCOM {filterCategory === 'ALL' ? '' : `${filterCategory} `}EMBROIDERY SPECIFICATIONS
               </div>
             </div>
 
             {/* Order Meta Bar - STRICTLY Style, Main Style, Design Number, and Serial Number */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 bg-neutral-50 border border-neutral-200 rounded-lg text-xs">
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">DESIGN NO.</span>
-                <span className="font-bold text-slate-900 font-mono text-sm">{designNo}</span>
+                <span className="text-[10px] font-bold text-neutral-500 uppercase block">DESIGN NO.</span>
+                <span className="font-bold text-neutral-900 font-mono text-sm">{designNo}</span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">SERIAL NO.</span>
-                <span className="font-bold text-slate-900 font-mono text-sm">{serialNo}</span>
+                <span className="text-[10px] font-bold text-neutral-500 uppercase block">SERIAL NO.</span>
+                <span className="font-bold text-neutral-900 font-mono text-sm">{serialNo}</span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">MAIN STYLE</span>
-                <span className="font-bold text-slate-900">{mainStyleVal}</span>
+                <span className="text-[10px] font-bold text-neutral-500 uppercase block">MAIN STYLE</span>
+                <span className="font-bold text-neutral-900">{mainStyleVal}</span>
               </div>
               <div>
-                <span className="text-[10px] font-bold text-slate-500 uppercase block">STYLE</span>
-                <span className="font-bold text-slate-900">{styleVal}</span>
+                <span className="text-[10px] font-bold text-neutral-500 uppercase block">STYLE</span>
+                <span className="font-bold text-neutral-900">{styleVal}</span>
               </div>
             </div>
 
             {/* Entries Display */}
             {filteredEntries.length === 0 ? (
-              <div className="p-12 text-center border border-dashed border-slate-300 rounded-lg text-slate-500 space-y-2">
-                <Sparkles className="w-8 h-8 text-slate-400 mx-auto" />
-                <p className="font-bold text-sm text-slate-700">No Wilcom Designs for this selection</p>
+              <div className="p-12 text-center border border-dashed border-neutral-300 rounded-lg text-neutral-500 space-y-2">
+                <Sparkles className="w-8 h-8 text-neutral-500 mx-auto" />
+                <p className="font-bold text-sm text-neutral-700">No Wilcom Designs for this selection</p>
               </div>
             ) : (
               <div className="space-y-4">
                 {filteredEntries.map((entry, idx) => (
-                  <div key={entry.id || idx} className="border border-slate-200 rounded-xl p-4 bg-white space-y-3 shadow-2xs">
-                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2">
+                  <div key={entry.id || idx} className="border border-neutral-200 rounded-xl p-4 bg-white space-y-3 shadow-2xs">
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-100 pb-2">
                       <div className="flex items-center gap-2">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase text-white ${
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase text-neutral-900 ${
                           entry.category === 'TOP'
-                            ? 'bg-lavender-800'
+                            ? 'bg-brand-600'
                             : entry.category === 'BOTTOM'
-                              ? 'bg-lavender-700'
+                              ? 'bg-accent-500'
                               : entry.category === 'DUPATTA'
-                                ? 'bg-lavender-700'
-                                : 'bg-slate-700'
+                                ? 'bg-accent-500'
+                                : 'bg-neutral-200'
                         }`}>
                           WILCOM {entry.category}
                         </span>
-                        <span className="font-semibold text-xs text-slate-900">
+                        <span className="font-semibold text-xs text-neutral-900">
                           {entry.styleName || styleVal || mainStyleVal}
                         </span>
                       </div>
-                      <span className="min-w-0 max-w-full sm:max-w-[58%] break-all text-right font-mono text-[11px] leading-tight font-bold px-2 py-0.5 bg-slate-100 text-slate-900 rounded border border-slate-200">
+                      <span className="min-w-0 max-w-full sm:max-w-[58%] break-all text-right font-mono text-[11px] leading-tight font-bold px-2 py-0.5 bg-neutral-100 text-neutral-900 rounded border border-neutral-200">
                         {entry.wilcomDesignNumber || designNo || 'N/A'}
                       </span>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-4 items-start">
                       {/* Photo Preview */}
-                      <div className="w-[160px] h-[160px] border border-slate-200 rounded-lg bg-slate-50 flex flex-col items-center justify-center overflow-hidden shrink-0 relative group">
+                      <div className="w-[160px] h-[160px] border border-neutral-200 rounded-lg bg-neutral-50 flex flex-col items-center justify-center overflow-hidden shrink-0 relative group">
                         {entry.photoUrl ? (
                           <>
                             <img
@@ -330,11 +329,11 @@ export function WilcomPrintModal({
                               onClick={() => setViewingPhoto(entry.photoUrl || null)}
                               title="Click to view full photo"
                             />
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
+                            <div className="absolute inset-0 bg-neutral-900/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
                               <button
                                 type="button"
                                 onClick={() => setViewingPhoto(entry.photoUrl || null)}
-                                className="p-1.5 bg-white/90 hover:bg-white text-slate-800 rounded-full shadow-xs cursor-pointer"
+                                className="p-1.5 bg-white/90 hover:bg-white text-neutral-900 rounded-full shadow-xs cursor-pointer"
                                 title="View full size"
                               >
                                 <Eye className="w-3.5 h-3.5" />
@@ -343,8 +342,8 @@ export function WilcomPrintModal({
                           </>
                         ) : (
                           <div className="text-center p-3 flex flex-col items-center justify-center gap-2">
-                            <ImageIcon className="w-6 h-6 text-slate-300" />
-                            <span className="text-[10px] text-slate-400 font-semibold">
+                            <ImageIcon className="w-6 h-6 text-neutral-700" />
+                            <span className="text-[10px] text-neutral-500 font-semibold">
                               No Artwork Photo
                             </span>
                           </div>
@@ -354,27 +353,27 @@ export function WilcomPrintModal({
                       {/* Details Box - strictly Design No, Serial No, Main Style, Style */}
                       <div className="space-y-2 text-xs">
                         <div>
-                          <span className="text-slate-400 block text-[11px]">Design Number:</span>
-                          <span className="font-mono font-bold text-slate-900 text-sm">{designNo}</span>
+                          <span className="text-neutral-500 block text-[11px]">Design Number:</span>
+                          <span className="font-mono font-bold text-neutral-900 text-sm">{designNo}</span>
                         </div>
                         <div>
-                          <span className="text-slate-400 block text-[11px]">Serial Number:</span>
-                          <span className="font-mono font-bold text-slate-900 text-sm">{serialNo}</span>
+                          <span className="text-neutral-500 block text-[11px]">Serial Number:</span>
+                          <span className="font-mono font-bold text-neutral-900 text-sm">{serialNo}</span>
                         </div>
                         <div>
-                          <span className="text-slate-400 block text-[11px]">Main Style:</span>
-                          <span className="font-bold text-slate-800">{mainStyleVal}</span>
+                          <span className="text-neutral-500 block text-[11px]">Main Style:</span>
+                          <span className="font-bold text-neutral-900">{mainStyleVal}</span>
                         </div>
                         <div>
-                          <span className="text-slate-400 block text-[11px]">Style:</span>
-                          <span className="font-semibold text-slate-800">{entry.styleName || styleVal}</span>
+                          <span className="text-neutral-500 block text-[11px]">Style:</span>
+                          <span className="font-semibold text-neutral-900">{entry.styleName || styleVal}</span>
                         </div>
                         {entry.photoUrl && (
                           <div className="flex items-center gap-3 pt-1">
                             <button
                               type="button"
                               onClick={() => setViewingPhoto(entry.photoUrl || null)}
-                              className="text-[11px] font-semibold text-lavender-800 hover:underline flex items-center gap-1 cursor-pointer"
+                              className="text-[11px] font-semibold text-brand-600 hover:underline flex items-center gap-1 cursor-pointer"
                             >
                               <Eye className="w-3.5 h-3.5" />
                               <span>View Full Photo</span>
@@ -395,7 +394,7 @@ export function WilcomPrintModal({
       {/* FULL-SIZE PHOTO LIGHTBOX MODAL */}
       {viewingPhoto && (
         <div
-          className="fixed inset-0 z-60 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150"
+          className="fixed inset-0 z-60 bg-neutral-900/85 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150"
           onClick={() => setViewingPhoto(null)}
         >
           <div
@@ -405,7 +404,7 @@ export function WilcomPrintModal({
             <button
               type="button"
               onClick={() => setViewingPhoto(null)}
-              className="absolute -top-3 -right-3 w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-black shadow-lg transition cursor-pointer"
+              className="absolute -top-3 -right-3 w-9 h-9 rounded-full bg-white text-neutral-900 flex items-center justify-center hover:bg-neutral-900 shadow-lg transition cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>

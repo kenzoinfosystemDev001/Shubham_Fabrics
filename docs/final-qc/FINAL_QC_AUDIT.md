@@ -14,17 +14,17 @@ Shubham Fabrics MES operates an enterprise multi-department apparel manufacturin
 $$\text{Finishing} \longrightarrow \text{Steam Press} \longrightarrow \mathbf{Final\ QC\ (FINAL\_CHECK)} \longrightarrow \text{Packing} \longrightarrow \text{Finished Goods} \longrightarrow \text{Dispatch}$$
 
 ### Key Findings from Codebase Audit:
-1. **Department Identity**: The department code is `DepartmentCode.FINAL_QC` in `@subham/types` and `packages/config`.
+1. **Department Identity**: The department code is `DepartmentCode.FINAL_CHECK` in `@subham/types` and `packages/config`.
 2. **Upstream Source**:
-   - Primary upstream: `STEAM_PRESS` (Steam Press Department), which issues handover Challans with `toDepartment: 'FINAL_QC'`.
-   - Alternative configured upstream: `FINISHING`, which also supports direct handover to `FINAL_QC` if Steam Press is bypassed for specific unpressed styles.
+   - Primary upstream: `STEAM_PRESS` (Steam Press Department), which issues handover Challans with `toDepartment: 'FINAL_CHECK'`.
+   - Alternative configured upstream: `FINISHING`, which also supports direct handover to `FINAL_CHECK` if Steam Press is bypassed for specific unpressed styles.
 3. **Downstream Destinations**:
-   - In `STANDARD_FACTORY_ROUTE`, the immediate department following `FINAL_QC` is `PACKING` (Folding, Tagging & Polybagging).
+   - In `STANDARD_FACTORY_ROUTE`, the immediate department following `FINAL_CHECK` is `PACKING` (Folding, Tagging & Polybagging).
    - Subsequent destinations in the route include `FINISHED_GOODS` (Warehouse) and `DISPATCH`.
    - Routing should dynamically resolve the next department from `STANDARD_FACTORY_ROUTE`, defaulting to `PACKING`.
 4. **Current Final QC Implementation State**:
-   - Final QC has a dedicated login station, route group, department navigation, queue, floor board, reports, and API handlers under `apps/web/src/app/api/final-qc`.
-   - The web API handlers use Prisma directly and are protected by `getFinalQCActor`; access is based on the existing `mes_jwt_<userId>_<timestamp>` token, an active database user, and Final QC department/role or admin membership.
+   - Final QC has a dedicated login station, route group, department navigation, queue, floor board, reports, and API handlers under `apps/web/src/app/api/final-check`.
+   - The web API handlers use Prisma directly and are protected by `getFinalCheckActor`; access is based on the existing `mes_jwt_<userId>_<timestamp>` token, an active database user, and Final QC department/role or admin membership.
    - The token format is not cryptographically signed. The Final QC guard verifies the active user and token timestamp but does not resolve the shared platform's token-forgery limitation; authentication must be migrated centrally to signed sessions.
    - Focused quantity-rule tests and web TypeScript validation have been run. Database-backed end-to-end validation requires an isolated test database and has not been performed.
 
@@ -45,7 +45,7 @@ The Prisma schema (`packages/database/prisma/schema.prisma`) already provides th
    - Links specific defect categories to the inspection record (`inspectionId`, `defectType`, `count`, `severity`).
 4. **`ProductionTransaction`**:
    - Quantitative tracking record.
-   - Fields: `departmentCode: 'FINAL_QC'`, `operationName: 'FINAL_QUALITY_INSPECTION'`, `inputQuantity`, `goodQuantity`, `reworkQuantity`, `rejectQuantity`, `balanceQuantity`.
+   - Fields: `departmentCode: 'FINAL_CHECK'`, `operationName: 'FINAL_QUALITY_INSPECTION'`, `inputQuantity`, `goodQuantity`, `reworkQuantity`, `rejectQuantity`, `balanceQuantity`.
 5. **`DefectRecord`**:
    - Defect tracking for rejected or rework items (`defectCode`, `severity`, `quantity`, `reason`, `status: 'OPEN'` or `'REWORK'`); rejected garments are not automatically classified as scrap.
 6. **`Challan` & `ChallanEvent`**:
@@ -61,18 +61,18 @@ The Prisma schema (`packages/database/prisma/schema.prisma`) already provides th
 
 | Component | Responsibility |
 | :--- | :--- |
-| **RBAC & Auth** | Update `rbac.ts` and `login/route.ts` with `isFinalQCUser()`, redirect to `/final-qc`, and enforce `/final-qc/*` route access. |
-| **Department Switcher & Guard** | Add `Final QC (FINAL_QC)` to `DepartmentSwitcher.tsx` and `DepartmentGuard.tsx`. |
+| **RBAC & Auth** | Update `rbac.ts` and `login/route.ts` with `isFinalCheckUser()`, redirect to `/final-check`, and enforce `/final-check/*` route access. |
+| **Department Switcher & Guard** | Add `Final check (FINAL_CHECK)` to `DepartmentSwitcher.tsx` and `DepartmentGuard.tsx`. |
 | **Quick-Login Station** | Add `finalcheck` station option to `/login` with `ShieldCheck` icon and emerald branding. |
-| **Final QC Navigation** | Create `FinalQCNavigation.tsx` supporting desktop sidebar and mobile drawer. |
-| **Inward Receipt Terminal** | `GET /api/final-qc/incoming` and `POST /api/final-qc/challans/[id]/receive` with physical count verification. |
-| **Inspection Floor Workstation** | `GET /api/final-qc/queue` and `POST /api/final-qc/jobs/[id]/start` for table allocation and queue management. |
-| **Quality Gate Execution** | `POST /api/final-qc/jobs/[id]/inspect` executing complete appearance, seam, stitch, measurement, and defect checks. |
+| **Final QC Navigation** | Create `FinalCheckNavigation.tsx` supporting desktop sidebar and mobile drawer. |
+| **Inward Receipt Terminal** | `GET /api/final-check/incoming` and `POST /api/final-check/challans/[id]/receive` with physical count verification. |
+| **Inspection Floor Workstation** | `GET /api/final-check/queue` and `POST /api/final-check/jobs/[id]/start` for table allocation and queue management. |
+| **Quality Gate Execution** | `POST /api/final-check/jobs/[id]/inspect` executing complete appearance, seam, stitch, measurement, and defect checks. |
 | **Strict Quantity Accounting** | Validate $Input = Accepted + Rework + Rejected + PendingBalance$, persist `ProductionTransaction` and `DefectRecord`. |
-| **Supervisor Hold & Review** | `POST /api/final-qc/jobs/[id]/hold` and `POST /api/final-qc/jobs/[id]/resume` for non-conforming batches. |
-| **Outgoing Handover Challan** | `POST /api/final-qc/issue-challan` to the next configured stage (`PACKING` today), accepted-quantity validation, child-challan genealogy, and atomic parent closure. Code-128 image generation is not implemented. |
-| **Live Kanban Board** | 4-lane live synchronized floor board (`GET /api/final-qc/floor-board`). |
-| **Analytics & Reports** | First-pass yield, defect Pareto distribution, measurement variance, and audit history (`GET /api/final-qc/reports`). |
+| **Supervisor Hold & Review** | `POST /api/final-check/jobs/[id]/hold` and `POST /api/final-check/jobs/[id]/resume` for non-conforming batches. |
+| **Outgoing Handover Challan** | `POST /api/final-check/issue-challan` to the next configured stage (`PACKING` today), accepted-quantity validation, child-challan genealogy, and atomic parent closure. Code-128 image generation is not implemented. |
+| **Live Kanban Board** | 4-lane live synchronized floor board (`GET /api/final-check/floor-board`). |
+| **Analytics & Reports** | First-pass yield, defect Pareto distribution, measurement variance, and audit history (`GET /api/final-check/reports`). |
 
 ---
 
@@ -96,7 +96,7 @@ For every batch received into Final QC:
 
 ## 5. SECURITY & REGRESSION RISKS
 
-1. **Route Tampering**: Users without `FINAL_QC_INSPECTOR`, `FINAL_QC_SUPERVISOR`, or `ADMIN` must be blocked from modifying inspection records.
+1. **Route Tampering**: Users without `FINAL_CHECK_INSPECTOR`, `FINAL_CHECK_SUPERVISOR`, or `ADMIN` must be blocked from modifying inspection records.
 2. **Downstream Destination Integrity**: The outgoing destination must be dynamically resolved from `STANDARD_FACTORY_ROUTE` (defaults to `PACKING`) to prevent unauthorized direct dispatch.
 3. **Data Overwrites**: Parent challan status and history must be immutable; each inspection attempt must be preserved.
 

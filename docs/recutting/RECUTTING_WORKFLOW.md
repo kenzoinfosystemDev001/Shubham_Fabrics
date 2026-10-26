@@ -2,7 +2,7 @@
 
 **Document Version:** 1.0.0  
 **Department:** Panel & Embroidery Recutting Section (`RECUTTING`)  
-**Pipeline Sequence:** $\text{Washing QC} \longrightarrow \text{Recutting} \longrightarrow \text{Stitching}$  
+**Pipeline Sequence:** $\text{QC Washing} \longrightarrow \text{Recutting} \longrightarrow \text{Stitching}$  
 
 ---
 
@@ -19,7 +19,7 @@ Embroidered fabric undergoes dimensional shifts, relaxation, and minor distortio
 ```
    ┌──────────────────────────────────────────────────────────────┐
    │ 1. QC WASHING ISSUANCE                                       │
-   │    Washing QC approves washed lot and issues Challan         │
+   │    QC Washing approves washed lot and issues Challan         │
    │    toDepartment = 'RECUTTING' (with linked Production Sheet) │
    └──────────────────────────────┬───────────────────────────────┘
                                   │
@@ -75,7 +75,7 @@ Embroidered fabric undergoes dimensional shifts, relaxation, and minor distortio
 
 ### Step 1: Incoming Challan Receiving
 1. Operator accesses `/recutting/incoming`.
-2. Inspects pending incoming challans issued by `WASHING_QC` (Washing QC).
+2. Inspects pending incoming challans issued by `QC3` (QC Washing).
 3. Clicks **Receive Material**:
    - Compares physical piece count with the challan item quantity.
    - Cross-checks with the linked Production Sheet design number.
@@ -112,4 +112,4 @@ Embroidered fabric undergoes dimensional shifts, relaxation, and minor distortio
    - System generates sequential challan number `CH-RC-XXXXXX`.
    - Sets `fromDepartment = 'RECUTTING'` and `toDepartment = 'STITCHING'`.
    - Embeds printable barcode sticker and detailed bundle items.
-   - Sets `parentChallanId` to the incoming Washing QC Challan ID, ensuring 100% digital thread integrity.
+   - Sets `parentChallanId` to the incoming QC Washing Challan ID, ensuring 100% digital thread integrity.

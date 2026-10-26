@@ -1,920 +1,108 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ChallanNumberInput, getChallanNumberError } from '@/components/challan/ChallanNumberInput';
-import {
-  Kanban,
-  RefreshCw,
-  Clock,
-  Layers,
-  CheckCircle2,
-  AlertCircle,
-  Eye,
-  Edit3,
-  Send,
-  Droplet,
-  ExternalLink,
-  X,
-  FileText,
-  Printer
-} from 'lucide-react';
+import { Notice, PageHeader, PriorityBadge, fetchJson, fmtDate, fmtQty, isOverdue, sheetRef } from '@/components/dyeing/DyeingUi';
 
-interface FloorOrder {
-  id: string;
-  orderNumber: string;
-  programId: string;
-  status: 'RECEIVED' | 'IN_DYEING' | 'PARTIALLY_DYED' | 'DYED' | 'READY_FOR_DYEING_QC' | 'SENT_TO_DYEING_QC';
-  priority: string;
-  fabricName: string;
-  fabricType: string | null;
-  targetColor: string;
-  dyedColor: string | null;
-  colorCode: string | null;
-  requiredQuantity: number;
-  dyedQuantity: number;
-  undyedQuantity: number;
-  readyForDyeingQcQuantity: number;
-  sentToDyeingQcQuantity: number;
-  uom: string;
-  inchargeName: string | null;
-  batchNumber: string | null;
-  machineNumber: string | null;
-  processRemarks: string | null;
-  createdAt: string;
-  updatedAt: string;
-  program?: {
-    id: string;
-    programNumber: string;
-    programSerialNo?: string | null;
-    clientName?: string | null;
-    buyerName?: string | null;
-    styleCode?: string | null;
-    mainStyle?: string | null;
-    fabricName?: string | null;
-    fabricColor?: string | null;
-    targetQuantity?: number | null;
-    deliveryDate?: string | null;
-    priority?: string | null;
-  };
-  inboundChallan?: {
-    id: string;
-    challanNumber: string;
-    status: string;
-    issuedDate: string;
-  };
-  dyeingQcChallan?: {
-    id: string;
-    challanNumber: string;
-    status: string;
-    issuedDate: string;
-  };
-}
-
-interface LanesData {
-  RECEIVED: FloorOrder[];
-  IN_DYEING: FloorOrder[];
-  PARTIALLY_DYED: FloorOrder[];
-  DYED: FloorOrder[];
-  READY_FOR_DYEING_QC: FloorOrder[];
-  SENT_TO_DYEING_QC: FloorOrder[];
-}
-
-const LANES_CONFIG: {
-  key: keyof LanesData;
-  label: string;
-  badgeBg: string;
-  badgeText: string;
-  borderTop: string;
-  description: string;
-}[] = [
-  {
-    key: 'RECEIVED',
-    label: '1. Received',
-    badgeBg: 'bg-slate-200',
-    badgeText: 'text-slate-800',
-    borderTop: 'border-t-slate-400',
-    description: 'Inward from Fabric Store awaiting processing',
-  },
-  {
-    key: 'IN_DYEING',
-    label: '2. In Dyeing',
-    badgeBg: 'bg-blue-100',
-    badgeText: 'text-blue-800',
-    borderTop: 'border-t-blue-600',
-    description: 'Active inside dyeing machines & vats',
-  },
-  {
-    key: 'PARTIALLY_DYED',
-    label: '3. Partially Dyed',
-    badgeBg: 'bg-amber-100',
-    badgeText: 'text-amber-800',
-    borderTop: 'border-t-amber-500',
-    description: 'Batch in progress; balance remaining',
-  },
-  {
-    key: 'DYED',
-    label: '4. Fully Dyed',
-    badgeBg: 'bg-teal-100',
-    badgeText: 'text-teal-800',
-    borderTop: 'border-t-teal-600',
-    description: 'Target dyed; drying & finishing stage',
-  },
-  {
-    key: 'READY_FOR_DYEING_QC',
-    label: '5. Ready for Dyeing QC',
-    badgeBg: 'bg-indigo-100',
-    badgeText: 'text-indigo-800',
-    borderTop: 'border-t-indigo-600',
-    description: 'Batch inspected & staged for dispatch',
-  },
-  {
-    key: 'SENT_TO_DYEING_QC',
-    label: '6. Sent to Dyeing QC',
-    badgeBg: 'bg-emerald-100',
-    badgeText: 'text-emerald-800',
-    borderTop: 'border-t-emerald-600',
-    description: 'Dispatched with verified Dyeing QC Challan',
-  },
-];
+const STAGE_HINT: Record<string, string> = {
+  AWAITING_RECEIPT: 'Expected',
+  RECEIVED: 'Received',
+  PENDING_DYEING: 'Received',
+  IN_PROGRESS: 'Still to dye',
+  COMPLETED: 'Ready for QC',
+  PARTIALLY_TRANSFERRED: 'Sent to QC',
+  FULLY_TRANSFERRED: 'Sent to QC',
+};
 
 export default function DyeingFloorBoardPage() {
-  const [lanes, setLanes] = useState<LanesData>({
-    RECEIVED: [],
-    IN_DYEING: [],
-    PARTIALLY_DYED: [],
-    DYED: [],
-    READY_FOR_DYEING_QC: [],
-    SENT_TO_DYEING_QC: [],
-  });
-  const [totalOrders, setTotalOrders] = useState(0);
+  const [stages, setStages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [updatedAt, setUpdatedAt] = useState<string | null>(null);
 
-  // Modal states
-  const [selectedOrderForUpdate, setSelectedOrderForUpdate] = useState<FloorOrder | null>(null);
-  const [selectedOrderForChallan, setSelectedOrderForChallan] = useState<FloorOrder | null>(null);
-
-  // Update Form State
-  const [updateForm, setUpdateForm] = useState({
-    dyedQuantity: 0,
-    dyedColor: '',
-    colorCode: '',
-    status: 'IN_DYEING',
-    inchargeName: '',
-    machineNumber: '',
-    batchNumber: '',
-    processRemarks: '',
-  });
-  const [updating, setUpdating] = useState(false);
-  const [updateError, setUpdateError] = useState<string | null>(null);
-
-  // Issue Challan Form State
-  const [challanForm, setChallanForm] = useState({
-    quantityToSend: 0,
-    color: '',
-    remarks: '',
-    vehicleNumber: '',
-    driverName: '',
-  });
-  const [issuingChallan, setIssuingChallan] = useState(false);
-  const [challanError, setChallanError] = useState<string | null>(null);
-  const [challanNumber, setChallanNumber] = useState('');
-  const [challanNumberError, setChallanNumberError] = useState<string | null>(null);
-  const [issuedSuccessChallan, setIssuedSuccessChallan] = useState<{ id: string; challanNumber: string } | null>(null);
-
-  const fetchFloorBoard = async () => {
+  const load = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
-      setError(null);
-      const res = await fetch('/api/dyeing/floor-board');
-      if (!res.ok) throw new Error('Failed to load floor board data');
-      const json = await res.json();
-      setLanes(json.data.lanes);
-      setTotalOrders(json.data.totalOrders);
-    } catch (err: any) {
-      console.error('Error fetching floor board:', err);
-      setError(err.message || 'Error communicating with database');
+      const body = await fetchJson('/api/dyeing/floor-board');
+      setStages(body.data?.stages || []);
+      setUpdatedAt(body.data?.generatedAt || null);
+    } catch (e: any) {
+      setError(e.message);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchFloorBoard();
+    load();
+    const timer = setInterval(load, 60000);
+    return () => clearInterval(timer);
   }, []);
 
-  const openUpdateModal = (order: FloorOrder) => {
-    setSelectedOrderForUpdate(order);
-    setUpdateForm({
-      dyedQuantity: order.dyedQuantity,
-      dyedColor: order.dyedColor || order.targetColor || '',
-      colorCode: order.colorCode || '',
-      status: order.status === 'RECEIVED' ? 'IN_DYEING' : order.status,
-      inchargeName: order.inchargeName || 'Dyeing Incharge',
-      machineNumber: order.machineNumber || '',
-      batchNumber: order.batchNumber || '',
-      processRemarks: order.processRemarks || '',
-    });
-    setUpdateError(null);
-  };
-
-  const handleUpdateSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedOrderForUpdate) return;
-    try {
-      setUpdating(true);
-      setUpdateError(null);
-
-      const payload = {
-        dyedQuantity: Number(updateForm.dyedQuantity),
-        dyedColor: updateForm.dyedColor,
-        colorCode: updateForm.colorCode,
-        status: updateForm.status,
-        inchargeName: updateForm.inchargeName,
-        machineNumber: updateForm.machineNumber,
-        batchNumber: updateForm.batchNumber,
-        processRemarks: updateForm.processRemarks,
-      };
-
-      const res = await fetch(`/api/dyeing/orders/${selectedOrderForUpdate.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      const resJson = await res.json();
-      if (!res.ok) {
-        throw new Error(resJson.error || 'Failed to update dyeing progress');
-      }
-
-      setSelectedOrderForUpdate(null);
-      await fetchFloorBoard();
-    } catch (err: any) {
-      setUpdateError(err.message || 'Error saving update');
-    } finally {
-      setUpdating(false);
-    }
-  };
-
-  const openChallanModal = (order: FloorOrder) => {
-    setSelectedOrderForChallan(order);
-    const available = Math.max(0, order.dyedQuantity - order.sentToDyeingQcQuantity);
-    setChallanForm({
-      quantityToSend: available,
-      color: order.dyedColor || order.targetColor || '',
-      remarks: `Dyeing completed lot for QC inspection. Ref: ${order.orderNumber}`,
-      vehicleNumber: '',
-      driverName: '',
-    });
-    setChallanError(null);
-    setChallanNumber('');
-    setChallanNumberError(null);
-    setIssuedSuccessChallan(null);
-  };
-
-  const handleChallanSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedOrderForChallan || issuingChallan) return;
-    const numberError = getChallanNumberError(challanNumber);
-    setChallanNumberError(numberError);
-    if (numberError) return;
-    try {
-      setIssuingChallan(true);
-      setChallanError(null);
-
-      const qty = Number(challanForm.quantityToSend);
-      if (isNaN(qty) || qty <= 0) {
-        throw new Error('Please enter a valid positive quantity to send.');
-      }
-
-      const available = Math.max(0, selectedOrderForChallan.dyedQuantity - selectedOrderForChallan.sentToDyeingQcQuantity);
-      if (qty > available) {
-        throw new Error(`Cannot dispatch ${qty} ${selectedOrderForChallan.uom}. Only ${available} ${selectedOrderForChallan.uom} available.`);
-      }
-
-      const res = await fetch(`/api/dyeing/orders/${selectedOrderForChallan.id}/issue-dyeing-qc-challan`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          challanNumber: challanNumber.trim(),
-          quantityToSend: qty,
-          color: challanForm.color,
-          remarks: challanForm.remarks,
-          vehicleNumber: challanForm.vehicleNumber,
-          driverName: challanForm.driverName,
-        }),
-      });
-
-      const resJson = await res.json();
-      if (!res.ok) {
-        if (resJson.field === 'challanNumber') {
-          setChallanNumberError(resJson.error);
-          return;
-        }
-        throw new Error(resJson.error || 'Failed to issue Challan to Dyeing QC');
-      }
-
-      setChallanNumber('');
-      setIssuedSuccessChallan({
-        id: resJson.data.challan.id,
-        challanNumber: resJson.data.challan.challanNumber,
-      });
-
-      await fetchFloorBoard();
-    } catch (err: any) {
-      setChallanError(err.message || 'Error issuing Challan');
-    } finally {
-      setIssuingChallan(false);
-    }
-  };
-
   return (
-    <div className="space-y-6 max-w-[1600px] mx-auto pb-16">
-      {/* SUCCESS BANNER WHEN CHALLAN ISSUED */}
-      {issuedSuccessChallan && (
-        <div className="p-4 bg-emerald-50 border-2 border-emerald-500 rounded-xl flex items-center justify-between shadow-sm animate-in fade-in duration-200">
-          <div className="flex items-center gap-3">
-            <CheckCircle2 className="w-6 h-6 text-emerald-600 flex-shrink-0" />
-            <div>
-              <h4 className="text-sm font-bold text-emerald-950">
-                Challan Successfully Issued to Dyeing QC!
-              </h4>
-              <p className="text-xs text-emerald-700">
-                Dispatch Challan <span className="font-mono font-bold">{issuedSuccessChallan.challanNumber}</span> has been dispatched to Dyeing QC.
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link
-              href={`/challans/${issuedSuccessChallan.id}`}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-lavender-700 hover:bg-lavender-800 text-white text-xs font-bold rounded-lg shadow-xs transition"
-            >
-              <Printer className="w-3.5 h-3.5" />
-              <span>View &amp; Print Slip</span>
-            </Link>
-            <button
-              onClick={() => setIssuedSuccessChallan(null)}
-              className="p-1.5 text-emerald-700 hover:bg-emerald-100 rounded-md"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
+    <div className="min-h-screen bg-canvas pb-10">
+      <PageHeader title="Floor Board" loading={loading} onRefresh={load}>
+        {updatedAt && <span className="text-xs text-neutral-500">Updated {fmtDate(updatedAt, true)}</span>}
+      </PageHeader>
 
-      {/* HEADER */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-purple-100 text-purple-800 border border-purple-200">
-              MES Shop Floor Board
-            </span>
-            <span className="text-xs text-slate-400">· Real-time Stage Tracking</span>
-          </div>
-          <h1 className="text-2xl font-bold font-serif text-slate-900 mt-1">
-            Dyeing Floor Kanban
-          </h1>
-          <p className="text-xs text-slate-600 mt-0.5">
-            Visualize the live flow of material lots across 6 physical stages: Received → In Dyeing → Partially Dyed → Fully Dyed → Ready for Dyeing QC → Sent to Dyeing QC.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="text-xs font-mono font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
-            Total Active Orders: {totalOrders}
-          </div>
-          <button
-            onClick={() => fetchFloorBoard()}
-            disabled={loading}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            <span>Refresh Board</span>
-          </button>
-        </div>
-      </div>
-
-      {/* ERROR BANNER */}
-      {error && (
-        <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-3 text-rose-900 text-xs">
-          <AlertCircle className="w-5 h-5 text-rose-600 flex-shrink-0" />
-          <span>Error loading floor board: {error}</span>
-        </div>
-      )}
-
-      {/* KANBAN SWIMLANES GRID (6 COLUMNS) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 items-start">
-        {LANES_CONFIG.map((lane) => {
-          const ordersInLane = lanes[lane.key] || [];
-
-          return (
-            <div
-              key={lane.key}
-              className={`bg-slate-100/90 rounded-xl border border-slate-200 border-t-4 ${lane.borderTop} flex flex-col min-h-[580px] shadow-xs`}
-            >
-              {/* LANE HEADER */}
-              <div className="p-3 border-b border-slate-200/80 bg-white/70 rounded-t-lg">
-                <div className="flex items-center justify-between mb-1">
-                  <h3 className="text-xs font-bold text-slate-900">{lane.label}</h3>
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${lane.badgeBg} ${lane.badgeText}`}
-                  >
-                    {ordersInLane.length}
-                  </span>
-                </div>
-                <p className="text-[10px] text-slate-500 leading-tight">
-                  {lane.description}
-                </p>
-              </div>
-
-              {/* LANE CARDS CONTAINER */}
-              <div className="p-2 space-y-2.5 flex-1 overflow-y-auto max-h-[70vh]">
-                {ordersInLane.length === 0 ? (
-                  <div className="h-32 border-2 border-dashed border-slate-200 rounded-lg flex items-center justify-center p-3 text-center">
-                    <span className="text-[11px] text-slate-400 font-mono">
-                      No lots in this stage
-                    </span>
+      <main className="p-4 sm:p-8 space-y-4">
+        {error && <Notice kind="error" onClose={() => setError(null)}>{error}</Notice>}
+        <div className="flex gap-4 overflow-x-auto pb-4 snap-x">
+          {stages.map((stage) => {
+            const totals: Record<string, number> = {};
+            for (const item of stage.items) totals[item.uom] = (totals[item.uom] || 0) + (item.quantity || 0);
+            return (
+              <section key={stage.key} className="snap-start shrink-0 w-72 flex flex-col bg-white/70 backdrop-blur border border-neutral-200 rounded-2xl">
+                <header className="px-4 py-3 border-b border-neutral-200">
+                  <div className="flex items-center justify-between gap-2">
+                    <h2 className="text-sm font-bold text-neutral-900">{stage.label}</h2>
+                    <span className="text-[11px] font-semibold tabular-nums bg-neutral-100 text-neutral-600 px-2 py-0.5 rounded-full">{stage.items.length}</span>
                   </div>
-                ) : (
-                  ordersInLane.map((order) => {
-                    const availableForQc = Math.max(0, order.dyedQuantity - order.sentToDyeingQcQuantity);
-                    const canIssue = order.dyedQuantity > 0 && availableForQc > 0;
-
-                    return (
-                      <div
-                        key={order.id}
-                        className="bg-white rounded-lg p-3 border border-slate-200 hover:border-lavender-800/50 shadow-xs hover:shadow-sm transition space-y-2"
-                      >
-                        {/* TOP: ORDER # & PRIORITY */}
-                        <div className="flex items-start justify-between gap-1">
-                          <div>
-                            <span className="font-mono font-bold text-xs text-slate-900 block">
-                              {order.program?.programSerialNo || order.orderNumber}
-                            </span>
-                            <span className="text-[10px] font-mono text-slate-400 block">
-                              {order.program?.programNumber || order.orderNumber}
-                            </span>
-                          </div>
-                          {order.priority === 'HIGH' && (
-                            <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-rose-100 text-rose-800">
-                              HIGH
-                            </span>
-                          )}
+                  <p className="mt-1 text-xs text-neutral-500 tabular-nums">
+                    {Object.entries(totals).map(([u, q]) => fmtQty(q, u)).join(' · ') || '—'}
+                  </p>
+                </header>
+                <div className="p-3 space-y-2 overflow-y-auto max-h-[70vh]">
+                  {stage.items.length === 0 && <p className="py-6 text-center text-xs text-neutral-400">Nothing here</p>}
+                  {stage.items.map((item: any) => (
+                    <Link
+                      key={item.id}
+                      href={stage.key === 'AWAITING_RECEIPT' ? '/dyeing/my-work/incoming' : `/dyeing/my-work/process?orderId=${item.id}`}
+                      className="block bg-white border border-neutral-200 hover:border-brand-300 rounded-xl p-3 shadow-xs transition"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <span className="font-mono text-xs font-semibold text-neutral-900">{sheetRef(item.program)}</span>
+                        <PriorityBadge priority={item.priority} />
+                      </div>
+                      <p className="mt-1 text-sm font-semibold text-neutral-900">{item.fabricName}</p>
+                      <p className="text-xs text-brand-900">
+                        {item.targetColor || '—'}
+                        {item.dyedColor && item.dyedColor !== item.targetColor ? ` · dyed ${item.dyedColor}` : ''}
+                      </p>
+                      <div className="mt-2 flex items-end justify-between gap-2">
+                        <div>
+                          <p className="text-[11px] text-neutral-500">{STAGE_HINT[stage.key]}</p>
+                          <p className="text-sm font-bold tabular-nums text-neutral-900">{fmtQty(item.quantity, item.uom)}</p>
                         </div>
-
-                        {/* CLIENT & STYLE */}
-                        <div className="text-[11px] text-slate-700 leading-tight">
-                          <span className="font-semibold block truncate">
-                            {order.program?.clientName || order.program?.buyerName || 'Standard Client'}
-                          </span>
-                          <span className="text-[10px] text-slate-500 block truncate">
-                            {order.program?.styleCode || 'General Lot'}
-                          </span>
-                        </div>
-
-                        {/* FABRIC & COLOR */}
-                        <div className="bg-slate-50 p-2 rounded border border-slate-100 text-[11px] space-y-1">
-                          <div className="font-semibold text-slate-900 truncate">
-                            {order.fabricName}
-                          </div>
-                          <div className="flex items-center gap-1.5 text-[10px]">
-                            <span
-                              className="w-2.5 h-2.5 rounded-full border border-slate-300 flex-shrink-0"
-                              style={{
-                                backgroundColor:
-                                  order.colorCode ||
-                                  (order.dyedColor?.toLowerCase() === 'black' ? '#000' :
-                                   order.dyedColor?.toLowerCase() === 'white' ? '#fff' :
-                                   order.dyedColor?.toLowerCase() === 'red' ? '#D63A1E' :
-                                   order.dyedColor?.toLowerCase() === 'blue' ? '#7D44A8' :
-                                   order.dyedColor?.toLowerCase() === 'green' ? '#677A00' : '#A19CA8')
-                              }}
-                            />
-                            <span className="text-slate-600 font-medium truncate">
-                              {order.dyedColor || order.targetColor}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* QUANTITY PILLS */}
-                        <div className="grid grid-cols-2 gap-1 text-[10px] font-mono text-center">
-                          <div className="bg-slate-100 rounded px-1.5 py-0.5">
-                            <span className="text-slate-400 block text-[8px] uppercase">Req</span>
-                            <span className="font-bold text-slate-800">{order.requiredQuantity}</span>
-                          </div>
-                          <div className="bg-emerald-50 rounded px-1.5 py-0.5">
-                            <span className="text-emerald-700 block text-[8px] uppercase">Dyed</span>
-                            <span className="font-bold text-emerald-800">{order.dyedQuantity}</span>
-                          </div>
-                          <div className="bg-amber-50 rounded px-1.5 py-0.5">
-                            <span className="text-amber-700 block text-[8px] uppercase">Undyed</span>
-                            <span className="font-bold text-amber-800">{order.undyedQuantity}</span>
-                          </div>
-                          <div className="bg-blue-50 rounded px-1.5 py-0.5">
-                            <span className="text-blue-700 block text-[8px] uppercase">Sent QC</span>
-                            <span className="font-bold text-blue-800">{order.sentToDyeingQcQuantity}</span>
-                          </div>
-                        </div>
-
-                        {/* INBOUND / OUTBOUND CHALLAN LINKS */}
-                        {order.dyeingQcChallan && (
-                          <div className="text-[10px] text-emerald-700 font-mono flex items-center justify-between border-t border-slate-100 pt-1">
-                            <span>Dyeing QC Slip:</span>
-                            <Link
-                              href={`/challans/${order.dyeingQcChallan.id}`}
-                              className="font-bold hover:underline inline-flex items-center gap-0.5"
-                            >
-                              <span>{order.dyeingQcChallan.challanNumber}</span>
-                              <ExternalLink className="w-2.5 h-2.5" />
-                            </Link>
-                          </div>
-                        )}
-
-                        {/* CARD ACTION BUTTONS */}
-                        <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-1">
-                          <button
-                            onClick={() => openUpdateModal(order)}
-                            className="flex-1 py-1 px-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[10px] font-bold transition flex items-center justify-center gap-1"
-                          >
-                            <Edit3 className="w-3 h-3 text-lavender-800" />
-                            <span>Update</span>
-                          </button>
-
-                          {canIssue && (
-                            <button
-                              onClick={() => openChallanModal(order)}
-                              title={`Send to Dyeing QC (${availableForQc} ${order.uom} available)`}
-                              className="py-1 px-2 bg-lavender-700 hover:bg-lavender-800 text-white rounded text-[10px] font-bold transition flex items-center justify-center gap-1 shadow-xs"
-                            >
-                              <Send className="w-3 h-3" />
-                              <span>Dyeing QC</span>
-                            </button>
-                          )}
+                        <div className="text-right text-[11px]">
+                          <p className="text-neutral-500 font-mono">{item.challan?.challanNumber || '—'}</p>
+                          <p className={isOverdue(item.program) ? 'font-semibold text-danger-700' : 'text-neutral-500'}>
+                            Due {fmtDate(item.program?.deliveryDate)}
+                          </p>
                         </div>
                       </div>
-                    );
-                  })
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* UPDATE MODAL */}
-      {selectedOrderForUpdate && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <form onSubmit={handleUpdateSubmit}>
-              <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-                <div className="flex items-center gap-3">
-                  <Edit3 className="w-5 h-5 text-lavender-800" />
-                  <div>
-                    <h3 className="text-base font-bold text-slate-900">
-                      Record Dyeing Work Progress
-                    </h3>
-                    <p className="text-xs text-slate-500 font-mono">
-                      Order: {selectedOrderForUpdate.orderNumber} · {selectedOrderForUpdate.fabricName}
-                    </p>
-                  </div>
+                      {item.qcChallans?.length > 0 && (
+                        <p className="mt-1.5 text-[11px] text-neutral-500 font-mono truncate">QC: {item.qcChallans.map((c: any) => c.challanNumber).join(', ')}</p>
+                      )}
+                    </Link>
+                  ))}
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setSelectedOrderForUpdate(null)}
-                  className="p-1.5 text-slate-400 hover:text-slate-700 rounded-md"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="p-6 space-y-4 text-xs">
-                {updateError && (
-                  <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg text-rose-800 text-xs flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                    <span>{updateError}</span>
-                  </div>
-                )}
-
-                {/* QUANTITY RECONCILIATION SUMMARY BOX */}
-                <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl grid grid-cols-3 gap-3 text-center">
-                  <div>
-                    <span className="text-[10px] text-slate-500 font-bold uppercase block">Required Total</span>
-                    <span className="font-mono font-bold text-slate-900 text-base">
-                      {selectedOrderForUpdate.requiredQuantity}
-                    </span>
-                    <span className="text-[10px] text-slate-400 block">{selectedOrderForUpdate.uom}</span>
-                  </div>
-                  <div className="border-x border-slate-200 px-2">
-                    <span className="text-[10px] text-amber-700 font-bold uppercase block">Remaining Undyed</span>
-                    <span className="font-mono font-bold text-amber-800 text-base">
-                      {Math.max(0, selectedOrderForUpdate.requiredQuantity - Number(updateForm.dyedQuantity || 0))}
-                    </span>
-                    <span className="text-[10px] text-slate-400 block">{selectedOrderForUpdate.uom}</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-blue-700 font-bold uppercase block">Ready for Dyeing QC</span>
-                    <span className="font-mono font-bold text-blue-800 text-base">
-                      {Math.max(0, Number(updateForm.dyedQuantity || 0) - selectedOrderForUpdate.sentToDyeingQcQuantity)}
-                    </span>
-                    <span className="text-[10px] text-slate-400 block">{selectedOrderForUpdate.uom}</span>
-                  </div>
-                </div>
-
-                {/* FORM INPUTS */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
-                      Dyed Quantity ({selectedOrderForUpdate.uom}) *
-                    </label>
-                    <input
-                      type="number"
-                      step="any"
-                      min="0"
-                      required
-                      value={updateForm.dyedQuantity}
-                      onChange={(e) => setUpdateForm({ ...updateForm, dyedQuantity: Number(e.target.value) })}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg font-mono font-bold text-sm text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-lavender-800"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
-                      Dyed Color *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={updateForm.dyedColor}
-                      onChange={(e) => setUpdateForm({ ...updateForm, dyedColor: e.target.value })}
-                      placeholder=""
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-lavender-800"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
-                      Dyeing Incharge
-                    </label>
-                    <input
-                      type="text"
-                      value={updateForm.inchargeName}
-                      onChange={(e) => setUpdateForm({ ...updateForm, inchargeName: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-medium text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-lavender-800"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
-                      Workflow Status
-                    </label>
-                    <select
-                      value={updateForm.status}
-                      onChange={(e) => setUpdateForm({ ...updateForm, status: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-lavender-800"
-                    >
-                      <option value="IN_DYEING">IN DYEING</option>
-                      <option value="PARTIALLY_DYED">PARTIALLY DYED</option>
-                      <option value="DYED">DYED</option>
-                      <option value="READY_FOR_DYEING_QC">READY FOR Dyeing QC</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
-                      Machine Number
-                    </label>
-                    <input
-                      type="text"
-                      value={updateForm.machineNumber}
-                      onChange={(e) => setUpdateForm({ ...updateForm, machineNumber: e.target.value })}
-                      placeholder=""
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-lavender-800"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
-                      Batch / Lot Number
-                    </label>
-                    <input
-                      type="text"
-                      value={updateForm.batchNumber}
-                      onChange={(e) => setUpdateForm({ ...updateForm, batchNumber: e.target.value })}
-                      placeholder=""
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-lavender-800"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
-                    Process Remarks / Observation
-                  </label>
-                  <textarea
-                    rows={2}
-                    value={updateForm.processRemarks}
-                    onChange={(e) => setUpdateForm({ ...updateForm, processRemarks: e.target.value })}
-                    placeholder=""
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-lavender-800"
-                  />
-                </div>
-              </div>
-
-              <div className="px-6 py-3.5 border-t border-slate-200 bg-slate-50 flex items-center justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setSelectedOrderForUpdate(null)}
-                  className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-xs font-semibold hover:bg-slate-100 transition"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={updating}
-                  className="px-5 py-2 bg-lavender-800 hover:bg-lavender-900 text-white rounded-lg text-xs font-semibold transition disabled:opacity-50 inline-flex items-center gap-1.5"
-                >
-                  {updating ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
-                  <span>Save Production Progress</span>
-                </button>
-              </div>
-            </form>
-          </div>
+              </section>
+            );
+          })}
         </div>
-      )}
-
-      {/* ISSUE CHALLAN MODAL */}
-      {selectedOrderForChallan && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <form onSubmit={handleChallanSubmit}>
-              <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center">
-                    <Send className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-bold text-slate-900">
-                      Issue Material Challan to Dyeing QC
-                    </h3>
-                    <p className="text-xs text-slate-500 font-mono">
-                      Order: {selectedOrderForChallan.orderNumber} · {selectedOrderForChallan.fabricName}
-                    </p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setSelectedOrderForChallan(null)}
-                  className="p-1.5 text-slate-400 hover:text-slate-700 rounded-md"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="p-6 space-y-4 text-xs">
-                {challanError && (
-                  <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg text-rose-800 text-xs flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                    <span>{challanError}</span>
-                  </div>
-                )}
-
-                {/* TRANSFER SUMMARY */}
-                <div className="p-3.5 bg-blue-50/60 border border-blue-200 rounded-xl space-y-2">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-bold text-blue-900">Transfer Route:</span>
-                    <span className="font-mono font-bold text-blue-950 bg-white px-2 py-0.5 rounded border border-blue-200">
-                      DYEING → Dyeing QC
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2 text-center pt-2 border-t border-blue-200/60">
-                    <div>
-                      <span className="text-[10px] text-slate-500 block uppercase">Dyed Total</span>
-                      <span className="font-mono font-bold text-slate-900 text-sm">
-                        {selectedOrderForChallan.dyedQuantity} {selectedOrderForChallan.uom}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-500 block uppercase">Already Sent</span>
-                      <span className="font-mono font-bold text-slate-600 text-sm">
-                        {selectedOrderForChallan.sentToDyeingQcQuantity} {selectedOrderForChallan.uom}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-emerald-700 font-bold block uppercase">Available Now</span>
-                      <span className="font-mono font-bold text-emerald-800 text-sm">
-                        {Math.max(0, selectedOrderForChallan.dyedQuantity - selectedOrderForChallan.sentToDyeingQcQuantity)} {selectedOrderForChallan.uom}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <ChallanNumberInput
-                  value={challanNumber}
-                  onChange={(value) => {
-                    setChallanNumber(value);
-                    setChallanNumberError(null);
-                  }}
-                  error={challanNumberError}
-                  disabled={issuingChallan}
-                />
-
-                {/* QUANTITY TO SEND INPUT */}
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="text-[11px] font-bold uppercase text-slate-700">
-                      Dispatch Quantity ({selectedOrderForChallan.uom}) *
-                    </label>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const avail = Math.max(0, selectedOrderForChallan.dyedQuantity - selectedOrderForChallan.sentToDyeingQcQuantity);
-                        setChallanForm({ ...challanForm, quantityToSend: avail });
-                      }}
-                      className="text-[11px] font-bold text-lavender-800 hover:underline"
-                    >
-                      Fill Max Available ({Math.max(0, selectedOrderForChallan.dyedQuantity - selectedOrderForChallan.sentToDyeingQcQuantity)} {selectedOrderForChallan.uom})
-                    </button>
-                  </div>
-                  <input
-                    type="number"
-                    step="any"
-                    min="0.01"
-                    max={Math.max(0, selectedOrderForChallan.dyedQuantity - selectedOrderForChallan.sentToDyeingQcQuantity)}
-                    required
-                    value={challanForm.quantityToSend}
-                    onChange={(e) => setChallanForm({ ...challanForm, quantityToSend: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg font-mono font-bold text-base text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-lavender-600"
-                  />
-                </div>
-
-                {/* COLOR & LOGISTICS */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
-                      Dyed Color
-                    </label>
-                    <input
-                      type="text"
-                      value={challanForm.color}
-                      onChange={(e) => setChallanForm({ ...challanForm, color: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-semibold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-lavender-800"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
-                      Vehicle / Cart No. (Optional)
-                    </label>
-                    <input
-                      type="text"
-                      value={challanForm.vehicleNumber}
-                      onChange={(e) => setChallanForm({ ...challanForm, vehicleNumber: e.target.value })}
-                      placeholder=""
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-lavender-800"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
-                    Dispatch Remarks &amp; QC Instructions
-                  </label>
-                  <textarea
-                    rows={2}
-                    value={challanForm.remarks}
-                    onChange={(e) => setChallanForm({ ...challanForm, remarks: e.target.value })}
-                    placeholder=""
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-lavender-800"
-                  />
-                </div>
-              </div>
-
-              <div className="px-6 py-3.5 border-t border-slate-200 bg-slate-50 flex items-center justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setSelectedOrderForChallan(null)}
-                  className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-xs font-semibold hover:bg-slate-100 transition"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={issuingChallan}
-                  className="px-5 py-2 bg-lavender-700 hover:bg-lavender-800 text-white rounded-lg text-xs font-semibold transition disabled:opacity-50 inline-flex items-center gap-1.5 shadow-xs"
-                >
-                  {issuingChallan ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-                  <span>Generate &amp; Issue Challan to Dyeing QC</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      </main>
     </div>
   );
 }

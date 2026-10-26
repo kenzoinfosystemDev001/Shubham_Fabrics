@@ -6,69 +6,37 @@ const getBaseUrl = () => {
 
 const API_BASE_URL = getBaseUrl();
 
+// Every department sidebar refreshes the signed-in profile when the page changes; within this
+// window they share one request instead of each navigation asking the server again.
+const PROFILE_REUSE_MS = 60_000;
+let profileRequest: { at: number; promise: Promise<any> } | null = null;
+
 class ApiClient {
-  private token: string | null = null;
-
-  setToken(token: string) {
-    this.token = token;
-    if (typeof window !== 'undefined') {
-      sessionStorage.setItem('mes_auth_token', token);
-      localStorage.setItem('subham_mes_token', token);
-    }
+  /**
+   * The session lives in an httpOnly cookie set by /api/auth/login, so the browser never
+   * holds the token itself. A stored user profile only means "show the signed-in UI".
+   */
+  hasSession(): boolean {
+    if (typeof window === 'undefined') return false;
+    return Boolean(localStorage.getItem('subham_mes_user'));
   }
 
-  getToken(): string | null {
-    if (this.token) return this.token;
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('subham_mes_token') || sessionStorage.getItem('mes_auth_token');
-      if (stored) {
-        this.token = stored;
-        return stored;
-      }
-    }
-    return null;
-  }
-
+  /** Signs out: clears the server session cookie and any locally cached profile. */
   clearToken() {
-    this.token = null;
+    profileRequest = null;
     if (typeof window !== 'undefined') {
+      fetch('/api/auth/logout', { method: 'POST', keepalive: true }).catch(() => {});
       sessionStorage.removeItem('mes_auth_token');
       localStorage.removeItem('subham_mes_token');
       localStorage.removeItem('subham_mes_user');
     }
   }
 
-  async ensureValidToken(): Promise<string> {
-    const existing = this.getToken();
-    return existing || '';
-  }
-
   private async request<T>(endpoint: string, options: RequestInit & { timeoutMs?: number } = {}): Promise<T> {
-    const token = this.getToken();
-
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       ...(options.headers as Record<string, string>),
     };
-
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    if (typeof window !== 'undefined') {
-      try {
-        const rawUser = localStorage.getItem('subham_mes_user');
-        if (rawUser) {
-          const u = JSON.parse(rawUser);
-          if (u.departmentCode && !headers['x-user-department']) {
-            headers['x-user-department'] = u.departmentCode;
-          }
-          if (u.role && !headers['x-user-role']) {
-            headers['x-user-role'] = u.role;
-          }
-        }
-      } catch {}
-    }
 
     const url = `${API_BASE_URL}${endpoint}`;
     
@@ -92,6 +60,12 @@ class ApiClient {
       clearTimeout(timer);
 
       if (!res.ok) {
+        if (res.status === 401 && typeof window !== 'undefined' && endpoint !== '/auth/login') {
+          localStorage.removeItem('subham_mes_user');
+          if (window.location.pathname !== '/login') {
+            window.location.assign(`/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+          }
+        }
         let errorMessage = `HTTP ${res.status} ${res.statusText}`;
         try {
           const errorBody = await res.json();
@@ -114,267 +88,23 @@ class ApiClient {
 
   // Auth
   async login(credentials: { usernameOrEmail: string; password: string }) {
-    try {
-      const res = await this.request<{ accessToken: string; user: any }>('/auth/login', {
-        method: 'POST',
-        body: JSON.stringify(credentials),
-      });
-      this.setToken(res.accessToken);
-      return res;
-    } catch (networkOrApiError: any) {
-      // Offline / Demo Fallback Mode
-      // When backend is cold-starting on Render free tier, or NEXT_PUBLIC_API_URL is pending in Vercel,
-      // allow instant sign-in for standard factory personas so the application never hangs on "Signing in..."
-      const u = credentials.usernameOrEmail.toLowerCase().trim();
-      const p = credentials.password.trim();
-
-      const DEMO_PERSONAS: Record<string, any> = {
-        program: {
-          id: 'usr-prog-001',
-          username: 'program',
-          fullName: 'Programming Department',
-          email: 'program@subhamfabrics.com',
-          role: 'PROGRAMMER',
-          roles: ['PROGRAMMING_INCHARGE', 'PROGRAMMER'],
-          permissions: ['programs.*', 'challans.create', 'challans.issue'],
-          departmentCode: 'PROGRAMMING',
-          defaultRedirect: '/',
-          validPins: ['1234', '1111', '0000', 'admin@12345'],
-        },
-        programmer: {
-          id: 'usr-prog-001',
-          username: 'programmer',
-          fullName: 'Programming Department',
-          email: 'program@subhamfabrics.com',
-          role: 'PROGRAMMER',
-          roles: ['PROGRAMMING_INCHARGE', 'PROGRAMMER'],
-          permissions: ['programs.*', 'challans.create', 'challans.issue'],
-          departmentCode: 'PROGRAMMING',
-          defaultRedirect: '/',
-          validPins: ['1234', '1111', '0000', 'admin@12345'],
-        },
-        store: {
-          id: 'usr-store-001',
-          username: 'store',
-          fullName: 'Fabric Store Department',
-          email: 'store@subhamfabrics.com',
-          role: 'FABRIC_STORE',
-          roles: ['FABRIC_STORE', 'STORE_MANAGER'],
-          permissions: ['store.*', 'inventory.*', 'challans.receive', 'challans.issue'],
-          departmentCode: 'STORE',
-          defaultRedirect: '/fabric-store',
-          validPins: ['1234', '1111', '0000', 'admin@12345'],
-        },
-        admin: {
-          id: 'usr-admin-001',
-          username: 'admin',
-          fullName: 'System Administrator',
-          email: 'admin@subhamfabrics.com',
-          role: 'ADMIN',
-          roles: ['ADMIN', 'SUPER_ADMIN'],
-          permissions: ['*'],
-          departmentCode: 'ADMIN',
-          defaultRedirect: '/admin',
-          validPins: ['1234', 'Admin@12345', 'admin@12345', '1111', 'admin'],
-        },
-        prod_manager: {
-          id: 'usr-pm-001',
-          username: 'prod_manager',
-          fullName: 'Production Manager',
-          email: 'pm@subhamfabrics.com',
-          role: 'PRODUCTION_MANAGER',
-          roles: ['PRODUCTION_MANAGER', 'USER'],
-          permissions: ['programs.create', 'programs.approve', 'challan.*', 'production.*'],
-          departmentCode: 'CUTTING',
-          validPins: ['Admin@12345', 'admin@12345', '1234'],
-        },
-        qc_insp: {
-          id: 'usr-qc-001',
-          username: 'qc_insp',
-          fullName: 'Quality Inspector',
-          email: 'qc@subhamfabrics.com',
-          role: 'QC_INSPECTOR',
-          roles: ['QC_INSPECTOR', 'USER'],
-          permissions: ['quality.inspect', 'defects.create', 'defects.review'],
-          departmentCode: 'DYEING_QC',
-          defaultRedirect: '/dyeing-qc',
-          validPins: ['Admin@12345', 'admin@12345', '1234'],
-        },
-        qc1: {
-          id: 'usr-qc-002',
-          username: 'qc1',
-          fullName: 'Dyeing QC Inspector',
-          email: 'qc1@subhamfabrics.com',
-          role: 'QC_INSPECTOR',
-          roles: ['QC_INSPECTOR', 'USER'],
-          permissions: ['quality.inspect', 'defects.create', 'defects.review'],
-          departmentCode: 'DYEING_QC',
-          defaultRedirect: '/dyeing-qc',
-          validPins: ['Admin@12345', 'admin@12345', '1234', '1111', '0000'],
-        },
-        dyeing: {
-          id: 'usr-dye-001',
-          username: 'dyeing',
-          fullName: 'Dyeing Incharge',
-          email: 'dyeing@subhamfabrics.com',
-          role: 'DYEING_INCHARGE',
-          roles: ['DYEING_INCHARGE', 'USER'],
-          permissions: ['dyeing.*', 'challans.receive', 'challans.issue'],
-          departmentCode: 'DYEING',
-          defaultRedirect: '/dyeing',
-          validPins: ['Admin@12345', 'admin@12345', '1234', '1111', '0000'],
-        },
-        embroidery: {
-          id: 'usr-emb-001',
-          username: 'embroidery',
-          fullName: 'Embroidery Incharge',
-          email: 'embroidery@subhamfabrics.com',
-          role: 'EMBROIDERY_INCHARGE',
-          roles: ['EMBROIDERY_INCHARGE', 'USER'],
-          permissions: ['embroidery.*', 'challans.receive', 'production.*'],
-          departmentCode: 'EMBROIDERY',
-          defaultRedirect: '/embroidery',
-          validPins: ['Admin@12345', 'admin@12345', '1234', '1111', '0000'],
-        },
-        cutting: {
-          id: 'usr-cut-001',
-          username: 'cutting',
-          fullName: 'Thread Cutting Incharge',
-          email: 'cutting@subhamfabrics.com',
-          role: 'THREAD_CUTTING_INCHARGE',
-          roles: ['THREAD_CUTTING_INCHARGE', 'USER'],
-          permissions: ['cutting.*', 'challans.receive', 'challans.issue'],
-          departmentCode: 'THREAD_CUTTING',
-          defaultRedirect: '/thread-cutting',
-          validPins: ['Admin@12345', 'admin@12345', '1234', '1111', '0000'],
-        },
-        qc2: {
-          id: 'usr-qc2-001',
-          username: 'qc2',
-          fullName: 'Threadcut QC Inspector',
-          email: 'qc2@subhamfabrics.com',
-          role: 'THREADCUT_QC_INSPECTOR',
-          roles: ['THREADCUT_QC_INSPECTOR', 'QC_INSPECTOR', 'USER'],
-          permissions: ['quality.inspect', 'defects.create', 'defects.review', 'challans.receive', 'challans.issue'],
-          departmentCode: 'THREADCUT_QC',
-          defaultRedirect: '/threadcut-qc',
-          validPins: ['Admin@12345', 'admin@12345', '1234', '1111', '0000'],
-        },
-        washing: {
-          id: 'usr-wash-001',
-          username: 'washing',
-          fullName: 'Washing Incharge',
-          email: 'washing@subhamfabrics.com',
-          role: 'WASHING_INCHARGE',
-          roles: ['WASHING_INCHARGE', 'USER'],
-          permissions: ['washing.*', 'challans.receive', 'challans.issue'],
-          departmentCode: 'WASHING',
-          defaultRedirect: '/washing',
-          validPins: ['Admin@12345', 'admin@12345', '1234', '1111', '0000'],
-        },
-        qcwashing: {
-          id: 'usr-qcw-001',
-          username: 'qcwashing',
-          fullName: 'Washing QC Inspector',
-          email: 'qcwashing@subhamfabrics.com',
-          role: 'WASHING_QC_INSPECTOR',
-          roles: ['WASHING_QC_INSPECTOR', 'QC_INSPECTOR', 'USER'],
-          permissions: ['quality.inspect', 'defects.create', 'defects.review', 'challans.receive', 'challans.issue'],
-          departmentCode: 'WASHING_QC',
-          defaultRedirect: '/washing-qc',
-          validPins: ['Admin@12345', 'admin@12345', '1234', '1111', '0000'],
-        },
-        qc3: {
-          id: 'usr-qcw-002',
-          username: 'qc3',
-          fullName: 'Washing QC Inspector',
-          email: 'qc3@subhamfabrics.com',
-          role: 'WASHING_QC_INSPECTOR',
-          roles: ['WASHING_QC_INSPECTOR', 'QC_INSPECTOR', 'USER'],
-          permissions: ['quality.inspect', 'defects.create', 'defects.review', 'challans.receive', 'challans.issue'],
-          departmentCode: 'WASHING_QC',
-          defaultRedirect: '/washing-qc',
-          validPins: ['Admin@12345', 'admin@12345', '1234', '1111', '0000'],
-        },
-        qc_washing: {
-          id: 'usr-qcw-003',
-          username: 'qc_washing',
-          fullName: 'Washing QC Inspector',
-          email: 'qc_washing@subhamfabrics.com',
-          role: 'WASHING_QC_INSPECTOR',
-          roles: ['WASHING_QC_INSPECTOR', 'QC_INSPECTOR', 'USER'],
-          permissions: ['quality.inspect', 'defects.create', 'defects.review', 'challans.receive', 'challans.issue'],
-          departmentCode: 'WASHING_QC',
-          defaultRedirect: '/washing-qc',
-          validPins: ['Admin@12345', 'admin@12345', '1234', '1111', '0000'],
-        },
-        recutting: {
-          id: 'usr-rec-001',
-          username: 'recutting',
-          fullName: 'Recutting Incharge',
-          email: 'recutting@subhamfabrics.com',
-          role: 'RECUTTING_SUPERVISOR',
-          roles: ['RECUTTING_SUPERVISOR', 'USER'],
-          permissions: ['cutting.*', 'production.*', 'challans.receive', 'challans.issue'],
-          departmentCode: 'RECUTTING',
-          defaultRedirect: '/recutting',
-          validPins: ['Admin@12345', 'admin@12345', '1234', '1111', '0000'],
-        },
-      };
-
-      const persona = DEMO_PERSONAS[u];
-      const isPinMatch = persona && (
-        persona.validPins.includes(p) ||
-        persona.validPins.includes(p.toLowerCase()) ||
-        p === '1234'
-      );
-
-      if (persona && isPinMatch) {
-        const demoToken = `demo_token_${u}_${Date.now()}`;
-        this.setToken(demoToken);
-        const { validPins, ...userData } = persona;
-        return {
-          accessToken: demoToken,
-          user: userData,
-        };
-      }
-
-      throw new Error(
-        networkOrApiError.message ||
-        'Invalid username or PIN. Please use jitender with PIN 1234 or admin with Admin@12345'
-      );
-    }
+    profileRequest = null;
+    return this.request<{ user: any }>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(credentials),
+    });
   }
 
   async getProfile() {
-    try {
-      return await this.request<any>('/auth/me');
-    } catch {
-      if (typeof window !== 'undefined') {
-        const saved = localStorage.getItem('subham_mes_user');
-        if (saved) return JSON.parse(saved);
-      }
-      return {
-        id: 'usr-jitender-001',
-        username: 'jitender',
-        fullName: 'jitender saini',
-        role: 'STORE_MANAGER',
-        departmentCode: 'STORE',
-      };
+    if (!profileRequest || Date.now() - profileRequest.at > PROFILE_REUSE_MS) {
+      const promise = this.request<any>('/auth/me');
+      profileRequest = { at: Date.now(), promise };
+      // A failed request is not reused.
+      promise.catch(() => {
+        if (profileRequest?.promise === promise) profileRequest = null;
+      });
     }
-  }
-
-  async getUsers() {
-    try {
-      return await this.request<any[]>('/auth/users');
-    } catch {
-      return [
-        { id: '1', username: 'admin', fullName: 'System Administrator', role: 'SUPER_ADMIN', departmentCode: 'CENTRAL', isActive: true },
-        { id: '2', username: 'jitender', fullName: 'jitender saini', role: 'STORE_MANAGER', departmentCode: 'STORE', isActive: true },
-        { id: '3', username: 'prod_manager', fullName: 'Production Manager', role: 'PRODUCTION_MANAGER', departmentCode: 'CUTTING', isActive: true },
-        { id: '4', username: 'qc_insp', fullName: 'Quality Inspector', role: 'QC_INSPECTOR', departmentCode: 'DYEING_QC', isActive: true },
-      ];
-    }
+    return profileRequest.promise;
   }
 
   // Dashboard
@@ -401,11 +131,8 @@ class ApiClient {
 
   // Programs & Production Sheets
   async getNextProgramNumber() {
-    try {
-      return await this.request<{ nextNumber: string }>('/programs/next-number');
-    } catch {
-      return { nextNumber: `PRG-${new Date().getFullYear()}-00001` };
-    }
+    // No invented fallback: a guessed number could duplicate an existing Production Sheet.
+    return this.request<{ nextNumber: string }>('/programs/next-number');
   }
 
   async getPrograms(params?: { status?: string; search?: string }) {

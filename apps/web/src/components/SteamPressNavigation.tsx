@@ -4,21 +4,15 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  LayoutDashboard,
-  Kanban,
   LogOut,
   Menu,
   X,
-  Wind,
-  Send,
-  ArrowDownLeft,
-  BarChart3,
-  CheckCircle,
+  Wind
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { isAdminUser } from '@/lib/rbac';
 import { DepartmentSwitcher } from '@/components/DepartmentSwitcher';
-import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
+import { SidebarDepartmentArt } from '@/components/SidebarDepartmentArt';
 import { InstallAppButton } from '@/components/InstallAppButton';
 
 export function SteamPressNavigation() {
@@ -45,7 +39,7 @@ export function SteamPressNavigation() {
     }
     const syncUser = async () => {
       try {
-        if (api.getToken()) {
+        if (api.hasSession()) {
           const profile = await api.getProfile();
           if (profile) {
             setCurrentUser(profile);
@@ -80,26 +74,26 @@ export function SteamPressNavigation() {
     const active = exact ? pathname === href : pathname === href || pathname.startsWith(href + '/');
     return `flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition ${
       active
-        ? 'bg-ink-800 text-white border-l-2 border-lavender-400 pl-2.5 shadow-xs'
-        : 'text-slate-300 hover:bg-slate-800/60 hover:text-white'
+        ? 'bg-brand-50 text-brand-800 border-l-2 border-brand-500 pl-2.5'
+        : 'text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900'
     }`;
   };
 
   return (
     <>
       {/* MOBILE TOP BAR (visible on screens < md) */}
-      <div className="md:hidden sticky top-0 z-40 bg-ink-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between shadow-sm">
+      <div className="md:hidden sticky top-0 z-40 bg-white border-b border-neutral-200 px-4 py-3 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setMobileOpen(true)}
-            className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition"
+            className="p-1.5 rounded-lg text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 transition"
             aria-label="Open Steam Press Navigation Menu"
           >
             <Menu className="w-6 h-6" />
           </button>
 
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-white p-0.5 border border-lavender-500/40 flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-white p-0.5 border border-neutral-200 flex items-center justify-center shrink-0">
               <img
                 src="/shubham-logo.jpg"
                 alt="Shubham Fabrics Logo"
@@ -107,8 +101,8 @@ export function SteamPressNavigation() {
               />
             </div>
             <div>
-              <span className="text-xs font-bold text-white tracking-wide block leading-none">SHUBHAM FABRICS</span>
-              <span className="text-[9px] font-bold text-lavender-400 tracking-wider uppercase block">STEAM PRESS & IRONING</span>
+              <span className="text-xs font-bold text-neutral-900 tracking-wide block leading-none">SHUBHAM FABRICS</span>
+              <span className="text-[9px] font-bold text-brand-700 tracking-wider uppercase block">STEAM PRESS & IRONING</span>
             </div>
           </div>
         </div>
@@ -117,7 +111,7 @@ export function SteamPressNavigation() {
           <InstallAppButton variant="nav" />
           <button
             onClick={handleSignOut}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-cyan-400 hover:bg-slate-800 transition"
+            className="p-1.5 rounded-lg text-neutral-500 hover:text-brand-700 hover:bg-neutral-100 transition"
             title="Sign Out"
           >
             <LogOut className="w-4 h-4" />
@@ -129,26 +123,23 @@ export function SteamPressNavigation() {
       {mobileOpen && (
         <div
           onClick={() => setMobileOpen(false)}
-          className="md:hidden fixed inset-0 bg-black/60 backdrop-blur-xs z-50 transition-opacity"
+          className="md:hidden fixed inset-0 bg-neutral-900/60 z-50 transition-opacity"
         />
       )}
 
       {/* SIDEBAR ASIDE */}
       <aside
-        style={{
-          backgroundImage: `linear-gradient(to bottom, rgba(37, 35, 42, 0.40), rgba(24, 22, 28, 0.60)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-        }}
-        className={`fixed inset-y-0 left-0 z-50 w-72 md:w-64 text-slate-100 flex flex-col border-r border-slate-700/80 select-none transform transition-transform duration-300 ease-in-out shadow-2xl backdrop-blur-xs ${
+        className={`bg-white fixed inset-y-0 left-0 z-50 w-72 md:w-64 text-neutral-900 flex flex-col border-r border-neutral-200 select-none transform transition-transform duration-300 ease-in-out ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
+        {/* SIDEBAR TEXTILE BACKGROUND (one image for all departments, Admin > Sidebar Image) */}
+        <SidebarDepartmentArt />
+
         {/* BRANDING */}
-        <div className="p-4 border-b border-slate-700/60 bg-slate-950/40 backdrop-blur-sm flex items-center justify-between">
+        <div className="p-4 border-b border-neutral-200 bg-white flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-white p-0.5 border border-lavender-500/40 flex items-center justify-center shadow-sm overflow-hidden shrink-0">
+            <div className="w-10 h-10 rounded-lg bg-white p-0.5 border border-neutral-200 flex items-center justify-center shadow-sm overflow-hidden shrink-0">
               <img
                 src="/shubham-logo.jpg"
                 alt="Shubham Fabrics Logo"
@@ -156,21 +147,21 @@ export function SteamPressNavigation() {
               />
             </div>
             <div className="min-w-0">
-              <span className="text-xs font-bold tracking-[0.14em] text-white truncate block">SHUBHAM FABRICS</span>
-              <span className="text-[10px] font-medium tracking-[0.18em] text-lavender-400 block truncate">STEAM PRESS & IRONING</span>
+              <span className="text-xs font-bold tracking-[0.14em] text-neutral-900 truncate block">SHUBHAM FABRICS</span>
+              <span className="text-[10px] font-medium tracking-[0.18em] text-brand-700 block truncate">STEAM PRESS & IRONING</span>
             </div>
           </div>
 
           <button
             onClick={() => setMobileOpen(false)}
-            className="md:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            className="md:hidden p-1.5 rounded-lg text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 transition"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* DEPARTMENT TITLE & WORKSPACE SWITCHER */}
-        <div className="relative px-3 pt-3 pb-2.5 border-b border-slate-700/60 bg-slate-950/20 backdrop-blur-xs">
+        <div className="relative px-3 pt-3 pb-2.5 border-b border-neutral-200 bg-white [&:not(:has(button))]:hidden">
           <div className="relative z-10">
             <DepartmentSwitcher
               currentDepartmentName="Steam Pressing"
@@ -188,86 +179,107 @@ export function SteamPressNavigation() {
             onClick={() => setMobileOpen(false)}
             className={linkClass('/steam-press', true)}
           >
-            <LayoutDashboard className="w-4 h-4 text-lavender-400" />
             <span>Dashboard</span>
           </Link>
 
           {/* 2. Incoming Challans */}
           <Link
-            href="/steam-press/incoming"
+            href="/steam-press/my-work/incoming"
             onClick={() => setMobileOpen(false)}
-            className={linkClass('/steam-press/incoming', false)}
+            className={linkClass('/steam-press/my-work/incoming', false)}
           >
-            <ArrowDownLeft className="w-4 h-4 text-amber-400" />
-            <span>Incoming (Finishing)</span>
+            <span>Incoming Challans</span>
           </Link>
 
-          {/* 3. My Work / Steam Press Floor */}
+          {/* 3. Received Production */}
           <Link
-            href="/steam-press/my-work"
+            href="/steam-press/my-work/received"
             onClick={() => setMobileOpen(false)}
-            className={linkClass('/steam-press/my-work', false)}
+            className={linkClass('/steam-press/my-work/received', false)}
           >
-            <Wind className="w-4 h-4 text-lavender-400" />
-            <span>Pressing Floor</span>
+            <span>Received Production</span>
           </Link>
 
-          {/* 4. Issue Challan / Final QC Handover */}
+          {/* 4. Steam Press Processing */}
           <Link
-            href="/steam-press/issue-challan"
+            href="/steam-press/my-work/process"
             onClick={() => setMobileOpen(false)}
-            className={linkClass('/steam-press/issue-challan', false)}
+            className={linkClass('/steam-press/my-work/process', false)}
           >
-            <Send className="w-4 h-4 text-emerald-400" />
-            <span>Issue Challan (Final QC)</span>
+            <span>Steam Press Processing</span>
           </Link>
 
-          {/* 5. Floor Board */}
+          {/* 5. Ready for Final QC */}
+          <Link
+            href="/steam-press/my-work/issue-challan"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/steam-press/my-work/issue-challan', false)}
+          >
+            <span>Ready for Final QC</span>
+          </Link>
+
+          {/* 6. Outgoing Challans */}
+          <Link
+            href="/steam-press/my-work/outgoing"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/steam-press/my-work/outgoing', false)}
+          >
+            <span>Outgoing Challans</span>
+          </Link>
+
+          {/* 7. Processing History */}
+          <Link
+            href="/steam-press/history"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/steam-press/history', false)}
+          >
+            <span>Processing History</span>
+          </Link>
+
+          {/* 8. Department Defective Shelf */}
+          <Link
+            href="/steam-press/my-work/defective"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/steam-press/my-work/defective', false)}
+          >
+            <span>Department Defective Shelf</span>
+          </Link>
+
+          {/* 9. Floor Board */}
           <Link
             href="/steam-press/floor-board"
             onClick={() => setMobileOpen(false)}
             className={linkClass('/steam-press/floor-board', true)}
           >
-            <Kanban className="w-4 h-4 text-blue-400" />
             <span>Floor Board</span>
-          </Link>
-
-          {/* 6. Reports & Analytics */}
-          <Link
-            href="/steam-press/reports"
-            onClick={() => setMobileOpen(false)}
-            className={linkClass('/steam-press/reports', false)}
-          >
-            <BarChart3 className="w-4 h-4 text-purple-400" />
-            <span>Yield & Defects</span>
           </Link>
         </nav>
 
         {/* FOOTER USER STATUS */}
-        <div className="p-3 border-t border-slate-700/60 bg-slate-950/40 backdrop-blur-sm">
+        <div className="p-3 border-t border-neutral-200 bg-white/75 backdrop-blur-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-full bg-lavender-500/20 border border-lavender-400/40 flex items-center justify-center shrink-0">
-                <Wind className="w-4 h-4 text-lavender-300" />
+              <div className="w-8 h-8 rounded-full bg-brand-50 border border-neutral-200 flex items-center justify-center shrink-0">
+                <Wind className="w-4 h-4 shrink-0" />
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-semibold text-white truncate">
+                <p className="text-xs font-semibold text-neutral-900 truncate">
                   {currentUser?.fullName || 'Steam Press Incharge'}
                 </p>
-                <p className="text-[10px] text-lavender-400 font-mono tracking-tight truncate">
+                <p className="text-[10px] text-brand-700 font-mono tracking-tight truncate">
                   {currentUser?.role || 'STEAM_PRESS_SUPERVISOR'}
                 </p>
               </div>
             </div>
 
-            <button
-              onClick={handleSignOut}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"
-              title="Sign Out"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
           </div>
+          <button
+            onClick={handleSignOut}
+            className="mt-3 w-full flex items-center justify-center gap-2 px-3 py-2 bg-white hover:bg-danger-50 hover:text-danger-800 hover:border-danger-500/60 border border-neutral-200 rounded-lg text-xs text-neutral-900 transition shadow-xs"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Sign Out</span>
+          </button>
         </div>
       </aside>
     </>

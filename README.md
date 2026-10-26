@@ -10,27 +10,27 @@ A real, database-backed, secure, traceable, enterprise Manufacturing Execution S
 PROGRAM FILE (PRG-YYYY-NNNN)
    │
    ▼
-[ STORE ] ──(CH-STR)──► [ DYEING ] ──(CH-DYE)──► [ DYEING QC ] ──(CH-EMB-DQC)──► [ EMBROIDERY ]
-                                                                                      │
-   ┌──────────────────────────────────────────────────────────────────────────────────┘
+[ STORE ] ──(CH-STR)──► [ DYEING ] ──(CH-DYE)──► [ QC1 (4-Point) ]
+                                                        │
+   ┌────────────────────────────────────────────────────┘
    ▼
-[ THREAD CUTTING ] ──(CH-THC)──► [ THREADCUT QC ] ──(CH-WASH-TQC)──► [ WASHING ]
+[ CUTTING ] ──(CH-CUT)──► [ EMBROIDERY ] ──(CH-EMB)──► [ THREAD CUTTING ]
+                                                              │
+   ┌──────────────────────────────────────────────────────────┘
+   ▼
+[ WASHING ] ──(CH-WSH)──► [ QC2 (Wash/Shrinkage) ] ──(CH-QC2)──► [ RECUTTING (if defect) ]
+                                                                        │
+   ┌────────────────────────────────────────────────────────────────────┘
+   ▼
+[ STITCHING ] ──(CH-STC)──► [ QC3 (Inline/End-Line) ] ──(CH-QC3)──► [ FINISHING ]
                                                                          │
    ┌─────────────────────────────────────────────────────────────────────┘
    ▼
-[ WASHING QC ] ──(CH-RECUT-WQC)──► [ RECUTTING ] ──► [ STITCHING ] ──(CH-STC)──► [ FINISHING ]
-                                                                                      │
-   ┌──────────────────────────────────────────────────────────────────────────────────┘
-   ▼
-[ BUTTON & ATTACHMENTS ] ──(CH-BTN)──► [ STEAM PRESS ] ──(CH-PRS)──► [ FINAL QC ] ──► [ PACKING ]
-                                                                                         │
-   ┌─────────────────────────────────────────────────────────────────────────────────────┘
+[ BUTTON & ATTACHMENTS ] ──(CH-BTN)──► [ STEAM PRESS ] ──(CH-PRS)──► [ PACKING ]
+                                                                         │
+   ┌─────────────────────────────────────────────────────────────────────┘
    ▼
 [ FINISHED GOODS WAREHOUSE ] ──(CH-FG)──► [ DISPATCH GATE ]
-
-Every QC gate (Dyeing QC, Threadcut QC, Washing QC, Final QC) decides PASS (forward to the next
-configured department), REJECT (department defective shelf, reason required) or REWORK (return to
-the department on the incoming challan, reason required).
 ```
 
 ---
@@ -84,73 +84,3 @@ Subham_Fabrics/
 └── docs/
     ├── architecture/        # Architecture Decision Records (ADRs)
     └── workflows/           # SOP-01, SOP-02, SOP-03
-```
-
----
-
-## 🚀 Quick Start Guide
-
-### 1. Install Dependencies
-```bash
-npm install
-```
-
-### 2. Database Sync & Seed
-```bash
-# Push schema to database
-npm run db:push
-
-# Seed factory departments, users, sample order (PRG-2026-0001), rolls, challans & logs
-npm run db:seed
-
-# Existing databases only: rename the legacy QC1/QC2/QC3/QCWASHING/FINAL_CHECK department
-# and role codes to DYEING_QC/THREADCUT_QC/WASHING_QC/FINAL_QC. Run before deploying a build
-# that uses the new codes. Safe to re-run.
-npm run db:migrate-qc -- --dry-run   # preview, then roll back
-npm run db:migrate-qc
-```
-
-### 3. Run Test Suite
-```bash
-npm run test --workspace=@subham/api
-```
-
-### 4. Start Development Servers
-```bash
-# Terminal 1: Backend API Gateway (http://localhost:3001/api)
-npm run dev:api
-
-# Terminal 2: Web Operational Portal (http://localhost:3000)
-npm run dev:web
-```
-
----
-
-## 👥 Default Operator Credentials (Seeded)
-
-| Persona / Station | Username | Password | Role |
-| :--- | :--- | :--- | :--- |
-| **Director / System Admin** | `admin` | `Admin@12345` | `SUPER_ADMIN` |
-| **VP Production** | `prod_manager` | `Admin@12345` | `PRODUCTION_MANAGER` |
-| **Store Supervisor** | `store_sup` | `Admin@12345` | `STORE_SUPERVISOR` |
-| **Cutting Master** | `cut_sup` | `Admin@12345` | `CUTTING_SUPERVISOR` |
-| **Stitching Supervisor** | `stitch_sup` | `Admin@12345` | `STITCHING_SUPERVISOR` |
-| **Senior QA Inspector** | `qc_insp` | `Admin@12345` | `QC_INSPECTOR` |
-| **Finishing Head** | `finish_sup` | `Admin@12345` | `FINISHING_SUPERVISOR` |
-| **Packing Supervisor** | `pack_sup` | `Admin@12345` | `PACKING_SUPERVISOR` |
-| **Dispatch Manager** | `dispatch_mgr` | `Admin@12345` | `DISPATCH_MANAGER` |
-
----
-
-## 🐳 Production Container Deployment
-
-```bash
-cd infrastructure/docker
-docker compose up -d --build
-```
-This launches:
-- **PostgreSQL 16**: Port 5432
-- **Redis 7**: Port 6379
-- **NestJS API**: Port 3001
-- **Next.js Web**: Port 3000
-- **Nginx Reverse Proxy**: Port 80

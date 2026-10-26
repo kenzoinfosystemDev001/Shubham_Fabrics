@@ -1,20 +1,16 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
-import { auditAdminAction, readReason, reasonRequiredResponse, requireAdmin } from '@/lib/admin-auth';
 import bcrypt from 'bcryptjs';
+import { destructiveAdminActionsDisabled, requireUser } from '@/lib/auth/require-user';
+import { randomBytes } from 'crypto';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
-  const auth = await requireAdmin(request);
-  if (!auth.actor) return auth.response;
-  const body = await request.json().catch(() => ({}));
-  // Irreversible bulk wipe: the admin must type the confirmation phrase and give a reason.
-  if (String(body?.confirm || '').trim() !== 'CLEAR ALL FACTORY DATA') {
-    return NextResponse.json({ error: 'Type "CLEAR ALL FACTORY DATA" to confirm.', field: 'confirm' }, { status: 400 });
-  }
-  const reason = readReason(body);
-  if (!reason) return reasonRequiredResponse();
+  const { user: authUser, response: authResponse } = await requireUser(request, { admin: true });
+  if (!authUser) return authResponse;
+  const disabledResponse = destructiveAdminActionsDisabled();
+  if (disabledResponse) return disabledResponse;
   try {
     await prisma.$transaction(
       async (tx) => {
@@ -40,9 +36,7 @@ export async function POST(request: Request) {
         await tx.stockLedgerEntry.deleteMany({});
 
         // 4. Clear Dyeing Orders
-        // Deadline alerts reference challans and programs; clear them with the data they describe.
-        await tx.deadlineAlertDismissal.deleteMany({});
-        await tx.deadlineAlert.deleteMany({});
+        await tx.departmentWorkItem.deleteMany({});
         await tx.dyeingOrder.deleteMany({});
 
         // 5. Clear Challans & Events (break genealogy first)
@@ -63,28 +57,20 @@ export async function POST(request: Request) {
 
         // 7. Clear Attachments & Audit Logs
         await tx.attachment.deleteMany({});
+        await tx.auditLog.deleteMany({});
 
         // 8. Ensure Core RBAC Users & Departments are intact
-        const hashedPin = await bcrypt.hash('1234', 10);
+        // Core users that have to be recreated get an unguessable PIN; an administrator must set a real one.
+        const unusablePin = await bcrypt.hash(randomBytes(32).toString('hex'), 10);
 
         const departments = [
           { code: 'ADMIN', name: 'Administration', sequenceOrder: 0 },
           { code: 'PROGRAMMING', name: 'Programming Department', sequenceOrder: 1 },
           { code: 'STORE', name: 'Fabric Store Department', sequenceOrder: 2 },
           { code: 'DYEING', name: 'Dyeing Department', sequenceOrder: 3 },
-          { code: 'DYEING_QC', name: 'Dyeing QC', sequenceOrder: 4 },
-          { code: 'EMBROIDERY', name: 'Embroidery Department', sequenceOrder: 5 },
-          { code: 'THREAD_CUTTING', name: 'Thread Cutting Department', sequenceOrder: 6 },
-          { code: 'THREADCUT_QC', name: 'Threadcut QC', sequenceOrder: 7 },
-          { code: 'WASHING', name: 'Washing Department', sequenceOrder: 8 },
-          { code: 'WASHING_QC', name: 'Washing QC', sequenceOrder: 9 },
-          { code: 'RECUTTING', name: 'Recutting Department', sequenceOrder: 10 },
-          { code: 'STITCHING', name: 'Stitching & Assembly', sequenceOrder: 11 },
-          { code: 'FINISHING', name: 'Finishing Department', sequenceOrder: 12 },
-          { code: 'STEAM_PRESS', name: 'Steam Press Department', sequenceOrder: 13 },
-          { code: 'FINAL_QC', name: 'Final QC', sequenceOrder: 14 },
-          { code: 'PACKING', name: 'Packing Department', sequenceOrder: 15 },
-          { code: 'DISPATCH', name: 'Dispatch Department', sequenceOrder: 16 },
+          { code: 'EMBROIDERY', name: 'Embroidery Department', sequenceOrder: 4 },
+          { code: 'QC1', name: 'Quality Control 1', sequenceOrder: 5 },
+          { code: 'FINISHING', name: 'Finishing & Packing', sequenceOrder: 6 },
         ];
 
         for (const d of departments) {
@@ -125,7 +111,7 @@ export async function POST(request: Request) {
                 username: u.username,
                 fullName: u.fullName,
                 email: u.email,
-                passwordHash: hashedPin,
+                passwordHash: unusablePin,
                 departmentCode: u.dept,
                 isActive: true,
               },
@@ -140,15 +126,12 @@ export async function POST(request: Request) {
             await tx.user.update({
               where: { id: existing.id },
               data: {
-                passwordHash: hashedPin,
                 departmentCode: u.dept,
                 isActive: true,
               },
             });
           }
         }
-
-        await auditAdminAction(request, auth.actor.id, 'FACTORY_DATA_CLEARED', 'System', 'FACTORY_DATA_CLEARED', { after: { reason } }, tx);
       },
       { maxWait: 20000, timeout: 60000 }
     );

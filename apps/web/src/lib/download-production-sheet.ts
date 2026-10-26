@@ -5,7 +5,7 @@
  * Implements the authentic factory floor traveler specification sheet
  * layout (Production Sheet format) with sub-style averages and multi-color breakdown grid.
  */
-import { getCurrentUser, canViewClientCode } from '@/lib/rbac';
+import { getCurrentUser, canViewClientCode, isAdminUser, isProgrammingUser } from '@/lib/rbac';
 import { loadProgramDocument } from '@/lib/program-document';
 
 export interface SubStyleAverage {
@@ -166,6 +166,39 @@ export function getSwatchColorHex(name?: string, fallback?: string): string {
 
 export type GarmentCategory = 'TOP' | 'BOTTOM' | 'DUPATTA' | 'OTHER' | (string & {});
 
+function programMeta(program: any): any {
+  if (!program?.metadataJson) return null;
+  try {
+    return typeof program.metadataJson === 'string' ? JSON.parse(program.metadataJson) : program.metadataJson;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * The Production Sheets of one production, in the order they were created: the components
+ * Programming forwarded to the floor (any number: TOP, BOTTOM, DUPATTA, custom styles). Older
+ * records without a forwarding list use their enabled components; a production with no component
+ * data is the single TOP sheet. `withUnforwarded` adds enabled sheets that were not forwarded.
+ */
+export function productionSheetCategories(program: any, { withUnforwarded = false } = {}): GarmentCategory[] {
+  const meta = programMeta(program);
+  const components = meta?.components && typeof meta.components === 'object' ? meta.components : null;
+  if (!components || Object.keys(components).length === 0) return ['TOP'];
+  const enabled = Object.keys(components).filter((k) => components[k]?.enabled !== false);
+  const list: string[] | null = Array.isArray(meta.forwardedComponents) ? meta.forwardedComponents : null;
+  const forwarded = enabled.filter((k) => (list ? list.includes(k) : components[k]?.forwarded !== false));
+  const base = forwarded.length > 0 ? forwarded : enabled;
+  const all = withUnforwarded ? [...base, ...enabled.filter((k) => !base.includes(k))] : base;
+  return all.length > 0 ? all : ['TOP'];
+}
+
+/** The sheets the signed-in user may open: forwarded ones, plus unforwarded drafts for Programming and Admin. */
+export function productionSheetCategoriesForViewer(program: any): GarmentCategory[] {
+  const user = typeof window !== 'undefined' ? getCurrentUser() : null;
+  return productionSheetCategories(program, { withUnforwarded: isProgrammingUser(user) || isAdminUser(user) });
+}
+
 function escapeHtmlText(value: string): string {
   return value.replace(/[&<>"']/g, (character) => {
     switch (character) {
@@ -222,28 +255,6 @@ export const DEFAULT_DUPATTA_SUB_STYLES: SubStyleAverage[] = [
   { name: 'LACE', average: '' },
   { name: 'TASSEL', average: '' },
 ];
-
-/**
- * The component sheets (TOP / BOTTOM / DUPATTA / ...) that Programming forwarded with
- * this production. Only these are shown to downstream departments; a legacy sheet
- * without component metadata is a single TOP sheet.
- */
-export function getForwardedSheetCategories(program: any): GarmentCategory[] {
-  let meta: any = null;
-  if (program?.metadataJson) {
-    try {
-      meta = typeof program.metadataJson === 'string' ? JSON.parse(program.metadataJson) : program.metadataJson;
-    } catch {}
-  }
-  if (Array.isArray(meta?.forwardedComponents) && meta.forwardedComponents.length > 0) {
-    return Array.from(new Set<GarmentCategory>(meta.forwardedComponents.map((c: unknown) => String(c))));
-  }
-  if (meta?.components && typeof meta.components === 'object') {
-    const enabled = Object.keys(meta.components).filter((c) => meta.components[c]?.enabled !== false);
-    if (enabled.length > 0) return enabled;
-  }
-  return ['TOP'];
-}
 
 export function getDefaultSubStylesForCategory(category: GarmentCategory): SubStyleAverage[] {
   if (category === 'BOTTOM') return DEFAULT_BOTTOM_SUB_STYLES.map(s => ({ ...s }));
@@ -302,7 +313,7 @@ export function extractSubStylesAndGrid(program: any, category: GarmentCategory 
       if (comp) {
         isEnabled = comp.enabled !== false;
         isForwarded = comp.forwarded !== false || forwardedComponents.includes(category);
-        topName = String(comp.styleName || (category === 'OTHER' ? 'INPUT' : category)).trim();
+        if (comp.styleName) topName = comp.styleName;
         if (comp.pattern) pattern = comp.pattern;
         if (comp.fabricName) fabricName = comp.fabricName;
         if (comp.fabricWidth) fabricWidth = comp.fabricWidth;
@@ -332,13 +343,6 @@ export function extractSubStylesAndGrid(program: any, category: GarmentCategory 
         if (meta?.note) noteText = meta.note;
       }
     } catch {}
-  }
-
-  // Older sheets saved the design number as the style when no style name was entered.
-  // In that case, show the component category, matching the production sheet form.
-  const designNumber = String(program.designNumber || program.designName || '').trim();
-  if (topName.trim() && designNumber && topName.trim().toLowerCase() === designNumber.toLowerCase()) {
-    topName = category === 'OTHER' ? 'INPUT' : category;
   }
 
   // Fallback for subStylesWithAverages if not found
@@ -451,14 +455,20 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
     ? new Date(program.startDate || program.programDate).toLocaleDateString('en-GB') 
     : new Date().toLocaleDateString('en-GB');
 
-  const targetCategories: GarmentCategory[] = category === 'ALL'
-    ? getForwardedSheetCategories(program)
-    : [category];
+  let meta: any = null;
+  if (program.metadataJson) {
+    try {
+      meta = typeof program.metadataJson === 'string' ? JSON.parse(program.metadataJson) : program.metadataJson;
+    } catch {}
+  }
+
+  // ALL: every Production Sheet of the production, one after another (as many as it has).
+  const targetCategories: GarmentCategory[] = category === 'ALL' ? productionSheetCategories(program) : [category];
 
   const categoryName = category === 'TOP' || category === 'BOTTOM' || category === 'DUPATTA'
     ? category
     : extractSubStylesAndGrid(program, category).topName.trim() || 'INPUT';
-  const categoryLabel = category === 'ALL' ? 'All Forwarded Components' : categoryName;
+  const categoryLabel = category === 'ALL' ? 'All Production Sheets' : categoryName;
   const safeCategoryLabel = escapeHtmlText(categoryLabel);
   const safeFilenameCategory = categoryLabel.replace(/[^a-z0-9_-]+/gi, '_');
 
@@ -683,7 +693,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
               ${swatches.length > 0
                 ? swatches.map((s) => `
                   <div class="swatch-card">
-                    <div class="fabric-swatch" style="background-color: ${s.color || '#E5E1E8'};">
+                    <div class="fabric-swatch" style="background-color: ${s.color || '#e2e8f0'};">
                       <span class="swatch-staple"></span>
                     </div>
                     ${s.name ? `<span class="swatch-name" title="${s.name}">${s.name}</span>` : ''}
@@ -743,7 +753,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       print-color-adjust: exact !important;
     }
     body {
-      background-color: #F1EFF4;
+      background-color: #f1f5f9;
       color: #000000;
       font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
       font-size: 11px;
@@ -756,7 +766,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #25232A;
+      background: #111827;
       color: #ffffff;
       padding: 8px 16px;
       border-radius: 6px;
@@ -775,11 +785,11 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       transition: opacity 0.15s;
     }
     .btn-primary {
-      background: #7D44A8;
+      background: #2563eb;
       color: #ffffff;
     }
     .btn-outline {
-      background: #423F48;
+      background: #374151;
       color: #ffffff;
     }
     .btn:hover {
@@ -1033,7 +1043,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       font-size: 11px;
     }
     .size-total {
-      color: #465300;
+      color: #047857;
       font-size: 9px;
       font-weight: 900;
       margin-top: 2px;
@@ -1042,7 +1052,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       height: 28px;
       border: 1.5px solid #000000;
       padding: 3.5px 3px;
-      background: #F1EFF4;
+      background: #f1f5f9;
       font-weight: 900;
     }
     .grid-total-details {
@@ -1050,7 +1060,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
     }
     .grid-total-details span + span {
       margin-left: 12px;
-      color: #57545E;
+      color: #475569;
       font-size: 9px;
       font-style: italic;
     }
@@ -1074,7 +1084,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
     }
     .note-content {
       font-size: 11px;
-      color: #302D35;
+      color: #1f2937;
       margin-bottom: 10px;
       min-height: 18px;
     }
@@ -1087,7 +1097,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       font-size: 11px;
       font-weight: 900;
       letter-spacing: 0.04em;
-      color: #4F2C6B;
+      color: #1e3a8a;
       text-transform: uppercase;
       margin-bottom: 6px;
     }
@@ -1117,24 +1127,24 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       transform: translate(-50%, -50%);
       width: 14px;
       height: 2px;
-      background-color: #423F48;
+      background-color: #334155;
       border-radius: 1px;
       box-shadow: 0 1px 1px rgba(0,0,0,0.4);
     }
     .swatch-empty-box {
       width: 44px;
       height: 44px;
-      border: 1.5px dashed #6B6872;
+      border: 1.5px dashed #64748b;
       position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: #F8F7FA;
+      background-color: #f8fafc;
     }
     .swatch-name {
       font-size: 8.5px;
       font-weight: 700;
-      color: #423F48;
+      color: #334155;
       text-align: center;
       max-width: 55px;
       white-space: nowrap;
@@ -1194,13 +1204,13 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
     </div>
     <div style="display: flex; gap: 8px;">
       <button class="btn btn-primary" onclick="window.print()">
-        🖨️ Print ${safeCategoryLabel} Sheet (A4)
+        Print ${safeCategoryLabel} Sheet (A4)
       </button>
-      <button class="btn btn-primary" style="background: #423F48;" onclick="window.downloadSelf()">
-        💾 Download ${safeCategoryLabel} Sheet
+      <button class="btn btn-primary" style="background: #8e55c4;" onclick="window.downloadSelf()">
+        Download ${safeCategoryLabel} Sheet
       </button>
       <button class="btn btn-outline" onclick="window.close()">
-        ✕ Close
+        Close
       </button>
     </div>
   </div>
@@ -1236,7 +1246,7 @@ export async function downloadProductionSheetHtml(program: any, category: Garmen
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Production_Sheet_${category}_${serialNo}.html`;
+    a.download = `Production_Sheet${category === 'ALL' ? 's_All' : `_${String(category).replace(/[^a-z0-9_-]+/gi, '_')}`}_${serialNo}.html`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

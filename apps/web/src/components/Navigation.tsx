@@ -3,17 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { 
-  LayoutDashboard, 
-  Briefcase, 
-  FilePlus, 
-  Send, 
-  Kanban, 
-  ChevronDown, 
-  ChevronRight, 
-  LogOut, 
+import {
+  ChevronDown,
+  ChevronRight,
+  LogOut,
   UserCircle,
-  Building2,
   Menu,
   X,
   History
@@ -21,7 +15,7 @@ import {
 import { api } from '@/lib/api';
 import { isAdminUser, isProgrammingUser } from '@/lib/rbac';
 import { DepartmentSwitcher } from '@/components/DepartmentSwitcher';
-import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
+import { SidebarDepartmentArt } from '@/components/SidebarDepartmentArt';
 
 export function Navigation() {
   const pathname = usePathname();
@@ -49,7 +43,7 @@ export function Navigation() {
 
     const syncUser = async () => {
       try {
-        if (api.getToken()) {
+        if (api.hasSession()) {
           const profile = await api.getProfile();
           if (profile) {
             setCurrentUser(profile);
@@ -88,17 +82,21 @@ export function Navigation() {
     pathname.startsWith('/fabric-store') ||
     pathname.startsWith('/admin') ||
     pathname.startsWith('/dyeing') ||
-    pathname.startsWith('/dyeing-qc') ||
+    pathname.startsWith('/qc1') ||
     pathname.startsWith('/embroidery') ||
     pathname.startsWith('/thread-cutting') ||
-    pathname.startsWith('/threadcut-qc') ||
+    pathname.startsWith('/qc2') ||
     pathname.startsWith('/washing') ||
-    pathname.startsWith('/washing-qc') ||
+    pathname.startsWith('/qcwashing') ||
+    pathname.startsWith('/qc3') ||
+    pathname.startsWith('/qc-washing') ||
     pathname.startsWith('/recutting') ||
     pathname.startsWith('/stitching') ||
     pathname.startsWith('/finishing') ||
     pathname.startsWith('/steam-press') ||
-    pathname.startsWith('/final-qc')
+    pathname.startsWith('/final-check') ||
+    pathname.startsWith('/inventory') ||
+    pathname.startsWith('/packing')
   ) {
     return null;
   }
@@ -118,17 +116,17 @@ export function Navigation() {
   return (
     <>
       {/* MOBILE TOP BAR (visible on screens < md) */}
-      <div className="md:hidden sticky top-0 z-40 bg-ink-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between shadow-sm">
+      <div className="md:hidden sticky top-0 z-40 bg-white border-b border-neutral-200 px-4 py-3 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setMobileOpen(true)}
-            className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition"
+            className="p-1.5 rounded-lg text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 transition"
             aria-label="Open Navigation Menu"
           >
             <Menu className="w-6 h-6" />
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-white p-0.5 border border-lavender-500/40 flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-white p-0.5 border border-neutral-200 flex items-center justify-center shrink-0">
               <img
                 src="/shubham-logo.jpg"
                 alt="Shubham Fabrics"
@@ -136,15 +134,15 @@ export function Navigation() {
               />
             </div>
             <div>
-              <span className="text-xs font-bold text-white tracking-wide block leading-none">SHUBHAM FABRICS</span>
-              <span className="text-[9px] font-bold text-lavender-400 tracking-wider uppercase block">PROGRAMMING</span>
+              <span className="text-xs font-bold text-neutral-900 tracking-wide block leading-none">SHUBHAM FABRICS</span>
+              <span className="text-[9px] font-bold text-brand-700 tracking-wider uppercase block">PROGRAMMING</span>
             </div>
           </div>
         </div>
 
         <button
           onClick={handleSignOut}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition"
+          className="p-1.5 rounded-lg text-neutral-500 hover:text-danger-600 hover:bg-neutral-100 transition"
           title="Sign Out"
         >
           <LogOut className="w-4 h-4" />
@@ -155,26 +153,23 @@ export function Navigation() {
       {mobileOpen && (
         <div
           onClick={() => setMobileOpen(false)}
-          className="md:hidden fixed inset-0 bg-black/60 backdrop-blur-xs z-50 transition-opacity"
+          className="md:hidden fixed inset-0 bg-neutral-900/60 z-50 transition-opacity"
         />
       )}
 
       {/* SIDEBAR ASIDE (responsive drawer on mobile, fixed w-64 on md+) */}
       <aside
-        style={{
-          backgroundImage: `linear-gradient(to bottom, rgba(37, 35, 42, 0.40), rgba(24, 22, 28, 0.60)), url('${DEPARTMENT_NAV_BG_IMAGE}')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-        }}
-        className={`fixed inset-y-0 left-0 z-50 w-72 md:w-64 text-slate-100 flex flex-col border-r border-slate-700/80 select-none transform transition-transform duration-300 ease-in-out shadow-2xl backdrop-blur-xs ${
+        className={`bg-white fixed inset-y-0 left-0 z-50 w-72 md:w-64 text-neutral-900 flex flex-col border-r border-neutral-200 select-none transform transition-transform duration-300 ease-in-out ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
+        {/* SIDEBAR TEXTILE BACKGROUND (one image for all departments, Admin > Sidebar Image) */}
+        <SidebarDepartmentArt />
+
         {/* BRANDING HEADER WITH OFFICIAL IMG 3 LOGO */}
-        <div className="p-4 border-b border-slate-700/60 bg-slate-950/40 backdrop-blur-sm flex items-center justify-between">
+        <div className="p-4 border-b border-neutral-200 bg-white flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-white p-0.5 border border-lavender-500/40 flex items-center justify-center shadow-sm overflow-hidden shrink-0">
+            <div className="w-10 h-10 rounded-lg bg-white p-0.5 border border-neutral-200 flex items-center justify-center shadow-sm overflow-hidden shrink-0">
               <img
                 src="/shubham-logo.jpg"
                 alt="Shubham Fabrics Logo"
@@ -182,11 +177,8 @@ export function Navigation() {
               />
             </div>
             <div className="min-w-0">
-              <span className="text-xs font-bold tracking-[0.14em] text-white truncate block">
+              <span className="text-xs font-bold tracking-[0.14em] text-neutral-900 truncate block">
                 SHUBHAM FABRICS
-              </span>
-              <span className="text-[10px] font-medium tracking-[0.18em] text-lavender-400 block truncate">
-                MES ENTERPRISE
               </span>
             </div>
           </div>
@@ -194,14 +186,14 @@ export function Navigation() {
           {/* Close button on mobile */}
           <button
             onClick={() => setMobileOpen(false)}
-            className="md:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            className="md:hidden p-1.5 rounded-lg text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 transition"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* DEPARTMENT TITLE & WORKSPACE SWITCHER */}
-        <div className="relative px-3 pt-3 pb-2.5 border-b border-slate-700/60 bg-slate-950/20 backdrop-blur-xs">
+        <div className="relative px-3 pt-3 pb-2.5 border-b border-neutral-200 bg-white [&:not(:has(button))]:hidden">
           <div className="relative z-10">
             <DepartmentSwitcher
               currentDepartmentName="Programming Department"
@@ -219,11 +211,10 @@ export function Navigation() {
             onClick={() => setMobileOpen(false)}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition ${
               isDashboardActive
-                ? 'bg-lavender-500/25 text-white border-l-2 border-lavender-400 pl-2.5 shadow-sm backdrop-blur-xs'
-                : 'text-slate-200 hover:bg-white/10 hover:text-white'
+                ? 'bg-accent-400/25 text-neutral-900 border-l-2 border-accent-500 pl-2.5 shadow-sm'
+                : 'text-neutral-900 hover:bg-neutral-100 hover:text-neutral-900'
             }`}
           >
-            <LayoutDashboard className="w-4 h-4 text-slate-400" />
             <span>Dashboard</span>
           </Link>
 
@@ -233,34 +224,32 @@ export function Navigation() {
               onClick={() => setMyWorkOpen(!myWorkOpen)}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold cursor-pointer transition ${
                 isMyWorkRootActive || isCreateSheetActive || isIssueChallanActive
-                  ? 'text-white'
-                  : 'text-slate-300 hover:bg-slate-800/60 hover:text-white'
+                  ? 'text-neutral-900'
+                  : 'text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900'
               }`}
             >
               <div className="flex items-center gap-3">
-                <Briefcase className="w-4 h-4 text-slate-400" />
                 <span>My Work</span>
               </div>
               {myWorkOpen ? (
-                <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                <ChevronDown className="w-3.5 h-3.5 text-neutral-500" />
               ) : (
-                <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                <ChevronRight className="w-3.5 h-3.5 text-neutral-500" />
               )}
             </div>
 
             {/* Sub-menu items */}
             {myWorkOpen && (
-              <div className="ml-4 pl-3 border-l border-slate-700/80 my-1 space-y-1">
+              <div className="ml-4 pl-3 border-l border-neutral-200 my-1 space-y-1">
                 <Link
                   href="/my-work/create-production-sheet"
                   onClick={() => setMobileOpen(false)}
                   className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[11px] font-medium transition ${
                     isCreateSheetActive
-                      ? 'bg-ink-800 text-white border-l-2 border-lavender-400 pl-2 shadow-xs'
-                      : 'text-slate-400 hover:bg-slate-800/50 hover:text-white'
+                      ? 'bg-brand-50 text-brand-800 border-l-2 border-brand-500 pl-2'
+                      : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900'
                   }`}
                 >
-                  <FilePlus className="w-3.5 h-3.5 text-lavender-400/80" />
                   <span>Create Production Sheet</span>
                 </Link>
 
@@ -269,11 +258,10 @@ export function Navigation() {
                   onClick={() => setMobileOpen(false)}
                   className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[11px] font-medium transition ${
                     isIssueChallanActive
-                      ? 'bg-ink-800 text-white border-l-2 border-lavender-400 pl-2 shadow-xs'
-                      : 'text-slate-400 hover:bg-slate-800/50 hover:text-white'
+                      ? 'bg-brand-50 text-brand-800 border-l-2 border-brand-500 pl-2'
+                      : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900'
                   }`}
                 >
-                  <Send className="w-3.5 h-3.5 text-blue-400" />
                   <span>Issue Challan</span>
                 </Link>
               </div>
@@ -286,11 +274,10 @@ export function Navigation() {
             onClick={() => setMobileOpen(false)}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition ${
               isHistoryActive
-                ? 'bg-ink-800 text-white border-l-2 border-lavender-400 pl-2.5 shadow-xs'
-                : 'text-slate-300 hover:bg-slate-800/60 hover:text-white'
+                ? 'bg-brand-50 text-brand-800 border-l-2 border-brand-500 pl-2.5'
+                : 'text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900'
             }`}
           >
-            <History className="w-4 h-4 text-lavender-400/90" />
             <span>Production History</span>
           </Link>
 
@@ -300,24 +287,23 @@ export function Navigation() {
             onClick={() => setMobileOpen(false)}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition ${
               isFloorBoardActive
-                ? 'bg-ink-800 text-white border-l-2 border-lavender-400 pl-2.5 shadow-xs'
-                : 'text-slate-300 hover:bg-slate-800/60 hover:text-white'
+                ? 'bg-brand-50 text-brand-800 border-l-2 border-brand-500 pl-2.5'
+                : 'text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900'
             }`}
           >
-            <Kanban className="w-4 h-4 text-slate-400" />
             <span>Floor Board</span>
           </Link>
         </nav>
 
         {/* USER & SIGN OUT FOOTER */}
-        <div className="p-4 border-t border-slate-700/60 bg-slate-950/50 backdrop-blur-md">
+        <div className="p-4 border-t border-neutral-200 bg-white/75 backdrop-blur-sm">
           <div className="flex items-center gap-3 mb-3">
-            <UserCircle className="w-8 h-8 text-lavender-400/90" />
+            <UserCircle className="w-8 h-8 text-brand-700" />
             <div className="flex-1 min-w-0">
-              <span className="text-xs font-semibold text-white truncate block drop-shadow-xs">
+              <span className="text-xs font-semibold text-neutral-900 truncate block drop-shadow-xs">
                 {currentUser.fullName || (isAdmin ? 'System Administrator' : 'Programming Incharge')}
               </span>
-              <span className="text-[10px] text-lavender-400 font-bold tracking-wide block truncate drop-shadow-xs">
+              <span className="text-[10px] text-brand-700 font-bold tracking-wide block truncate drop-shadow-xs">
                 Programming Department
               </span>
             </div>
@@ -326,7 +312,7 @@ export function Navigation() {
 
           <button
             onClick={handleSignOut}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-slate-900/70 hover:bg-rose-950/50 hover:text-rose-200 hover:border-rose-700/60 border border-slate-700/60 rounded-lg text-xs text-slate-200 transition shadow-xs"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-white hover:bg-danger-50 hover:text-danger-800 hover:border-danger-500/60 border border-neutral-200 rounded-lg text-xs text-neutral-900 transition shadow-xs"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Sign Out</span>

@@ -2,7 +2,7 @@
 
 ## 1. Executive Summary
 The Finishing Department is the critical post-assembly manufacturing stage in the Shubham Fabrics MES pipeline. It follows Garment Stitching (`STITCHING`) and precedes secondary embellishment, button attachment, or final pressing and packing:
-$$\text{Washing QC} \longrightarrow \text{Recutting (RECUTTING)} \longrightarrow \text{Stitching (STITCHING)} \longrightarrow \text{Finishing (FINISHING)} \longrightarrow \text{Next Configured Department (BUTTON\_ATTACHMENT / PACKING)}$$
+$$\text{QC Washing (QC3)} \longrightarrow \text{Recutting (RECUTTING)} \longrightarrow \text{Stitching (STITCHING)} \longrightarrow \text{Finishing (FINISHING)} \longrightarrow \text{Next Configured Department (BUTTON\_ATTACHMENT / PACKING)}$$
 
 ## 2. Upstream Integration Points
 1. **Source Department:** `STITCHING` (Stitching & Assembly Section).
@@ -11,7 +11,7 @@ $$\text{Washing QC} \longrightarrow \text{Recutting (RECUTTING)} \longrightarrow
 4. **Physical Transfer Material:** Stitched garments assembled from precision-cut embroidered components.
 
 ## 3. Core Capabilities Discovered in Codebase
-- **Standard Factory Route:** In `@subham/config`, `STANDARD_FACTORY_ROUTE` specifies `... RECUTTING -> STITCHING -> FINISHING -> BUTTON_ATTACHMENT -> STEAM_PRESS -> FINAL_QC -> PACKING -> FINISHED_GOODS -> DISPATCH`.
+- **Standard Factory Route:** In `@subham/config`, `STANDARD_FACTORY_ROUTE` specifies `... RECUTTING -> STITCHING -> FINISHING -> BUTTON_ATTACHMENT -> STEAM_PRESS -> FINAL_CHECK -> PACKING -> FINISHED_GOODS -> DISPATCH`.
 - **Department Label:** `DepartmentCode.FINISHING` maps to `'Finishing & Thread Trimming'`.
 - **Existing Models:**
   - `Challan` & `ChallanItem`: Tracks physical transfer between departments.

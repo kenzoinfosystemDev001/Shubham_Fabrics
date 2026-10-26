@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
-import { requireAdmin } from '@/lib/admin-auth';
+import { requireUser } from '@/lib/auth/require-user';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
-  const auth = await requireAdmin(request);
-  if (!auth.actor) return auth.response;
+  const { user: authUser, response: authResponse } = await requireUser(request, { admin: true });
+  if (!authUser) return authResponse;
   try {
     const [rolls, batches, totalStockAggr] = await Promise.all([
       prisma.fabricStoreRoll.findMany({
