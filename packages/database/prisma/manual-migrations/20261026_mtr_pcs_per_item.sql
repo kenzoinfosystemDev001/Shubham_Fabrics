@@ -6,11 +6,12 @@
 -- - DefectRecord.quantity INTEGER -> DOUBLE PRECISION, so meter defects such as 2.5 MTR are not rounded.
 --   Widening keeps every existing value exactly.
 -- Apply with: npx prisma db execute --schema prisma/schema.prisma --file prisma/manual-migrations/20261026_mtr_pcs_per_item.sql
+-- Re-runnable (IF NOT EXISTS; widening an already DOUBLE PRECISION column is a no-op).
 -- Requires approval for the shared Neon DB.
 
 -- AlterTable
-ALTER TABLE "Challan" ADD COLUMN     "defectiveUnit" TEXT;
+ALTER TABLE "Challan" ADD COLUMN IF NOT EXISTS "defectiveUnit" TEXT;
 
 -- AlterTable
-ALTER TABLE "DefectRecord" ADD COLUMN     "uom" TEXT,
+ALTER TABLE "DefectRecord" ADD COLUMN IF NOT EXISTS "uom" TEXT,
 ALTER COLUMN "quantity" SET DATA TYPE DOUBLE PRECISION;
