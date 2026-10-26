@@ -1190,6 +1190,17 @@ exports.Prisma.FabricInwardScalarFieldEnum = {
   colour: 'colour',
   supplierName: 'supplierName',
   remarks: 'remarks',
+  rollNumber: 'rollNumber',
+  rollKey: 'rollKey',
+  batchNumber: 'batchNumber',
+  shade: 'shade',
+  composition: 'composition',
+  width: 'width',
+  unitRate: 'unitRate',
+  storageLocation: 'storageLocation',
+  purchaseOrderNumber: 'purchaseOrderNumber',
+  importId: 'importId',
+  importRowNumber: 'importRowNumber',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -1213,6 +1224,45 @@ exports.Prisma.FabricOutwardScalarFieldEnum = {
   fabricType: 'fabricType',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.FabricStockImportScalarFieldEnum = {
+  id: 'id',
+  status: 'status',
+  fileName: 'fileName',
+  fileHash: 'fileHash',
+  fileSize: 'fileSize',
+  fileData: 'fileData',
+  sheetsJson: 'sheetsJson',
+  selectedSheet: 'selectedSheet',
+  headerRow: 'headerRow',
+  mappingJson: 'mappingJson',
+  correctionsJson: 'correctionsJson',
+  resolutionsJson: 'resolutionsJson',
+  validationJson: 'validationJson',
+  payloadHash: 'payloadHash',
+  receiptNumber: 'receiptNumber',
+  confirmKey: 'confirmKey',
+  postedAt: 'postedAt',
+  postedById: 'postedById',
+  postedResultJson: 'postedResultJson',
+  failureReason: 'failureReason',
+  uploadedById: 'uploadedById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.FabricStockImportDocumentScalarFieldEnum = {
+  id: 'id',
+  importId: 'importId',
+  kind: 'kind',
+  sheetName: 'sheetName',
+  mimeType: 'mimeType',
+  size: 'size',
+  sha256: 'sha256',
+  data: 'data',
+  ocrStatus: 'ocrStatus',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.DeadlineAlertScalarFieldEnum = {
@@ -1480,6 +1530,8 @@ exports.Prisma.ModelName = {
   WorkItemInspection: 'WorkItemInspection',
   FabricInward: 'FabricInward',
   FabricOutward: 'FabricOutward',
+  FabricStockImport: 'FabricStockImport',
+  FabricStockImportDocument: 'FabricStockImportDocument',
   DeadlineAlert: 'DeadlineAlert',
   DeadlineAlertDismissal: 'DeadlineAlertDismissal',
   PackingAllocation: 'PackingAllocation',

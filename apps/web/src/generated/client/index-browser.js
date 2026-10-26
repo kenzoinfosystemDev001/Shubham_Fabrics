@@ -1190,6 +1190,17 @@ exports.Prisma.FabricInwardScalarFieldEnum = {
   colour: 'colour',
   supplierName: 'supplierName',
   remarks: 'remarks',
+  rollNumber: 'rollNumber',
+  rollKey: 'rollKey',
+  batchNumber: 'batchNumber',
+  shade: 'shade',
+  composition: 'composition',
+  width: 'width',
+  unitRate: 'unitRate',
+  storageLocation: 'storageLocation',
+  purchaseOrderNumber: 'purchaseOrderNumber',
+  importId: 'importId',
+  importRowNumber: 'importRowNumber',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -1213,6 +1224,45 @@ exports.Prisma.FabricOutwardScalarFieldEnum = {
   fabricType: 'fabricType',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.FabricStockImportScalarFieldEnum = {
+  id: 'id',
+  status: 'status',
+  fileName: 'fileName',
+  fileHash: 'fileHash',
+  fileSize: 'fileSize',
+  fileData: 'fileData',
+  sheetsJson: 'sheetsJson',
+  selectedSheet: 'selectedSheet',
+  headerRow: 'headerRow',
+  mappingJson: 'mappingJson',
+  correctionsJson: 'correctionsJson',
+  resolutionsJson: 'resolutionsJson',
+  validationJson: 'validationJson',
+  payloadHash: 'payloadHash',
+  receiptNumber: 'receiptNumber',
+  confirmKey: 'confirmKey',
+  postedAt: 'postedAt',
+  postedById: 'postedById',
+  postedResultJson: 'postedResultJson',
+  failureReason: 'failureReason',
+  uploadedById: 'uploadedById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.FabricStockImportDocumentScalarFieldEnum = {
+  id: 'id',
+  importId: 'importId',
+  kind: 'kind',
+  sheetName: 'sheetName',
+  mimeType: 'mimeType',
+  size: 'size',
+  sha256: 'sha256',
+  data: 'data',
+  ocrStatus: 'ocrStatus',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.DeadlineAlertScalarFieldEnum = {
@@ -1249,6 +1299,72 @@ exports.Prisma.DeadlineAlertDismissalScalarFieldEnum = {
   alertId: 'alertId',
   userId: 'userId',
   dismissedAt: 'dismissedAt'
+};
+
+exports.Prisma.PackingAllocationScalarFieldEnum = {
+  id: 'id',
+  packingNumber: 'packingNumber',
+  workItemId: 'workItemId',
+  quantity: 'quantity',
+  packedQuantity: 'packedQuantity',
+  returnedQuantity: 'returnedQuantity',
+  status: 'status',
+  priority: 'priority',
+  packingDate: 'packingDate',
+  remarks: 'remarks',
+  createdById: 'createdById',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.GarmentImageScalarFieldEnum = {
+  id: 'id',
+  programId: 'programId',
+  garmentCategory: 'garmentCategory',
+  styleRef: 'styleRef',
+  storageProvider: 'storageProvider',
+  storageKey: 'storageKey',
+  imageUrl: 'imageUrl',
+  imageData: 'imageData',
+  mimeType: 'mimeType',
+  fileName: 'fileName',
+  fileSize: 'fileSize',
+  version: 'version',
+  uploadedById: 'uploadedById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.StockImportScalarFieldEnum = {
+  id: 'id',
+  source: 'source',
+  fileName: 'fileName',
+  mimeType: 'mimeType',
+  fileSize: 'fileSize',
+  fileHash: 'fileHash',
+  fileData: 'fileData',
+  status: 'status',
+  extractedJson: 'extractedJson',
+  rowCount: 'rowCount',
+  engine: 'engine',
+  uploadedById: 'uploadedById',
+  uploadedAt: 'uploadedAt',
+  confirmKey: 'confirmKey',
+  confirmedById: 'confirmedById',
+  confirmedAt: 'confirmedAt',
+  confirmedJson: 'confirmedJson',
+  resultJson: 'resultJson',
+  addedCount: 'addedCount',
+  skippedCount: 'skippedCount',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ManualMigrationScalarFieldEnum = {
+  name: 'name',
+  checksum: 'checksum',
+  appliedAt: 'appliedAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -1414,8 +1530,14 @@ exports.Prisma.ModelName = {
   WorkItemInspection: 'WorkItemInspection',
   FabricInward: 'FabricInward',
   FabricOutward: 'FabricOutward',
+  FabricStockImport: 'FabricStockImport',
+  FabricStockImportDocument: 'FabricStockImportDocument',
   DeadlineAlert: 'DeadlineAlert',
-  DeadlineAlertDismissal: 'DeadlineAlertDismissal'
+  DeadlineAlertDismissal: 'DeadlineAlertDismissal',
+  PackingAllocation: 'PackingAllocation',
+  GarmentImage: 'GarmentImage',
+  StockImport: 'StockImport',
+  ManualMigration: 'ManualMigration'
 };
 
 /**

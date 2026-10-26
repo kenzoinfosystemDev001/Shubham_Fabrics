@@ -47,22 +47,26 @@ model User {
   recutsApproved     RecutRequest[]          @relation("RecutApprover")
 
   // Fabric Store back-relations
-  fabricBatchesCreated FabricBatch[]            @relation("FabricBatchCreator")
-  grnReceived          MaterialReceipt[]        @relation("GRNReceiver")
-  fabricRollsInspected FabricStoreRoll[]        @relation("FabricRollQCInspector")
-  fabricQCInspections  FabricQCInspection[]     @relation("FabricQCInspector")
-  fabricLedgerEntries  FabricStockLedger[]      @relation("FabricLedgerTransactor")
-  dyeingOrdersIncharge DyeingOrder[]            @relation("DyeingInchargeUser")
-  dyeingOrdersReceived DyeingOrder[]            @relation("DyeingReceiver")
-  dyeingColorReviews   DyeingOrder[]            @relation("DyeingColorReviewer")
-  dyeingQcTransfers    DyeingQcTransfer[]       @relation("DyeingQcTransferCreator")
-  workItemsReceived    DepartmentWorkItem[]     @relation("WorkItemReceiver")
-  workTransfers        DepartmentWorkTransfer[] @relation("WorkTransferCreator")
-  workInspections      WorkItemInspection[]     @relation("WorkItemInspector")
-  workAllocations      WorkItemAllocation[]     @relation("AllocationCreator")
+  fabricBatchesCreated  FabricBatch[]            @relation("FabricBatchCreator")
+  grnReceived           MaterialReceipt[]        @relation("GRNReceiver")
+  fabricRollsInspected  FabricStoreRoll[]        @relation("FabricRollQCInspector")
+  fabricQCInspections   FabricQCInspection[]     @relation("FabricQCInspector")
+  fabricLedgerEntries   FabricStockLedger[]      @relation("FabricLedgerTransactor")
+  dyeingOrdersIncharge  DyeingOrder[]            @relation("DyeingInchargeUser")
+  dyeingOrdersReceived  DyeingOrder[]            @relation("DyeingReceiver")
+  dyeingColorReviews    DyeingOrder[]            @relation("DyeingColorReviewer")
+  dyeingQcTransfers     DyeingQcTransfer[]       @relation("DyeingQcTransferCreator")
+  workItemsReceived     DepartmentWorkItem[]     @relation("WorkItemReceiver")
+  workTransfers         DepartmentWorkTransfer[] @relation("WorkTransferCreator")
+  workInspections       WorkItemInspection[]     @relation("WorkItemInspector")
+  workAllocations       WorkItemAllocation[]     @relation("AllocationCreator")
+  packingAllocations    PackingAllocation[]      @relation("PackingAllocationCreator")
+  garmentImagesUploaded GarmentImage[]           @relation("GarmentImageUploader")
 
   // Smart Deadline Alerts
-  deadlineAlertDismissals DeadlineAlertDismissal[]
+  deadlineAlertDismissals    DeadlineAlertDismissal[]
+  fabricStockImportsUploaded FabricStockImport[]      @relation("FabricStockImportUploader")
+  fabricStockImportsPosted   FabricStockImport[]      @relation("FabricStockImportPoster")
 
   // Sidebar department images
   departmentImagesUploaded DepartmentImage[] @relation("DepartmentImageUploader")
@@ -478,6 +482,7 @@ model Program {
   dyeingOrders        DyeingOrder[]
   deadlineAlerts      DeadlineAlert[]
   departmentWorkItems DepartmentWorkItem[]
+  garmentImages       GarmentImage[]
 
   @@index([programNumber])
   @@index([status])
@@ -1586,11 +1591,12 @@ model DepartmentWorkItem {
   lastTransferredAt      DateTime?
   remarks                String?
 
-  transfers   DepartmentWorkTransfer[]
-  inspections WorkItemInspection[]
-  allocations WorkItemAllocation[]
-  createdAt   DateTime                 @default(now())
-  updatedAt   DateTime                 @updatedAt
+  transfers          DepartmentWorkTransfer[]
+  inspections        WorkItemInspection[]
+  allocations        WorkItemAllocation[]
+  packingAllocations PackingAllocation[]
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
 
   @@unique([departmentCode, inboundChallanItemId])
   @@index([departmentCode, status])
@@ -1677,24 +1683,38 @@ model WorkItemInspection {
 // ==========================================
 
 model FabricInward {
-  id            String   @id @default(uuid())
-  sNo           Int      @default(autoincrement())
-  entryType     String // "KORA" or "DYED"
-  itemName      String // e.g. "Cotton 60x60 Cambric"
-  billNo        String // Supplier bill / invoice number
-  billDate      DateTime // Bill Date
-  receivingDate DateTime // Date received in store
-  billQty       Float // Quantity
-  unit          String   @default("MTR") // "MTR" or "PCS"; never converted
-  colour        String? // null on entries recorded before colour tracking
-  supplierName  String?
-  remarks       String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                  String             @id @default(uuid())
+  sNo                 Int                @default(autoincrement())
+  entryType           String // "KORA" or "DYED"
+  itemName            String // e.g. "Cotton 60x60 Cambric"
+  billNo              String // Supplier bill / invoice number
+  billDate            DateTime // Bill Date
+  receivingDate       DateTime // Date received in store
+  billQty             Float // Quantity
+  unit                String             @default("MTR") // "MTR" or "PCS"; never converted
+  colour              String? // null on entries recorded before colour tracking
+  supplierName        String?
+  remarks             String?
+  // Roll / commercial details (Excel stock import; null on manual entries)
+  rollNumber          String?
+  rollKey             String?            @unique // normalized supplier + roll number; one roll per supplier
+  batchNumber         String?
+  shade               String?
+  composition         String?
+  width               String?
+  unitRate            Float?
+  storageLocation     String?
+  purchaseOrderNumber String?
+  importId            String?
+  import              FabricStockImport? @relation(fields: [importId], references: [id])
+  importRowNumber     Int? // worksheet row the entry came from
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
 
   @@index([entryType])
   @@index([billNo])
   @@index([receivingDate])
+  @@index([importId])
 }
 
 model FabricOutward {
@@ -1720,6 +1740,61 @@ model FabricOutward {
   @@index([challanNumber])
   @@index([designNumber])
   @@index([date])
+}
+
+// Excel stock inward import. The uploaded workbook is evidence only; stock changes when an
+// authorized user confirms a fully valid import, which creates FabricInward rows and posts them
+// to StockLedgerEntry in one transaction. A posted import is the inward receipt.
+model FabricStockImport {
+  id               String    @id @default(uuid())
+  status           String    @default("UPLOADED") // see lib/fabric-stock-import/state.mjs
+  fileName         String // as uploaded; display only, never used as a path
+  fileHash         String // SHA-256 of the file bytes
+  fileSize         Int
+  fileData         Bytes // original workbook, served only to authorized users
+  sheetsJson       String    @db.Text // cell values of each worksheet, read once at upload
+  selectedSheet    String?
+  headerRow        Int?
+  mappingJson      String?   @db.Text
+  correctionsJson  String?   @db.Text
+  resolutionsJson  String?   @db.Text
+  validationJson   String?   @db.Text
+  payloadHash      String? // hash of the rows the user previewed; confirmation must match it
+  receiptNumber    String?   @unique
+  confirmKey       String?   @unique // idempotency key of the confirmation that posted it
+  postedAt         DateTime?
+  postedById       String?
+  postedBy         User?     @relation("FabricStockImportPoster", fields: [postedById], references: [id])
+  postedResultJson String?   @db.Text
+  failureReason    String?
+  uploadedById     String
+  uploadedBy       User      @relation("FabricStockImportUploader", fields: [uploadedById], references: [id])
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  inwards   FabricInward[]
+  documents FabricStockImportDocument[]
+
+  @@index([fileHash])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// Images embedded in an imported workbook (scanned invoices, delivery challans), kept as evidence.
+model FabricStockImportDocument {
+  id        String            @id @default(uuid())
+  importId  String
+  import    FabricStockImport @relation(fields: [importId], references: [id], onDelete: Cascade)
+  kind      String // EMBEDDED_IMAGE
+  sheetName String?
+  mimeType  String
+  size      Int
+  sha256    String
+  data      Bytes
+  ocrStatus String            @default("NOT_CONFIGURED") // OCR is not enabled; see docs/fabric-store-stock-inward/OCR_DESIGN.md
+  createdAt DateTime          @default(now())
+
+  @@index([importId])
 }
 
 // ==========================================
@@ -1780,4 +1855,95 @@ model DeadlineAlertDismissal {
 
   @@index([alertId, userId])
   @@index([userId, dismissedAt])
+}
+
+// Inventory: part of a received finished-garment line (DepartmentWorkItem, department INVENTORY)
+// sent for packing, in whole pieces. The line keeps the totals: takenQuantity = sent for packing
+// (net of returns), processedQuantity = packed. Every change is also posted to StockLedgerEntry.
+model PackingAllocation {
+  id               String             @id @default(uuid())
+  packingNumber    String             @unique // e.g. PKG-2026-0001
+  workItemId       String
+  workItem         DepartmentWorkItem @relation(fields: [workItemId], references: [id], onDelete: Cascade)
+  quantity         Int // pieces sent for packing
+  packedQuantity   Int                @default(0)
+  returnedQuantity Int                @default(0) // sent back to inventory unpacked
+  status           String             @default("SENT_FOR_PACKING") // SENT_FOR_PACKING, PACKING_IN_PROGRESS, PARTIALLY_PACKED, PACKING_COMPLETED, CANCELLED
+  priority         String             @default("NORMAL")
+  packingDate      DateTime
+  remarks          String?
+  createdById      String
+  createdBy        User               @relation("PackingAllocationCreator", fields: [createdById], references: [id])
+  startedAt        DateTime?
+  completedAt      DateTime?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  @@index([workItemId])
+  @@index([status])
+}
+
+// Complete-garment photo for one design (Production Sheet) and garment category, optionally one
+// style. Kept apart from Wilcom and fabric photos. Stored like DepartmentImage: Cloudinary when
+// configured, otherwise the bytes in imageData. Replacing bumps version (the image route's ETag).
+model GarmentImage {
+  id              String   @id @default(uuid())
+  programId       String
+  program         Program  @relation(fields: [programId], references: [id], onDelete: Cascade)
+  garmentCategory String // TOP | BOTTOM | DUPATTA | OTHERS, or "" when the line has none
+  styleRef        String   @default("") // "" = the whole category
+  storageProvider String // CLOUDINARY | DATABASE
+  storageKey      String?
+  imageUrl        String?
+  imageData       Bytes?
+  mimeType        String
+  fileName        String
+  fileSize        Int
+  version         Int      @default(1)
+  uploadedById    String?
+  uploadedBy      User?    @relation("GarmentImageUploader", fields: [uploadedById], references: [id], onDelete: SetNull)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([programId, garmentCategory, styleRef])
+}
+
+// Fabric Store "Upload Stock Sheet" (photo, scan or Excel). Audit record of one uploaded file: the original
+// bytes, the rows read from it, and - once a user confirmed the reviewed rows - who confirmed and which
+// FabricInward rows were created. Unconfirmed imports never touch stock.
+model StockImport {
+  id            String    @id @default(uuid())
+  source        String // IMAGE or EXCEL
+  fileName      String
+  mimeType      String
+  fileSize      Int
+  fileHash      String // sha256 of the file; the same file uploaded again is flagged
+  fileData      Bytes
+  status        String    @default("EXTRACTED") // EXTRACTED | CONFIRMED | DISCARDED
+  extractedJson Json? // rows and header exactly as read, with confidence and warnings
+  rowCount      Int       @default(0)
+  engine        String? // e.g. claude-opus-5-5, sheetjs
+  uploadedById  String
+  uploadedAt    DateTime  @default(now())
+  confirmKey    String?   @unique // idempotency key of the confirm request; a retry returns the same result
+  confirmedById String?
+  confirmedAt   DateTime?
+  confirmedJson Json? // rows as the user confirmed them
+  resultJson    Json? // created inward ids and skipped rows with reasons
+  addedCount    Int       @default(0)
+  skippedCount  Int       @default(0)
+  updatedAt     DateTime  @updatedAt
+
+  @@index([fileHash])
+  @@index([uploadedAt])
+}
+
+// Manual migrations already applied (scripts/apply-appearance-migrations.js, run before the web app starts).
+// Created by that script; kept here so prisma db push never treats the table as unknown.
+model ManualMigration {
+  name      String   @id
+  checksum  String
+  appliedAt DateTime @default(now())
+
+  @@map("_manual_migrations")
 }

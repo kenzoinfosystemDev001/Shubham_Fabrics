@@ -416,3 +416,42 @@ export async function syncManualOutwardStock(tx: Tx, outwardId: string, actorId:
 export function fabricStockErrorBody(error: FabricStockError) {
   return { error: [error.message, ...error.details].join(' '), details: error.details, code: 'INSUFFICIENT_STOCK' };
 }
+
+/**
+ * Posts newly created inward rows (an Excel import) as receipts in one pass. Call it in the same
+ * transaction that created the rows, with `baseBook` loaded before they were created. Each row
+ * gets the ledger posting syncInwardStock would make (same idempotency key, revision 0), so later
+ * edits or removals of a row reconcile normally.
+ */
+export async function postNewInwardRows(
+  tx: Tx,
+  rows: Array<{ id: string; itemName: string; entryType: string; colour: string | null; unit: string; billQty: number }>,
+  options: { actorId: string; baseBook: ReturnType<typeof createStockBook>; label: string },
+) {
+  const running = new Map<string, number>();
+  const data = rows.map((row) => {
+    const unit = normalizeStockUnit(row.unit);
+    if (!unit) throw new FabricStockError(`${options.label}: unit ${row.unit} is not MTR or PCS.`);
+    const key = stockKey({ fabric: row.itemName, type: row.entryType, colour: row.colour, unit });
+    const balance = roundQty((running.get(key) ?? bucketBalance(options.baseBook, key)) + row.billQty);
+    running.set(key, balance);
+    return {
+      id: crypto.randomUUID(),
+      entryType: 'RECEIPT',
+      departmentCode: STORE_STOCK_DEPARTMENT,
+      itemCode: key,
+      itemName: row.itemName,
+      colour: row.colour,
+      quantity: row.billQty,
+      uom: unit,
+      referenceType: STOCK_REFERENCE.INWARD,
+      referenceId: row.id,
+      actorId: options.actorId,
+      balanceAfter: balance,
+      idempotencyKey: ledgerIdempotencyKey(STOCK_REFERENCE.INWARD, row.id, key, 0),
+      notes: options.label,
+    };
+  });
+  if (data.length > 0) await tx.stockLedgerEntry.createMany({ data });
+  return data.map(({ id, referenceId, itemCode, quantity, uom, balanceAfter }) => ({ id, inwardId: referenceId, key: itemCode, quantity, uom, balanceAfter }));
+}
