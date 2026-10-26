@@ -43,7 +43,7 @@ type ImportView = {
   receiptNumber: string | null;
   failureReason: string | null;
   documents: Array<{ id: string; sheetName: string | null; mimeType: string; size: number; ocrStatus: string }>;
-  sheets: Array<{ name: string; hidden: boolean; rowCount: number; columnCount: number; detectedHeaderRow: number | null; imageCount: number; preview: Array<{ rowNumber: number; cells: Cell[] }> }>;
+  sheets: Array<{ name: string; hidden: boolean; rowCount: number; columnCount: number; detectedHeaderRow: number | null; imageCount: number; preview: Array<{ rowNumber: number; cells: Cell[] }>; notes?: string[] }>;
   selectedSheet: string | null;
   headerRow: number | null;
   mapping: Record<string, number>;
@@ -216,7 +216,7 @@ export default function StockImportDetailPage() {
         )}
 
         {view.status === 'FAILED' && (
-          <Panel title="This workbook could not be read">
+          <Panel title="This file could not be read">
             <p className="text-xs text-danger-700">{view.failureReason}</p>
             <p className="text-[11px] text-neutral-600 mt-1">Nothing was posted. Fix the file and upload it again from the import page.</p>
           </Panel>
@@ -226,6 +226,21 @@ export default function StockImportDetailPage() {
             <p className="text-xs text-neutral-600">This import was cancelled. Nothing was posted to stock.</p>
           </Panel>
         )}
+
+        {(() => {
+          // What the reader assumed while reading the file (e.g. a received date that is not written).
+          const notes = view.sheets.find((s) => s.name === view.selectedSheet)?.notes || [];
+          return notes.length > 0 && editable ? (
+            <div className="p-3 bg-accent-50 border border-accent-200 rounded-lg text-xs text-neutral-800 space-y-1">
+              {notes.map((note) => (
+                <p key={note} className="flex items-start gap-2">
+                  <AlertCircle className="w-3.5 h-3.5 text-accent-800 shrink-0 mt-0.5" />
+                  <span>{note}</span>
+                </p>
+              ))}
+            </div>
+          ) : null;
+        })()}
 
         {view.documents.length > 0 && <DocumentsPanel view={view} />}
 

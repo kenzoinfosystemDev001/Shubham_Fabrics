@@ -21,6 +21,14 @@ import {
 import { canApproveStockInward } from './permissions.mjs';
 import { IMPORT_LIMITS, WorkbookRejectedError, inspectWorkbookBytes, safeFileName } from './workbook-guard.mjs';
 import { readWorkbook, type StoredSheet } from './workbook';
+import {
+  DocumentReadError,
+  convertToXlsx,
+  detectSourceKind,
+  documentReaderConfigured,
+  readDocument,
+  readSheetLayout,
+} from './document-reader';
 
 /**
  * Excel stock inward imports. The uploaded workbook is stored as evidence and read once; mapping,
@@ -190,6 +198,7 @@ export function presentImport(record: ImportRecord, viewer?: Actor) {
       detectedHeaderRow: s.detectedHeaderRow,
       imageCount: s.imageCount,
       preview: s.rows.slice(0, 20),
+      notes: s.notes || [],
     })),
     selectedSheet: record.selectedSheet,
     headerRow: record.headerRow,
@@ -215,30 +224,86 @@ async function audit(db: Db, actorId: string, action: string, entityId: string, 
 // Operations
 // ---------------------------------------------------------------------------
 
-/** Stores an uploaded workbook, reads it and, when the columns are unambiguous, validates it. */
+/**
+ * Stores an uploaded stock document and reads its fabric lines automatically:
+ * - Excel (.xlsx, .xls, .ods) and CSV: headings in the standard names are mapped straight away;
+ *   any other layout is worked out by the document reader (cells are still copied from the file).
+ * - PDF bills and photos / scans: the document reader transcribes the lines.
+ * The rows are then validated; stock changes only when a person confirms the import.
+ */
 export async function createImport(file: { name: string; bytes: Buffer }, actor: Actor) {
+  const kind = detectSourceKind(file.name, file.bytes);
+  if (!kind) {
+    throw new StockImportError('This file type cannot be imported. Upload an Excel file (.xlsx, .xls), a CSV, a PDF, or a photo (JPG, PNG) of the bill or stock sheet.', 400, 'UNSUPPORTED');
+  }
+  const fileHash = sha256(file.bytes);
+  const fileName = safeFileName(file.name);
+  const today = factoryDay(new Date(), TIME_ZONE);
+
+  // Keep a FAILED record so the attempt shows in the import history.
+  const recordFailure = async (message: string, code: string, status = 400): Promise<never> => {
+    const failed = await prisma.fabricStockImport.create({
+      data: { status: 'FAILED', fileName, fileHash, fileSize: file.bytes.length, fileData: new Uint8Array(file.bytes), sheetsJson: '[]', failureReason: message, uploadedById: actor.id },
+      select: { id: true },
+    });
+    await audit(prisma, actor.id, 'FABRIC_STOCK_IMPORT_FAILED', failed.id, { fileName, fileHash, reason: code });
+    throw new StockImportError(message, status, code, { importId: failed.id });
+  };
+
+  if (kind === 'PDF' || kind === 'IMAGE') {
+    let read: Awaited<ReturnType<typeof readDocument>>;
+    try {
+      read = await readDocument(kind, file.bytes, fileName, today);
+    } catch (error) {
+      if (error instanceof DocumentReadError) return recordFailure(error.message, error.code, error.status);
+      throw error;
+    }
+    const sheet = { ...read.sheet, notes: read.notes };
+    const created = await prisma.fabricStockImport.create({
+      data: {
+        status: 'PARSED',
+        fileName,
+        fileHash,
+        fileSize: file.bytes.length,
+        fileData: new Uint8Array(file.bytes),
+        sheetsJson: JSON.stringify([sheet]),
+        selectedSheet: sheet.name,
+        headerRow: read.headerRow,
+        mappingJson: JSON.stringify(read.mapping),
+        uploadedById: actor.id,
+      },
+      select: { id: true },
+    });
+    await audit(prisma, actor.id, 'FABRIC_STOCK_IMPORT_UPLOADED', created.id, {
+      fileName, fileHash, fileSize: file.bytes.length, source: kind, engine: read.engine, rows: sheet.rowCount - 1, notes: read.notes,
+    });
+    return revalidate(prisma, created.id);
+  }
+
+  // Spreadsheets: other formats become .xlsx first, so one reader handles every workbook.
+  let workbookBytes = file.bytes;
+  if (kind === 'SPREADSHEET') {
+    try {
+      workbookBytes = convertToXlsx(file.bytes);
+    } catch (error) {
+      if (error instanceof DocumentReadError) return recordFailure(error.message, error.code, error.status);
+      throw error;
+    }
+  }
   try {
-    inspectWorkbookBytes(file.bytes);
+    inspectWorkbookBytes(workbookBytes);
   } catch (error) {
     if (error instanceof WorkbookRejectedError) throw new StockImportError(error.message, 400, error.code);
     throw error;
   }
-  const fileHash = sha256(file.bytes);
-  const fileName = safeFileName(file.name);
 
   let sheets: StoredSheet[];
   let images: Awaited<ReturnType<typeof readWorkbook>>['images'];
   try {
-    ({ sheets, images } = await readWorkbook(file.bytes));
+    ({ sheets, images } = await readWorkbook(workbookBytes));
   } catch (error) {
     if (!(error instanceof WorkbookRejectedError)) throw error;
-    // Keep a FAILED record so the attempt shows in the import history.
-    const failed = await prisma.fabricStockImport.create({
-      data: { status: 'FAILED', fileName, fileHash, fileSize: file.bytes.length, fileData: new Uint8Array(file.bytes), sheetsJson: '[]', failureReason: error.message, uploadedById: actor.id },
-      select: { id: true },
-    });
-    await audit(prisma, actor.id, 'FABRIC_STOCK_IMPORT_FAILED', failed.id, { fileName, fileHash, reason: error.code });
-    throw new StockImportError(error.message, 400, error.code, { importId: failed.id });
+    return recordFailure(error.message, error.code);
   }
 
   const usable = sheets.filter((s) => s.rowCount > 0);
@@ -280,6 +345,33 @@ export async function createImport(file: { name: string; bytes: Buffer }, actor:
     if (suggestion.ambiguities.length === 0 && suggestion.missingRequired.length === 0) {
       await prisma.fabricStockImport.update({ where: { id: created.id }, data: { mappingJson: JSON.stringify(suggestion.mapping) } });
       return revalidate(prisma, created.id);
+    }
+  }
+
+  // Any other layout (supplier bills, registers, missing Type / Received Date columns): the document
+  // reader names the columns and the sheet-wide values. If it is not available or finds no stock
+  // table, the import waits for the user to map the columns, as before.
+  if (documentReaderConfigured()) {
+    const target = auto ?? usable.reduce((a, b) => (b.rowCount > a.rowCount ? b : a));
+    try {
+      const layout = await readSheetLayout(target, today);
+      if (layout) {
+        const sheet = { ...layout.sheet, notes: layout.notes };
+        await prisma.fabricStockImport.update({
+          where: { id: created.id },
+          data: {
+            sheetsJson: JSON.stringify(sheets.map((s) => (s.name === target.name ? sheet : s))),
+            selectedSheet: sheet.name,
+            headerRow: layout.headerRow,
+            mappingJson: JSON.stringify(layout.mapping),
+          },
+        });
+        await audit(prisma, actor.id, 'FABRIC_STOCK_IMPORT_MAPPED', created.id, { sheet: sheet.name, headerRow: layout.headerRow, mapping: layout.mapping, engine: layout.engine, notes: layout.notes });
+        return revalidate(prisma, created.id);
+      }
+    } catch (error) {
+      // Reading the layout is a convenience: the user can still map the columns by hand.
+      console.warn('Stock import layout reading skipped:', error instanceof Error ? error.message : error);
     }
   }
   return loadImport(prisma, created.id);

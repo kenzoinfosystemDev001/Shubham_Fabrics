@@ -31,6 +31,8 @@ export interface StoredSheet {
   detectedHeaderRow: number | null;
   imageCount: number;
   rows: StoredRow[];
+  /** What the document reader assumed (e.g. a received date that was not written). */
+  notes?: string[];
 }
 
 export interface ExtractedImage {
