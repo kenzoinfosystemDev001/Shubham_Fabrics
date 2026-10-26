@@ -172,7 +172,7 @@ function InventoryRollsContent() {
                 onClick={() => setBatchIdFilter('')}
                 className="text-xs font-semibold text-danger-600 hover:underline"
               >
-                Clear Batch Filter ✕
+                Clear Batch Filter
               </button>
             )}
           </div>

@@ -1,9 +1,10 @@
 -- Smart Deadline Alerts: additive only (two new tables, indexes, FKs). No existing table or row is changed.
 -- Generated with: prisma migrate diff --from-schema-datamodel <main schema> --to-schema-datamodel prisma/schema.prisma --script
--- Apply with 'npm run db:push' (the project's usual flow) or by running this file. Requires approval for the shared Neon DB.
+-- Apply with 'npm run db:push' (the project's usual flow) or by running this file. Re-runnable: every statement is skipped when its object already exists.
+-- Also applied by: node scripts/apply-appearance-migrations.js
 
 -- CreateTable
-CREATE TABLE "DeadlineAlert" (
+CREATE TABLE IF NOT EXISTS "DeadlineAlert" (
     "id" TEXT NOT NULL,
     "dedupKey" TEXT NOT NULL,
     "departmentCode" TEXT NOT NULL,
@@ -35,7 +36,7 @@ CREATE TABLE "DeadlineAlert" (
 );
 
 -- CreateTable
-CREATE TABLE "DeadlineAlertDismissal" (
+CREATE TABLE IF NOT EXISTS "DeadlineAlertDismissal" (
     "id" TEXT NOT NULL,
     "alertId" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
@@ -45,35 +46,55 @@ CREATE TABLE "DeadlineAlertDismissal" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "DeadlineAlert_dedupKey_key" ON "DeadlineAlert"("dedupKey");
+CREATE UNIQUE INDEX IF NOT EXISTS "DeadlineAlert_dedupKey_key" ON "DeadlineAlert"("dedupKey");
 
 -- CreateIndex
-CREATE INDEX "DeadlineAlert_departmentCode_status_idx" ON "DeadlineAlert"("departmentCode", "status");
+CREATE INDEX IF NOT EXISTS "DeadlineAlert_departmentCode_status_idx" ON "DeadlineAlert"("departmentCode", "status");
 
 -- CreateIndex
-CREATE INDEX "DeadlineAlert_entityType_entityId_status_idx" ON "DeadlineAlert"("entityType", "entityId", "status");
+CREATE INDEX IF NOT EXISTS "DeadlineAlert_entityType_entityId_status_idx" ON "DeadlineAlert"("entityType", "entityId", "status");
 
 -- CreateIndex
-CREATE INDEX "DeadlineAlert_programId_idx" ON "DeadlineAlert"("programId");
+CREATE INDEX IF NOT EXISTS "DeadlineAlert_programId_idx" ON "DeadlineAlert"("programId");
 
 -- CreateIndex
-CREATE INDEX "DeadlineAlert_challanId_idx" ON "DeadlineAlert"("challanId");
+CREATE INDEX IF NOT EXISTS "DeadlineAlert_challanId_idx" ON "DeadlineAlert"("challanId");
 
 -- CreateIndex
-CREATE INDEX "DeadlineAlertDismissal_alertId_userId_idx" ON "DeadlineAlertDismissal"("alertId", "userId");
+CREATE INDEX IF NOT EXISTS "DeadlineAlertDismissal_alertId_userId_idx" ON "DeadlineAlertDismissal"("alertId", "userId");
 
 -- CreateIndex
-CREATE INDEX "DeadlineAlertDismissal_userId_dismissedAt_idx" ON "DeadlineAlertDismissal"("userId", "dismissedAt");
+CREATE INDEX IF NOT EXISTS "DeadlineAlertDismissal_userId_dismissedAt_idx" ON "DeadlineAlertDismissal"("userId", "dismissedAt");
 
 -- AddForeignKey
-ALTER TABLE "DeadlineAlert" ADD CONSTRAINT "DeadlineAlert_programId_fkey" FOREIGN KEY ("programId") REFERENCES "Program"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'DeadlineAlert_programId_fkey') THEN
+    ALTER TABLE "DeadlineAlert" ADD CONSTRAINT "DeadlineAlert_programId_fkey" FOREIGN KEY ("programId") REFERENCES "Program"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+  END IF;
+END $$;
 
 -- AddForeignKey
-ALTER TABLE "DeadlineAlert" ADD CONSTRAINT "DeadlineAlert_challanId_fkey" FOREIGN KEY ("challanId") REFERENCES "Challan"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'DeadlineAlert_challanId_fkey') THEN
+    ALTER TABLE "DeadlineAlert" ADD CONSTRAINT "DeadlineAlert_challanId_fkey" FOREIGN KEY ("challanId") REFERENCES "Challan"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+  END IF;
+END $$;
 
 -- AddForeignKey
-ALTER TABLE "DeadlineAlertDismissal" ADD CONSTRAINT "DeadlineAlertDismissal_alertId_fkey" FOREIGN KEY ("alertId") REFERENCES "DeadlineAlert"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'DeadlineAlertDismissal_alertId_fkey') THEN
+    ALTER TABLE "DeadlineAlertDismissal" ADD CONSTRAINT "DeadlineAlertDismissal_alertId_fkey" FOREIGN KEY ("alertId") REFERENCES "DeadlineAlert"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+  END IF;
+END $$;
 
 -- AddForeignKey
-ALTER TABLE "DeadlineAlertDismissal" ADD CONSTRAINT "DeadlineAlertDismissal_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'DeadlineAlertDismissal_userId_fkey') THEN
+    ALTER TABLE "DeadlineAlertDismissal" ADD CONSTRAINT "DeadlineAlertDismissal_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+  END IF;
+END $$;
 

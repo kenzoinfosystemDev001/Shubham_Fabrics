@@ -38,10 +38,10 @@ const DEPT_CONFIG: Record<
     shelfName: 'Thread Cutting Trimming & Snip Shelf',
   },
   QC2: {
-    name: 'Thread Cut QC',
+    name: 'Threadcut QC',
     defaultUnit: 'PCS',
     shelfCode: 'DEF-SHELF-QC2',
-    shelfName: 'Thread Cut QC Defective Shelf',
+    shelfName: 'Threadcut QC Defective Shelf',
   },
   WASHING: {
     name: 'Washing Department',

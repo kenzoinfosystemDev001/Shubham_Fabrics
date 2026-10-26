@@ -14,7 +14,8 @@ import {
   calculateProductionMeasurementTotal,
   formatSizeExpressionTotal,
   SWATCH_CLIP_PATH,
-  GarmentCategory
+  GarmentCategory,
+  productionSheetCategoriesForViewer,
 } from '@/lib/download-production-sheet';
 import { getCurrentUser, canViewClientCode } from '@/lib/rbac';
 import { useProgramDocument } from '@/hooks/useProgramDocument';
@@ -33,16 +34,16 @@ export function ProductionSheetPrintModal({
   sheetData,
   isOpen,
   onClose,
-  initialTab = 'TOP',
+  initialTab,
   onViewChallan,
 }: ProductionSheetPrintModalProps) {
   const sourceProgram = propProgram || sheetData;
   const { program, loading, error } = useProgramDocument(sourceProgram, isOpen);
-  const [activeTab, setActiveTab] = useState<GarmentCategory>(initialTab);
+  const [selectedTab, setSelectedTab] = useState<GarmentCategory | undefined>(initialTab);
 
   React.useEffect(() => {
     if (initialTab) {
-      setActiveTab(initialTab);
+      setSelectedTab(initialTab);
     }
   }, [initialTab]);
 
@@ -59,9 +60,10 @@ export function ProductionSheetPrintModal({
   }
 
   const components = meta?.components || null;
-  const componentCategories: GarmentCategory[] = components
-    ? Object.keys(components)
-    : ['TOP', 'BOTTOM', 'DUPATTA', 'OTHER'];
+  // Every Production Sheet of this production (1, 2, 3 or more); opens on the first unless one was asked for.
+  const componentCategories: GarmentCategory[] = productionSheetCategoriesForViewer(program);
+  const activeTab: GarmentCategory = selectedTab && componentCategories.includes(selectedTab) ? selectedTab : componentCategories[0];
+  const setActiveTab = setSelectedTab;
   const activeTabName = components?.[activeTab]?.styleName || (activeTab === 'OTHER' ? 'INPUT' : activeTab);
   const forwardedComponents: string[] = Array.isArray(meta?.forwardedComponents) ? meta.forwardedComponents : ['TOP'];
 
@@ -239,7 +241,14 @@ export function ProductionSheetPrintModal({
               onClick={() => printProductionSheet(program, 'ALL')}
               className="text-[11px] font-semibold text-brand-700 hover:underline px-2 py-1 rounded hover:bg-brand-50 cursor-pointer"
             >
-              Print All Forwarded
+              Print All ({componentCategories.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => void downloadProductionSheetHtml(program, 'ALL')}
+              className="text-[11px] font-semibold text-brand-700 hover:underline px-2 py-1 rounded hover:bg-brand-50 cursor-pointer"
+            >
+              Download All ({componentCategories.length})
             </button>
           </div>
         </div>

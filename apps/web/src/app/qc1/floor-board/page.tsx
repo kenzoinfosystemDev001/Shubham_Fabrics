@@ -163,9 +163,6 @@ export default function QC1FloorBoard() {
       {/* TOP HEADER */}
       <header className="bg-white border-b border-neutral-200/80 sticky top-0 z-30 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-700 block">
-            SHUBHAM FABRICS MES · INSPECTION STAGES
-          </span>
           <h1 className="text-xl font-bold text-neutral-900 flex items-center gap-2">
             <Kanban className="w-5 h-5 text-accent-700" />
             <span>QC1 Floor Board</span>

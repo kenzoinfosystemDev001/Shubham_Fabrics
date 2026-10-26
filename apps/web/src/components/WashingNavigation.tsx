@@ -4,19 +4,15 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  LayoutDashboard,
-  Briefcase,
-  Kanban,
   LogOut,
   UserCircle,
   Menu,
-  X,
-  Waves,
-  FileText
+  X
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { isAdminUser } from '@/lib/rbac';
 import { DepartmentSwitcher } from '@/components/DepartmentSwitcher';
+import { SidebarDepartmentArt } from '@/components/SidebarDepartmentArt';
 import { InstallAppButton } from '@/components/InstallAppButton';
 
 export function WashingNavigation() {
@@ -136,6 +132,9 @@ export function WashingNavigation() {
           mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
+        {/* SIDEBAR TEXTILE BACKGROUND (one image for all departments, Admin > Sidebar Image) */}
+        <SidebarDepartmentArt />
+
         <div className="flex flex-col h-full overflow-hidden">
           {/* BRAND HEADER */}
           <div className="p-4 border-b border-neutral-200 flex items-center justify-between">
@@ -164,7 +163,7 @@ export function WashingNavigation() {
           </div>
 
           {/* DEPARTMENT SWITCHER & QUICK ACTIONS */}
-          <div className="px-3 py-2 border-b border-neutral-200 flex flex-col gap-2">
+          <div className="px-3 py-2 border-b border-neutral-200 flex flex-col gap-2 [&:not(:has(button))]:hidden">
             <DepartmentSwitcher
               currentDepartmentName="Washing Department"
               accentColor="teal"
@@ -174,41 +173,61 @@ export function WashingNavigation() {
           </div>
 
           {/* NAVIGATION LINKS */}
-          <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
-            <div className="px-3 pb-1 text-[10px] font-bold tracking-wider uppercase text-neutral-500">
-              Washing Operations
-            </div>
-
-            <Link href="/washing" className={linkClass('/washing', true)}>
-              <LayoutDashboard className="w-4 h-4 shrink-0" />
+          <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+            {/* 1. Dashboard */}
+            <Link href="/washing" onClick={() => setMobileOpen(false)} className={linkClass('/washing', true)}>
               <span>Dashboard</span>
             </Link>
 
-            <Link href="/washing/my-work" className={linkClass('/washing/my-work')}>
-              <Briefcase className="w-4 h-4 shrink-0" />
-              <span>Work Center & Lots</span>
-            </Link>
-
-            <Link href="/washing/floor-board" className={linkClass('/washing/floor-board')}>
-              <Kanban className="w-4 h-4 shrink-0" />
-              <span>Washing Floor Board</span>
-            </Link>
-
-            <div className="pt-3 px-3 pb-1 text-[10px] font-bold tracking-wider uppercase text-neutral-500">
-              Fabric & Production
+            {/* 2. My Work */}
+            <div>
+              <div
+                className={`px-3 py-2.5 text-xs font-semibold ${
+                  pathname.startsWith('/washing/my-work') ? 'text-neutral-900' : 'text-neutral-700'
+                }`}
+              >
+                My Work
+              </div>
+              <div className="ml-4 pl-3 border-l border-neutral-200 space-y-0.5 mb-1">
+                {[
+                  { href: '/washing/my-work/incoming', label: 'Incoming Challans' },
+                  { href: '/washing/my-work/received', label: 'Received Material' },
+                  { href: '/washing/my-work/process', label: 'Washing Process' },
+                  { href: '/washing/my-work/issue-challan', label: 'Issue Challan to Washing QC' },
+                ].map((item) => {
+                  const active = pathname === item.href || pathname.startsWith(item.href + '/');
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setMobileOpen(false)}
+                      aria-current={active ? 'page' : undefined}
+                      className={`flex items-center px-2.5 py-2 rounded-lg text-[11px] font-medium transition ${
+                        active
+                          ? 'bg-brand-50 text-brand-800 border-l-2 border-brand-500 pl-2'
+                          : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900'
+                      }`}
+                    >
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
 
-            <Link
-              href="/washing/my-work?tab=PRODUCTION_SHEETS"
-              className={linkClass('/washing/my-work?tab=PRODUCTION_SHEETS')}
-            >
-              <FileText className="w-4 h-4 shrink-0" />
-              <span>Production Sheets</span>
+            {/* 3. Washing History */}
+            <Link href="/washing/history" onClick={() => setMobileOpen(false)} className={linkClass('/washing/history', true)}>
+              <span>Washing History</span>
+            </Link>
+
+            {/* 4. Floor Board */}
+            <Link href="/washing/floor-board" onClick={() => setMobileOpen(false)} className={linkClass('/washing/floor-board', true)}>
+              <span>Floor Board</span>
             </Link>
           </nav>
 
           {/* USER PROFILE & FOOTER */}
-          <div className="p-3 border-t border-neutral-200 bg-white">
+          <div className="p-3 border-t border-neutral-200 bg-white/75 backdrop-blur-sm">
             <div className="flex items-center justify-between gap-2 p-2 rounded-lg bg-white border border-neutral-200">
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="w-8 h-8 rounded-full bg-brand-50 border border-neutral-200 flex items-center justify-center shrink-0">
@@ -228,14 +247,14 @@ export function WashingNavigation() {
                   </div>
                 </div>
               </div>
-              <button
-                onClick={handleSignOut}
-                className="p-1.5 rounded-md text-neutral-500 hover:text-danger-600 hover:bg-neutral-100 transition shrink-0"
-                title="Sign Out"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
             </div>
+            <button
+              onClick={handleSignOut}
+              className="mt-3 w-full flex items-center justify-center gap-2 px-3 py-2 bg-white hover:bg-danger-50 hover:text-danger-800 hover:border-danger-500/60 border border-neutral-200 rounded-lg text-xs text-neutral-900 transition shadow-xs"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Sign Out</span>
+            </button>
           </div>
         </div>
       </aside>

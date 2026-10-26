@@ -8,7 +8,7 @@
     "generate": "node -e \"if(!process.env.DATABASE_URL) ; try { require('child_process').execSync('npx prisma generate', {stdio:'inherit', env:process.env}); } catch(e) { console.warn('Using existing client:', e.message); }\"",
     "push": "prisma db push",
     "prebuild": "npm run generate",
-    "build": "tsc && node -e \"const fs=require('fs'); try { fs.cpSync('src/generated', 'dist/generated', {recursive:true}); } catch(e) {}\"",
+    "build": "tsc && node -e \"const fs=require('fs'); try { fs.cpSync('src/generated', 'dist/generated', {recursive:true}); } catch(e) {} try { const t = new Date(); fs.utimesSync('../../apps/web/next.config.mjs', t, t); } catch(e) {}\"",
     "dev": "tsc --watch"
   },
   "dependencies": {

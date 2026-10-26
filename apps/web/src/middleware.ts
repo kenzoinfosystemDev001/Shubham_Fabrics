@@ -10,7 +10,14 @@ import {
 } from '@/lib/auth/session-token';
 
 // The cron route authenticates itself (CRON_SECRET bearer or an administrator session).
-const PUBLIC_API_PATHS = new Set(['/api/auth/login', '/api/auth/logout', '/api/health', '/api/cron/deadline-alerts']);
+// The login background is read-only and shown before sign-in.
+const PUBLIC_API_PATHS = new Set([
+  '/api/auth/login',
+  '/api/auth/logout',
+  '/api/health',
+  '/api/cron/deadline-alerts',
+  '/api/branding/login-background',
+]);
 const PUBLIC_PAGE_PATHS = new Set(['/login']);
 
 function forwardWithIdentity(request: NextRequest, claims: SessionClaims | null) {

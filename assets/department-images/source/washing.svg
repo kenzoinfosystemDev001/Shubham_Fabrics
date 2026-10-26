@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="1280" height="720" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <pattern id="weave" width="8" height="8" patternUnits="userSpaceOnUse">
+      <rect width="8" height="8" fill="#EAEDF7"/>
+      <rect x="0" y="0.6" width="4" height="2.8" rx="1.2" fill="#D9DFF0"/>
+      <rect x="4" y="4.6" width="4" height="2.8" rx="1.2" fill="#D9DFF0"/>
+      <rect x="4.6" y="0" width="2.8" height="4" rx="1.2" fill="#F5F7FC"/>
+      <rect x="0.6" y="4" width="2.8" height="4" rx="1.2" fill="#F5F7FC"/>
+    </pattern>
+    <pattern id="weaveBig" width="20" height="20" patternUnits="userSpaceOnUse">
+      <rect width="20" height="20" fill="#EAEDF7"/>
+      <rect x="0" y="1.5" width="10" height="7" rx="3" fill="#D9DFF0"/>
+      <rect x="10" y="11.5" width="10" height="7" rx="3" fill="#D9DFF0"/>
+      <rect x="11.5" y="0" width="7" height="10" rx="3" fill="#F5F7FC"/>
+      <rect x="1.5" y="10" width="7" height="10" rx="3" fill="#F5F7FC"/>
+    </pattern>
+    <linearGradient id="fold" x1="0" y1="0" x2="1" y2="0.35">
+      <stop offset="0" stop-color="#FFF" stop-opacity="0.5"/>
+      <stop offset="0.2" stop-color="#B57EDC" stop-opacity="0.08"/>
+      <stop offset="0.4" stop-color="#FFF" stop-opacity="0.4"/>
+      <stop offset="0.6" stop-color="#8E5AB5" stop-opacity="0.12"/>
+      <stop offset="0.8" stop-color="#FFF" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#B57EDC" stop-opacity="0.1"/>
+    </linearGradient>
+    <linearGradient id="shade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFF" stop-opacity="0"/>
+      <stop offset="1" stop-color="#6E4590" stop-opacity="0.12"/>
+    </linearGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#6E4590" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  <rect width="640" height="360" fill="url(#weave)"/>
+  <rect width="640" height="360" fill="url(#fold)"/>
+    <path d="M0 220 C 100 180, 200 260, 320 214 S 520 170, 640 214 V360 H0Z" fill="#C6D0EC" filter="url(#soft)"/>
+    <path d="M0 262 C 120 228, 230 300, 350 258 S 540 226, 640 258 V360 H0Z" fill="#D7C2EC" filter="url(#soft)"/>
+    <path d="M0 302 C 140 276, 250 330, 380 298 S 560 280, 640 300 V360 H0Z" fill="#EADDF5" filter="url(#soft)"/>
+    <path d="M40 252 C 120 226, 220 282, 320 244" stroke="#FFF" stroke-width="4" fill="none" opacity="0.7"/>
+    <circle cx="150" cy="160" r="18" fill="#FFF" fill-opacity="0.45" stroke="#A98BD0" stroke-opacity="0.7" stroke-width="2"/><path d="M141.9 158.2 a 9 9 0 0 1 7.2 -7.2" stroke="#FFF" stroke-width="1.6" fill="none"/><circle cx="200" cy="120" r="10" fill="#FFF" fill-opacity="0.45" stroke="#A98BD0" stroke-opacity="0.7" stroke-width="2"/><path d="M195.5 119 a 5 5 0 0 1 4 -4" stroke="#FFF" stroke-width="1.6" fill="none"/><circle cx="420" cy="140" r="22" fill="#FFF" fill-opacity="0.45" stroke="#A98BD0" stroke-opacity="0.7" stroke-width="2"/><path d="M410.1 137.8 a 11 11 0 0 1 8.8 -8.8" stroke="#FFF" stroke-width="1.6" fill="none"/><circle cx="470" cy="96" r="12" fill="#FFF" fill-opacity="0.45" stroke="#A98BD0" stroke-opacity="0.7" stroke-width="2"/><path d="M464.6 94.8 a 6 6 0 0 1 4.800000000000001 -4.800000000000001" stroke="#FFF" stroke-width="1.6" fill="none"/><circle cx="530" cy="170" r="9" fill="#FFF" fill-opacity="0.45" stroke="#A98BD0" stroke-opacity="0.7" stroke-width="2"/><path d="M525.95 169.1 a 4.5 4.5 0 0 1 3.6 -3.6" stroke="#FFF" stroke-width="1.6" fill="none"/><circle cx="300" cy="150" r="13" fill="#FFF" fill-opacity="0.45" stroke="#A98BD0" stroke-opacity="0.7" stroke-width="2"/><path d="M294.15 148.7 a 6.5 6.5 0 0 1 5.2 -5.2" stroke="#FFF" stroke-width="1.6" fill="none"/><circle cx="360" cy="110" r="7" fill="#FFF" fill-opacity="0.45" stroke="#A98BD0" stroke-opacity="0.7" stroke-width="2"/><path d="M356.85 109.3 a 3.5 3.5 0 0 1 2.8000000000000003 -2.8000000000000003" stroke="#FFF" stroke-width="1.6" fill="none"/>
+  <rect width="640" height="360" fill="url(#shade)"/>
+  <rect x="0" y="342" width="640" height="2" fill="#DFFF00" fill-opacity="0.55"/>
+  <rect x="0" y="347" width="640" height="1" fill="#FF6347" fill-opacity="0.35"/>
+</svg>

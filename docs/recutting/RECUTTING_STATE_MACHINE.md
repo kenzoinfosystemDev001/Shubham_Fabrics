@@ -9,7 +9,7 @@
 
 ```mermaid
 stateDiagram-v2
-    [*] --> ISSUED : Issued by QC Washing
+    [*] --> ISSUED : Issued by Washing QC
     ISSUED --> RECEIVED : Physical Count Verified by Recutting
     ISSUED --> ON_HOLD : Discrepancy / Damaged in Transit
     ON_HOLD --> RECEIVED : Discrepancy Resolved / Rectified

@@ -4,8 +4,8 @@ import { ThemeProvider } from '@/components/ThemeContext';
 import '../globals.css';
 
 export const metadata = {
-  title: 'Shubham Fabrics India Pvt. Ltd. | MES - QC Washing Department',
-  description: 'Enterprise Manufacturing Execution System - Quality Check Washing Inspection Workspace',
+  title: 'Shubham Fabrics India Pvt. Ltd. | MES - Washing QC',
+  description: 'Enterprise Manufacturing Execution System - Washing QC Workspace',
 };
 
 export default function QCWashingLayout({

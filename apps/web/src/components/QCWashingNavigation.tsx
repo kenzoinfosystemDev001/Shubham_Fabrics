@@ -4,22 +4,15 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  LayoutDashboard,
-  Briefcase,
-  Kanban,
   LogOut,
   UserCircle,
   Menu,
-  X,
-  ShieldCheck,
-  CheckCircle2,
-  FileText,
-  Send,
-  Waves
+  X
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { isAdminUser } from '@/lib/rbac';
 import { DepartmentSwitcher } from '@/components/DepartmentSwitcher';
+import { SidebarDepartmentArt } from '@/components/SidebarDepartmentArt';
 import { InstallAppButton } from '@/components/InstallAppButton';
 
 export function QCWashingNavigation() {
@@ -28,7 +21,7 @@ export function QCWashingNavigation() {
   const [mounted, setMounted] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>({
-    fullName: 'QC Washing Inspector',
+    fullName: 'Washing QC Inspector',
     username: 'qcwashing',
     role: 'QC3_INSPECTOR',
     departmentCode: 'QC3',
@@ -94,7 +87,7 @@ export function QCWashingNavigation() {
           <button
             onClick={() => setMobileOpen(true)}
             className="p-1.5 rounded-lg text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 transition"
-            aria-label="Open QC Washing Navigation Menu"
+            aria-label="Open Washing QC Navigation Menu"
           >
             <Menu className="w-6 h-6" />
           </button>
@@ -109,7 +102,7 @@ export function QCWashingNavigation() {
             </div>
             <div>
               <span className="text-xs font-bold text-neutral-900 tracking-wide block leading-none">SHUBHAM FABRICS</span>
-              <span className="text-[9px] font-bold text-brand-700 tracking-wider uppercase block">QC WASHING</span>
+              <span className="text-[9px] font-bold text-brand-700 tracking-wider uppercase block">WASHING QC</span>
             </div>
           </div>
         </div>
@@ -140,6 +133,9 @@ export function QCWashingNavigation() {
           mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
+        {/* SIDEBAR TEXTILE BACKGROUND (one image for all departments, Admin > Sidebar Image) */}
+        <SidebarDepartmentArt />
+
         {/* BRANDING */}
         <div className="p-4 border-b border-neutral-200 bg-white flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -152,7 +148,6 @@ export function QCWashingNavigation() {
             </div>
             <div className="min-w-0">
               <span className="text-xs font-bold tracking-[0.14em] text-neutral-900 truncate block">SHUBHAM FABRICS</span>
-              <span className="text-[10px] font-medium tracking-[0.18em] text-brand-700 block truncate">QC WASHING DEPT</span>
             </div>
           </div>
 
@@ -165,10 +160,10 @@ export function QCWashingNavigation() {
         </div>
 
         {/* DEPARTMENT TITLE & WORKSPACE SWITCHER */}
-        <div className="relative px-3 pt-3 pb-2.5 border-b border-neutral-200 bg-white">
+        <div className="relative px-3 pt-3 pb-2.5 border-b border-neutral-200 bg-white [&:not(:has(button))]:hidden">
           <div className="relative z-10">
             <DepartmentSwitcher
-              currentDepartmentName="QC Washing"
+              currentDepartmentName="Washing QC"
               accentColor="emerald"
               onNavigate={() => setMobileOpen(false)}
             />
@@ -183,28 +178,54 @@ export function QCWashingNavigation() {
             onClick={() => setMobileOpen(false)}
             className={linkClass('/qcwashing', true)}
           >
-            <LayoutDashboard className="w-4 h-4 shrink-0" />
             <span>Dashboard</span>
           </Link>
 
           {/* 2. My Work */}
-          <Link
-            href="/qcwashing/my-work"
-            onClick={() => setMobileOpen(false)}
-            className={linkClass('/qcwashing/my-work', false)}
-          >
-            <Briefcase className="w-4 h-4 shrink-0" />
-            <span>My Work</span>
-          </Link>
+          <div>
+            <div
+              className={`px-3 py-2.5 text-xs font-semibold ${
+                pathname.startsWith('/qcwashing/my-work') ? 'text-neutral-900' : 'text-neutral-700'
+              }`}
+            >
+              My Work
+            </div>
+            <div className="ml-4 pl-3 border-l border-neutral-200 space-y-0.5 mb-1">
+              {[
+                { href: '/qcwashing/my-work/incoming', label: 'Incoming Challans' },
+                { href: '/qcwashing/my-work/received', label: 'Received Material' },
+                { href: '/qcwashing/my-work/inspection', label: 'QC Inspection' },
+                { href: '/qcwashing/my-work/issue-challan', label: 'Issue Challan to Recutting' },
+                { href: '/qcwashing/my-work/rejected', label: 'Rejected Material' },
+                { href: '/qcwashing/my-work/rework', label: 'Rework Material' },
+              ].map((item) => {
+                const active = pathname === item.href || pathname.startsWith(item.href + '/');
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileOpen(false)}
+                    aria-current={active ? 'page' : undefined}
+                    className={`flex items-center px-2.5 py-2 rounded-lg text-[11px] font-medium transition ${
+                      active
+                        ? 'bg-brand-50 text-brand-800 border-l-2 border-brand-500 pl-2'
+                        : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
 
-          {/* 3. Issue Challan */}
+          {/* 3. Washing QC History */}
           <Link
-            href="/qcwashing/issue-challan"
+            href="/qcwashing/history"
             onClick={() => setMobileOpen(false)}
-            className={linkClass('/qcwashing/issue-challan', false)}
+            className={linkClass('/qcwashing/history', true)}
           >
-            <Send className="w-4 h-4 shrink-0" />
-            <span>Issue Challan</span>
+            <span>Washing QC History</span>
           </Link>
 
           {/* 4. Floor Board */}
@@ -213,31 +234,20 @@ export function QCWashingNavigation() {
             onClick={() => setMobileOpen(false)}
             className={linkClass('/qcwashing/floor-board', true)}
           >
-            <Kanban className="w-4 h-4 shrink-0" />
             <span>Floor Board</span>
-          </Link>
-
-          {/* 5. Production Sheets */}
-          <Link
-            href="/qcwashing/my-work?tab=PRODUCTION_SHEETS"
-            onClick={() => setMobileOpen(false)}
-            className={linkClass('/qcwashing/my-work?tab=PRODUCTION_SHEETS', false)}
-          >
-            <FileText className="w-4 h-4 shrink-0" />
-            <span>Production Sheets</span>
           </Link>
         </nav>
 
         {/* USER & SIGN OUT FOOTER */}
-        <div className="p-4 border-t border-neutral-200 bg-white">
+        <div className="p-4 border-t border-neutral-200 bg-white/75 backdrop-blur-sm">
           <div className="flex items-center gap-3 mb-3">
             <UserCircle className="w-8 h-8 text-brand-700" />
             <div className="flex-1 min-w-0">
               <span className="text-xs font-semibold text-neutral-900 truncate block drop-shadow-xs">
-                {currentUser.fullName || (isAdmin ? 'System Administrator' : 'QC Washing Inspector')}
+                {currentUser.fullName || (isAdmin ? 'System Administrator' : 'Washing QC Inspector')}
               </span>
               <span className="text-[10px] text-brand-700 font-bold tracking-wide block truncate drop-shadow-xs">
-                QC Washing Department
+                Washing QC
               </span>
             </div>
           </div>

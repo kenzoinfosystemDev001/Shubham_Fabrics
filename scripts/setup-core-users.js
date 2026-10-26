@@ -318,34 +318,40 @@ async function setup() {
   await prisma.userRole.create({ data: { userId: finalCheckUser.id, roleId: finalCheckRole.id } });
   console.log('✓ Final QC user ready: finalcheck (FINAL_CHECK_INSPECTOR)');
 
-  // 12. Packing & Inventory Department & User
+  // 12. Inventory Department & User (Packing is a module of Inventory, not a department).
+  // An existing "packing" station user (the earlier Packing & Inventory department) is reused.
   await prisma.department.upsert({
-    where: { code: 'PACKING' },
-    update: { name: 'Folding, Tagging & Polybagging', sequenceOrder: 16 },
-    create: { code: 'PACKING', name: 'Folding, Tagging & Polybagging', sequenceOrder: 16, description: 'Finished garment folding, tagging, carton packing, and inventory update' },
+    where: { code: 'INVENTORY' },
+    update: { name: 'Inventory Department', sequenceOrder: 16 },
+    create: { code: 'INVENTORY', name: 'Inventory Department', sequenceOrder: 16, description: 'Finished garment receipt, inventory and packing' },
   });
 
-  let packingRole = await prisma.role.findFirst({ where: { code: 'PACKING_SUPERVISOR' } });
-  if (!packingRole) {
-    packingRole = await prisma.role.create({
-      data: { code: 'PACKING_SUPERVISOR', name: 'Packing Supervisor', description: 'Packing, packaging, and finished goods inventory supervisor', isSystem: true },
+  let inventoryRole = await prisma.role.findFirst({ where: { code: 'INVENTORY_SUPERVISOR' } });
+  if (!inventoryRole) {
+    inventoryRole = await prisma.role.create({
+      data: { code: 'INVENTORY_SUPERVISOR', name: 'Inventory Supervisor', description: 'Finished garment inventory and packing', isSystem: true },
     });
   }
 
-  const packingUser = await prisma.user.upsert({
-    where: { username: 'packing' },
-    update: { departmentCode: 'PACKING', fullName: 'Packing Supervisor' },
-    create: {
-      username: 'packing',
-      email: 'packing@subhamfabrics.com',
-      fullName: 'Packing Supervisor',
-      passwordHash: hash,
-      departmentCode: 'PACKING',
-    },
-  });
-  await prisma.userRole.deleteMany({ where: { userId: packingUser.id } });
-  await prisma.userRole.create({ data: { userId: packingUser.id, roleId: packingRole.id } });
-  console.log('✓ Packing user ready: packing (PACKING_SUPERVISOR)');
+  const existingInventoryUser =
+    (await prisma.user.findUnique({ where: { username: 'inventory' } })) || (await prisma.user.findUnique({ where: { username: 'packing' } }));
+  const inventoryUser = existingInventoryUser
+    ? await prisma.user.update({
+        where: { id: existingInventoryUser.id },
+        data: { username: 'inventory', departmentCode: 'INVENTORY', fullName: 'Inventory Supervisor' },
+      })
+    : await prisma.user.create({
+        data: {
+          username: 'inventory',
+          email: 'inventory@subhamfabrics.com',
+          fullName: 'Inventory Supervisor',
+          passwordHash: hash,
+          departmentCode: 'INVENTORY',
+        },
+      });
+  await prisma.userRole.deleteMany({ where: { userId: inventoryUser.id } });
+  await prisma.userRole.create({ data: { userId: inventoryUser.id, roleId: inventoryRole.id } });
+  console.log('✓ Inventory user ready: inventory (INVENTORY_SUPERVISOR)');
 
   console.log('✓ Downstream factory route departments verified');
 

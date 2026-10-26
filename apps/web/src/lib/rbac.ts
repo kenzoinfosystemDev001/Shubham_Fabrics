@@ -340,7 +340,8 @@ export function isSteamPressUser(user: MESUser | null): boolean {
   );
 }
 
-export function isPackingUser(user: MESUser | null): boolean {
+/** Inventory Department (Packing is a module of Inventory); "packing" / PACKING_* are the earlier department's names. */
+export function isInventoryUser(user: MESUser | null): boolean {
   if (!user) return false;
   if (isAdminUser(user)) return true; // Admins have all access
 
@@ -350,12 +351,15 @@ export function isPackingUser(user: MESUser | null): boolean {
   const roles = (user.roles || []).map((r) => r.toUpperCase());
 
   return (
+    username === 'inventory' ||
     username === 'packing' ||
     username === 'packing_supervisor' ||
+    dept === 'INVENTORY' ||
     dept === 'PACKING' ||
     dept === 'FINISHED_GOODS' ||
-    role === 'PACKING_SUPERVISOR' ||
-    roles.includes('PACKING_SUPERVISOR')
+    ['INVENTORY_SUPERVISOR', 'INVENTORY_OPERATOR', 'INVENTORY_INCHARGE', 'PACKING_SUPERVISOR', 'PACKING_OPERATOR', 'PACKING_INCHARGE'].some(
+      (r) => role === r || roles.includes(r),
+    )
   );
 }
 
@@ -405,7 +409,7 @@ export function isFinishingUser(user: MESUser | null): boolean {
 export function getUserStationHome(user: MESUser | null): string {
   if (!user) return '/login';
   if (isAdminUser(user)) return '/admin';
-  if (isPackingUser(user)) return '/packing';
+  if (isInventoryUser(user)) return '/inventory';
   if (isFinalCheckUser(user)) return '/final-check';
   if (isSteamPressUser(user)) return '/steam-press';
   if (isFinishingUser(user)) return '/finishing';
@@ -517,7 +521,7 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
     };
   }
 
-  // QC2 Department routes protection
+  // Threadcut QC (QC2) routes protection
   if (pathname.startsWith('/qc2')) {
     if (isQc2User(user)) {
       return { allowed: true, redirectTarget: pathname };
@@ -525,11 +529,11 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
     return {
       allowed: false,
       redirectTarget: defaultUserHome,
-      reason: 'Access Restricted: You are not authorized for the QC2 Department. Access is restricted to QC2 Quality personnel and Admins.',
+      reason: 'Access Restricted: You are not authorized for Threadcut QC. Access is restricted to Threadcut QC personnel and Admins.',
     };
   }
 
-  // QC Washing Department routes protection
+  // Washing QC (QC3) routes protection
   if (pathname.startsWith('/qcwashing') || pathname.startsWith('/qc-washing') || pathname.startsWith('/qc3')) {
     if (isQcWashingUser(user)) {
       return { allowed: true, redirectTarget: pathname };
@@ -537,7 +541,7 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
     return {
       allowed: false,
       redirectTarget: defaultUserHome,
-      reason: 'Access Restricted: You are not authorized for the QC Washing Department. Access is restricted to QC Washing personnel and Admins.',
+      reason: 'Access Restricted: You are not authorized for Washing QC. Access is restricted to Washing QC personnel and Admins.',
     };
   }
 
@@ -601,15 +605,15 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
     };
   }
 
-  // Packing & Inventory Department routes protection
-  if (pathname.startsWith('/packing')) {
-    if (isPackingUser(user)) {
+  // Inventory Department routes protection (/packing only redirects into Inventory)
+  if (pathname.startsWith('/inventory') || pathname.startsWith('/packing')) {
+    if (isInventoryUser(user)) {
       return { allowed: true, redirectTarget: pathname };
     }
     return {
       allowed: false,
       redirectTarget: defaultUserHome,
-      reason: 'Access Restricted: You are not authorized for Packing & Inventory. Access is restricted to Packing personnel and Admins.',
+      reason: 'Access Restricted: You are not authorized for the Inventory Department. Access is restricted to Inventory personnel and Admins.',
     };
   }
 
@@ -643,7 +647,7 @@ export function checkRouteAccess(pathname: string, user: MESUser | null): {
       !pathname.startsWith('/finishing/floor-board') &&
       !pathname.startsWith('/steam-press/floor-board') &&
       !pathname.startsWith('/final-check/floor-board') &&
-      !pathname.startsWith('/packing/floor-board') &&
+      !pathname.startsWith('/inventory/floor-board') &&
       !pathname.startsWith('/thread-cutting/floor-board'));
 
   if (isProgrammingRoute) {

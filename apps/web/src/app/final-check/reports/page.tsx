@@ -1,6 +1,6 @@
-import React from 'react';
-import { FinalCheckWorkspace } from '@/components/FinalCheckWorkspace';
+import { redirect } from 'next/navigation';
 
-export default function FinalCheckReportsPage() {
-  return <FinalCheckWorkspace section="reports" />;
+/** Quality reporting is now Inspection History. */
+export default function FinalQcReportsPage() {
+  redirect('/final-check/history');
 }

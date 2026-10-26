@@ -1348,9 +1348,6 @@ export default function CreateProductionSheetPage() {
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <div>
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-700 block">
-              SHUBHAM FABRICS &middot; PROGRAMMING DEPARTMENT
-            </span>
             <h1 className="text-lg font-black text-neutral-900 flex items-center gap-2">
               <span>Production Sheet Management</span>
               {designNumber && (
@@ -1573,7 +1570,7 @@ export default function CreateProductionSheetPage() {
                         className="w-3.5 h-3.5 text-accent-700 rounded border-neutral-300 focus:ring-brand-500/40 cursor-pointer"
                       />
                       <span className={isForwarded ? 'text-accent-800 font-black' : 'text-neutral-600'}>
-                        {isForwarded ? '✓ Included for Forwarding' : 'Forward Later'}
+                        {isForwarded ? 'Included for Forwarding' : 'Forward Later'}
                       </span>
                     </label>
                   </div>
@@ -1603,18 +1600,75 @@ export default function CreateProductionSheetPage() {
                             className="w-full border-[1.5px] border-neutral-200 px-3 py-1.5 h-10 font-bold text-xs bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 shadow-2xs"
                           />
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => {
+                        {(() => {
+                          // Wilcom designs saved for this sheet (an "Other" style's designs are stored under its name).
+                          const customName = cat === 'OTHER' ? comp.styleName.trim().toUpperCase() : null;
+                          const catEntries = wilcomEntries.filter((e) => e.category === cat || (customName !== null && e.category === customName));
+                          const withPhoto = catEntries.filter((e) => e.photoUrl);
+                          const openWilcom = () => {
                             setWilcomCategory(cat);
                             setShowWilcomModal(true);
-                          }}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-900 text-[10px] font-bold border border-brand-200 rounded transition cursor-pointer"
-                          title={`Manage Wilcom specifications for ${categoryDisplayName}`}
-                        >
-                          <Sparkles className="w-3 h-3" />
-                          Manage Wilcom
-                        </button>
+                          };
+                          return (
+                            <div>
+                              <span className="block text-[11px] font-black uppercase tracking-wider text-neutral-900 mb-1">
+                                WILCOM:
+                              </span>
+                              <div className="flex items-center gap-3 border-[1.5px] border-neutral-200 bg-white px-3 py-2 shadow-2xs">
+                                <span className="w-8 h-8 shrink-0 rounded-md bg-brand-50 border border-brand-100 flex items-center justify-center" aria-hidden="true">
+                                  <Sparkles className="w-4 h-4 text-brand-600" />
+                                </span>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs font-bold text-neutral-900">
+                                    {catEntries.length === 0
+                                      ? 'No Wilcom design yet'
+                                      : `${catEntries.length} ${catEntries.length === 1 ? 'design' : 'designs'} attached`}
+                                  </p>
+                                  <p className={`text-[11px] text-neutral-500 truncate ${catEntries.length ? 'font-mono' : ''}`}>
+                                    {catEntries.length
+                                      ? catEntries.map((e) => e.wilcomDesignNumber).join(' · ')
+                                      : `Add the embroidery design for ${categoryDisplayName}`}
+                                  </p>
+                                </div>
+                                {withPhoto.length > 0 && (
+                                  <div className="hidden sm:flex items-center -space-x-2 shrink-0">
+                                    {withPhoto.slice(0, 3).map((e) => (
+                                      // eslint-disable-next-line @next/next/no-img-element
+                                      <img
+                                        key={e.id}
+                                        src={e.photoUrl}
+                                        alt={`Wilcom ${e.wilcomDesignNumber}`}
+                                        className="w-8 h-8 rounded-md border-2 border-white bg-white object-contain shadow-2xs"
+                                      />
+                                    ))}
+                                    {withPhoto.length > 3 && (
+                                      <span className="w-8 h-8 rounded-md border-2 border-white bg-neutral-100 text-[10px] font-bold text-neutral-700 flex items-center justify-center">
+                                        +{withPhoto.length - 3}
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+                                <button
+                                  type="button"
+                                  onClick={openWilcom}
+                                  className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-bold transition cursor-pointer ${
+                                    catEntries.length
+                                      ? 'bg-white text-brand-800 border border-brand-300 hover:bg-brand-50'
+                                      : 'bg-brand-600 text-white hover:bg-brand-700'
+                                  }`}
+                                  title={`Manage Wilcom specifications for ${categoryDisplayName}`}
+                                >
+                                  {catEntries.length ? 'Manage' : (
+                                    <>
+                                      <Plus className="w-3 h-3" />
+                                      Add design
+                                    </>
+                                  )}
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })()}
 
                         {/* STYLE & PATTERN (SIDE-BY-SIDE EQUAL BOXES) */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

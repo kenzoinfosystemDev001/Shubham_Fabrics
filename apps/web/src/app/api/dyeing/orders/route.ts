@@ -1,113 +1,66 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { requireDepartment } from '@/lib/auth/department-access';
+import { syncInboundChallansToDyeingOrders } from '@/lib/dyeing-sync';
+import { DYEING_ORDER_INCLUDE, dyeingErrorResponse } from '@/lib/dyeing-server';
+import { OPEN_DYEING_STATUSES, availableForQc, stageOf } from '@/lib/dyeing-workflow.mjs';
 
 export const dynamic = 'force-dynamic';
 
-import { syncInboundChallansToDyeingOrders } from '@/lib/dyeing-sync';
-import { requireDepartment } from '@/lib/auth/department-access';
-
-// GET /api/dyeing/orders
+/**
+ * GET /api/dyeing/orders
+ * Filters: status (comma list), stage (Floor Board stage key), open=1 (work still in Dyeing),
+ * overdue=1 (open and past delivery date), qcReady=1 (dyed quantity not yet sent),
+ * programId, priority, search.
+ */
 export async function GET(request: Request) {
-  const { user: authUser, response: authResponse } = await requireDepartment(request, 'DYEING');
-  if (!authUser) return authResponse;
+  const { user, response } = await requireDepartment(request, 'DYEING');
+  if (!user) return response;
   try {
-    const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status');
-    const priority = searchParams.get('priority');
-    const search = searchParams.get('search');
-    const programId = searchParams.get('programId');
-
-    // Auto-sync any fresh inbound challans from Fabric Store
     await syncInboundChallansToDyeingOrders();
+    const p = new URL(request.url).searchParams;
+    const statuses = (p.get('status') || '').split(',').map((s) => s.trim()).filter((s) => s && s !== 'ALL');
+    const priority = p.get('priority');
+    const search = p.get('search')?.trim();
 
     const where: any = {};
-    if (status && status !== 'ALL') where.status = status;
+    if (statuses.length) where.status = { in: statuses };
+    else if (p.get('open') === '1' || p.get('overdue') === '1') where.status = { in: OPEN_DYEING_STATUSES };
     if (priority && priority !== 'ALL') where.priority = priority;
-    if (programId) where.programId = programId;
-
+    if (p.get('programId')) where.programId = p.get('programId');
+    if (p.get('overdue') === '1') where.program = { deliveryDate: { lt: new Date() } };
     if (search) {
       where.OR = [
         { orderNumber: { contains: search, mode: 'insensitive' } },
         { fabricName: { contains: search, mode: 'insensitive' } },
         { targetColor: { contains: search, mode: 'insensitive' } },
         { dyedColor: { contains: search, mode: 'insensitive' } },
-        { inchargeName: { contains: search, mode: 'insensitive' } },
+        { inboundChallan: { challanNumber: { contains: search, mode: 'insensitive' } } },
         {
           program: {
             OR: [
               { programNumber: { contains: search, mode: 'insensitive' } },
               { programSerialNo: { contains: search, mode: 'insensitive' } },
+              { designNumber: { contains: search, mode: 'insensitive' } },
               { clientName: { contains: search, mode: 'insensitive' } },
-              { buyerName: { contains: search, mode: 'insensitive' } },
-              { styleCode: { contains: search, mode: 'insensitive' } },
             ],
           },
         },
       ];
     }
 
-    const orders = await prisma.dyeingOrder.findMany({
+    let orders = await prisma.dyeingOrder.findMany({
       where,
-      include: {
-        program: {
-          select: {
-            id: true,
-            programNumber: true,
-            programSerialNo: true,
-            clientName: true,
-            buyerName: true,
-            styleCode: true,
-            mainStyle: true,
-            fabricName: true,
-            fabricType: true,
-            fabricColor: true,
-            targetQuantity: true,
-            deliveryDate: true,
-            priority: true,
-            status: true,
-            quantityMeasurement: true,
-            wilcomDesignPhoto: true,
-            baseDesignPhoto: true,
-          },
-        },
-        inboundChallan: {
-          select: {
-            id: true,
-            challanNumber: true,
-            fromDepartment: true,
-            toDepartment: true,
-            status: true,
-            priority: true,
-            issuedDate: true,
-            remarks: true,
-            items: true,
-          },
-        },
-        qc1Challan: {
-          select: {
-            id: true,
-            challanNumber: true,
-            fromDepartment: true,
-            toDepartment: true,
-            status: true,
-            issuedDate: true,
-            items: true,
-          },
-        },
-        incharge: {
-          select: {
-            id: true,
-            fullName: true,
-            username: true,
-          },
-        },
-      },
-      orderBy: { createdAt: 'desc' },
+      include: DYEING_ORDER_INCLUDE,
+      orderBy: [{ createdAt: 'desc' }, { orderNumber: 'asc' }],
+      take: 500,
     });
+    const stage = p.get('stage');
+    if (stage) orders = orders.filter((o) => stageOf(o) === stage);
+    if (p.get('qcReady') === '1') orders = orders.filter((o) => availableForQc(o) > 0);
 
     return NextResponse.json({ data: orders });
-  } catch (error: any) {
-    console.error('Error fetching dyeing orders:', error);
-    return NextResponse.json({ error: error.message || 'Failed to fetch dyeing orders' }, { status: 500 });
+  } catch (error) {
+    return dyeingErrorResponse(error, 'Failed to load dyeing records.');
   }
 }

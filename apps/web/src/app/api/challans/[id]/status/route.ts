@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import { requireUser } from '@/lib/auth/require-user';
 import { canUpdateChallan } from '@/lib/auth/department-access';
+import { workflowReceiving } from '@/lib/work-items-server';
 
 import {
   FabricStockError,
@@ -49,6 +50,15 @@ export async function PATCH(
       return NextResponse.json(
         { error: 'Only the sending or receiving department can update this challan.' },
         { status: 403 }
+      );
+    }
+
+    // Work-item departments record what each line actually received (shortages, excess) on their own screen.
+    const receivingFlow = status === 'RECEIVED' ? workflowReceiving(existing) : null;
+    if (receivingFlow) {
+      return NextResponse.json(
+        { error: `Receive this challan from ${receivingFlow.label} > My Work > Incoming Challans so each line's received quantity is recorded.` },
+        { status: 409 }
       );
     }
 
@@ -145,20 +155,8 @@ export async function PATCH(
         }
       }
 
-      // If toDepartment is DYEING and status is RECEIVED, update linked DyeingOrder
-      if (
-        (ch.toDepartment === 'DYEING' || ch.toDepartment.toLowerCase().includes('dye')) &&
-        status === 'RECEIVED'
-      ) {
-        try {
-          await tx.dyeingOrder.updateMany({
-            where: { inboundChallanId: id },
-            data: { status: 'RECEIVED' },
-          });
-        } catch (e) {
-          console.warn('Failed to sync DyeingOrder status:', e);
-        }
-      }
+      // Dyeing orders are not marked received here: Dyeing records the actual quantity per line
+      // through POST /api/dyeing/challans/:id/receive.
 
       // If defective pieces cut, ensure DefectRecord is logged
       if (data.defectivePieces && data.defectivePieces > 0) {

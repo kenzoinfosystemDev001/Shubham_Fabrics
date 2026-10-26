@@ -1,6 +1,6 @@
-import React from 'react';
-import { FinalCheckWorkspace } from '@/components/FinalCheckWorkspace';
+import { redirect } from 'next/navigation';
 
-export default function FinalCheckIncomingPage() {
-  return <FinalCheckWorkspace section="incoming" />;
+/** Moved under My Work. */
+export default function FinalQcIncomingPage() {
+  redirect('/final-check/my-work/incoming');
 }

@@ -24,6 +24,7 @@
     "@subham/types": "*",
     "@subham/validation": "*",
     "bcryptjs": "^3.0.2",
+    "dotenv": "^16.6.1",
     "helmet": "^8.3.0",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",

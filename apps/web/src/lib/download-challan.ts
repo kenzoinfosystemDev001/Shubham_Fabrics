@@ -12,6 +12,16 @@ import { generateCode128SvgBars } from '@/lib/barcode';
 import { getCurrentUser, canViewClientCode } from '@/lib/rbac';
 import { loadProgramDocument } from '@/lib/program-document';
 import { extractRootWilcomPhoto, prepareWilcomImages } from '@/lib/download-wilcom';
+import { generateProductionSheetHtml } from '@/lib/download-production-sheet';
+import { garmentImageUrl, groupGarments, imageFor, isFinishedGoodsChallan } from '@/lib/finished-garments.mjs';
+
+/** A finished garment as printed on the challan: its name and image (a data URL, so the file works offline). */
+export interface PrintedGarment {
+  name: string;
+  image: string | null;
+}
+
+const escapeHtml = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
 export interface ChallanItem {
   id?: string;
@@ -66,12 +76,16 @@ export function generateChallanHtml(challan: any): string {
     EMBROIDERY: 'EMBROIDERY DEPARTMENT',
     THREAD_CUTTING: 'THREAD CUTTING DEPARTMENT',
     CUTTING: 'CUTTING DEPARTMENT',
-    RECUTTING: 'RECUTTING WORKSTATION',
-    QC2: 'QC2 (QUALITY CHECK 2)',
+    RECUTTING: 'RECUTTING DEPARTMENT',
+    STITCHING: 'STITCHING DEPARTMENT',
+    QC2: 'THREADCUT QC',
     WASHING: 'WASHING DEPARTMENT',
-    QCWASHING: 'QC WASHING (QUALITY CHECK 3)',
-    QC3: 'QC3 (QUALITY CHECK 3)',
+    QCWASHING: 'WASHING QC',
+    QC3: 'WASHING QC',
     FINISHING: 'FINISHING DEPARTMENT',
+    STEAM_PRESS: 'STEAM PRESS DEPARTMENT',
+    FINAL_CHECK: 'FINAL QC',
+    INVENTORY: 'INVENTORY',
     PACKING: 'PACKING & DISPATCH',
     PROGRAMMING: 'PROGRAMMING & PLANNING'
   };
@@ -86,17 +100,22 @@ export function generateChallanHtml(challan: any): string {
   } else if (fromDept === 'DYEING' || toDept === 'QC1' || challanNo.startsWith('CH-DYE-')) {
     voucherTitle = 'DYEING → QC1 QUALITY INSPECTION CHALLAN';
   } else if (fromDept === 'THREAD_CUTTING' && toDept === 'QC2') {
-    voucherTitle = 'THREAD CUTTING → QC2 QUALITY CHECK CHALLAN';
+    voucherTitle = 'THREAD CUTTING → THREADCUT QC INSPECTION CHALLAN';
   } else if (fromDept === 'QC2' && toDept === 'WASHING') {
-    voucherTitle = 'QC2 → WASHING DEPARTMENT TRANSFER CHALLAN';
+    voucherTitle = 'THREADCUT QC → WASHING DEPARTMENT TRANSFER CHALLAN';
   } else if (fromDept === 'WASHING' && (toDept === 'QCWASHING' || toDept === 'QC3')) {
-    voucherTitle = 'WASHING → QC WASHING INSPECTION CHALLAN';
+    voucherTitle = 'WASHING → WASHING QC INSPECTION CHALLAN';
+  } else if (fromDept === 'RECUTTING' && toDept === 'STITCHING') {
+    voucherTitle = 'RECUTTING TO STITCHING CATEGORY / STYLE CHALLAN';
   }
 
   // Items
   const items: ChallanItem[] = Array.isArray(challan.items) ? challan.items : [];
   const totalQuantity = items.reduce((sum, it) => sum + (Number(it.quantity) || 0), 0);
   const uom = items[0]?.uom || 'PCS';
+  // Finished garments (Finishing onward): name and image only; the Production Sheet pages follow.
+  const garments: PrintedGarment[] | null = Array.isArray(challan.finishedGarments) ? challan.finishedGarments : null;
+  const attachedSheets: { styles: string; html: string } | null = challan.attachedSheets || null;
 
   // Ledger calculation
   const fabricIn = challan.fabricIn ?? (challan.parentChallan?.fabricOut || totalQuantity);
@@ -370,17 +389,17 @@ export function generateChallanHtml(challan: any): string {
       justify-content: space-between;
       align-items: center;
     }
-    table {
+    .challan-container table {
       width: 100%;
       border-collapse: collapse;
       font-size: 11px;
     }
-    th, td {
+    .challan-container th, .challan-container td {
       border: 1.5px solid #d3ced8;
       padding: 6px 10px;
       text-align: left;
     }
-    th {
+    .challan-container th {
       background: #f1eff4;
       font-weight: 800;
       text-transform: uppercase;
@@ -388,16 +407,51 @@ export function generateChallanHtml(challan: any): string {
       color: #57545e;
       letter-spacing: 0.5px;
     }
-    td.num {
+    .challan-container td.num {
       text-align: right;
       font-family: monospace;
       font-weight: 700;
     }
-    tr.totals-row td {
+    .challan-container tr.totals-row td {
       background: #f8f7fa;
       font-weight: 800;
       font-size: 11px;
       border-top: 2px solid #25232a;
+    }
+
+    /* FINISHED GARMENTS */
+    .garment-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .garment-card {
+      border: 1.5px solid #000000;
+      border-radius: 6px;
+      padding: 8px;
+      text-align: center;
+      break-inside: avoid;
+    }
+    .garment-card img, .garment-card .no-image {
+      width: 100%;
+      height: 150px;
+      object-fit: contain;
+      background: #f8f7fa;
+      border-radius: 4px;
+    }
+    .garment-card .no-image {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: #6b6872;
+      border: 1px dashed #b8b2bf;
+    }
+    .garment-name {
+      margin-top: 6px;
+      font-size: 12px;
+      font-weight: 900;
+      color: #000000;
     }
 
     /* PRODUCTION SHEET ATTACHMENT CARD */
@@ -480,6 +534,12 @@ export function generateChallanHtml(challan: any): string {
       }
     }
   </style>
+  ${attachedSheets ? `<style>${attachedSheets.styles}</style>
+  <style>
+    /* The challan keeps its own type over the Production Sheet's page styles, and the sheets start on a new page. */
+    .challan-container { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 400; letter-spacing: normal; line-height: 1.4; color: #25232a; margin-bottom: 20px; }
+    .challan-page-break { break-after: page; page-break-after: always; }
+  </style>` : ''}
 </head>
 <body>
 
@@ -501,7 +561,7 @@ export function generateChallanHtml(challan: any): string {
     </div>
   </div>
 
-  <div class="challan-container" id="challan-document">
+  <div class="challan-container${attachedSheets ? ' challan-page-break' : ''}" id="challan-document">
     
     <!-- TOP HEADER -->
     <div class="company-header">
@@ -595,6 +655,20 @@ export function generateChallanHtml(challan: any): string {
     ` : ''}
 
     <!-- TRANSFERRED ITEMS TABLE -->
+    ${garments ? `
+    <div class="table-container">
+      <div class="table-title">
+        <span>FINISHED GARMENTS</span>
+        <span>${garments.length} garment${garments.length === 1 ? '' : 's'}${attachedSheets ? ' &middot; Production Sheet attached' : ''}</span>
+      </div>
+      <div class="garment-grid">
+        ${garments.map((g) => `
+        <div class="garment-card">
+          ${g.image ? `<img src="${g.image}" alt="${escapeHtml(g.name)}">` : '<div class="no-image">No image</div>'}
+          <div class="garment-name">${escapeHtml(g.name)}</div>
+        </div>`).join('')}
+      </div>
+    </div>` : `
     <div class="table-container">
       <div class="table-title">
         <span>ITEMS / MATERIALS</span>
@@ -642,7 +716,7 @@ export function generateChallanHtml(challan: any): string {
           </tr>
         </tbody>
       </table>
-    </div>
+    </div>`}
 
 
     <!-- DUAL PHYSICAL HANDOVER AUTHORIZATION SIGNATURES -->
@@ -662,10 +736,11 @@ export function generateChallanHtml(challan: any): string {
     <!-- FOOTER -->
     <div class="footer-notice">
       <span>SHUBHAM FABRICS INDIA PVT. LTD. &middot; MES SHOP-FLOOR LOGISTICS</span>
-      <span>CHALLAN ID: ${challan.id || challanNo} &middot; PAGE 1 OF 1</span>
+      <span>CHALLAN ID: ${challan.id || challanNo}${attachedSheets ? '' : ' &middot; PAGE 1 OF 1'}</span>
     </div>
 
   </div>
+  ${attachedSheets ? attachedSheets.html : ''}
 
   <script>
     window.downloadSelf = function() {
@@ -684,16 +759,68 @@ export function generateChallanHtml(challan: any): string {
 </html>`;
 }
 
+/** An image fetched as a data URL (so a saved challan shows it offline); its address when that fails. */
+async function imageAsDataUrl(url: string): Promise<string | null> {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const blob = await res.blob();
+    return await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result));
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return typeof window !== 'undefined' ? new URL(url, window.location.origin).href : url;
+  }
+}
+
+/** The finished garments of a challan, each once, with its image. */
+async function printedGarments(challan: any): Promise<PrintedGarment[]> {
+  const programId = challan.programId || challan.program?.id;
+  const groups = groupGarments((challan.items || []).map((i: any) => ({ ...i, programId: i.programId || programId })));
+  let images: any[] = [];
+  if (programId) {
+    const res = await fetch(`/api/garment-images?programIds=${encodeURIComponent(programId)}`).catch(() => null);
+    const body = res && res.ok ? await res.json().catch(() => ({})) : {};
+    images = body.data || [];
+  }
+  return Promise.all(
+    groups.map(async (g) => {
+      const url = garmentImageUrl(imageFor(images, g.items[0]));
+      return { name: g.name, image: url ? await imageAsDataUrl(url) : null };
+    }),
+  );
+}
+
+/** The Production Sheet pages of the program, to print after the challan. */
+function productionSheetPages(program: any): { styles: string; html: string } | null {
+  if (typeof DOMParser === 'undefined') return null;
+  const doc = new DOMParser().parseFromString(generateProductionSheetHtml(program, 'ALL'), 'text/html');
+  const html = Array.from(doc.querySelectorAll('.sheet-wrapper')).map((el) => el.outerHTML).join('\n');
+  if (!html) return null;
+  return { styles: Array.from(doc.querySelectorAll('style')).map((s) => s.textContent || '').join('\n'), html };
+}
+
+/**
+ * The challan with everything its document shows: the full program and, for finished garments
+ * (Finishing onward), each garment's name and image and the Production Sheet pages.
+ */
+async function completeChallanFor(challan: any) {
+  const program = await prepareWilcomImages(await loadProgramDocument(challan.program || { id: challan.programId }));
+  const complete = { ...challan, program };
+  if (!isFinishedGoodsChallan(challan)) return complete;
+  return { ...complete, finishedGarments: await printedGarments(complete), attachedSheets: productionSheetPages(program) };
+}
+
 /**
  * Downloads Challan as an offline, standalone self-contained HTML file
  */
 export async function downloadChallanHtml(challan: any): Promise<void> {
   if (!challan) return;
   try {
-    const completeChallan = {
-      ...challan,
-      program: await prepareWilcomImages(await loadProgramDocument(challan.program || { id: challan.programId })),
-    };
+    const completeChallan = await completeChallanFor(challan);
     const html = generateChallanHtml(completeChallan);
     const challanNo = (completeChallan.challanNumber || 'CHALLAN').replace(/[^a-zA-Z0-9_-]/g, '_');
     const fromDept = (completeChallan.fromDepartment || 'FROM').replace(/[^a-zA-Z0-9_-]/g, '_');
@@ -723,10 +850,7 @@ export function printChallan(challan: any): void {
   if (printWindow) {
     void (async () => {
       try {
-        const completeChallan = {
-          ...challan,
-          program: await prepareWilcomImages(await loadProgramDocument(challan.program || { id: challan.programId })),
-        };
+        const completeChallan = await completeChallanFor(challan);
         printWindow.document.open();
         printWindow.document.write(generateChallanHtml(completeChallan));
         printWindow.document.close();

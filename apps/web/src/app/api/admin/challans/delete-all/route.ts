@@ -19,7 +19,10 @@ export async function DELETE(request: Request) {
           data: { parentChallanId: null },
         });
 
-        // 2. Unlink Challans from Dyeing Orders
+        // 2. Department work items are derived from challans: remove them with the challans.
+        await tx.departmentWorkItem.deleteMany({});
+
+        // Unlink Challans from Dyeing Orders
         await tx.dyeingOrder.updateMany({
           data: { inboundChallanId: null, qc1ChallanId: null },
         });

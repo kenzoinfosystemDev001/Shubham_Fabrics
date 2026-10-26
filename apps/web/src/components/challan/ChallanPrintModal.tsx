@@ -17,6 +17,8 @@ import { generateCode128SvgBars } from '@/lib/barcode';
 import { getCurrentUser, canViewClientCode } from '@/lib/rbac';
 import { extractRootWilcomPhoto } from '@/lib/download-wilcom';
 import { useProgramDocument } from '@/hooks/useProgramDocument';
+import { FinishedGarmentList, useGarmentImages } from '@/components/workflow/FinishedGarments';
+import { isFinishedGoodsChallan } from '@/lib/finished-garments.mjs';
 
 interface ChallanPrintModalProps {
   challan: any;
@@ -36,6 +38,9 @@ export function ChallanPrintModal({
   const sourceProgram = sourceChallan?.program || (sourceChallan?.programId ? { id: sourceChallan.programId } : undefined);
   const { program, loading, error } = useProgramDocument(sourceProgram, isOpen);
   const challan = sourceChallan ? { ...sourceChallan, program: program || sourceProgram } : null;
+  // Finished garments (Finishing onward): name and image only, sent with the Production Sheet.
+  const finishedGoods = isFinishedGoodsChallan(sourceChallan);
+  const { images: garmentImages } = useGarmentImages(isOpen && finishedGoods ? [sourceChallan?.programId || sourceProgram?.id] : []);
   if (!isOpen || !challan) return null;
 
   const currentUser = typeof window !== 'undefined' ? getCurrentUser() : null;
@@ -77,12 +82,16 @@ export function ChallanPrintModal({
     EMBROIDERY: 'EMBROIDERY DEPARTMENT',
     THREAD_CUTTING: 'THREAD CUTTING DEPARTMENT',
     CUTTING: 'CUTTING DEPARTMENT',
-    RECUTTING: 'RECUTTING WORKSTATION',
-    QC2: 'QC2 (QUALITY CHECK 2)',
+    RECUTTING: 'RECUTTING DEPARTMENT',
+    STITCHING: 'STITCHING DEPARTMENT',
+    QC2: 'THREADCUT QC',
     WASHING: 'WASHING DEPARTMENT',
-    QCWASHING: 'QC WASHING (QUALITY CHECK 3)',
-    QC3: 'QC3 (QUALITY CHECK 3)',
+    QCWASHING: 'WASHING QC',
+    QC3: 'WASHING QC',
     FINISHING: 'FINISHING DEPARTMENT',
+    STEAM_PRESS: 'STEAM PRESS DEPARTMENT',
+    FINAL_CHECK: 'FINAL QC',
+    INVENTORY: 'INVENTORY',
     PACKING: 'PACKING & DISPATCH',
     PROGRAMMING: 'PROGRAMMING & PLANNING'
   };
@@ -298,7 +307,21 @@ export function ChallanPrintModal({
               </div>
             )}
 
+            {/* Finished garments */}
+            {finishedGoods && (
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-neutral-700">
+                  <span>FINISHED GARMENTS</span>
+                  <span className="normal-case font-semibold">Production Sheet {programSerial} is printed with this challan</span>
+                </div>
+                <div className="border-[1.5px] border-neutral-200 rounded">
+                  <FinishedGarmentList items={items} programId={challan.programId || prog.id} images={garmentImages} />
+                </div>
+              </div>
+            )}
+
             {/* Items Table */}
+            {!finishedGoods && (
             <div className="space-y-1">
               <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-neutral-700">
                 <span>ITEMS / MATERIALS</span>
@@ -353,6 +376,7 @@ export function ChallanPrintModal({
                 </table>
               </div>
             </div>
+            )}
 
 
             {/* Dual Custody Signatures Bar */}

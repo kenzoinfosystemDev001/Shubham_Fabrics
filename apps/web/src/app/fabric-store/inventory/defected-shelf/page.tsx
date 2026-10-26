@@ -71,7 +71,7 @@ const DEPARTMENT_SHELVES: DepartmentShelfInfo[] = [
   },
   {
     code: 'DEF-SHELF-QC2',
-    name: 'Thread Cut QC Defective Shelf',
+    name: 'Threadcut QC Defective Shelf',
     deptKey: 'QC2',
     badgeColor: 'bg-danger-100 text-danger-900 border-danger-300',
     borderLight: 'border-danger-200',
@@ -386,7 +386,7 @@ export default function DefectedShelfPage() {
               6 Stations
             </p>
             <span className="text-[10px] text-neutral-500">
-              Store · Dyeing · QC1 · Emb · THC · QC2
+              Store · Dyeing · QC1 · Emb · THC · Threadcut QC
             </span>
           </div>
 
@@ -580,7 +580,7 @@ export default function DefectedShelfPage() {
                   { key: 'QC1', label: 'Dyeing QC (DEF-SHELF-QC1)' },
                   { key: 'EMBROIDERY', label: 'Embroidery (DEF-SHELF-EMBROIDERY)' },
                   { key: 'THREAD_CUTTING', label: 'Thread Cutting (DEF-SHELF-THREAD-CUTTING)' },
-                  { key: 'QC2', label: 'Thread Cut QC (DEF-SHELF-QC2)' },
+                  { key: 'QC2', label: 'Threadcut QC (DEF-SHELF-QC2)' },
                   { key: 'QC3', label: 'Washing QC (DEF-SHELF-QC3)' },
                   { key: 'FINAL_CHECK', label: 'Final check (DEF-SHELF-FINAL-CHECK)' },
                 ].map((tab) => (

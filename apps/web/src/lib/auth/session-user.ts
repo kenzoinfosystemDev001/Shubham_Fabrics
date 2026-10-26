@@ -204,12 +204,18 @@ export function buildSessionUser(user: SessionUserSource): SessionUser {
       roleCodes.includes('FINISHING_OPERATOR') ||
       roleCodes.includes('FINISHING_INCHARGE'));
 
-  const isPacking =
+  // Inventory (Packing is a module of it); PACKING_* / "packing" are the earlier department's names.
+  const isInventory =
     !isAdmin &&
-    (user.username.toLowerCase() === 'packing' ||
+    (user.username.toLowerCase() === 'inventory' ||
+      user.username.toLowerCase() === 'packing' ||
       user.username.toLowerCase() === 'packing_supervisor' ||
+      user.departmentCode === 'INVENTORY' ||
       user.departmentCode === 'PACKING' ||
       user.departmentCode === 'FINISHED_GOODS' ||
+      roleCodes.includes('INVENTORY_SUPERVISOR') ||
+      roleCodes.includes('INVENTORY_OPERATOR') ||
+      roleCodes.includes('INVENTORY_INCHARGE') ||
       roleCodes.includes('PACKING_SUPERVISOR') ||
       roleCodes.includes('PACKING_OPERATOR') ||
       roleCodes.includes('PACKING_INCHARGE'));
@@ -268,8 +274,8 @@ export function buildSessionUser(user: SessionUserSource): SessionUser {
     ? 'EMBROIDERY_INCHARGE'
     : isProgramming
     ? 'PROGRAMMER'
-    : isPacking
-    ? 'PACKING_SUPERVISOR'
+    : isInventory
+    ? 'INVENTORY_SUPERVISOR'
     : isFinalCheck
     ? 'FINAL_CHECK_INSPECTOR'
     : isSteamPress
@@ -302,8 +308,8 @@ export function buildSessionUser(user: SessionUserSource): SessionUser {
     ? 'EMBROIDERY'
     : isProgramming
     ? 'PROGRAMMING'
-    : isPacking
-    ? 'PACKING'
+    : isInventory
+    ? 'INVENTORY'
     : isFinalCheck
     ? 'FINAL_CHECK'
     : isSteamPress
@@ -334,8 +340,8 @@ export function buildSessionUser(user: SessionUserSource): SessionUser {
     ? '/fabric-store'
     : isEmbroidery
     ? '/embroidery'
-    : isPacking
-    ? '/packing'
+    : isInventory
+    ? '/inventory'
     : isFinalCheck
     ? '/final-check'
     : isSteamPress
