@@ -62,7 +62,7 @@ export async function GET(request: Request) {
     const grns = await prisma.materialReceipt.findMany({
       where,
       include: {
-        batch: { select: { batchNumber: true, fabricType: true, fabricDescription: true, colorName: true } },
+        batch: { select: { batchNumber: true, fabricType: true, fabricDescription: true, colorName: true, unit: true } },
         receivedBy: { select: { fullName: true } },
         _count: { select: { items: true } },
       },
@@ -90,6 +90,7 @@ export async function POST(request: Request) {
       colorCode,
       colorName,
       programId,
+      unit: rawUnit,
       rolls: rollInputs,
     } = body;
 
@@ -98,6 +99,11 @@ export async function POST(request: Request) {
         { error: 'supplierName, fabricType, and fabricDescription are required' },
         { status: 400 }
       );
+    }
+    // Older clients send no unit; GRNs were meters-only before the unit dropdown.
+    const unit = rawUnit === undefined || rawUnit === null || rawUnit === '' ? 'MTR' : String(rawUnit).toUpperCase();
+    if (unit !== 'MTR' && unit !== 'PCS') {
+      return NextResponse.json({ error: 'unit must be MTR or PCS' }, { status: 400 });
     }
     if (!Array.isArray(rollInputs) || rollInputs.length === 0) {
       return NextResponse.json({ error: 'At least one roll entry is required' }, { status: 400 });
@@ -142,6 +148,7 @@ export async function POST(request: Request) {
           programId: programId || null,
           totalRolls: rollInputs.length,
           totalMeters,
+          unit,
           status: 'PARTIALLY_RECEIVED',
           createdById: actor.id,
         },

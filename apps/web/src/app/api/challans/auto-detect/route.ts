@@ -1,7 +1,20 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { challanTotalsByUnit, unitOf } from '@/lib/challan-units.mjs';
 
 export const dynamic = 'force-dynamic';
+
+// The prior challan's OUT is this department's IN, per unit. One unit: detectedFabricIn + detectedUnit as
+// before. Lines in both units: detectedFabricIn and detectedUnit are null and detectedTotals holds each
+// unit's quantity, so meters and pieces are never added together.
+function detectIn(challan: { items: Array<{ quantity: number; uom: string }>; fabricUnit: string | null; fabricIn: number | null; fabricOut: number | null }) {
+  const detectedTotals: Record<string, number> = challanTotalsByUnit(challan);
+  const units = Object.keys(detectedTotals);
+  if (units.length > 1) return { detectedFabricIn: null as number | null, detectedUnit: null as string | null, detectedTotals };
+  const detectedUnit = units[0] || unitOf(challan.fabricUnit) || 'MTR';
+  const detectedFabricIn = challan.fabricOut ?? (detectedTotals[detectedUnit] || challan.fabricIn || 0);
+  return { detectedFabricIn: detectedFabricIn as number | null, detectedUnit: detectedUnit as string | null, detectedTotals: { [detectedUnit]: detectedFabricIn } };
+}
 
 // Map departments to their possible alias strings in toDepartment
 const DEPT_ALIASES: Record<string, string[]> = {
@@ -67,24 +80,15 @@ export async function GET(request: Request) {
       });
 
       if (parent) {
-        const itemsTotal = parent.items.reduce(
-          (sum, it) => sum + (Number(it.quantity) || 0),
-          0
-        );
-        // The leftover pieces/fabric OUT from parent is this department's IN!
-        const detectedFabricIn =
-          parent.fabricOut !== null && parent.fabricOut !== undefined
-            ? parent.fabricOut
-            : itemsTotal > 0
-              ? itemsTotal
-              : parent.fabricIn ?? 0;
-        const detectedUnit = parent.fabricUnit || parent.items[0]?.uom || 'MTR';
+        // The leftover pieces/fabric OUT from parent is this department's IN (per unit).
+        const { detectedFabricIn, detectedUnit, detectedTotals } = detectIn(parent);
 
         return NextResponse.json({
           success: true,
           data: {
             detectedFabricIn,
             detectedUnit,
+            detectedTotals,
             detectedFromDepartment: parent.fromDepartment,
             detectedFromChallanId: parent.id,
             detectedFromChallanNumber: parent.challanNumber,
@@ -163,25 +167,15 @@ export async function GET(request: Request) {
         }
 
         if (inboundChallan) {
-          const itemsTotal = inboundChallan.items.reduce(
-            (sum, it) => sum + (Number(it.quantity) || 0),
-            0
-          );
-          // The pieces/fabric OUT from the prior department is the IN for this department!
-          const detectedFabricIn =
-            inboundChallan.fabricOut !== null && inboundChallan.fabricOut !== undefined
-              ? inboundChallan.fabricOut
-              : itemsTotal > 0
-                ? itemsTotal
-                : inboundChallan.fabricIn ?? 0;
-          const detectedUnit =
-            inboundChallan.fabricUnit || inboundChallan.items[0]?.uom || 'MTR';
+          // The pieces/fabric OUT from the prior department is the IN for this department (per unit).
+          const { detectedFabricIn, detectedUnit, detectedTotals } = detectIn(inboundChallan);
 
           return NextResponse.json({
             success: true,
             data: {
               detectedFabricIn,
               detectedUnit,
+              detectedTotals,
               detectedFromDepartment: inboundChallan.fromDepartment,
               detectedFromChallanId: inboundChallan.id,
               detectedFromChallanNumber: inboundChallan.challanNumber,
@@ -213,6 +207,7 @@ export async function GET(request: Request) {
           data: {
             detectedFabricIn,
             detectedUnit,
+            detectedTotals: { [detectedUnit]: detectedFabricIn },
             detectedFromDepartment: 'PROGRAMMING_SHEET',
             detectedFromChallanId: null,
             detectedFromChallanNumber: prog.programSerialNo || prog.programNumber,

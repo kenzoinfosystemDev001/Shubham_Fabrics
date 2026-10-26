@@ -87,7 +87,7 @@ test('rules: outcomes stay separate; only passed, unsent quantity can go to Inve
   assert.equal(rules.qcStatusOf(fqcLine({ processedQuantity: 48, passedQuantity: 45, rejectedQuantity: 3, transferredQuantity: 45, rejectSentQuantity: 3 })), 'TRANSFERRED');
 });
 
-test('rules: transfer lines block over-dispatch, duplicates, mixed units and other sheets', () => {
+test('rules: transfer lines block over-dispatch, duplicates and other sheets; each line keeps its unit', () => {
   const a = fqcLine({ processedQuantity: 20, passedQuantity: 18, rejectedQuantity: 2 });
   const b = fqcLine({ id: 'w2', itemNumber: 'FQC-2026-0002', uom: 'MTR', processedQuantity: 5, passedQuantity: 5 });
   const c = fqcLine({ id: 'w3', itemNumber: 'FQC-2026-0003', programId: 'p2', processedQuantity: 5, passedQuantity: 5 });
@@ -96,7 +96,7 @@ test('rules: transfer lines block over-dispatch, duplicates, mixed units and oth
   assert.match(check([{ workItemId: 'w1', quantity: 19 }]).error, /only 18 PCS .* passed and not yet transferred/);
   assert.match(check([{ workItemId: 'w1', quantity: 3 }], 'REJECT').error, /only 2 PCS .* rejected/);
   assert.match(check([{ workItemId: 'w1', quantity: 1 }, { workItemId: 'w1', quantity: 1 }]).error, /listed twice/);
-  assert.match(check([{ workItemId: 'w1', quantity: 1 }, { workItemId: 'w2', quantity: 1 }]).error, /cannot be mixed/);
+  assert.deepEqual(check([{ workItemId: 'w1', quantity: 1 }, { workItemId: 'w2', quantity: 1 }]), { ok: true, unit: 'MIXED', programId: 'p1' }, 'meters and pieces travel on one challan, each line in its own unit');
   assert.match(check([{ workItemId: 'w1', quantity: 1 }, { workItemId: 'w3', quantity: 1 }]).error, /same Production Sheet/);
   assert.match(rules.validateTransferLines([{ workItemId: 'w1', quantity: 1 }], byId, 'QC3').error, /not found/, 'another department cannot move Final QC lines');
   assert.deepEqual(check([{ workItemId: 'w1', quantity: 18 }]), { ok: true, unit: 'PCS', programId: 'p1' });
@@ -518,7 +518,7 @@ test('Inventory challan: manual number; finished garments go whole (every passed
 
   assert.equal((await issue({ challanNumber: 'FQ/1', lines: [{ workItemId: pcs }] }, 'inventory')).status, 403);
   assert.equal((await issue({ challanNumber: '  ', lines: [{ workItemId: pcs }] })).status, 400);
-  assert.match((await issue({ challanNumber: 'FQ/1', lines: [{ workItemId: pcs }, { workItemId: item('ci-2').id }] })).body.error, /cannot be mixed/);
+  assert.match((await issue({ challanNumber: 'FQ/1', lines: [{ workItemId: pcs }, { workItemId: item('ci-2').id }] })).body.error, /receives finished garments in PCS only/, 'Inventory still takes pieces only');
   assert.match((await issue({ challanNumber: 'SP/101', lines: [{ workItemId: pcs }] })).body.error, /already used/i, 'challan numbers stay unique');
 
   // No quantity is asked for: a quantity in the request is ignored and all 43 passed pieces go.

@@ -19,6 +19,7 @@ import { extractRootWilcomPhoto } from '@/lib/download-wilcom';
 import { useProgramDocument } from '@/hooks/useProgramDocument';
 import { FinishedGarmentList, useGarmentImages } from '@/components/workflow/FinishedGarments';
 import { isFinishedGoodsChallan } from '@/lib/finished-garments.mjs';
+import { challanTotalsByUnit, formatTotals, unitOf } from '@/lib/challan-units.mjs';
 
 interface ChallanPrintModalProps {
   challan: any;
@@ -100,11 +101,16 @@ export function ChallanPrintModal({
   const toLabel = deptLabels[toDept] || toDept;
 
   const items: ChallanItem[] = Array.isArray(challan.items) ? challan.items : [];
-  const totalQuantity = items.reduce((sum, it) => sum + (Number(it.quantity) || 0), 0);
-  const uom = items[0]?.uom || 'PCS';
+  // Each line keeps its unit: totals are per unit, never MTR + PCS.
+  const unitTotals = challanTotalsByUnit(challan);
+  const totalUnits = Object.keys(unitTotals);
+  const singleUnit = totalUnits.length === 1 ? totalUnits[0] : null;
+  const totalQtyText = singleUnit ? String(unitTotals[singleUnit]) : formatTotals(unitTotals);
+  const uom = singleUnit || unitOf(challan.fabricUnit) || unitOf(items[0]?.uom) || 'PCS';
+  const totalUnitLabel = singleUnit || '';
 
   const defectivePieces = challan.defectivePieces ?? 0;
-  const fabricUnit = challan.fabricUnit || uom;
+  const fabricUnit = unitOf(challan.defectiveUnit) || unitOf(challan.fabricUnit) || '';
   const defectiveShelf = challan.defectiveShelfLocation || 'Station Defective Shelf';
   const defectReason = challan.defectReason || '';
 
@@ -326,7 +332,7 @@ export function ChallanPrintModal({
               <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-neutral-700">
                 <span>ITEMS / MATERIALS</span>
                 <span className="font-mono text-xs text-neutral-900">
-                  Total: {totalQuantity || challan.fabricOut || challan.fabricIn || 0} {uom}
+                  Total: {totalQtyText} {totalUnitLabel}
                 </span>
               </div>
               <div className="overflow-x-auto">
@@ -359,8 +365,8 @@ export function ChallanPrintModal({
                         <td className="border-[1.5px] border-neutral-200 p-1 font-bold">{fabricName || styleCode || 'Production Material'}</td>
                         <td className="border-[1.5px] border-neutral-200 p-1">{prog.fabricColor || 'Standard'}</td>
                         <td className="border-[1.5px] border-neutral-200 p-1 font-mono">—</td>
-                        <td className="border-[1.5px] border-neutral-200 p-1 text-right font-mono font-bold">{totalQuantity || challan.fabricOut || challan.fabricIn || 0}</td>
-                        <td className="border-[1.5px] border-neutral-200 p-1 text-center">{uom}</td>
+                        <td className="border-[1.5px] border-neutral-200 p-1 text-right font-mono font-bold">{totalQtyText}</td>
+                        <td className="border-[1.5px] border-neutral-200 p-1 text-center">{totalUnitLabel}</td>
                       </tr>
                     )}
                     <tr className="bg-neutral-50 font-black">
@@ -368,9 +374,9 @@ export function ChallanPrintModal({
                         TOTAL QUANTITY:
                       </td>
                       <td className="border-[1.5px] border-neutral-200 p-1 text-right font-mono text-sm font-black">
-                        {totalQuantity || challan.fabricOut || challan.fabricIn || 0}
+                        {totalQtyText}
                       </td>
-                      <td className="border-[1.5px] border-neutral-200 p-1 text-center font-black">{uom}</td>
+                      <td className="border-[1.5px] border-neutral-200 p-1 text-center font-black">{totalUnitLabel}</td>
                     </tr>
                   </tbody>
                 </table>

@@ -89,12 +89,12 @@ export default function QC1Dashboard() {
   ];
 
   const quantityStats = [
-    { label: 'Total Received', value: kpis.totalQuantityReceived, tone: 'text-neutral-900' },
-    { label: 'Total Inspected', value: kpis.totalQuantityInspected, tone: 'text-brand-700' },
-    { label: 'Passed', value: kpis.passedQuantity, tone: 'text-neutral-900' },
-    { label: 'Rejected', value: kpis.failedQuantity, tone: 'text-danger-700' },
-    { label: 'Rework', value: kpis.reworkQuantity, tone: 'text-brand-700' },
-    { label: 'On Hold', value: kpis.holdQuantity, tone: 'text-neutral-900' },
+    { label: 'Total Received', value: kpis.totalQuantityReceivedText ?? kpis.totalQuantityReceived, tone: 'text-neutral-900' },
+    { label: 'Total Inspected', value: kpis.totalQuantityInspectedText ?? kpis.totalQuantityInspected, tone: 'text-brand-700' },
+    { label: 'Passed', value: kpis.passedQuantityText ?? kpis.passedQuantity, tone: 'text-neutral-900' },
+    { label: 'Rejected', value: kpis.failedQuantityText ?? kpis.failedQuantity, tone: 'text-danger-700' },
+    { label: 'Rework', value: kpis.reworkQuantityText ?? kpis.reworkQuantity, tone: 'text-brand-700' },
+    { label: 'On Hold', value: kpis.holdQuantityText ?? kpis.holdQuantity, tone: 'text-neutral-900' },
   ];
 
   const fmtStatus = (s: any) => String(s ?? '').replace(/_/g, ' ');
@@ -168,7 +168,7 @@ export default function QC1Dashboard() {
             {quantityStats.map((s) => (
               <div key={s.label} className="px-5 py-4">
                 <p className={`text-xl font-bold tabular-nums leading-none ${s.tone}`}>
-                  {Number(s.value || 0).toLocaleString()}
+                  {typeof s.value === 'string' ? s.value : Number(s.value || 0).toLocaleString()}
                 </p>
                 <p className="text-xs font-medium text-neutral-500 mt-2">{s.label}</p>
               </div>
@@ -205,7 +205,7 @@ export default function QC1Dashboard() {
                     </div>
                     <div className="text-right shrink-0">
                       <span className="font-mono font-semibold text-neutral-900 block tabular-nums">
-                        {item.quantity} {item.uom}
+                        {item.quantityText ?? `${item.quantity} ${item.uom}`}
                       </span>
                       <span className="text-[10px] text-neutral-500 uppercase font-medium">{fmtStatus(item.status)}</span>
                     </div>
@@ -235,7 +235,7 @@ export default function QC1Dashboard() {
                         <span className="text-[11px] text-neutral-600 truncate">({item.clientName})</span>
                       </div>
                       <p className="text-[11px] text-neutral-500 mt-0.5">
-                        Challan: <span className="font-mono">{item.challanNumber}</span> · {item.quantity} {item.uom}
+                        Challan: <span className="font-mono">{item.challanNumber}</span> · {item.quantityText ?? `${item.quantity} ${item.uom}`}
                       </p>
                     </div>
                     <div className="text-right shrink-0">

@@ -2,6 +2,8 @@
 // (Embroidery now; Thread Cutting and later departments reuse these). Pure, no database or framework
 // imports. Quantity flow: expected -> received -> processed -> transferred.
 
+import { headerUnitOf } from './challan-units.mjs';
+
 export const WORK_STATUS = /** @type {const} */ ({
   AWAITING_RECEIPT: 'AWAITING_RECEIPT',
   RECEIVED: 'RECEIVED',
@@ -346,7 +348,7 @@ export function validateProductionUpdate(item, input) {
 export function validateTransferLines(lines, itemsById, departmentCode, kind = 'PASS') {
   if (!Array.isArray(lines) || lines.length === 0) return { ok: false, error: 'Add at least one item to transfer.' };
   const seen = new Set();
-  let unit = null;
+  const units = [];
   let programId = null;
   for (const [index, line] of lines.entries()) {
     const n = index + 1;
@@ -358,8 +360,8 @@ export function validateTransferLines(lines, itemsById, departmentCode, kind = '
       return { ok: false, error: 'All items on one challan must belong to the same Production Sheet.' };
     }
     programId = item.programId;
-    if (unit && item.uom !== unit) return { ok: false, error: 'Meters and pieces cannot be mixed on one challan.' };
-    unit = item.uom;
+    // Each line keeps its own unit; meters and pieces are never added together.
+    units.push(item.uom);
     const qc = isQcItem(item);
     if (!qc && kind !== 'PASS') return { ok: false, error: `Line ${n}: ${item.itemNumber} has no inspection outcomes.` };
     if (!qc && !TRANSFERABLE_STATUSES.includes(item.status)) return { ok: false, error: `Line ${n}: ${item.itemNumber} is not ready for transfer.` };
@@ -371,5 +373,5 @@ export function validateTransferLines(lines, itemsById, departmentCode, kind = '
       return { ok: false, error: `Line ${n}: only ${available} ${item.uom} of ${item.itemNumber} is ${what}.` };
     }
   }
-  return { ok: true, unit: /** @type {string} */ (unit), programId: /** @type {string} */ (programId) };
+  return { ok: true, unit: /** @type {string} */ (headerUnitOf(units)), programId: /** @type {string} */ (programId) };
 }

@@ -26,6 +26,7 @@ import { destinationName, workPath, type TransferKind, type WorkflowView } from 
 import { GarmentTag } from '@/components/recutting/RecuttingUi';
 import { GarmentImageUpload, GarmentThumb, useGarmentImages } from '@/components/workflow/FinishedGarments';
 import { groupGarments, imageFor } from '@/lib/finished-garments.mjs';
+import { formatTotals, totalsByUnit } from '@/lib/challan-units.mjs';
 
 const AVAILABLE_LABEL: Record<TransferKind, string> = { PASS: 'Available', REJECT: 'Rejected', REWORK: 'For Rework' };
 
@@ -144,7 +145,6 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
       ? (garmentByKey(r.itemId)?.items || []).map((i: any) => ({ item: i, quantity: available(i) }))
       : [itemById(r.itemId)].filter(Boolean).map((i) => ({ item: i, quantity: Number(r.quantity) || 0 }));
   const chosenLines = filled.flatMap(rowLines);
-  const units = new Set(chosenLines.map((l) => l.item.uom));
   const totals = chosenLines.reduce<Record<string, number>>((acc, l) => {
     acc[l.item.uom] = (acc[l.item.uom] || 0) + l.quantity;
     return acc;
@@ -167,7 +167,6 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
     if (!program) return setError('Choose a Production Sheet.');
     if (!challanNumber.trim()) return setNumberError('Challan Number is required.');
     if (filled.length === 0) return setError(finished ? 'Add at least one finished garment.' : 'Add at least one item.');
-    if (units.size > 1) return setError('Meters and pieces cannot be mixed on one challan.');
     if (withoutImage.length > 0) return setError(`Add the image of ${withoutImage.map((g) => g!.name).join(', ')} before issuing the challan.`);
     setSubmitting(true);
     try {
@@ -446,7 +445,6 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
                   {filled.length
                     ? `${filled.length} finished garment${filled.length === 1 ? '' : 's'} go to ${dest} with the Production Sheet.`
                     : `Choose the finished garments to send to ${dest}.`}
-                  {units.size > 1 && <span className="ml-2 text-danger-700 font-semibold">Mixed units</span>}
                 </span>
               ) : (
               <span className="text-sm text-neutral-600">
@@ -454,7 +452,6 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
                 <span className="font-semibold text-neutral-900 tabular-nums">
                   {Object.entries(totals).map(([u, q]) => fmtQty(q, u)).join(' · ') || '—'}
                 </span>
-                {units.size > 1 && <span className="ml-2 text-danger-700 font-semibold">Mixed units</span>}
               </span>
               )}
               <button type="submit" disabled={submitting || !program} className={BTN_PRIMARY}>
@@ -514,7 +511,7 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
                           ))}
                         </td>
                         <td className="py-3 px-3 text-right tabular-nums whitespace-nowrap">
-                          {fmtQty((c.items || []).reduce((s: number, i: any) => s + (Number(i.quantity) || 0), 0), c.items?.[0]?.uom)}
+                          {formatTotals(totalsByUnit(c.items || []), '—')}
                         </td>
                       </>
                     )}

@@ -34,7 +34,7 @@ export async function GET(request: Request) {
         where,
         include: {
           roll: { select: { rollNumber: true } },
-          batch: { select: { batchNumber: true, fabricDescription: true } },
+          batch: { select: { batchNumber: true, fabricDescription: true, unit: true } },
           fromLocation: { select: { locationCode: true } },
           toLocation: { select: { locationCode: true } },
           transactedBy: { select: { fullName: true } },

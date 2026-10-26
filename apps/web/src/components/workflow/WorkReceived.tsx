@@ -22,6 +22,7 @@ import {
 import { availableToProcess, readyToTransfer, receivedBasis } from '@/lib/work-items.mjs';
 import { departmentName, workPath, type WorkflowView } from '@/lib/workflow-views';
 import { GarmentTag } from '@/components/recutting/RecuttingUi';
+import { formatTotals, totalsByUnit, unitOf } from '@/lib/challan-units.mjs';
 
 type StockDepartment = React.ComponentProps<typeof DepartmentStockView>['department'];
 
@@ -242,7 +243,7 @@ function ReceivedContent({ flow, only }: { flow: WorkflowView; only?: 'defective
                       </td>
                       <td className="py-3 px-3 text-xs text-neutral-600">{fmtDate(d.issuedDate || d.createdAt)}</td>
                       <td className="py-3 px-3 font-mono text-xs">{d.program?.programSerialNo || d.program?.programNumber || '—'}</td>
-                      <td className="py-3 px-3 text-right tabular-nums font-semibold text-danger-700">{fmtQty(d.defectivePieces, d.fabricUnit)}</td>
+                      <td className="py-3 px-3 text-right tabular-nums font-semibold text-danger-700">{Number(d.defectivePieces) > 0 ? fmtQty(d.defectivePieces, unitOf(d.defectiveUnit) || unitOf(d.fabricUnit) || 'PCS') : formatTotals(totalsByUnit(d.items || [], d.fabricUnit))}</td>
                       <td className="py-3 px-3 text-neutral-700">{d.defectReason || '—'}</td>
                       <td className="py-3 px-3 text-xs text-neutral-600">{d.defectiveShelfLocation || '—'}</td>
                     </tr>
@@ -284,7 +285,7 @@ function ReceivedContent({ flow, only }: { flow: WorkflowView; only?: 'defective
                         {r.itemDescription || '—'}
                         {r.resolutionNotes && <span className="block text-[11px] text-neutral-500">{r.resolutionNotes}</span>}
                       </td>
-                      <td className="py-3 px-3 text-right tabular-nums font-semibold text-danger-700">{r.quantity}</td>
+                      <td className="py-3 px-3 text-right tabular-nums font-semibold text-danger-700">{fmtQty(r.quantity, unitOf(r.uom) || unitOf(r.challan?.defectiveUnit) || unitOf(r.challan?.fabricUnit) || 'PCS')}</td>
                       <td className="py-3 px-3 text-neutral-700">{r.reason || '—'}</td>
                       <td className="py-3 px-3 text-xs text-neutral-600">{r.detectedBy?.fullName || '—'}</td>
                       <td className="py-3 px-3 text-xs">{String(r.status || '').replace(/_/g, ' ')}</td>

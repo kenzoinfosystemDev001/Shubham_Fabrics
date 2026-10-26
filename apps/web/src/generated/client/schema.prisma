@@ -738,8 +738,9 @@ model Challan {
   // Fabric / Piece In & Out Auto-Detection Tracking across Departments
   fabricIn               Float?
   fabricOut              Float?
-  fabricUnit             String? @default("MTR")
-  defectivePieces        Float?  @default(0)
+  fabricUnit             String? @default("MTR") // MTR | PCS | MIXED (lines in both units: totals come from the lines)
+  defectivePieces        Float?  @default(0) // defective quantity, in defectiveUnit
+  defectiveUnit          String? // MTR | PCS; null on older challans, which used fabricUnit
   defectiveShelfLocation String?
   defectReason           String?
   detectedFromChallanId  String?
@@ -1076,7 +1077,8 @@ model DefectRecord {
   bundle          Bundle?   @relation(fields: [bundleId], references: [id])
   itemDescription String
   severity        String // MINOR, MAJOR, CRITICAL
-  quantity        Int
+  quantity        Float
+  uom             String? // MTR | PCS; null on older records
   reason          String
   detectedById    String
   detectedBy      User      @relation("DefectDetector", fields: [detectedById], references: [id])
@@ -1260,7 +1262,8 @@ model FabricBatch {
   colorCode         String?
   colorName         String?
   totalRolls        Int               @default(0)
-  totalMeters       Decimal           @default(0) @db.Decimal(10, 2)
+  totalMeters       Decimal           @default(0) @db.Decimal(10, 2) // total quantity, in `unit`
+  unit              String            @default("MTR") // "MTR" | "PCS"; every roll in the batch uses this unit
   status            FabricBatchStatus @default(PENDING_RECEIPT)
   receivedAt        DateTime?
   createdById       String
@@ -1302,7 +1305,7 @@ model FabricStoreRoll {
   batch             FabricBatch        @relation(fields: [batchId], references: [id])
   locationId        String?
   location          InventoryLocation? @relation("RollLocation", fields: [locationId], references: [id])
-  length            Decimal            @db.Decimal(10, 2) // meters
+  length            Decimal            @db.Decimal(10, 2) // quantity in batch.unit (MTR or PCS)
   width             Decimal?           @db.Decimal(10, 2) // cm
   weight            Decimal?           @db.Decimal(10, 3) // kg
   status            FabricRollStatus   @default(RECEIVED)

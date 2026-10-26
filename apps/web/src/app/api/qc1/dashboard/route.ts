@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
+import { addTotals, formatTotals, totalsByUnit, unitOf } from '@/lib/challan-units.mjs';
 
 export const dynamic = 'force-dynamic';
 
@@ -109,18 +110,27 @@ export async function GET(request: Request) {
     const hold = qc1Challans.filter((c) => c.status === 'ON_HOLD').length;
     const completed = passed + failed + rework;
 
-    // Total Quantities received across all QC1 Challans
-    const totalQuantityReceived = qc1Challans.reduce((sum, ch) => {
-      const itemsSum = ch.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
-      return sum + itemsSum;
-    }, 0);
-
-    // Sum quantities from completed QC1 transactions
-    const totalQuantityInspected = qc1Transactions.reduce((sum, tx) => sum + (Number(tx.inputQuantity) || 0), 0);
-    const passedQuantity = qc1Transactions.reduce((sum, tx) => sum + (Number(tx.goodQuantity) || 0), 0);
-    const failedQuantity = qc1Transactions.reduce((sum, tx) => sum + (Number(tx.rejectQuantity) || 0), 0);
-    const reworkQuantity = qc1Transactions.reduce((sum, tx) => sum + (Number(tx.reworkQuantity) || 0), 0);
-    const holdQuantity = qc1Transactions.reduce((sum, tx) => sum + (Number(tx.balanceQuantity) || 0), 0);
+    // Quantities are kept per unit (MTR / PCS), never added across units.
+    const receivedByUnit = qc1Challans.reduce<Record<string, number>>((acc, ch) => addTotals(acc, totalsByUnit(ch.items, ch.fabricUnit)), {});
+    const totalsOf = (field: 'inputQuantity' | 'goodQuantity' | 'rejectQuantity' | 'reworkQuantity' | 'balanceQuantity') =>
+      totalsByUnit(qc1Transactions.map((tx) => ({ quantity: tx[field], uom: tx.unitOfMeasure })));
+    // The plain numbers are the meter figures (QC1 receives dyed fabric, normally in meters); the
+    // *Text fields show every unit, e.g. "1,200 MTR · 40 PCS".
+    const quantityKpis = {
+      totalQuantityReceived: receivedByUnit,
+      totalQuantityInspected: totalsOf('inputQuantity'),
+      passedQuantity: totalsOf('goodQuantity'),
+      failedQuantity: totalsOf('rejectQuantity'),
+      reworkQuantity: totalsOf('reworkQuantity'),
+      holdQuantity: totalsOf('balanceQuantity'),
+    };
+    const totalQuantityReceived = quantityKpis.totalQuantityReceived.MTR || 0;
+    const totalQuantityInspected = quantityKpis.totalQuantityInspected.MTR || 0;
+    const passedQuantity = quantityKpis.passedQuantity.MTR || 0;
+    const failedQuantity = quantityKpis.failedQuantity.MTR || 0;
+    const reworkQuantity = quantityKpis.reworkQuantity.MTR || 0;
+    const holdQuantity = quantityKpis.holdQuantity.MTR || 0;
+    const quantityText = Object.fromEntries(Object.entries(quantityKpis).map(([k, v]) => [`${k}Text`, formatTotals(v)]));
 
     // 4. Priority Work Items (Urgent / High priority awaiting or under inspection)
     const priorityWork = qc1Challans
@@ -132,7 +142,8 @@ export async function GET(request: Request) {
         productionSheetNumber: c.program?.programSerialNo || c.program?.programNumber || '—',
         fabric: c.items[0]?.itemDescription || c.program?.fabricName || '—',
         color: c.items[0]?.colour || c.program?.fabricColor || '—',
-        quantity: c.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0),
+        quantity: totalsByUnit(c.items, c.fabricUnit)[unitOf(c.items[0]?.uom) || 'MTR'] || 0,
+        quantityText: formatTotals(totalsByUnit(c.items, c.fabricUnit)),
         uom: c.items[0]?.uom || 'MTR',
         priority: c.priority,
         status: c.status,
@@ -150,7 +161,8 @@ export async function GET(request: Request) {
         productionSheetNumber: c.program?.programSerialNo || c.program?.programNumber || '—',
         clientName: c.program?.clientName || c.program?.buyerName || 'Standard Client',
         deliveryDate: c.program.deliveryDate,
-        quantity: c.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0),
+        quantity: totalsByUnit(c.items, c.fabricUnit)[unitOf(c.items[0]?.uom) || 'MTR'] || 0,
+        quantityText: formatTotals(totalsByUnit(c.items, c.fabricUnit)),
         uom: c.items[0]?.uom || 'MTR',
         status: c.status,
       }));
@@ -189,6 +201,7 @@ export async function GET(request: Request) {
           failedQuantity,
           reworkQuantity,
           holdQuantity,
+          ...quantityText,
         },
         priorityWork,
         upcomingDelivery,

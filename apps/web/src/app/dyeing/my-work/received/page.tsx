@@ -20,6 +20,7 @@ import {
   fmtQty,
 } from '@/components/dyeing/DyeingUi';
 import { availableForQc, receivedBasis, remainingToDye } from '@/lib/dyeing-workflow.mjs';
+import { formatTotals, totalsByUnit, unitOf } from '@/lib/challan-units.mjs';
 
 // Received by Dyeing and not yet fully transferred to QC.
 const IN_DYEING = 'RECEIVED,IN_DYEING,PARTIALLY_DYED,DYED,READY_FOR_QC1,PARTIALLY_SENT_TO_QC1';
@@ -211,7 +212,7 @@ function ReceivedFabricContent() {
                       </td>
                       <td className="py-3 px-3 text-xs text-neutral-600">{fmtDate(d.issuedDate || d.createdAt)}</td>
                       <td className="py-3 px-3 font-mono text-xs">{d.program?.programSerialNo || d.program?.programNumber || '—'}</td>
-                      <td className="py-3 px-3 text-right tabular-nums font-semibold text-danger-700">{fmtQty(d.defectivePieces, d.fabricUnit)}</td>
+                      <td className="py-3 px-3 text-right tabular-nums font-semibold text-danger-700">{Number(d.defectivePieces) > 0 ? fmtQty(d.defectivePieces, unitOf(d.defectiveUnit) || unitOf(d.fabricUnit) || 'PCS') : formatTotals(totalsByUnit(d.items || [], d.fabricUnit))}</td>
                       <td className="py-3 px-3 text-neutral-700">{d.defectReason || '—'}</td>
                       <td className="py-3 px-3 text-xs text-neutral-600">{d.defectiveShelfLocation || '—'}</td>
                     </tr>

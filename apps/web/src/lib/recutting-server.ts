@@ -16,6 +16,7 @@ import {
   workflowHandlers,
 } from '@/lib/work-items-server';
 import { OPEN_WORK_STATUSES, receivedBasis } from '@/lib/work-items.mjs';
+import { MIXED_UNIT } from '@/lib/challan-units.mjs';
 import {
   CATEGORY_LABEL,
   GARMENT_CATEGORIES,
@@ -467,7 +468,7 @@ const issueStitchingChallan = (request: Request) =>
             createdById: user.id,
             issuedById: user.id,
             issuedDate,
-            fabricOut: total,
+            fabricOut: check.unit === MIXED_UNIT ? null : total, // mixed units: totals come from the lines
             fabricUnit: check.unit,
             remarks: textOf(body.remarks),
           },

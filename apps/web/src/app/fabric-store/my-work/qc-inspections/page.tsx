@@ -143,7 +143,7 @@ export default function QCInspectionsQueuePage() {
                         {roll.batch?.colorName || '—'}
                       </td>
                       <td className="py-3.5 px-4 font-mono font-bold text-neutral-900">
-                        {parseFloat(roll.length).toFixed(2)} m
+                        {parseFloat(roll.length).toFixed(2)} {roll.batch?.unit || 'MTR'}
                       </td>
                       <td className="py-3.5 px-4 font-mono text-neutral-600">
                         {roll.width ? `${roll.width} cm` : '—'}

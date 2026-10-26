@@ -128,7 +128,7 @@ export async function GET(request: Request) {
     const issuedRolls = await prisma.fabricStoreRoll.findMany({
       where: { status: 'ISSUED' },
       include: {
-        batch: { select: { batchNumber: true, fabricType: true, fabricDescription: true } },
+        batch: { select: { batchNumber: true, fabricType: true, fabricDescription: true, unit: true } },
         programIssuedTo: { select: { programNumber: true, clientName: true } },
         location: { select: { locationCode: true } },
       },

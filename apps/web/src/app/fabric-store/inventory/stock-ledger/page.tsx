@@ -136,7 +136,7 @@ export default function StockLedgerPage() {
                     <th className="py-3 px-4">Type</th>
                     <th className="py-3 px-4">Roll Number</th>
                     <th className="py-3 px-4">Batch #</th>
-                    <th className="py-3 px-4">Meters Moved</th>
+                    <th className="py-3 px-4">Qty Moved</th>
                     <th className="py-3 px-4">From Location</th>
                     <th className="py-3 px-4">To Location</th>
                     <th className="py-3 px-4">Transacted By</th>
@@ -160,7 +160,7 @@ export default function StockLedgerPage() {
                         {entry.batch?.batchNumber}
                       </td>
                       <td className="py-3 px-4 font-mono font-bold text-neutral-900">
-                        {parseFloat(entry.quantity).toFixed(2)} m
+                        {parseFloat(entry.quantity).toFixed(2)} {entry.batch?.unit || 'MTR'}
                       </td>
                       <td className="py-3 px-4 font-mono text-neutral-500">
                         {entry.fromLocation?.locationCode || '—'}

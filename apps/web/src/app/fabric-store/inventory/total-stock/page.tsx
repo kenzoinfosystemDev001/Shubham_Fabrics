@@ -243,10 +243,14 @@ function TotalStockContent() {
                 <span className="text-neutral-700 font-medium">+{fmt(card.data.totalInwardMeters)}</span> in
                 <span className="mx-1.5 text-neutral-300">|</span>
                 <span className="text-neutral-700 font-medium">−{fmt(card.data.totalOutwardMeters)}</span> out
-                {card.data.availableBalancePcs > 0 && (
+                {(card.data.availableBalancePcs > 0 || card.data.totalInwardPcs > 0 || card.data.totalOutwardPcs > 0) && (
                   <>
                     <span className="mx-1.5 text-neutral-300">|</span>
                     {fmt(card.data.availableBalancePcs)} PCS
+                    <span className="ml-1">
+                      (<span className="text-neutral-700 font-medium">+{fmt(card.data.totalInwardPcs)}</span> in,{' '}
+                      <span className="text-neutral-700 font-medium">−{fmt(card.data.totalOutwardPcs)}</span> out)
+                    </span>
                   </>
                 )}
               </p>

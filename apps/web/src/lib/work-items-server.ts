@@ -28,6 +28,7 @@ import {
 } from '@/lib/work-items.mjs';
 import { INVENTORY_UNIT, LEDGER, garmentLabel } from '@/lib/inventory.mjs';
 import { garmentName } from '@/lib/finished-garments.mjs';
+import { MIXED_UNIT } from '@/lib/challan-units.mjs';
 
 /** How a department receives and passes on work. Add an entry to bring a new department online. */
 export interface WorkflowConfig {
@@ -666,7 +667,8 @@ export function workflowHandlers(cfg: WorkflowConfig) {
               departmentCode: cfg.code,
               itemDescription: [item.garmentCategory, item.styleRef, item.fabricName, item.colour].filter(Boolean).join(' · '),
               severity: 'MAJOR',
-              quantity: Math.max(1, Math.round(newDefect)),
+              quantity: newDefect,
+              uom: item.uom,
               reason: defectReason!,
               detectedById: user.id,
               status: 'OPEN',
@@ -1041,11 +1043,11 @@ export function workflowHandlers(cfg: WorkflowConfig) {
               createdById: user.id,
               issuedById: user.id,
               issuedDate,
-              fabricOut: kind === 'REJECT' ? 0 : total,
+              fabricOut: kind === 'REJECT' ? 0 : check.unit === MIXED_UNIT ? null : total, // mixed units: totals come from the lines
               fabricUnit: check.unit,
               // The Fabric Store defective shelf reads these fields; the rejected quantity is counted there once.
               ...(kind === 'REJECT' && cfg.qc
-                ? { defectivePieces: total, defectiveShelfLocation: cfg.qc.rejectTo.shelf, defectReason: reasons || 'Rejected at inspection' }
+                ? { defectivePieces: check.unit === MIXED_UNIT ? null : total, defectiveUnit: check.unit === MIXED_UNIT ? null : check.unit, defectiveShelfLocation: cfg.qc.rejectTo.shelf, defectReason: reasons || 'Rejected at inspection' }
                 : {}),
               remarks:
                 [

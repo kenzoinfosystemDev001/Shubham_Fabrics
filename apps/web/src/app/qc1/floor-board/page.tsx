@@ -34,6 +34,7 @@ interface FloorItem {
   fabricType: string | null;
   color: string;
   quantity: number;
+  quantityText?: string; // every unit, e.g. "120 MTR · 10 PCS"
   quantityInspected: number;
   quantityPassed: number;
   quantityFailed: number;
@@ -311,7 +312,7 @@ export default function QC1FloorBoard() {
                             <div>
                               <span className="text-neutral-500 block">Sent / Recv:</span>
                               <span className="font-mono font-bold text-neutral-900">
-                                {it.quantity} {it.uom}
+                                {it.quantityText ?? `${it.quantity} ${it.uom}`}
                               </span>
                             </div>
 

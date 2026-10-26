@@ -32,6 +32,7 @@ import {
 } from '@/lib/download-production-sheet';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { newSubmissionKey } from '@/components/challan/ChallanNumberField';
+import { addTotals, formatTotals, totalsByUnit } from '@/lib/challan-units.mjs';
 
 import {
   ColorFabricMeasurementTable,
@@ -274,16 +275,14 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
       setError('Please enter at least one item in the Color / Fabric / Measurement table.');
       return;
     }
-    if (new Set(validItems.map((item) => item.unit)).size > 1) {
-      setError('Use the same unit for every quantity in one challan.');
-      return;
-    }
-
-    const issueUnit: 'MTR' | 'PCS' = validItems[0].unit === 'PCS' ? 'PCS' : 'MTR';
-    const issueQuantity = validItems.reduce((sum, item) => sum + Number(item.measurement), 0);
-    // The API also checks availability against this exact unit before creating the challan.
+    // Each line keeps its own unit; meters and pieces are totalled and stocked separately.
+    const lineUnit = (item: ChallanItemData): 'MTR' | 'PCS' => (item.unit === 'PCS' ? 'PCS' : 'MTR');
+    const issueTotals = totalsByUnit(validItems.map((item) => ({ quantity: Number(item.measurement), uom: lineUnit(item) })));
+    const issueUnits = Object.keys(issueTotals) as Array<'MTR' | 'PCS'>;
+    const singleUnit = issueUnits.length === 1 ? issueUnits[0] : null;
+    // The API checks availability for every unit on the challan before creating it.
     if (
-      fabricAvailability?.requiredUnit === issueUnit &&
+      issueUnits.includes(fabricAvailability?.requiredUnit) &&
       !fabricAvailability.isAvailable
     ) {
       setError(
@@ -294,9 +293,10 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
       }
       return;
     }
-    const trackingMatchesUnit = storeTracking.fabricUnit === issueUnit;
-    const challanDefectiveQuantity = trackingMatchesUnit ? storeTracking.defectivePieces : 0;
-    const challanFabricIn = issueQuantity + challanDefectiveQuantity;
+    // The defective quantity is in the tracking unit, which must be one of the issued units.
+    const defectiveUnit = storeTracking.fabricUnit;
+    const challanDefectiveQuantity = issueUnits.includes(defectiveUnit) ? storeTracking.defectivePieces : 0;
+    const inTotals = addTotals({ ...issueTotals }, challanDefectiveQuantity > 0 ? { [defectiveUnit]: challanDefectiveQuantity } : {});
 
     try {
       setSubmitting(true);
@@ -307,7 +307,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
         itemDescription: `${item.fabric || 'Fabric'} — ${item.color || 'Standard'}`,
         unitType: 'ROLL',
         quantity: Number(item.measurement),
-        uom: issueUnit,
+        uom: lineUnit(item),
         fabricCode: item.fabric || selectedProgram.fabricName || 'FABRIC',
         // Current colour and the colour Dyeing must achieve are stored separately per line.
         colour: item.color || null,
@@ -322,7 +322,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
         storeInchargeName ? `Store Incharge: ${storeInchargeName}` : null,
         storeInchargeContact ? `Contact: ${storeInchargeContact}` : null,
         designNumber ? `Design #: ${designNumber}` : null,
-        `Accounting: In: ${challanFabricIn} ${issueUnit} | Defective Cut: ${challanDefectiveQuantity} ${issueUnit} (${storeTracking.defectiveShelfLocation}) | Out to ${destinationDepartment}: ${issueQuantity} ${issueUnit}`,
+        `Accounting: In: ${formatTotals(inTotals)} | Defective Cut: ${challanDefectiveQuantity} ${defectiveUnit} (${storeTracking.defectiveShelfLocation}) | Out to ${destinationDepartment}: ${formatTotals(issueTotals)}`,
       ]
         .filter(Boolean)
         .join(' · ');
@@ -336,12 +336,14 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
         toDepartment: destinationDepartment,
         priority: priority || 'NORMAL',
         issuedDate: challanDate,
-        fabricIn: challanFabricIn,
+        // Header totals exist only for a single-unit challan; the server derives the rest from the lines.
+        fabricIn: singleUnit ? inTotals[singleUnit] : undefined,
         defectivePieces: challanDefectiveQuantity,
+        defectiveUnit: challanDefectiveQuantity > 0 ? defectiveUnit : undefined,
         defectiveShelfLocation: storeTracking.defectiveShelfLocation,
         defectReason: storeTracking.defectReason,
-        fabricOut: issueQuantity,
-        fabricUnit: issueUnit,
+        fabricOut: singleUnit ? issueTotals[singleUnit] : undefined,
+        fabricUnit: singleUnit || undefined,
         detectedFromDepartment: storeTracking.detectedFromDept || 'PROGRAMMING',
         remarks: inchargeInfo,
         items: challanItems,
