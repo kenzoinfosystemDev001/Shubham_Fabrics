@@ -1,6 +1,8 @@
 // Production fixes tests: manual challan numbers, Fabric Store stock in meters and pieces
 // (pure rules plus the real ledger service against an in-memory Prisma stand-in), and the
-// Fabric Store -> Dyeing instruction lines. Touches no database.
+// Fabric Store -> Dyeing instruction lines, and the Upload Stock Sheet rules (file types, Excel
+// columns, quantities, dates, review warnings, confirm validation), and finished-garment challans
+// (Finishing onward: garment name and image only). Touches no database.
 // Run: node --test scripts/test-production-fixes.mjs
 import assert from 'node:assert/strict';
 import test from 'node:test';
@@ -11,6 +13,8 @@ import { fileURLToPath } from 'node:url';
 import * as challanNumber from '../apps/web/src/lib/challan-number.mjs';
 import * as stock from '../apps/web/src/lib/fabric-stock-rules.mjs';
 import * as dyeing from '../apps/web/src/lib/dyeing-instructions.mjs';
+import * as stockImport from '../apps/web/src/lib/stock-import-rules.mjs';
+import * as finished from '../apps/web/src/lib/finished-garments.mjs';
 
 // ---------------------------------------------------------------------------
 // Manual challan numbers
@@ -508,4 +512,263 @@ test('issue form fields: current colour and required dyeing colour are stored ap
     dyeing.storeDyeingItemFields({ colour: 'Kora', shade: 'Greige', requiredDyeColor: '', requiredDyeQuantity: '' }),
     { colour: 'Kora', shade: 'Greige', requiredColour: null, requiredQuantity: null },
   );
+});
+
+// ---------------------------------------------------------------------------
+// Production Sheets: every sheet of a production, however many it has
+// ---------------------------------------------------------------------------
+
+const sheets = require(path.join(webSrc, 'lib/download-production-sheet.ts'));
+
+const component = (category, enabled, forwarded, styleName = category) => ({
+  enabled,
+  forwarded,
+  category,
+  styleName,
+  fabricName: 'Rayon',
+  fabricWidth: '44"',
+  subStyles: [{ name: 'A', average: 1.2 }],
+  productionGrid: [{ color: 'Red', pcs: 10, mtr: 12 }],
+});
+const programWith = (components, forwardedComponents) => ({
+  programSerialNo: 'SR-9',
+  designNumber: 'D-9',
+  metadataJson: JSON.stringify({ components, ...(forwardedComponents ? { forwardedComponents } : {}) }),
+});
+
+test('production sheets: a production with no component data is its single TOP sheet', () => {
+  assert.deepEqual(sheets.productionSheetCategories({ programSerialNo: 'SR-1' }), ['TOP']);
+  assert.deepEqual(sheets.productionSheetCategories({ metadataJson: '{not json' }), ['TOP']);
+});
+
+test('production sheets: all forwarded sheets, in order, any number, custom styles included', () => {
+  const three = programWith(
+    { TOP: component('TOP', true, true), BOTTOM: component('BOTTOM', true, true), DUPATTA: component('DUPATTA', true, true) },
+    ['TOP', 'BOTTOM', 'DUPATTA'],
+  );
+  assert.deepEqual(sheets.productionSheetCategories(three), ['TOP', 'BOTTOM', 'DUPATTA']);
+  const custom = programWith(
+    { TOP: component('TOP', true, true), KAFTAN: component('KAFTAN', true, true, 'Kaftan'), BOTTOM: component('BOTTOM', false, false) },
+    ['TOP', 'KAFTAN'],
+  );
+  assert.deepEqual(sheets.productionSheetCategories(custom), ['TOP', 'KAFTAN'], 'disabled sheets are not part of the production');
+  const noTop = programWith({ TOP: component('TOP', false, false), DUPATTA: component('DUPATTA', true, true) }, ['DUPATTA']);
+  assert.deepEqual(sheets.productionSheetCategories(noTop), ['DUPATTA'], 'a production without a TOP sheet');
+});
+
+test('production sheets: unforwarded drafts only for Programming / Admin; older records use their flags', () => {
+  const p = programWith({ TOP: component('TOP', true, true), BOTTOM: component('BOTTOM', true, false) }, ['TOP']);
+  assert.deepEqual(sheets.productionSheetCategories(p), ['TOP']);
+  assert.deepEqual(sheets.productionSheetCategories(p, { withUnforwarded: true }), ['TOP', 'BOTTOM']);
+  const noList = programWith({ TOP: component('TOP', true, true), BOTTOM: component('BOTTOM', true, true) });
+  assert.deepEqual(sheets.productionSheetCategories(noList), ['TOP', 'BOTTOM']);
+});
+
+test('production sheets: print / download without a category carries every sheet of the production', () => {
+  const p = programWith(
+    { TOP: component('TOP', true, true), BOTTOM: component('BOTTOM', true, true), DUPATTA: component('DUPATTA', true, true), KAFTAN: component('KAFTAN', true, true, 'Kaftan') },
+    ['TOP', 'BOTTOM', 'DUPATTA', 'KAFTAN'],
+  );
+  const html = sheets.generateProductionSheetHtml(p);
+  const titles = Array.from(html.matchAll(/<div class="header-title">PRODUCTION SHEET &mdash; ([^<]+)<\/div>/g), (m) => m[1]);
+  assert.deepEqual(titles, ['TOP', 'BOTTOM', 'DUPATTA', 'Kaftan']);
+  assert.match(html, /All Production Sheets/);
+  const one = sheets.generateProductionSheetHtml(p, 'BOTTOM');
+  assert.deepEqual(Array.from(one.matchAll(/<div class="header-title">PRODUCTION SHEET &mdash; ([^<]+)<\/div>/g), (m) => m[1]), ['BOTTOM'], 'a single sheet can still be chosen');
+});
+
+// ---------------------------------------------------------------------------
+// Upload Stock Sheet rules (lib/stock-import-rules.mjs)
+// ---------------------------------------------------------------------------
+
+const fileHead = (...b) => Uint8Array.from([...b, ...new Array(16).fill(0)]);
+
+test('rules: only real JPG/PNG/XLSX/XLS files are accepted, and the extension must agree', () => {
+  assert.equal(stockImport.sniffImportFile(fileHead(0xff, 0xd8, 0xff, 0xe0), 'a.JPG').source, 'IMAGE');
+  assert.equal(stockImport.sniffImportFile(fileHead(0xff, 0xd8, 0xff, 0xe0), 'a.jpeg').mimeType, 'image/jpeg');
+  assert.equal(stockImport.sniffImportFile(fileHead(0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a), 'scan.png').mimeType, 'image/png');
+  assert.equal(stockImport.sniffImportFile(fileHead(0x50, 0x4b, 0x03, 0x04), 'stock.xlsx').source, 'EXCEL');
+  assert.equal(stockImport.sniffImportFile(fileHead(0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1), 'old.xls').source, 'EXCEL');
+  assert.equal(stockImport.sniffImportFile(fileHead(0x50, 0x4b, 0x03, 0x04), 'evil.png'), null, 'a zip named .png');
+  assert.equal(stockImport.sniffImportFile(fileHead(0xff, 0xd8, 0xff), 'photo.xlsx'), null);
+  assert.equal(stockImport.sniffImportFile(fileHead(0x25, 0x50, 0x44, 0x46), 'bill.pdf'), null);
+  assert.equal(stockImport.sniffImportFile(new TextEncoder().encode('fabric,qty\nx,1\n'), 'sheet.xlsx'), null);
+  assert.equal(stockImport.sniffImportFile(new Uint8Array(3), 'a.jpg'), null);
+  assert.equal(stockImport.safeFileName('../../etc/pass wd<script>.xlsx'), '.._.._etc_pass wd_script_.xlsx');
+});
+
+test('rules: quantities are read exactly; anything unclear stays empty', () => {
+  assert.deepEqual(stockImport.parseQuantity('1,250.5'), { value: 1250.5, unit: null, raw: '1,250.5' });
+  assert.deepEqual(stockImport.parseQuantity('1,25,000'), { value: 125000, unit: null, raw: '1,25,000' });
+  assert.equal(stockImport.parseQuantity('120 mtr').unit, 'MTR');
+  assert.equal(stockImport.parseQuantity('120 mtr').value, 120);
+  assert.equal(stockImport.parseQuantity('45 Pcs').unit, 'PCS');
+  assert.equal(stockImport.parseQuantity(37.25).value, 37.25);
+  for (const bad of ['12O', 'abc', '0', '-5', '1.2.3', '', null, '--', '5 yards x', 0, -3, NaN]) {
+    assert.equal(stockImport.parseQuantity(bad).value, null, `"${bad}" is not a quantity`);
+  }
+  assert.equal(stockImport.parseQuantity('5 yards').unit, null, 'only MTR and PCS are units here');
+});
+
+test('rules: dates are read day first and must be real', () => {
+  assert.equal(stockImport.parseSheetDate('05/10/2026'), '2026-10-05');
+  assert.equal(stockImport.parseSheetDate('5-10-26'), '2026-10-05');
+  assert.equal(stockImport.parseSheetDate('2026-10-05'), '2026-10-05');
+  assert.equal(stockImport.parseSheetDate('5 Oct 2026'), '2026-10-05');
+  assert.equal(stockImport.parseSheetDate('05-October-2026'), '2026-10-05');
+  assert.equal(stockImport.parseSheetDate(new Date(2026, 9, 5)), '2026-10-05');
+  for (const bad of ['31/02/2026', '13/13/2026', 'yesterday', '2026', '', null, '05/10/1890', new Date('x')]) {
+    assert.equal(stockImport.parseSheetDate(bad), null, `${bad} is not a date`);
+  }
+});
+
+const STOCK_SHEET = [
+  ['SHUBHAM FABRICS — FABRIC RECEIPT REGISTER', null, null, null, null, null, null],
+  [null, null, null, null, null, null, null],
+  ['S.No', 'Fabric Name', 'Fabric Code', 'Colour', 'Dyeing Colour', 'Qty (Mtr)', 'Unit', 'Challan No', 'Challan Date', 'Supplier'],
+  [1, 'Rayon Slub', 'RS-14', 'Off White', 'Maroon', 120.5, null, 'CH-881', '05/10/2026', 'Vardhman Mills'],
+  [2, 'Rayon Slub', 'RS-14', 'Off White', 'Navy', 80, null, null, null, null],
+  [3, 'Cotton Cambric', 'CC-60', 'Black', null, '45', 'Pcs', null, null, null],
+  [null, null, null, null, null, null, null, null, null, null],
+  [4, 'Cotton Cambric', 'CC-60', 'Black', null, 'illegible', 'Pcs', null, null, null],
+  [null, 'Total', null, null, null, 245.5, null, null, null, null],
+];
+
+test('rules: Excel columns are found under title rows; merged cells fill the rows they cover; totals are left out', () => {
+  const matrix = STOCK_SHEET.map((r) => [...r]);
+  // Challan No, Challan Date and Supplier are merged down over rows 4-8 (0-based 3-7).
+  stockImport.expandMerges(matrix, [7, 8, 9].map((c) => ({ s: { r: 3, c }, e: { r: 7, c } })));
+  const read = stockImport.rowsFromSheet(matrix, 'Sheet1');
+  assert.equal(read.error, null);
+  assert.equal(read.headerRow, 3);
+  assert.equal(read.rows.length, 4, 'blank row and total row are not stock rows');
+  assert.deepEqual(read.notes, ['Sheet1 row 9: total row left out.']);
+  const [a, b, c, d] = read.rows;
+  assert.deepEqual(
+    [a.itemName, a.fabricCode, a.colour, a.dyeColour, a.quantity, a.unit, a.billNo, a.billDate, a.supplierName, a.source],
+    ['Rayon Slub', 'RS-14', 'Off White', 'Maroon', 120.5, 'MTR', 'CH-881', '2026-10-05', 'Vardhman Mills', 'Sheet1 row 4'],
+  );
+  // Same fabric and colour, different dyeing colour: two separate rows, never merged.
+  assert.deepEqual([b.itemName, b.colour, b.dyeColour, b.quantity, b.unit, b.billNo], ['Rayon Slub', 'Off White', 'Navy', 80, 'MTR', 'CH-881']);
+  // The Unit column overrides the quantity heading: pieces stay pieces.
+  assert.deepEqual([c.quantity, c.unit], [45, 'PCS']);
+  assert.deepEqual([d.quantity, d.quantityText, d.unit], [null, 'illegible', 'PCS']);
+});
+
+test('rules: a sheet with no fabric/quantity headings is refused; a missing unit stays empty', () => {
+  assert.equal(stockImport.rowsFromSheet([['Name', 'Phone'], ['A', '1']], 'S').error, 'no-header');
+  const read = stockImport.rowsFromSheet([['Item', 'Quantity'], ['Georgette', 10]], 'S');
+  assert.deepEqual([read.rows[0].itemName, read.rows[0].quantity, read.rows[0].unit], ['Georgette', 10, null]);
+  const pcs = stockImport.rowsFromSheet([['Quality', 'Pieces'], ['Lining', 7]], 'S');
+  assert.equal(pcs.rows[0].unit, 'PCS', 'a Pieces column means PCS');
+});
+
+test('rules: photo readings keep their confidence; nothing unreadable is filled in', () => {
+  const f = (value, confidence = 'high') => ({ value, confidence });
+  const empty = { itemName: f(null, 'low'), fabricCode: f(null), colour: f(null), dyeColour: f(null), quantity: f(null), unit: f(null), supplierName: f(null), billNo: f(null), billDate: f(null), remarks: f(null), unreadableFields: [] };
+  const read = stockImport.rowsFromVision({
+    document: { readable: true, problem: null, supplierName: f('Arvind Mills'), billNo: f('A/77', 'medium'), billDate: f('6/10/26') },
+    rows: [
+      { ...empty, itemName: f('Muslin'), colour: f('Peach', 'medium'), quantity: f('12O', 'medium'), unit: f('Mtrs') },
+      { ...empty, itemName: f('Muslin'), colour: f('Mint'), quantity: f('30'), unit: f('yards') },
+      { ...empty, itemName: f('Lining'), quantity: f('25'), unit: f(null, 'low'), unreadableFields: ['unit', 'colour', 'bogus'] },
+      empty,
+    ],
+  });
+  assert.deepEqual(read.header, { supplierName: 'Arvind Mills', billNo: 'A/77', billDate: '2026-10-06', billDateText: null, confidence: { supplierName: 'high', billNo: 'medium', billDate: 'high' } });
+  assert.equal(read.rows.length, 3, 'a line with nothing read is dropped');
+  const [a, b, c] = read.rows;
+  assert.deepEqual([a.quantity, a.quantityText, a.unit, a.confidence.quantity, a.confidence.colour], [null, '12O', 'MTR', 'low', 'medium']);
+  assert.deepEqual([b.quantity, b.unit, b.unitText, b.confidence.unit], [30, null, 'yards', 'low']);
+  assert.deepEqual([c.unit, c.colour, c.unreadable], [null, null, ['unit', 'colour']]);
+  assert.equal(stockImport.rowsFromVision({ document: { readable: false, problem: 'Too blurred' }, rows: [] }).readable, false);
+  assert.deepEqual(stockImport.rowsFromVision(null).rows, []);
+});
+
+test('rules: review flags what must be fixed and what should be checked', () => {
+  const ok = { rowNo: 1, itemName: 'Rayon', quantity: 10, unit: 'MTR', billNo: 'B1', billDate: '2026-10-01', confidence: {} };
+  assert.deepEqual(stockImport.reviewRow(ok), { blocking: [], warnings: [] });
+  const bad = stockImport.reviewRow({ rowNo: 2, itemName: '', quantity: null, quantityText: '12O', unit: null, unitText: 'yards', billNo: '', billDate: null, billDateText: '31/02', confidence: { colour: 'low' }, unreadable: ['remarks'] });
+  assert.deepEqual(bad.blocking, [
+    'Fabric name is missing.',
+    'Quantity "12O" is not a valid number.',
+    'Unit "yards" is not MTR or PCS — choose one.',
+    'Challan / bill no. is missing.',
+    'Date "31/02" is not a valid date.',
+  ]);
+  assert.deepEqual(bad.warnings, ['Colour was hard to read — check it.', 'Remarks could not be read.']);
+  assert.deepEqual(stockImport.reviewRow({ ...ok, billNo: null, billDate: null }, { billNo: 'H-1', billDate: '2026-10-02' }).blocking, [], 'header values cover the row');
+  const repeats = stockImport.repeatedRows([ok, { ...ok, rowNo: 2 }, { ...ok, rowNo: 3, colour: 'Red' }, { ...ok, rowNo: 4 }]);
+  assert.deepEqual([...repeats], [[2, 1], [4, 1]]);
+});
+
+test('rules: confirm validation checks every row, keeps units, and puts code and dye colour in remarks', () => {
+  const body = {
+    entryType: 'dyed',
+    receivingDate: '2026-10-26',
+    header: { billNo: 'CH-9', billDate: '2026-10-25', supplierName: 'Mill' },
+    rows: [
+      { rowNo: 1, itemName: ' Rayon ', colour: 'Red', quantity: 10.12345, unit: 'MTR', fabricCode: 'R-1', dyeColour: 'Wine', remarks: 'Lot 4' },
+      { rowNo: 2, itemName: 'Rayon', colour: 'Red', quantity: '5', unit: 'pcs', billNo: 'CH-10', supplierName: 'Other' },
+    ],
+  };
+  const ok = stockImport.validateConfirmRows(body);
+  assert.deepEqual(ok.errors, []);
+  assert.equal(ok.entryType, 'DYED');
+  assert.deepEqual(
+    ok.lines.map((l) => [l.itemName, l.billQty, l.unit, l.billNo, l.supplierName, l.remarks, l.billDate.toISOString().slice(0, 10)]),
+    [
+      ['Rayon', 10.123, 'MTR', 'CH-9', 'Mill', 'Code: R-1 · Dye to: Wine · Lot 4', '2026-10-25'],
+      ['Rayon', 5, 'PCS', 'CH-10', 'Other', null, '2026-10-25'],
+    ],
+  );
+  const bad = stockImport.validateConfirmRows({ entryType: 'X', receivingDate: '', header: {}, rows: [{ rowNo: 7, itemName: 'A', quantity: 0, unit: 'KG' }] });
+  assert.deepEqual(bad.errors, [
+    'Choose Undyed or Dyed fabric.',
+    'Receiving date is required.',
+    'Row 7: quantity must be a number greater than zero, unit must be MTR or PCS, challan / bill no. is required, challan / bill date is required.',
+  ]);
+  assert.deepEqual(stockImport.validateConfirmRows({ entryType: 'UNDYED', receivingDate: '2026-10-26', rows: [] }).errors, ['There are no rows to add.']);
+});
+
+// ---------------------------------------------------------------------------
+// Finished-garment challans (lib/finished-garments.mjs)
+// ---------------------------------------------------------------------------
+
+test('finished garments: Finishing, Steam Press and Final QC challans carry garments by name only', () => {
+  assert.deepEqual(['FINISHING', 'STEAM_PRESS', 'FINAL_CHECK', 'STITCHING', 'INVENTORY'].map((d) => finished.isFinishedGoodsChallan({ fromDepartment: d })), [true, true, true, false, false]);
+  assert.equal(finished.isFinishedGoodsChallan(null), false);
+  assert.equal(finished.garmentName({ garmentCategory: 'TOP', styleRef: 'Kurta', colour: 'Red', fabricName: 'Rayon' }), 'Top · Kurta', 'no colour or fabric in the name');
+  assert.equal(finished.garmentName({ garmentCategory: 'DUPATTA', colour: 'Red' }), 'Dupatta');
+  assert.equal(finished.garmentName({ fabricName: 'Rayon Slub' }), 'Rayon Slub', 'lines without a category keep their cloth name');
+});
+
+test('finished garments: each colour of a garment is one line, but the challan shows the garment once', () => {
+  const lines = [
+    { id: 'a', programId: 'p1', garmentCategory: 'TOP', styleRef: 'Kurta', colour: 'Red' },
+    { id: 'b', programId: 'p1', garmentCategory: 'TOP', styleRef: 'Kurta', colour: 'Blue' },
+    { id: 'c', programId: 'p1', garmentCategory: 'TOP', styleRef: 'Short Kurta', colour: 'Red' },
+    { id: 'd', programId: 'p2', garmentCategory: 'TOP', styleRef: 'Kurta', colour: 'Red' },
+    { id: 'e', programId: 'p1', garmentCategory: 'BOTTOM', styleRef: null, colour: 'Red' },
+  ];
+  assert.deepEqual(finished.groupGarments(lines).map((g) => [g.name, g.programId, g.items.map((i) => i.id)]), [
+    ['Top · Kurta', 'p1', ['a', 'b']],
+    ['Top · Short Kurta', 'p1', ['c']],
+    ['Top · Kurta', 'p2', ['d']],
+    ['Bottom', 'p1', ['e']],
+  ]);
+});
+
+test('finished garments: the style image, else the category image, never another sheet', () => {
+  const images = [
+    { id: 'i1', programId: 'p1', garmentCategory: 'TOP', styleRef: 'Kurta', version: 2 },
+    { id: 'i2', programId: 'p1', garmentCategory: 'TOP', styleRef: '', version: 1 },
+    { id: 'i3', programId: 'p2', garmentCategory: 'BOTTOM', styleRef: '', version: 1 },
+  ];
+  assert.equal(finished.imageFor(images, { programId: 'p1', garmentCategory: 'TOP', styleRef: 'Kurta' }).id, 'i1');
+  assert.equal(finished.imageFor(images, { programId: 'p1', garmentCategory: 'TOP', styleRef: 'Short Kurta' }).id, 'i2');
+  assert.equal(finished.imageFor(images, { programId: 'p1', garmentCategory: 'BOTTOM' }), null);
+  assert.equal(finished.imageFor(images, { programId: 'p3', garmentCategory: 'TOP', styleRef: 'Kurta' }), null);
+  assert.equal(finished.garmentImageUrl(images[0]), '/api/garment-images/i1?v=2');
+  assert.equal(finished.garmentImageUrl(null), null);
 });

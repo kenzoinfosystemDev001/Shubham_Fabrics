@@ -5,7 +5,7 @@
  * Implements the authentic factory floor traveler specification sheet
  * layout (Production Sheet format) with sub-style averages and multi-color breakdown grid.
  */
-import { getCurrentUser, canViewClientCode } from '@/lib/rbac';
+import { getCurrentUser, canViewClientCode, isAdminUser, isProgrammingUser } from '@/lib/rbac';
 import { loadProgramDocument } from '@/lib/program-document';
 
 export interface SubStyleAverage {
@@ -165,6 +165,39 @@ export function getSwatchColorHex(name?: string, fallback?: string): string {
 }
 
 export type GarmentCategory = 'TOP' | 'BOTTOM' | 'DUPATTA' | 'OTHER' | (string & {});
+
+function programMeta(program: any): any {
+  if (!program?.metadataJson) return null;
+  try {
+    return typeof program.metadataJson === 'string' ? JSON.parse(program.metadataJson) : program.metadataJson;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * The Production Sheets of one production, in the order they were created: the components
+ * Programming forwarded to the floor (any number: TOP, BOTTOM, DUPATTA, custom styles). Older
+ * records without a forwarding list use their enabled components; a production with no component
+ * data is the single TOP sheet. `withUnforwarded` adds enabled sheets that were not forwarded.
+ */
+export function productionSheetCategories(program: any, { withUnforwarded = false } = {}): GarmentCategory[] {
+  const meta = programMeta(program);
+  const components = meta?.components && typeof meta.components === 'object' ? meta.components : null;
+  if (!components || Object.keys(components).length === 0) return ['TOP'];
+  const enabled = Object.keys(components).filter((k) => components[k]?.enabled !== false);
+  const list: string[] | null = Array.isArray(meta.forwardedComponents) ? meta.forwardedComponents : null;
+  const forwarded = enabled.filter((k) => (list ? list.includes(k) : components[k]?.forwarded !== false));
+  const base = forwarded.length > 0 ? forwarded : enabled;
+  const all = withUnforwarded ? [...base, ...enabled.filter((k) => !base.includes(k))] : base;
+  return all.length > 0 ? all : ['TOP'];
+}
+
+/** The sheets the signed-in user may open: forwarded ones, plus unforwarded drafts for Programming and Admin. */
+export function productionSheetCategoriesForViewer(program: any): GarmentCategory[] {
+  const user = typeof window !== 'undefined' ? getCurrentUser() : null;
+  return productionSheetCategories(program, { withUnforwarded: isProgrammingUser(user) || isAdminUser(user) });
+}
 
 function escapeHtmlText(value: string): string {
   return value.replace(/[&<>"']/g, (character) => {
@@ -412,7 +445,7 @@ export function extractSubStylesAndGrid(program: any, category: GarmentCategory 
   };
 }
 
-export function generateProductionSheetHtml(program: any, category: GarmentCategory | 'ALL' = 'TOP'): string {
+export function generateProductionSheetHtml(program: any, category: GarmentCategory | 'ALL' = 'ALL'): string {
   const currentUser = typeof window !== 'undefined' ? getCurrentUser() : null;
   const canSeeClientCode = canViewClientCode(currentUser) && Boolean(program.clientCode);
 
@@ -429,26 +462,13 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
     } catch {}
   }
 
-  let targetCategories: GarmentCategory[] = [];
-  if (category === 'ALL') {
-    if (Array.isArray(meta?.forwardedComponents) && meta.forwardedComponents.length > 0) {
-      targetCategories = meta.forwardedComponents;
-    } else if (meta?.components) {
-      targetCategories = Object.keys(meta.components).filter(
-        (c) => meta.components[c]?.enabled !== false
-      );
-    }
-    if (targetCategories.length === 0) {
-      targetCategories = ['TOP'];
-    }
-  } else {
-    targetCategories = [category];
-  }
+  // ALL: every Production Sheet of the production, one after another (as many as it has).
+  const targetCategories: GarmentCategory[] = category === 'ALL' ? productionSheetCategories(program) : [category];
 
   const categoryName = category === 'TOP' || category === 'BOTTOM' || category === 'DUPATTA'
     ? category
     : extractSubStylesAndGrid(program, category).topName.trim() || 'INPUT';
-  const categoryLabel = category === 'ALL' ? 'All Forwarded Components' : categoryName;
+  const categoryLabel = category === 'ALL' ? 'All Production Sheets' : categoryName;
   const safeCategoryLabel = escapeHtmlText(categoryLabel);
   const safeFilenameCategory = categoryLabel.replace(/[^a-z0-9_-]+/gi, '_');
 
@@ -1190,7 +1210,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
         Download ${safeCategoryLabel} Sheet
       </button>
       <button class="btn btn-outline" onclick="window.close()">
-        ✕ Close
+        Close
       </button>
     </div>
   </div>
@@ -1217,7 +1237,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
 /**
  * Download Production Sheet as an offline HTML file
  */
-export async function downloadProductionSheetHtml(program: any, category: GarmentCategory | 'ALL' = 'TOP') {
+export async function downloadProductionSheetHtml(program: any, category: GarmentCategory | 'ALL' = 'ALL') {
   try {
     const completeProgram = await loadProgramDocument(program);
     const html = generateProductionSheetHtml(completeProgram, category);
@@ -1226,7 +1246,7 @@ export async function downloadProductionSheetHtml(program: any, category: Garmen
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Production_Sheet_${category}_${serialNo}.html`;
+    a.download = `Production_Sheet${category === 'ALL' ? 's_All' : `_${String(category).replace(/[^a-z0-9_-]+/gi, '_')}`}_${serialNo}.html`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -1240,7 +1260,7 @@ export async function downloadProductionSheetHtml(program: any, category: Garmen
 /**
  * Open print window for the Production Sheet
  */
-export function printProductionSheet(program: any, category: GarmentCategory | 'ALL' = 'TOP') {
+export function printProductionSheet(program: any, category: GarmentCategory | 'ALL' = 'ALL') {
   const printWindow = window.open('', '_blank');
   if (printWindow) {
     void (async () => {

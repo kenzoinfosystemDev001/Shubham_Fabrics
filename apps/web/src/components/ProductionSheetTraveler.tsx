@@ -53,7 +53,7 @@ export function ProductionSheetTraveler({
               onClick={onClose}
               className="px-2.5 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded text-xs font-semibold transition"
             >
-              ✕ Close
+              Close
             </button>
           )}
         </div>

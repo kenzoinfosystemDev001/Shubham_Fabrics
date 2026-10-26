@@ -8,8 +8,16 @@ import {
   RefreshCw, 
   CheckCircle2, 
   ShieldAlert,
-  Layers
+  Layers,
+  CopyPlus
 } from 'lucide-react';
+
+// Shared input style for the items table; dye-specific fields add a light lavender tint.
+const FIELD_BASE =
+  'w-full h-9 px-3 border rounded-lg text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition';
+const FIELD = `${FIELD_BASE} bg-white border-neutral-200 hover:border-neutral-300`;
+const DYE_FIELD = `${FIELD_BASE} bg-brand-50/60 border-brand-200 hover:border-brand-300`;
+const REQUIRED = <span className="text-danger-500 ml-0.5" aria-hidden="true">*</span>;
 
 export interface ChallanItemData {
   id: string;
@@ -26,6 +34,8 @@ export interface ChallanItemData {
   width?: string;
   rollNumber?: string;
   remarks?: string;
+  /** Screen only (never saved): lines of the same fabric card. Lines without it group by fabric name. */
+  group?: string;
 }
 
 export type ChallanContext =
@@ -114,7 +124,7 @@ export function getDeptDefaultShelf(dept?: string): string {
   if (d.includes('DYE')) return 'DEF-SHELF-DYEING (Dyeing Station Defective Shelf)';
   if (d.includes('EMB')) return 'DEF-SHELF-EMBROIDERY (Embroidery Station Defective Shelf)';
   if (d.includes('QC2') || d.includes('THREAD CUT QC') || d.includes('THREAD CUTTING QC'))
-    return 'DEF-SHELF-QC2 (Thread Cut QC Defective Shelf)';
+    return 'DEF-SHELF-QC2 (Threadcut QC Defective Shelf)';
   if (d.includes('THREAD') || d.includes('CUTTING') || d.includes('THC'))
     return 'DEF-SHELF-THREAD-CUTTING (Thread Cutting Trimming Shelf)';
   if (d.includes('QC3') || d.includes('WASHING QC') || d.includes('WASH QC'))
@@ -333,27 +343,53 @@ export function ColorFabricMeasurementTable({
     onChange(updated);
   };
 
+  // Fabric cards: one fabric, any number of colours, each colour its own quantity and unit. The saved
+  // data stays one line per fabric + colour; cards are how the lines are shown and edited.
+  const cardKeyOf = (item: ChallanItemData) =>
+    item.group || (item.fabric.trim() ? `fabric:${item.fabric.trim().toLowerCase()}` : item.id);
+  const cards: Array<{ key: string; lines: Array<{ item: ChallanItemData; index: number }> }> = [];
+  items.forEach((item, index) => {
+    const key = cardKeyOf(item);
+    let card = cards.find((c) => c.key === key);
+    if (!card) {
+      card = { key, lines: [] };
+      cards.push(card);
+    }
+    card.lines.push({ item, index });
+  });
+  const newCardKey = () => `fabric-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+  // Every edit pins the card key on its lines, so renaming a fabric never splits its colours apart.
+  const replaceCard = (cardIndex: number, lines: ChallanItemData[]) =>
+    onChange(cards.flatMap((c, i) => (i === cardIndex ? lines : c.lines.map((l) => l.item))));
+  const pinned = (cardIndex: number) => cards[cardIndex].lines.map((l) => ({ ...l.item, group: cards[cardIndex].key }));
+
   const handleAddItem = () => {
     if (readOnly) return;
     const newItem = createBlankChallanItem(context);
     newItem.unit = items[0]?.unit || 'MTR';
+    newItem.group = newCardKey();
     onChange([...items, newItem]);
   };
 
-  const handleAddColorMeasurement = (index: number) => {
+  const handleFabricNameChange = (cardIndex: number, value: string) => {
     if (readOnly) return;
-    const sourceItem = items[index];
-    const colorItem = {
-      ...createBlankChallanItem(context),
-      fabric: sourceItem.fabric,
-      width: sourceItem.width,
-      colorCode: sourceItem.colorCode,
-      unit: sourceItem.unit,
-    };
-    onChange([
-      ...items.slice(0, index + 1),
-      colorItem,
-      ...items.slice(index + 1),
+    replaceCard(cardIndex, pinned(cardIndex).map((item) => ({ ...item, fabric: value })));
+  };
+
+  const handleAddColour = (cardIndex: number) => {
+    if (readOnly) return;
+    const lines = pinned(cardIndex);
+    const last = lines[lines.length - 1];
+    replaceCard(cardIndex, [
+      ...lines,
+      {
+        ...createBlankChallanItem(context),
+        group: cards[cardIndex].key,
+        fabric: last.fabric,
+        width: last.width,
+        colorCode: last.colorCode,
+        unit: last.unit,
+      },
     ]);
   };
 
@@ -364,6 +400,27 @@ export function ColorFabricMeasurementTable({
       return;
     }
     onChange(items.filter((_, i) => i !== index));
+  };
+
+  const handleRemoveFabric = (cardIndex: number) => {
+    if (readOnly) return;
+    if (cards.length <= 1) {
+      alert('A challan must contain at least one fabric.');
+      return;
+    }
+    const lines = cards[cardIndex].lines;
+    if (lines.length > 1 && !confirm(`Remove this fabric and its ${lines.length} colours?`)) return;
+    onChange(cards.filter((_, i) => i !== cardIndex).flatMap((c) => c.lines.map((l) => l.item)));
+  };
+
+  /** "120 MTR · 40 PCS" for a card (units are never added together). */
+  const cardTotal = (lines: Array<{ item: ChallanItemData }>) => {
+    const totals: Record<string, number> = {};
+    for (const { item } of lines) totals[item.unit || 'MTR'] = (totals[item.unit || 'MTR'] || 0) + (Number(item.measurement) || 0);
+    return Object.entries(totals)
+      .filter(([, q]) => q > 0)
+      .map(([u, q]) => `${Number(q.toFixed(2)).toLocaleString('en-IN')} ${u}`)
+      .join(' · ');
   };
 
   const handleFieldChange = (index: number, field: keyof ChallanItemData, value: any) => {
@@ -524,11 +581,11 @@ export function ColorFabricMeasurementTable({
                     <option value="DEF-SHELF-THREAD-CUTTING (Thread Cutting Trimming Shelf)">
                       DEF-SHELF-THREAD-CUTTING (Thread Cut)
                     </option>
-                    <option value="DEF-SHELF-QC2 (Thread Cut QC Defective Shelf)">
-                      DEF-SHELF-QC2 (QC2)
+                    <option value="DEF-SHELF-QC2 (Threadcut QC Defective Shelf)">
+                      DEF-SHELF-QC2 (Threadcut QC)
                     </option>
                     <option value="DEF-SHELF-QC3 (Washing QC Defective Shelf)">
-                      DEF-SHELF-QC3 (QC3)
+                      DEF-SHELF-QC3 (Washing QC)
                     </option>
                     <option value="DEF-SHELF-FINAL-CHECK (Final check Defective Shelf)">
                       DEF-SHELF-FINAL-CHECK (Final Check)
@@ -564,296 +621,326 @@ export function ColorFabricMeasurementTable({
         </div>
       )}
 
-      <div className={`space-y-4 ${trackingOnly ? 'hidden' : ''}`}>
-      {/* 2. HEADER SECTION WITH TITLE AND ADD ITEM BUTTON */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-neutral-900">
-              COLOR / FABRIC / MEASUREMENT SPECIFICATIONS
-            </span>
-            <span className="text-[10px] font-mono font-bold bg-neutral-100 text-neutral-600 px-2 py-0.5 rounded-full border border-neutral-200">
-              {items.length} {items.length === 1 ? 'Item' : 'Items'}
-            </span>
-          </div>
-          <p className="text-[11px] text-neutral-500 mt-0.5">
-            Specify color, fabric composition, exact measurement, and unit (meters or pieces).
-          </p>
+      <div className={`space-y-3 ${trackingOnly ? 'hidden' : ''}`}>
+      {/* 2. HEADER: TITLE, COUNTS, ADD FABRIC */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-bold text-neutral-900">Items</h3>
+          <span className="text-[11px] font-semibold tabular-nums bg-neutral-100 text-neutral-600 px-2 py-0.5 rounded-full">
+            {cards.length} {cards.length === 1 ? 'fabric' : 'fabrics'} · {items.length} {items.length === 1 ? 'colour' : 'colours'}
+          </span>
         </div>
 
         {!readOnly && (
           <button
             type="button"
             onClick={handleAddItem}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-lg shadow-xs transition shrink-0 self-start sm:self-auto cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-brand-50 text-brand-800 border border-brand-300 text-xs font-semibold rounded-lg transition cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>Add Item</span>
+            <span>Add fabric</span>
           </button>
         )}
       </div>
 
-      {/* 3. ITEMS TABLE */}
-      <div className="border border-neutral-200 rounded-xl overflow-hidden bg-white shadow-2xs">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead className="bg-neutral-50 border-b border-neutral-200 text-neutral-600 font-semibold uppercase text-[10px] tracking-wider">
-              <tr>
-                <th className="py-2.5 px-3 w-10 text-center">#</th>
-                <th className="py-2.5 px-3 min-w-[140px]">
-                  Fabric Name / Spec <span className="text-danger-600">*</span>
-                </th>
-                <th className="py-2.5 px-3 min-w-[120px]">
-                  {context === 'STORE_DYEING' ? 'Base / Current Color' : 'Color / Shade'}{' '}
-                  <span className="text-danger-600">*</span>
-                </th>
-                {showRequiredDyeColor && (
-                  <th className="py-2.5 px-3 min-w-[120px]">
-                    Required Dye Color <span className="text-danger-600">*</span>
-                  </th>
+      {/* 3. ONE CARD PER FABRIC, ITS COLOURS INSIDE */}
+      {cards.map((card, cardIndex) => {
+        const first = card.lines[0].item;
+        const total = cardTotal(card.lines);
+        return (
+          <div key={card.key} className="border border-neutral-200 rounded-xl bg-white shadow-xs overflow-hidden">
+            {/* Fabric heading */}
+            <div className="px-4 py-3 bg-neutral-50 border-b border-neutral-200 flex flex-wrap items-center gap-3">
+              <span className="inline-flex items-center justify-center min-w-7 h-7 px-2 rounded-lg bg-brand-50 border border-brand-100 text-[11px] font-bold text-brand-800 tabular-nums">
+                {cardIndex + 1}
+              </span>
+              <div className="flex-1 min-w-[200px]">
+                {readOnly ? (
+                  <span className="text-sm font-bold text-neutral-900">{first.fabric || '—'}</span>
+                ) : (
+                  <label className="flex items-center gap-2">
+                    <span className="text-[11px] font-semibold uppercase tracking-wide text-neutral-500 shrink-0">
+                      Fabric{REQUIRED}
+                    </span>
+                    <input
+                      type="text"
+                      required
+                      aria-label={`Fabric ${cardIndex + 1}`}
+                      value={first.fabric}
+                      onChange={(e) => handleFabricNameChange(cardIndex, e.target.value)}
+                      onFocus={(e) => e.target.select()}
+                      placeholder="Fabric name"
+                      className={`${FIELD} font-semibold max-w-md`}
+                    />
+                  </label>
                 )}
-                {showActualDyedColor && (
-                  <th className="py-2.5 px-3 min-w-[120px]">
-                    Actual Dyed Color <span className="text-danger-600">*</span>
-                  </th>
-                )}
-                {showProcessingStatus && (
-                  <th className="py-2.5 px-3 w-28">Status</th>
-                )}
-                <th className="py-2.5 px-3 w-32">
-                  {context === 'QC1_EMBROIDERY'
-                    ? 'Passed Measurement'
-                    : context === 'STORE_DYEING'
-                    ? 'Fabric Qty Issued'
-                    : 'Measurement / Qty'}{' '}
-                  <span className="text-danger-600">*</span>
-                </th>
-                {showRequiredDyeQty && (
-                  <th className="py-2.5 px-3 w-32">
-                    Required Qty to Dye <span className="text-danger-600">*</span>
-                  </th>
-                )}
-                <th className="py-2.5 px-3 w-24">
-                  Unit <span className="text-danger-600">*</span>
-                </th>
-                <th className="py-2.5 px-3 min-w-[130px]">Remarks / Roll #</th>
-                {!readOnly && (
-                  <th className="py-2.5 px-3 w-12 text-center">Action</th>
-                )}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-neutral-100">
-              {items.map((item, idx) => {
-                const itemError = errors[`item_${idx}`];
-                return (
-                  <tr key={item.id || idx} className="hover:bg-neutral-50/60 transition">
-                    <td className="py-2 px-3 text-center text-neutral-500 font-mono font-bold">
-                      {idx + 1}
-                    </td>
+              </div>
+              <span className="text-xs text-neutral-500 tabular-nums">
+                {card.lines.length} {card.lines.length === 1 ? 'colour' : 'colours'}
+                {total ? <span className="font-semibold text-neutral-800"> · {total}</span> : null}
+              </span>
+              {!readOnly && (
+                <button
+                  type="button"
+                  onClick={() => handleRemoveFabric(cardIndex)}
+                  className="p-2 text-neutral-400 hover:text-danger-600 rounded-lg hover:bg-danger-50 transition cursor-pointer"
+                  title="Remove this fabric"
+                  aria-label={`Remove fabric ${cardIndex + 1}`}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
+            </div>
 
-                    {/* FABRIC */}
-                    <td className="py-2 px-3">
-                      {readOnly ? (
-                        <span className="font-semibold text-neutral-900">{item.fabric || '—'}</span>
-                      ) : (
-                        <input
-                          type="text"
-                          required
-                          value={item.fabric}
-                          onChange={(e) => handleFieldChange(idx, 'fabric', e.target.value)}
-                          onFocus={(e) => e.target.select()}
-                          placeholder=""
-                          className="w-full px-2.5 py-1.5 bg-white border border-neutral-300 rounded-lg text-xs text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500/40 transition"
-                        />
-                      )}
-                    </td>
+            {/* Colours of this fabric */}
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm border-collapse">
+                <thead className="border-b border-neutral-100 text-[11px] font-semibold uppercase tracking-wide text-neutral-500 whitespace-nowrap">
+                  <tr>
+                    <th className="py-2.5 pl-4 pr-2 w-10">#</th>
+                    <th className="py-2.5 px-2 min-w-[150px]">
+                      {context === 'STORE_DYEING' ? 'Base color' : 'Color'}
+                      {REQUIRED}
+                    </th>
+                    {showRequiredDyeColor && (
+                      <th className="py-2.5 px-2 min-w-[150px]">
+                        Dye color{REQUIRED}
+                      </th>
+                    )}
+                    {showActualDyedColor && (
+                      <th className="py-2.5 px-2 min-w-[150px]">
+                        Dyed color{REQUIRED}
+                      </th>
+                    )}
+                    {showProcessingStatus && <th className="py-2.5 px-2 w-28">Status</th>}
+                    <th className="py-2.5 px-2 w-32 text-right">
+                      {context === 'QC1_EMBROIDERY' ? 'Passed qty' : context === 'STORE_DYEING' ? 'Qty issued' : 'Quantity'}
+                      {REQUIRED}
+                    </th>
+                    {showRequiredDyeQty && (
+                      <th className="py-2.5 px-2 w-32 text-right">
+                        Qty to dye{REQUIRED}
+                      </th>
+                    )}
+                    <th className="py-2.5 px-2 w-32">Unit</th>
+                    <th className="py-2.5 px-2 min-w-[160px]">Remarks / Roll #</th>
+                    {!readOnly && (
+                      <th className="py-2.5 pl-2 pr-4 w-12">
+                        <span className="sr-only">Remove</span>
+                      </th>
+                    )}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-neutral-100">
+                  {card.lines.map(({ item, index: idx }, lineIndex) => (
+                    <tr key={item.id || idx} className="hover:bg-neutral-50/60 transition">
+                      <td className="py-2.5 pl-4 pr-2 text-xs font-semibold text-neutral-400 tabular-nums">{lineIndex + 1}</td>
 
-                    {/* COLOR */}
-                    <td className="py-2 px-3">
-                      {readOnly ? (
-                        <span className="text-neutral-900">{item.color || '—'}</span>
-                      ) : (
-                        <div className="space-y-1.5">
+                      {/* COLOR */}
+                      <td className="py-2.5 px-2">
+                        {readOnly ? (
+                          <span className="text-neutral-900">{item.color || '—'}</span>
+                        ) : (
                           <input
                             type="text"
                             required
+                            aria-label="Color"
                             value={item.color}
                             onChange={(e) => handleFieldChange(idx, 'color', e.target.value)}
                             onFocus={(e) => e.target.select()}
-                            placeholder=""
-                            className="w-full px-2.5 py-1.5 bg-white border border-neutral-300 rounded-lg text-xs text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500/40 transition"
+                            className={FIELD}
                           />
-                          <button
-                            type="button"
-                            onClick={() => handleAddColorMeasurement(idx)}
-                            className="inline-flex items-center gap-1 text-[10px] font-semibold text-neutral-600 hover:text-neutral-900 transition cursor-pointer whitespace-nowrap"
-                            title="Add another color with its own measurement"
-                          >
-                            <Plus className="w-3 h-3" />
-                            <span>Add Color &amp; Measurement</span>
-                          </button>
-                        </div>
+                        )}
+                      </td>
+
+                      {/* REQUIRED DYE COLOR (Dyeing / QC1) */}
+                      {showRequiredDyeColor && (
+                        <td className="py-2.5 px-2">
+                          {readOnly ? (
+                            <span className="font-semibold text-brand-900">{item.requiredDyeColor || '—'}</span>
+                          ) : (
+                            <input
+                              type="text"
+                              required
+                              aria-label="Dye color"
+                              value={item.requiredDyeColor || ''}
+                              onChange={(e) => handleFieldChange(idx, 'requiredDyeColor', e.target.value)}
+                              onFocus={(e) => e.target.select()}
+                              className={DYE_FIELD}
+                            />
+                          )}
+                        </td>
                       )}
-                    </td>
 
-                    {/* REQUIRED DYE COLOR (Dyeing / QC1) */}
-                    {showRequiredDyeColor && (
-                      <td className="py-2 px-3">
-                        {readOnly ? (
-                          <span className="font-semibold text-brand-900">{item.requiredDyeColor || '—'}</span>
-                        ) : (
-                          <input
-                            type="text"
-                            required
-                            value={item.requiredDyeColor || ''}
-                            onChange={(e) => handleFieldChange(idx, 'requiredDyeColor', e.target.value)}
-                            onFocus={(e) => e.target.select()}
-                            placeholder=""
-                            className="w-full px-2.5 py-1.5 bg-white border border-brand-300 rounded-lg text-xs font-semibold text-brand-900 focus:outline-none focus:ring-1 focus:ring-brand-500 transition"
-                          />
-                        )}
-                      </td>
-                    )}
-
-                    {/* ACTUAL DYED COLOR (Dyeing to QC1) */}
-                    {showActualDyedColor && (
-                      <td className="py-2 px-3">
-                        {readOnly ? (
-                          <span className="font-semibold text-neutral-900">{item.actualDyedColor || '—'}</span>
-                        ) : (
-                          <input
-                            type="text"
-                            required
-                            value={item.actualDyedColor || ''}
-                            onChange={(e) => handleFieldChange(idx, 'actualDyedColor', e.target.value)}
-                            onFocus={(e) => e.target.select()}
-                            placeholder=""
-                            className="w-full px-2.5 py-1.5 bg-white border border-brand-300 rounded-lg text-xs font-semibold text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 transition"
-                          />
-                        )}
-                      </td>
-                    )}
-
-                    {/* PROCESSING STATUS (Undyed / Dyed) */}
-                    {showProcessingStatus && (
-                      <td className="py-2 px-3">
-                        {readOnly || context === 'STORE_EMBROIDERY' || context === 'QC1_EMBROIDERY' ? (
-                          <span
-                            className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${
-                              item.fabricProcessingStatus === 'Undyed'
-                                ? 'bg-accent-100 text-accent-800 border border-accent-200'
-                                : 'bg-brand-100 text-brand-900 border border-brand-200'
-                            }`}
-                          >
-                            {item.fabricProcessingStatus || (context === 'STORE_EMBROIDERY' ? 'Undyed' : 'Dyed')}
-                          </span>
-                        ) : (
-                          <select
-                            value={item.fabricProcessingStatus || 'Dyed'}
-                            onChange={(e) =>
-                              handleFieldChange(idx, 'fabricProcessingStatus', e.target.value as 'Dyed' | 'Undyed')
-                            }
-                            className="w-full px-2 py-1.5 bg-white border border-neutral-300 rounded-lg text-xs font-semibold text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500/40 transition cursor-pointer"
-                          >
-                            <option value="Dyed">Dyed</option>
-                            <option value="Undyed">Undyed</option>
-                          </select>
-                        )}
-                      </td>
-                    )}
-
-                    {/* MEASUREMENT / QUANTITY */}
-                    <td className="py-2 px-3">
-                      {readOnly ? (
-                        <span className="font-mono font-bold text-neutral-900">{item.measurement || '0'}</span>
-                      ) : (
-                        <input
-                          type="number"
-                          step="any"
-                          min="0.01"
-                          required
-                          value={item.measurement}
-                          onChange={(e) => handleFieldChange(idx, 'measurement', e.target.value)}
-                          onFocus={(e) => e.target.select()}
-                          placeholder="0.00"
-                          className="w-full px-2.5 py-1.5 bg-white border border-neutral-300 rounded-lg text-xs font-mono font-bold text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500/40 transition"
-                        />
+                      {/* ACTUAL DYED COLOR (Dyeing to QC1) */}
+                      {showActualDyedColor && (
+                        <td className="py-2.5 px-2">
+                          {readOnly ? (
+                            <span className="font-semibold text-neutral-900">{item.actualDyedColor || '—'}</span>
+                          ) : (
+                            <input
+                              type="text"
+                              required
+                              aria-label="Dyed color"
+                              value={item.actualDyedColor || ''}
+                              onChange={(e) => handleFieldChange(idx, 'actualDyedColor', e.target.value)}
+                              onFocus={(e) => e.target.select()}
+                              className={DYE_FIELD}
+                            />
+                          )}
+                        </td>
                       )}
-                    </td>
 
-                    {/* REQUIRED DYE QUANTITY (Store to Dyeing) */}
-                    {showRequiredDyeQty && (
-                      <td className="py-2 px-3">
+                      {/* PROCESSING STATUS (Undyed / Dyed) */}
+                      {showProcessingStatus && (
+                        <td className="py-2.5 px-2">
+                          {readOnly || context === 'STORE_EMBROIDERY' || context === 'QC1_EMBROIDERY' ? (
+                            <span
+                              className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${
+                                item.fabricProcessingStatus === 'Undyed'
+                                  ? 'bg-accent-100 text-accent-800 border border-accent-200'
+                                  : 'bg-brand-100 text-brand-900 border border-brand-200'
+                              }`}
+                            >
+                              {item.fabricProcessingStatus || (context === 'STORE_EMBROIDERY' ? 'Undyed' : 'Dyed')}
+                            </span>
+                          ) : (
+                            <select
+                              aria-label="Status"
+                              value={item.fabricProcessingStatus || 'Dyed'}
+                              onChange={(e) => handleFieldChange(idx, 'fabricProcessingStatus', e.target.value as 'Dyed' | 'Undyed')}
+                              className={`${FIELD} cursor-pointer`}
+                            >
+                              <option value="Dyed">Dyed</option>
+                              <option value="Undyed">Undyed</option>
+                            </select>
+                          )}
+                        </td>
+                      )}
+
+                      {/* MEASUREMENT / QUANTITY */}
+                      <td className="py-2.5 px-2">
                         {readOnly ? (
-                          <span className="font-mono font-bold text-brand-900">{item.requiredDyeQuantity || item.measurement || '0'}</span>
+                          <span className="block text-right font-semibold tabular-nums text-neutral-900">{item.measurement || '0'}</span>
                         ) : (
                           <input
                             type="number"
                             step="any"
                             min="0.01"
                             required
-                            value={item.requiredDyeQuantity || ''}
-                            onChange={(e) => handleFieldChange(idx, 'requiredDyeQuantity', e.target.value)}
+                            aria-label="Quantity"
+                            value={item.measurement}
+                            onChange={(e) => handleFieldChange(idx, 'measurement', e.target.value)}
                             onFocus={(e) => e.target.select()}
                             placeholder="0.00"
-                            className="w-full px-2.5 py-1.5 bg-white border border-brand-300 rounded-lg text-xs font-mono font-bold text-brand-900 focus:outline-none focus:ring-1 focus:ring-brand-500 transition"
+                            className={`${FIELD} text-right tabular-nums font-semibold`}
                           />
                         )}
                       </td>
-                    )}
 
-                    {/* UNIT (MTR or PCS strictly) */}
-                    <td className="py-2 px-3">
-                      {readOnly ? (
-                        <span className="font-bold text-neutral-700">{item.unit || 'MTR'}</span>
-                      ) : (
-                        <select
-                          value={item.unit || 'MTR'}
-                          onChange={(e) => handleFieldChange(idx, 'unit', e.target.value as 'MTR' | 'PCS')}
-                          className="w-full px-2 py-1.5 bg-white border border-neutral-300 rounded-lg text-xs font-bold text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500/40 transition cursor-pointer"
-                        >
-                          <option value="MTR">MTR (Meters)</option>
-                          <option value="PCS">PCS (Pieces)</option>
-                        </select>
+                      {/* REQUIRED DYE QUANTITY (Store to Dyeing) */}
+                      {showRequiredDyeQty && (
+                        <td className="py-2.5 px-2">
+                          {readOnly ? (
+                            <span className="block text-right font-semibold tabular-nums text-brand-900">
+                              {item.requiredDyeQuantity || item.measurement || '0'}
+                            </span>
+                          ) : (
+                            <input
+                              type="number"
+                              step="any"
+                              min="0.01"
+                              required
+                              aria-label="Qty to dye"
+                              value={item.requiredDyeQuantity || ''}
+                              onChange={(e) => handleFieldChange(idx, 'requiredDyeQuantity', e.target.value)}
+                              onFocus={(e) => e.target.select()}
+                              placeholder="0.00"
+                              className={`${DYE_FIELD} text-right tabular-nums font-semibold`}
+                            />
+                          )}
+                        </td>
                       )}
-                    </td>
 
-                    {/* REMARKS */}
-                    <td className="py-2 px-3">
-                      {readOnly ? (
-                        <span className="text-neutral-600">{item.remarks || '—'}</span>
-                      ) : (
-                        <input
-                          type="text"
-                          value={item.remarks || ''}
-                          onChange={(e) => handleFieldChange(idx, 'remarks', e.target.value)}
-                          onFocus={(e) => e.target.select()}
-                          placeholder=""
-                          className="w-full px-2.5 py-1.5 bg-white border border-neutral-300 rounded-lg text-xs text-neutral-600 focus:outline-none focus:ring-1 focus:ring-brand-500/40 transition"
-                        />
-                      )}
-                    </td>
-
-                    {/* ACTION: REMOVE */}
-                    {!readOnly && (
-                      <td className="py-2 px-3 text-center">
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveItem(idx)}
-                          className="p-1.5 text-neutral-500 hover:text-danger-600 rounded-md hover:bg-danger-50 transition cursor-pointer"
-                          title="Remove item"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                      {/* UNIT (MTR or PCS strictly) */}
+                      <td className="py-2.5 px-2">
+                        {readOnly ? (
+                          <span className="font-semibold text-neutral-700">{item.unit || 'MTR'}</span>
+                        ) : (
+                          <div role="radiogroup" aria-label="Unit" className="inline-flex h-9 p-0.5 bg-neutral-100 rounded-lg">
+                            {(['MTR', 'PCS'] as const).map((unit) => {
+                              const active = (item.unit || 'MTR') === unit;
+                              return (
+                                <button
+                                  key={unit}
+                                  type="button"
+                                  role="radio"
+                                  aria-checked={active}
+                                  title={unit === 'MTR' ? 'Meters' : 'Pieces'}
+                                  onClick={() => handleFieldChange(idx, 'unit', unit)}
+                                  className={`px-2.5 rounded-md text-xs font-semibold transition cursor-pointer ${
+                                    active ? 'bg-white text-brand-800 shadow-xs' : 'text-neutral-500 hover:text-neutral-900'
+                                  }`}
+                                >
+                                  {unit}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
                       </td>
-                    )}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-        </div>
+
+                      {/* REMARKS */}
+                      <td className="py-2.5 px-2">
+                        {readOnly ? (
+                          <span className="text-neutral-600">{item.remarks || '—'}</span>
+                        ) : (
+                          <input
+                            type="text"
+                            aria-label="Remarks / Roll #"
+                            value={item.remarks || ''}
+                            onChange={(e) => handleFieldChange(idx, 'remarks', e.target.value)}
+                            onFocus={(e) => e.target.select()}
+                            className={FIELD}
+                          />
+                        )}
+                      </td>
+
+                      {/* REMOVE THIS COLOUR */}
+                      {!readOnly && (
+                        <td className="py-2.5 pl-2 pr-4">
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveItem(idx)}
+                            className="p-2 text-neutral-400 hover:text-danger-600 rounded-lg hover:bg-danger-50 transition cursor-pointer"
+                            title="Remove this colour"
+                            aria-label={`Remove colour ${lineIndex + 1} of fabric ${cardIndex + 1}`}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {!readOnly && (
+              <div className="px-4 py-2.5 border-t border-neutral-100">
+                <button
+                  type="button"
+                  onClick={() => handleAddColour(cardIndex)}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-brand-700 hover:bg-brand-50 transition cursor-pointer"
+                >
+                  <CopyPlus className="w-3.5 h-3.5" />
+                  <span>Add colour{first.fabric.trim() ? ` to ${first.fabric.trim()}` : ''}</span>
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      })}
       </div>
     </div>
   );

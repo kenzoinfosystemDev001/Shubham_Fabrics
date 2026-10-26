@@ -90,6 +90,7 @@ export interface StockBookResult {
 export async function loadStockBook(
   db: Tx,
   exclude?: { referenceType: StockReferenceType; referenceId: string },
+  options: { excludeInwardIds?: Set<string> } = {},
 ): Promise<StockBookResult> {
   const excluded = exclude ? refId(exclude.referenceType, exclude.referenceId) : null;
   const [inwardEntries, ledgerEntries, storeChallansRaw, manualOutwards] = await Promise.all([
@@ -124,7 +125,7 @@ export async function loadStockBook(
 
   const book = createStockBook();
   for (const inward of inwardEntries) {
-    if (excluded === refId(STOCK_REFERENCE.INWARD, inward.id)) continue;
+    if (excluded === refId(STOCK_REFERENCE.INWARD, inward.id) || options.excludeInwardIds?.has(inward.id)) continue;
     addInward(book, {
       fabric: inward.itemName,
       type: inward.entryType,
@@ -342,6 +343,50 @@ export async function syncInwardStock(tx: Tx, inwardId: string, actorId: string)
   });
 }
 
+/**
+ * Posts many inward rows created in this same transaction (stock-sheet import) as receipts, with one
+ * lock and one stock-book load instead of one per row. Receipts only add stock, so no balance check
+ * can fail; the result is the same as calling syncInwardStock for each row in order.
+ */
+export async function postNewInwardStock(tx: Tx, inwards: Array<Prisma.FabricInwardGetPayload<object>>, actorId: string) {
+  if (inwards.length === 0) return 0;
+  await lockFabricStock(tx);
+  const newIds = new Set(inwards.map((row) => row.id));
+  const already = await tx.stockLedgerEntry.count({
+    where: { departmentCode: STORE_STOCK_DEPARTMENT, referenceType: STOCK_REFERENCE.INWARD, referenceId: { in: [...newIds] } },
+  });
+  if (already > 0) throw new Error('These inward rows are already posted to the stock ledger.');
+
+  // Balances before these rows; each row is then added in order, so its balanceAfter includes itself.
+  const { book } = await loadStockBook(tx, undefined, { excludeInwardIds: newIds });
+
+  const data: Prisma.StockLedgerEntryCreateManyInput[] = [];
+  for (const row of inwards) {
+    const unit = normalizeStockUnit(row.unit);
+    if (!unit || !(row.billQty > 0)) continue;
+    const key = addInward(book, { fabric: row.itemName, type: row.entryType, colour: row.colour, unit, quantity: row.billQty, date: row.receivingDate });
+    if (!key) continue;
+    data.push({
+      entryType: 'RECEIPT',
+      departmentCode: STORE_STOCK_DEPARTMENT,
+      itemCode: key,
+      itemName: row.itemName,
+      colour: row.colour,
+      quantity: row.billQty,
+      uom: unit,
+      referenceType: STOCK_REFERENCE.INWARD,
+      referenceId: row.id,
+      programId: null,
+      actorId,
+      balanceAfter: bucketBalance(book, key),
+      idempotencyKey: ledgerIdempotencyKey(STOCK_REFERENCE.INWARD, row.id, key, 0),
+      notes: `Inward bill ${row.billNo}`,
+    });
+  }
+  if (data.length > 0) await tx.stockLedgerEntry.createMany({ data });
+  return data.length;
+}
+
 /** Posts a manual outward row; rows that mirror a Fabric Store challan post nothing. */
 export async function syncManualOutwardStock(tx: Tx, outwardId: string, actorId: string) {
   await lockFabricStock(tx);
@@ -370,4 +415,43 @@ export async function syncManualOutwardStock(tx: Tx, outwardId: string, actorId:
 /** JSON body for a refused stock change. */
 export function fabricStockErrorBody(error: FabricStockError) {
   return { error: [error.message, ...error.details].join(' '), details: error.details, code: 'INSUFFICIENT_STOCK' };
+}
+
+/**
+ * Posts newly created inward rows (an Excel import) as receipts in one pass. Call it in the same
+ * transaction that created the rows, with `baseBook` loaded before they were created. Each row
+ * gets the ledger posting syncInwardStock would make (same idempotency key, revision 0), so later
+ * edits or removals of a row reconcile normally.
+ */
+export async function postNewInwardRows(
+  tx: Tx,
+  rows: Array<{ id: string; itemName: string; entryType: string; colour: string | null; unit: string; billQty: number }>,
+  options: { actorId: string; baseBook: ReturnType<typeof createStockBook>; label: string },
+) {
+  const running = new Map<string, number>();
+  const data = rows.map((row) => {
+    const unit = normalizeStockUnit(row.unit);
+    if (!unit) throw new FabricStockError(`${options.label}: unit ${row.unit} is not MTR or PCS.`);
+    const key = stockKey({ fabric: row.itemName, type: row.entryType, colour: row.colour, unit });
+    const balance = roundQty((running.get(key) ?? bucketBalance(options.baseBook, key)) + row.billQty);
+    running.set(key, balance);
+    return {
+      id: crypto.randomUUID(),
+      entryType: 'RECEIPT',
+      departmentCode: STORE_STOCK_DEPARTMENT,
+      itemCode: key,
+      itemName: row.itemName,
+      colour: row.colour,
+      quantity: row.billQty,
+      uom: unit,
+      referenceType: STOCK_REFERENCE.INWARD,
+      referenceId: row.id,
+      actorId: options.actorId,
+      balanceAfter: balance,
+      idempotencyKey: ledgerIdempotencyKey(STOCK_REFERENCE.INWARD, row.id, key, 0),
+      notes: options.label,
+    };
+  });
+  if (data.length > 0) await tx.stockLedgerEntry.createMany({ data });
+  return data.map(({ id, referenceId, itemCode, quantity, uom, balanceAfter }) => ({ id, inwardId: referenceId, key: itemCode, quantity, uom, balanceAfter }));
 }

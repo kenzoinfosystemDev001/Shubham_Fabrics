@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import { buildSessionUser } from '@/lib/auth/session-user';
 import { setSessionCookies } from '@/lib/auth/require-user';
 import { AuthConfigError, signSessionToken } from '@/lib/auth/session-token';
+import { MES_DEPARTMENTS, isStationUsername } from '@/lib/departments';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,21 +23,25 @@ export async function POST(request: Request) {
       );
     }
 
-    const user = await prisma.user.findFirst({
+    const include = { userRoles: { include: { role: true } } } as const;
+    let user = await prisma.user.findFirst({
       where: {
         OR: [
           { username: { equals: usernameOrEmail, mode: 'insensitive' } },
           { email: { equals: usernameOrEmail, mode: 'insensitive' } },
         ],
       },
-      include: {
-        userRoles: {
-          include: {
-            role: true,
-          },
-        },
-      },
+      include,
     });
+    // A station's other sign-in names (e.g. "inventory" and the earlier "packing") reach the same account.
+    const station = user ? null : MES_DEPARTMENTS.find((d) => isStationUsername(d, usernameOrEmail));
+    if (station) {
+      const names = [station.stationId, ...(station.stationAliases || [])].filter((n) => n !== usernameOrEmail);
+      user = await prisma.user.findFirst({
+        where: { OR: names.map((n) => ({ username: { equals: n, mode: 'insensitive' as const } })) },
+        include,
+      });
+    }
 
     const isPasswordValid = user?.passwordHash
       ? await bcrypt.compare(password, user.passwordHash).catch(() => false)

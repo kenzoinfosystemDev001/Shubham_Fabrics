@@ -1,4 +1,6 @@
 import type { DepartmentKey } from '@/lib/auth/department-access';
+import { OPEN_DYEING_STATUSES } from '@/lib/dyeing-workflow.mjs';
+import { OPEN_WORK_STATUSES } from '@/lib/work-items.mjs';
 
 /**
  * Smart Deadline Alerts configuration. Everything department-specific lives here: turning a
@@ -28,7 +30,15 @@ export interface InboundChallansSource {
   openStatuses: string[];
 }
 
-export type AlertSource = DyeingOrdersSource | InboundChallansSource;
+export interface WorkItemsSource {
+  kind: 'workItems';
+  /** DepartmentWorkItem.departmentCode (one item per incoming challan line). */
+  departmentCode: string;
+  /** Item statuses that count as open work; anything else (e.g. TRANSFERRED) is finished. */
+  openStatuses: string[];
+}
+
+export type AlertSource = DyeingOrdersSource | InboundChallansSource | WorkItemsSource;
 
 export interface DepartmentAlertConfig {
   enabled: boolean;
@@ -61,9 +71,9 @@ export const DEPARTMENT_ALERTS: Partial<Record<DepartmentKey, DepartmentAlertCon
     recipients: ['DYEING'],
     source: {
       kind: 'dyeingOrders',
-      openStatuses: ['RECEIVED', 'IN_DYEING', 'PARTIALLY_DYED', 'DYED', 'READY_FOR_QC1'],
+      openStatuses: [...OPEN_DYEING_STATUSES],
     },
-    workHref: ({ entityId }) => `/dyeing/my-work?tab=incoming&programId=${encodeURIComponent(entityId)}`,
+    workHref: ({ entityId }) => `/dyeing/my-work/process?orderId=${encodeURIComponent(entityId)}`,
   },
   QC1: {
     enabled: false,
@@ -77,26 +87,82 @@ export const DEPARTMENT_ALERTS: Partial<Record<DepartmentKey, DepartmentAlertCon
     workHref: () => '/qc1/my-work',
   },
   EMBROIDERY: {
-    enabled: false,
+    enabled: true,
     label: 'Embroidery',
     recipients: ['EMBROIDERY'],
-    source: {
-      kind: 'inboundChallans',
-      toDepartments: ['EMBROIDERY'],
-      openStatuses: ['ISSUED', 'RECEIVED', 'IN_PROGRESS'],
-    },
-    workHref: () => '/embroidery/my-work',
+    source: { kind: 'workItems', departmentCode: 'EMBROIDERY', openStatuses: [...OPEN_WORK_STATUSES] },
+    workHref: ({ entityId }) => `/embroidery/my-work/process?itemId=${encodeURIComponent(entityId)}`,
   },
   THREAD_CUTTING: {
-    enabled: false,
+    enabled: true,
     label: 'Thread Cutting',
     recipients: ['THREAD_CUTTING'],
-    source: {
-      kind: 'inboundChallans',
-      toDepartments: ['THREAD_CUTTING'],
-      openStatuses: ['ISSUED', 'RECEIVED', 'IN_PROGRESS'],
-    },
-    workHref: () => '/thread-cutting/my-work',
+    source: { kind: 'workItems', departmentCode: 'THREAD_CUTTING', openStatuses: [...OPEN_WORK_STATUSES] },
+    workHref: ({ entityId }) => `/thread-cutting/my-work/process?itemId=${encodeURIComponent(entityId)}`,
+  },
+  QC2: {
+    enabled: true,
+    label: 'Threadcut QC',
+    recipients: ['QC2'],
+    source: { kind: 'workItems', departmentCode: 'QC2', openStatuses: [...OPEN_WORK_STATUSES] },
+    workHref: ({ entityId }) => `/qc2/my-work/inspection?itemId=${encodeURIComponent(entityId)}`,
+  },
+  WASHING: {
+    enabled: true,
+    label: 'Washing',
+    recipients: ['WASHING'],
+    source: { kind: 'workItems', departmentCode: 'WASHING', openStatuses: [...OPEN_WORK_STATUSES] },
+    workHref: ({ entityId }) => `/washing/my-work/process?itemId=${encodeURIComponent(entityId)}`,
+  },
+  QC3: {
+    enabled: true,
+    label: 'Washing QC',
+    recipients: ['QC3'],
+    source: { kind: 'workItems', departmentCode: 'QC3', openStatuses: [...OPEN_WORK_STATUSES] },
+    workHref: ({ entityId }) => `/qcwashing/my-work/inspection?itemId=${encodeURIComponent(entityId)}`,
+  },
+  RECUTTING: {
+    enabled: true,
+    label: 'Recutting',
+    recipients: ['RECUTTING'],
+    source: { kind: 'workItems', departmentCode: 'RECUTTING', openStatuses: [...OPEN_WORK_STATUSES] },
+    workHref: ({ entityId }) => `/recutting/my-work/allocation?itemId=${encodeURIComponent(entityId)}`,
+  },
+  STITCHING: {
+    enabled: true,
+    label: 'Stitching',
+    recipients: ['STITCHING'],
+    source: { kind: 'workItems', departmentCode: 'STITCHING', openStatuses: [...OPEN_WORK_STATUSES] },
+    workHref: ({ entityId }) => `/stitching/my-work/process?itemId=${encodeURIComponent(entityId)}`,
+  },
+  FINISHING: {
+    enabled: true,
+    label: 'Finishing',
+    recipients: ['FINISHING'],
+    source: { kind: 'workItems', departmentCode: 'FINISHING', openStatuses: [...OPEN_WORK_STATUSES] },
+    workHref: ({ entityId }) => `/finishing/my-work/process?itemId=${encodeURIComponent(entityId)}`,
+  },
+  STEAM_PRESS: {
+    enabled: true,
+    label: 'Steam Press',
+    recipients: ['STEAM_PRESS'],
+    source: { kind: 'workItems', departmentCode: 'STEAM_PRESS', openStatuses: [...OPEN_WORK_STATUSES] },
+    workHref: ({ entityId }) => `/steam-press/my-work/process?itemId=${encodeURIComponent(entityId)}`,
+  },
+  FINAL_CHECK: {
+    enabled: true,
+    label: 'Final QC',
+    recipients: ['FINAL_CHECK'],
+    source: { kind: 'workItems', departmentCode: 'FINAL_CHECK', openStatuses: [...OPEN_WORK_STATUSES] },
+    workHref: ({ entityId }) => `/final-check/my-work/inspection?itemId=${encodeURIComponent(entityId)}`,
+  },
+  // Finished garments: open until every piece received has been packed (COMPLETED = fully packed).
+  INVENTORY: {
+    enabled: true,
+    label: 'Inventory',
+    recipients: ['INVENTORY'],
+    source: { kind: 'workItems', departmentCode: 'INVENTORY', openStatuses: ['AWAITING_RECEIPT', 'RECEIVED', 'IN_PROGRESS'] },
+    workHref: ({ entityId }) => `/inventory/packing?itemId=${encodeURIComponent(entityId)}`,
   },
 };
 

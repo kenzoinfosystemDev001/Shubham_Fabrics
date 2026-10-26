@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="1280" height="720" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <pattern id="weave" width="8" height="8" patternUnits="userSpaceOnUse">
+      <rect width="8" height="8" fill="#EFE4F7"/>
+      <rect x="0" y="0.6" width="4" height="2.8" rx="1.2" fill="#E2CFF0"/>
+      <rect x="4" y="4.6" width="4" height="2.8" rx="1.2" fill="#E2CFF0"/>
+      <rect x="4.6" y="0" width="2.8" height="4" rx="1.2" fill="#F7F0FB"/>
+      <rect x="0.6" y="4" width="2.8" height="4" rx="1.2" fill="#F7F0FB"/>
+    </pattern>
+    <pattern id="weaveBig" width="20" height="20" patternUnits="userSpaceOnUse">
+      <rect width="20" height="20" fill="#EFE4F7"/>
+      <rect x="0" y="1.5" width="10" height="7" rx="3" fill="#E2CFF0"/>
+      <rect x="10" y="11.5" width="10" height="7" rx="3" fill="#E2CFF0"/>
+      <rect x="11.5" y="0" width="7" height="10" rx="3" fill="#F7F0FB"/>
+      <rect x="1.5" y="10" width="7" height="10" rx="3" fill="#F7F0FB"/>
+    </pattern>
+    <linearGradient id="fold" x1="0" y1="0" x2="1" y2="0.35">
+      <stop offset="0" stop-color="#FFF" stop-opacity="0.5"/>
+      <stop offset="0.2" stop-color="#B57EDC" stop-opacity="0.08"/>
+      <stop offset="0.4" stop-color="#FFF" stop-opacity="0.4"/>
+      <stop offset="0.6" stop-color="#8E5AB5" stop-opacity="0.12"/>
+      <stop offset="0.8" stop-color="#FFF" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#B57EDC" stop-opacity="0.1"/>
+    </linearGradient>
+    <linearGradient id="shade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFF" stop-opacity="0"/>
+      <stop offset="1" stop-color="#6E4590" stop-opacity="0.12"/>
+    </linearGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#6E4590" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  <rect width="640" height="360" fill="url(#weave)"/>
+  <rect width="640" height="360" fill="url(#fold)"/>
+    <path d="M0 236 C 160 210, 420 262, 640 222" stroke="#8E5AB5" stroke-width="3" fill="none" stroke-dasharray="14 9" opacity="0.8"/>
+    <path d="M0 252 C 160 226, 420 278, 640 238" stroke="#E2CFF0" stroke-width="2" fill="none"/>
+    <path d="M110 228 q 6 -14 14 -18 M114 228 q 10 -8 18 -6" stroke="#FF6347" stroke-width="2" fill="none"/><path d="M180 222 q 6 -14 14 -18 M184 222 q 10 -8 18 -6" stroke="#FF6347" stroke-width="2" fill="none"/>
+    
+  <g filter="url(#soft)">
+    <line x1="444.4" y1="264.4" x2="513.4" y2="333.4" stroke="#6E4590" stroke-width="20.24" stroke-linecap="round"/>
+    <clipPath id="lens380"><circle cx="380" cy="200" r="92"/></clipPath>
+    <g clip-path="url(#lens380)"><rect x="288" y="108" width="184" height="184" fill="url(#weaveBig)"/><path d="M280 232 C 340 222, 420 248, 480 238" stroke="#8E5AB5" stroke-width="7" fill="none" stroke-dasharray="26 16"/></g>
+    <circle cx="380" cy="200" r="92" fill="#FFF" fill-opacity="0.18" stroke="#8E5AB5" stroke-width="11.04"/>
+    <path d="M329.4 177 A 55.199999999999996 55.199999999999996 0 0 1 361.6 146.64" stroke="#FFF" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.8"/>
+  </g>
+    
+  <g filter="url(#soft)"><circle cx="470" cy="120" r="24" fill="#DFFF00"/>
+  <path d="M459.2 120 l7.199999999999999 7.68 l14.399999999999999 -14.879999999999999" fill="none" stroke="#4A3A57" stroke-width="4.32" stroke-linecap="round" stroke-linejoin="round"/></g>
+  <rect width="640" height="360" fill="url(#shade)"/>
+  <rect x="0" y="342" width="640" height="2" fill="#DFFF00" fill-opacity="0.55"/>
+  <rect x="0" y="347" width="640" height="1" fill="#FF6347" fill-opacity="0.35"/>
+</svg>

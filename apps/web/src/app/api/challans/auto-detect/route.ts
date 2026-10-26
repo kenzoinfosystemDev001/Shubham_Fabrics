@@ -17,9 +17,9 @@ const DEPT_ALIASES: Record<string, string[]> = {
     'THREAD CUTTING DEPARTMENT',
     'CUTTING',
   ],
-  QC2: ['QC2', 'QC_2', 'QC 2', 'QUALITY CHECK 2'],
+  QC2: ['QC2', 'QC_2', 'QC 2', 'QUALITY CHECK 2', 'THREADCUT QC', 'THREAD CUT QC'],
   FINISHING: ['FINISHING', 'FINISHING DEPARTMENT'],
-  PACKING: ['PACKING', 'PACKING DEPARTMENT', 'DISPATCH'],
+  INVENTORY: ['INVENTORY', 'INVENTORY DEPARTMENT', 'PACKING', 'PACKING DEPARTMENT', 'DISPATCH'],
 };
 
 // Standard predecessor department chain
@@ -32,7 +32,7 @@ const PREDECESSORS: Record<string, string[]> = {
   THREAD_CUTTING: ['EMBROIDERY'],
   QC2: ['THREAD_CUTTING'],
   FINISHING: ['QC2'],
-  PACKING: ['FINISHING'],
+  INVENTORY: ['FINISHING'],
 };
 
 function normalizeDeptCode(dept: string): string {
@@ -44,7 +44,7 @@ function normalizeDeptCode(dept: string): string {
   if (upper.includes('DYE')) return 'DYEING';
   if (upper.includes('STORE')) return 'STORE';
   if (upper.includes('FINISH')) return 'FINISHING';
-  if (upper.includes('PACK')) return 'PACKING';
+  if (upper.includes('PACK') || upper.includes('INVENTORY')) return 'INVENTORY';
   return upper;
 }
 

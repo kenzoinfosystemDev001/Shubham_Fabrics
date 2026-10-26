@@ -3,7 +3,7 @@ import { DEADLINE_ALERTS, type AlertSource } from './config';
 
 /** A unit of department work that can carry a deadline, normalized across sources. */
 export interface WorkItem {
-  entityType: 'DYEING_ORDER' | 'CHALLAN';
+  entityType: 'DYEING_ORDER' | 'CHALLAN' | 'WORK_ITEM';
   entityId: string;
   programId: string | null;
   challanId: string | null;
@@ -108,6 +108,34 @@ async function dyeingOrderItems(source: Extract<AlertSource, { kind: 'dyeingOrde
   });
 }
 
+async function departmentWorkItems(source: Extract<AlertSource, { kind: 'workItems' }>, ids?: string[]): Promise<WorkItem[]> {
+  const items = await prisma.departmentWorkItem.findMany({
+    where: ids ? { id: { in: ids } } : { departmentCode: source.departmentCode, status: { in: source.openStatuses } },
+    select: {
+      id: true,
+      itemNumber: true,
+      status: true,
+      fabricName: true,
+      program: { select: programSelect },
+      inboundChallan: { select: { id: true, challanNumber: true, status: true } },
+    },
+  });
+  return items.map((item) => {
+    const closedReason = closedReasonFor(item.program?.status, undefined, source.openStatuses.includes(item.status));
+    return {
+      entityType: 'WORK_ITEM',
+      entityId: item.id,
+      ...sheetFields(item.program),
+      challanId: item.inboundChallan?.id ?? null,
+      challanNumber: item.inboundChallan?.challanNumber ?? null,
+      taskLabel: `${item.itemNumber} ${item.fabricName}`,
+      workStatus: item.status,
+      isOpen: closedReason === null,
+      closedReason,
+    };
+  });
+}
+
 async function inboundChallanItems(source: Extract<AlertSource, { kind: 'inboundChallans' }>, ids?: string[]): Promise<WorkItem[]> {
   const challans = await prisma.challan.findMany({
     where: ids ? { id: { in: ids } } : { toDepartment: { in: source.toDepartments }, status: { in: source.openStatuses } },
@@ -142,5 +170,7 @@ export function loadWorkItems(source: AlertSource, ids?: string[]): Promise<Work
       return dyeingOrderItems(source, ids);
     case 'inboundChallans':
       return inboundChallanItems(source, ids);
+    case 'workItems':
+      return departmentWorkItems(source, ids);
   }
 }

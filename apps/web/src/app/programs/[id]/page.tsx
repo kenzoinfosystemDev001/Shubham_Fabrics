@@ -24,7 +24,8 @@ import {
   Check,
   Building,
   RefreshCw,
-  Upload
+  Upload,
+  X
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { getCurrentUser, canViewClientCode } from '@/lib/rbac';
@@ -35,7 +36,8 @@ import {
   downloadProductionSheetHtml, 
   printProductionSheet,
   extractSubStylesAndGrid,
-  GarmentCategory 
+  GarmentCategory,
+  productionSheetCategoriesForViewer,
 } from '@/lib/download-production-sheet';
 import { WilcomPrintModal } from '@/components/wilcom/WilcomPrintModal';
 import { 
@@ -227,9 +229,8 @@ export default function ProgramDetailPage() {
   }
 
   const components = meta?.components || null;
-  const componentCategories: GarmentCategory[] = components
-    ? Object.keys(components)
-    : ['TOP', 'BOTTOM', 'DUPATTA', 'OTHER'];
+  // Every Production Sheet of this production (any number); the selected tab falls back to the first.
+  const componentCategories: GarmentCategory[] = productionSheetCategoriesForViewer(program);
   const forwardedComponents: string[] = Array.isArray(meta?.forwardedComponents) ? meta.forwardedComponents : ['TOP'];
   
   const rootWilcomPhoto = extractRootWilcomPhoto(program, meta);
@@ -262,7 +263,7 @@ export default function ProgramDetailPage() {
     }));
   }
 
-  const activeCategory = activeCategoryTab;
+  const activeCategory: GarmentCategory = componentCategories.includes(activeCategoryTab) ? activeCategoryTab : componentCategories[0];
 
   const {
     subStylesWithAverages,
@@ -336,9 +337,6 @@ export default function ProgramDetailPage() {
             <ArrowLeft className="w-4 h-4" />
           </button>
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-700 block">
-              SHUBHAM FABRICS · PRODUCTION SHEET
-            </span>
             <div className="flex items-center gap-3">
               <h1 className="text-xl font-bold font-mono text-neutral-900">
                 {program.programSerialNo || program.programNumber}
@@ -465,7 +463,7 @@ export default function ProgramDetailPage() {
 
                 {storeAvailability?.fabricStoreVerified && (
                   <p className="text-[11px] text-accent-800 font-semibold pt-0.5">
-                    ✓ Verified by {storeAvailability.fabricStoreVerifiedBy || 'Store Incharge'}
+                    Verified by {storeAvailability.fabricStoreVerifiedBy || 'Store Incharge'}
                     {storeAvailability.fabricStoreVerifiedAt &&
                       ` on ${new Date(storeAvailability.fabricStoreVerifiedAt).toLocaleDateString()}`}
                   </p>
@@ -827,7 +825,7 @@ export default function ProgramDetailPage() {
                     type="button"
                     onClick={() => setActiveCategoryTab(cat)}
                     className={`px-3 py-1 rounded text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-                      activeCategoryTab === cat
+                      activeCategory === cat
                         ? 'bg-brand-600 text-white shadow-2xs'
                         : isEnabled
                           ? 'bg-neutral-100 text-neutral-900 hover:bg-neutral-200 border border-neutral-300'
@@ -846,7 +844,7 @@ export default function ProgramDetailPage() {
 
             <ProductionSheetView
               program={program}
-              activeCategory={activeCategoryTab}
+              activeCategory={activeCategory}
               onCategoryChange={(cat) => setActiveCategoryTab(cat)}
               onOpenPrintModal={() => setShowPrintModal(true)}
               isClientCodeVisible={isClientCodeVisible}
@@ -901,7 +899,7 @@ export default function ProgramDetailPage() {
         program={program}
         isOpen={showPrintModal}
         onClose={() => setShowPrintModal(false)}
-        initialTab={activeCategoryTab}
+        initialTab={activeCategory}
       />
 
       <WilcomPrintModal
@@ -929,11 +927,12 @@ export default function ProgramDetailPage() {
             <div className="w-full flex items-center justify-between pb-2 border-b border-neutral-200">
               <span className="text-xs font-bold text-neutral-900">Wilcom Design Artwork Reference</span>
               <button
+                aria-label="Close"
                 type="button"
                 onClick={() => setViewingPhotoModal(null)}
                 className="text-neutral-500 hover:text-neutral-900 text-sm font-black p-1 hover:bg-neutral-100 rounded transition cursor-pointer"
               >
-                ✕
+                <X className="w-4 h-4" aria-hidden="true" />
               </button>
             </div>
             <div className="p-3 overflow-auto max-h-[75vh] flex items-center justify-center">

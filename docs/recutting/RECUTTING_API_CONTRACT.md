@@ -11,7 +11,7 @@
 | Method | Endpoint | Description | Access Role |
 | :--- | :--- | :--- | :--- |
 | `GET` | `/api/recutting/dashboard` | Returns operational KPIs, pipeline counts, and recent activity | `RECUTTING_OPERATOR`, `ADMIN` |
-| `GET` | `/api/recutting/incoming` | Lists incoming challans issued by QC Washing pending receipt | `RECUTTING_OPERATOR`, `ADMIN` |
+| `GET` | `/api/recutting/incoming` | Lists incoming challans issued by Washing QC pending receipt | `RECUTTING_OPERATOR`, `ADMIN` |
 | `POST` | `/api/recutting/challans/:id/receive` | Receives incoming challan, logs physical check & transit diffs | `RECUTTING_OPERATOR`, `ADMIN` |
 | `GET` | `/api/recutting/queue` | Lists received jobs in the Recutting Work Queue | `RECUTTING_OPERATOR`, `ADMIN` |
 | `GET` | `/api/recutting/jobs/:id` | Returns complete job details, linked Production Sheet & Wilcom info | `RECUTTING_OPERATOR`, `ADMIN` |

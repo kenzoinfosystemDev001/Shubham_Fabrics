@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import { requireUser } from '@/lib/auth/require-user';
 import { canUpdateChallan } from '@/lib/auth/department-access';
+import { workflowReceiving } from '@/lib/work-items-server';
 
 import {
   FabricStockError,
@@ -107,7 +108,10 @@ export async function DELETE(
           data: { parentChallanId: null },
         });
 
-        // 2. Unlink or clean up DyeingOrder references
+        // 2. Department work items received on this challan go with it (their transfers cascade).
+        await tx.departmentWorkItem.deleteMany({ where: { inboundChallanId: id } });
+
+        // Unlink or clean up DyeingOrder references
         await tx.dyeingOrder.updateMany({
           where: { inboundChallanId: id },
           data: { inboundChallanId: null },
@@ -224,10 +228,17 @@ export async function PATCH(
 
     const current = await prisma.challan.findUnique({
       where: { id },
-      select: { fromDepartment: true, toDepartment: true },
+      select: { fromDepartment: true, toDepartment: true, challanType: true },
     });
     if (!current) {
       return NextResponse.json({ error: 'Challan not found' }, { status: 404 });
+    }
+    const receivingFlow = status === 'RECEIVED' ? workflowReceiving(current) : null;
+    if (receivingFlow) {
+      return NextResponse.json(
+        { error: `Receive this challan from ${receivingFlow.label} > My Work > Incoming Challans so each line's received quantity is recorded.` },
+        { status: 409 }
+      );
     }
     if (!canUpdateChallan(authUser, current, status)) {
       return NextResponse.json(
@@ -267,7 +278,7 @@ export async function PATCH(
         else if (upDept.includes('DYE')) defaultDeptShelf = 'DEF-SHELF-DYEING (Dyeing Station Defective Shelf)';
         else if (upDept.includes('EMB')) defaultDeptShelf = 'DEF-SHELF-EMBROIDERY (Embroidery Station Defective Shelf)';
         else if (upDept.includes('QC2') || upDept.includes('THREAD CUT QC') || upDept.includes('THREAD CUTTING QC'))
-          defaultDeptShelf = 'DEF-SHELF-QC2 (Thread Cut QC Defective Shelf)';
+          defaultDeptShelf = 'DEF-SHELF-QC2 (Threadcut QC Defective Shelf)';
         else if (upDept.includes('THREAD') || upDept.includes('CUTTING') || upDept.includes('THC'))
           defaultDeptShelf = 'DEF-SHELF-THREAD-CUTTING (Thread Cutting Trimming Shelf)';
         else if (upDept.includes('QC3') || upDept.includes('WASHING QC') || upDept.includes('WASH QC'))

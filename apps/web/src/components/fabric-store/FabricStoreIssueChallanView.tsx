@@ -541,7 +541,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                 <span>Download HTML</span>
               </button>
               <Link
-                href={destinationDepartment === 'DYEING' ? '/dyeing/my-work' : '/embroidery/my-work'}
+                href={destinationDepartment === 'DYEING' ? '/dyeing/my-work/incoming' : '/embroidery/my-work/incoming'}
                 className="flex items-center gap-1.5 px-3.5 py-2 bg-brand-50 hover:bg-brand-100 border border-brand-300 text-brand-900 text-xs font-bold rounded-lg transition"
               >
                 <Eye className="w-3.5 h-3.5 text-brand-700" />

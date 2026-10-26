@@ -11,16 +11,20 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.3.0",
     "@subham/config": "*",
     "@subham/database": "*",
     "@subham/types": "*",
     "@subham/validation": "*",
     "clsx": "^2.1.1",
+    "exceljs": "4.4.0",
     "lucide-react": "^1.16.0",
     "next": "^15.2.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "sharp": "^0.35.5",
     "tailwind-merge": "^3.0.2",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
     "zod": "^3.24.2"
   },
   "devDependencies": {

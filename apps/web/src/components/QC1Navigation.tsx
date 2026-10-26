@@ -4,18 +4,15 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  LayoutDashboard,
-  Briefcase,
-  Kanban,
   LogOut,
   UserCircle,
   Menu,
-  X,
-  CheckCircle2,
+  X
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { isAdminUser } from '@/lib/rbac';
 import { DepartmentSwitcher } from '@/components/DepartmentSwitcher';
+import { SidebarDepartmentArt } from '@/components/SidebarDepartmentArt';
 
 export function QC1Navigation() {
   const pathname = usePathname();
@@ -131,6 +128,9 @@ export function QC1Navigation() {
           mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
+        {/* SIDEBAR TEXTILE BACKGROUND (one image for all departments, Admin > Sidebar Image) */}
+        <SidebarDepartmentArt />
+
         {/* BRANDING */}
         <div className="p-4 border-b border-neutral-200 bg-white flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -143,7 +143,6 @@ export function QC1Navigation() {
             </div>
             <div className="min-w-0">
               <span className="text-xs font-bold tracking-[0.14em] text-neutral-900 truncate block">SHUBHAM FABRICS</span>
-              <span className="text-[10px] font-medium tracking-[0.18em] text-brand-700 block truncate">MES ENTERPRISE</span>
             </div>
           </div>
 
@@ -156,7 +155,7 @@ export function QC1Navigation() {
         </div>
 
         {/* DEPARTMENT TITLE & WORKSPACE SWITCHER */}
-        <div className="relative px-3 pt-3 pb-2.5 border-b border-neutral-200 bg-white">
+        <div className="relative px-3 pt-3 pb-2.5 border-b border-neutral-200 bg-white [&:not(:has(button))]:hidden">
           <div className="relative z-10">
             <DepartmentSwitcher
               currentDepartmentName="Dyeing QC"
@@ -174,7 +173,6 @@ export function QC1Navigation() {
             onClick={() => setMobileOpen(false)}
             className={linkClass('/qc1', true)}
           >
-            <LayoutDashboard className="w-4 h-4 shrink-0" />
             <span>Dashboard</span>
           </Link>
 
@@ -184,7 +182,6 @@ export function QC1Navigation() {
             onClick={() => setMobileOpen(false)}
             className={linkClass('/qc1/my-work', false)}
           >
-            <Briefcase className="w-4 h-4 shrink-0" />
             <span>My Work</span>
           </Link>
 
@@ -194,13 +191,12 @@ export function QC1Navigation() {
             onClick={() => setMobileOpen(false)}
             className={linkClass('/qc1/floor-board', true)}
           >
-            <Kanban className="w-4 h-4 shrink-0" />
             <span>Floor Board</span>
           </Link>
         </nav>
 
         {/* USER & SIGN OUT FOOTER */}
-        <div className="p-4 border-t border-neutral-200 bg-white">
+        <div className="p-4 border-t border-neutral-200 bg-white/75 backdrop-blur-sm">
           <div className="flex items-center gap-3 mb-3">
             <UserCircle className="w-8 h-8 text-brand-700" />
             <div className="flex-1 min-w-0">

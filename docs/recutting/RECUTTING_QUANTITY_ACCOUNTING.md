@@ -12,7 +12,7 @@ In the precision cutting of embroidered panels, material conservation must hold 
 $$\text{Incoming Verified Quantity} = \text{Good Output (Approved)} + \text{Rework / Re-trim} + \text{Rejection (Miss-cuts)} + \text{WIP Balance}$$
 
 Where:
-- $\text{Incoming Verified Quantity}$: Total pieces received via the incoming QC Washing challan.
+- $\text{Incoming Verified Quantity}$: Total pieces received via the incoming Washing QC challan.
 - $\text{Good Output (Approved)}$: Accurately separated embroidered panels ready for Stitching.
 - $\text{Rework / Re-trim}$: Panels requiring secondary edging without dimensional violation.
 - $\text{Rejection}$: Panels rendered unusable due to blade deviation, incorrect notch cut, or fabric tearing during cutting.
