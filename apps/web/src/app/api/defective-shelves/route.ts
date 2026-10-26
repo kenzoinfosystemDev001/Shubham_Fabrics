@@ -163,6 +163,7 @@ export async function GET(request: Request) {
             fabricType: true,
             fabricDescription: true,
             colorName: true,
+            unit: true,
           },
         },
         location: {
@@ -258,7 +259,11 @@ export async function GET(request: Request) {
     }
 
     const totalQuarantinedMeters = rolls.reduce(
-      (sum, r) => sum + (Number(r.length) || 0),
+      (sum, r) => sum + (r.batch?.unit === 'PCS' ? 0 : Number(r.length) || 0),
+      0
+    );
+    const totalQuarantinedPcs = rolls.reduce(
+      (sum, r) => sum + (r.batch?.unit === 'PCS' ? Number(r.length) || 0 : 0),
       0
     );
 
@@ -273,6 +278,7 @@ export async function GET(request: Request) {
         summary: {
           factoryTotalDefectivePieces,
           factoryTotalQuarantinedMeters: Number(totalQuarantinedMeters.toFixed(2)),
+          factoryTotalQuarantinedPcs: Number(totalQuarantinedPcs.toFixed(2)),
           totalDefectedRolls: rolls.length,
           totalIncidents: allDefectChallans.length + rolls.length,
           departmentStats,

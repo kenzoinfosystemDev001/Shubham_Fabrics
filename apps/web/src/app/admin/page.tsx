@@ -1109,7 +1109,7 @@ export default function AdminConsolePage() {
                       Total Fabric Length
                     </span>
                     <div className="text-2xl font-bold font-mono text-brand-700">
-                      {(stocksData?.summary?.totalMeters || 0).toLocaleString()} Mtr
+                      {(stocksData?.summary?.totalMeters || 0).toLocaleString()} Mtr{stocksData?.summary?.totalPcs ? ` / ${stocksData.summary.totalPcs.toLocaleString()} Pcs` : ''}
                     </div>
                   </div>
 
@@ -1147,7 +1147,7 @@ export default function AdminConsolePage() {
                           <td className="py-2.5 px-4 font-mono text-neutral-600">{r.batchNumber}</td>
                           <td className="py-2.5 px-4 text-neutral-900 font-medium">{r.fabricName}</td>
                           <td className="py-2.5 px-4 text-neutral-700">{r.color}</td>
-                          <td className="py-2.5 px-4 font-mono font-semibold text-brand-700">{r.lengthMeters} M</td>
+                          <td className="py-2.5 px-4 font-mono font-semibold text-brand-700">{r.lengthMeters} {r.unit === 'PCS' ? 'PCS' : 'M'}</td>
                           <td className="py-2.5 px-4 font-mono text-neutral-600">{r.netWeightKg} kg</td>
                           <td className="py-2.5 px-4">
                             <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-neutral-100 text-neutral-700">

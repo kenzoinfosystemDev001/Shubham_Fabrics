@@ -41,6 +41,8 @@ function CreateGRNContent() {
   const [colorCode, setColorCode] = useState('');
   const [colorName, setColorName] = useState('');
   const [programId, setProgramId] = useState('');
+  // Every roll in one GRN shares this unit; meters and pieces are never combined.
+  const [unit, setUnit] = useState<'MTR' | 'PCS'>('MTR');
 
   // Dynamic rolls
   const [rolls, setRolls] = useState<RollRow[]>([
@@ -71,6 +73,7 @@ function CreateGRNContent() {
             if (ch.items?.[0]) {
               setFabricDescription(ch.items[0].itemDescription || '');
               if (ch.items[0].colour) setColorName(ch.items[0].colour);
+              if (ch.items[0].uom === 'PCS') setUnit('PCS');
             }
             setRemarks(`Received via Challan ${ch.challanNumber}`);
           }
@@ -131,7 +134,7 @@ function CreateGRNContent() {
     for (let i = 0; i < rolls.length; i++) {
       const len = parseFloat(rolls[i].length);
       if (!rolls[i].length || isNaN(len) || len <= 0) {
-        setError(`Roll #${i + 1} has an invalid or missing length (meters).`);
+        setError(`Roll #${i + 1} has an invalid or missing quantity (${unit}).`);
         return;
       }
     }
@@ -147,6 +150,7 @@ function CreateGRNContent() {
         colorCode,
         colorName,
         programId: programId || null,
+        unit,
         rolls: rolls.map((r) => ({
           length: parseFloat(r.length),
           width: r.width ? parseFloat(r.width) : null,
@@ -346,7 +350,19 @@ function CreateGRNContent() {
                 <thead className="bg-neutral-50 text-neutral-700 font-semibold border-b border-neutral-200">
                   <tr>
                     <th className="py-2.5 px-3 w-16">#</th>
-                    <th className="py-2.5 px-3">Length (Meters) *</th>
+                    <th className="py-2.5 px-3">
+                      <div className="flex items-center gap-2">
+                        <span>Quantity *</span>
+                        <select
+                          value={unit}
+                          onChange={(e) => setUnit(e.target.value === 'PCS' ? 'PCS' : 'MTR')}
+                          className="px-2 py-1 bg-white border border-neutral-300 rounded text-xs font-bold text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 cursor-pointer"
+                        >
+                          <option value="MTR">MTR (Meters)</option>
+                          <option value="PCS">PCS (Pieces)</option>
+                        </select>
+                      </div>
+                    </th>
                     <th className="py-2.5 px-3">Width (cm)</th>
                     <th className="py-2.5 px-3">Weight (kg)</th>
                     <th className="py-2.5 px-3">Roll Remarks</th>
@@ -421,9 +437,9 @@ function CreateGRNContent() {
                 Total Rolls: <strong className="text-brand-900 font-bold">{rolls.length}</strong>
               </span>
               <span className="font-semibold text-neutral-700">
-                Total Measured Length:{' '}
+                Total Measured Quantity:{' '}
                 <strong className="text-brand-900 font-mono font-bold">
-                  {totalMeters.toFixed(2)} m
+                  {totalMeters.toFixed(2)} {unit}
                 </strong>
               </span>
               <span className="font-semibold text-neutral-700">

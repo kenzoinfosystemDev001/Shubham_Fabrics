@@ -16,6 +16,8 @@ async function getFabricAvailability(
       qcStatus: 'PASSED',
       batch: {
         is: {
+          // requiredMeters is in meters, so only MTR batches count towards it.
+          unit: 'MTR',
           fabricDescription: { equals: fabricName, mode: 'insensitive' },
           ...(fabricColor
             ? { colorName: { equals: fabricColor, mode: 'insensitive' } }

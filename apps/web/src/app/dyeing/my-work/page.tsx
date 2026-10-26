@@ -911,7 +911,7 @@ export default function DyeingMyWorkPage() {
                   </div>
                   <div>
                     <span className="text-neutral-500 block text-[10px] uppercase font-semibold">Quantity</span>
-                    <strong className="font-mono text-neutral-900 text-sm">{createdChallanSuccess.qty} MTR</strong>
+                    <strong className="font-mono text-neutral-900 text-sm">{createdChallanSuccess.qty} {createdChallanSuccess.tableItems?.[0]?.unit || 'MTR'}</strong>
                   </div>
                 </div>
 

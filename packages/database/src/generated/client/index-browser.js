@@ -902,6 +902,7 @@ exports.Prisma.FabricBatchScalarFieldEnum = {
   colorName: 'colorName',
   totalRolls: 'totalRolls',
   totalMeters: 'totalMeters',
+  unit: 'unit',
   status: 'status',
   receivedAt: 'receivedAt',
   createdById: 'createdById',

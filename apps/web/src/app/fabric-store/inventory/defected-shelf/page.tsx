@@ -219,7 +219,8 @@ export default function DefectedShelfPage() {
     });
   }, [rolls, filterRollStatus, search]);
 
-  const totalLength = rolls.reduce((acc, r) => acc + (parseFloat(r.length) || 0), 0);
+  const totalLength = rolls.reduce((acc, r) => acc + (r.batch?.unit === 'PCS' ? 0 : parseFloat(r.length) || 0), 0);
+  const totalPcs = rolls.reduce((acc, r) => acc + (r.batch?.unit === 'PCS' ? parseFloat(r.length) || 0 : 0), 0);
   const holdCount = rolls.filter((r) => r.status === 'QC_HOLD' || r.qcStatus === 'ON_HOLD').length;
   const rejectedCount = rolls.filter((r) => r.status === 'QC_REJECTED' || r.qcStatus === 'FAILED').length;
   const factoryTotalPieces = masterData?.summary?.factoryTotalDefectivePieces || 0;
@@ -369,6 +370,11 @@ export default function DefectedShelfPage() {
             </div>
             <p className="text-2xl font-bold text-neutral-900 mt-1">
               {loading ? '…' : totalLength.toFixed(1)} <span className="text-sm font-normal text-neutral-500">m</span>
+              {!loading && totalPcs > 0 && (
+                <>
+                  {' / '}{totalPcs.toFixed(1)} <span className="text-sm font-normal text-neutral-500">pcs</span>
+                </>
+              )}
             </p>
             <span className="text-[10px] text-neutral-500">
               {rolls.length} rolls on DEF-SHELF-STORE
@@ -814,7 +820,7 @@ export default function DefectedShelfPage() {
                             </span>
                           </td>
                           <td className="py-3.5 px-4 font-mono font-bold text-neutral-900">
-                            {parseFloat(roll.length).toFixed(2)} m
+                            {parseFloat(roll.length).toFixed(2)} {roll.batch?.unit || 'MTR'}
                           </td>
                           <td className="py-3.5 px-4">
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-danger-100/80 text-danger-800 border border-danger-200">
@@ -1085,9 +1091,9 @@ export default function DefectedShelfPage() {
                   </span>
                 </div>
                 <div>
-                  <span className="text-neutral-500">Meters: </span>
+                  <span className="text-neutral-500">Quantity: </span>
                   <span className="font-mono font-bold text-neutral-900">
-                    {parseFloat(selectedRoll.length).toFixed(2)} m
+                    {parseFloat(selectedRoll.length).toFixed(2)} {selectedRoll.batch?.unit || 'MTR'}
                   </span>
                 </div>
                 {selectedRoll.qcRemarks && (

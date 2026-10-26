@@ -192,7 +192,7 @@ export default function ConductQCPage() {
             </div>
             <div>
               <span className="text-neutral-500 block text-[10px] font-bold uppercase">Measured Length</span>
-              <span className="font-mono font-bold text-brand-800 text-sm">{parseFloat(roll.length).toFixed(2)} m</span>
+              <span className="font-mono font-bold text-brand-800 text-sm">{parseFloat(roll.length).toFixed(2)} {roll.batch?.unit || 'MTR'}</span>
             </div>
             <div>
               <span className="text-neutral-500 block text-[10px] font-bold uppercase">Measured Width</span>

@@ -147,13 +147,15 @@ export async function GET(request: Request) {
             fabricType: true,
             fabricDescription: true,
             colorName: true,
+            unit: true,
           },
         },
       },
     });
 
+    // STORE balance is reported in MTR; rolls received in PCS must not be added to meters.
     const storeAvailableMeters = storeRolls.reduce(
-      (sum, r) => sum + (Number(r.length) || 0),
+      (sum, r) => sum + (r.batch?.unit === 'PCS' ? 0 : Number(r.length) || 0),
       0
     );
 

@@ -20,7 +20,7 @@ export async function GET(request: Request) {
         include: {
           roll: {
             include: {
-              batch: { select: { batchNumber: true, fabricType: true, fabricDescription: true } },
+              batch: { select: { batchNumber: true, fabricType: true, fabricDescription: true, unit: true } },
               location: { select: { locationCode: true } },
             },
           },
@@ -46,6 +46,7 @@ export async function GET(request: Request) {
             fabricDescription: true,
             colorName: true,
             supplierId: true,
+            unit: true,
           },
         },
         receiptItems: {

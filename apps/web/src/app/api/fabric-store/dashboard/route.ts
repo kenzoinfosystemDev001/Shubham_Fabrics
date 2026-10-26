@@ -56,7 +56,7 @@ export async function GET(request: Request) {
         orderBy: { transactedAt: 'desc' },
         include: {
           roll: { select: { rollNumber: true } },
-          batch: { select: { batchNumber: true, fabricDescription: true } },
+          batch: { select: { batchNumber: true, fabricDescription: true, unit: true } },
           transactedBy: { select: { fullName: true } },
         },
       }),

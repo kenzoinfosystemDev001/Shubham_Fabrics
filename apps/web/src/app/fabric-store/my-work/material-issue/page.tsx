@@ -81,8 +81,13 @@ function MaterialIssueContent() {
   });
 
   const selectedRollsData = rolls.filter((r) => selectedRollIds.includes(r.id));
+  // Meters and pieces are totalled separately, never added together.
   const totalSelectedMeters = selectedRollsData.reduce(
-    (sum, r) => sum + parseFloat(r.length || '0'),
+    (sum, r) => sum + (r.batch?.unit === 'PCS' ? 0 : parseFloat(r.length || '0')),
+    0
+  );
+  const totalSelectedPcs = selectedRollsData.reduce(
+    (sum, r) => sum + (r.batch?.unit === 'PCS' ? parseFloat(r.length || '0') : 0),
     0
   );
 
@@ -312,7 +317,7 @@ function MaterialIssueContent() {
                           {roll.batch?.colorName || 'Natural'}
                         </td>
                         <td className="py-3.5 px-4 font-mono font-bold text-neutral-900">
-                          {parseFloat(roll.length).toFixed(2)} m
+                          {parseFloat(roll.length).toFixed(2)} {roll.batch?.unit || 'MTR'}
                         </td>
                         <td className="py-3.5 px-4 font-mono text-neutral-600">
                           {roll.location?.locationCode || 'UNASSIGNED'}
@@ -341,9 +346,10 @@ function MaterialIssueContent() {
               <span className="text-base font-bold text-brand-600">{selectedRollIds.length} rolls</span>
             </div>
             <div>
-              <span className="text-neutral-500 block text-[10px] uppercase font-bold">Total Meters</span>
+              <span className="text-neutral-500 block text-[10px] uppercase font-bold">Total Qty</span>
               <span className="text-base font-bold font-mono text-accent-700">
-                {totalSelectedMeters.toFixed(2)} m
+                {totalSelectedMeters.toFixed(2)} MTR
+                {totalSelectedPcs > 0 && ` / ${totalSelectedPcs.toFixed(2)} PCS`}
               </span>
             </div>
           </div>
