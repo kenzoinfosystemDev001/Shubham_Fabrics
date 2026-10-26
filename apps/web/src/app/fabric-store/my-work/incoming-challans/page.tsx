@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { TransferDocuments } from '@/components/common/TransferDocuments';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
+import { formatTotals, totalsByUnit } from '@/lib/challan-units.mjs';
 
 export default function IncomingChallansPage() {
   const [loading, setLoading] = useState(true);
@@ -220,9 +221,9 @@ export default function IncomingChallansPage() {
 
                         <td className="py-3 px-4 text-[11px] text-neutral-900 max-w-[220px]">
                           <span className="line-clamp-2">{ch.items?.[0]?.itemDescription || '—'}</span>
-                          {ch.items?.[0]?.quantity && (
+                          {(ch.items || []).length > 0 && (
                             <span className="text-[10px] font-mono text-neutral-500 block mt-0.5">
-                              Qty: {ch.items[0].quantity} {ch.items[0].uom || 'PCS'}
+                              Qty: {formatTotals(totalsByUnit(ch.items), '')}
                             </span>
                           )}
                         </td>

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
+import { formatTotals, totalsByUnit, unitOf } from '@/lib/challan-units.mjs';
 
 export const dynamic = 'force-dynamic';
 
@@ -119,11 +120,36 @@ export async function GET(request: Request) {
 
     const formatted = challans.map((c) => {
       const primaryItem = c.items[0];
-      const totalSentQuantity = c.items.reduce((sum, it) => sum + (Number(it.quantity) || 0), 0);
       const latestInspection = c.inspections[0];
-      const latestProdLog = c.productionLogs[0];
-      const inspectedQty = latestProdLog ? latestProdLog.inputQuantity : (latestInspection?.sampleSize || 0);
-      const pendingInspectionQty = Math.max(0, totalSentQuantity - inspectedQty);
+      // Every line keeps its unit: received, inspected and outcome quantities are per unit (an
+      // inspection writes one production log per unit, at the same moment).
+      const sentByUnit = totalsByUnit(c.items, c.fabricUnit);
+      const unitList = Object.keys(sentByUnit).length ? Object.keys(sentByUnit) : [unitOf(primaryItem?.uom) || unitOf(c.program?.quantityMeasurement) || 'MTR'];
+      const latestAt = c.productionLogs[0]?.recordedAt?.getTime();
+      const latestLogs = c.productionLogs.filter((l) => l.recordedAt?.getTime() === latestAt);
+      const logFor = (unit: string) => latestLogs.find((l) => (unitOf(l.unitOfMeasure) || unitList[0]) === unit);
+      const units = unitList.map((unit) => {
+        const log = logFor(unit);
+        const sent = sentByUnit[unit] || 0;
+        const inspected = log ? log.inputQuantity : unitList.length === 1 ? latestInspection?.sampleSize || 0 : 0;
+        return {
+          unit,
+          sent,
+          inspected,
+          pending: Math.max(0, sent - inspected),
+          passed: log ? log.goodQuantity : 0,
+          failed: log ? log.rejectQuantity : 0,
+          rework: log ? log.reworkQuantity : 0,
+          hold: log ? log.balanceQuantity : 0,
+        };
+      });
+      // Single-unit fields kept for existing screens: the first unit's figures (the only one for most challans).
+      const first = units[0];
+      const totalSentQuantity = first.sent;
+      const inspectedQty = first.inspected;
+      const pendingInspectionQty = first.pending;
+      const latestProdLog = logFor(first.unit);
+      const sumOf = (key: 'sent' | 'pending' | 'inspected') => formatTotals(Object.fromEntries(units.map((u) => [u.unit, u[key]])));
 
       return {
         id: c.id,
@@ -157,7 +183,11 @@ export async function GET(request: Request) {
         failedQuantity: latestProdLog ? latestProdLog.rejectQuantity : 0,
         reworkQuantity: latestProdLog ? latestProdLog.reworkQuantity : 0,
         holdQuantity: latestProdLog ? latestProdLog.balanceQuantity : 0,
-        uom: primaryItem?.uom || c.program?.quantityMeasurement || 'MTR',
+        uom: first.unit,
+        units,
+        sentText: sumOf('sent'),
+        pendingText: sumOf('pending'),
+        inspectedText: sumOf('inspected'),
         deliveryDate: c.program?.deliveryDate || null,
         items: c.items,
         program: c.program,

@@ -149,7 +149,7 @@ export default function BarcodeStickerCard({
         <div>
           <span className="text-[10px] uppercase font-bold text-neutral-500 block">Dispatched Pieces</span>
           <strong className="text-sm font-mono font-black text-accent-800 block">
-            {params.totalQuantity || '—'} {params.uom || 'PCS'}
+            {params.totalQuantity || '—'} {params.uom ?? 'PCS'}
           </strong>
         </div>
       </div>

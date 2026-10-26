@@ -38,6 +38,7 @@ export function buildDepartmentTrackingData(
       fabricIn,
       fabricOut: outgoingQuantity,
       fabricUnit,
+      defectiveUnit: defectivePieces > 0 ? fabricUnit : null,
       defectivePieces,
       defectiveShelfLocation: body.defectiveShelfLocation || null,
       defectReason: body.defectReason || null,

@@ -17,6 +17,15 @@ import {
   syncChallanStock,
 } from '@/lib/fabric-stock-ledger';
 import { storeDyeingItemFields } from '@/lib/dyeing-instructions.mjs';
+import {
+  MIXED_UNIT,
+  QUANTITY_UNITS,
+  challanTotalsByUnit,
+  formatTotals,
+  headerUnitOf,
+  totalsByUnit,
+  unitOf,
+} from '@/lib/challan-units.mjs';
 
 const CHALLAN_CREATE_ENDPOINT = 'POST /api/challans';
 
@@ -320,27 +329,24 @@ export async function POST(request: Request) {
 
     if (isMovingOutFromStore || isBypassingToProcessing) {
       const { checkFabricStoreAvailability } = await import('@/lib/fabric-availability');
-      const firstItemWithUnit = Array.isArray(body.items)
-        ? body.items.find((item: any) => item?.uom || item?.unit)
-        : undefined;
-      const requestedUnit = String(
-        firstItemWithUnit?.uom ||
-        firstItemWithUnit?.unit ||
-        body.fabricUnit ||
-        ''
-      ).toUpperCase();
-      const unitOverride = requestedUnit === 'MTR' || requestedUnit === 'PCS'
-        ? requestedUnit
-        : undefined;
-      const availability = await checkFabricStoreAvailability(resolvedProgramId, unitOverride);
-      if (!availability.isAvailable) {
-        return NextResponse.json(
-          {
-            error: `Fabric is not available in Fabric Store for Program ${availability.programSerialNo || resolvedProgramId}. ${availability.message}`,
-            fabricAvailability: availability,
-          },
-          { status: 400 }
-        );
+      // Each unit on the challan is checked against stock in that same unit; MTR and PCS never mix.
+      const requestedUnits = Array.from(new Set(
+        (Array.isArray(body.items) ? body.items : [])
+          .map((item: any) => unitOf(item?.uom || item?.unit))
+          .filter(Boolean)
+      )) as Array<'MTR' | 'PCS'>;
+      if (requestedUnits.length === 0 && unitOf(body.fabricUnit)) requestedUnits.push(unitOf(body.fabricUnit) as 'MTR' | 'PCS');
+      for (const unitOverride of requestedUnits.length ? requestedUnits : [undefined]) {
+        const availability = await checkFabricStoreAvailability(resolvedProgramId, unitOverride);
+        if (!availability.isAvailable) {
+          return NextResponse.json(
+            {
+              error: `Fabric is not available in Fabric Store for Program ${availability.programSerialNo || resolvedProgramId}. ${availability.message}`,
+              fabricAvailability: availability,
+            },
+            { status: 400 }
+          );
+        }
       }
     }
 
@@ -359,12 +365,16 @@ export async function POST(request: Request) {
         include: { items: true },
       });
       if (parent) {
-        const pItemsTotal = parent.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
-        detectedFabricIn = parent.fabricOut ?? (pItemsTotal > 0 ? pItemsTotal : parent.fabricIn ?? 0);
+        // A parent with lines in both units has no single "in" quantity; its lines carry their own.
+        const pTotals = challanTotalsByUnit(parent);
+        const pUnits = Object.keys(pTotals);
+        if (pUnits.length <= 1) {
+          detectedFabricIn = parent.fabricOut ?? (pTotals[pUnits[0]] || parent.fabricIn || 0);
+          if (pUnits[0]) detectedUnit = pUnits[0];
+          else if (unitOf(parent.fabricUnit)) detectedUnit = parent.fabricUnit as string;
+        }
         detectedFromDept = parent.fromDepartment;
         detectedFromChallanId = parent.id;
-        if (parent.fabricUnit) detectedUnit = parent.fabricUnit;
-        else if (parent.items[0]?.uom) detectedUnit = parent.items[0].uom;
       }
     } else if (resolvedProgramId && fromDept !== 'PROGRAMMING') {
       const priorChallan = await prisma.challan.findFirst({
@@ -376,58 +386,73 @@ export async function POST(request: Request) {
         include: { items: true },
       });
       if (priorChallan) {
-        const prItemsTotal = priorChallan.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
-        detectedFabricIn = priorChallan.fabricOut ?? (prItemsTotal > 0 ? prItemsTotal : priorChallan.fabricIn ?? 0);
+        const prTotals = challanTotalsByUnit(priorChallan);
+        const prUnits = Object.keys(prTotals);
+        if (prUnits.length <= 1) {
+          detectedFabricIn = priorChallan.fabricOut ?? (prTotals[prUnits[0]] || priorChallan.fabricIn || 0);
+          if (prUnits[0]) detectedUnit = prUnits[0];
+          else if (unitOf(priorChallan.fabricUnit)) detectedUnit = priorChallan.fabricUnit as string;
+        }
         detectedFromDept = priorChallan.fromDepartment;
         detectedFromChallanId = priorChallan.id;
-        if (priorChallan.fabricUnit) detectedUnit = priorChallan.fabricUnit;
-        else if (priorChallan.items[0]?.uom) detectedUnit = priorChallan.items[0].uom;
       }
     }
 
-    const rawItemsSum = (Array.isArray(body.items) ? body.items : []).reduce(
-      (sum: number, it: any) => sum + (Number(it.quantity ?? it.measurement) || 0),
-      0
-    );
+    // Every line has its own unit (MTR or PCS). Header quantities hold one unit, so a challan whose
+    // lines use both keeps fabricUnit MIXED and leaves fabricIn/fabricOut empty: its totals are per
+    // unit, from the lines. Meters and pieces are never added together or converted.
+    const bodyItems: any[] = Array.isArray(body.items) ? body.items : [];
+    const itemUnits = bodyItems.map((item: any) => unitOf(item?.uom || item?.unit) || String(item?.uom || item?.unit || '').toUpperCase());
+    if (bodyItems.length > 0 && itemUnits.some((u) => !QUANTITY_UNITS.includes(u as any))) {
+      return NextResponse.json({ error: 'Choose MTR or PCS for every item.' }, { status: 400 });
+    }
+    for (const [index, item] of bodyItems.entries()) {
+      const qty = Number(item?.quantity ?? item?.measurement);
+      if (!Number.isFinite(qty) || qty <= 0) {
+        return NextResponse.json({ error: `Item ${index + 1}: enter a quantity greater than zero.` }, { status: 400 });
+      }
+    }
+    const itemUnit = headerUnitOf(itemUnits); // MTR | PCS | MIXED | null (no lines)
+    const isMixed = itemUnit === MIXED_UNIT;
+    const rawItemsSum = isMixed ? 0 : bodyItems.reduce((sum: number, it: any) => sum + (Number(it.quantity ?? it.measurement) || 0), 0);
 
     const isFabricStoreIssue = fromDept === 'STORE' &&
       (body.challanType === 'STORE_TO_DYEING' || body.challanType === 'STORE_TO_EMBROIDERY');
-    const storeItemUnits = isFabricStoreIssue
-      ? new Set((Array.isArray(body.items) ? body.items : [])
-          .map((item: any) => String(item?.uom || item?.unit || body.fabricUnit || 'MTR').toUpperCase()))
-      : new Set<string>();
-    if (isFabricStoreIssue && storeItemUnits.size > 1) {
-      return NextResponse.json({ error: 'Use one stock unit (MTR or PCS) for every item in a Fabric Store challan.' }, { status: 400 });
-    }
-    const storeItemUnit = storeItemUnits.values().next().value as string | undefined;
-    if (isFabricStoreIssue && storeItemUnit && !['MTR', 'PCS'].includes(storeItemUnit)) {
-      return NextResponse.json({ error: 'Fabric Store challan items must use MTR or PCS.' }, { status: 400 });
-    }
 
     const defectivePieces = Number(body.defectivePieces || 0);
-    const fabricUnit = (isFabricStoreIssue && storeItemUnit) || body.fabricUnit || detectedUnit || body.uom || 'MTR';
-    const hasMeasuredStoreItems = isFabricStoreIssue && Boolean(storeItemUnit) && rawItemsSum > 0;
-
-    if (
-      isFabricStoreIssue &&
-      defectivePieces > 0 &&
-      body.fabricUnit &&
-      String(body.fabricUnit).toUpperCase() !== fabricUnit
-    ) {
-      return NextResponse.json({ error: 'The defective quantity unit must match the challan item unit.' }, { status: 400 });
+    const fabricUnit = isMixed
+      ? MIXED_UNIT
+      : (isFabricStoreIssue && itemUnit) || body.fabricUnit || detectedUnit || body.uom || 'MTR';
+    // The defective quantity is in the unit chosen for it (the tracking unit), never the MIXED header.
+    const defectiveUnit = defectivePieces > 0
+      ? unitOf(body.defectiveUnit) || unitOf(body.fabricUnit) || unitOf(fabricUnit) || null
+      : null;
+    if (defectivePieces > 0 && !defectiveUnit) {
+      return NextResponse.json({ error: 'Choose MTR or PCS for the defective quantity.' }, { status: 400 });
     }
+    if (isFabricStoreIssue && defectivePieces > 0 && itemUnit && !itemUnits.includes(defectiveUnit as string)) {
+      return NextResponse.json({ error: 'The defective quantity must be in a unit used by the challan items.' }, { status: 400 });
+    }
+    const hasMeasuredStoreItems = isFabricStoreIssue && Boolean(itemUnit) && !isMixed && rawItemsSum > 0;
+    // Defects are counted into "in" only when they share the items' unit.
+    const defectInItemUnit = defectiveUnit && defectiveUnit === (itemUnit || unitOf(fabricUnit)) ? defectivePieces : 0;
 
-    const fabricIn = hasMeasuredStoreItems
-      ? rawItemsSum + defectivePieces
+    const fabricIn = isMixed
+      ? null
+      : hasMeasuredStoreItems
+      ? rawItemsSum + defectInItemUnit
       : body.fabricIn !== undefined && body.fabricIn !== null && body.fabricIn !== ''
         ? Number(body.fabricIn)
         : (detectedFabricIn ?? (rawItemsSum || Number(body.quantity || 1)));
 
-    const fabricOut = hasMeasuredStoreItems
+    const fabricOut = isMixed
+      ? null
+      : hasMeasuredStoreItems
       ? rawItemsSum
       : body.fabricOut !== undefined && body.fabricOut !== null && body.fabricOut !== ''
         ? Number(body.fabricOut)
-        : Math.max(0, fabricIn - defectivePieces);
+        : Math.max(0, (fabricIn ?? 0) - defectInItemUnit);
+    const outText = fabricOut === null ? formatTotals(totalsByUnit(bodyItems, null, (it) => it.quantity ?? it.measurement)) : `${fabricOut} ${fabricUnit}`;
     const getDefaultDefectiveShelf = (dept: string) => {
       const up = dept.toUpperCase();
       if (up.includes('QC1') || up.includes('DYEING QC') || up.includes('DYE QC'))
@@ -473,6 +498,7 @@ export async function POST(request: Request) {
           fabricOut,
           fabricUnit,
           defectivePieces,
+          defectiveUnit,
           defectiveShelfLocation,
           defectReason,
           detectedFromChallanId,
@@ -481,9 +507,9 @@ export async function POST(request: Request) {
             [
               body.remarks,
               defectivePieces > 0
-                ? `[DEFECT ISOLATION: ${defectivePieces} ${fabricUnit} cut & routed to ${defectiveShelfLocation} (Reason: ${defectReason}). Net Out: ${fabricOut} ${fabricUnit}]`
+                ? `[DEFECT ISOLATION: ${defectivePieces} ${defectiveUnit} cut & routed to ${defectiveShelfLocation} (Reason: ${defectReason}). Net Out: ${outText}]`
                 : null,
-              detectedFromDept
+              detectedFromDept && !isMixed
                 ? `[Auto-detected from ${detectedFromDept}: In ${fabricIn} ${fabricUnit}]`
                 : null,
               body.vehicleNumber ? `Vehicle: ${body.vehicleNumber}` : null,
@@ -505,11 +531,12 @@ export async function POST(request: Request) {
               departmentCode: fromDept,
               itemDescription: `Defective pieces cut in ${fromDept} — Quarantined on ${defectiveShelfLocation}`,
               severity: 'MAJOR',
-              quantity: Math.max(1, Math.round(defectivePieces)),
+              quantity: defectivePieces,
+              uom: defectiveUnit,
               reason: defectReason || 'Defective piece cut during department processing',
               detectedById: actorId,
               status: 'OPEN',
-              resolutionNotes: `Defective ${defectivePieces} ${fabricUnit} segregated to ${defectiveShelfLocation}. Leftover ${fabricOut} ${fabricUnit} dispatched to ${toDept}.`,
+              resolutionNotes: `Defective ${defectivePieces} ${defectiveUnit} segregated to ${defectiveShelfLocation}. Leftover ${outText} dispatched to ${toDept}.`,
             },
           });
         } catch (defectErr) {
@@ -550,7 +577,7 @@ export async function POST(request: Request) {
               `${item.fabric || item.fabricCode || 'Fabric'} — ${item.colour || item.color || 'Standard'}`,
             unitType: item.unitType || 'ROLL',
             quantity: Number(item.quantity ?? item.measurement ?? 1),
-            uom: item.uom || item.unit || fabricUnit || 'MTR',
+            uom: unitOf(item.uom || item.unit) || unitOf(fabricUnit) || 'MTR',
             fabricCode: item.fabricCode || item.fabric || null,
             colour: colourFields.colour,
             shade: colourFields.shade,

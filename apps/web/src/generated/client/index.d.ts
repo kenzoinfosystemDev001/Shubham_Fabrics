@@ -49442,6 +49442,7 @@ export namespace Prisma {
     fabricOut: number | null
     fabricUnit: string | null
     defectivePieces: number | null
+    defectiveUnit: string | null
     defectiveShelfLocation: string | null
     defectReason: string | null
     detectedFromChallanId: string | null
@@ -49472,6 +49473,7 @@ export namespace Prisma {
     fabricOut: number | null
     fabricUnit: string | null
     defectivePieces: number | null
+    defectiveUnit: string | null
     defectiveShelfLocation: string | null
     defectReason: string | null
     detectedFromChallanId: string | null
@@ -49502,6 +49504,7 @@ export namespace Prisma {
     fabricOut: number
     fabricUnit: number
     defectivePieces: number
+    defectiveUnit: number
     defectiveShelfLocation: number
     defectReason: number
     detectedFromChallanId: number
@@ -49546,6 +49549,7 @@ export namespace Prisma {
     fabricOut?: true
     fabricUnit?: true
     defectivePieces?: true
+    defectiveUnit?: true
     defectiveShelfLocation?: true
     defectReason?: true
     detectedFromChallanId?: true
@@ -49576,6 +49580,7 @@ export namespace Prisma {
     fabricOut?: true
     fabricUnit?: true
     defectivePieces?: true
+    defectiveUnit?: true
     defectiveShelfLocation?: true
     defectReason?: true
     detectedFromChallanId?: true
@@ -49606,6 +49611,7 @@ export namespace Prisma {
     fabricOut?: true
     fabricUnit?: true
     defectivePieces?: true
+    defectiveUnit?: true
     defectiveShelfLocation?: true
     defectReason?: true
     detectedFromChallanId?: true
@@ -49723,6 +49729,7 @@ export namespace Prisma {
     fabricOut: number | null
     fabricUnit: string | null
     defectivePieces: number | null
+    defectiveUnit: string | null
     defectiveShelfLocation: string | null
     defectReason: string | null
     detectedFromChallanId: string | null
@@ -49772,6 +49779,7 @@ export namespace Prisma {
     fabricOut?: boolean
     fabricUnit?: boolean
     defectivePieces?: boolean
+    defectiveUnit?: boolean
     defectiveShelfLocation?: boolean
     defectReason?: boolean
     detectedFromChallanId?: boolean
@@ -49824,6 +49832,7 @@ export namespace Prisma {
     fabricOut?: boolean
     fabricUnit?: boolean
     defectivePieces?: boolean
+    defectiveUnit?: boolean
     defectiveShelfLocation?: boolean
     defectReason?: boolean
     detectedFromChallanId?: boolean
@@ -49862,6 +49871,7 @@ export namespace Prisma {
     fabricOut?: boolean
     fabricUnit?: boolean
     defectivePieces?: boolean
+    defectiveUnit?: boolean
     defectiveShelfLocation?: boolean
     defectReason?: boolean
     detectedFromChallanId?: boolean
@@ -49900,13 +49910,14 @@ export namespace Prisma {
     fabricOut?: boolean
     fabricUnit?: boolean
     defectivePieces?: boolean
+    defectiveUnit?: boolean
     defectiveShelfLocation?: boolean
     defectReason?: boolean
     detectedFromChallanId?: boolean
     detectedFromDepartment?: boolean
   }
 
-  export type ChallanOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "challanNumber" | "challanType" | "programId" | "parentChallanId" | "fromDepartment" | "toDepartment" | "status" | "priority" | "issuedDate" | "receivedDate" | "completedDate" | "createdById" | "issuedById" | "receivedById" | "approvedById" | "remarks" | "createdAt" | "updatedAt" | "fabricIn" | "fabricOut" | "fabricUnit" | "defectivePieces" | "defectiveShelfLocation" | "defectReason" | "detectedFromChallanId" | "detectedFromDepartment", ExtArgs["result"]["challan"]>
+  export type ChallanOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "challanNumber" | "challanType" | "programId" | "parentChallanId" | "fromDepartment" | "toDepartment" | "status" | "priority" | "issuedDate" | "receivedDate" | "completedDate" | "createdById" | "issuedById" | "receivedById" | "approvedById" | "remarks" | "createdAt" | "updatedAt" | "fabricIn" | "fabricOut" | "fabricUnit" | "defectivePieces" | "defectiveUnit" | "defectiveShelfLocation" | "defectReason" | "detectedFromChallanId" | "detectedFromDepartment", ExtArgs["result"]["challan"]>
   export type ChallanInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     program?: boolean | ProgramDefaultArgs<ExtArgs>
     parentChallan?: boolean | Challan$parentChallanArgs<ExtArgs>
@@ -50001,6 +50012,7 @@ export namespace Prisma {
       fabricOut: number | null
       fabricUnit: string | null
       defectivePieces: number | null
+      defectiveUnit: string | null
       defectiveShelfLocation: string | null
       defectReason: string | null
       detectedFromChallanId: string | null
@@ -50472,6 +50484,7 @@ export namespace Prisma {
     readonly fabricOut: FieldRef<"Challan", 'Float'>
     readonly fabricUnit: FieldRef<"Challan", 'String'>
     readonly defectivePieces: FieldRef<"Challan", 'Float'>
+    readonly defectiveUnit: FieldRef<"Challan", 'String'>
     readonly defectiveShelfLocation: FieldRef<"Challan", 'String'>
     readonly defectReason: FieldRef<"Challan", 'String'>
     readonly detectedFromChallanId: FieldRef<"Challan", 'String'>
@@ -67517,6 +67530,7 @@ export namespace Prisma {
     itemDescription: string | null
     severity: string | null
     quantity: number | null
+    uom: string | null
     reason: string | null
     detectedById: string | null
     status: string | null
@@ -67536,6 +67550,7 @@ export namespace Prisma {
     itemDescription: string | null
     severity: string | null
     quantity: number | null
+    uom: string | null
     reason: string | null
     detectedById: string | null
     status: string | null
@@ -67555,6 +67570,7 @@ export namespace Prisma {
     itemDescription: number
     severity: number
     quantity: number
+    uom: number
     reason: number
     detectedById: number
     status: number
@@ -67584,6 +67600,7 @@ export namespace Prisma {
     itemDescription?: true
     severity?: true
     quantity?: true
+    uom?: true
     reason?: true
     detectedById?: true
     status?: true
@@ -67603,6 +67620,7 @@ export namespace Prisma {
     itemDescription?: true
     severity?: true
     quantity?: true
+    uom?: true
     reason?: true
     detectedById?: true
     status?: true
@@ -67622,6 +67640,7 @@ export namespace Prisma {
     itemDescription?: true
     severity?: true
     quantity?: true
+    uom?: true
     reason?: true
     detectedById?: true
     status?: true
@@ -67728,6 +67747,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom: string | null
     reason: string
     detectedById: string
     status: string
@@ -67766,6 +67786,7 @@ export namespace Prisma {
     itemDescription?: boolean
     severity?: boolean
     quantity?: boolean
+    uom?: boolean
     reason?: boolean
     detectedById?: boolean
     status?: boolean
@@ -67792,6 +67813,7 @@ export namespace Prisma {
     itemDescription?: boolean
     severity?: boolean
     quantity?: boolean
+    uom?: boolean
     reason?: boolean
     detectedById?: boolean
     status?: boolean
@@ -67815,6 +67837,7 @@ export namespace Prisma {
     itemDescription?: boolean
     severity?: boolean
     quantity?: boolean
+    uom?: boolean
     reason?: boolean
     detectedById?: boolean
     status?: boolean
@@ -67838,6 +67861,7 @@ export namespace Prisma {
     itemDescription?: boolean
     severity?: boolean
     quantity?: boolean
+    uom?: boolean
     reason?: boolean
     detectedById?: boolean
     status?: boolean
@@ -67847,7 +67871,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type DefectRecordOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "defectCode" | "programId" | "challanId" | "departmentCode" | "bundleId" | "itemDescription" | "severity" | "quantity" | "reason" | "detectedById" | "status" | "resolutionNotes" | "resolvedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["defectRecord"]>
+  export type DefectRecordOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "defectCode" | "programId" | "challanId" | "departmentCode" | "bundleId" | "itemDescription" | "severity" | "quantity" | "uom" | "reason" | "detectedById" | "status" | "resolutionNotes" | "resolvedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["defectRecord"]>
   export type DefectRecordInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     program?: boolean | ProgramDefaultArgs<ExtArgs>
     challan?: boolean | DefectRecord$challanArgs<ExtArgs>
@@ -67890,6 +67914,7 @@ export namespace Prisma {
       itemDescription: string
       severity: string
       quantity: number
+      uom: string | null
       reason: string
       detectedById: string
       status: string
@@ -68334,7 +68359,8 @@ export namespace Prisma {
     readonly bundleId: FieldRef<"DefectRecord", 'String'>
     readonly itemDescription: FieldRef<"DefectRecord", 'String'>
     readonly severity: FieldRef<"DefectRecord", 'String'>
-    readonly quantity: FieldRef<"DefectRecord", 'Int'>
+    readonly quantity: FieldRef<"DefectRecord", 'Float'>
+    readonly uom: FieldRef<"DefectRecord", 'String'>
     readonly reason: FieldRef<"DefectRecord", 'String'>
     readonly detectedById: FieldRef<"DefectRecord", 'String'>
     readonly status: FieldRef<"DefectRecord", 'String'>
@@ -105763,6 +105789,7 @@ export namespace Prisma {
     fabricOut: 'fabricOut',
     fabricUnit: 'fabricUnit',
     defectivePieces: 'defectivePieces',
+    defectiveUnit: 'defectiveUnit',
     defectiveShelfLocation: 'defectiveShelfLocation',
     defectReason: 'defectReason',
     detectedFromChallanId: 'detectedFromChallanId',
@@ -106043,6 +106070,7 @@ export namespace Prisma {
     itemDescription: 'itemDescription',
     severity: 'severity',
     quantity: 'quantity',
+    uom: 'uom',
     reason: 'reason',
     detectedById: 'detectedById',
     status: 'status',
@@ -110021,6 +110049,7 @@ export namespace Prisma {
     fabricOut?: FloatNullableFilter<"Challan"> | number | null
     fabricUnit?: StringNullableFilter<"Challan"> | string | null
     defectivePieces?: FloatNullableFilter<"Challan"> | number | null
+    defectiveUnit?: StringNullableFilter<"Challan"> | string | null
     defectiveShelfLocation?: StringNullableFilter<"Challan"> | string | null
     defectReason?: StringNullableFilter<"Challan"> | string | null
     detectedFromChallanId?: StringNullableFilter<"Challan"> | string | null
@@ -110072,6 +110101,7 @@ export namespace Prisma {
     fabricOut?: SortOrderInput | SortOrder
     fabricUnit?: SortOrderInput | SortOrder
     defectivePieces?: SortOrderInput | SortOrder
+    defectiveUnit?: SortOrderInput | SortOrder
     defectiveShelfLocation?: SortOrderInput | SortOrder
     defectReason?: SortOrderInput | SortOrder
     detectedFromChallanId?: SortOrderInput | SortOrder
@@ -110126,6 +110156,7 @@ export namespace Prisma {
     fabricOut?: FloatNullableFilter<"Challan"> | number | null
     fabricUnit?: StringNullableFilter<"Challan"> | string | null
     defectivePieces?: FloatNullableFilter<"Challan"> | number | null
+    defectiveUnit?: StringNullableFilter<"Challan"> | string | null
     defectiveShelfLocation?: StringNullableFilter<"Challan"> | string | null
     defectReason?: StringNullableFilter<"Challan"> | string | null
     detectedFromChallanId?: StringNullableFilter<"Challan"> | string | null
@@ -110177,6 +110208,7 @@ export namespace Prisma {
     fabricOut?: SortOrderInput | SortOrder
     fabricUnit?: SortOrderInput | SortOrder
     defectivePieces?: SortOrderInput | SortOrder
+    defectiveUnit?: SortOrderInput | SortOrder
     defectiveShelfLocation?: SortOrderInput | SortOrder
     defectReason?: SortOrderInput | SortOrder
     detectedFromChallanId?: SortOrderInput | SortOrder
@@ -110215,6 +110247,7 @@ export namespace Prisma {
     fabricOut?: FloatNullableWithAggregatesFilter<"Challan"> | number | null
     fabricUnit?: StringNullableWithAggregatesFilter<"Challan"> | string | null
     defectivePieces?: FloatNullableWithAggregatesFilter<"Challan"> | number | null
+    defectiveUnit?: StringNullableWithAggregatesFilter<"Challan"> | string | null
     defectiveShelfLocation?: StringNullableWithAggregatesFilter<"Challan"> | string | null
     defectReason?: StringNullableWithAggregatesFilter<"Challan"> | string | null
     detectedFromChallanId?: StringNullableWithAggregatesFilter<"Challan"> | string | null
@@ -111626,7 +111659,8 @@ export namespace Prisma {
     bundleId?: StringNullableFilter<"DefectRecord"> | string | null
     itemDescription?: StringFilter<"DefectRecord"> | string
     severity?: StringFilter<"DefectRecord"> | string
-    quantity?: IntFilter<"DefectRecord"> | number
+    quantity?: FloatFilter<"DefectRecord"> | number
+    uom?: StringNullableFilter<"DefectRecord"> | string | null
     reason?: StringFilter<"DefectRecord"> | string
     detectedById?: StringFilter<"DefectRecord"> | string
     status?: StringFilter<"DefectRecord"> | string
@@ -111652,6 +111686,7 @@ export namespace Prisma {
     itemDescription?: SortOrder
     severity?: SortOrder
     quantity?: SortOrder
+    uom?: SortOrderInput | SortOrder
     reason?: SortOrder
     detectedById?: SortOrder
     status?: SortOrder
@@ -111679,7 +111714,8 @@ export namespace Prisma {
     bundleId?: StringNullableFilter<"DefectRecord"> | string | null
     itemDescription?: StringFilter<"DefectRecord"> | string
     severity?: StringFilter<"DefectRecord"> | string
-    quantity?: IntFilter<"DefectRecord"> | number
+    quantity?: FloatFilter<"DefectRecord"> | number
+    uom?: StringNullableFilter<"DefectRecord"> | string | null
     reason?: StringFilter<"DefectRecord"> | string
     detectedById?: StringFilter<"DefectRecord"> | string
     status?: StringFilter<"DefectRecord"> | string
@@ -111705,6 +111741,7 @@ export namespace Prisma {
     itemDescription?: SortOrder
     severity?: SortOrder
     quantity?: SortOrder
+    uom?: SortOrderInput | SortOrder
     reason?: SortOrder
     detectedById?: SortOrder
     status?: SortOrder
@@ -111731,7 +111768,8 @@ export namespace Prisma {
     bundleId?: StringNullableWithAggregatesFilter<"DefectRecord"> | string | null
     itemDescription?: StringWithAggregatesFilter<"DefectRecord"> | string
     severity?: StringWithAggregatesFilter<"DefectRecord"> | string
-    quantity?: IntWithAggregatesFilter<"DefectRecord"> | number
+    quantity?: FloatWithAggregatesFilter<"DefectRecord"> | number
+    uom?: StringNullableWithAggregatesFilter<"DefectRecord"> | string | null
     reason?: StringWithAggregatesFilter<"DefectRecord"> | string
     detectedById?: StringWithAggregatesFilter<"DefectRecord"> | string
     status?: StringWithAggregatesFilter<"DefectRecord"> | string
@@ -118496,6 +118534,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -118547,6 +118586,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -118582,6 +118622,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -118633,6 +118674,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -118676,6 +118718,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -118698,6 +118741,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -118728,6 +118772,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -120311,6 +120356,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     status?: string
     resolutionNotes?: string | null
@@ -120335,6 +120381,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     detectedById: string
     status?: string
@@ -120352,7 +120399,8 @@ export namespace Prisma {
     departmentCode?: StringFieldUpdateOperationsInput | string
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -120376,7 +120424,8 @@ export namespace Prisma {
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -120398,6 +120447,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     detectedById: string
     status?: string
@@ -120413,7 +120463,8 @@ export namespace Prisma {
     departmentCode?: StringFieldUpdateOperationsInput | string
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -120431,7 +120482,8 @@ export namespace Prisma {
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -126622,6 +126674,7 @@ export namespace Prisma {
     fabricOut?: SortOrder
     fabricUnit?: SortOrder
     defectivePieces?: SortOrder
+    defectiveUnit?: SortOrder
     defectiveShelfLocation?: SortOrder
     defectReason?: SortOrder
     detectedFromChallanId?: SortOrder
@@ -126658,6 +126711,7 @@ export namespace Prisma {
     fabricOut?: SortOrder
     fabricUnit?: SortOrder
     defectivePieces?: SortOrder
+    defectiveUnit?: SortOrder
     defectiveShelfLocation?: SortOrder
     defectReason?: SortOrder
     detectedFromChallanId?: SortOrder
@@ -126688,6 +126742,7 @@ export namespace Prisma {
     fabricOut?: SortOrder
     fabricUnit?: SortOrder
     defectivePieces?: SortOrder
+    defectiveUnit?: SortOrder
     defectiveShelfLocation?: SortOrder
     defectReason?: SortOrder
     detectedFromChallanId?: SortOrder
@@ -127595,6 +127650,7 @@ export namespace Prisma {
     itemDescription?: SortOrder
     severity?: SortOrder
     quantity?: SortOrder
+    uom?: SortOrder
     reason?: SortOrder
     detectedById?: SortOrder
     status?: SortOrder
@@ -127618,6 +127674,7 @@ export namespace Prisma {
     itemDescription?: SortOrder
     severity?: SortOrder
     quantity?: SortOrder
+    uom?: SortOrder
     reason?: SortOrder
     detectedById?: SortOrder
     status?: SortOrder
@@ -127637,6 +127694,7 @@ export namespace Prisma {
     itemDescription?: SortOrder
     severity?: SortOrder
     quantity?: SortOrder
+    uom?: SortOrder
     reason?: SortOrder
     detectedById?: SortOrder
     status?: SortOrder
@@ -138385,6 +138443,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -138434,6 +138493,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -138479,6 +138539,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -138528,6 +138589,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -138573,6 +138635,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -138622,6 +138685,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -138667,6 +138731,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -138716,6 +138781,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -139042,6 +139108,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     status?: string
     resolutionNotes?: string | null
@@ -139065,6 +139132,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     status?: string
     resolutionNotes?: string | null
@@ -140533,6 +140601,7 @@ export namespace Prisma {
     fabricOut?: FloatNullableFilter<"Challan"> | number | null
     fabricUnit?: StringNullableFilter<"Challan"> | string | null
     defectivePieces?: FloatNullableFilter<"Challan"> | number | null
+    defectiveUnit?: StringNullableFilter<"Challan"> | string | null
     defectiveShelfLocation?: StringNullableFilter<"Challan"> | string | null
     defectReason?: StringNullableFilter<"Challan"> | string | null
     detectedFromChallanId?: StringNullableFilter<"Challan"> | string | null
@@ -140821,7 +140890,8 @@ export namespace Prisma {
     bundleId?: StringNullableFilter<"DefectRecord"> | string | null
     itemDescription?: StringFilter<"DefectRecord"> | string
     severity?: StringFilter<"DefectRecord"> | string
-    quantity?: IntFilter<"DefectRecord"> | number
+    quantity?: FloatFilter<"DefectRecord"> | number
+    uom?: StringNullableFilter<"DefectRecord"> | string | null
     reason?: StringFilter<"DefectRecord"> | string
     detectedById?: StringFilter<"DefectRecord"> | string
     status?: StringFilter<"DefectRecord"> | string
@@ -142255,6 +142325,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -142304,6 +142375,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -142349,6 +142421,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -142398,6 +142471,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -145076,6 +145150,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -145125,6 +145200,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -145373,6 +145449,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     status?: string
     resolutionNotes?: string | null
@@ -145395,6 +145472,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     detectedById: string
     status?: string
@@ -150498,6 +150576,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -150548,6 +150627,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -150587,6 +150667,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -150636,6 +150717,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -151416,6 +151498,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     status?: string
     resolutionNotes?: string | null
@@ -151438,6 +151521,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     detectedById: string
     status?: string
@@ -152077,6 +152161,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -152127,6 +152212,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -152931,6 +153017,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -152981,6 +153068,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -153031,6 +153119,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -153081,6 +153170,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -153278,6 +153368,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -153328,6 +153419,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -153652,6 +153744,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -153702,6 +153795,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -153847,6 +153941,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -153897,6 +153992,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -154112,6 +154208,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -154162,6 +154259,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -154435,6 +154533,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -154485,6 +154584,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -154640,6 +154740,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -154690,6 +154791,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -156046,6 +156148,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -156096,6 +156199,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -156171,6 +156275,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     status?: string
     resolutionNotes?: string | null
@@ -156193,6 +156298,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     detectedById: string
     status?: string
@@ -156526,6 +156632,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -156576,6 +156683,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -158281,6 +158389,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -158331,6 +158440,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -158798,6 +158908,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -158848,6 +158959,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -159077,6 +159189,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     status?: string
     resolutionNotes?: string | null
@@ -159100,6 +159213,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     detectedById: string
     status?: string
@@ -159400,7 +159514,8 @@ export namespace Prisma {
     departmentCode?: StringFieldUpdateOperationsInput | string
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -159423,7 +159538,8 @@ export namespace Prisma {
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -159884,6 +160000,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     status?: string
     resolutionNotes?: string | null
@@ -159907,6 +160024,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     detectedById: string
     status?: string
@@ -160428,7 +160546,8 @@ export namespace Prisma {
     departmentCode?: StringFieldUpdateOperationsInput | string
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -160451,7 +160570,8 @@ export namespace Prisma {
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -164252,6 +164372,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -164302,6 +164423,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -164688,6 +164810,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -164738,6 +164861,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -164957,6 +165081,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -165007,6 +165132,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -165401,6 +165527,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -165451,6 +165578,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -165572,6 +165700,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -165622,6 +165751,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -165870,6 +166000,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -165920,6 +166051,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -166228,6 +166360,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -166278,6 +166411,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -167022,6 +167156,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -167072,6 +167207,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -167552,6 +167688,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -167602,6 +167739,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -167909,6 +168047,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -167959,6 +168098,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -170181,6 +170321,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -170231,6 +170372,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -170472,6 +170614,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -170522,6 +170665,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -172036,6 +172180,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -172065,6 +172210,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -172094,6 +172240,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -172123,6 +172270,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -172250,6 +172398,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     status?: string
     resolutionNotes?: string | null
@@ -173268,6 +173417,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -173317,6 +173467,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -173359,6 +173510,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -173381,6 +173533,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -173430,6 +173583,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -173472,6 +173626,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -173494,6 +173649,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -173543,6 +173699,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -173585,6 +173742,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -173607,6 +173765,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -173656,6 +173815,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -173698,6 +173858,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -174051,7 +174212,8 @@ export namespace Prisma {
     departmentCode?: StringFieldUpdateOperationsInput | string
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -174074,7 +174236,8 @@ export namespace Prisma {
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -174094,7 +174257,8 @@ export namespace Prisma {
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -175698,6 +175862,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -175727,6 +175892,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -175852,6 +176018,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -175901,6 +176068,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -175943,6 +176111,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -175965,6 +176134,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -176014,6 +176184,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -176056,6 +176227,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -177545,6 +177717,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -177639,6 +177812,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     detectedById: string
     status?: string
@@ -178114,6 +178288,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -178163,6 +178338,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -178205,6 +178381,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -178468,7 +178645,8 @@ export namespace Prisma {
     departmentCode?: StringFieldUpdateOperationsInput | string
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -178490,7 +178668,8 @@ export namespace Prisma {
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -178510,7 +178689,8 @@ export namespace Prisma {
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -179293,6 +179473,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -179402,6 +179583,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     detectedById: string
     status?: string
@@ -179600,6 +179782,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -179649,6 +179832,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -179691,6 +179875,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -179997,7 +180182,8 @@ export namespace Prisma {
     departmentCode?: StringFieldUpdateOperationsInput | string
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -180019,7 +180205,8 @@ export namespace Prisma {
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -180039,7 +180226,8 @@ export namespace Prisma {
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -180765,6 +180953,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     detectedById: string
     status?: string
@@ -180823,7 +181012,8 @@ export namespace Prisma {
     departmentCode?: StringFieldUpdateOperationsInput | string
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -180845,7 +181035,8 @@ export namespace Prisma {
     departmentCode?: StringFieldUpdateOperationsInput | string
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -180865,7 +181056,8 @@ export namespace Prisma {
     departmentCode?: StringFieldUpdateOperationsInput | string
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string

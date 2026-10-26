@@ -28,6 +28,7 @@ import { DocumentActionButtons } from '@/components/common/DocumentActionButtons
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 
 import { isAdminUser, isProgrammingUser } from '@/lib/rbac';
+import { formatTotals, totalsByUnit } from '@/lib/challan-units.mjs';
 
 export default function ProgrammingDashboardPage() {
   const router = useRouter();
@@ -432,7 +433,7 @@ export default function ProgrammingDashboardPage() {
                         </div>
                       </td>
                       <td className="py-3 px-4 font-mono text-neutral-900 font-medium">
-                        {ch.items?.[0]?.quantity || '—'} {ch.items?.[0]?.uom || ''}
+                        {formatTotals(totalsByUnit(ch.items || []), '—')}
                       </td>
                       <td className="py-3 px-4">
                         <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-bold bg-brand-50 text-brand-800 border border-brand-200">

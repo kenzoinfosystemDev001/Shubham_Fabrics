@@ -208,12 +208,6 @@ export default function ProgramDetailPage() {
     ];
   }
 
-  const grandTotalMeasurement = programItems.reduce((acc, it) => acc + (Number(it.measurement) || 0), 0);
-  const totalFabricRequired = programItems.reduce((acc, it) => {
-    const qty = Number(it.measurement) || 0;
-    const avg = Number(it.fabricAverage) || Number(program.fabricAverage) || 1.25;
-    return acc + (qty * avg);
-  }, 0);
   const uniqueProgramColors = Array.from(new Set(programItems.map((it) => String(it.color || '').trim()).filter(Boolean)));
 
   let programSubStyles: string[] = Array.isArray(program.subStyles) ? program.subStyles : [];

@@ -3,6 +3,7 @@ import { prisma } from '@subham/database';
 import { requireUser } from '@/lib/auth/require-user';
 import { canUpdateChallan } from '@/lib/auth/department-access';
 import { workflowReceiving } from '@/lib/work-items-server';
+import { challanTotalsByUnit, unitOf } from '@/lib/challan-units.mjs';
 
 import {
   FabricStockError,
@@ -29,6 +30,7 @@ export async function PATCH(
       fabricOut,
       fabricUnit,
       defectivePieces,
+      defectiveUnit,
       defectiveShelfLocation,
       defectReason,
     } = body;
@@ -81,17 +83,19 @@ export async function PATCH(
     if (fabricIn !== undefined && fabricIn !== null) {
       data.fabricIn = Number(fabricIn);
     } else if (status === 'RECEIVED' && (existing.fabricIn === null || existing.fabricIn === 0)) {
-      const itemsQty = existing.items.reduce(
-        (sum, it) => sum + (Number(it.quantity) || 0),
-        0
-      );
-      data.fabricIn = itemsQty > 0 ? itemsQty : Number(existing.program?.targetQuantity || 0);
+      // Lines in both units have no single "in" quantity: the header stays empty, the lines hold it.
+      const totals = challanTotalsByUnit({ ...existing, fabricOut: null, fabricIn: null });
+      const units = Object.keys(totals);
+      if (units.length === 1) data.fabricIn = totals[units[0]];
+      else if (units.length === 0) data.fabricIn = Number(existing.program?.targetQuantity || 0);
     }
 
     if (fabricUnit !== undefined) data.fabricUnit = fabricUnit;
 
     if (defectivePieces !== undefined && defectivePieces !== null) {
       data.defectivePieces = Number(defectivePieces);
+      // The defective quantity keeps its own unit (a MIXED challan has no single header unit).
+      data.defectiveUnit = Number(defectivePieces) > 0 ? unitOf(defectiveUnit) || unitOf(fabricUnit) || unitOf(existing.defectiveUnit) || unitOf(existing.fabricUnit) || null : null;
       if (Number(defectivePieces) > 0) {
         data.defectiveShelfLocation =
           defectiveShelfLocation ||
@@ -171,11 +175,12 @@ export async function PATCH(
                 departmentCode: ch.toDepartment || ch.fromDepartment,
                 itemDescription: `Defective pieces cut in ${ch.toDepartment || ch.fromDepartment} — Stored in ${data.defectiveShelfLocation || 'DEF-SHELF-01'}`,
                 severity: 'MAJOR',
-                quantity: Math.max(1, Math.round(data.defectivePieces)),
+                quantity: data.defectivePieces,
+                uom: data.defectiveUnit,
                 reason: data.defectReason || 'Quality Defect / Segregation',
                 detectedById: actor.id,
                 status: 'OPEN',
-                resolutionNotes: `Defective ${data.defectivePieces} ${data.fabricUnit || ch.fabricUnit || 'PCS'} cut to ${data.defectiveShelfLocation || 'DEF-SHELF-01'}. Leftover ${data.fabricOut || ch.fabricOut} sent forward.`,
+                resolutionNotes: `Defective ${data.defectivePieces} ${data.defectiveUnit || ch.defectiveUnit || ""} cut to ${data.defectiveShelfLocation || 'DEF-SHELF-01'}. Leftover ${data.fabricOut || ch.fabricOut} sent forward.`,
               },
             });
           } catch (e) {

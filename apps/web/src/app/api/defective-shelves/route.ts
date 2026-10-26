@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
+import { addTotals, totalsByUnit, unitOf } from '@/lib/challan-units.mjs';
 
 export const dynamic = 'force-dynamic';
 
@@ -132,6 +133,7 @@ export async function GET(request: Request) {
             defectiveShelfLocation: true,
             defectReason: true,
             fabricUnit: true,
+            defectiveUnit: true,
           },
         },
         detectedBy: {
@@ -191,11 +193,12 @@ export async function GET(request: Request) {
         toDepartment: true,
         defectivePieces: true,
         fabricUnit: true,
+        defectiveUnit: true,
         defectiveShelfLocation: true,
         defectReason: true,
         createdAt: true,
         items: {
-          select: { quantity: true },
+          select: { quantity: true, uom: true },
         },
       },
     });
@@ -230,22 +233,29 @@ export async function GET(request: Request) {
       FINAL_CHECK: { shelfCode: 'DEF-SHELF-FINAL-CHECK', shelfName: 'Final check Defective Shelf', totalPieces: 0, totalIncidents: 0, quantitiesByUnit: {} },
     };
 
-    const addDepartmentDefect = (department: string, quantity: number, unit: string) => {
+    // Defects are kept per unit (quantitiesByUnit); totalPieces counts pieces only, never meters.
+    const addDepartmentDefect = (department: string, totals: Record<string, number>) => {
       const stats = departmentStats[department];
       if (!stats) return;
-      stats.totalPieces += quantity;
+      stats.totalPieces += totals.PCS || 0;
       stats.totalIncidents += 1;
-      stats.quantitiesByUnit[unit] = (stats.quantitiesByUnit[unit] || 0) + quantity;
+      addTotals(stats.quantitiesByUnit, totals);
     };
 
+    // Pieces only; factoryDefectiveByUnit holds every unit separately.
     let factoryTotalDefectivePieces = 0;
+    const factoryDefectiveByUnit: Record<string, number> = {};
 
     for (const ch of allDefectChallans) {
-      const pcs = ch.defectivePieces || ch.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
+      // The header defect quantity is in defectiveUnit (older challans: fabricUnit). A challan without
+      // one (a DEFECT_RETURN, or lines in both units) counts its lines, each in its own unit.
+      const defectUnit = unitOf(ch.defectiveUnit) || unitOf(ch.fabricUnit);
+      const totals: Record<string, number> =
+        Number(ch.defectivePieces) > 0
+          ? { [defectUnit || 'PCS']: Number(ch.defectivePieces) }
+          : totalsByUnit(ch.items, ch.fabricUnit);
       const dKey = normalizeDeptKey(ch.fromDepartment);
-      const quantity = Number(pcs) || 0;
-      const unit = (ch.fabricUnit || 'PCS').toUpperCase();
-      addDepartmentDefect(dKey, quantity, unit);
+      addDepartmentDefect(dKey, totals);
       const shelfLocation = (ch.defectiveShelfLocation || '').toUpperCase();
       if (
         dKey !== 'STORE' &&
@@ -253,9 +263,10 @@ export async function GET(request: Request) {
         shelfLocation.includes('DEF-SHELF-STORE') &&
         departmentStats.STORE
       ) {
-        addDepartmentDefect('STORE', quantity, unit);
+        addDepartmentDefect('STORE', totals);
       }
-      factoryTotalDefectivePieces += quantity;
+      factoryTotalDefectivePieces += totals.PCS || 0;
+      addTotals(factoryDefectiveByUnit, totals);
     }
 
     const totalQuarantinedMeters = rolls.reduce(
@@ -277,6 +288,7 @@ export async function GET(request: Request) {
         defectedRolls: rolls,
         summary: {
           factoryTotalDefectivePieces,
+          factoryDefectiveByUnit,
           factoryTotalQuarantinedMeters: Number(totalQuarantinedMeters.toFixed(2)),
           factoryTotalQuarantinedPcs: Number(totalQuarantinedPcs.toFixed(2)),
           totalDefectedRolls: rolls.length,

@@ -738,8 +738,9 @@ model Challan {
   // Fabric / Piece In & Out Auto-Detection Tracking across Departments
   fabricIn               Float?
   fabricOut              Float?
-  fabricUnit             String?   @default("MTR")
-  defectivePieces        Float?    @default(0)
+  fabricUnit             String?   @default("MTR") // MTR | PCS | MIXED (lines in both units: totals come from the lines)
+  defectivePieces        Float?    @default(0) // defective quantity, in defectiveUnit
+  defectiveUnit          String?   // MTR | PCS; null on older challans, which used fabricUnit
   defectiveShelfLocation String?
   defectReason           String?
   detectedFromChallanId  String?
@@ -1076,7 +1077,8 @@ model DefectRecord {
   bundle          Bundle?             @relation(fields: [bundleId], references: [id])
   itemDescription String
   severity        String              // MINOR, MAJOR, CRITICAL
-  quantity        Int
+  quantity        Float
+  uom             String?             // MTR | PCS; null on older records
   reason          String
   detectedById    String
   detectedBy      User                @relation("DefectDetector", fields: [detectedById], references: [id])

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import { formatTotals, totalsByUnit, unitOf } from '@/lib/challan-units.mjs';
 import {
   AlertTriangle,
   RefreshCw,
@@ -91,6 +92,14 @@ const DEPARTMENT_SHELVES: DepartmentShelfInfo[] = [
     borderLight: 'border-accent-200',
   },
 ];
+
+// A challan's defect quantity per unit: its header defect (in defectiveUnit, older rows fabricUnit),
+// or, when it has none, its lines each in their own unit. Meters and pieces are never added together.
+function defectTotalsOf(ch: any): Record<string, number> {
+  const unit = unitOf(ch?.defectiveUnit) || unitOf(ch?.fabricUnit);
+  if (Number(ch?.defectivePieces) > 0) return { [unit || 'PCS']: Number(ch.defectivePieces) };
+  return totalsByUnit(ch?.items || [], ch?.fabricUnit);
+}
 
 export default function DefectedShelfPage() {
   const [loading, setLoading] = useState(true);
@@ -223,7 +232,9 @@ export default function DefectedShelfPage() {
   const totalPcs = rolls.reduce((acc, r) => acc + (r.batch?.unit === 'PCS' ? parseFloat(r.length) || 0 : 0), 0);
   const holdCount = rolls.filter((r) => r.status === 'QC_HOLD' || r.qcStatus === 'ON_HOLD').length;
   const rejectedCount = rolls.filter((r) => r.status === 'QC_REJECTED' || r.qcStatus === 'FAILED').length;
-  const factoryTotalPieces = masterData?.summary?.factoryTotalDefectivePieces || 0;
+  const factoryDefectiveByUnit: Record<string, number> =
+    masterData?.summary?.factoryDefectiveByUnit ||
+    (masterData?.summary?.factoryTotalDefectivePieces ? { PCS: masterData.summary.factoryTotalDefectivePieces } : {});
   const deptStats = masterData?.summary?.departmentStats || {};
 
   const handleActionSubmit = async (e: React.FormEvent) => {
@@ -353,7 +364,7 @@ export default function DefectedShelfPage() {
               <ShieldAlert className="w-4 h-4" />
             </div>
             <p className="text-2xl font-bold text-danger-700 mt-1">
-              {loading ? '…' : `${factoryTotalPieces} PCS`}
+              {loading ? '…' : formatTotals(factoryDefectiveByUnit, '0 PCS')}
             </p>
             <span className="text-[10px] text-neutral-500">
               Recorded across all 6 department shelves
@@ -648,8 +659,7 @@ export default function DefectedShelfPage() {
                     </thead>
                     <tbody className="divide-y divide-neutral-100 text-neutral-700">
                       {filteredMasterChallans.map((ch) => {
-                        const defectPcs = ch.defectivePieces || ch.items?.reduce((s: number, it: any) => s + (Number(it.quantity) || 0), 0) || 0;
-                        const unit = ch.fabricUnit || ch.items?.[0]?.uom || 'PCS';
+                        const defectQty = formatTotals(defectTotalsOf(ch));
 
                         return (
                           <tr key={ch.id} className="hover:bg-danger-50/30 transition">
@@ -673,7 +683,7 @@ export default function DefectedShelfPage() {
                             </td>
 
                             <td className="py-3.5 px-3.5 text-center font-mono font-bold text-danger-700">
-                              {defectPcs} {unit}
+                              {defectQty}
                             </td>
 
                             <td className="py-3.5 px-3.5">
@@ -911,12 +921,7 @@ export default function DefectedShelfPage() {
                       </thead>
                       <tbody className="divide-y divide-neutral-100">
                         {filteredDefectReturns.map((challan: any) => {
-                          const quantity = Number(challan.defectivePieces) ||
-                            (challan.items || []).reduce(
-                              (sum: number, item: any) => sum + (Number(item.quantity) || 0),
-                              0
-                            );
-                          const unit = challan.fabricUnit || challan.items?.[0]?.uom || 'PCS';
+                          const quantity = formatTotals(defectTotalsOf(challan));
 
                           return (
                             <tr key={challan.id} className="hover:bg-accent-50/40">
@@ -931,7 +936,7 @@ export default function DefectedShelfPage() {
                                 </span>
                               </td>
                               <td className="py-3 px-4 text-right font-mono font-bold text-danger-700">
-                                {quantity} {unit}
+                                {quantity}
                               </td>
                               <td className="py-3 px-4 max-w-56">{challan.defectReason || challan.remarks || '-'}</td>
                               <td className="py-3 px-4">{challan.createdBy?.fullName || '-'}</td>
@@ -1000,7 +1005,7 @@ export default function DefectedShelfPage() {
                       <th className="py-2.5 px-3">Return Challan #</th>
                       <th className="py-2.5 px-3">Source Department</th>
                       <th className="py-2.5 px-3">Program / Style</th>
-                      <th className="py-2.5 px-3 text-center">Defective Pcs</th>
+                      <th className="py-2.5 px-3 text-center">Defective Qty</th>
                       <th className="py-2.5 px-3">Target Defective Shelf</th>
                       <th className="py-2.5 px-3">Defect Reason &amp; Comments</th>
                       <th className="py-2.5 px-3">Date</th>
@@ -1009,10 +1014,7 @@ export default function DefectedShelfPage() {
                   </thead>
                   <tbody className="divide-y divide-neutral-100">
                     {defectReturns.map((ch: any) => {
-                      const totalPcs = (ch.items || []).reduce(
-                        (sum: number, it: any) => sum + (Number(it.quantity) || 0),
-                        0
-                      );
+                      const lineTotals = formatTotals(totalsByUnit(ch.items || [], ch.fabricUnit));
 
                       return (
                         <tr key={ch.id} className="hover:bg-accent-50/40 transition">
@@ -1033,7 +1035,7 @@ export default function DefectedShelfPage() {
                             </span>
                           </td>
                           <td className="py-3 px-3 text-center font-mono font-bold text-danger-700 text-sm">
-                            {totalPcs} PCS
+                            {lineTotals}
                           </td>
                           <td className="py-3 px-3">
                             <span className="px-2 py-0.5 rounded bg-danger-50 border border-danger-200 text-danger-800 font-mono text-[10px] font-bold">

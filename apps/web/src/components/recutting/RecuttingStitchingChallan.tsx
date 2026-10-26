@@ -92,7 +92,6 @@ function StitchingChallanContent() {
   };
 
   const filled = rows.filter((r) => r.allocationId);
-  const units = new Set(filled.map((r) => byId(r.allocationId)?.cutUom));
   const totals = filled.reduce<Record<string, number>>((acc, r) => {
     const a = byId(r.allocationId);
     if (a) acc[a.cutUom] = (acc[a.cutUom] || 0) + (Number(r.quantity) || 0);
@@ -108,7 +107,6 @@ function StitchingChallanContent() {
     if (!program) return setError('Choose a Production Sheet.');
     if (!challanNumber.trim()) return setNumberError('Challan Number is required.');
     if (filled.length === 0) return setError('Add at least one item.');
-    if (units.size > 1) return setError('Meters and pieces cannot be mixed on one challan. Issue them on separate challans.');
     setSubmitting(true);
     try {
       const body = await fetchJson('/api/recutting/stitching-challans', {
@@ -303,7 +301,6 @@ function StitchingChallanContent() {
               <span className="text-sm text-neutral-600">
                 Total to stitch:{' '}
                 <span className="font-semibold text-neutral-900 tabular-nums">{Object.entries(totals).map(([u, q]) => fmtQty(q, u)).join(' · ') || '—'}</span>
-                {units.size > 1 && <span className="ml-2 text-danger-700 font-semibold">Mixed units</span>}
               </span>
               <button type="submit" disabled={submitting || !program} className={BTN_PRIMARY}>
                 <Send className="w-3.5 h-3.5" />

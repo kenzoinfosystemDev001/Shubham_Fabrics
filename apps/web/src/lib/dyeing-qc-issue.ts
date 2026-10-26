@@ -4,6 +4,7 @@ import type { AuthenticatedUser } from '@/lib/auth/require-user';
 import { assertChallanNumbersAvailable, challanNumberErrorResponse, requireChallanNumber } from '@/lib/challan-number-server';
 import { DyeingRequestError, TX_OPTIONS, dyeingErrorResponse } from '@/lib/dyeing-server';
 import { isColorMismatch, statusAfterTransfer, validateQcTransferLines } from '@/lib/dyeing-workflow.mjs';
+import { MIXED_UNIT } from '@/lib/challan-units.mjs';
 
 const ENDPOINT = 'DYEING_QC_CHALLAN';
 const round = (n: number) => Math.round(n * 1000) / 1000;
@@ -126,7 +127,7 @@ export async function issueDyeingQcChallan(user: AuthenticatedUser, input: Issue
           createdById: user.id,
           issuedById: user.id,
           issuedDate,
-          fabricOut: total,
+          fabricOut: check.unit === MIXED_UNIT ? null : total, // mixed units: totals come from the lines
           fabricUnit: check.unit,
           remarks: typeof input.remarks === 'string' && input.remarks.trim() ? input.remarks.trim().slice(0, 500) : null,
         },

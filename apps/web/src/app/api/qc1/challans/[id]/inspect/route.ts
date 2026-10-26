@@ -6,6 +6,7 @@ import {
   challanNumberErrorResponse,
   requireChallanNumberSet,
 } from '@/lib/challan-number-server';
+import { MIXED_UNIT, formatTotals, headerUnitOf, totalsByUnit, unitOf } from '@/lib/challan-units.mjs';
 
 export const dynamic = 'force-dynamic';
 
@@ -76,69 +77,80 @@ export async function POST(
       );
     }
 
-    // 2. Strict Backend Validations on Quantities
-    const totalReceivedQty = challan.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
-
-    const qInspected = Number(quantityInspected);
-    const qPassed = Number(quantityPassed || 0);
-    const qFailed = Number(quantityFailed || 0);
-    const qRework = Number(quantityRework || 0);
-    const qHold = Number(quantityHold || 0);
-
-    if (isNaN(qInspected) || qInspected <= 0) {
+    // 2. Strict Backend Validations on Quantities, per unit. Every challan line keeps its unit (MTR or
+    // PCS); each unit is inspected in that unit and nothing is ever added across units. A single-unit
+    // challan may still send the plain quantityInspected / quantityPassed / ... fields.
+    const receivedByUnit = totalsByUnit(challan.items, challan.fabricUnit);
+    const challanUnits = Object.keys(receivedByUnit);
+    if (challanUnits.length === 0) {
+      return NextResponse.json({ error: 'This challan has no quantity to inspect.' }, { status: 400 });
+    }
+    const rawByUnit: Record<string, any> | null =
+      body.byUnit && typeof body.byUnit === 'object'
+        ? body.byUnit
+        : challanUnits.length === 1
+          ? { [challanUnits[0]]: { quantityInspected, quantityPassed, quantityFailed, quantityRework, quantityHold } }
+          : null;
+    if (!rawByUnit) {
       return NextResponse.json(
-        { error: 'Quantity Inspected must be a positive number greater than 0.' },
+        { error: 'This challan has lines in MTR and PCS. Enter the inspection quantities for each unit.' },
         { status: 400 }
       );
     }
-
-    if (isNaN(qPassed) || qPassed < 0) {
-      return NextResponse.json(
-        { error: 'Quantity Passed cannot be negative.' },
-        { status: 400 }
-      );
+    const num = (v: unknown) => (v === undefined || v === null || v === '' ? 0 : Number(v));
+    const byUnit: Array<{ unit: string; inspected: number; passed: number; failed: number; rework: number; hold: number }> = [];
+    for (const [rawUnit, q] of Object.entries(rawByUnit)) {
+      const unit = unitOf(rawUnit);
+      if (!unit || !(unit in receivedByUnit)) {
+        return NextResponse.json({ error: `Challan ${challan.challanNumber} has no ${rawUnit} line to inspect.` }, { status: 400 });
+      }
+      const row = {
+        unit,
+        inspected: num(q?.quantityInspected),
+        passed: num(q?.quantityPassed),
+        failed: num(q?.quantityFailed),
+        rework: num(q?.quantityRework),
+        hold: num(q?.quantityHold),
+      };
+      for (const [label, v] of [['Quantity Inspected', row.inspected], ['Quantity Passed', row.passed], ['Quantity Failed', row.failed], ['Quantity Rework', row.rework], ['Quantity Hold', row.hold]] as const) {
+        if (!Number.isFinite(v) || v < 0) {
+          return NextResponse.json({ error: `${label} (${unit}) cannot be negative.` }, { status: 400 });
+        }
+      }
+      const sumCategories = row.passed + row.failed + row.rework + row.hold;
+      if (row.inspected <= 0 && sumCategories <= 0) continue; // this unit is not part of this inspection
+      if (row.inspected <= 0) {
+        return NextResponse.json({ error: `Quantity Inspected (${unit}) must be a positive number greater than 0.` }, { status: 400 });
+      }
+      if (row.inspected > receivedByUnit[unit] + 0.001) {
+        return NextResponse.json(
+          { error: `Quantity Inspected (${row.inspected} ${unit}) cannot exceed Quantity Received from Dyeing (${receivedByUnit[unit]} ${unit}).` },
+          { status: 400 }
+        );
+      }
+      // Allow slight float precision variance (0.001)
+      if (sumCategories > row.inspected + 0.001) {
+        return NextResponse.json(
+          {
+            error: `The sum of Passed (${row.passed}) + Failed (${row.failed}) + Rework (${row.rework}) + Hold (${row.hold}) = ${sumCategories} ${unit}, which exceeds Quantity Inspected (${row.inspected} ${unit}).`,
+          },
+          { status: 400 }
+        );
+      }
+      byUnit.push(row);
     }
-
-    if (isNaN(qFailed) || qFailed < 0) {
-      return NextResponse.json(
-        { error: 'Quantity Failed cannot be negative.' },
-        { status: 400 }
-      );
+    if (byUnit.length === 0) {
+      return NextResponse.json({ error: 'Quantity Inspected must be a positive number greater than 0.' }, { status: 400 });
     }
-
-    if (isNaN(qRework) || qRework < 0) {
-      return NextResponse.json(
-        { error: 'Quantity Rework cannot be negative.' },
-        { status: 400 }
-      );
-    }
-
-    if (isNaN(qHold) || qHold < 0) {
-      return NextResponse.json(
-        { error: 'Quantity Hold cannot be negative.' },
-        { status: 400 }
-      );
-    }
-
-    if (qInspected > totalReceivedQty) {
-      return NextResponse.json(
-        {
-          error: `Quantity Inspected (${qInspected}) cannot exceed Quantity Received from Dyeing (${totalReceivedQty}).`,
-        },
-        { status: 400 }
-      );
-    }
-
-    const sumCategories = qPassed + qFailed + qRework + qHold;
-    // Allow slight float precision variance (0.001)
-    if (sumCategories > qInspected + 0.001) {
-      return NextResponse.json(
-        {
-          error: `The sum of Passed (${qPassed}) + Failed (${qFailed}) + Rework (${qRework}) + Hold (${qHold}) = ${sumCategories}, which exceeds Quantity Inspected (${qInspected}).`,
-        },
-        { status: 400 }
-      );
-    }
+    // "Any quantity" flags only; quantities of different units are never added together.
+    const qPassed = byUnit.some((r) => r.passed > 0) ? 1 : 0;
+    const qFailed = byUnit.some((r) => r.failed > 0) ? 1 : 0;
+    const qRework = byUnit.some((r) => r.rework > 0) ? 1 : 0;
+    const lineTotals = (key: 'inspected' | 'passed' | 'failed' | 'rework') =>
+      Object.fromEntries(byUnit.filter((r) => r[key] > 0).map((r) => [r.unit, r[key]])) as Record<string, number>;
+    const breakdownText = (key: 'inspected' | 'passed' | 'failed' | 'rework') => formatTotals(lineTotals(key));
+    // Header quantities hold one unit only: set when this inspection (and the challan) use a single unit.
+    const singleUnit = byUnit.length === 1 && challanUnits.length === 1 ? byUnit[0] : null;
 
     // 3. Strict 3 Decisions: PASS, REWORK, REJECT (Rule 4)
     const normalizedResult = result === 'FAIL' ? 'REJECT' : result;
@@ -200,8 +212,17 @@ export async function POST(
     const actorId = actorUser?.id || '';
 
     const primaryItem = challan.items[0];
-    const uom = primaryItem?.uom || challan.program?.quantityMeasurement || 'MTR';
+    const uom = singleUnit?.unit || headerUnitOf(byUnit.map((r) => r.unit)) || 'MTR';
     const effectiveColor = observedColor || primaryItem?.colour || challan.program?.fabricColor || 'Standard';
+    // The challan line a unit's outgoing quantity is described from (fabric, colour).
+    const itemFor = (unit: string) => challan.items.find((it) => unitOf(it.uom) === unit) || primaryItem;
+    // Lines of an outgoing challan: one per unit with quantity; header totals only for one unit.
+    const outgoing = (key: 'passed' | 'failed' | 'rework') => {
+      const rows = byUnit.filter((r) => r[key] > 0);
+      const one = rows.length === 1 ? rows[0] : null;
+      return { rows, unit: one ? one.unit : MIXED_UNIT, quantity: one ? one[key] : null };
+    };
+    const recordedAt = new Date();
 
     // 5. Transactional Execution
     const transactionResult = await prisma.$transaction(
@@ -213,7 +234,7 @@ export async function POST(
             programId: challan.programId,
             departmentCode: 'QC1',
             inspectorId: actorId,
-            sampleSize: Math.round(qInspected),
+            sampleSize: Math.round(byUnit[0].inspected), // per-unit figures are in the QUANTITY_BREAKDOWN parameters
             status: normalizedResult,
             notes: [
               effectiveRemark,
@@ -239,15 +260,16 @@ export async function POST(
               comments: observedColor ? `Observed: ${observedColor}` : 'Matches standard lab dip',
               uom: 'VISUAL',
             },
-            {
+            // One breakdown per unit: meters and pieces are recorded separately.
+            ...byUnit.map((r) => ({
               inspectionId: inspection.id,
               parameterName: 'QUANTITY_BREAKDOWN',
-              expectedValue: `${totalReceivedQty} ${uom}`,
-              measuredValue: `Pass: ${qPassed}, Reject: ${qFailed}, Rework: ${qRework}`,
+              expectedValue: `${receivedByUnit[r.unit]} ${r.unit}`,
+              measuredValue: `Pass: ${r.passed}, Reject: ${r.failed}, Rework: ${r.rework}`,
               status: normalizedResult === 'PASS' ? 'PASS' : 'FAIL',
-              comments: `Inspected: ${qInspected} ${uom}`,
-              uom,
-            },
+              comments: `Inspected: ${r.inspected} ${r.unit}`,
+              uom: r.unit,
+            })),
           ],
         });
 
@@ -266,42 +288,51 @@ export async function POST(
             }
           }
         } else if (qFailed > 0 || qRework > 0) {
-          // Automatic defect log entry for non-zero failed or rework yardage
-          await tx.defectLog.create({
-            data: {
-              inspectionId: inspection.id,
-              defectType: normalizedResult === 'REWORK' ? (reworkReason || 'ALTERATION_REWORK') : (defectRemarks || 'FABRIC_DEFECT'),
-              count: Math.round(qFailed + qRework),
-              severity: normalizedResult === 'REJECT' ? 'CRITICAL' : 'MAJOR',
-            },
-          });
+          // Automatic defect log entry (per unit) for non-zero failed or rework yardage
+          for (const r of byUnit.filter((x) => x.failed + x.rework > 0)) {
+            await tx.defectLog.create({
+              data: {
+                inspectionId: inspection.id,
+                defectType: normalizedResult === 'REWORK' ? (reworkReason || 'ALTERATION_REWORK') : (defectRemarks || 'FABRIC_DEFECT'),
+                count: Math.round(r.failed + r.rework),
+                severity: normalizedResult === 'REJECT' ? 'CRITICAL' : 'MAJOR',
+              },
+            });
+          }
         }
 
-        // D. Record Production Transaction for traceability and balance accounting
-        const prodTx = await tx.productionTransaction.create({
-          data: {
-            programId: challan.programId,
-            challanId: challan.id,
-            departmentCode: 'QC1',
-            operationName: 'QC1_FABRIC_INSPECTION',
-            operatorId: actorId,
-            inputQuantity: qInspected,
-            goodQuantity: qPassed,
-            rejectQuantity: qFailed,
-            reworkQuantity: qRework,
-            balanceQuantity: 0,
-            unitOfMeasure: uom,
-            reworkReason: reworkReason || null,
-            rejectReason: defectRemarks || (normalizedResult === 'REJECT' ? effectiveRemark : null),
-            notes: effectiveRemark || `Dyeing QC Inspection complete: ${normalizedResult}. Passed: ${qPassed} ${uom}`,
-            recordedAt: new Date(),
-          },
-        });
+        // D. Record Production Transactions (one per unit) for traceability and balance accounting
+        const productionTransactions = [];
+        for (const r of byUnit) {
+          productionTransactions.push(
+            await tx.productionTransaction.create({
+              data: {
+                programId: challan.programId,
+                challanId: challan.id,
+                departmentCode: 'QC1',
+                operationName: 'QC1_FABRIC_INSPECTION',
+                operatorId: actorId,
+                inputQuantity: r.inspected,
+                goodQuantity: r.passed,
+                rejectQuantity: r.failed,
+                reworkQuantity: r.rework,
+                balanceQuantity: 0,
+                unitOfMeasure: r.unit,
+                reworkReason: reworkReason || null,
+                rejectReason: defectRemarks || (normalizedResult === 'REJECT' ? effectiveRemark : null),
+                notes: effectiveRemark || `Dyeing QC Inspection complete: ${normalizedResult}. Passed: ${r.passed} ${r.unit}`,
+                recordedAt,
+              },
+            })
+          );
+        }
+        const prodTx = productionTransactions[0];
 
         // E. Return Rework yardage to Dyeing Department if rework quantity > 0 (Rule 5)
         let reworkReturnChallan = null;
         if (qRework > 0) {
           const returnChallanNumber = typedNumbers.reworkChallanNumber;
+          const rework = outgoing('rework');
 
           reworkReturnChallan = await tx.challan.create({
             data: {
@@ -316,28 +347,34 @@ export async function POST(
               createdById: actorId,
               issuedById: actorId,
               issuedDate: new Date(),
+              fabricOut: rework.quantity,
+              fabricUnit: rework.unit,
               remarks: `QC1 Rework/Alter Return for Sheet ${challan.program.programSerialNo || challan.program.programNumber}. Reason: ${reworkReason || effectiveRemark}. Must go through QC1 again before Embroidery.`,
             },
           });
 
-          await tx.challanItem.create({
-            data: {
-              challanId: reworkReturnChallan.id,
-              itemDescription: `${primaryItem?.itemDescription || 'Dyed Fabric'} - QC1 Rework Return`,
-              fabricCode: primaryItem?.fabricCode || 'KNIT',
-              colour: effectiveColor,
-              unitType: 'ROLL',
-              quantity: qRework,
-              uom,
-              remarks: `Returned for rework/alteration. Must go through QC1 again: ${reworkReason || effectiveRemark}`,
-            },
-          });
+          for (const r of rework.rows) {
+            const src = itemFor(r.unit);
+            await tx.challanItem.create({
+              data: {
+                challanId: reworkReturnChallan.id,
+                itemDescription: `${src?.itemDescription || 'Dyed Fabric'} - QC1 Rework Return`,
+                fabricCode: src?.fabricCode || 'KNIT',
+                colour: observedColor || src?.colour || effectiveColor,
+                unitType: r.unit === 'PCS' ? 'PCS' : 'ROLL',
+                quantity: r.rework,
+                uom: r.unit,
+                remarks: `Returned for rework/alteration. Must go through QC1 again: ${reworkReason || effectiveRemark}`,
+              },
+            });
+          }
         }
 
         // E.2 Return Rejected / Defective yardage to Fabric Store Defective Shelf if failed quantity > 0 (Rule 6)
         let rejectReturnChallan = null;
         if (qFailed > 0) {
           const rejectChallanNumber = typedNumbers.rejectChallanNumber;
+          const reject = outgoing('failed');
 
           rejectReturnChallan = await tx.challan.create({
             data: {
@@ -352,10 +389,12 @@ export async function POST(
               createdById: actorId,
               issuedById: actorId,
               issuedDate: new Date(),
-              fabricIn: qFailed,
-              defectivePieces: qFailed,
+              // One unit: header quantities; both units: the lines carry them.
+              fabricIn: reject.quantity,
+              defectivePieces: reject.quantity,
+              defectiveUnit: reject.quantity === null ? null : reject.unit,
               fabricOut: 0,
-              fabricUnit: uom,
+              fabricUnit: reject.unit,
               defectiveShelfLocation: 'DEF-SHELF-STORE (Fabric Store Quarantined Shelf · DEF-SHELF-CENTRAL)',
               defectReason: defectRemarks || effectiveRemark,
               detectedFromDepartment: 'QC1',
@@ -364,24 +403,28 @@ export async function POST(
             },
           });
 
-          await tx.challanItem.create({
-            data: {
-              challanId: rejectReturnChallan.id,
-              itemDescription: `${primaryItem?.itemDescription || 'Dyed Fabric'} - DEFECTIVE SHELF (DEF-SHELF-STORE)`,
-              fabricCode: primaryItem?.fabricCode || 'KNIT',
-              colour: effectiveColor,
-              unitType: 'ROLL',
-              quantity: qFailed,
-              uom,
-              remarks: `QC_REJECTED: Allocated to Fabric Store Defective Shelf (DEF-SHELF-STORE). Not approved for Embroidery. Reason: ${defectRemarks || effectiveRemark}`,
-            },
-          });
+          for (const r of reject.rows) {
+            const src = itemFor(r.unit);
+            await tx.challanItem.create({
+              data: {
+                challanId: rejectReturnChallan.id,
+                itemDescription: `${src?.itemDescription || 'Dyed Fabric'} - DEFECTIVE SHELF (DEF-SHELF-STORE)`,
+                fabricCode: src?.fabricCode || 'KNIT',
+                colour: observedColor || src?.colour || effectiveColor,
+                unitType: r.unit === 'PCS' ? 'PCS' : 'ROLL',
+                quantity: r.failed,
+                uom: r.unit,
+                remarks: `QC_REJECTED: Allocated to Fabric Store Defective Shelf (DEF-SHELF-STORE). Not approved for Embroidery. Reason: ${defectRemarks || effectiveRemark}`,
+              },
+            });
+          }
         }
 
         // E.3 Forward Passed yardage to Embroidery Department if result is PASS (Rule 7)
         let passForwardChallan = null;
         if (normalizedResult === 'PASS' && qPassed > 0) {
           const passChallanNumber = typedNumbers.passChallanNumber;
+          const pass = outgoing('passed');
 
           passForwardChallan = await tx.challan.create({
             data: {
@@ -396,30 +439,33 @@ export async function POST(
               createdById: actorId,
               issuedById: actorId,
               issuedDate: new Date(),
-              fabricIn: qPassed,
+              fabricIn: pass.quantity,
               defectivePieces: 0,
-              fabricOut: qPassed,
-              fabricUnit: uom,
+              fabricOut: pass.quantity,
+              fabricUnit: pass.unit,
               detectedFromDepartment: 'QC1',
               detectedFromChallanId: challan.id,
               remarks: `QC1 Passed Fabric — Approved for Embroidery Department for Sheet ${challan.program?.programSerialNo || challan.program?.programNumber || ''}. QC Incharge Remark: ${effectiveRemark}`,
             },
           });
 
-          await tx.challanItem.create({
-            data: {
-              challanId: passForwardChallan.id,
-              itemDescription: `${primaryItem?.itemDescription || 'QC1 Approved Fabric'} — Embroidery Lot`,
-              fabricCode: primaryItem?.fabricCode || 'FABRIC',
-              colour: effectiveColor,
-              unitType: 'ROLL',
-              quantity: qPassed,
-              uom,
-              // Passed QC after dyeing: this line is dyed fabric.
-              fabricProcessingStatus: 'DYED',
-              remarks: `Inspected & Passed by QC1 Gate. Approved for Embroidery: ${effectiveRemark}`,
-            },
-          });
+          for (const r of pass.rows) {
+            const src = itemFor(r.unit);
+            await tx.challanItem.create({
+              data: {
+                challanId: passForwardChallan.id,
+                itemDescription: `${src?.itemDescription || 'QC1 Approved Fabric'} — Embroidery Lot`,
+                fabricCode: src?.fabricCode || 'FABRIC',
+                colour: observedColor || src?.colour || effectiveColor,
+                unitType: r.unit === 'PCS' ? 'PCS' : 'ROLL',
+                quantity: r.passed,
+                uom: r.unit,
+                // Passed QC after dyeing: this line is dyed fabric.
+                fabricProcessingStatus: 'DYED',
+                remarks: `Inspected & Passed by QC1 Gate. Approved for Embroidery: ${effectiveRemark}`,
+              },
+            });
+          }
         }
 
         // F. Compute final status for the Dyeing -> QC1 Challan
@@ -435,15 +481,21 @@ export async function POST(
           data: {
             status: newChallanStatus,
             completedDate: new Date(),
-            fabricIn: challan.fabricIn ?? qInspected,
-            defectivePieces: (challan.defectivePieces || 0) + qFailed,
-            fabricOut: qPassed,
-            fabricUnit: uom,
+            // Header quantities only for a single-unit challan; with MTR and PCS lines they stay per line.
+            ...(singleUnit
+              ? {
+                  fabricIn: challan.fabricIn ?? singleUnit.inspected,
+                  defectivePieces: (challan.defectivePieces || 0) + singleUnit.failed,
+                  defectiveUnit: singleUnit.failed > 0 || challan.defectivePieces ? singleUnit.unit : challan.defectiveUnit,
+                  fabricOut: singleUnit.passed,
+                  fabricUnit: singleUnit.unit,
+                }
+              : { fabricIn: null, fabricOut: null, fabricUnit: headerUnitOf(challanUnits) }),
             defectiveShelfLocation: qFailed > 0 ? 'DEF-SHELF-STORE (Fabric Store Quarantined Shelf · DEF-SHELF-CENTRAL)' : challan.defectiveShelfLocation,
             defectReason: qFailed > 0 ? (defectRemarks || effectiveRemark) : challan.defectReason,
             remarks: [
               challan.remarks,
-              `QC1 Result: ${normalizedResult} (Pass: ${qPassed} → Embroidery | Rework: ${qRework} → Dyeing | Reject: ${qFailed} → Store Defective Shelf ${uom}) | QC Remark: ${effectiveRemark}`,
+              `QC1 Result: ${normalizedResult} (Pass: ${breakdownText('passed')} → Embroidery | Rework: ${breakdownText('rework')} → Dyeing | Reject: ${breakdownText('failed')} → Store Defective Shelf) | QC Remark: ${effectiveRemark}`,
               passForwardChallan ? `Embroidery Challan: ${passForwardChallan.challanNumber}` : null,
               reworkReturnChallan ? `Rework Challan (Dyeing): ${reworkReturnChallan.challanNumber}` : null,
               rejectReturnChallan ? `Defective Shelf Challan (Store): ${rejectReturnChallan.challanNumber}` : null,
@@ -468,11 +520,7 @@ export async function POST(
             notes: effectiveRemark,
             metadata: JSON.stringify({
               result: normalizedResult,
-              quantityInspected: qInspected,
-              quantityPassed: qPassed,
-              quantityFailed: qFailed,
-              quantityRework: qRework,
-              uom,
+              byUnit,
               reworkReturnChallanNumber: reworkReturnChallan?.challanNumber || null,
               rejectReturnChallanNumber: rejectReturnChallan?.challanNumber || null,
               passForwardChallanNumber: passForwardChallan?.challanNumber || null,
@@ -490,10 +538,7 @@ export async function POST(
             afterState: JSON.stringify({
               challanNumber: challan.challanNumber,
               result: normalizedResult,
-              quantityInspected: qInspected,
-              quantityPassed: qPassed,
-              quantityFailed: qFailed,
-              quantityRework: qRework,
+              byUnit,
               qcRemark: effectiveRemark,
               reworkReturnChallan: reworkReturnChallan?.challanNumber || null,
               rejectReturnChallan: rejectReturnChallan?.challanNumber || null,
@@ -506,6 +551,8 @@ export async function POST(
         return {
           inspection,
           productionTransaction: prodTx,
+          productionTransactions,
+          byUnit,
           passForwardChallan,
           reworkReturnChallan,
           rejectReturnChallan,

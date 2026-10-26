@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import { canViewClientCode, getSessionUser } from '@/lib/auth/require-user';
 import { requireDepartment } from '@/lib/auth/department-access';
+import { unitOf } from '@/lib/challan-units.mjs';
 
 export const dynamic = 'force-dynamic';
 
@@ -205,7 +206,10 @@ export async function POST(request: Request) {
       : (data.fabricAverage ? parseFloat(data.fabricAverage) : 1.25);
 
     const gridTotalPcs = rawGrid.reduce((acc: number, it: any) => acc + (Number(it.pcs) || 0), 0);
-    const itemsTotalQty = rawItems.reduce((acc: number, it: any) => acc + (Number(it.measurement) || 0), 0);
+    // Legacy item lines: only those in the program's own unit count (meters and pieces are never added together).
+    const legacyUnit = unitOf(data.quantityMeasurement) || unitOf(rawItems[0]?.unit) || 'PCS';
+    const inLegacyUnit = (it: any) => (unitOf(it.unit) || legacyUnit) === legacyUnit;
+    const itemsTotalQty = rawItems.filter(inLegacyUnit).reduce((acc: number, it: any) => acc + (Number(it.measurement) || 0), 0);
     
     const targetQty = gridTotalPcs > 0
       ? Math.round(gridTotalPcs)
@@ -349,7 +353,7 @@ export async function POST(request: Request) {
 
       // Quantity Info
       colorQuantity: targetQty,
-      quantityMeasurement: data.quantityMeasurement || rawItems[0]?.unit || 'PCS',
+      quantityMeasurement: legacyUnit,
       specialMaterial: data.specialMaterial || rawItems[0]?.specialMaterial || null,
       specialMaterialQuantity: data.specialMaterialQuantity || null,
 
@@ -418,7 +422,7 @@ export async function POST(request: Request) {
         }
       } else if (rawItems.length > 0) {
         const colorMap: Record<string, number> = {};
-        for (const it of rawItems) {
+        for (const it of rawItems.filter(inLegacyUnit)) {
           const c = String(it.color || '').trim() || 'Standard';
           colorMap[c] = (colorMap[c] || 0) + (Number(it.measurement) || 0);
         }

@@ -22,6 +22,7 @@ import {
   sheetRef,
 } from '@/components/dyeing/DyeingUi';
 import { availableForQc, needsColorReview } from '@/lib/dyeing-workflow.mjs';
+import { formatTotals, totalsByUnit } from '@/lib/challan-units.mjs';
 
 const READY = ['DYED', 'READY_FOR_QC1', 'PARTIALLY_SENT_TO_QC1'];
 
@@ -99,7 +100,6 @@ function IssueChallanContent() {
   };
 
   const filled = rows.filter((r) => r.orderId);
-  const units = new Set(filled.map((r) => orderById(r.orderId)?.uom));
   const totals = filled.reduce<Record<string, number>>((acc, r) => {
     const o = orderById(r.orderId);
     if (o) acc[o.uom] = (acc[o.uom] || 0) + (Number(r.quantity) || 0);
@@ -120,7 +120,6 @@ function IssueChallanContent() {
     if (!program) return setError('Choose a Production Sheet.');
     if (!challanNumber.trim()) return setNumberError('Challan Number is required.');
     if (filled.length === 0) return setError('Add at least one item.');
-    if (units.size > 1) return setError('Meters and pieces cannot be mixed on one challan.');
     setSubmitting(true);
     try {
       const body = await fetchJson('/api/dyeing/qc-challans', {
@@ -324,7 +323,6 @@ function IssueChallanContent() {
                 <span className="font-semibold text-neutral-900 tabular-nums">
                   {Object.entries(totals).map(([u, q]) => fmtQty(q, u)).join(' · ') || '—'}
                 </span>
-                {units.size > 1 && <span className="ml-2 text-danger-700 font-semibold">Mixed units</span>}
               </span>
               <button type="submit" disabled={submitting || !program} className={BTN_PRIMARY}>
                 <Send className="w-3.5 h-3.5" />
@@ -363,7 +361,7 @@ function IssueChallanContent() {
                       {(c.items || []).map((i: any) => i.colour || i.itemDescription).join(', ') || '—'}
                     </td>
                     <td className="py-3 px-3 text-right tabular-nums whitespace-nowrap">
-                      {fmtQty((c.items || []).reduce((s: number, i: any) => s + (Number(i.quantity) || 0), 0), c.items?.[0]?.uom)}
+                      {formatTotals(totalsByUnit(c.items || []), '—')}
                     </td>
                     <td className="py-3 px-3 text-xs">{String(c.status || '').replace(/_/g, ' ')}</td>
                     <td className="py-3 px-3 text-right"><DocumentsButton programId={c.programId} challanId={c.id} /></td>

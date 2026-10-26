@@ -3,6 +3,7 @@ import { prisma } from '@subham/database';
 import { requireUser } from '@/lib/auth/require-user';
 import { canUpdateChallan } from '@/lib/auth/department-access';
 import { workflowReceiving } from '@/lib/work-items-server';
+import { unitOf } from '@/lib/challan-units.mjs';
 
 import {
   FabricStockError,
@@ -222,13 +223,14 @@ export async function PATCH(
       fabricOut,
       fabricUnit,
       defectivePieces,
+      defectiveUnit,
       defectiveShelfLocation,
       defectReason,
     } = body;
 
     const current = await prisma.challan.findUnique({
       where: { id },
-      select: { fromDepartment: true, toDepartment: true, challanType: true },
+      select: { fromDepartment: true, toDepartment: true, challanType: true, fabricUnit: true, defectiveUnit: true },
     });
     if (!current) {
       return NextResponse.json({ error: 'Challan not found' }, { status: 404 });
@@ -270,6 +272,8 @@ export async function PATCH(
     if (fabricUnit !== undefined) updateData.fabricUnit = fabricUnit;
     if (defectivePieces !== undefined && defectivePieces !== null) {
       updateData.defectivePieces = Number(defectivePieces);
+      // The defective quantity keeps its own unit (a MIXED challan has no single header unit).
+      updateData.defectiveUnit = Number(defectivePieces) > 0 ? unitOf(defectiveUnit) || unitOf(fabricUnit) || unitOf(current?.defectiveUnit) || unitOf(current?.fabricUnit) || null : null;
       if (Number(defectivePieces) > 0) {
         const upDept = (fromDepartment || '').toUpperCase();
         let defaultDeptShelf = 'DEF-SHELF-STORE (Fabric Store Quarantined Shelf)';
@@ -328,11 +332,12 @@ export async function PATCH(
                 departmentCode: ch.fromDepartment,
                 itemDescription: `Defective pieces cut in ${ch.fromDepartment} — Stored in ${updateData.defectiveShelfLocation || 'DEF-SHELF-01'}`,
                 severity: 'MAJOR',
-                quantity: Math.max(1, Math.round(updateData.defectivePieces)),
+                quantity: updateData.defectivePieces,
+                uom: updateData.defectiveUnit,
                 reason: updateData.defectReason || 'Quality Defect / Segregation',
                 detectedById: actor.id,
                 status: 'OPEN',
-                resolutionNotes: `Defective ${updateData.defectivePieces} ${updateData.fabricUnit || ch.fabricUnit || 'PCS'} cut to ${updateData.defectiveShelfLocation || 'DEF-SHELF-01'}. Leftover ${updateData.fabricOut || ch.fabricOut} sent forward.`,
+                resolutionNotes: `Defective ${updateData.defectivePieces} ${updateData.defectiveUnit || ch.defectiveUnit || ""} cut to ${updateData.defectiveShelfLocation || 'DEF-SHELF-01'}. Leftover ${updateData.fabricOut || ch.fabricOut} sent forward.`,
               },
             });
           } catch (e) {

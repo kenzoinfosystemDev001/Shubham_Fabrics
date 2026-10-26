@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { formatTotals } from '@/lib/challan-units.mjs';
 import { 
   Plus, 
   Trash2, 
@@ -169,12 +170,13 @@ export function ColorFabricMeasurementTable({
   trackingOnly = false,
   onSyncToItems,
 }: ColorFabricMeasurementTableProps) {
-  // Local In/Out Tracking State
+  // Local In/Out Tracking State. The tracking panel is in one unit; only lines in that unit count
+  // towards it (meters and pieces are never added together).
+  const defaultUnit = items[0]?.unit || 'MTR';
   const sumOfItems = items.reduce(
-    (sum, it) => sum + (Number(it.measurement) || 0),
+    (sum, it) => sum + ((it.unit || 'MTR') === defaultUnit ? Number(it.measurement) || 0 : 0),
     0
   );
-  const defaultUnit = items[0]?.unit || 'MTR';
 
   const [fabricIn, setFabricIn] = useState<number>(() => {
     if (externalTracking?.fabricIn !== undefined) return externalTracking.fabricIn;
@@ -295,19 +297,22 @@ export function ColorFabricMeasurementTable({
 
       if (json.success && json.data) {
         const d = json.data;
-        if (d.detectedFabricIn > 0 || d.detectedFromDepartment) {
-          setFabricIn(Number(d.detectedFabricIn) || 0);
+        // A predecessor with MTR and PCS lines has no single "in" quantity: the panel takes the
+        // quantity in its own unit from detectedTotals; nothing is converted.
+        const detectedIn = d.detectedUnit ? Number(d.detectedFabricIn) || 0 : Number(d.detectedTotals?.[fabricUnit]) || 0;
+        if (detectedIn > 0 || d.detectedFromDepartment) {
+          setFabricIn(detectedIn);
           if (d.detectedUnit) setFabricUnit(d.detectedUnit);
           setDetectedFromDept(d.detectedFromDepartment);
           setDetectedFromChallanId(d.detectedFromChallanId);
           setDetectedFromChallanNumber(d.detectedFromChallanNumber);
 
           setAutoDetectMessage(
-            `Auto-detected ${d.detectedFabricIn} ${d.detectedUnit || 'MTR'} from ${d.detectedFromDepartment || 'predecessor'}${d.detectedFromChallanNumber ? ` (${d.detectedFromChallanNumber})` : ''}!`
+            `Auto-detected ${d.detectedUnit ? `${d.detectedFabricIn} ${d.detectedUnit}` : formatTotals(d.detectedTotals || {})} from ${d.detectedFromDepartment || 'predecessor'}${d.detectedFromChallanNumber ? ` (${d.detectedFromChallanNumber})` : ''}!`
           );
 
-          // Update items measurement if only 1 item exists with empty or default measurement
-          if (items.length === 1 && (!items[0].measurement || items[0].measurement === '0' || Number(items[0].measurement) === 0)) {
+          // Update items measurement if only 1 item exists with empty or default measurement (single-unit predecessor only)
+          if (d.detectedUnit && items.length === 1 && (!items[0].measurement || items[0].measurement === '0' || Number(items[0].measurement) === 0)) {
             const updated = [...items];
             updated[0] = {
               ...updated[0],
@@ -427,7 +432,8 @@ export function ColorFabricMeasurementTable({
     if (readOnly) return;
     const updated = items.map((item, i) => (i === index ? { ...item, [field]: value } : item));
     onChange(updated);
-    if (field === 'unit') {
+    // Each line keeps its own unit; the tracking panel follows only when every line shares it.
+    if (field === 'unit' && updated.every((item) => (item.unit || 'MTR') === value)) {
       setFabricUnit(value as 'MTR' | 'PCS');
     }
   };

@@ -14,6 +14,7 @@ import { loadProgramDocument } from '@/lib/program-document';
 import { extractRootWilcomPhoto, prepareWilcomImages } from '@/lib/download-wilcom';
 import { generateProductionSheetHtml } from '@/lib/download-production-sheet';
 import { garmentImageUrl, groupGarments, imageFor, isFinishedGoodsChallan } from '@/lib/finished-garments.mjs';
+import { challanTotalsByUnit, formatTotals, unitOf } from '@/lib/challan-units.mjs';
 
 /** A finished garment as printed on the challan: its name and image (a data URL, so the file works offline). */
 export interface PrintedGarment {
@@ -111,17 +112,20 @@ export function generateChallanHtml(challan: any): string {
 
   // Items
   const items: ChallanItem[] = Array.isArray(challan.items) ? challan.items : [];
-  const totalQuantity = items.reduce((sum, it) => sum + (Number(it.quantity) || 0), 0);
-  const uom = items[0]?.uom || 'PCS';
+  // Each line keeps its unit: totals are per unit, never MTR + PCS.
+  const unitTotals = challanTotalsByUnit(challan);
+  const totalUnits = Object.keys(unitTotals);
+  const singleUnit = totalUnits.length === 1 ? totalUnits[0] : null;
+  const totalQtyText = singleUnit ? String(unitTotals[singleUnit]) : formatTotals(unitTotals);
+  const uom = singleUnit || unitOf(challan.fabricUnit) || unitOf(items[0]?.uom) || 'PCS';
+  const totalUnitLabel = singleUnit || '';
   // Finished garments (Finishing onward): name and image only; the Production Sheet pages follow.
   const garments: PrintedGarment[] | null = Array.isArray(challan.finishedGarments) ? challan.finishedGarments : null;
   const attachedSheets: { styles: string; html: string } | null = challan.attachedSheets || null;
 
   // Ledger calculation
-  const fabricIn = challan.fabricIn ?? (challan.parentChallan?.fabricOut || totalQuantity);
-  const fabricOut = challan.fabricOut ?? totalQuantity;
   const defectivePieces = challan.defectivePieces ?? 0;
-  const fabricUnit = challan.fabricUnit || uom;
+  const fabricUnit = unitOf(challan.defectiveUnit) || unitOf(challan.fabricUnit) || '';
   const defectiveShelf = challan.defectiveShelfLocation || 'Station Defective Shelf';
   const defectReason = challan.defectReason || '';
 
@@ -672,7 +676,7 @@ export function generateChallanHtml(challan: any): string {
     <div class="table-container">
       <div class="table-title">
         <span>ITEMS / MATERIALS</span>
-        <span style="font-family: monospace; font-size: 11px;">Total: ${totalQuantity || challan.fabricOut || challan.fabricIn || 0} ${uom}</span>
+        <span style="font-family: monospace; font-size: 11px;">Total: ${totalQtyText} ${totalUnitLabel}</span>
       </div>
       <table>
         <thead>
@@ -701,8 +705,8 @@ export function generateChallanHtml(challan: any): string {
               <td style="font-weight: 700;">${fabricName || styleCode || 'Production Material'}</td>
               <td>${prog.fabricColor || 'Standard'}</td>
               <td style="font-family: monospace;">—</td>
-              <td class="num">${totalQuantity || challan.fabricOut || challan.fabricIn || 0}</td>
-              <td style="text-align: center;">${uom}</td>
+              <td class="num">${totalQtyText}</td>
+              <td style="text-align: center;">${totalUnitLabel}</td>
             </tr>
           `}
           <tr class="totals-row">
@@ -710,9 +714,9 @@ export function generateChallanHtml(challan: any): string {
               TOTAL QUANTITY:
             </td>
             <td class="num" style="font-size: 13px; font-weight: 900;">
-              ${totalQuantity || challan.fabricOut || challan.fabricIn || 0}
+              ${totalQtyText}
             </td>
-            <td style="text-align: center; font-weight: 900;">${uom}</td>
+            <td style="text-align: center; font-weight: 900;">${totalUnitLabel}</td>
           </tr>
         </tbody>
       </table>
