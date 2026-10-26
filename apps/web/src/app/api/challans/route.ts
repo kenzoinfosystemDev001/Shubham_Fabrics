@@ -4,6 +4,7 @@ import { prisma } from '@subham/database';
 import { syncInboundChallansToDyeingOrders } from '@/lib/dyeing-sync';
 import { requireUser } from '@/lib/auth/require-user';
 import { userBelongsToDepartment } from '@/lib/auth/department-access';
+import { workflowIssuing } from '@/lib/work-items-server';
 import {
   assertChallanNumbersAvailable,
   challanNumberErrorResponse,
@@ -251,6 +252,21 @@ export async function POST(request: Request) {
     const fromDept = (body.fromDepartment || 'PROGRAMMING').toUpperCase();
     const toDept = (body.toDepartment || 'STORE').toUpperCase();
 
+    // Dyeing -> Dyeing QC challans move dyed quantities and must go through the Dyeing endpoint,
+    // which checks and records what each line transfers.
+    if (fromDept === 'DYEING' && toDept === 'QC1') {
+      return NextResponse.json(
+        { error: 'Issue Dyeing to Dyeing QC challans from Dyeing > My Work > Issue Challan to Dyeing QC.' },
+        { status: 400 },
+      );
+    }
+    // Same for work-item departments (lib/work-items-server: transferred quantities per line),
+    // e.g. Embroidery -> Thread Cutting, Thread Cutting -> Threadcut QC, Threadcut QC -> Washing.
+    const issuingScreen = workflowIssuing(fromDept, toDept);
+    if (issuingScreen) {
+      return NextResponse.json({ error: `Issue this challan from ${issuingScreen}.` }, { status: 400 });
+    }
+
     // A department may only issue challans from itself.
     if (!userBelongsToDepartment(authUser, fromDept)) {
       return NextResponse.json(
@@ -419,7 +435,7 @@ export async function POST(request: Request) {
       if (up.includes('DYE')) return 'DEF-SHELF-DYEING (Dyeing Station Defective Shelf)';
       if (up.includes('EMB')) return 'DEF-SHELF-EMBROIDERY (Embroidery Station Defective Shelf)';
       if (up.includes('QC2') || up.includes('THREAD CUT QC') || up.includes('THREAD CUTTING QC'))
-        return 'DEF-SHELF-QC2 (Thread Cut QC Defective Shelf)';
+        return 'DEF-SHELF-QC2 (Threadcut QC Defective Shelf)';
       if (up.includes('THREAD') || up.includes('CUTTING') || up.includes('THC'))
         return 'DEF-SHELF-THREAD-CUTTING (Thread Cutting Trimming Shelf)';
       if (up.includes('QC3') || up.includes('WASHING QC') || up.includes('WASH QC'))
@@ -540,6 +556,10 @@ export async function POST(request: Request) {
             shade: colourFields.shade,
             requiredColour: colourFields.requiredColour,
             requiredQuantity: colourFields.requiredQuantity,
+            // Dyed / Undyed for this line, as chosen on the issuing form (e.g. Store -> Embroidery).
+            fabricProcessingStatus: ['DYED', 'UNDYED'].includes(String(item.fabricProcessingStatus || '').toUpperCase())
+              ? String(item.fabricProcessingStatus).toUpperCase()
+              : null,
             size: item.size || null,
             rollNumber: item.rollNumber || null,
             remarks: itemRemarks || null,

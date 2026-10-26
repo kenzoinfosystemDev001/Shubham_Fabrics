@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Boxes, RefreshCw, Eye, Layers, Filter, AlertTriangle } from 'lucide-react';
+import { Boxes, RefreshCw, Eye, Layers, Filter, AlertTriangle, X } from 'lucide-react';
 import { DepartmentStockView } from '@/components/DepartmentStockView';
 
 export default function InventoryStockPage() {
@@ -265,10 +265,11 @@ export default function InventoryStockPage() {
                   </h3>
                 </div>
                 <button
+                  aria-label="Close"
                   onClick={() => setSelectedBatch(null)}
                   className="text-neutral-500 hover:text-neutral-700 text-lg font-bold p-1"
                 >
-                  ✕
+                  <X className="w-4 h-4" aria-hidden="true" />
                 </button>
               </div>
 

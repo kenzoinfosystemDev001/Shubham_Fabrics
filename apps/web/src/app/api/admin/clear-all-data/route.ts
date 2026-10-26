@@ -36,6 +36,7 @@ export async function POST(request: Request) {
         await tx.stockLedgerEntry.deleteMany({});
 
         // 4. Clear Dyeing Orders
+        await tx.departmentWorkItem.deleteMany({});
         await tx.dyeingOrder.deleteMany({});
 
         // 5. Clear Challans & Events (break genealogy first)

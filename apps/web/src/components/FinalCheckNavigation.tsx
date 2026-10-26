@@ -4,27 +4,30 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  Briefcase,
-  Kanban,
-  Send,
-  LayoutDashboard,
   LogOut,
   Menu,
-  ShieldAlert,
   UserCircle,
-  X,
+  X
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { isAdminUser } from '@/lib/rbac';
 import { DepartmentSwitcher } from '@/components/DepartmentSwitcher';
+import { SidebarDepartmentArt } from '@/components/SidebarDepartmentArt';
 import { InstallAppButton } from '@/components/InstallAppButton';
 
 const NAV_ITEMS = [
-  { label: 'Dashboard', href: '/final-check', icon: LayoutDashboard, exact: true },
-  { label: 'My Work', href: '/final-check/queue', icon: Briefcase },
-  { label: 'Issue Challan', href: '/final-check/issue-challan', icon: Send },
-  { label: 'Floor Board', href: '/final-check/floor-board', icon: Kanban },
-  { label: 'Quality Summary', href: '/final-check/reports', icon: ShieldAlert },
+  { label: 'Dashboard', href: '/final-check', exact: true },
+  { label: 'Incoming Challans', href: '/final-check/my-work/incoming' },
+  { label: 'Received Garments', href: '/final-check/my-work/received' },
+  { label: 'Final Inspection', href: '/final-check/my-work/inspection' },
+  { label: 'Passed Items', href: '/final-check/my-work/passed' },
+  { label: 'Rejected Items', href: '/final-check/my-work/rejected' },
+  { label: 'Rework Items', href: '/final-check/my-work/rework' },
+  { label: 'Ready for Inventory', href: '/final-check/my-work/issue-challan' },
+  { label: 'Outgoing Challans', href: '/final-check/my-work/outgoing' },
+  { label: 'Inspection History', href: '/final-check/history' },
+  { label: 'Defective Shelf', href: '/final-check/my-work/defective' },
+  { label: 'Floor Board', href: '/final-check/floor-board' },
 ];
 
 export function FinalCheckNavigation() {
@@ -138,6 +141,9 @@ export function FinalCheckNavigation() {
           mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
+        {/* SIDEBAR TEXTILE BACKGROUND (one image for all departments, Admin > Sidebar Image) */}
+        <SidebarDepartmentArt />
+
         <div className="flex items-center justify-between border-b border-neutral-200 bg-white p-4">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-neutral-200 bg-white p-0.5">
@@ -145,7 +151,6 @@ export function FinalCheckNavigation() {
             </div>
             <div>
               <span className="block truncate text-xs font-bold tracking-[0.14em] text-neutral-900">SHUBHAM FABRICS</span>
-              <span className="block truncate text-[10px] font-medium tracking-[0.18em] text-brand-700">MES ENTERPRISE</span>
             </div>
           </div>
           <button
@@ -158,7 +163,7 @@ export function FinalCheckNavigation() {
           </button>
         </div>
 
-        <div className="relative border-b border-neutral-200 bg-white px-3 pb-2.5 pt-3">
+        <div className="relative border-b border-neutral-200 bg-white px-3 pb-2.5 pt-3 [&:not(:has(button))]:hidden">
           <DepartmentSwitcher
             currentDepartmentName="Final QC Department"
             accentColor="emerald"
@@ -167,20 +172,19 @@ export function FinalCheckNavigation() {
         </div>
 
         <nav aria-label="Final QC navigation" className="flex-1 space-y-1 overflow-y-auto px-3 pt-2">
-          {NAV_ITEMS.map(({ label, href, icon: Icon, exact }) => (
+          {NAV_ITEMS.map(({ label, href, exact }) => (
             <Link
               key={label}
               href={href}
               onClick={() => setMobileOpen(false)}
               className={linkClass(href, exact)}
             >
-              <Icon className="h-4 w-4 shrink-0" />
               <span>{label}</span>
             </Link>
           ))}
         </nav>
 
-        <div className="border-t border-neutral-200 bg-white p-4">
+        <div className="border-t border-neutral-200 bg-white/75 backdrop-blur-sm p-4">
           <div className="mb-3 flex items-center gap-3">
             <UserCircle className="h-8 w-8 shrink-0 text-brand-700" />
             <div className="min-w-0 flex-1">

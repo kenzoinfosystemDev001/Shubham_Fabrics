@@ -43,7 +43,8 @@ export async function DELETE(request: Request) {
         await tx.recutRequest.deleteMany({});
         await tx.stockLedgerEntry.deleteMany({});
 
-        // 5. Delete all Dyeing Orders
+        // 5. Delete all department work items and Dyeing Orders
+        await tx.departmentWorkItem.deleteMany({});
         await tx.dyeingOrder.deleteMany({});
 
         // 6. Delete all Challan Items, Events, and Challans

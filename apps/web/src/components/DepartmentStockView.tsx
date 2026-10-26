@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 
 interface DepartmentStockViewProps {
-  department: 'STORE' | 'DYEING' | 'QC1' | 'EMBROIDERY' | 'THREAD_CUTTING' | 'QC2' | 'PROGRAMMING';
+  department: 'STORE' | 'DYEING' | 'QC1' | 'EMBROIDERY' | 'THREAD_CUTTING' | 'QC2' | 'WASHING' | 'QC3' | 'PROGRAMMING';
   title?: string;
   accentColor?: string;
   createChallanUrl?: string;

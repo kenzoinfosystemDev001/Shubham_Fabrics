@@ -6,6 +6,11 @@ const getBaseUrl = () => {
 
 const API_BASE_URL = getBaseUrl();
 
+// Every department sidebar refreshes the signed-in profile when the page changes; within this
+// window they share one request instead of each navigation asking the server again.
+const PROFILE_REUSE_MS = 60_000;
+let profileRequest: { at: number; promise: Promise<any> } | null = null;
+
 class ApiClient {
   /**
    * The session lives in an httpOnly cookie set by /api/auth/login, so the browser never
@@ -18,6 +23,7 @@ class ApiClient {
 
   /** Signs out: clears the server session cookie and any locally cached profile. */
   clearToken() {
+    profileRequest = null;
     if (typeof window !== 'undefined') {
       fetch('/api/auth/logout', { method: 'POST', keepalive: true }).catch(() => {});
       sessionStorage.removeItem('mes_auth_token');
@@ -82,6 +88,7 @@ class ApiClient {
 
   // Auth
   async login(credentials: { usernameOrEmail: string; password: string }) {
+    profileRequest = null;
     return this.request<{ user: any }>('/auth/login', {
       method: 'POST',
       body: JSON.stringify(credentials),
@@ -89,20 +96,15 @@ class ApiClient {
   }
 
   async getProfile() {
-    return this.request<any>('/auth/me');
-  }
-
-  async getUsers() {
-    try {
-      return await this.request<any[]>('/auth/users');
-    } catch {
-      return [
-        { id: '1', username: 'admin', fullName: 'System Administrator', role: 'SUPER_ADMIN', departmentCode: 'CENTRAL', isActive: true },
-        { id: '2', username: 'jitender', fullName: 'jitender saini', role: 'STORE_MANAGER', departmentCode: 'STORE', isActive: true },
-        { id: '3', username: 'prod_manager', fullName: 'Production Manager', role: 'PRODUCTION_MANAGER', departmentCode: 'CUTTING', isActive: true },
-        { id: '4', username: 'qc_insp', fullName: 'Quality Inspector', role: 'QC_INSPECTOR', departmentCode: 'QC1', isActive: true },
-      ];
+    if (!profileRequest || Date.now() - profileRequest.at > PROFILE_REUSE_MS) {
+      const promise = this.request<any>('/auth/me');
+      profileRequest = { at: Date.now(), promise };
+      // A failed request is not reused.
+      promise.catch(() => {
+        if (profileRequest?.promise === promise) profileRequest = null;
+      });
     }
+    return profileRequest.promise;
   }
 
   // Dashboard
@@ -129,11 +131,8 @@ class ApiClient {
 
   // Programs & Production Sheets
   async getNextProgramNumber() {
-    try {
-      return await this.request<{ nextNumber: string }>('/programs/next-number');
-    } catch {
-      return { nextNumber: `PRG-${new Date().getFullYear()}-00001` };
-    }
+    // No invented fallback: a guessed number could duplicate an existing Production Sheet.
+    return this.request<{ nextNumber: string }>('/programs/next-number');
   }
 
   async getPrograms(params?: { status?: string; search?: string }) {
@@ -471,54 +470,6 @@ class ApiClient {
       method: 'POST',
       body: JSON.stringify(data),
     });
-  }
-
-  // Packing & Finished Goods Inventory
-  async getPackingDashboard() {
-    return this.request<any>('/packing/dashboard');
-  }
-
-  async getPackingIncoming(params?: { status?: string; search?: string }) {
-    const query = new URLSearchParams();
-    if (params?.status) query.append("status", params.status);
-    if (params?.search) query.append("search", params.search);
-    return this.request<any>("/packing/incoming?" + query.toString());
-  }
-
-  async receivePackingChallan(id: string, data: { receivedQuantity?: number; remarks?: string; markOnHold?: boolean }) {
-    return this.request<any>("/packing/challans/" + id + "/receive", {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  }
-
-  async getPackingQueue(params?: { status?: string; search?: string }) {
-    const query = new URLSearchParams();
-    if (params?.status) query.append("status", params.status);
-    if (params?.search) query.append("search", params.search);
-    return this.request<any>("/packing/queue?" + query.toString());
-  }
-
-  async getPackingJob(id: string) {
-    return this.request<any>("/packing/jobs/" + id);
-  }
-
-  async packJob(id: string, data: any) {
-    return this.request<any>("/packing/jobs/" + id + "/pack", {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  }
-
-  async getFinishedGoodsInventory(params?: { search?: string; status?: string }) {
-    const query = new URLSearchParams();
-    if (params?.search) query.append("search", params.search);
-    if (params?.status) query.append("status", params.status);
-    return this.request<any>("/packing/inventory?" + query.toString());
-  }
-
-  async getPackingReports(days: number = 30) {
-    return this.request<any>("/packing/reports?days=" + days);
   }
 
   // Health

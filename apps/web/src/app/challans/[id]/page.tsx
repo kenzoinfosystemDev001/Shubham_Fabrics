@@ -46,6 +46,8 @@ import {
   downloadChallanHtml, 
   printChallan 
 } from '@/lib/download-challan';
+import { FinishedGarmentList, useGarmentImages } from '@/components/workflow/FinishedGarments';
+import { isFinishedGoodsChallan } from '@/lib/finished-garments.mjs';
 
 export default function ChallanDetailPage() {
   const { id } = useParams() as { id: string };
@@ -56,6 +58,9 @@ export default function ChallanDetailPage() {
   const [user, setUser] = useState<any>(null);
   const [downloadingBarcode, setDownloadingBarcode] = useState(false);
   const [showSheetModal, setShowSheetModal] = useState(false);
+  // Finished garments (Finishing onward) are shown by name and image only, without colour or quantity.
+  const finishedGoods = isFinishedGoodsChallan(challan);
+  const { images: garmentImages } = useGarmentImages(finishedGoods ? [challan?.programId] : []);
 
   useEffect(() => {
     setUser(getCurrentUser());
@@ -193,7 +198,8 @@ export default function ChallanDetailPage() {
     CUTTING: 'CUTTING',
     QC2: 'QC2',
     FINISHING: 'FINISHING',
-    PACKING: 'PACKING'
+    INVENTORY: 'INVENTORY',
+    PACKING: 'INVENTORY'
   };
 
   const deptDisplay = challan ? (deptLabels[challan.fromDepartment] || challan.fromDepartment || 'PRODUCTION') : 'PRODUCTION';
@@ -357,7 +363,7 @@ export default function ChallanDetailPage() {
                   </h2>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-sm font-black font-mono tracking-wider text-brand-900 bg-brand-50 px-2 py-0.5 rounded border border-brand-200">
-                      THREAD CUTTING → QC2 (QUALITY CHECK 2)
+                      THREAD CUTTING → THREADCUT QC
                     </span>
                     <span className="text-sm font-bold text-neutral-900 tracking-widest">
                       CHALLAN
@@ -562,7 +568,7 @@ export default function ChallanDetailPage() {
               <span className="font-semibold text-neutral-900 text-sm">
                 {challan.issuedBy?.fullName || challan.createdBy?.fullName || challan.createdBy?.username || 'Department Incharge'}
               </span>
-              <span className="text-[10px] text-accent-800 block">✓ Digitally Signed</span>
+              <span className="text-[10px] text-accent-800 block">Digitally Signed</span>
             </div>
           </div>
 
@@ -596,12 +602,12 @@ export default function ChallanDetailPage() {
                             QUALITY ASSURANCE DIRECTIVE
                           </span>
                           <h4 className="text-sm font-bold text-neutral-900">
-                            QC2 Piece-by-Piece Quality Inspection Basis
+                            Threadcut QC Piece-by-Piece Inspection Basis
                           </h4>
                         </div>
                       </div>
                       <div className="text-left sm:text-right bg-white px-3.5 py-1.5 rounded-xl border border-accent-300">
-                        <span className="text-[10px] uppercase font-bold text-neutral-500 block">Pieces Dispatched to QC2</span>
+                        <span className="text-[10px] uppercase font-bold text-neutral-500 block">Pieces Dispatched to Threadcut QC</span>
                         <strong className="text-lg font-mono font-black text-neutral-900">
                           {totalQuantity} PCS
                         </strong>
@@ -611,7 +617,7 @@ export default function ChallanDetailPage() {
                 )}
 
                 {/* DEPARTMENT PIECE / FABRIC IN & OUT AUTO-DETECTION & DEFECTIVE SHELF AUDIT CARD */}
-                {(() => {
+                {!finishedGoods && (() => {
                   const fIn = challan.fabricIn ?? (challan.parentChallan?.fabricOut || totalQuantity);
                   const fOut = challan.fabricOut ?? totalQuantity;
                   const fDef = challan.defectivePieces ?? 0;
@@ -704,7 +710,21 @@ export default function ChallanDetailPage() {
                   );
                 })()}
 
+                {/* FINISHED GARMENTS: name and image only, with the Production Sheet */}
+                {finishedGoods && (
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-900">Finished Garments</h3>
+                      <span className="text-[11px] text-neutral-500">Sent with Production Sheet {challan.program?.programSerialNo || challan.program?.programNumber || ''}</span>
+                    </div>
+                    <div className="border border-neutral-200 rounded-lg bg-neutral-50/60">
+                      <FinishedGarmentList items={challan.items || []} programId={challan.programId} images={garmentImages} />
+                    </div>
+                  </div>
+                )}
+
                 {/* ITEMS TRANSFER TABLE */}
+                {!finishedGoods && (
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-900">
@@ -750,7 +770,7 @@ export default function ChallanDetailPage() {
                         <tr>
                           <td colSpan={3} className="py-2.5 px-4 text-right uppercase text-[11px] tracking-wider text-neutral-700">
                             {isThreadCuttingToQc2
-                              ? 'Total Dispatched Pieces for QC2 Inspection:'
+                              ? 'Total Dispatched Pieces for Threadcut QC Inspection:'
                               : 'Total Material Quantity:'}
                           </td>
                           <td className="py-2.5 px-4 text-right font-mono text-sm font-black text-neutral-900">
@@ -764,6 +784,7 @@ export default function ChallanDetailPage() {
                     </table>
                   </div>
                 </div>
+                )}
 
 
                 {/* PHYSICAL SIGNATURE BLOCKS FOR FACTORY HANDOFF */}

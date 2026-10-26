@@ -4,21 +4,15 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  LayoutDashboard,
-  Briefcase,
-  Kanban,
   LogOut,
   UserCircle,
   Menu,
-  X,
-  Scissors,
-  CheckCircle2,
-  Layers,
-  ArrowRight
+  X
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { isAdminUser } from '@/lib/rbac';
 import { DepartmentSwitcher } from '@/components/DepartmentSwitcher';
+import { SidebarDepartmentArt } from '@/components/SidebarDepartmentArt';
 
 export function ThreadCuttingNavigation() {
   const pathname = usePathname();
@@ -130,6 +124,9 @@ export function ThreadCuttingNavigation() {
           mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
+        {/* SIDEBAR TEXTILE BACKGROUND (one image for all departments, Admin > Sidebar Image) */}
+        <SidebarDepartmentArt />
+
         {/* BRANDING HEADER */}
         <div className="p-4 border-b border-neutral-200 bg-white flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -159,7 +156,7 @@ export function ThreadCuttingNavigation() {
         </div>
 
         {/* DEPARTMENT TITLE & WORKSPACE SWITCHER */}
-        <div className="relative px-3 pt-3 pb-2.5 border-b border-neutral-200 bg-white">
+        <div className="relative px-3 pt-3 pb-2.5 border-b border-neutral-200 bg-white [&:not(:has(button))]:hidden">
           <div className="relative z-10">
             <DepartmentSwitcher
               currentDepartmentName="Thread Cutting Department"
@@ -177,33 +174,66 @@ export function ThreadCuttingNavigation() {
             onClick={() => setMobileOpen(false)}
             className={linkClass('/thread-cutting', true)}
           >
-            <LayoutDashboard className="w-4 h-4 shrink-0" />
             <span>Dashboard</span>
           </Link>
 
           {/* 2. My Work */}
+          <div>
+            <div
+              className={`px-3 py-2.5 text-xs font-semibold ${
+                pathname.startsWith('/thread-cutting/my-work') ? 'text-neutral-900' : 'text-neutral-700'
+              }`}
+            >
+              My Work
+            </div>
+            <div className="ml-4 pl-3 border-l border-neutral-200 space-y-0.5 mb-1">
+              {[
+                { href: '/thread-cutting/my-work/incoming', label: 'Incoming Challans' },
+                { href: '/thread-cutting/my-work/received', label: 'Received Fabric' },
+                { href: '/thread-cutting/my-work/process', label: 'Thread Cutting Process' },
+                { href: '/thread-cutting/my-work/issue-challan', label: 'Issue Challan to Threadcut QC' },
+              ].map((item) => {
+                const active = pathname === item.href || pathname.startsWith(item.href + '/');
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileOpen(false)}
+                    aria-current={active ? 'page' : undefined}
+                    className={`flex items-center px-2.5 py-2 rounded-lg text-[11px] font-medium transition ${
+                      active
+                        ? 'bg-brand-50 text-brand-800 border-l-2 border-brand-500 pl-2'
+                        : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 3. Thread Cutting History */}
           <Link
-            href="/thread-cutting/my-work"
+            href="/thread-cutting/history"
             onClick={() => setMobileOpen(false)}
-            className={linkClass('/thread-cutting/my-work', false)}
+            className={linkClass('/thread-cutting/history', true)}
           >
-            <Briefcase className="w-4 h-4 shrink-0" />
-            <span>My Work</span>
+            <span>Thread Cutting History</span>
           </Link>
 
-          {/* 3. Floor Board */}
+          {/* 4. Floor Board */}
           <Link
             href="/thread-cutting/floor-board"
             onClick={() => setMobileOpen(false)}
             className={linkClass('/thread-cutting/floor-board', true)}
           >
-            <Kanban className="w-4 h-4 shrink-0" />
             <span>Floor Board</span>
           </Link>
         </nav>
 
         {/* USER & SIGN OUT FOOTER */}
-        <div className="p-4 border-t border-neutral-200 bg-white">
+        <div className="p-4 border-t border-neutral-200 bg-white/75 backdrop-blur-sm">
           <div className="flex items-center gap-3 mb-3">
             <UserCircle className="w-8 h-8 text-brand-700" />
             <div className="flex-1 min-w-0">
@@ -218,7 +248,7 @@ export function ThreadCuttingNavigation() {
 
           <button
             onClick={handleSignOut}
-            className="w-full flex items-center justify-center gap-2 py-2 px-3 text-xs font-semibold text-danger-600 hover:text-neutral-900 bg-danger-500/10 hover:bg-danger-500/30 border border-danger-500/20 hover:border-danger-500/40 rounded-lg transition"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-white hover:bg-danger-50 hover:text-danger-800 hover:border-danger-500/60 border border-neutral-200 rounded-lg text-xs text-neutral-900 transition shadow-xs"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Sign Out</span>

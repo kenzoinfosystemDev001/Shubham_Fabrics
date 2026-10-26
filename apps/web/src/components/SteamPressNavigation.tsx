@@ -4,20 +4,15 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  LayoutDashboard,
-  Kanban,
   LogOut,
   Menu,
   X,
-  Wind,
-  Send,
-  ArrowDownLeft,
-  BarChart3,
-  CheckCircle,
+  Wind
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { isAdminUser } from '@/lib/rbac';
 import { DepartmentSwitcher } from '@/components/DepartmentSwitcher';
+import { SidebarDepartmentArt } from '@/components/SidebarDepartmentArt';
 import { InstallAppButton } from '@/components/InstallAppButton';
 
 export function SteamPressNavigation() {
@@ -138,6 +133,9 @@ export function SteamPressNavigation() {
           mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
+        {/* SIDEBAR TEXTILE BACKGROUND (one image for all departments, Admin > Sidebar Image) */}
+        <SidebarDepartmentArt />
+
         {/* BRANDING */}
         <div className="p-4 border-b border-neutral-200 bg-white flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -163,7 +161,7 @@ export function SteamPressNavigation() {
         </div>
 
         {/* DEPARTMENT TITLE & WORKSPACE SWITCHER */}
-        <div className="relative px-3 pt-3 pb-2.5 border-b border-neutral-200 bg-white">
+        <div className="relative px-3 pt-3 pb-2.5 border-b border-neutral-200 bg-white [&:not(:has(button))]:hidden">
           <div className="relative z-10">
             <DepartmentSwitcher
               currentDepartmentName="Steam Pressing"
@@ -181,63 +179,84 @@ export function SteamPressNavigation() {
             onClick={() => setMobileOpen(false)}
             className={linkClass('/steam-press', true)}
           >
-            <LayoutDashboard className="w-4 h-4 shrink-0" />
             <span>Dashboard</span>
           </Link>
 
           {/* 2. Incoming Challans */}
           <Link
-            href="/steam-press/incoming"
+            href="/steam-press/my-work/incoming"
             onClick={() => setMobileOpen(false)}
-            className={linkClass('/steam-press/incoming', false)}
+            className={linkClass('/steam-press/my-work/incoming', false)}
           >
-            <ArrowDownLeft className="w-4 h-4 shrink-0" />
-            <span>Incoming (Finishing)</span>
+            <span>Incoming Challans</span>
           </Link>
 
-          {/* 3. My Work / Steam Press Floor */}
+          {/* 3. Received Production */}
           <Link
-            href="/steam-press/my-work"
+            href="/steam-press/my-work/received"
             onClick={() => setMobileOpen(false)}
-            className={linkClass('/steam-press/my-work', false)}
+            className={linkClass('/steam-press/my-work/received', false)}
           >
-            <Wind className="w-4 h-4 shrink-0" />
-            <span>Pressing Floor</span>
+            <span>Received Production</span>
           </Link>
 
-          {/* 4. Issue Challan / Final QC Handover */}
+          {/* 4. Steam Press Processing */}
           <Link
-            href="/steam-press/issue-challan"
+            href="/steam-press/my-work/process"
             onClick={() => setMobileOpen(false)}
-            className={linkClass('/steam-press/issue-challan', false)}
+            className={linkClass('/steam-press/my-work/process', false)}
           >
-            <Send className="w-4 h-4 shrink-0" />
-            <span>Issue Challan (Final QC)</span>
+            <span>Steam Press Processing</span>
           </Link>
 
-          {/* 5. Floor Board */}
+          {/* 5. Ready for Final QC */}
+          <Link
+            href="/steam-press/my-work/issue-challan"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/steam-press/my-work/issue-challan', false)}
+          >
+            <span>Ready for Final QC</span>
+          </Link>
+
+          {/* 6. Outgoing Challans */}
+          <Link
+            href="/steam-press/my-work/outgoing"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/steam-press/my-work/outgoing', false)}
+          >
+            <span>Outgoing Challans</span>
+          </Link>
+
+          {/* 7. Processing History */}
+          <Link
+            href="/steam-press/history"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/steam-press/history', false)}
+          >
+            <span>Processing History</span>
+          </Link>
+
+          {/* 8. Department Defective Shelf */}
+          <Link
+            href="/steam-press/my-work/defective"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/steam-press/my-work/defective', false)}
+          >
+            <span>Department Defective Shelf</span>
+          </Link>
+
+          {/* 9. Floor Board */}
           <Link
             href="/steam-press/floor-board"
             onClick={() => setMobileOpen(false)}
             className={linkClass('/steam-press/floor-board', true)}
           >
-            <Kanban className="w-4 h-4 shrink-0" />
             <span>Floor Board</span>
-          </Link>
-
-          {/* 6. Reports & Analytics */}
-          <Link
-            href="/steam-press/reports"
-            onClick={() => setMobileOpen(false)}
-            className={linkClass('/steam-press/reports', false)}
-          >
-            <BarChart3 className="w-4 h-4 shrink-0" />
-            <span>Yield & Defects</span>
           </Link>
         </nav>
 
         {/* FOOTER USER STATUS */}
-        <div className="p-3 border-t border-neutral-200 bg-white">
+        <div className="p-3 border-t border-neutral-200 bg-white/75 backdrop-blur-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-8 h-8 rounded-full bg-brand-50 border border-neutral-200 flex items-center justify-center shrink-0">
@@ -253,14 +272,14 @@ export function SteamPressNavigation() {
               </div>
             </div>
 
-            <button
-              onClick={handleSignOut}
-              className="p-1.5 rounded-lg text-neutral-500 hover:text-danger-600 hover:bg-neutral-100 transition"
-              title="Sign Out"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
           </div>
+          <button
+            onClick={handleSignOut}
+            className="mt-3 w-full flex items-center justify-center gap-2 px-3 py-2 bg-white hover:bg-danger-50 hover:text-danger-800 hover:border-danger-500/60 border border-neutral-200 rounded-lg text-xs text-neutral-900 transition shadow-xs"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Sign Out</span>
+          </button>
         </div>
       </aside>
     </>

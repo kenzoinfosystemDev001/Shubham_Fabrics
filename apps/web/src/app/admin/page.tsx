@@ -23,11 +23,14 @@ import {
   RefreshCw,
   KeyRound,
   UserPlus,
-  Pencil
+  Pencil,
+  Image as ImageIcon,
+  Palette
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { getCurrentUser, isAdminUser } from '@/lib/rbac';
 import { ShubhamLogo } from '@/components/ShubhamLogo';
+import { AppearancePanel, SidebarImagePanel } from '@/components/admin/LoginAppearancePanel';
 import { printProductionSheet } from '@/lib/download-production-sheet';
 
 // Every department a user can belong to, with the role a new user there normally gets.
@@ -39,15 +42,15 @@ const DEPARTMENT_OPTIONS = [
   { code: 'QC1', label: 'Dyeing QC (QC1)', defaultRole: 'QC1_INSPECTOR' },
   { code: 'EMBROIDERY', label: 'Embroidery', defaultRole: 'EMBROIDERY_INCHARGE' },
   { code: 'THREAD_CUTTING', label: 'Thread Cutting', defaultRole: 'THREAD_CUTTING_INCHARGE' },
-  { code: 'QC2', label: 'QC2', defaultRole: 'QC2_INSPECTOR' },
+  { code: 'QC2', label: 'Threadcut QC', defaultRole: 'QC2_INSPECTOR' },
   { code: 'WASHING', label: 'Washing', defaultRole: 'WASHING_INCHARGE' },
-  { code: 'QC3', label: 'QC Washing (QC3)', defaultRole: 'QC3_INSPECTOR' },
+  { code: 'QC3', label: 'Washing QC', defaultRole: 'QC3_INSPECTOR' },
   { code: 'RECUTTING', label: 'Recutting', defaultRole: 'RECUTTING_SUPERVISOR' },
   { code: 'STITCHING', label: 'Stitching', defaultRole: 'STITCHING_SUPERVISOR' },
   { code: 'FINISHING', label: 'Finishing', defaultRole: 'FINISHING_SUPERVISOR' },
   { code: 'STEAM_PRESS', label: 'Steam Press', defaultRole: 'STEAM_PRESS_SUPERVISOR' },
   { code: 'FINAL_CHECK', label: 'Final QC', defaultRole: 'FINAL_CHECK_INSPECTOR' },
-  { code: 'PACKING', label: 'Packing & Inventory', defaultRole: 'PACKING_SUPERVISOR' },
+  { code: 'INVENTORY', label: 'Inventory', defaultRole: 'INVENTORY_SUPERVISOR' },
 ];
 
 const ROLE_OPTIONS = Array.from(
@@ -81,7 +84,7 @@ interface EditableUser {
 export default function AdminConsolePage() {
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<'users' | 'programs' | 'challans' | 'suppliers' | 'fabrics' | 'stocks'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'programs' | 'challans' | 'suppliers' | 'fabrics' | 'stocks' | 'sidebar-image' | 'login-appearance'>('users');
   const [loading, setLoading] = useState(true);
 
   // Data states
@@ -498,10 +501,10 @@ export default function AdminConsolePage() {
           <Link
             href="/qc2"
             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-accent-400/10 text-accent-700 border border-accent-500/30 hover:bg-accent-400/20 transition shrink-0"
-            title="Open QC2 Department"
+            title="Open Threadcut QC"
           >
             <Building2 className="w-3.5 h-3.5" />
-            <span>QC2</span>
+            <span>Threadcut QC</span>
           </Link>
 
           <button
@@ -589,6 +592,8 @@ export default function AdminConsolePage() {
             { id: 'suppliers', label: 'Suppliers', icon: Building, count: suppliers.length },
             { id: 'fabrics', label: 'Fabrics Master', icon: Layers, count: fabrics.length },
             { id: 'stocks', label: 'Stocks & Inventory', icon: Boxes, count: stocksData?.summary?.totalRolls },
+            { id: 'sidebar-image', label: 'Sidebar Image', icon: ImageIcon, count: undefined },
+            { id: 'login-appearance', label: 'Appearance', icon: Palette, count: undefined },
           ].map((tab) => {
             const Icon = tab.icon;
             const active = activeTab === tab.id;
@@ -628,6 +633,10 @@ export default function AdminConsolePage() {
           </div>
         ) : (
           <>
+            {/* DEPARTMENT SIDEBAR IMAGES */}
+            {activeTab === 'sidebar-image' && <SidebarImagePanel onNotify={showNotification} />}
+            {activeTab === 'login-appearance' && <AppearancePanel onNotify={showNotification} />}
+
             {/* TAB 1: USERS & RBAC */}
             {activeTab === 'users' && (
               <div className="space-y-4">

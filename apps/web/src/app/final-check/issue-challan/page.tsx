@@ -1,7 +1,6 @@
-'use client';
+import { redirect } from 'next/navigation';
 
-import { FinalCheckWorkspace } from '@/components/FinalCheckWorkspace';
-
-export default function FinalCheckIssueChallanPage() {
-  return <FinalCheckWorkspace section="issue-challan" />;
+/** Moved under My Work. */
+export default function FinalQcIssueChallanPage() {
+  redirect('/final-check/my-work/issue-challan');
 }

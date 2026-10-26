@@ -16,7 +16,8 @@ import {
   formatSizeExpressionTotal,
   SWATCH_CLIP_PATH,
   printProductionSheet,
-  downloadProductionSheetHtml
+  downloadProductionSheetHtml,
+  productionSheetCategoriesForViewer,
 } from '@/lib/download-production-sheet';
 import { useProgramDocument } from '@/hooks/useProgramDocument';
 
@@ -44,9 +45,7 @@ export function ProductionSheetView({
   }
 
   const components = meta?.components || null;
-  const componentCategories: GarmentCategory[] = components
-    ? Object.keys(components)
-    : ['TOP', 'BOTTOM', 'DUPATTA', 'OTHER'];
+  const componentCategories: GarmentCategory[] = productionSheetCategoriesForViewer(program);
   const activeCategoryName = components?.[activeCategory]?.styleName || (activeCategory === 'OTHER' ? 'INPUT' : activeCategory);
   const forwardedComponents: string[] = Array.isArray(meta?.forwardedComponents) ? meta.forwardedComponents : ['TOP'];
 

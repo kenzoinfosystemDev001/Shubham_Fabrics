@@ -1,183 +1,95 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
-import { syncInboundChallansToDyeingOrders } from '@/lib/dyeing-sync';
 import { requireDepartment } from '@/lib/auth/department-access';
+import { syncInboundChallansToDyeingOrders } from '@/lib/dyeing-sync';
+import { DYEING_PROGRAM_SELECT, dyeingErrorResponse } from '@/lib/dyeing-server';
+import { OPEN_DYEING_STATUSES, availableForQc, receivedBasis } from '@/lib/dyeing-workflow.mjs';
 
 export const dynamic = 'force-dynamic';
 
+type UnitTotals = Record<string, number>;
+const add = (totals: UnitTotals, unit: string, qty: number) => {
+  totals[unit] = Math.round(((totals[unit] || 0) + qty) * 1000) / 1000;
+};
+
+/**
+ * GET /api/dyeing/dashboard — live counts for the Dyeing dashboard. Every number comes from the
+ * database; quantities are totalled per unit (meters and pieces are never added together).
+ */
 export async function GET(request: Request) {
-  const { user: authUser, response: authResponse } = await requireDepartment(request, 'DYEING');
-  if (!authUser) return authResponse;
+  const { user, response } = await requireDepartment(request, 'DYEING');
+  if (!user) return response;
   try {
     await syncInboundChallansToDyeingOrders();
-
-    const orders = await prisma.dyeingOrder.findMany({
-      include: {
-        program: {
-          select: {
-            id: true,
-            programNumber: true,
-            programSerialNo: true,
-            clientName: true,
-            buyerName: true,
-            styleCode: true,
-            mainStyle: true,
-            designNumber: true,
-            wilcomDesignNumber: true,
-            wilcomDesignPhoto: true,
-            baseDesignPhoto: true,
-            fabricName: true,
-            fabricColor: true,
-            targetQuantity: true,
-            deliveryDate: true,
-            priority: true,
-            status: true,
-          },
-        },
-        inboundChallan: {
-          select: {
-            id: true,
-            challanNumber: true,
-            status: true,
-            issuedDate: true,
-          },
-        },
-        qc1Challan: {
-          select: {
-            id: true,
-            challanNumber: true,
-            status: true,
-            issuedDate: true,
-          },
-        },
-        incharge: {
-          select: {
-            id: true,
-            fullName: true,
-            username: true,
-          },
-        },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
-
-    // 1. KPI Counts
-    const totalWork = orders.length;
-    const received = orders.filter((o) => o.status === 'RECEIVED').length;
-    const inDyeing = orders.filter((o) => o.status === 'IN_DYEING').length;
-    const partiallyDyed = orders.filter((o) => o.status === 'PARTIALLY_DYED').length;
-    const dyed = orders.filter((o) => o.status === 'DYED').length;
-    const readyForQc1 = orders.filter((o) => o.status === 'READY_FOR_QC1' || (o.readyForQc1Quantity > 0 && o.status !== 'SENT_TO_QC1')).length;
-    const sentToQc1 = orders.filter((o) => o.status === 'SENT_TO_QC1').length;
-
-    // 2. Quantity Aggregations
-    const totalRequiredQuantity = orders.reduce((sum, o) => sum + (o.requiredQuantity || 0), 0);
-    const totalDyedQuantity = orders.reduce((sum, o) => sum + (o.dyedQuantity || 0), 0);
-    const totalUndyedQuantity = orders.reduce((sum, o) => sum + (o.undyedQuantity || 0), 0);
-    const totalSentToQc1Quantity = orders.reduce((sum, o) => sum + (o.sentToQc1Quantity || 0), 0);
-
-    // 3. Color Visibility Breakdown
-    const colorMap = new Map<string, {
-      colorName: string;
-      colorCode: string | null;
-      ordersCount: number;
-      required: number;
-      dyed: number;
-      undyed: number;
-      sentToQc1: number;
-      uom: string;
-    }>();
-
-    for (const order of orders) {
-      const colorKey = (order.dyedColor || order.targetColor || 'Standard').trim();
-      const existing = colorMap.get(colorKey) || {
-        colorName: colorKey,
-        colorCode: order.colorCode || null,
-        ordersCount: 0,
-        required: 0,
-        dyed: 0,
-        undyed: 0,
-        sentToQc1: 0,
-        uom: order.uom || 'MTR',
-      };
-
-      existing.ordersCount += 1;
-      existing.required += order.requiredQuantity || 0;
-      existing.dyed += order.dyedQuantity || 0;
-      existing.undyed += order.undyedQuantity || 0;
-      existing.sentToQc1 += order.sentToQc1Quantity || 0;
-
-      colorMap.set(colorKey, existing);
-    }
-
-    const colorBreakdown = Array.from(colorMap.values());
-
-    // 4. Current Dyeing Incharges
-    const dyeingIncharges = await prisma.user.findMany({
-      where: {
-        OR: [
-          { departmentCode: 'DYEING' },
-          { username: 'dyeing' },
-          { userRoles: { some: { role: { code: { in: ['DYEING_INCHARGE', 'DYEING_OPERATOR'] } } } } },
-        ],
-        isActive: true,
-      },
-      select: {
-        id: true,
-        fullName: true,
-        username: true,
-        email: true,
-      },
-    });
-
-    // 5. Priority Work
-    const priorityWork = orders
-      .filter((o) => (o.priority === 'URGENT' || o.priority === 'HIGH') && o.status !== 'SENT_TO_QC1')
-      .slice(0, 5);
-
-    // 6. Upcoming Delivery
     const now = new Date();
-    const upcomingDelivery = orders
-      .filter((o) => o.program?.deliveryDate && o.status !== 'SENT_TO_QC1')
-      .sort((a, b) => new Date(a.program.deliveryDate).getTime() - new Date(b.program.deliveryDate).getTime())
-      .slice(0, 5);
 
-    // 7. Recent Activity (Production Transactions & Challans)
-    const recentTransactions = await prisma.productionTransaction.findMany({
-      where: { departmentCode: 'DYEING' },
-      take: 6,
-      orderBy: { recordedAt: 'desc' },
-      include: {
-        program: { select: { programNumber: true, clientName: true } },
-        operator: { select: { fullName: true } },
-      },
-    });
+    const [openOrders, pendingInwardChallans, challansIssuedToQc, activeAlerts] = await Promise.all([
+      prisma.dyeingOrder.findMany({
+        where: { status: { in: OPEN_DYEING_STATUSES } },
+        include: {
+          program: { select: DYEING_PROGRAM_SELECT },
+          inboundChallan: { select: { id: true, challanNumber: true } },
+        },
+      }),
+      prisma.challan.count({
+        where: { toDepartment: { equals: 'DYEING', mode: 'insensitive' }, dyeingInboundOrders: { some: { status: 'AWAITING_RECEIPT' } } },
+      }),
+      prisma.challan.count({ where: { fromDepartment: 'DYEING', toDepartment: 'QC1' } }),
+      prisma.deadlineAlert.count({ where: { departmentCode: 'DYEING', status: 'ACTIVE' } }).catch(() => 0),
+    ]);
+
+    const received = openOrders.filter((o) => o.status === 'RECEIVED');
+    const inProgress = openOrders.filter((o) => o.status === 'IN_DYEING' || o.status === 'PARTIALLY_DYED');
+    const readyForQc = openOrders.filter((o) => availableForQc(o) > 0);
+    const overdue = openOrders.filter((o) => o.program?.deliveryDate && new Date(o.program.deliveryDate) < now);
+
+    const receivedQty: UnitTotals = {};
+    for (const o of received) add(receivedQty, o.uom, receivedBasis(o));
+    const readyQty: UnitTotals = {};
+    for (const o of readyForQc) add(readyQty, o.uom, availableForQc(o));
+
+    // Most urgent open work first: earliest delivery date, then priority.
+    const rank: Record<string, number> = { URGENT: 0, HIGH: 1, NORMAL: 2, LOW: 3 };
+    const pendingTasks = openOrders
+      .slice()
+      .sort((a, b) => {
+        const da = a.program?.deliveryDate ? new Date(a.program.deliveryDate).getTime() : Infinity;
+        const db = b.program?.deliveryDate ? new Date(b.program.deliveryDate).getTime() : Infinity;
+        return da - db || (rank[a.priority] ?? 2) - (rank[b.priority] ?? 2);
+      })
+      .slice(0, 10)
+      .map((o) => ({
+        id: o.id,
+        orderNumber: o.orderNumber,
+        status: o.status,
+        priority: o.priority,
+        fabricName: o.fabricName,
+        targetColor: o.targetColor,
+        uom: o.uom,
+        expected: o.requiredQuantity,
+        received: receivedBasis(o),
+        dyed: o.dyedQuantity,
+        sent: o.sentToQc1Quantity,
+        challanNumber: o.inboundChallan?.challanNumber ?? null,
+        program: o.program,
+      }));
 
     return NextResponse.json({
       data: {
-        kpis: {
-          totalWork,
-          received,
-          inDyeing,
-          partiallyDyed,
-          dyed,
-          readyForQc1,
-          sentToQc1,
-          totalRequiredQuantity,
-          totalDyedQuantity,
-          totalUndyedQuantity,
-          totalSentToQc1Quantity,
+        counts: {
+          pendingInwardChallans,
+          fabricReceived: received.length,
+          dyeingInProgress: inProgress.length,
+          readyForQc: readyForQc.length,
+          challansIssuedToQc,
+          deadlineAlerts: activeAlerts,
+          overdueWork: overdue.length,
         },
-        colorBreakdown,
-        dyeingIncharges,
-        priorityWork,
-        upcomingDelivery,
-        recentActivity: recentTransactions,
-        receivedProductions: orders.slice(0, 10),
+        quantities: { received: receivedQty, readyForQc: readyQty },
+        pendingTasks,
       },
     });
-  } catch (error: any) {
-    console.error('Error loading dyeing dashboard:', error);
-    return NextResponse.json({ error: error.message || 'Failed to load dyeing dashboard' }, { status: 500 });
+  } catch (error) {
+    return dyeingErrorResponse(error, 'Failed to load the Dyeing dashboard.');
   }
 }

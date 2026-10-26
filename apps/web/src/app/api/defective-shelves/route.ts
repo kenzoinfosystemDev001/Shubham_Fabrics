@@ -31,8 +31,8 @@ const DEPARTMENT_SHELF_MAP: Record<string, { code: string; name: string; deptNam
   },
   QC2: {
     code: 'DEF-SHELF-QC2',
-    name: 'Thread Cut QC Defective Shelf',
-    deptName: 'Thread Cut QC',
+    name: 'Threadcut QC Defective Shelf',
+    deptName: 'Threadcut QC',
   },
   QC3: {
     code: 'DEF-SHELF-QC3',
@@ -224,7 +224,7 @@ export async function GET(request: Request) {
       QC1: { shelfCode: 'DEF-SHELF-QC1', shelfName: 'Dyeing QC Defective Shelf', totalPieces: 0, totalIncidents: 0, quantitiesByUnit: {} },
       EMBROIDERY: { shelfCode: 'DEF-SHELF-EMBROIDERY', shelfName: 'Embroidery Station Defective Shelf', totalPieces: 0, totalIncidents: 0, quantitiesByUnit: {} },
       THREAD_CUTTING: { shelfCode: 'DEF-SHELF-THREAD-CUTTING', shelfName: 'Thread Cutting Trimming & Snip Shelf', totalPieces: 0, totalIncidents: 0, quantitiesByUnit: {} },
-      QC2: { shelfCode: 'DEF-SHELF-QC2', shelfName: 'Thread Cut QC Defective Shelf', totalPieces: 0, totalIncidents: 0, quantitiesByUnit: {} },
+      QC2: { shelfCode: 'DEF-SHELF-QC2', shelfName: 'Threadcut QC Defective Shelf', totalPieces: 0, totalIncidents: 0, quantitiesByUnit: {} },
       QC3: { shelfCode: 'DEF-SHELF-QC3', shelfName: 'Washing QC Defective Shelf', totalPieces: 0, totalIncidents: 0, quantitiesByUnit: {} },
       FINAL_CHECK: { shelfCode: 'DEF-SHELF-FINAL-CHECK', shelfName: 'Final check Defective Shelf', totalPieces: 0, totalIncidents: 0, quantitiesByUnit: {} },
     };

@@ -1,6 +1,6 @@
-import React from 'react';
-import { FinalCheckWorkspace } from '@/components/FinalCheckWorkspace';
+import { redirect } from 'next/navigation';
 
-export default function FinalCheckQueuePage() {
-  return <FinalCheckWorkspace section="queue" />;
+/** The inspection queue is now My Work > Final Inspection. */
+export default function FinalQcQueuePage() {
+  redirect('/final-check/my-work/inspection');
 }

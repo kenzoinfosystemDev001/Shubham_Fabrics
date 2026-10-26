@@ -4,8 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ChevronDown, Building2, Check, ExternalLink, ShieldCheck } from 'lucide-react';
-import { isAdminUser, getCurrentUser } from '@/lib/rbac';
-import { DEPARTMENT_NAV_BG_IMAGE } from '@/lib/nav-bg';
+import { isAdminUser } from '@/lib/rbac';
 
 export interface DepartmentSwitcherProps {
   currentDepartmentName: string;
@@ -75,7 +74,7 @@ const DEPARTMENTS = [
     activeBg: 'bg-brand-50 text-brand-800 font-bold',
   },
   {
-    name: 'QC2 Department',
+    name: 'Threadcut QC',
     code: 'QC2',
     href: '/qc2',
     color: 'emerald',
@@ -95,7 +94,7 @@ const DEPARTMENTS = [
     activeBg: 'bg-brand-50 text-brand-800 font-bold',
   },
   {
-    name: 'QC Washing',
+    name: 'Washing QC',
     code: 'QC3',
     href: '/qcwashing',
     color: 'emerald',
@@ -155,11 +154,11 @@ const DEPARTMENTS = [
     activeBg: 'bg-brand-50 text-brand-800 font-bold',
   },
   {
-    name: 'Packing & Inventory',
-    code: 'PACKING',
-    href: '/packing',
+    name: 'Inventory Department',
+    code: 'INVENTORY',
+    href: '/inventory',
     color: 'amber',
-    badge: 'PCK',
+    badge: 'INV',
     dotClass: 'bg-brand-500',
     hoverClass: 'hover:text-neutral-900',
     activeBg: 'bg-brand-50 text-brand-800 font-bold',
@@ -175,7 +174,6 @@ export function DepartmentSwitcher({
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
-  const [bgImage, setBgImage] = useState<string>(DEPARTMENT_NAV_BG_IMAGE);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -187,16 +185,6 @@ export function DepartmentSwitcher({
       }
     }
 
-    // Load real background image from database API
-    fetch('/api/department-nav/background')
-      .then((res) => res.json())
-      .then((json) => {
-        if (json.data?.fileUrl) {
-          setBgImage(json.data.fileUrl);
-        }
-      })
-      .catch(() => {});
-
     const handleClickOutside = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setOpen(false);
@@ -206,38 +194,18 @@ export function DepartmentSwitcher({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const activeUser = currentUser || (typeof window !== 'undefined' ? getCurrentUser() : null);
-  const isAdmin = isAdminUser(activeUser);
+  // The user comes from localStorage, which only exists in the browser: read it in the effect above, never
+  // during render, so the server and the first client render match (no hydration error).
+  const isAdmin = isAdminUser(currentUser);
 
   const getAccentText = () => {
     // One brand color for every department; accentColor is kept for API compatibility.
     return 'text-brand-700';
   };
 
-  // If user is NOT an Admin: Department incharge can ONLY see their assigned department.
-  // No other departments can be seen or opened.
-  if (!isAdmin) {
-    return (
-      <div className="relative w-full">
-        <div
-          className="bg-white w-full flex items-center justify-between px-3 py-2.5 rounded-xl border border-neutral-200 text-left relative overflow-hidden select-none"
-        >
-          <div className="min-w-0 flex-1 pr-2 relative z-10">
-            <span className="text-[9px] font-bold text-neutral-900 uppercase tracking-widest block leading-tight">
-              Active Station
-            </span>
-            <span className={`text-[11px] font-bold uppercase tracking-wider truncate block leading-snug mt-0.5 ${getAccentText()}`}>
-              {currentDepartmentName}
-            </span>
-          </div>
-          <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-white border border-neutral-200 text-[9px] font-bold text-neutral-700 shrink-0">
-            <span className="w-1.5 h-1.5 rounded-full bg-accent-400" />
-            <span className="tracking-wide">ASSIGNED</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Department users only ever see their own department (named in the sidebar footer), so there
+  // is nothing to show or switch; the sidebar hides this section when it renders nothing.
+  if (!isAdmin) return null;
 
   // Admin user: Can see and switch between all departments
   return (

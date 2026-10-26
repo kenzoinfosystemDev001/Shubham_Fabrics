@@ -469,8 +469,8 @@ test('authorization: other departments cannot see or dismiss Dyeing alerts', asy
   assert.equal((await dismissAlertForUser(dyeingUserA, 'no-such-alert')).status, 404);
 });
 
-test('config: only Dyeing is enabled; enabling QC1 needs no code change', async () => {
-  assert.deepEqual(config.enabledAlertDepartments(), ['DYEING']);
+test('config: Dyeing and Embroidery are enabled; enabling QC1 needs no code change', async () => {
+  assert.deepEqual(config.enabledAlertDepartments(), ['DYEING', 'EMBROIDERY', 'THREAD_CUTTING', 'QC2', 'WASHING', 'QC3', 'RECUTTING', 'STITCHING', 'FINISHING', 'STEAM_PRESS', 'FINAL_CHECK', 'INVENTORY']);
   fake.db.programs.push({ id: 'prog-q', programNumber: 'PRG-q', programSerialNo: 'SF-q', designNumber: null, wilcomDesignNumber: 'W-1', styleCode: 'S', deliveryDate: at('2026-10-25T00:00:00Z'), status: 'IN_PRODUCTION', metadataJson: null });
   fake.db.challans.push({ id: 'ch-q', challanNumber: 'QC1-001', challanType: 'INTER_DEPARTMENT', status: 'UNDER_INSPECTION', toDepartment: 'QC1', programId: 'prog-q' });
 
