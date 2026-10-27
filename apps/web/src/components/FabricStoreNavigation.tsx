@@ -10,7 +10,6 @@ import {
   UserCircle,
   Menu,
   X,
-  FileSpreadsheet,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { isAdminUser } from '@/lib/rbac';
@@ -108,7 +107,7 @@ export function FabricStoreNavigation() {
   );
 
   const myWorkActive = pathname.includes('/fabric-store/my-work');
-  const inventoryActive = pathname.includes('/fabric-store/inventory/inward') || pathname.includes('/fabric-store/inventory/import');
+  const inventoryActive = pathname.includes('/fabric-store/inventory/inward');
   const totalStockActive = pathname.includes('/fabric-store/inventory/total-stock');
 
   return (
@@ -269,14 +268,6 @@ export function FabricStoreNavigation() {
                   className={subLinkClass('/fabric-store/inventory/inward')}
                 >
                   <span>Inward Stock</span>
-                </Link>
-                <Link
-                  href="/fabric-store/inventory/import"
-                  onClick={() => setMobileOpen(false)}
-                  className={subLinkClass('/fabric-store/inventory/import')}
-                >
-                  <FileSpreadsheet className="w-3.5 h-3.5 shrink-0" />
-                  <span>Import Stock</span>
                 </Link>
               </div>
             )}
