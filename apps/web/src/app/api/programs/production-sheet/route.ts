@@ -285,9 +285,10 @@ export async function POST(request: Request) {
     metadataObj.wilcomDesignNumber = resolvedWilcomNumber;
 
     if (submittedWilcomEntries.length > 0) {
+      // Each production sheet keeps its own artwork; only a TOP design falls back to the root Wilcom photo.
       metadataObj.wilcomEntries = submittedWilcomEntries.map((entry: any) => ({
         ...entry,
-        photoUrl: entry.photoUrl || resolvedWilcomPhoto || '',
+        photoUrl: entry.photoUrl || (String(entry.category || 'TOP').trim().toUpperCase() === 'TOP' ? resolvedWilcomPhoto : '') || '',
       }));
     } else if (resolvedWilcomNumber || resolvedWilcomPhoto) {
       metadataObj.wilcomEntries = [

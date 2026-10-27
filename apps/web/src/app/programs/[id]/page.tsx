@@ -43,7 +43,8 @@ import { WilcomPrintModal } from '@/components/wilcom/WilcomPrintModal';
 import { 
   printWilcomForm, 
   downloadWilcomFormHtml,
-  extractRootWilcomPhoto
+  extractRootWilcomPhoto,
+  inheritedWilcomPhoto
 } from '@/lib/download-wilcom';
 import { ChallanListTable } from '@/components/challan/ChallanListTable';
 import { 
@@ -251,9 +252,9 @@ export default function ProgramDetailPage() {
       },
     ];
   } else {
-    wilcomEntries = wilcomEntries.map((e: any, idx: number) => ({
+    wilcomEntries = wilcomEntries.map((e: any) => ({
       ...e,
-      photoUrl: e.photoUrl || e.photo || e.imageUrl || e.image || (idx === 0 ? rootWilcomPhoto : '') || '',
+      photoUrl: e.photoUrl || e.photo || e.imageUrl || e.image || inheritedWilcomPhoto(e, rootWilcomPhoto) || '',
     }));
   }
 
@@ -803,7 +804,8 @@ export default function ProgramDetailPage() {
                   {program.fabricDyeingRequired ? 'Dyeing Department' : 'Embroidery Department'}
                 </span>
               </div>
-            </div>          </div>
+            </div>
+          </div>
 
           {/* PRODUCTION SHEET SPECIFICATION & BREAKDOWN */}
           <div className="bg-white border-2 border-neutral-200 rounded-lg p-5 shadow-xs space-y-4 md:col-span-2 text-neutral-900">

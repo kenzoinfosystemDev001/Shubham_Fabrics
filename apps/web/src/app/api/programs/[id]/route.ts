@@ -8,6 +8,11 @@ import { syncChallanStock } from '@/lib/fabric-stock-ledger';
 
 export const dynamic = 'force-dynamic';
 
+/** A TOP design (or a legacy one with no category) is the only one that shares the root Wilcom photo. */
+function isTopWilcomEntry(entry: any): boolean {
+  return String(entry?.category || 'TOP').trim().toUpperCase() === 'TOP';
+}
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -323,15 +328,16 @@ export async function PATCH(
       if (!resolvedPhoto) {
         resolvedPhoto = body.wilcomEntries.find((e: any) => e?.photoUrl)?.photoUrl || null;
       }
+      // Only a TOP design falls back to the root Wilcom photo; other sheets keep their own artwork.
       meta.wilcomEntries = body.wilcomEntries.map((e: any) => ({
         ...e,
-        photoUrl: e.photoUrl || resolvedPhoto || undefined,
+        photoUrl: e.photoUrl || (isTopWilcomEntry(e) ? resolvedPhoto : null) || undefined,
       }));
     } else if (body.wilcomDesignPhoto) {
       if (Array.isArray(meta.wilcomEntries) && meta.wilcomEntries.length > 0) {
         meta.wilcomEntries = meta.wilcomEntries.map((e: any) => ({
           ...e,
-          photoUrl: e.photoUrl || body.wilcomDesignPhoto,
+          photoUrl: e.photoUrl || (isTopWilcomEntry(e) ? body.wilcomDesignPhoto : undefined),
         }));
       } else {
         meta.wilcomEntries = [

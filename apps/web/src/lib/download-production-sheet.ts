@@ -1248,7 +1248,10 @@ export async function downloadProductionSheetHtml(program: any, category: Garmen
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Production_Sheet${category === 'ALL' ? 's_All' : `_${String(category).replace(/[^a-z0-9_-]+/gi, '_')}`}_${serialNo}.html`;
+    const categoryName = category === 'ALL' || category === 'TOP' || category === 'BOTTOM' || category === 'DUPATTA'
+      ? category
+      : extractSubStylesAndGrid(completeProgram, category).topName.trim() || 'INPUT';
+    a.download = `Production_Sheet${category === 'ALL' ? 's_All' : `_${String(categoryName).replace(/[^a-z0-9_-]+/gi, '_')}`}_${serialNo}.html`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

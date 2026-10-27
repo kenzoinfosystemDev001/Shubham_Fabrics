@@ -179,7 +179,7 @@ export function ProductionSheetPrintModal({
               className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer disabled:cursor-wait"
             >
               <Printer className="w-3.5 h-3.5" />
-              <span>Print {activeTab} Sheet</span>
+              <span>Print {activeTabName} Sheet</span>
             </button>
             <button
               type="button"
@@ -188,7 +188,7 @@ export function ProductionSheetPrintModal({
               className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-xs transition cursor-pointer disabled:cursor-wait"
             >
               <Download className="w-3.5 h-3.5" />
-              <span>Download {activeTab} Sheet</span>
+              <span>Download {activeTabName} Sheet</span>
             </button>
             <button
               type="button"
