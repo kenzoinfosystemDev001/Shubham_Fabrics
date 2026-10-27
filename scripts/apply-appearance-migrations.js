@@ -2,12 +2,17 @@
 // the app needs, each ONCE: applied files are recorded in the "_manual_migrations" table, so later runs only
 // check that table. A file is applied again only if its contents change (every file is re-runnable).
 //
-// Runs automatically when the web app starts (apps/web/src/instrumentation.ts, with --soft), so a newly
+// Runs automatically before the web app starts (apps/web "predev" / "prestart", with --soft), so a newly
 // added migration reaches the database without anyone having to remember a command. It can also be run by
 // hand from the Shubham_Fabrics folder:  node scripts/apply-appearance-migrations.js
 //
 // Flags:  --soft   never fail the caller (prints the problem and exits 0, so the app still starts)
 //         --force  apply every file again
+//         --vercel-production  run only in a Vercel production build (VERCEL_ENV=production) and skip
+//                  everywhere else. apps/web "prebuild" uses it, so a production deploy applies its
+//                  migrations before the new code goes live; preview builds of unmerged branches never
+//                  change the shared database. A failure fails the build, so code never ships ahead of
+//                  its database.
 //
 // All files are additive and re-runnable except 20261026_inventory_department.sql, which moves records from
 // the department code PACKING to INVENTORY (see that file; it applies all-or-nothing).
@@ -33,13 +38,20 @@ const MIGRATIONS = [
   '20261025_work_item_source.sql',
   '20261026_inventory_packing.sql',
   '20261026_inventory_department.sql',
-  '20261027_roll_units.sql',
+  '20261026_stock_imports.sql',
+  '20261026_grn_unit.sql',
+  '20261026_mtr_pcs_per_item.sql',
   '20261027_inward_bill_details.sql',
 ];
 
 const args = new Set(process.argv.slice(2));
 const SOFT = args.has('--soft');
 const FORCE = args.has('--force');
+
+if (args.has('--vercel-production') && process.env.VERCEL_ENV !== 'production') {
+  console.log(`[migrations] Skipped: not a Vercel production build (VERCEL_ENV=${process.env.VERCEL_ENV || 'unset'}).`);
+  process.exit(0);
+}
 
 function fail(message) {
   console.error(`\n[migrations] ${message}`);

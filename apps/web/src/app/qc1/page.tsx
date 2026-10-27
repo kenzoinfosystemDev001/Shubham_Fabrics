@@ -11,7 +11,6 @@ import {
   PackageCheck,
 } from 'lucide-react';
 import { api } from '@/lib/api';
-import { formatUnitTotals } from '@/lib/fabric-stock';
 import { DeadlineAlertsPanel } from '@/components/alerts/DeadlineAlertsPanel';
 
 export default function QC1Dashboard() {
@@ -62,12 +61,12 @@ export default function QC1Dashboard() {
     failed: 0,
     rework: 0,
     hold: 0,
-    totalQuantityReceived: {},
-    totalQuantityInspected: {},
-    passedQuantity: {},
-    failedQuantity: {},
-    reworkQuantity: {},
-    holdQuantity: {},
+    totalQuantityReceived: 0,
+    totalQuantityInspected: 0,
+    passedQuantity: 0,
+    failedQuantity: 0,
+    reworkQuantity: 0,
+    holdQuantity: 0,
   };
 
   const priorityWork = data?.priorityWork || [];
@@ -90,12 +89,12 @@ export default function QC1Dashboard() {
   ];
 
   const quantityStats = [
-    { label: 'Total Received', value: kpis.totalQuantityReceived, tone: 'text-neutral-900' },
-    { label: 'Total Inspected', value: kpis.totalQuantityInspected, tone: 'text-brand-700' },
-    { label: 'Passed', value: kpis.passedQuantity, tone: 'text-neutral-900' },
-    { label: 'Rejected', value: kpis.failedQuantity, tone: 'text-danger-700' },
-    { label: 'Rework', value: kpis.reworkQuantity, tone: 'text-brand-700' },
-    { label: 'On Hold', value: kpis.holdQuantity, tone: 'text-neutral-900' },
+    { label: 'Total Received', value: kpis.totalQuantityReceivedText ?? kpis.totalQuantityReceived, tone: 'text-neutral-900' },
+    { label: 'Total Inspected', value: kpis.totalQuantityInspectedText ?? kpis.totalQuantityInspected, tone: 'text-brand-700' },
+    { label: 'Passed', value: kpis.passedQuantityText ?? kpis.passedQuantity, tone: 'text-neutral-900' },
+    { label: 'Rejected', value: kpis.failedQuantityText ?? kpis.failedQuantity, tone: 'text-danger-700' },
+    { label: 'Rework', value: kpis.reworkQuantityText ?? kpis.reworkQuantity, tone: 'text-brand-700' },
+    { label: 'On Hold', value: kpis.holdQuantityText ?? kpis.holdQuantity, tone: 'text-neutral-900' },
   ];
 
   const fmtStatus = (s: any) => String(s ?? '').replace(/_/g, ' ');
@@ -160,16 +159,16 @@ export default function QC1Dashboard() {
           ))}
         </section>
 
-        {/* QUANTITIES (per unit: MTR and PCS are never added together) */}
+        {/* QUANTITIES (MTR) */}
         <section className={panel}>
           <div className={panelHeader}>
-            <h2 className="text-sm font-bold text-neutral-900">Quantities</h2>
+            <h2 className="text-sm font-bold text-neutral-900">Quantities (MTR)</h2>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
             {quantityStats.map((s) => (
               <div key={s.label} className="px-5 py-4">
                 <p className={`text-xl font-bold tabular-nums leading-none ${s.tone}`}>
-                  {typeof s.value === 'number' ? s.value.toLocaleString() : formatUnitTotals(s.value)}
+                  {typeof s.value === 'string' ? s.value : Number(s.value || 0).toLocaleString()}
                 </p>
                 <p className="text-xs font-medium text-neutral-500 mt-2">{s.label}</p>
               </div>
@@ -206,7 +205,7 @@ export default function QC1Dashboard() {
                     </div>
                     <div className="text-right shrink-0">
                       <span className="font-mono font-semibold text-neutral-900 block tabular-nums">
-                        {item.quantity} {item.uom}
+                        {item.quantityText ?? `${item.quantity} ${item.uom}`}
                       </span>
                       <span className="text-[10px] text-neutral-500 uppercase font-medium">{fmtStatus(item.status)}</span>
                     </div>
@@ -236,7 +235,7 @@ export default function QC1Dashboard() {
                         <span className="text-[11px] text-neutral-600 truncate">({item.clientName})</span>
                       </div>
                       <p className="text-[11px] text-neutral-500 mt-0.5">
-                        Challan: <span className="font-mono">{item.challanNumber}</span> · {item.quantity} {item.uom}
+                        Challan: <span className="font-mono">{item.challanNumber}</span> · {item.quantityText ?? `${item.quantity} ${item.uom}`}
                       </p>
                     </div>
                     <div className="text-right shrink-0">

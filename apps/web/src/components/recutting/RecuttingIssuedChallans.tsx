@@ -6,6 +6,7 @@ import { Search } from 'lucide-react';
 import { BTN_PRIMARY, ChallanBarcode, DocumentsButton, EmptyRow, FIELD, FabricStatusBadge, Notice, PageHeader, Panel, THEAD, fetchJson, fmtDate, fmtQty, sheetRef } from '@/components/workflow/WorkflowUi';
 import { CategoryBadge } from '@/components/recutting/RecuttingUi';
 import { CATEGORY_LABEL, GARMENT_CATEGORIES } from '@/lib/recutting.mjs';
+import { formatTotals, totalsByUnit } from '@/lib/challan-units.mjs';
 
 export function RecuttingIssuedChallans() {
   const [rows, setRows] = useState<any[]>([]);
@@ -84,7 +85,6 @@ export function RecuttingIssuedChallans() {
               <tbody className="divide-y divide-neutral-100">
                 {!loading && rows.length === 0 && <EmptyRow colSpan={7} text="No challans issued to Stitching yet" />}
                 {rows.map((c) => {
-                  const unit = c.items?.[0]?.uom;
                   const open = expanded === c.id;
                   return (
                     <React.Fragment key={c.id}>
@@ -110,7 +110,7 @@ export function RecuttingIssuedChallans() {
                           ))}
                         </td>
                         <td className="py-3 px-3 text-right tabular-nums whitespace-nowrap">
-                          {fmtQty((c.items || []).reduce((s: number, i: any) => s + (Number(i.quantity) || 0), 0), unit)}
+                          {formatTotals(totalsByUnit(c.items || []), '—')}
                         </td>
                         <td className="py-3 px-3 text-xs">{String(c.status || '').replace(/_/g, ' ')}</td>
                         <td className="py-3 px-3 text-right"><DocumentsButton programId={c.programId} challanId={c.id} /></td>

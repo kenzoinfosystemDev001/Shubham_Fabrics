@@ -82,7 +82,6 @@ export async function POST(request: Request) {
             batchId: roll.batchId,
             transactionType: 'RETURN',
             quantity: roll.length,
-            uom: roll.unit,
             referenceType: 'RETURN_CHALLAN',
             referenceId: roll.id,
             transactedById: actor.id,
@@ -129,7 +128,7 @@ export async function GET(request: Request) {
     const issuedRolls = await prisma.fabricStoreRoll.findMany({
       where: { status: 'ISSUED' },
       include: {
-        batch: { select: { batchNumber: true, fabricType: true, fabricDescription: true } },
+        batch: { select: { batchNumber: true, fabricType: true, fabricDescription: true, unit: true } },
         programIssuedTo: { select: { programNumber: true, clientName: true } },
         location: { select: { locationCode: true } },
       },

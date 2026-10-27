@@ -599,6 +599,7 @@ exports.Prisma.ChallanScalarFieldEnum = {
   fabricOut: 'fabricOut',
   fabricUnit: 'fabricUnit',
   defectivePieces: 'defectivePieces',
+  defectiveUnit: 'defectiveUnit',
   defectiveShelfLocation: 'defectiveShelfLocation',
   defectReason: 'defectReason',
   detectedFromChallanId: 'detectedFromChallanId',
@@ -837,6 +838,7 @@ exports.Prisma.DefectRecordScalarFieldEnum = {
   itemDescription: 'itemDescription',
   severity: 'severity',
   quantity: 'quantity',
+  uom: 'uom',
   reason: 'reason',
   detectedById: 'detectedById',
   status: 'status',
@@ -949,7 +951,7 @@ exports.Prisma.FabricBatchScalarFieldEnum = {
   colorName: 'colorName',
   totalRolls: 'totalRolls',
   totalMeters: 'totalMeters',
-  totalPieces: 'totalPieces',
+  unit: 'unit',
   status: 'status',
   receivedAt: 'receivedAt',
   createdById: 'createdById',
@@ -963,7 +965,6 @@ exports.Prisma.FabricStoreRollScalarFieldEnum = {
   batchId: 'batchId',
   locationId: 'locationId',
   length: 'length',
-  unit: 'unit',
   width: 'width',
   weight: 'weight',
   status: 'status',
@@ -988,7 +989,6 @@ exports.Prisma.MaterialReceiptScalarFieldEnum = {
   supplierName: 'supplierName',
   totalRollsReceived: 'totalRollsReceived',
   totalMetersReceived: 'totalMetersReceived',
-  totalPiecesReceived: 'totalPiecesReceived',
   status: 'status',
   remarks: 'remarks',
   createdAt: 'createdAt',
@@ -1025,7 +1025,6 @@ exports.Prisma.FabricStockLedgerScalarFieldEnum = {
   batchId: 'batchId',
   transactionType: 'transactionType',
   quantity: 'quantity',
-  uom: 'uom',
   referenceType: 'referenceType',
   referenceId: 'referenceId',
   fromLocationId: 'fromLocationId',
@@ -1199,6 +1198,17 @@ exports.Prisma.FabricInwardScalarFieldEnum = {
   hsnCode: 'hsnCode',
   taxPercent: 'taxPercent',
   remarks: 'remarks',
+  rollNumber: 'rollNumber',
+  rollKey: 'rollKey',
+  batchNumber: 'batchNumber',
+  shade: 'shade',
+  composition: 'composition',
+  width: 'width',
+  unitRate: 'unitRate',
+  storageLocation: 'storageLocation',
+  purchaseOrderNumber: 'purchaseOrderNumber',
+  importId: 'importId',
+  importRowNumber: 'importRowNumber',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -1222,6 +1232,45 @@ exports.Prisma.FabricOutwardScalarFieldEnum = {
   fabricType: 'fabricType',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.FabricStockImportScalarFieldEnum = {
+  id: 'id',
+  status: 'status',
+  fileName: 'fileName',
+  fileHash: 'fileHash',
+  fileSize: 'fileSize',
+  fileData: 'fileData',
+  sheetsJson: 'sheetsJson',
+  selectedSheet: 'selectedSheet',
+  headerRow: 'headerRow',
+  mappingJson: 'mappingJson',
+  correctionsJson: 'correctionsJson',
+  resolutionsJson: 'resolutionsJson',
+  validationJson: 'validationJson',
+  payloadHash: 'payloadHash',
+  receiptNumber: 'receiptNumber',
+  confirmKey: 'confirmKey',
+  postedAt: 'postedAt',
+  postedById: 'postedById',
+  postedResultJson: 'postedResultJson',
+  failureReason: 'failureReason',
+  uploadedById: 'uploadedById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.FabricStockImportDocumentScalarFieldEnum = {
+  id: 'id',
+  importId: 'importId',
+  kind: 'kind',
+  sheetName: 'sheetName',
+  mimeType: 'mimeType',
+  size: 'size',
+  sha256: 'sha256',
+  data: 'data',
+  ocrStatus: 'ocrStatus',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.DeadlineAlertScalarFieldEnum = {
@@ -1293,6 +1342,30 @@ exports.Prisma.GarmentImageScalarFieldEnum = {
   version: 'version',
   uploadedById: 'uploadedById',
   createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.StockImportScalarFieldEnum = {
+  id: 'id',
+  source: 'source',
+  fileName: 'fileName',
+  mimeType: 'mimeType',
+  fileSize: 'fileSize',
+  fileHash: 'fileHash',
+  fileData: 'fileData',
+  status: 'status',
+  extractedJson: 'extractedJson',
+  rowCount: 'rowCount',
+  engine: 'engine',
+  uploadedById: 'uploadedById',
+  uploadedAt: 'uploadedAt',
+  confirmKey: 'confirmKey',
+  confirmedById: 'confirmedById',
+  confirmedAt: 'confirmedAt',
+  confirmedJson: 'confirmedJson',
+  resultJson: 'resultJson',
+  addedCount: 'addedCount',
+  skippedCount: 'skippedCount',
   updatedAt: 'updatedAt'
 };
 
@@ -1465,10 +1538,13 @@ exports.Prisma.ModelName = {
   WorkItemInspection: 'WorkItemInspection',
   FabricInward: 'FabricInward',
   FabricOutward: 'FabricOutward',
+  FabricStockImport: 'FabricStockImport',
+  FabricStockImportDocument: 'FabricStockImportDocument',
   DeadlineAlert: 'DeadlineAlert',
   DeadlineAlertDismissal: 'DeadlineAlertDismissal',
   PackingAllocation: 'PackingAllocation',
   GarmentImage: 'GarmentImage',
+  StockImport: 'StockImport',
   ManualMigration: 'ManualMigration'
 };
 

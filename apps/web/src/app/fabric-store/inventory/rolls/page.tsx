@@ -198,7 +198,7 @@ function InventoryRollsContent() {
                     <th className="py-3 px-4">Roll Number</th>
                     <th className="py-3 px-4">Batch #</th>
                     <th className="py-3 px-4">Fabric Description</th>
-                    <th className="py-3 px-4">Quantity</th>
+                    <th className="py-3 px-4">Length</th>
                     <th className="py-3 px-4">Width</th>
                     <th className="py-3 px-4">Weight</th>
                     <th className="py-3 px-4">Location</th>
@@ -217,7 +217,7 @@ function InventoryRollsContent() {
                         <span className="text-[10px] text-neutral-500">{roll.batch?.fabricDescription}</span>
                       </td>
                       <td className="py-3 px-4 font-mono font-bold text-neutral-900">
-                        {parseFloat(roll.length).toFixed(2)} {roll.unit || 'MTR'}
+                        {parseFloat(roll.length).toFixed(2)} {roll.batch?.unit || 'MTR'}
                       </td>
                       <td className="py-3 px-4 font-mono text-neutral-600">
                         {roll.width ? `${roll.width} cm` : '—'}

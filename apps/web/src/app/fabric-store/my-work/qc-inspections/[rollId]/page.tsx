@@ -191,8 +191,8 @@ export default function ConductQCPage() {
               <span className="font-semibold text-neutral-900">{roll.batch?.colorName || 'Natural'}</span>
             </div>
             <div>
-              <span className="text-neutral-500 block text-[10px] font-bold uppercase">Measured Quantity</span>
-              <span className="font-mono font-bold text-brand-800 text-sm">{parseFloat(roll.length).toFixed(2)} {roll.unit || 'MTR'}</span>
+              <span className="text-neutral-500 block text-[10px] font-bold uppercase">Measured Length</span>
+              <span className="font-mono font-bold text-brand-800 text-sm">{parseFloat(roll.length).toFixed(2)} {roll.batch?.unit || 'MTR'}</span>
             </div>
             <div>
               <span className="text-neutral-500 block text-[10px] font-bold uppercase">Measured Width</span>

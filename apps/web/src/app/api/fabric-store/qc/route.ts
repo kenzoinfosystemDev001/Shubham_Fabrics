@@ -20,7 +20,7 @@ export async function GET(request: Request) {
         include: {
           roll: {
             include: {
-              batch: { select: { batchNumber: true, fabricType: true, fabricDescription: true } },
+              batch: { select: { batchNumber: true, fabricType: true, fabricDescription: true, unit: true } },
               location: { select: { locationCode: true } },
             },
           },
@@ -46,6 +46,7 @@ export async function GET(request: Request) {
             fabricDescription: true,
             colorName: true,
             supplierId: true,
+            unit: true,
           },
         },
         receiptItems: {
@@ -169,7 +170,6 @@ export async function POST(request: Request) {
           batchId: roll.batchId,
           transactionType: transactionTypeMap[result] as any,
           quantity: roll.length,
-          uom: roll.unit,
           referenceType: 'QC_INSPECTION',
           referenceId: qci.id,
           transactedById: actor.id,

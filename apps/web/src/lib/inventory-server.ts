@@ -576,7 +576,8 @@ export const dashboard = (request: Request) =>
           beingPacked: sum(open.filter((a) => a.status !== 'SENT_FOR_PACKING').map((a) => a.open)),
           packed: sum(stocks.map((s) => s.packed)),
           remaining: sum(stocks.map((s) => s.remaining)),
-          awaitingReceipt: sum(items.filter((i) => i.status === 'AWAITING_RECEIPT').map((i) => i.expectedQuantity)),
+          // Pieces only: Inventory receives finished garments in PCS; lines in meters are never counted as pieces.
+          awaitingReceipt: sum(items.filter((i) => i.status === 'AWAITING_RECEIPT' && i.uom === INVENTORY_UNIT).map((i) => i.expectedQuantity)),
         },
         counts: {
           pendingChallans,

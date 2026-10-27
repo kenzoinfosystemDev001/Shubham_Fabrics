@@ -65,6 +65,8 @@ model User {
 
   // Smart Deadline Alerts
   deadlineAlertDismissals DeadlineAlertDismissal[]
+  fabricStockImportsUploaded FabricStockImport[] @relation("FabricStockImportUploader")
+  fabricStockImportsPosted   FabricStockImport[] @relation("FabricStockImportPoster")
 
   // Sidebar department images
   departmentImagesUploaded DepartmentImage[] @relation("DepartmentImageUploader")
@@ -736,8 +738,9 @@ model Challan {
   // Fabric / Piece In & Out Auto-Detection Tracking across Departments
   fabricIn               Float?
   fabricOut              Float?
-  fabricUnit             String?   @default("MTR")
-  defectivePieces        Float?    @default(0)
+  fabricUnit             String?   @default("MTR") // MTR | PCS | MIXED (lines in both units: totals come from the lines)
+  defectivePieces        Float?    @default(0) // defective quantity, in defectiveUnit
+  defectiveUnit          String?   // MTR | PCS; null on older challans, which used fabricUnit
   defectiveShelfLocation String?
   defectReason           String?
   detectedFromChallanId  String?
@@ -1074,7 +1077,8 @@ model DefectRecord {
   bundle          Bundle?             @relation(fields: [bundleId], references: [id])
   itemDescription String
   severity        String              // MINOR, MAJOR, CRITICAL
-  quantity        Int
+  quantity        Float
+  uom             String?             // MTR | PCS; null on older records
   reason          String
   detectedById    String
   detectedBy      User                @relation("DefectDetector", fields: [detectedById], references: [id])
@@ -1258,8 +1262,8 @@ model FabricBatch {
   colorCode          String?
   colorName          String?
   totalRolls         Int               @default(0)
-  totalMeters        Decimal           @default(0) @db.Decimal(10, 2) // rolls received in MTR
-  totalPieces        Decimal           @default(0) @db.Decimal(10, 2) // rolls received in PCS; never added to meters
+  totalMeters        Decimal           @default(0) @db.Decimal(10, 2) // total quantity, in `unit`
+  unit               String            @default("MTR") // "MTR" | "PCS"; every roll in the batch uses this unit
   status             FabricBatchStatus @default(PENDING_RECEIPT)
   receivedAt         DateTime?
   createdById        String
@@ -1301,8 +1305,7 @@ model FabricStoreRoll {
   batch              FabricBatch     @relation(fields: [batchId], references: [id])
   locationId         String?
   location           InventoryLocation? @relation("RollLocation", fields: [locationId], references: [id])
-  length             Decimal         @db.Decimal(10, 2) // quantity of the roll, in `unit`
-  unit               String          @default("MTR") // MTR or PCS; never converted
+  length             Decimal         @db.Decimal(10, 2) // quantity in batch.unit (MTR or PCS)
   width              Decimal?        @db.Decimal(10, 2) // cm
   weight             Decimal?        @db.Decimal(10, 3) // kg
   status             FabricRollStatus @default(RECEIVED)
@@ -1347,8 +1350,7 @@ model MaterialReceipt {
   vehicleNumber       String?
   supplierName        String
   totalRollsReceived  Int          @default(0)
-  totalMetersReceived Decimal      @default(0) @db.Decimal(10, 2) // rolls received in MTR
-  totalPiecesReceived Decimal      @default(0) @db.Decimal(10, 2) // rolls received in PCS
+  totalMetersReceived Decimal      @default(0) @db.Decimal(10, 2)
   status              GRNStatus    @default(DRAFT)
   remarks             String?
   createdAt           DateTime     @default(now())
@@ -1424,8 +1426,7 @@ model FabricStockLedger {
   batchId         String
   batch           FabricBatch          @relation(fields: [batchId], references: [id])
   transactionType StockTransactionType
-  quantity        Decimal              @db.Decimal(10, 2) // quantity moved, in `uom`
-  uom             String               @default("MTR") // MTR or PCS, the roll's unit
+  quantity        Decimal              @db.Decimal(10, 2) // meters moved
   referenceType   String               // "GRN", "ISSUE_CHALLAN", "RETURN_CHALLAN", "QC_HOLD"
   referenceId     String               // the relevant document ID
   fromLocationId  String?
@@ -1702,12 +1703,26 @@ model FabricInward {
   hsnCode       String?
   taxPercent    Float?
   remarks       String?
+  // Roll / commercial details (Excel stock import; null on manual entries)
+  rollNumber          String?
+  rollKey             String?   @unique // normalized supplier + roll number; one roll per supplier
+  batchNumber         String?
+  shade               String?
+  composition         String?
+  width               String?
+  unitRate            Float?
+  storageLocation     String?
+  purchaseOrderNumber String?
+  importId            String?
+  import              FabricStockImport? @relation(fields: [importId], references: [id])
+  importRowNumber     Int?      // worksheet row the entry came from
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
   @@index([entryType])
   @@index([billNo])
   @@index([receivingDate])
+  @@index([importId])
 }
 
 model FabricOutward {
@@ -1733,6 +1748,61 @@ model FabricOutward {
   @@index([challanNumber])
   @@index([designNumber])
   @@index([date])
+}
+
+// Excel stock inward import. The uploaded workbook is evidence only; stock changes when an
+// authorized user confirms a fully valid import, which creates FabricInward rows and posts them
+// to StockLedgerEntry in one transaction. A posted import is the inward receipt.
+model FabricStockImport {
+  id               String    @id @default(uuid())
+  status           String    @default("UPLOADED") // see lib/fabric-stock-import/state.mjs
+  fileName         String    // as uploaded; display only, never used as a path
+  fileHash         String    // SHA-256 of the file bytes
+  fileSize         Int
+  fileData         Bytes     // original workbook, served only to authorized users
+  sheetsJson       String    @db.Text // cell values of each worksheet, read once at upload
+  selectedSheet    String?
+  headerRow        Int?
+  mappingJson      String?   @db.Text
+  correctionsJson  String?   @db.Text
+  resolutionsJson  String?   @db.Text
+  validationJson   String?   @db.Text
+  payloadHash      String?   // hash of the rows the user previewed; confirmation must match it
+  receiptNumber    String?   @unique
+  confirmKey       String?   @unique // idempotency key of the confirmation that posted it
+  postedAt         DateTime?
+  postedById       String?
+  postedBy         User?     @relation("FabricStockImportPoster", fields: [postedById], references: [id])
+  postedResultJson String?   @db.Text
+  failureReason    String?
+  uploadedById     String
+  uploadedBy       User      @relation("FabricStockImportUploader", fields: [uploadedById], references: [id])
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  inwards          FabricInward[]
+  documents        FabricStockImportDocument[]
+
+  @@index([fileHash])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// Images embedded in an imported workbook (scanned invoices, delivery challans), kept as evidence.
+model FabricStockImportDocument {
+  id        String            @id @default(uuid())
+  importId  String
+  import    FabricStockImport @relation(fields: [importId], references: [id], onDelete: Cascade)
+  kind      String            // EMBEDDED_IMAGE
+  sheetName String?
+  mimeType  String
+  size      Int
+  sha256    String
+  data      Bytes
+  ocrStatus String            @default("NOT_CONFIGURED") // OCR is not enabled; see docs/fabric-store-stock-inward/OCR_DESIGN.md
+  createdAt DateTime          @default(now())
+
+  @@index([importId])
 }
 
 // ==========================================
@@ -1846,6 +1916,35 @@ model GarmentImage {
   @@unique([programId, garmentCategory, styleRef])
 }
 
+// Fabric Store "Upload Stock Sheet" (photo, scan or Excel). Audit record of one uploaded file: the original
+// bytes, the rows read from it, and - once a user confirmed the reviewed rows - who confirmed and which
+// FabricInward rows were created. Unconfirmed imports never touch stock.
+model StockImport {
+  id            String    @id @default(uuid())
+  source        String    // IMAGE or EXCEL
+  fileName      String
+  mimeType      String
+  fileSize      Int
+  fileHash      String    // sha256 of the file; the same file uploaded again is flagged
+  fileData      Bytes
+  status        String    @default("EXTRACTED") // EXTRACTED | CONFIRMED | DISCARDED
+  extractedJson Json?     // rows and header exactly as read, with confidence and warnings
+  rowCount      Int       @default(0)
+  engine        String?   // e.g. claude-opus-5-5, sheetjs
+  uploadedById  String
+  uploadedAt    DateTime  @default(now())
+  confirmKey    String?   @unique // idempotency key of the confirm request; a retry returns the same result
+  confirmedById String?
+  confirmedAt   DateTime?
+  confirmedJson Json?     // rows as the user confirmed them
+  resultJson    Json?     // created inward ids and skipped rows with reasons
+  addedCount    Int       @default(0)
+  skippedCount  Int       @default(0)
+  updatedAt     DateTime  @updatedAt
+
+  @@index([fileHash])
+  @@index([uploadedAt])
+}
 
 // Manual migrations already applied (scripts/apply-appearance-migrations.js, run before the web app starts).
 // Created by that script; kept here so prisma db push never treats the table as unknown.

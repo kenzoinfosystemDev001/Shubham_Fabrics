@@ -103,7 +103,6 @@ export async function PATCH(
               batchId: roll.batchId,
               transactionType: isWriteOff ? 'WRITE_OFF' : isTransfer ? 'TRANSFER' : 'ADJUSTMENT',
               quantity: roll.length,
-              uom: roll.unit,
               referenceType: isWriteOff ? 'SCRAP_QUARANTINE' : isTransfer ? 'LOCATION_TRANSFER' : 'QC_RELEASE',
               referenceId: roll.id,
               fromLocationId: roll.locationId || null,

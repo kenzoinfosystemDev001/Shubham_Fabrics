@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { PackageCheck, Plus, RefreshCw, Eye, CheckCircle2 } from 'lucide-react';
-import { formatUnitTotals } from '@/lib/fabric-stock';
 
 export default function MaterialReceiptListPage() {
   const [loading, setLoading] = useState(true);
@@ -152,7 +151,7 @@ export default function MaterialReceiptListPage() {
                     <th className="py-3 px-4">Batch Number</th>
                     <th className="py-3 px-4">Fabric Details</th>
                     <th className="py-3 px-4">Rolls</th>
-                    <th className="py-3 px-4">Total Quantity</th>
+                    <th className="py-3 px-4">Total Qty</th>
                     <th className="py-3 px-4">Status</th>
                     <th className="py-3 px-4 text-right">Actions</th>
                   </tr>
@@ -185,7 +184,7 @@ export default function MaterialReceiptListPage() {
                         {grn.totalRollsReceived}
                       </td>
                       <td className="py-3.5 px-4 font-mono font-semibold text-neutral-900">
-                        {formatUnitTotals({ MTR: parseFloat(grn.totalMetersReceived) || 0, PCS: parseFloat(grn.totalPiecesReceived) || 0 })}
+                        {parseFloat(grn.totalMetersReceived).toFixed(2)} {grn.batch?.unit || 'MTR'}
                       </td>
                       <td className="py-3.5 px-4">{statusBadge(grn.status)}</td>
                       <td className="py-3.5 px-4 text-right space-x-2">

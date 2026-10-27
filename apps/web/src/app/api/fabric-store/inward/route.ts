@@ -35,6 +35,8 @@ export async function GET(request: Request) {
         { itemName: { contains: search, mode: 'insensitive' } },
         { billNo: { contains: search, mode: 'insensitive' } },
         { colour: { contains: search, mode: 'insensitive' } },
+        { rollNumber: { contains: search, mode: 'insensitive' } },
+        { remarks: { contains: search, mode: 'insensitive' } },
         { supplierName: { contains: search, mode: 'insensitive' } },
         { hsnCode: { contains: search, mode: 'insensitive' } },
         { billerStateCity: { contains: search, mode: 'insensitive' } },

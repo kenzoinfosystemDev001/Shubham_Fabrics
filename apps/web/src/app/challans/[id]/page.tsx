@@ -42,13 +42,13 @@ import {
   printBarcodeSticker,
   generateCode128SvgBars 
 } from '@/lib/barcode';
+import { challanTotalsByUnit, formatTotals, unitOf } from '@/lib/challan-units.mjs';
 import { 
   downloadChallanHtml, 
   printChallan 
 } from '@/lib/download-challan';
 import { FinishedGarmentList, useGarmentImages } from '@/components/workflow/FinishedGarments';
 import { isFinishedGoodsChallan } from '@/lib/finished-garments.mjs';
-import { lineTotals } from '@/lib/fabric-stock';
 
 export default function ChallanDetailPage() {
   const { id } = useParams() as { id: string };
@@ -205,8 +205,11 @@ export default function ChallanDetailPage() {
 
   const deptDisplay = challan ? (deptLabels[challan.fromDepartment] || challan.fromDepartment || 'PRODUCTION') : 'PRODUCTION';
 
-  // Lines may be in MTR and PCS; the total is per unit and never added together.
-  const itemTotals = lineTotals(challan?.items || [], challan?.fabricUnit || 'PCS');
+  // Each line keeps its unit: totals are per unit, never MTR + PCS.
+  const unitTotals: Record<string, number> = challan ? challanTotalsByUnit(challan) : {};
+  const totalUnits = Object.keys(unitTotals);
+  const singleUnit = totalUnits.length === 1 ? totalUnits[0] : null;
+  const totalQtyText = singleUnit ? String(unitTotals[singleUnit]) : formatTotals(unitTotals);
 
   const barcodeStickerParams: BarcodeStickerParams | null = challan ? {
     challanNumber: challan.challanNumber,
@@ -217,8 +220,8 @@ export default function ChallanDetailPage() {
     programSerialNo: challan.program?.programSerialNo || challan.program?.programNumber || '—',
     clientName: challan.program?.clientName || challan.program?.buyerName || 'Standard Client',
     mainStyle: challan.program?.mainStyle || challan.program?.styleCode || '—',
-    totalQuantity: itemTotals.single ? itemTotals.single.quantity : itemTotals.label,
-    uom: itemTotals.single ? itemTotals.single.unit : '',
+    totalQuantity: totalQtyText,
+    uom: singleUnit || '',
     date: challan.createdAt ? new Date(challan.createdAt).toLocaleDateString('en-IN') : new Date().toLocaleDateString('en-IN')
   } : null;
 
@@ -581,10 +584,8 @@ export default function ChallanDetailPage() {
 
           {/* TOTAL PIECES CALCULATION & QC2 CHECKING DIRECTIVE */}
           {(() => {
-            const totalQuantity = (challan.items || []).reduce(
-              (sum: number, it: any) => sum + (Number(it.quantity) || 0),
-              0
-            );
+            // Per-unit total text ("30 MTR · 10 PCS"); never one sum across units.
+            const totalQuantityText = formatTotals(unitTotals);
             const isThreadCuttingToQc2 =
               challan.fromDepartment === 'THREAD_CUTTING' && challan.toDepartment === 'QC2';
 
@@ -608,7 +609,7 @@ export default function ChallanDetailPage() {
                       <div className="text-left sm:text-right bg-white px-3.5 py-1.5 rounded-xl border border-accent-300">
                         <span className="text-[10px] uppercase font-bold text-neutral-500 block">Pieces Dispatched to Threadcut QC</span>
                         <strong className="text-lg font-mono font-black text-neutral-900">
-                          {totalQuantity} PCS
+                          {totalQuantityText}
                         </strong>
                       </div>
                     </div>
@@ -617,10 +618,17 @@ export default function ChallanDetailPage() {
 
                 {/* DEPARTMENT PIECE / FABRIC IN & OUT AUTO-DETECTION & DEFECTIVE SHELF AUDIT CARD */}
                 {!finishedGoods && (() => {
-                  const fIn = challan.fabricIn ?? (challan.parentChallan?.fabricOut || totalQuantity);
-                  const fOut = challan.fabricOut ?? totalQuantity;
+                  // Header in/out hold one unit; a challan with lines in both units shows its per-unit line totals.
+                  const fUnit = singleUnit || unitOf(challan.fabricUnit) || '';
+                  const lineTotal = singleUnit ? unitTotals[singleUnit] : null;
+                  const fInQty = challan.fabricIn ?? (challan.parentChallan?.fabricOut || lineTotal);
+                  const fOutQty = challan.fabricOut ?? lineTotal;
+                  const fIn = fInQty ?? totalQtyText;
+                  const fOut = fOutQty ?? totalQtyText;
                   const fDef = challan.defectivePieces ?? 0;
-                  const fUnit = challan.fabricUnit || challan.items?.[0]?.uom || 'MTR';
+                  const dUnit = unitOf(challan.defectiveUnit) || unitOf(challan.fabricUnit) || '';
+                  const inUnit = fInQty != null ? fUnit : '';
+                  const outUnit = fOutQty != null ? fUnit : '';
                   const shelf = challan.defectiveShelfLocation || 'DEF-SHELF-01 (Fabric Store Quarantined Shelf)';
                   const reason = challan.defectReason || 'Quality Defect / Trimming Rejection';
                   const detectedSource = challan.detectedFromDepartment || challan.parentChallan?.fromDepartment;
@@ -650,7 +658,7 @@ export default function ChallanDetailPage() {
                             1. Fabric / Pieces IN
                           </span>
                           <div className="text-xl font-mono font-bold text-neutral-900">
-                            {fIn} <span className="text-xs font-normal text-neutral-500">{fUnit}</span>
+                            {fIn} <span className="text-xs font-normal text-neutral-500">{inUnit}</span>
                           </div>
                           <span className="text-[10px] text-neutral-500 block truncate">
                             {detectedSource ? `Source: ${detectedSource}` : `From: ${challan.fromDepartment}`}
@@ -668,7 +676,7 @@ export default function ChallanDetailPage() {
                             </span>
                           </div>
                           <div className="text-xl font-mono font-bold text-danger-600">
-                            {fDef} <span className="text-xs font-normal text-danger-600">{fUnit}</span>
+                            {fDef} <span className="text-xs font-normal text-danger-600">{dUnit}</span>
                           </div>
                           <span className="text-[10px] text-danger-800 block truncate" title={shelf}>
                             {fDef > 0 ? `Station Shelf: ${shelf} | Central Hub: DEF-SHELF-CENTRAL` : 'Zero defects cut'}
@@ -686,7 +694,7 @@ export default function ChallanDetailPage() {
                             </span>
                           </div>
                           <div className="text-xl font-mono font-black text-neutral-900">
-                            {fOut} <span className="text-xs font-normal text-accent-700">{fUnit}</span>
+                            {fOut} <span className="text-xs font-normal text-accent-700">{outUnit}</span>
                           </div>
                           <span className="text-[10px] text-accent-700 block truncate">
                             Auto-detected by {challan.toDepartment}
@@ -697,7 +705,7 @@ export default function ChallanDetailPage() {
                       {/* BALANCE BAR */}
                       <div className="pt-2 border-t border-neutral-200 flex items-center justify-between text-[11px] font-mono text-neutral-700">
                         <span>
-                          Accounting: <strong>{fIn} {fUnit} IN</strong> = <strong>{fDef} {fUnit} CUT</strong> (To Shelf) + <strong>{fOut} {fUnit} OUT</strong> (To {challan.toDepartment})
+                          Accounting: <strong>{fIn} {inUnit} IN</strong> = <strong>{fDef} {dUnit} CUT</strong> (To Shelf) + <strong>{fOut} {outUnit} OUT</strong> (To {challan.toDepartment})
                         </span>
                         {fDef > 0 && (
                           <span className="text-accent-700 text-[10px]">
@@ -731,7 +739,7 @@ export default function ChallanDetailPage() {
                     </h3>
                     {isThreadCuttingToQc2 && (
                       <span className="text-[11px] font-mono font-bold text-accent-800 bg-accent-100 px-2.5 py-0.5 rounded border border-accent-200">
-                        Dispatched Pieces: {totalQuantity} PCS
+                        Dispatched Pieces: {totalQuantityText}
                       </span>
                     )}
                   </div>
@@ -773,10 +781,10 @@ export default function ChallanDetailPage() {
                               : 'Total Material Quantity:'}
                           </td>
                           <td className="py-2.5 px-4 text-right font-mono text-sm font-black text-neutral-900">
-                            {itemTotals.single ? totalQuantity : itemTotals.label}
+                            {totalQtyText}
                           </td>
                           <td className="py-2.5 px-4 font-bold text-neutral-700">
-                            {itemTotals.single ? itemTotals.single.unit : ''}
+                            {singleUnit || ''}
                           </td>
                         </tr>
                       </tfoot>
@@ -799,7 +807,7 @@ export default function ChallanDetailPage() {
                         : 'Dispatch Department'}
                     </span>
                     <span className="text-[10px] text-neutral-500 block">
-                      Authorized Issuer Signature (Dispatched: {totalQuantity} PCS)
+                      Authorized Issuer Signature (Dispatched: {totalQuantityText})
                     </span>
                   </div>
                   <div className="border-t border-dashed border-neutral-300 pt-2 text-center space-y-1">
@@ -808,7 +816,7 @@ export default function ChallanDetailPage() {
                     </span>
                     <span className="text-[10px] text-neutral-500 block">
                       {challan.toDepartment === 'QC2'
-                        ? `Checking Basis: ${totalQuantity} PCS | Checked: ____ | Passed: ____ | Defective: ____`
+                        ? `Checking Basis: ${totalQuantityText} | Checked: ____ | Passed: ____ | Defective: ____`
                         : 'Receiver Gate Inward Stamp & Signature'}
                     </span>
                   </div>

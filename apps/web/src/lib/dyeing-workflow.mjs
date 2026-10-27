@@ -4,6 +4,8 @@
 // Quantity flow per order:  expected (challan line) -> received -> dyed -> sent to QC1.
 // Each stage can only draw from the one before it, so nothing is counted twice.
 
+import { headerUnitOf } from './challan-units.mjs';
+
 export const DYEING_STATUS = /** @type {const} */ ({
   AWAITING_RECEIPT: 'AWAITING_RECEIPT',
   RECEIVED: 'RECEIVED',
@@ -200,7 +202,7 @@ export function validateProcessUpdate(order, input) {
 export function validateQcTransferLines(lines, ordersById) {
   if (!Array.isArray(lines) || lines.length === 0) return { ok: false, error: 'Add at least one item to transfer.' };
   const seen = new Set();
-  let unit = null;
+  const units = [];
   let programId = null;
   for (const [index, line] of lines.entries()) {
     const n = index + 1;
@@ -212,8 +214,8 @@ export function validateQcTransferLines(lines, ordersById) {
       return { ok: false, error: 'All items on one challan must belong to the same Production Sheet.' };
     }
     programId = order.programId;
-    if (unit && order.uom !== unit) return { ok: false, error: 'Meters and pieces cannot be mixed on one challan.' };
-    unit = order.uom;
+    // Each line keeps its own unit; meters and pieces are never added together.
+    units.push(order.uom);
     if (!['DYED', 'READY_FOR_QC1', 'PARTIALLY_SENT_TO_QC1'].includes(order.status)) {
       return { ok: false, error: `Line ${n}: ${order.orderNumber} is not ready for QC.` };
     }
@@ -227,5 +229,5 @@ export function validateQcTransferLines(lines, ordersById) {
       return { ok: false, error: `Line ${n}: only ${available} ${order.uom} of ${order.orderNumber} is available to transfer.` };
     }
   }
-  return { ok: true, unit: /** @type {string} */ (unit), programId: /** @type {string} */ (programId) };
+  return { ok: true, unit: /** @type {string} */ (headerUnitOf(units)), programId: /** @type {string} */ (programId) };
 }

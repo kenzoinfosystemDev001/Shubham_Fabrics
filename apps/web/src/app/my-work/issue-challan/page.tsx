@@ -20,8 +20,9 @@ import {
   Barcode as BarcodeIcon
 } from 'lucide-react';
 import { api } from '@/lib/api';
-import { 
-  ColorFabricMeasurementTable, 
+import { formatTotals, totalsByUnit } from '@/lib/challan-units.mjs';
+import {
+  ColorFabricMeasurementTable,
   ChallanItemData, 
   createBlankChallanItem,
   DepartmentInOutTracking
@@ -202,8 +203,7 @@ function IssueChallanContent() {
       setError('Please add at least one fabric item in COLOR / FABRIC / MEASUREMENT.');
       return;
     }
-
-    // Validate item rows
+    // Validate item rows (each row has its own quantity and unit)
     for (let i = 0; i < items.length; i++) {
       const it = items[i];
       if (!it.fabric.trim()) {
@@ -219,11 +219,13 @@ function IssueChallanContent() {
         setError(`Item #${i + 1}: Measurement / Quantity must be a positive number.`);
         return;
       }
-      if (it.unit !== 'MTR' && it.unit !== 'PCS') {
-        setError(`Item #${i + 1}: choose the unit (MTR or PCS).`);
-        return;
-      }
     }
+
+    // Meters and pieces are totalled separately; header totals exist only for a single-unit challan.
+    const lineUnit = (it: ChallanItemData) => (it.unit === 'PCS' ? 'PCS' : 'MTR');
+    const itemTotals = totalsByUnit(items.map((it) => ({ quantity: parseFloat(String(it.measurement)), uom: lineUnit(it) })));
+    const itemUnits = Object.keys(itemTotals);
+    const singleUnit = itemUnits.length === 1 ? itemUnits[0] : null;
 
     setLoading(true);
     try {
@@ -237,12 +239,13 @@ function IssueChallanContent() {
         priority,
         status: 'ISSUED',
         issuedDate: challanDate,
-        fabricIn: tracking.fabricIn,
+        fabricIn: singleUnit ? tracking.fabricIn : undefined,
         defectivePieces: tracking.defectivePieces,
+        defectiveUnit: tracking.defectivePieces > 0 ? tracking.fabricUnit : undefined,
         defectiveShelfLocation: tracking.defectiveShelfLocation,
         defectReason: tracking.defectReason,
-        fabricOut: tracking.fabricOut,
-        fabricUnit: items.some((it) => it.unit === tracking.fabricUnit) ? tracking.fabricUnit : items[0]?.unit,
+        fabricOut: singleUnit ? tracking.fabricOut : undefined,
+        fabricUnit: singleUnit || undefined,
         detectedFromDepartment: 'PROGRAMMING',
         remarks: [
           remarks,
@@ -250,15 +253,16 @@ function IssueChallanContent() {
           serialNumber ? `Serial: ${serialNumber}` : null,
           inchargeName ? `Incharge: ${inchargeName}` : null,
           deliveryDate ? `Delivery Date: ${deliveryDate}` : null,
-          `Accounting: In: ${tracking.fabricIn} ${tracking.fabricUnit} | Defective Cut: ${tracking.defectivePieces} ${tracking.fabricUnit} | Leftover Out to Store: ${tracking.fabricOut} ${tracking.fabricUnit}`,
+          singleUnit
+            ? `Accounting: In: ${tracking.fabricIn} ${tracking.fabricUnit} | Defective Cut: ${tracking.defectivePieces} ${tracking.fabricUnit} | Leftover Out to Store: ${tracking.fabricOut} ${tracking.fabricUnit}`
+            : `Accounting: Out to Store: ${formatTotals(itemTotals)}`,
         ]
           .filter(Boolean)
           .join(' | '),
         items: items.map((it) => ({
           itemDescription: `${it.fabric} (${it.color})`,
           quantity: parseFloat(String(it.measurement)),
-          // Each line keeps its own unit; MTR and PCS lines may share a challan.
-          uom: it.unit,
+          uom: lineUnit(it),
           colour: it.color,
           fabricCode: it.fabric,
           remarks: it.remarks || null,

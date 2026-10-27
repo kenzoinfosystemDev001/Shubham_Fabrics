@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import {
   ArrowDownToLine,
   Plus,
@@ -176,9 +175,20 @@ export default function InwardStockPage() {
     }
   };
 
+  // A receipt link opens this page filtered to that import (?search=FSR-...).
+  const [searchReady, setSearchReady] = useState(false);
   useEffect(() => {
-    loadData();
-  }, [typeFilter]);
+    try {
+      const initial = new URLSearchParams(window.location.search).get('search');
+      if (initial) setSearch(initial);
+    } catch {}
+    setSearchReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (searchReady) loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [typeFilter, searchReady]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();

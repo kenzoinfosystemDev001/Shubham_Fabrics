@@ -354,6 +354,16 @@ export type FabricInward = $Result.DefaultSelection<Prisma.$FabricInwardPayload>
  */
 export type FabricOutward = $Result.DefaultSelection<Prisma.$FabricOutwardPayload>
 /**
+ * Model FabricStockImport
+ * 
+ */
+export type FabricStockImport = $Result.DefaultSelection<Prisma.$FabricStockImportPayload>
+/**
+ * Model FabricStockImportDocument
+ * 
+ */
+export type FabricStockImportDocument = $Result.DefaultSelection<Prisma.$FabricStockImportDocumentPayload>
+/**
  * Model DeadlineAlert
  * 
  */
@@ -373,6 +383,11 @@ export type PackingAllocation = $Result.DefaultSelection<Prisma.$PackingAllocati
  * 
  */
 export type GarmentImage = $Result.DefaultSelection<Prisma.$GarmentImagePayload>
+/**
+ * Model StockImport
+ * 
+ */
+export type StockImport = $Result.DefaultSelection<Prisma.$StockImportPayload>
 /**
  * Model ManualMigration
  * 
@@ -1304,6 +1319,26 @@ export class PrismaClient<
   get fabricOutward(): Prisma.FabricOutwardDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.fabricStockImport`: Exposes CRUD operations for the **FabricStockImport** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more FabricStockImports
+    * const fabricStockImports = await prisma.fabricStockImport.findMany()
+    * ```
+    */
+  get fabricStockImport(): Prisma.FabricStockImportDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.fabricStockImportDocument`: Exposes CRUD operations for the **FabricStockImportDocument** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more FabricStockImportDocuments
+    * const fabricStockImportDocuments = await prisma.fabricStockImportDocument.findMany()
+    * ```
+    */
+  get fabricStockImportDocument(): Prisma.FabricStockImportDocumentDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.deadlineAlert`: Exposes CRUD operations for the **DeadlineAlert** model.
     * Example usage:
     * ```ts
@@ -1342,6 +1377,16 @@ export class PrismaClient<
     * ```
     */
   get garmentImage(): Prisma.GarmentImageDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.stockImport`: Exposes CRUD operations for the **StockImport** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more StockImports
+    * const stockImports = await prisma.stockImport.findMany()
+    * ```
+    */
+  get stockImport(): Prisma.StockImportDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.manualMigration`: Exposes CRUD operations for the **ManualMigration** model.
@@ -1861,10 +1906,13 @@ export namespace Prisma {
     WorkItemInspection: 'WorkItemInspection',
     FabricInward: 'FabricInward',
     FabricOutward: 'FabricOutward',
+    FabricStockImport: 'FabricStockImport',
+    FabricStockImportDocument: 'FabricStockImportDocument',
     DeadlineAlert: 'DeadlineAlert',
     DeadlineAlertDismissal: 'DeadlineAlertDismissal',
     PackingAllocation: 'PackingAllocation',
     GarmentImage: 'GarmentImage',
+    StockImport: 'StockImport',
     ManualMigration: 'ManualMigration'
   };
 
@@ -1884,7 +1932,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "role" | "permission" | "rolePermission" | "userRole" | "department" | "workCenter" | "machine" | "shift" | "supplier" | "customer" | "item" | "fabric" | "trim" | "design" | "colour" | "size" | "operation" | "defectCode" | "program" | "programFabric" | "programColour" | "programSize" | "programSpecification" | "programBOM" | "programRoute" | "programRouteStep" | "attachment" | "departmentImage" | "brandingAsset" | "appSetting" | "auditLog" | "challan" | "challanItem" | "productionTransaction" | "qualityInspection" | "defectLog" | "inventoryStock" | "challanEvent" | "stockLedgerEntry" | "fabricRoll" | "bundle" | "carton" | "cartonBundle" | "dispatchOrder" | "dispatchCarton" | "defectRecord" | "reworkTransaction" | "recutRequest" | "qualityInspectionParameter" | "idempotencyRecord" | "notification" | "integrityScanResult" | "inventoryLocation" | "fabricBatch" | "fabricStoreRoll" | "materialReceipt" | "materialReceiptItem" | "fabricQCInspection" | "fabricStockLedger" | "dyeingOrder" | "dyeingQcTransfer" | "departmentWorkItem" | "departmentWorkTransfer" | "workItemAllocation" | "workItemInspection" | "fabricInward" | "fabricOutward" | "deadlineAlert" | "deadlineAlertDismissal" | "packingAllocation" | "garmentImage" | "manualMigration"
+      modelProps: "user" | "role" | "permission" | "rolePermission" | "userRole" | "department" | "workCenter" | "machine" | "shift" | "supplier" | "customer" | "item" | "fabric" | "trim" | "design" | "colour" | "size" | "operation" | "defectCode" | "program" | "programFabric" | "programColour" | "programSize" | "programSpecification" | "programBOM" | "programRoute" | "programRouteStep" | "attachment" | "departmentImage" | "brandingAsset" | "appSetting" | "auditLog" | "challan" | "challanItem" | "productionTransaction" | "qualityInspection" | "defectLog" | "inventoryStock" | "challanEvent" | "stockLedgerEntry" | "fabricRoll" | "bundle" | "carton" | "cartonBundle" | "dispatchOrder" | "dispatchCarton" | "defectRecord" | "reworkTransaction" | "recutRequest" | "qualityInspectionParameter" | "idempotencyRecord" | "notification" | "integrityScanResult" | "inventoryLocation" | "fabricBatch" | "fabricStoreRoll" | "materialReceipt" | "materialReceiptItem" | "fabricQCInspection" | "fabricStockLedger" | "dyeingOrder" | "dyeingQcTransfer" | "departmentWorkItem" | "departmentWorkTransfer" | "workItemAllocation" | "workItemInspection" | "fabricInward" | "fabricOutward" | "fabricStockImport" | "fabricStockImportDocument" | "deadlineAlert" | "deadlineAlertDismissal" | "packingAllocation" | "garmentImage" | "stockImport" | "manualMigration"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -6920,6 +6968,154 @@ export namespace Prisma {
           }
         }
       }
+      FabricStockImport: {
+        payload: Prisma.$FabricStockImportPayload<ExtArgs>
+        fields: Prisma.FabricStockImportFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.FabricStockImportFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockImportPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.FabricStockImportFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockImportPayload>
+          }
+          findFirst: {
+            args: Prisma.FabricStockImportFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockImportPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.FabricStockImportFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockImportPayload>
+          }
+          findMany: {
+            args: Prisma.FabricStockImportFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockImportPayload>[]
+          }
+          create: {
+            args: Prisma.FabricStockImportCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockImportPayload>
+          }
+          createMany: {
+            args: Prisma.FabricStockImportCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.FabricStockImportCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockImportPayload>[]
+          }
+          delete: {
+            args: Prisma.FabricStockImportDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockImportPayload>
+          }
+          update: {
+            args: Prisma.FabricStockImportUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockImportPayload>
+          }
+          deleteMany: {
+            args: Prisma.FabricStockImportDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.FabricStockImportUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.FabricStockImportUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockImportPayload>[]
+          }
+          upsert: {
+            args: Prisma.FabricStockImportUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockImportPayload>
+          }
+          aggregate: {
+            args: Prisma.FabricStockImportAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateFabricStockImport>
+          }
+          groupBy: {
+            args: Prisma.FabricStockImportGroupByArgs<ExtArgs>
+            result: $Utils.Optional<FabricStockImportGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.FabricStockImportCountArgs<ExtArgs>
+            result: $Utils.Optional<FabricStockImportCountAggregateOutputType> | number
+          }
+        }
+      }
+      FabricStockImportDocument: {
+        payload: Prisma.$FabricStockImportDocumentPayload<ExtArgs>
+        fields: Prisma.FabricStockImportDocumentFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.FabricStockImportDocumentFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockImportDocumentPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.FabricStockImportDocumentFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockImportDocumentPayload>
+          }
+          findFirst: {
+            args: Prisma.FabricStockImportDocumentFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockImportDocumentPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.FabricStockImportDocumentFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockImportDocumentPayload>
+          }
+          findMany: {
+            args: Prisma.FabricStockImportDocumentFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockImportDocumentPayload>[]
+          }
+          create: {
+            args: Prisma.FabricStockImportDocumentCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockImportDocumentPayload>
+          }
+          createMany: {
+            args: Prisma.FabricStockImportDocumentCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.FabricStockImportDocumentCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockImportDocumentPayload>[]
+          }
+          delete: {
+            args: Prisma.FabricStockImportDocumentDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockImportDocumentPayload>
+          }
+          update: {
+            args: Prisma.FabricStockImportDocumentUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockImportDocumentPayload>
+          }
+          deleteMany: {
+            args: Prisma.FabricStockImportDocumentDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.FabricStockImportDocumentUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.FabricStockImportDocumentUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockImportDocumentPayload>[]
+          }
+          upsert: {
+            args: Prisma.FabricStockImportDocumentUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FabricStockImportDocumentPayload>
+          }
+          aggregate: {
+            args: Prisma.FabricStockImportDocumentAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateFabricStockImportDocument>
+          }
+          groupBy: {
+            args: Prisma.FabricStockImportDocumentGroupByArgs<ExtArgs>
+            result: $Utils.Optional<FabricStockImportDocumentGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.FabricStockImportDocumentCountArgs<ExtArgs>
+            result: $Utils.Optional<FabricStockImportDocumentCountAggregateOutputType> | number
+          }
+        }
+      }
       DeadlineAlert: {
         payload: Prisma.$DeadlineAlertPayload<ExtArgs>
         fields: Prisma.DeadlineAlertFieldRefs
@@ -7216,6 +7412,80 @@ export namespace Prisma {
           }
         }
       }
+      StockImport: {
+        payload: Prisma.$StockImportPayload<ExtArgs>
+        fields: Prisma.StockImportFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.StockImportFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockImportPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.StockImportFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockImportPayload>
+          }
+          findFirst: {
+            args: Prisma.StockImportFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockImportPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.StockImportFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockImportPayload>
+          }
+          findMany: {
+            args: Prisma.StockImportFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockImportPayload>[]
+          }
+          create: {
+            args: Prisma.StockImportCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockImportPayload>
+          }
+          createMany: {
+            args: Prisma.StockImportCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.StockImportCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockImportPayload>[]
+          }
+          delete: {
+            args: Prisma.StockImportDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockImportPayload>
+          }
+          update: {
+            args: Prisma.StockImportUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockImportPayload>
+          }
+          deleteMany: {
+            args: Prisma.StockImportDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.StockImportUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.StockImportUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockImportPayload>[]
+          }
+          upsert: {
+            args: Prisma.StockImportUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StockImportPayload>
+          }
+          aggregate: {
+            args: Prisma.StockImportAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateStockImport>
+          }
+          groupBy: {
+            args: Prisma.StockImportGroupByArgs<ExtArgs>
+            result: $Utils.Optional<StockImportGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.StockImportCountArgs<ExtArgs>
+            result: $Utils.Optional<StockImportCountAggregateOutputType> | number
+          }
+        }
+      }
       ManualMigration: {
         payload: Prisma.$ManualMigrationPayload<ExtArgs>
         fields: Prisma.ManualMigrationFieldRefs
@@ -7454,10 +7724,13 @@ export namespace Prisma {
     workItemInspection?: WorkItemInspectionOmit
     fabricInward?: FabricInwardOmit
     fabricOutward?: FabricOutwardOmit
+    fabricStockImport?: FabricStockImportOmit
+    fabricStockImportDocument?: FabricStockImportDocumentOmit
     deadlineAlert?: DeadlineAlertOmit
     deadlineAlertDismissal?: DeadlineAlertDismissalOmit
     packingAllocation?: PackingAllocationOmit
     garmentImage?: GarmentImageOmit
+    stockImport?: StockImportOmit
     manualMigration?: ManualMigrationOmit
   }
 
@@ -7574,6 +7847,8 @@ export namespace Prisma {
     packingAllocations: number
     garmentImagesUploaded: number
     deadlineAlertDismissals: number
+    fabricStockImportsUploaded: number
+    fabricStockImportsPosted: number
     departmentImagesUploaded: number
     brandingAssetsUploaded: number
   }
@@ -7614,6 +7889,8 @@ export namespace Prisma {
     packingAllocations?: boolean | UserCountOutputTypeCountPackingAllocationsArgs
     garmentImagesUploaded?: boolean | UserCountOutputTypeCountGarmentImagesUploadedArgs
     deadlineAlertDismissals?: boolean | UserCountOutputTypeCountDeadlineAlertDismissalsArgs
+    fabricStockImportsUploaded?: boolean | UserCountOutputTypeCountFabricStockImportsUploadedArgs
+    fabricStockImportsPosted?: boolean | UserCountOutputTypeCountFabricStockImportsPostedArgs
     departmentImagesUploaded?: boolean | UserCountOutputTypeCountDepartmentImagesUploadedArgs
     brandingAssetsUploaded?: boolean | UserCountOutputTypeCountBrandingAssetsUploadedArgs
   }
@@ -7872,6 +8149,20 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountDeadlineAlertDismissalsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: DeadlineAlertDismissalWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountFabricStockImportsUploadedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FabricStockImportWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountFabricStockImportsPostedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FabricStockImportWhereInput
   }
 
   /**
@@ -9307,6 +9598,46 @@ export namespace Prisma {
 
 
   /**
+   * Count Type FabricStockImportCountOutputType
+   */
+
+  export type FabricStockImportCountOutputType = {
+    inwards: number
+    documents: number
+  }
+
+  export type FabricStockImportCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    inwards?: boolean | FabricStockImportCountOutputTypeCountInwardsArgs
+    documents?: boolean | FabricStockImportCountOutputTypeCountDocumentsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * FabricStockImportCountOutputType without action
+   */
+  export type FabricStockImportCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImportCountOutputType
+     */
+    select?: FabricStockImportCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * FabricStockImportCountOutputType without action
+   */
+  export type FabricStockImportCountOutputTypeCountInwardsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FabricInwardWhereInput
+  }
+
+  /**
+   * FabricStockImportCountOutputType without action
+   */
+  export type FabricStockImportCountOutputTypeCountDocumentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FabricStockImportDocumentWhereInput
+  }
+
+
+  /**
    * Count Type DeadlineAlertCountOutputType
    */
 
@@ -9572,6 +9903,8 @@ export namespace Prisma {
     packingAllocations?: boolean | User$packingAllocationsArgs<ExtArgs>
     garmentImagesUploaded?: boolean | User$garmentImagesUploadedArgs<ExtArgs>
     deadlineAlertDismissals?: boolean | User$deadlineAlertDismissalsArgs<ExtArgs>
+    fabricStockImportsUploaded?: boolean | User$fabricStockImportsUploadedArgs<ExtArgs>
+    fabricStockImportsPosted?: boolean | User$fabricStockImportsPostedArgs<ExtArgs>
     departmentImagesUploaded?: boolean | User$departmentImagesUploadedArgs<ExtArgs>
     brandingAssetsUploaded?: boolean | User$brandingAssetsUploadedArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -9650,6 +9983,8 @@ export namespace Prisma {
     packingAllocations?: boolean | User$packingAllocationsArgs<ExtArgs>
     garmentImagesUploaded?: boolean | User$garmentImagesUploadedArgs<ExtArgs>
     deadlineAlertDismissals?: boolean | User$deadlineAlertDismissalsArgs<ExtArgs>
+    fabricStockImportsUploaded?: boolean | User$fabricStockImportsUploadedArgs<ExtArgs>
+    fabricStockImportsPosted?: boolean | User$fabricStockImportsPostedArgs<ExtArgs>
     departmentImagesUploaded?: boolean | User$departmentImagesUploadedArgs<ExtArgs>
     brandingAssetsUploaded?: boolean | User$brandingAssetsUploadedArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -9695,6 +10030,8 @@ export namespace Prisma {
       packingAllocations: Prisma.$PackingAllocationPayload<ExtArgs>[]
       garmentImagesUploaded: Prisma.$GarmentImagePayload<ExtArgs>[]
       deadlineAlertDismissals: Prisma.$DeadlineAlertDismissalPayload<ExtArgs>[]
+      fabricStockImportsUploaded: Prisma.$FabricStockImportPayload<ExtArgs>[]
+      fabricStockImportsPosted: Prisma.$FabricStockImportPayload<ExtArgs>[]
       departmentImagesUploaded: Prisma.$DepartmentImagePayload<ExtArgs>[]
       brandingAssetsUploaded: Prisma.$BrandingAssetPayload<ExtArgs>[]
     }
@@ -10137,6 +10474,8 @@ export namespace Prisma {
     packingAllocations<T extends User$packingAllocationsArgs<ExtArgs> = {}>(args?: Subset<T, User$packingAllocationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PackingAllocationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     garmentImagesUploaded<T extends User$garmentImagesUploadedArgs<ExtArgs> = {}>(args?: Subset<T, User$garmentImagesUploadedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GarmentImagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     deadlineAlertDismissals<T extends User$deadlineAlertDismissalsArgs<ExtArgs> = {}>(args?: Subset<T, User$deadlineAlertDismissalsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DeadlineAlertDismissalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    fabricStockImportsUploaded<T extends User$fabricStockImportsUploadedArgs<ExtArgs> = {}>(args?: Subset<T, User$fabricStockImportsUploadedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStockImportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    fabricStockImportsPosted<T extends User$fabricStockImportsPostedArgs<ExtArgs> = {}>(args?: Subset<T, User$fabricStockImportsPostedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStockImportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     departmentImagesUploaded<T extends User$departmentImagesUploadedArgs<ExtArgs> = {}>(args?: Subset<T, User$departmentImagesUploadedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DepartmentImagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     brandingAssetsUploaded<T extends User$brandingAssetsUploadedArgs<ExtArgs> = {}>(args?: Subset<T, User$brandingAssetsUploadedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BrandingAssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
@@ -11402,6 +11741,54 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: DeadlineAlertDismissalScalarFieldEnum | DeadlineAlertDismissalScalarFieldEnum[]
+  }
+
+  /**
+   * User.fabricStockImportsUploaded
+   */
+  export type User$fabricStockImportsUploadedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImport
+     */
+    select?: FabricStockImportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockImport
+     */
+    omit?: FabricStockImportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockImportInclude<ExtArgs> | null
+    where?: FabricStockImportWhereInput
+    orderBy?: FabricStockImportOrderByWithRelationInput | FabricStockImportOrderByWithRelationInput[]
+    cursor?: FabricStockImportWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FabricStockImportScalarFieldEnum | FabricStockImportScalarFieldEnum[]
+  }
+
+  /**
+   * User.fabricStockImportsPosted
+   */
+  export type User$fabricStockImportsPostedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImport
+     */
+    select?: FabricStockImportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockImport
+     */
+    omit?: FabricStockImportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockImportInclude<ExtArgs> | null
+    where?: FabricStockImportWhereInput
+    orderBy?: FabricStockImportOrderByWithRelationInput | FabricStockImportOrderByWithRelationInput[]
+    cursor?: FabricStockImportWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FabricStockImportScalarFieldEnum | FabricStockImportScalarFieldEnum[]
   }
 
   /**
@@ -49055,6 +49442,7 @@ export namespace Prisma {
     fabricOut: number | null
     fabricUnit: string | null
     defectivePieces: number | null
+    defectiveUnit: string | null
     defectiveShelfLocation: string | null
     defectReason: string | null
     detectedFromChallanId: string | null
@@ -49085,6 +49473,7 @@ export namespace Prisma {
     fabricOut: number | null
     fabricUnit: string | null
     defectivePieces: number | null
+    defectiveUnit: string | null
     defectiveShelfLocation: string | null
     defectReason: string | null
     detectedFromChallanId: string | null
@@ -49115,6 +49504,7 @@ export namespace Prisma {
     fabricOut: number
     fabricUnit: number
     defectivePieces: number
+    defectiveUnit: number
     defectiveShelfLocation: number
     defectReason: number
     detectedFromChallanId: number
@@ -49159,6 +49549,7 @@ export namespace Prisma {
     fabricOut?: true
     fabricUnit?: true
     defectivePieces?: true
+    defectiveUnit?: true
     defectiveShelfLocation?: true
     defectReason?: true
     detectedFromChallanId?: true
@@ -49189,6 +49580,7 @@ export namespace Prisma {
     fabricOut?: true
     fabricUnit?: true
     defectivePieces?: true
+    defectiveUnit?: true
     defectiveShelfLocation?: true
     defectReason?: true
     detectedFromChallanId?: true
@@ -49219,6 +49611,7 @@ export namespace Prisma {
     fabricOut?: true
     fabricUnit?: true
     defectivePieces?: true
+    defectiveUnit?: true
     defectiveShelfLocation?: true
     defectReason?: true
     detectedFromChallanId?: true
@@ -49336,6 +49729,7 @@ export namespace Prisma {
     fabricOut: number | null
     fabricUnit: string | null
     defectivePieces: number | null
+    defectiveUnit: string | null
     defectiveShelfLocation: string | null
     defectReason: string | null
     detectedFromChallanId: string | null
@@ -49385,6 +49779,7 @@ export namespace Prisma {
     fabricOut?: boolean
     fabricUnit?: boolean
     defectivePieces?: boolean
+    defectiveUnit?: boolean
     defectiveShelfLocation?: boolean
     defectReason?: boolean
     detectedFromChallanId?: boolean
@@ -49437,6 +49832,7 @@ export namespace Prisma {
     fabricOut?: boolean
     fabricUnit?: boolean
     defectivePieces?: boolean
+    defectiveUnit?: boolean
     defectiveShelfLocation?: boolean
     defectReason?: boolean
     detectedFromChallanId?: boolean
@@ -49475,6 +49871,7 @@ export namespace Prisma {
     fabricOut?: boolean
     fabricUnit?: boolean
     defectivePieces?: boolean
+    defectiveUnit?: boolean
     defectiveShelfLocation?: boolean
     defectReason?: boolean
     detectedFromChallanId?: boolean
@@ -49513,13 +49910,14 @@ export namespace Prisma {
     fabricOut?: boolean
     fabricUnit?: boolean
     defectivePieces?: boolean
+    defectiveUnit?: boolean
     defectiveShelfLocation?: boolean
     defectReason?: boolean
     detectedFromChallanId?: boolean
     detectedFromDepartment?: boolean
   }
 
-  export type ChallanOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "challanNumber" | "challanType" | "programId" | "parentChallanId" | "fromDepartment" | "toDepartment" | "status" | "priority" | "issuedDate" | "receivedDate" | "completedDate" | "createdById" | "issuedById" | "receivedById" | "approvedById" | "remarks" | "createdAt" | "updatedAt" | "fabricIn" | "fabricOut" | "fabricUnit" | "defectivePieces" | "defectiveShelfLocation" | "defectReason" | "detectedFromChallanId" | "detectedFromDepartment", ExtArgs["result"]["challan"]>
+  export type ChallanOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "challanNumber" | "challanType" | "programId" | "parentChallanId" | "fromDepartment" | "toDepartment" | "status" | "priority" | "issuedDate" | "receivedDate" | "completedDate" | "createdById" | "issuedById" | "receivedById" | "approvedById" | "remarks" | "createdAt" | "updatedAt" | "fabricIn" | "fabricOut" | "fabricUnit" | "defectivePieces" | "defectiveUnit" | "defectiveShelfLocation" | "defectReason" | "detectedFromChallanId" | "detectedFromDepartment", ExtArgs["result"]["challan"]>
   export type ChallanInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     program?: boolean | ProgramDefaultArgs<ExtArgs>
     parentChallan?: boolean | Challan$parentChallanArgs<ExtArgs>
@@ -49614,6 +50012,7 @@ export namespace Prisma {
       fabricOut: number | null
       fabricUnit: string | null
       defectivePieces: number | null
+      defectiveUnit: string | null
       defectiveShelfLocation: string | null
       defectReason: string | null
       detectedFromChallanId: string | null
@@ -50085,6 +50484,7 @@ export namespace Prisma {
     readonly fabricOut: FieldRef<"Challan", 'Float'>
     readonly fabricUnit: FieldRef<"Challan", 'String'>
     readonly defectivePieces: FieldRef<"Challan", 'Float'>
+    readonly defectiveUnit: FieldRef<"Challan", 'String'>
     readonly defectiveShelfLocation: FieldRef<"Challan", 'String'>
     readonly defectReason: FieldRef<"Challan", 'String'>
     readonly detectedFromChallanId: FieldRef<"Challan", 'String'>
@@ -67130,6 +67530,7 @@ export namespace Prisma {
     itemDescription: string | null
     severity: string | null
     quantity: number | null
+    uom: string | null
     reason: string | null
     detectedById: string | null
     status: string | null
@@ -67149,6 +67550,7 @@ export namespace Prisma {
     itemDescription: string | null
     severity: string | null
     quantity: number | null
+    uom: string | null
     reason: string | null
     detectedById: string | null
     status: string | null
@@ -67168,6 +67570,7 @@ export namespace Prisma {
     itemDescription: number
     severity: number
     quantity: number
+    uom: number
     reason: number
     detectedById: number
     status: number
@@ -67197,6 +67600,7 @@ export namespace Prisma {
     itemDescription?: true
     severity?: true
     quantity?: true
+    uom?: true
     reason?: true
     detectedById?: true
     status?: true
@@ -67216,6 +67620,7 @@ export namespace Prisma {
     itemDescription?: true
     severity?: true
     quantity?: true
+    uom?: true
     reason?: true
     detectedById?: true
     status?: true
@@ -67235,6 +67640,7 @@ export namespace Prisma {
     itemDescription?: true
     severity?: true
     quantity?: true
+    uom?: true
     reason?: true
     detectedById?: true
     status?: true
@@ -67341,6 +67747,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom: string | null
     reason: string
     detectedById: string
     status: string
@@ -67379,6 +67786,7 @@ export namespace Prisma {
     itemDescription?: boolean
     severity?: boolean
     quantity?: boolean
+    uom?: boolean
     reason?: boolean
     detectedById?: boolean
     status?: boolean
@@ -67405,6 +67813,7 @@ export namespace Prisma {
     itemDescription?: boolean
     severity?: boolean
     quantity?: boolean
+    uom?: boolean
     reason?: boolean
     detectedById?: boolean
     status?: boolean
@@ -67428,6 +67837,7 @@ export namespace Prisma {
     itemDescription?: boolean
     severity?: boolean
     quantity?: boolean
+    uom?: boolean
     reason?: boolean
     detectedById?: boolean
     status?: boolean
@@ -67451,6 +67861,7 @@ export namespace Prisma {
     itemDescription?: boolean
     severity?: boolean
     quantity?: boolean
+    uom?: boolean
     reason?: boolean
     detectedById?: boolean
     status?: boolean
@@ -67460,7 +67871,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type DefectRecordOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "defectCode" | "programId" | "challanId" | "departmentCode" | "bundleId" | "itemDescription" | "severity" | "quantity" | "reason" | "detectedById" | "status" | "resolutionNotes" | "resolvedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["defectRecord"]>
+  export type DefectRecordOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "defectCode" | "programId" | "challanId" | "departmentCode" | "bundleId" | "itemDescription" | "severity" | "quantity" | "uom" | "reason" | "detectedById" | "status" | "resolutionNotes" | "resolvedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["defectRecord"]>
   export type DefectRecordInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     program?: boolean | ProgramDefaultArgs<ExtArgs>
     challan?: boolean | DefectRecord$challanArgs<ExtArgs>
@@ -67503,6 +67914,7 @@ export namespace Prisma {
       itemDescription: string
       severity: string
       quantity: number
+      uom: string | null
       reason: string
       detectedById: string
       status: string
@@ -67947,7 +68359,8 @@ export namespace Prisma {
     readonly bundleId: FieldRef<"DefectRecord", 'String'>
     readonly itemDescription: FieldRef<"DefectRecord", 'String'>
     readonly severity: FieldRef<"DefectRecord", 'String'>
-    readonly quantity: FieldRef<"DefectRecord", 'Int'>
+    readonly quantity: FieldRef<"DefectRecord", 'Float'>
+    readonly uom: FieldRef<"DefectRecord", 'String'>
     readonly reason: FieldRef<"DefectRecord", 'String'>
     readonly detectedById: FieldRef<"DefectRecord", 'String'>
     readonly status: FieldRef<"DefectRecord", 'String'>
@@ -76480,13 +76893,11 @@ export namespace Prisma {
   export type FabricBatchAvgAggregateOutputType = {
     totalRolls: number | null
     totalMeters: Decimal | null
-    totalPieces: Decimal | null
   }
 
   export type FabricBatchSumAggregateOutputType = {
     totalRolls: number | null
     totalMeters: Decimal | null
-    totalPieces: Decimal | null
   }
 
   export type FabricBatchMinAggregateOutputType = {
@@ -76500,7 +76911,7 @@ export namespace Prisma {
     colorName: string | null
     totalRolls: number | null
     totalMeters: Decimal | null
-    totalPieces: Decimal | null
+    unit: string | null
     status: $Enums.FabricBatchStatus | null
     receivedAt: Date | null
     createdById: string | null
@@ -76519,7 +76930,7 @@ export namespace Prisma {
     colorName: string | null
     totalRolls: number | null
     totalMeters: Decimal | null
-    totalPieces: Decimal | null
+    unit: string | null
     status: $Enums.FabricBatchStatus | null
     receivedAt: Date | null
     createdById: string | null
@@ -76538,7 +76949,7 @@ export namespace Prisma {
     colorName: number
     totalRolls: number
     totalMeters: number
-    totalPieces: number
+    unit: number
     status: number
     receivedAt: number
     createdById: number
@@ -76551,13 +76962,11 @@ export namespace Prisma {
   export type FabricBatchAvgAggregateInputType = {
     totalRolls?: true
     totalMeters?: true
-    totalPieces?: true
   }
 
   export type FabricBatchSumAggregateInputType = {
     totalRolls?: true
     totalMeters?: true
-    totalPieces?: true
   }
 
   export type FabricBatchMinAggregateInputType = {
@@ -76571,7 +76980,7 @@ export namespace Prisma {
     colorName?: true
     totalRolls?: true
     totalMeters?: true
-    totalPieces?: true
+    unit?: true
     status?: true
     receivedAt?: true
     createdById?: true
@@ -76590,7 +76999,7 @@ export namespace Prisma {
     colorName?: true
     totalRolls?: true
     totalMeters?: true
-    totalPieces?: true
+    unit?: true
     status?: true
     receivedAt?: true
     createdById?: true
@@ -76609,7 +77018,7 @@ export namespace Prisma {
     colorName?: true
     totalRolls?: true
     totalMeters?: true
-    totalPieces?: true
+    unit?: true
     status?: true
     receivedAt?: true
     createdById?: true
@@ -76715,7 +77124,7 @@ export namespace Prisma {
     colorName: string | null
     totalRolls: number
     totalMeters: Decimal
-    totalPieces: Decimal
+    unit: string
     status: $Enums.FabricBatchStatus
     receivedAt: Date | null
     createdById: string
@@ -76753,7 +77162,7 @@ export namespace Prisma {
     colorName?: boolean
     totalRolls?: boolean
     totalMeters?: boolean
-    totalPieces?: boolean
+    unit?: boolean
     status?: boolean
     receivedAt?: boolean
     createdById?: boolean
@@ -76778,7 +77187,7 @@ export namespace Prisma {
     colorName?: boolean
     totalRolls?: boolean
     totalMeters?: boolean
-    totalPieces?: boolean
+    unit?: boolean
     status?: boolean
     receivedAt?: boolean
     createdById?: boolean
@@ -76799,7 +77208,7 @@ export namespace Prisma {
     colorName?: boolean
     totalRolls?: boolean
     totalMeters?: boolean
-    totalPieces?: boolean
+    unit?: boolean
     status?: boolean
     receivedAt?: boolean
     createdById?: boolean
@@ -76820,7 +77229,7 @@ export namespace Prisma {
     colorName?: boolean
     totalRolls?: boolean
     totalMeters?: boolean
-    totalPieces?: boolean
+    unit?: boolean
     status?: boolean
     receivedAt?: boolean
     createdById?: boolean
@@ -76828,7 +77237,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type FabricBatchOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "batchNumber" | "programId" | "supplierId" | "fabricType" | "fabricDescription" | "colorCode" | "colorName" | "totalRolls" | "totalMeters" | "totalPieces" | "status" | "receivedAt" | "createdById" | "createdAt" | "updatedAt", ExtArgs["result"]["fabricBatch"]>
+  export type FabricBatchOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "batchNumber" | "programId" | "supplierId" | "fabricType" | "fabricDescription" | "colorCode" | "colorName" | "totalRolls" | "totalMeters" | "unit" | "status" | "receivedAt" | "createdById" | "createdAt" | "updatedAt", ExtArgs["result"]["fabricBatch"]>
   export type FabricBatchInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     program?: boolean | FabricBatch$programArgs<ExtArgs>
     createdBy?: boolean | UserDefaultArgs<ExtArgs>
@@ -76866,7 +77275,7 @@ export namespace Prisma {
       colorName: string | null
       totalRolls: number
       totalMeters: Prisma.Decimal
-      totalPieces: Prisma.Decimal
+      unit: string
       status: $Enums.FabricBatchStatus
       receivedAt: Date | null
       createdById: string
@@ -77310,7 +77719,7 @@ export namespace Prisma {
     readonly colorName: FieldRef<"FabricBatch", 'String'>
     readonly totalRolls: FieldRef<"FabricBatch", 'Int'>
     readonly totalMeters: FieldRef<"FabricBatch", 'Decimal'>
-    readonly totalPieces: FieldRef<"FabricBatch", 'Decimal'>
+    readonly unit: FieldRef<"FabricBatch", 'String'>
     readonly status: FieldRef<"FabricBatch", 'FabricBatchStatus'>
     readonly receivedAt: FieldRef<"FabricBatch", 'DateTime'>
     readonly createdById: FieldRef<"FabricBatch", 'String'>
@@ -77851,7 +78260,6 @@ export namespace Prisma {
     batchId: string | null
     locationId: string | null
     length: Decimal | null
-    unit: string | null
     width: Decimal | null
     weight: Decimal | null
     status: $Enums.FabricRollStatus | null
@@ -77871,7 +78279,6 @@ export namespace Prisma {
     batchId: string | null
     locationId: string | null
     length: Decimal | null
-    unit: string | null
     width: Decimal | null
     weight: Decimal | null
     status: $Enums.FabricRollStatus | null
@@ -77891,7 +78298,6 @@ export namespace Prisma {
     batchId: number
     locationId: number
     length: number
-    unit: number
     width: number
     weight: number
     status: number
@@ -77925,7 +78331,6 @@ export namespace Prisma {
     batchId?: true
     locationId?: true
     length?: true
-    unit?: true
     width?: true
     weight?: true
     status?: true
@@ -77945,7 +78350,6 @@ export namespace Prisma {
     batchId?: true
     locationId?: true
     length?: true
-    unit?: true
     width?: true
     weight?: true
     status?: true
@@ -77965,7 +78369,6 @@ export namespace Prisma {
     batchId?: true
     locationId?: true
     length?: true
-    unit?: true
     width?: true
     weight?: true
     status?: true
@@ -78072,7 +78475,6 @@ export namespace Prisma {
     batchId: string
     locationId: string | null
     length: Decimal
-    unit: string
     width: Decimal | null
     weight: Decimal | null
     status: $Enums.FabricRollStatus
@@ -78111,7 +78513,6 @@ export namespace Prisma {
     batchId?: boolean
     locationId?: boolean
     length?: boolean
-    unit?: boolean
     width?: boolean
     weight?: boolean
     status?: boolean
@@ -78139,7 +78540,6 @@ export namespace Prisma {
     batchId?: boolean
     locationId?: boolean
     length?: boolean
-    unit?: boolean
     width?: boolean
     weight?: boolean
     status?: boolean
@@ -78163,7 +78563,6 @@ export namespace Prisma {
     batchId?: boolean
     locationId?: boolean
     length?: boolean
-    unit?: boolean
     width?: boolean
     weight?: boolean
     status?: boolean
@@ -78187,7 +78586,6 @@ export namespace Prisma {
     batchId?: boolean
     locationId?: boolean
     length?: boolean
-    unit?: boolean
     width?: boolean
     weight?: boolean
     status?: boolean
@@ -78201,7 +78599,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type FabricStoreRollOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "rollNumber" | "batchId" | "locationId" | "length" | "unit" | "width" | "weight" | "status" | "qcStatus" | "qcInspectedById" | "qcInspectedAt" | "qcRemarks" | "programIssuedToId" | "issuedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["fabricStoreRoll"]>
+  export type FabricStoreRollOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "rollNumber" | "batchId" | "locationId" | "length" | "width" | "weight" | "status" | "qcStatus" | "qcInspectedById" | "qcInspectedAt" | "qcRemarks" | "programIssuedToId" | "issuedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["fabricStoreRoll"]>
   export type FabricStoreRollInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     batch?: boolean | FabricBatchDefaultArgs<ExtArgs>
     location?: boolean | FabricStoreRoll$locationArgs<ExtArgs>
@@ -78242,7 +78640,6 @@ export namespace Prisma {
       batchId: string
       locationId: string | null
       length: Prisma.Decimal
-      unit: string
       width: Prisma.Decimal | null
       weight: Prisma.Decimal | null
       status: $Enums.FabricRollStatus
@@ -78689,7 +79086,6 @@ export namespace Prisma {
     readonly batchId: FieldRef<"FabricStoreRoll", 'String'>
     readonly locationId: FieldRef<"FabricStoreRoll", 'String'>
     readonly length: FieldRef<"FabricStoreRoll", 'Decimal'>
-    readonly unit: FieldRef<"FabricStoreRoll", 'String'>
     readonly width: FieldRef<"FabricStoreRoll", 'Decimal'>
     readonly weight: FieldRef<"FabricStoreRoll", 'Decimal'>
     readonly status: FieldRef<"FabricStoreRoll", 'FabricRollStatus'>
@@ -79259,13 +79655,11 @@ export namespace Prisma {
   export type MaterialReceiptAvgAggregateOutputType = {
     totalRollsReceived: number | null
     totalMetersReceived: Decimal | null
-    totalPiecesReceived: Decimal | null
   }
 
   export type MaterialReceiptSumAggregateOutputType = {
     totalRollsReceived: number | null
     totalMetersReceived: Decimal | null
-    totalPiecesReceived: Decimal | null
   }
 
   export type MaterialReceiptMinAggregateOutputType = {
@@ -79279,7 +79673,6 @@ export namespace Prisma {
     supplierName: string | null
     totalRollsReceived: number | null
     totalMetersReceived: Decimal | null
-    totalPiecesReceived: Decimal | null
     status: $Enums.GRNStatus | null
     remarks: string | null
     createdAt: Date | null
@@ -79297,7 +79690,6 @@ export namespace Prisma {
     supplierName: string | null
     totalRollsReceived: number | null
     totalMetersReceived: Decimal | null
-    totalPiecesReceived: Decimal | null
     status: $Enums.GRNStatus | null
     remarks: string | null
     createdAt: Date | null
@@ -79315,7 +79707,6 @@ export namespace Prisma {
     supplierName: number
     totalRollsReceived: number
     totalMetersReceived: number
-    totalPiecesReceived: number
     status: number
     remarks: number
     createdAt: number
@@ -79327,13 +79718,11 @@ export namespace Prisma {
   export type MaterialReceiptAvgAggregateInputType = {
     totalRollsReceived?: true
     totalMetersReceived?: true
-    totalPiecesReceived?: true
   }
 
   export type MaterialReceiptSumAggregateInputType = {
     totalRollsReceived?: true
     totalMetersReceived?: true
-    totalPiecesReceived?: true
   }
 
   export type MaterialReceiptMinAggregateInputType = {
@@ -79347,7 +79736,6 @@ export namespace Prisma {
     supplierName?: true
     totalRollsReceived?: true
     totalMetersReceived?: true
-    totalPiecesReceived?: true
     status?: true
     remarks?: true
     createdAt?: true
@@ -79365,7 +79753,6 @@ export namespace Prisma {
     supplierName?: true
     totalRollsReceived?: true
     totalMetersReceived?: true
-    totalPiecesReceived?: true
     status?: true
     remarks?: true
     createdAt?: true
@@ -79383,7 +79770,6 @@ export namespace Prisma {
     supplierName?: true
     totalRollsReceived?: true
     totalMetersReceived?: true
-    totalPiecesReceived?: true
     status?: true
     remarks?: true
     createdAt?: true
@@ -79488,7 +79874,6 @@ export namespace Prisma {
     supplierName: string
     totalRollsReceived: number
     totalMetersReceived: Decimal
-    totalPiecesReceived: Decimal
     status: $Enums.GRNStatus
     remarks: string | null
     createdAt: Date
@@ -79525,7 +79910,6 @@ export namespace Prisma {
     supplierName?: boolean
     totalRollsReceived?: boolean
     totalMetersReceived?: boolean
-    totalPiecesReceived?: boolean
     status?: boolean
     remarks?: boolean
     createdAt?: boolean
@@ -79547,7 +79931,6 @@ export namespace Prisma {
     supplierName?: boolean
     totalRollsReceived?: boolean
     totalMetersReceived?: boolean
-    totalPiecesReceived?: boolean
     status?: boolean
     remarks?: boolean
     createdAt?: boolean
@@ -79567,7 +79950,6 @@ export namespace Prisma {
     supplierName?: boolean
     totalRollsReceived?: boolean
     totalMetersReceived?: boolean
-    totalPiecesReceived?: boolean
     status?: boolean
     remarks?: boolean
     createdAt?: boolean
@@ -79587,14 +79969,13 @@ export namespace Prisma {
     supplierName?: boolean
     totalRollsReceived?: boolean
     totalMetersReceived?: boolean
-    totalPiecesReceived?: boolean
     status?: boolean
     remarks?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type MaterialReceiptOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "grnNumber" | "batchId" | "challanId" | "receivedById" | "receivedAt" | "vehicleNumber" | "supplierName" | "totalRollsReceived" | "totalMetersReceived" | "totalPiecesReceived" | "status" | "remarks" | "createdAt" | "updatedAt", ExtArgs["result"]["materialReceipt"]>
+  export type MaterialReceiptOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "grnNumber" | "batchId" | "challanId" | "receivedById" | "receivedAt" | "vehicleNumber" | "supplierName" | "totalRollsReceived" | "totalMetersReceived" | "status" | "remarks" | "createdAt" | "updatedAt", ExtArgs["result"]["materialReceipt"]>
   export type MaterialReceiptInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     batch?: boolean | FabricBatchDefaultArgs<ExtArgs>
     receivedBy?: boolean | UserDefaultArgs<ExtArgs>
@@ -79628,7 +80009,6 @@ export namespace Prisma {
       supplierName: string
       totalRollsReceived: number
       totalMetersReceived: Prisma.Decimal
-      totalPiecesReceived: Prisma.Decimal
       status: $Enums.GRNStatus
       remarks: string | null
       createdAt: Date
@@ -80069,7 +80449,6 @@ export namespace Prisma {
     readonly supplierName: FieldRef<"MaterialReceipt", 'String'>
     readonly totalRollsReceived: FieldRef<"MaterialReceipt", 'Int'>
     readonly totalMetersReceived: FieldRef<"MaterialReceipt", 'Decimal'>
-    readonly totalPiecesReceived: FieldRef<"MaterialReceipt", 'Decimal'>
     readonly status: FieldRef<"MaterialReceipt", 'GRNStatus'>
     readonly remarks: FieldRef<"MaterialReceipt", 'String'>
     readonly createdAt: FieldRef<"MaterialReceipt", 'DateTime'>
@@ -82796,7 +83175,6 @@ export namespace Prisma {
     batchId: string | null
     transactionType: $Enums.StockTransactionType | null
     quantity: Decimal | null
-    uom: string | null
     referenceType: string | null
     referenceId: string | null
     fromLocationId: string | null
@@ -82814,7 +83192,6 @@ export namespace Prisma {
     batchId: string | null
     transactionType: $Enums.StockTransactionType | null
     quantity: Decimal | null
-    uom: string | null
     referenceType: string | null
     referenceId: string | null
     fromLocationId: string | null
@@ -82832,7 +83209,6 @@ export namespace Prisma {
     batchId: number
     transactionType: number
     quantity: number
-    uom: number
     referenceType: number
     referenceId: number
     fromLocationId: number
@@ -82860,7 +83236,6 @@ export namespace Prisma {
     batchId?: true
     transactionType?: true
     quantity?: true
-    uom?: true
     referenceType?: true
     referenceId?: true
     fromLocationId?: true
@@ -82878,7 +83253,6 @@ export namespace Prisma {
     batchId?: true
     transactionType?: true
     quantity?: true
-    uom?: true
     referenceType?: true
     referenceId?: true
     fromLocationId?: true
@@ -82896,7 +83270,6 @@ export namespace Prisma {
     batchId?: true
     transactionType?: true
     quantity?: true
-    uom?: true
     referenceType?: true
     referenceId?: true
     fromLocationId?: true
@@ -83001,7 +83374,6 @@ export namespace Prisma {
     batchId: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal
-    uom: string
     referenceType: string
     referenceId: string
     fromLocationId: string | null
@@ -83038,7 +83410,6 @@ export namespace Prisma {
     batchId?: boolean
     transactionType?: boolean
     quantity?: boolean
-    uom?: boolean
     referenceType?: boolean
     referenceId?: boolean
     fromLocationId?: boolean
@@ -83061,7 +83432,6 @@ export namespace Prisma {
     batchId?: boolean
     transactionType?: boolean
     quantity?: boolean
-    uom?: boolean
     referenceType?: boolean
     referenceId?: boolean
     fromLocationId?: boolean
@@ -83084,7 +83454,6 @@ export namespace Prisma {
     batchId?: boolean
     transactionType?: boolean
     quantity?: boolean
-    uom?: boolean
     referenceType?: boolean
     referenceId?: boolean
     fromLocationId?: boolean
@@ -83107,7 +83476,6 @@ export namespace Prisma {
     batchId?: boolean
     transactionType?: boolean
     quantity?: boolean
-    uom?: boolean
     referenceType?: boolean
     referenceId?: boolean
     fromLocationId?: boolean
@@ -83118,7 +83486,7 @@ export namespace Prisma {
     createdAt?: boolean
   }
 
-  export type FabricStockLedgerOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "entryNumber" | "rollId" | "batchId" | "transactionType" | "quantity" | "uom" | "referenceType" | "referenceId" | "fromLocationId" | "toLocationId" | "transactedById" | "transactedAt" | "remarks" | "createdAt", ExtArgs["result"]["fabricStockLedger"]>
+  export type FabricStockLedgerOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "entryNumber" | "rollId" | "batchId" | "transactionType" | "quantity" | "referenceType" | "referenceId" | "fromLocationId" | "toLocationId" | "transactedById" | "transactedAt" | "remarks" | "createdAt", ExtArgs["result"]["fabricStockLedger"]>
   export type FabricStockLedgerInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     roll?: boolean | FabricStoreRollDefaultArgs<ExtArgs>
     batch?: boolean | FabricBatchDefaultArgs<ExtArgs>
@@ -83157,7 +83525,6 @@ export namespace Prisma {
       batchId: string
       transactionType: $Enums.StockTransactionType
       quantity: Prisma.Decimal
-      uom: string
       referenceType: string
       referenceId: string
       fromLocationId: string | null
@@ -83600,7 +83967,6 @@ export namespace Prisma {
     readonly batchId: FieldRef<"FabricStockLedger", 'String'>
     readonly transactionType: FieldRef<"FabricStockLedger", 'StockTransactionType'>
     readonly quantity: FieldRef<"FabricStockLedger", 'Decimal'>
-    readonly uom: FieldRef<"FabricStockLedger", 'String'>
     readonly referenceType: FieldRef<"FabricStockLedger", 'String'>
     readonly referenceId: FieldRef<"FabricStockLedger", 'String'>
     readonly fromLocationId: FieldRef<"FabricStockLedger", 'String'>
@@ -92501,6 +92867,8 @@ export namespace Prisma {
     pricePerUnit: number | null
     boxThanQty: number | null
     taxPercent: number | null
+    unitRate: number | null
+    importRowNumber: number | null
   }
 
   export type FabricInwardSumAggregateOutputType = {
@@ -92509,6 +92877,8 @@ export namespace Prisma {
     pricePerUnit: number | null
     boxThanQty: number | null
     taxPercent: number | null
+    unitRate: number | null
+    importRowNumber: number | null
   }
 
   export type FabricInwardMinAggregateOutputType = {
@@ -92529,6 +92899,17 @@ export namespace Prisma {
     hsnCode: string | null
     taxPercent: number | null
     remarks: string | null
+    rollNumber: string | null
+    rollKey: string | null
+    batchNumber: string | null
+    shade: string | null
+    composition: string | null
+    width: string | null
+    unitRate: number | null
+    storageLocation: string | null
+    purchaseOrderNumber: string | null
+    importId: string | null
+    importRowNumber: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -92551,6 +92932,17 @@ export namespace Prisma {
     hsnCode: string | null
     taxPercent: number | null
     remarks: string | null
+    rollNumber: string | null
+    rollKey: string | null
+    batchNumber: string | null
+    shade: string | null
+    composition: string | null
+    width: string | null
+    unitRate: number | null
+    storageLocation: string | null
+    purchaseOrderNumber: string | null
+    importId: string | null
+    importRowNumber: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -92573,6 +92965,17 @@ export namespace Prisma {
     hsnCode: number
     taxPercent: number
     remarks: number
+    rollNumber: number
+    rollKey: number
+    batchNumber: number
+    shade: number
+    composition: number
+    width: number
+    unitRate: number
+    storageLocation: number
+    purchaseOrderNumber: number
+    importId: number
+    importRowNumber: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -92585,6 +92988,8 @@ export namespace Prisma {
     pricePerUnit?: true
     boxThanQty?: true
     taxPercent?: true
+    unitRate?: true
+    importRowNumber?: true
   }
 
   export type FabricInwardSumAggregateInputType = {
@@ -92593,6 +92998,8 @@ export namespace Prisma {
     pricePerUnit?: true
     boxThanQty?: true
     taxPercent?: true
+    unitRate?: true
+    importRowNumber?: true
   }
 
   export type FabricInwardMinAggregateInputType = {
@@ -92613,6 +93020,17 @@ export namespace Prisma {
     hsnCode?: true
     taxPercent?: true
     remarks?: true
+    rollNumber?: true
+    rollKey?: true
+    batchNumber?: true
+    shade?: true
+    composition?: true
+    width?: true
+    unitRate?: true
+    storageLocation?: true
+    purchaseOrderNumber?: true
+    importId?: true
+    importRowNumber?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -92635,6 +93053,17 @@ export namespace Prisma {
     hsnCode?: true
     taxPercent?: true
     remarks?: true
+    rollNumber?: true
+    rollKey?: true
+    batchNumber?: true
+    shade?: true
+    composition?: true
+    width?: true
+    unitRate?: true
+    storageLocation?: true
+    purchaseOrderNumber?: true
+    importId?: true
+    importRowNumber?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -92657,6 +93086,17 @@ export namespace Prisma {
     hsnCode?: true
     taxPercent?: true
     remarks?: true
+    rollNumber?: true
+    rollKey?: true
+    batchNumber?: true
+    shade?: true
+    composition?: true
+    width?: true
+    unitRate?: true
+    storageLocation?: true
+    purchaseOrderNumber?: true
+    importId?: true
+    importRowNumber?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -92766,6 +93206,17 @@ export namespace Prisma {
     hsnCode: string | null
     taxPercent: number | null
     remarks: string | null
+    rollNumber: string | null
+    rollKey: string | null
+    batchNumber: string | null
+    shade: string | null
+    composition: string | null
+    width: string | null
+    unitRate: number | null
+    storageLocation: string | null
+    purchaseOrderNumber: string | null
+    importId: string | null
+    importRowNumber: number | null
     createdAt: Date
     updatedAt: Date
     _count: FabricInwardCountAggregateOutputType | null
@@ -92807,8 +93258,20 @@ export namespace Prisma {
     hsnCode?: boolean
     taxPercent?: boolean
     remarks?: boolean
+    rollNumber?: boolean
+    rollKey?: boolean
+    batchNumber?: boolean
+    shade?: boolean
+    composition?: boolean
+    width?: boolean
+    unitRate?: boolean
+    storageLocation?: boolean
+    purchaseOrderNumber?: boolean
+    importId?: boolean
+    importRowNumber?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    import?: boolean | FabricInward$importArgs<ExtArgs>
   }, ExtArgs["result"]["fabricInward"]>
 
   export type FabricInwardSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -92829,8 +93292,20 @@ export namespace Prisma {
     hsnCode?: boolean
     taxPercent?: boolean
     remarks?: boolean
+    rollNumber?: boolean
+    rollKey?: boolean
+    batchNumber?: boolean
+    shade?: boolean
+    composition?: boolean
+    width?: boolean
+    unitRate?: boolean
+    storageLocation?: boolean
+    purchaseOrderNumber?: boolean
+    importId?: boolean
+    importRowNumber?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    import?: boolean | FabricInward$importArgs<ExtArgs>
   }, ExtArgs["result"]["fabricInward"]>
 
   export type FabricInwardSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -92851,8 +93326,20 @@ export namespace Prisma {
     hsnCode?: boolean
     taxPercent?: boolean
     remarks?: boolean
+    rollNumber?: boolean
+    rollKey?: boolean
+    batchNumber?: boolean
+    shade?: boolean
+    composition?: boolean
+    width?: boolean
+    unitRate?: boolean
+    storageLocation?: boolean
+    purchaseOrderNumber?: boolean
+    importId?: boolean
+    importRowNumber?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    import?: boolean | FabricInward$importArgs<ExtArgs>
   }, ExtArgs["result"]["fabricInward"]>
 
   export type FabricInwardSelectScalar = {
@@ -92873,15 +93360,37 @@ export namespace Prisma {
     hsnCode?: boolean
     taxPercent?: boolean
     remarks?: boolean
+    rollNumber?: boolean
+    rollKey?: boolean
+    batchNumber?: boolean
+    shade?: boolean
+    composition?: boolean
+    width?: boolean
+    unitRate?: boolean
+    storageLocation?: boolean
+    purchaseOrderNumber?: boolean
+    importId?: boolean
+    importRowNumber?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type FabricInwardOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sNo" | "entryType" | "itemName" | "billNo" | "billDate" | "receivingDate" | "billQty" | "unit" | "colour" | "supplierName" | "billerStateCity" | "pricePerUnit" | "boxThanQty" | "hsnCode" | "taxPercent" | "remarks" | "createdAt" | "updatedAt", ExtArgs["result"]["fabricInward"]>
+  export type FabricInwardOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sNo" | "entryType" | "itemName" | "billNo" | "billDate" | "receivingDate" | "billQty" | "unit" | "colour" | "supplierName" | "billerStateCity" | "pricePerUnit" | "boxThanQty" | "hsnCode" | "taxPercent" | "remarks" | "rollNumber" | "rollKey" | "batchNumber" | "shade" | "composition" | "width" | "unitRate" | "storageLocation" | "purchaseOrderNumber" | "importId" | "importRowNumber" | "createdAt" | "updatedAt", ExtArgs["result"]["fabricInward"]>
+  export type FabricInwardInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    import?: boolean | FabricInward$importArgs<ExtArgs>
+  }
+  export type FabricInwardIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    import?: boolean | FabricInward$importArgs<ExtArgs>
+  }
+  export type FabricInwardIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    import?: boolean | FabricInward$importArgs<ExtArgs>
+  }
 
   export type $FabricInwardPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "FabricInward"
-    objects: {}
+    objects: {
+      import: Prisma.$FabricStockImportPayload<ExtArgs> | null
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       sNo: number
@@ -92900,6 +93409,17 @@ export namespace Prisma {
       hsnCode: string | null
       taxPercent: number | null
       remarks: string | null
+      rollNumber: string | null
+      rollKey: string | null
+      batchNumber: string | null
+      shade: string | null
+      composition: string | null
+      width: string | null
+      unitRate: number | null
+      storageLocation: string | null
+      purchaseOrderNumber: string | null
+      importId: string | null
+      importRowNumber: number | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["fabricInward"]>
@@ -93296,6 +93816,7 @@ export namespace Prisma {
    */
   export interface Prisma__FabricInwardClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    import<T extends FabricInward$importArgs<ExtArgs> = {}>(args?: Subset<T, FabricInward$importArgs<ExtArgs>>): Prisma__FabricStockImportClient<$Result.GetResult<Prisma.$FabricStockImportPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -93342,6 +93863,17 @@ export namespace Prisma {
     readonly hsnCode: FieldRef<"FabricInward", 'String'>
     readonly taxPercent: FieldRef<"FabricInward", 'Float'>
     readonly remarks: FieldRef<"FabricInward", 'String'>
+    readonly rollNumber: FieldRef<"FabricInward", 'String'>
+    readonly rollKey: FieldRef<"FabricInward", 'String'>
+    readonly batchNumber: FieldRef<"FabricInward", 'String'>
+    readonly shade: FieldRef<"FabricInward", 'String'>
+    readonly composition: FieldRef<"FabricInward", 'String'>
+    readonly width: FieldRef<"FabricInward", 'String'>
+    readonly unitRate: FieldRef<"FabricInward", 'Float'>
+    readonly storageLocation: FieldRef<"FabricInward", 'String'>
+    readonly purchaseOrderNumber: FieldRef<"FabricInward", 'String'>
+    readonly importId: FieldRef<"FabricInward", 'String'>
+    readonly importRowNumber: FieldRef<"FabricInward", 'Int'>
     readonly createdAt: FieldRef<"FabricInward", 'DateTime'>
     readonly updatedAt: FieldRef<"FabricInward", 'DateTime'>
   }
@@ -93361,6 +93893,10 @@ export namespace Prisma {
      */
     omit?: FabricInwardOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricInwardInclude<ExtArgs> | null
+    /**
      * Filter, which FabricInward to fetch.
      */
     where: FabricInwardWhereUniqueInput
@@ -93379,6 +93915,10 @@ export namespace Prisma {
      */
     omit?: FabricInwardOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricInwardInclude<ExtArgs> | null
+    /**
      * Filter, which FabricInward to fetch.
      */
     where: FabricInwardWhereUniqueInput
@@ -93396,6 +93936,10 @@ export namespace Prisma {
      * Omit specific fields from the FabricInward
      */
     omit?: FabricInwardOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricInwardInclude<ExtArgs> | null
     /**
      * Filter, which FabricInward to fetch.
      */
@@ -93445,6 +93989,10 @@ export namespace Prisma {
      */
     omit?: FabricInwardOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricInwardInclude<ExtArgs> | null
+    /**
      * Filter, which FabricInward to fetch.
      */
     where?: FabricInwardWhereInput
@@ -93493,6 +94041,10 @@ export namespace Prisma {
      */
     omit?: FabricInwardOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricInwardInclude<ExtArgs> | null
+    /**
      * Filter, which FabricInwards to fetch.
      */
     where?: FabricInwardWhereInput
@@ -93536,6 +94088,10 @@ export namespace Prisma {
      */
     omit?: FabricInwardOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricInwardInclude<ExtArgs> | null
+    /**
      * The data needed to create a FabricInward.
      */
     data: XOR<FabricInwardCreateInput, FabricInwardUncheckedCreateInput>
@@ -93569,6 +94125,10 @@ export namespace Prisma {
      */
     data: FabricInwardCreateManyInput | FabricInwardCreateManyInput[]
     skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricInwardIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -93583,6 +94143,10 @@ export namespace Prisma {
      * Omit specific fields from the FabricInward
      */
     omit?: FabricInwardOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricInwardInclude<ExtArgs> | null
     /**
      * The data needed to update a FabricInward.
      */
@@ -93635,6 +94199,10 @@ export namespace Prisma {
      * Limit how many FabricInwards to update.
      */
     limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricInwardIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -93649,6 +94217,10 @@ export namespace Prisma {
      * Omit specific fields from the FabricInward
      */
     omit?: FabricInwardOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricInwardInclude<ExtArgs> | null
     /**
      * The filter to search for the FabricInward to update in case it exists.
      */
@@ -93676,6 +94248,10 @@ export namespace Prisma {
      */
     omit?: FabricInwardOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricInwardInclude<ExtArgs> | null
+    /**
      * Filter which FabricInward to delete.
      */
     where: FabricInwardWhereUniqueInput
@@ -93696,6 +94272,25 @@ export namespace Prisma {
   }
 
   /**
+   * FabricInward.import
+   */
+  export type FabricInward$importArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImport
+     */
+    select?: FabricStockImportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockImport
+     */
+    omit?: FabricStockImportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockImportInclude<ExtArgs> | null
+    where?: FabricStockImportWhereInput
+  }
+
+  /**
    * FabricInward without action
    */
   export type FabricInwardDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -93707,6 +94302,10 @@ export namespace Prisma {
      * Omit specific fields from the FabricInward
      */
     omit?: FabricInwardOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricInwardInclude<ExtArgs> | null
   }
 
 
@@ -94917,6 +95516,2578 @@ export namespace Prisma {
      * Omit specific fields from the FabricOutward
      */
     omit?: FabricOutwardOmit<ExtArgs> | null
+  }
+
+
+  /**
+   * Model FabricStockImport
+   */
+
+  export type AggregateFabricStockImport = {
+    _count: FabricStockImportCountAggregateOutputType | null
+    _avg: FabricStockImportAvgAggregateOutputType | null
+    _sum: FabricStockImportSumAggregateOutputType | null
+    _min: FabricStockImportMinAggregateOutputType | null
+    _max: FabricStockImportMaxAggregateOutputType | null
+  }
+
+  export type FabricStockImportAvgAggregateOutputType = {
+    fileSize: number | null
+    headerRow: number | null
+  }
+
+  export type FabricStockImportSumAggregateOutputType = {
+    fileSize: number | null
+    headerRow: number | null
+  }
+
+  export type FabricStockImportMinAggregateOutputType = {
+    id: string | null
+    status: string | null
+    fileName: string | null
+    fileHash: string | null
+    fileSize: number | null
+    fileData: Bytes | null
+    sheetsJson: string | null
+    selectedSheet: string | null
+    headerRow: number | null
+    mappingJson: string | null
+    correctionsJson: string | null
+    resolutionsJson: string | null
+    validationJson: string | null
+    payloadHash: string | null
+    receiptNumber: string | null
+    confirmKey: string | null
+    postedAt: Date | null
+    postedById: string | null
+    postedResultJson: string | null
+    failureReason: string | null
+    uploadedById: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FabricStockImportMaxAggregateOutputType = {
+    id: string | null
+    status: string | null
+    fileName: string | null
+    fileHash: string | null
+    fileSize: number | null
+    fileData: Bytes | null
+    sheetsJson: string | null
+    selectedSheet: string | null
+    headerRow: number | null
+    mappingJson: string | null
+    correctionsJson: string | null
+    resolutionsJson: string | null
+    validationJson: string | null
+    payloadHash: string | null
+    receiptNumber: string | null
+    confirmKey: string | null
+    postedAt: Date | null
+    postedById: string | null
+    postedResultJson: string | null
+    failureReason: string | null
+    uploadedById: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FabricStockImportCountAggregateOutputType = {
+    id: number
+    status: number
+    fileName: number
+    fileHash: number
+    fileSize: number
+    fileData: number
+    sheetsJson: number
+    selectedSheet: number
+    headerRow: number
+    mappingJson: number
+    correctionsJson: number
+    resolutionsJson: number
+    validationJson: number
+    payloadHash: number
+    receiptNumber: number
+    confirmKey: number
+    postedAt: number
+    postedById: number
+    postedResultJson: number
+    failureReason: number
+    uploadedById: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type FabricStockImportAvgAggregateInputType = {
+    fileSize?: true
+    headerRow?: true
+  }
+
+  export type FabricStockImportSumAggregateInputType = {
+    fileSize?: true
+    headerRow?: true
+  }
+
+  export type FabricStockImportMinAggregateInputType = {
+    id?: true
+    status?: true
+    fileName?: true
+    fileHash?: true
+    fileSize?: true
+    fileData?: true
+    sheetsJson?: true
+    selectedSheet?: true
+    headerRow?: true
+    mappingJson?: true
+    correctionsJson?: true
+    resolutionsJson?: true
+    validationJson?: true
+    payloadHash?: true
+    receiptNumber?: true
+    confirmKey?: true
+    postedAt?: true
+    postedById?: true
+    postedResultJson?: true
+    failureReason?: true
+    uploadedById?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FabricStockImportMaxAggregateInputType = {
+    id?: true
+    status?: true
+    fileName?: true
+    fileHash?: true
+    fileSize?: true
+    fileData?: true
+    sheetsJson?: true
+    selectedSheet?: true
+    headerRow?: true
+    mappingJson?: true
+    correctionsJson?: true
+    resolutionsJson?: true
+    validationJson?: true
+    payloadHash?: true
+    receiptNumber?: true
+    confirmKey?: true
+    postedAt?: true
+    postedById?: true
+    postedResultJson?: true
+    failureReason?: true
+    uploadedById?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FabricStockImportCountAggregateInputType = {
+    id?: true
+    status?: true
+    fileName?: true
+    fileHash?: true
+    fileSize?: true
+    fileData?: true
+    sheetsJson?: true
+    selectedSheet?: true
+    headerRow?: true
+    mappingJson?: true
+    correctionsJson?: true
+    resolutionsJson?: true
+    validationJson?: true
+    payloadHash?: true
+    receiptNumber?: true
+    confirmKey?: true
+    postedAt?: true
+    postedById?: true
+    postedResultJson?: true
+    failureReason?: true
+    uploadedById?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type FabricStockImportAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FabricStockImport to aggregate.
+     */
+    where?: FabricStockImportWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricStockImports to fetch.
+     */
+    orderBy?: FabricStockImportOrderByWithRelationInput | FabricStockImportOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: FabricStockImportWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricStockImports from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricStockImports.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned FabricStockImports
+    **/
+    _count?: true | FabricStockImportCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: FabricStockImportAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: FabricStockImportSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: FabricStockImportMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: FabricStockImportMaxAggregateInputType
+  }
+
+  export type GetFabricStockImportAggregateType<T extends FabricStockImportAggregateArgs> = {
+        [P in keyof T & keyof AggregateFabricStockImport]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateFabricStockImport[P]>
+      : GetScalarType<T[P], AggregateFabricStockImport[P]>
+  }
+
+
+
+
+  export type FabricStockImportGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FabricStockImportWhereInput
+    orderBy?: FabricStockImportOrderByWithAggregationInput | FabricStockImportOrderByWithAggregationInput[]
+    by: FabricStockImportScalarFieldEnum[] | FabricStockImportScalarFieldEnum
+    having?: FabricStockImportScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: FabricStockImportCountAggregateInputType | true
+    _avg?: FabricStockImportAvgAggregateInputType
+    _sum?: FabricStockImportSumAggregateInputType
+    _min?: FabricStockImportMinAggregateInputType
+    _max?: FabricStockImportMaxAggregateInputType
+  }
+
+  export type FabricStockImportGroupByOutputType = {
+    id: string
+    status: string
+    fileName: string
+    fileHash: string
+    fileSize: number
+    fileData: Bytes
+    sheetsJson: string
+    selectedSheet: string | null
+    headerRow: number | null
+    mappingJson: string | null
+    correctionsJson: string | null
+    resolutionsJson: string | null
+    validationJson: string | null
+    payloadHash: string | null
+    receiptNumber: string | null
+    confirmKey: string | null
+    postedAt: Date | null
+    postedById: string | null
+    postedResultJson: string | null
+    failureReason: string | null
+    uploadedById: string
+    createdAt: Date
+    updatedAt: Date
+    _count: FabricStockImportCountAggregateOutputType | null
+    _avg: FabricStockImportAvgAggregateOutputType | null
+    _sum: FabricStockImportSumAggregateOutputType | null
+    _min: FabricStockImportMinAggregateOutputType | null
+    _max: FabricStockImportMaxAggregateOutputType | null
+  }
+
+  type GetFabricStockImportGroupByPayload<T extends FabricStockImportGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<FabricStockImportGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof FabricStockImportGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], FabricStockImportGroupByOutputType[P]>
+            : GetScalarType<T[P], FabricStockImportGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type FabricStockImportSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    status?: boolean
+    fileName?: boolean
+    fileHash?: boolean
+    fileSize?: boolean
+    fileData?: boolean
+    sheetsJson?: boolean
+    selectedSheet?: boolean
+    headerRow?: boolean
+    mappingJson?: boolean
+    correctionsJson?: boolean
+    resolutionsJson?: boolean
+    validationJson?: boolean
+    payloadHash?: boolean
+    receiptNumber?: boolean
+    confirmKey?: boolean
+    postedAt?: boolean
+    postedById?: boolean
+    postedResultJson?: boolean
+    failureReason?: boolean
+    uploadedById?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    postedBy?: boolean | FabricStockImport$postedByArgs<ExtArgs>
+    uploadedBy?: boolean | UserDefaultArgs<ExtArgs>
+    inwards?: boolean | FabricStockImport$inwardsArgs<ExtArgs>
+    documents?: boolean | FabricStockImport$documentsArgs<ExtArgs>
+    _count?: boolean | FabricStockImportCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["fabricStockImport"]>
+
+  export type FabricStockImportSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    status?: boolean
+    fileName?: boolean
+    fileHash?: boolean
+    fileSize?: boolean
+    fileData?: boolean
+    sheetsJson?: boolean
+    selectedSheet?: boolean
+    headerRow?: boolean
+    mappingJson?: boolean
+    correctionsJson?: boolean
+    resolutionsJson?: boolean
+    validationJson?: boolean
+    payloadHash?: boolean
+    receiptNumber?: boolean
+    confirmKey?: boolean
+    postedAt?: boolean
+    postedById?: boolean
+    postedResultJson?: boolean
+    failureReason?: boolean
+    uploadedById?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    postedBy?: boolean | FabricStockImport$postedByArgs<ExtArgs>
+    uploadedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["fabricStockImport"]>
+
+  export type FabricStockImportSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    status?: boolean
+    fileName?: boolean
+    fileHash?: boolean
+    fileSize?: boolean
+    fileData?: boolean
+    sheetsJson?: boolean
+    selectedSheet?: boolean
+    headerRow?: boolean
+    mappingJson?: boolean
+    correctionsJson?: boolean
+    resolutionsJson?: boolean
+    validationJson?: boolean
+    payloadHash?: boolean
+    receiptNumber?: boolean
+    confirmKey?: boolean
+    postedAt?: boolean
+    postedById?: boolean
+    postedResultJson?: boolean
+    failureReason?: boolean
+    uploadedById?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    postedBy?: boolean | FabricStockImport$postedByArgs<ExtArgs>
+    uploadedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["fabricStockImport"]>
+
+  export type FabricStockImportSelectScalar = {
+    id?: boolean
+    status?: boolean
+    fileName?: boolean
+    fileHash?: boolean
+    fileSize?: boolean
+    fileData?: boolean
+    sheetsJson?: boolean
+    selectedSheet?: boolean
+    headerRow?: boolean
+    mappingJson?: boolean
+    correctionsJson?: boolean
+    resolutionsJson?: boolean
+    validationJson?: boolean
+    payloadHash?: boolean
+    receiptNumber?: boolean
+    confirmKey?: boolean
+    postedAt?: boolean
+    postedById?: boolean
+    postedResultJson?: boolean
+    failureReason?: boolean
+    uploadedById?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type FabricStockImportOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "status" | "fileName" | "fileHash" | "fileSize" | "fileData" | "sheetsJson" | "selectedSheet" | "headerRow" | "mappingJson" | "correctionsJson" | "resolutionsJson" | "validationJson" | "payloadHash" | "receiptNumber" | "confirmKey" | "postedAt" | "postedById" | "postedResultJson" | "failureReason" | "uploadedById" | "createdAt" | "updatedAt", ExtArgs["result"]["fabricStockImport"]>
+  export type FabricStockImportInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    postedBy?: boolean | FabricStockImport$postedByArgs<ExtArgs>
+    uploadedBy?: boolean | UserDefaultArgs<ExtArgs>
+    inwards?: boolean | FabricStockImport$inwardsArgs<ExtArgs>
+    documents?: boolean | FabricStockImport$documentsArgs<ExtArgs>
+    _count?: boolean | FabricStockImportCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type FabricStockImportIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    postedBy?: boolean | FabricStockImport$postedByArgs<ExtArgs>
+    uploadedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type FabricStockImportIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    postedBy?: boolean | FabricStockImport$postedByArgs<ExtArgs>
+    uploadedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $FabricStockImportPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "FabricStockImport"
+    objects: {
+      postedBy: Prisma.$UserPayload<ExtArgs> | null
+      uploadedBy: Prisma.$UserPayload<ExtArgs>
+      inwards: Prisma.$FabricInwardPayload<ExtArgs>[]
+      documents: Prisma.$FabricStockImportDocumentPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      status: string
+      fileName: string
+      fileHash: string
+      fileSize: number
+      fileData: Prisma.Bytes
+      sheetsJson: string
+      selectedSheet: string | null
+      headerRow: number | null
+      mappingJson: string | null
+      correctionsJson: string | null
+      resolutionsJson: string | null
+      validationJson: string | null
+      payloadHash: string | null
+      receiptNumber: string | null
+      confirmKey: string | null
+      postedAt: Date | null
+      postedById: string | null
+      postedResultJson: string | null
+      failureReason: string | null
+      uploadedById: string
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["fabricStockImport"]>
+    composites: {}
+  }
+
+  type FabricStockImportGetPayload<S extends boolean | null | undefined | FabricStockImportDefaultArgs> = $Result.GetResult<Prisma.$FabricStockImportPayload, S>
+
+  type FabricStockImportCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<FabricStockImportFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: FabricStockImportCountAggregateInputType | true
+    }
+
+  export interface FabricStockImportDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['FabricStockImport'], meta: { name: 'FabricStockImport' } }
+    /**
+     * Find zero or one FabricStockImport that matches the filter.
+     * @param {FabricStockImportFindUniqueArgs} args - Arguments to find a FabricStockImport
+     * @example
+     * // Get one FabricStockImport
+     * const fabricStockImport = await prisma.fabricStockImport.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends FabricStockImportFindUniqueArgs>(args: SelectSubset<T, FabricStockImportFindUniqueArgs<ExtArgs>>): Prisma__FabricStockImportClient<$Result.GetResult<Prisma.$FabricStockImportPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one FabricStockImport that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {FabricStockImportFindUniqueOrThrowArgs} args - Arguments to find a FabricStockImport
+     * @example
+     * // Get one FabricStockImport
+     * const fabricStockImport = await prisma.fabricStockImport.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends FabricStockImportFindUniqueOrThrowArgs>(args: SelectSubset<T, FabricStockImportFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FabricStockImportClient<$Result.GetResult<Prisma.$FabricStockImportPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FabricStockImport that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricStockImportFindFirstArgs} args - Arguments to find a FabricStockImport
+     * @example
+     * // Get one FabricStockImport
+     * const fabricStockImport = await prisma.fabricStockImport.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends FabricStockImportFindFirstArgs>(args?: SelectSubset<T, FabricStockImportFindFirstArgs<ExtArgs>>): Prisma__FabricStockImportClient<$Result.GetResult<Prisma.$FabricStockImportPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FabricStockImport that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricStockImportFindFirstOrThrowArgs} args - Arguments to find a FabricStockImport
+     * @example
+     * // Get one FabricStockImport
+     * const fabricStockImport = await prisma.fabricStockImport.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends FabricStockImportFindFirstOrThrowArgs>(args?: SelectSubset<T, FabricStockImportFindFirstOrThrowArgs<ExtArgs>>): Prisma__FabricStockImportClient<$Result.GetResult<Prisma.$FabricStockImportPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more FabricStockImports that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricStockImportFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all FabricStockImports
+     * const fabricStockImports = await prisma.fabricStockImport.findMany()
+     * 
+     * // Get first 10 FabricStockImports
+     * const fabricStockImports = await prisma.fabricStockImport.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const fabricStockImportWithIdOnly = await prisma.fabricStockImport.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends FabricStockImportFindManyArgs>(args?: SelectSubset<T, FabricStockImportFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStockImportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a FabricStockImport.
+     * @param {FabricStockImportCreateArgs} args - Arguments to create a FabricStockImport.
+     * @example
+     * // Create one FabricStockImport
+     * const FabricStockImport = await prisma.fabricStockImport.create({
+     *   data: {
+     *     // ... data to create a FabricStockImport
+     *   }
+     * })
+     * 
+     */
+    create<T extends FabricStockImportCreateArgs>(args: SelectSubset<T, FabricStockImportCreateArgs<ExtArgs>>): Prisma__FabricStockImportClient<$Result.GetResult<Prisma.$FabricStockImportPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many FabricStockImports.
+     * @param {FabricStockImportCreateManyArgs} args - Arguments to create many FabricStockImports.
+     * @example
+     * // Create many FabricStockImports
+     * const fabricStockImport = await prisma.fabricStockImport.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends FabricStockImportCreateManyArgs>(args?: SelectSubset<T, FabricStockImportCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many FabricStockImports and returns the data saved in the database.
+     * @param {FabricStockImportCreateManyAndReturnArgs} args - Arguments to create many FabricStockImports.
+     * @example
+     * // Create many FabricStockImports
+     * const fabricStockImport = await prisma.fabricStockImport.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many FabricStockImports and only return the `id`
+     * const fabricStockImportWithIdOnly = await prisma.fabricStockImport.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends FabricStockImportCreateManyAndReturnArgs>(args?: SelectSubset<T, FabricStockImportCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStockImportPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a FabricStockImport.
+     * @param {FabricStockImportDeleteArgs} args - Arguments to delete one FabricStockImport.
+     * @example
+     * // Delete one FabricStockImport
+     * const FabricStockImport = await prisma.fabricStockImport.delete({
+     *   where: {
+     *     // ... filter to delete one FabricStockImport
+     *   }
+     * })
+     * 
+     */
+    delete<T extends FabricStockImportDeleteArgs>(args: SelectSubset<T, FabricStockImportDeleteArgs<ExtArgs>>): Prisma__FabricStockImportClient<$Result.GetResult<Prisma.$FabricStockImportPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one FabricStockImport.
+     * @param {FabricStockImportUpdateArgs} args - Arguments to update one FabricStockImport.
+     * @example
+     * // Update one FabricStockImport
+     * const fabricStockImport = await prisma.fabricStockImport.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends FabricStockImportUpdateArgs>(args: SelectSubset<T, FabricStockImportUpdateArgs<ExtArgs>>): Prisma__FabricStockImportClient<$Result.GetResult<Prisma.$FabricStockImportPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more FabricStockImports.
+     * @param {FabricStockImportDeleteManyArgs} args - Arguments to filter FabricStockImports to delete.
+     * @example
+     * // Delete a few FabricStockImports
+     * const { count } = await prisma.fabricStockImport.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends FabricStockImportDeleteManyArgs>(args?: SelectSubset<T, FabricStockImportDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FabricStockImports.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricStockImportUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many FabricStockImports
+     * const fabricStockImport = await prisma.fabricStockImport.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends FabricStockImportUpdateManyArgs>(args: SelectSubset<T, FabricStockImportUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FabricStockImports and returns the data updated in the database.
+     * @param {FabricStockImportUpdateManyAndReturnArgs} args - Arguments to update many FabricStockImports.
+     * @example
+     * // Update many FabricStockImports
+     * const fabricStockImport = await prisma.fabricStockImport.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more FabricStockImports and only return the `id`
+     * const fabricStockImportWithIdOnly = await prisma.fabricStockImport.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends FabricStockImportUpdateManyAndReturnArgs>(args: SelectSubset<T, FabricStockImportUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStockImportPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one FabricStockImport.
+     * @param {FabricStockImportUpsertArgs} args - Arguments to update or create a FabricStockImport.
+     * @example
+     * // Update or create a FabricStockImport
+     * const fabricStockImport = await prisma.fabricStockImport.upsert({
+     *   create: {
+     *     // ... data to create a FabricStockImport
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the FabricStockImport we want to update
+     *   }
+     * })
+     */
+    upsert<T extends FabricStockImportUpsertArgs>(args: SelectSubset<T, FabricStockImportUpsertArgs<ExtArgs>>): Prisma__FabricStockImportClient<$Result.GetResult<Prisma.$FabricStockImportPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of FabricStockImports.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricStockImportCountArgs} args - Arguments to filter FabricStockImports to count.
+     * @example
+     * // Count the number of FabricStockImports
+     * const count = await prisma.fabricStockImport.count({
+     *   where: {
+     *     // ... the filter for the FabricStockImports we want to count
+     *   }
+     * })
+    **/
+    count<T extends FabricStockImportCountArgs>(
+      args?: Subset<T, FabricStockImportCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], FabricStockImportCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a FabricStockImport.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricStockImportAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends FabricStockImportAggregateArgs>(args: Subset<T, FabricStockImportAggregateArgs>): Prisma.PrismaPromise<GetFabricStockImportAggregateType<T>>
+
+    /**
+     * Group by FabricStockImport.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricStockImportGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends FabricStockImportGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: FabricStockImportGroupByArgs['orderBy'] }
+        : { orderBy?: FabricStockImportGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, FabricStockImportGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFabricStockImportGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the FabricStockImport model
+   */
+  readonly fields: FabricStockImportFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for FabricStockImport.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__FabricStockImportClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    postedBy<T extends FabricStockImport$postedByArgs<ExtArgs> = {}>(args?: Subset<T, FabricStockImport$postedByArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    uploadedBy<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    inwards<T extends FabricStockImport$inwardsArgs<ExtArgs> = {}>(args?: Subset<T, FabricStockImport$inwardsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricInwardPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    documents<T extends FabricStockImport$documentsArgs<ExtArgs> = {}>(args?: Subset<T, FabricStockImport$documentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStockImportDocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the FabricStockImport model
+   */
+  interface FabricStockImportFieldRefs {
+    readonly id: FieldRef<"FabricStockImport", 'String'>
+    readonly status: FieldRef<"FabricStockImport", 'String'>
+    readonly fileName: FieldRef<"FabricStockImport", 'String'>
+    readonly fileHash: FieldRef<"FabricStockImport", 'String'>
+    readonly fileSize: FieldRef<"FabricStockImport", 'Int'>
+    readonly fileData: FieldRef<"FabricStockImport", 'Bytes'>
+    readonly sheetsJson: FieldRef<"FabricStockImport", 'String'>
+    readonly selectedSheet: FieldRef<"FabricStockImport", 'String'>
+    readonly headerRow: FieldRef<"FabricStockImport", 'Int'>
+    readonly mappingJson: FieldRef<"FabricStockImport", 'String'>
+    readonly correctionsJson: FieldRef<"FabricStockImport", 'String'>
+    readonly resolutionsJson: FieldRef<"FabricStockImport", 'String'>
+    readonly validationJson: FieldRef<"FabricStockImport", 'String'>
+    readonly payloadHash: FieldRef<"FabricStockImport", 'String'>
+    readonly receiptNumber: FieldRef<"FabricStockImport", 'String'>
+    readonly confirmKey: FieldRef<"FabricStockImport", 'String'>
+    readonly postedAt: FieldRef<"FabricStockImport", 'DateTime'>
+    readonly postedById: FieldRef<"FabricStockImport", 'String'>
+    readonly postedResultJson: FieldRef<"FabricStockImport", 'String'>
+    readonly failureReason: FieldRef<"FabricStockImport", 'String'>
+    readonly uploadedById: FieldRef<"FabricStockImport", 'String'>
+    readonly createdAt: FieldRef<"FabricStockImport", 'DateTime'>
+    readonly updatedAt: FieldRef<"FabricStockImport", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * FabricStockImport findUnique
+   */
+  export type FabricStockImportFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImport
+     */
+    select?: FabricStockImportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockImport
+     */
+    omit?: FabricStockImportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockImportInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricStockImport to fetch.
+     */
+    where: FabricStockImportWhereUniqueInput
+  }
+
+  /**
+   * FabricStockImport findUniqueOrThrow
+   */
+  export type FabricStockImportFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImport
+     */
+    select?: FabricStockImportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockImport
+     */
+    omit?: FabricStockImportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockImportInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricStockImport to fetch.
+     */
+    where: FabricStockImportWhereUniqueInput
+  }
+
+  /**
+   * FabricStockImport findFirst
+   */
+  export type FabricStockImportFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImport
+     */
+    select?: FabricStockImportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockImport
+     */
+    omit?: FabricStockImportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockImportInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricStockImport to fetch.
+     */
+    where?: FabricStockImportWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricStockImports to fetch.
+     */
+    orderBy?: FabricStockImportOrderByWithRelationInput | FabricStockImportOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FabricStockImports.
+     */
+    cursor?: FabricStockImportWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricStockImports from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricStockImports.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FabricStockImports.
+     */
+    distinct?: FabricStockImportScalarFieldEnum | FabricStockImportScalarFieldEnum[]
+  }
+
+  /**
+   * FabricStockImport findFirstOrThrow
+   */
+  export type FabricStockImportFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImport
+     */
+    select?: FabricStockImportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockImport
+     */
+    omit?: FabricStockImportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockImportInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricStockImport to fetch.
+     */
+    where?: FabricStockImportWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricStockImports to fetch.
+     */
+    orderBy?: FabricStockImportOrderByWithRelationInput | FabricStockImportOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FabricStockImports.
+     */
+    cursor?: FabricStockImportWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricStockImports from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricStockImports.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FabricStockImports.
+     */
+    distinct?: FabricStockImportScalarFieldEnum | FabricStockImportScalarFieldEnum[]
+  }
+
+  /**
+   * FabricStockImport findMany
+   */
+  export type FabricStockImportFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImport
+     */
+    select?: FabricStockImportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockImport
+     */
+    omit?: FabricStockImportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockImportInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricStockImports to fetch.
+     */
+    where?: FabricStockImportWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricStockImports to fetch.
+     */
+    orderBy?: FabricStockImportOrderByWithRelationInput | FabricStockImportOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing FabricStockImports.
+     */
+    cursor?: FabricStockImportWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricStockImports from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricStockImports.
+     */
+    skip?: number
+    distinct?: FabricStockImportScalarFieldEnum | FabricStockImportScalarFieldEnum[]
+  }
+
+  /**
+   * FabricStockImport create
+   */
+  export type FabricStockImportCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImport
+     */
+    select?: FabricStockImportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockImport
+     */
+    omit?: FabricStockImportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockImportInclude<ExtArgs> | null
+    /**
+     * The data needed to create a FabricStockImport.
+     */
+    data: XOR<FabricStockImportCreateInput, FabricStockImportUncheckedCreateInput>
+  }
+
+  /**
+   * FabricStockImport createMany
+   */
+  export type FabricStockImportCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many FabricStockImports.
+     */
+    data: FabricStockImportCreateManyInput | FabricStockImportCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * FabricStockImport createManyAndReturn
+   */
+  export type FabricStockImportCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImport
+     */
+    select?: FabricStockImportSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockImport
+     */
+    omit?: FabricStockImportOmit<ExtArgs> | null
+    /**
+     * The data used to create many FabricStockImports.
+     */
+    data: FabricStockImportCreateManyInput | FabricStockImportCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockImportIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * FabricStockImport update
+   */
+  export type FabricStockImportUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImport
+     */
+    select?: FabricStockImportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockImport
+     */
+    omit?: FabricStockImportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockImportInclude<ExtArgs> | null
+    /**
+     * The data needed to update a FabricStockImport.
+     */
+    data: XOR<FabricStockImportUpdateInput, FabricStockImportUncheckedUpdateInput>
+    /**
+     * Choose, which FabricStockImport to update.
+     */
+    where: FabricStockImportWhereUniqueInput
+  }
+
+  /**
+   * FabricStockImport updateMany
+   */
+  export type FabricStockImportUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update FabricStockImports.
+     */
+    data: XOR<FabricStockImportUpdateManyMutationInput, FabricStockImportUncheckedUpdateManyInput>
+    /**
+     * Filter which FabricStockImports to update
+     */
+    where?: FabricStockImportWhereInput
+    /**
+     * Limit how many FabricStockImports to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * FabricStockImport updateManyAndReturn
+   */
+  export type FabricStockImportUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImport
+     */
+    select?: FabricStockImportSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockImport
+     */
+    omit?: FabricStockImportOmit<ExtArgs> | null
+    /**
+     * The data used to update FabricStockImports.
+     */
+    data: XOR<FabricStockImportUpdateManyMutationInput, FabricStockImportUncheckedUpdateManyInput>
+    /**
+     * Filter which FabricStockImports to update
+     */
+    where?: FabricStockImportWhereInput
+    /**
+     * Limit how many FabricStockImports to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockImportIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * FabricStockImport upsert
+   */
+  export type FabricStockImportUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImport
+     */
+    select?: FabricStockImportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockImport
+     */
+    omit?: FabricStockImportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockImportInclude<ExtArgs> | null
+    /**
+     * The filter to search for the FabricStockImport to update in case it exists.
+     */
+    where: FabricStockImportWhereUniqueInput
+    /**
+     * In case the FabricStockImport found by the `where` argument doesn't exist, create a new FabricStockImport with this data.
+     */
+    create: XOR<FabricStockImportCreateInput, FabricStockImportUncheckedCreateInput>
+    /**
+     * In case the FabricStockImport was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<FabricStockImportUpdateInput, FabricStockImportUncheckedUpdateInput>
+  }
+
+  /**
+   * FabricStockImport delete
+   */
+  export type FabricStockImportDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImport
+     */
+    select?: FabricStockImportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockImport
+     */
+    omit?: FabricStockImportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockImportInclude<ExtArgs> | null
+    /**
+     * Filter which FabricStockImport to delete.
+     */
+    where: FabricStockImportWhereUniqueInput
+  }
+
+  /**
+   * FabricStockImport deleteMany
+   */
+  export type FabricStockImportDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FabricStockImports to delete
+     */
+    where?: FabricStockImportWhereInput
+    /**
+     * Limit how many FabricStockImports to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * FabricStockImport.postedBy
+   */
+  export type FabricStockImport$postedByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * FabricStockImport.inwards
+   */
+  export type FabricStockImport$inwardsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricInward
+     */
+    select?: FabricInwardSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricInward
+     */
+    omit?: FabricInwardOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricInwardInclude<ExtArgs> | null
+    where?: FabricInwardWhereInput
+    orderBy?: FabricInwardOrderByWithRelationInput | FabricInwardOrderByWithRelationInput[]
+    cursor?: FabricInwardWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FabricInwardScalarFieldEnum | FabricInwardScalarFieldEnum[]
+  }
+
+  /**
+   * FabricStockImport.documents
+   */
+  export type FabricStockImport$documentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImportDocument
+     */
+    select?: FabricStockImportDocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockImportDocument
+     */
+    omit?: FabricStockImportDocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockImportDocumentInclude<ExtArgs> | null
+    where?: FabricStockImportDocumentWhereInput
+    orderBy?: FabricStockImportDocumentOrderByWithRelationInput | FabricStockImportDocumentOrderByWithRelationInput[]
+    cursor?: FabricStockImportDocumentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FabricStockImportDocumentScalarFieldEnum | FabricStockImportDocumentScalarFieldEnum[]
+  }
+
+  /**
+   * FabricStockImport without action
+   */
+  export type FabricStockImportDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImport
+     */
+    select?: FabricStockImportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockImport
+     */
+    omit?: FabricStockImportOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockImportInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model FabricStockImportDocument
+   */
+
+  export type AggregateFabricStockImportDocument = {
+    _count: FabricStockImportDocumentCountAggregateOutputType | null
+    _avg: FabricStockImportDocumentAvgAggregateOutputType | null
+    _sum: FabricStockImportDocumentSumAggregateOutputType | null
+    _min: FabricStockImportDocumentMinAggregateOutputType | null
+    _max: FabricStockImportDocumentMaxAggregateOutputType | null
+  }
+
+  export type FabricStockImportDocumentAvgAggregateOutputType = {
+    size: number | null
+  }
+
+  export type FabricStockImportDocumentSumAggregateOutputType = {
+    size: number | null
+  }
+
+  export type FabricStockImportDocumentMinAggregateOutputType = {
+    id: string | null
+    importId: string | null
+    kind: string | null
+    sheetName: string | null
+    mimeType: string | null
+    size: number | null
+    sha256: string | null
+    data: Bytes | null
+    ocrStatus: string | null
+    createdAt: Date | null
+  }
+
+  export type FabricStockImportDocumentMaxAggregateOutputType = {
+    id: string | null
+    importId: string | null
+    kind: string | null
+    sheetName: string | null
+    mimeType: string | null
+    size: number | null
+    sha256: string | null
+    data: Bytes | null
+    ocrStatus: string | null
+    createdAt: Date | null
+  }
+
+  export type FabricStockImportDocumentCountAggregateOutputType = {
+    id: number
+    importId: number
+    kind: number
+    sheetName: number
+    mimeType: number
+    size: number
+    sha256: number
+    data: number
+    ocrStatus: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type FabricStockImportDocumentAvgAggregateInputType = {
+    size?: true
+  }
+
+  export type FabricStockImportDocumentSumAggregateInputType = {
+    size?: true
+  }
+
+  export type FabricStockImportDocumentMinAggregateInputType = {
+    id?: true
+    importId?: true
+    kind?: true
+    sheetName?: true
+    mimeType?: true
+    size?: true
+    sha256?: true
+    data?: true
+    ocrStatus?: true
+    createdAt?: true
+  }
+
+  export type FabricStockImportDocumentMaxAggregateInputType = {
+    id?: true
+    importId?: true
+    kind?: true
+    sheetName?: true
+    mimeType?: true
+    size?: true
+    sha256?: true
+    data?: true
+    ocrStatus?: true
+    createdAt?: true
+  }
+
+  export type FabricStockImportDocumentCountAggregateInputType = {
+    id?: true
+    importId?: true
+    kind?: true
+    sheetName?: true
+    mimeType?: true
+    size?: true
+    sha256?: true
+    data?: true
+    ocrStatus?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type FabricStockImportDocumentAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FabricStockImportDocument to aggregate.
+     */
+    where?: FabricStockImportDocumentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricStockImportDocuments to fetch.
+     */
+    orderBy?: FabricStockImportDocumentOrderByWithRelationInput | FabricStockImportDocumentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: FabricStockImportDocumentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricStockImportDocuments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricStockImportDocuments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned FabricStockImportDocuments
+    **/
+    _count?: true | FabricStockImportDocumentCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: FabricStockImportDocumentAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: FabricStockImportDocumentSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: FabricStockImportDocumentMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: FabricStockImportDocumentMaxAggregateInputType
+  }
+
+  export type GetFabricStockImportDocumentAggregateType<T extends FabricStockImportDocumentAggregateArgs> = {
+        [P in keyof T & keyof AggregateFabricStockImportDocument]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateFabricStockImportDocument[P]>
+      : GetScalarType<T[P], AggregateFabricStockImportDocument[P]>
+  }
+
+
+
+
+  export type FabricStockImportDocumentGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FabricStockImportDocumentWhereInput
+    orderBy?: FabricStockImportDocumentOrderByWithAggregationInput | FabricStockImportDocumentOrderByWithAggregationInput[]
+    by: FabricStockImportDocumentScalarFieldEnum[] | FabricStockImportDocumentScalarFieldEnum
+    having?: FabricStockImportDocumentScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: FabricStockImportDocumentCountAggregateInputType | true
+    _avg?: FabricStockImportDocumentAvgAggregateInputType
+    _sum?: FabricStockImportDocumentSumAggregateInputType
+    _min?: FabricStockImportDocumentMinAggregateInputType
+    _max?: FabricStockImportDocumentMaxAggregateInputType
+  }
+
+  export type FabricStockImportDocumentGroupByOutputType = {
+    id: string
+    importId: string
+    kind: string
+    sheetName: string | null
+    mimeType: string
+    size: number
+    sha256: string
+    data: Bytes
+    ocrStatus: string
+    createdAt: Date
+    _count: FabricStockImportDocumentCountAggregateOutputType | null
+    _avg: FabricStockImportDocumentAvgAggregateOutputType | null
+    _sum: FabricStockImportDocumentSumAggregateOutputType | null
+    _min: FabricStockImportDocumentMinAggregateOutputType | null
+    _max: FabricStockImportDocumentMaxAggregateOutputType | null
+  }
+
+  type GetFabricStockImportDocumentGroupByPayload<T extends FabricStockImportDocumentGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<FabricStockImportDocumentGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof FabricStockImportDocumentGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], FabricStockImportDocumentGroupByOutputType[P]>
+            : GetScalarType<T[P], FabricStockImportDocumentGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type FabricStockImportDocumentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    importId?: boolean
+    kind?: boolean
+    sheetName?: boolean
+    mimeType?: boolean
+    size?: boolean
+    sha256?: boolean
+    data?: boolean
+    ocrStatus?: boolean
+    createdAt?: boolean
+    import?: boolean | FabricStockImportDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["fabricStockImportDocument"]>
+
+  export type FabricStockImportDocumentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    importId?: boolean
+    kind?: boolean
+    sheetName?: boolean
+    mimeType?: boolean
+    size?: boolean
+    sha256?: boolean
+    data?: boolean
+    ocrStatus?: boolean
+    createdAt?: boolean
+    import?: boolean | FabricStockImportDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["fabricStockImportDocument"]>
+
+  export type FabricStockImportDocumentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    importId?: boolean
+    kind?: boolean
+    sheetName?: boolean
+    mimeType?: boolean
+    size?: boolean
+    sha256?: boolean
+    data?: boolean
+    ocrStatus?: boolean
+    createdAt?: boolean
+    import?: boolean | FabricStockImportDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["fabricStockImportDocument"]>
+
+  export type FabricStockImportDocumentSelectScalar = {
+    id?: boolean
+    importId?: boolean
+    kind?: boolean
+    sheetName?: boolean
+    mimeType?: boolean
+    size?: boolean
+    sha256?: boolean
+    data?: boolean
+    ocrStatus?: boolean
+    createdAt?: boolean
+  }
+
+  export type FabricStockImportDocumentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "importId" | "kind" | "sheetName" | "mimeType" | "size" | "sha256" | "data" | "ocrStatus" | "createdAt", ExtArgs["result"]["fabricStockImportDocument"]>
+  export type FabricStockImportDocumentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    import?: boolean | FabricStockImportDefaultArgs<ExtArgs>
+  }
+  export type FabricStockImportDocumentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    import?: boolean | FabricStockImportDefaultArgs<ExtArgs>
+  }
+  export type FabricStockImportDocumentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    import?: boolean | FabricStockImportDefaultArgs<ExtArgs>
+  }
+
+  export type $FabricStockImportDocumentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "FabricStockImportDocument"
+    objects: {
+      import: Prisma.$FabricStockImportPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      importId: string
+      kind: string
+      sheetName: string | null
+      mimeType: string
+      size: number
+      sha256: string
+      data: Prisma.Bytes
+      ocrStatus: string
+      createdAt: Date
+    }, ExtArgs["result"]["fabricStockImportDocument"]>
+    composites: {}
+  }
+
+  type FabricStockImportDocumentGetPayload<S extends boolean | null | undefined | FabricStockImportDocumentDefaultArgs> = $Result.GetResult<Prisma.$FabricStockImportDocumentPayload, S>
+
+  type FabricStockImportDocumentCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<FabricStockImportDocumentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: FabricStockImportDocumentCountAggregateInputType | true
+    }
+
+  export interface FabricStockImportDocumentDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['FabricStockImportDocument'], meta: { name: 'FabricStockImportDocument' } }
+    /**
+     * Find zero or one FabricStockImportDocument that matches the filter.
+     * @param {FabricStockImportDocumentFindUniqueArgs} args - Arguments to find a FabricStockImportDocument
+     * @example
+     * // Get one FabricStockImportDocument
+     * const fabricStockImportDocument = await prisma.fabricStockImportDocument.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends FabricStockImportDocumentFindUniqueArgs>(args: SelectSubset<T, FabricStockImportDocumentFindUniqueArgs<ExtArgs>>): Prisma__FabricStockImportDocumentClient<$Result.GetResult<Prisma.$FabricStockImportDocumentPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one FabricStockImportDocument that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {FabricStockImportDocumentFindUniqueOrThrowArgs} args - Arguments to find a FabricStockImportDocument
+     * @example
+     * // Get one FabricStockImportDocument
+     * const fabricStockImportDocument = await prisma.fabricStockImportDocument.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends FabricStockImportDocumentFindUniqueOrThrowArgs>(args: SelectSubset<T, FabricStockImportDocumentFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FabricStockImportDocumentClient<$Result.GetResult<Prisma.$FabricStockImportDocumentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FabricStockImportDocument that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricStockImportDocumentFindFirstArgs} args - Arguments to find a FabricStockImportDocument
+     * @example
+     * // Get one FabricStockImportDocument
+     * const fabricStockImportDocument = await prisma.fabricStockImportDocument.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends FabricStockImportDocumentFindFirstArgs>(args?: SelectSubset<T, FabricStockImportDocumentFindFirstArgs<ExtArgs>>): Prisma__FabricStockImportDocumentClient<$Result.GetResult<Prisma.$FabricStockImportDocumentPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FabricStockImportDocument that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricStockImportDocumentFindFirstOrThrowArgs} args - Arguments to find a FabricStockImportDocument
+     * @example
+     * // Get one FabricStockImportDocument
+     * const fabricStockImportDocument = await prisma.fabricStockImportDocument.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends FabricStockImportDocumentFindFirstOrThrowArgs>(args?: SelectSubset<T, FabricStockImportDocumentFindFirstOrThrowArgs<ExtArgs>>): Prisma__FabricStockImportDocumentClient<$Result.GetResult<Prisma.$FabricStockImportDocumentPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more FabricStockImportDocuments that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricStockImportDocumentFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all FabricStockImportDocuments
+     * const fabricStockImportDocuments = await prisma.fabricStockImportDocument.findMany()
+     * 
+     * // Get first 10 FabricStockImportDocuments
+     * const fabricStockImportDocuments = await prisma.fabricStockImportDocument.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const fabricStockImportDocumentWithIdOnly = await prisma.fabricStockImportDocument.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends FabricStockImportDocumentFindManyArgs>(args?: SelectSubset<T, FabricStockImportDocumentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStockImportDocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a FabricStockImportDocument.
+     * @param {FabricStockImportDocumentCreateArgs} args - Arguments to create a FabricStockImportDocument.
+     * @example
+     * // Create one FabricStockImportDocument
+     * const FabricStockImportDocument = await prisma.fabricStockImportDocument.create({
+     *   data: {
+     *     // ... data to create a FabricStockImportDocument
+     *   }
+     * })
+     * 
+     */
+    create<T extends FabricStockImportDocumentCreateArgs>(args: SelectSubset<T, FabricStockImportDocumentCreateArgs<ExtArgs>>): Prisma__FabricStockImportDocumentClient<$Result.GetResult<Prisma.$FabricStockImportDocumentPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many FabricStockImportDocuments.
+     * @param {FabricStockImportDocumentCreateManyArgs} args - Arguments to create many FabricStockImportDocuments.
+     * @example
+     * // Create many FabricStockImportDocuments
+     * const fabricStockImportDocument = await prisma.fabricStockImportDocument.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends FabricStockImportDocumentCreateManyArgs>(args?: SelectSubset<T, FabricStockImportDocumentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many FabricStockImportDocuments and returns the data saved in the database.
+     * @param {FabricStockImportDocumentCreateManyAndReturnArgs} args - Arguments to create many FabricStockImportDocuments.
+     * @example
+     * // Create many FabricStockImportDocuments
+     * const fabricStockImportDocument = await prisma.fabricStockImportDocument.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many FabricStockImportDocuments and only return the `id`
+     * const fabricStockImportDocumentWithIdOnly = await prisma.fabricStockImportDocument.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends FabricStockImportDocumentCreateManyAndReturnArgs>(args?: SelectSubset<T, FabricStockImportDocumentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStockImportDocumentPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a FabricStockImportDocument.
+     * @param {FabricStockImportDocumentDeleteArgs} args - Arguments to delete one FabricStockImportDocument.
+     * @example
+     * // Delete one FabricStockImportDocument
+     * const FabricStockImportDocument = await prisma.fabricStockImportDocument.delete({
+     *   where: {
+     *     // ... filter to delete one FabricStockImportDocument
+     *   }
+     * })
+     * 
+     */
+    delete<T extends FabricStockImportDocumentDeleteArgs>(args: SelectSubset<T, FabricStockImportDocumentDeleteArgs<ExtArgs>>): Prisma__FabricStockImportDocumentClient<$Result.GetResult<Prisma.$FabricStockImportDocumentPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one FabricStockImportDocument.
+     * @param {FabricStockImportDocumentUpdateArgs} args - Arguments to update one FabricStockImportDocument.
+     * @example
+     * // Update one FabricStockImportDocument
+     * const fabricStockImportDocument = await prisma.fabricStockImportDocument.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends FabricStockImportDocumentUpdateArgs>(args: SelectSubset<T, FabricStockImportDocumentUpdateArgs<ExtArgs>>): Prisma__FabricStockImportDocumentClient<$Result.GetResult<Prisma.$FabricStockImportDocumentPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more FabricStockImportDocuments.
+     * @param {FabricStockImportDocumentDeleteManyArgs} args - Arguments to filter FabricStockImportDocuments to delete.
+     * @example
+     * // Delete a few FabricStockImportDocuments
+     * const { count } = await prisma.fabricStockImportDocument.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends FabricStockImportDocumentDeleteManyArgs>(args?: SelectSubset<T, FabricStockImportDocumentDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FabricStockImportDocuments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricStockImportDocumentUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many FabricStockImportDocuments
+     * const fabricStockImportDocument = await prisma.fabricStockImportDocument.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends FabricStockImportDocumentUpdateManyArgs>(args: SelectSubset<T, FabricStockImportDocumentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FabricStockImportDocuments and returns the data updated in the database.
+     * @param {FabricStockImportDocumentUpdateManyAndReturnArgs} args - Arguments to update many FabricStockImportDocuments.
+     * @example
+     * // Update many FabricStockImportDocuments
+     * const fabricStockImportDocument = await prisma.fabricStockImportDocument.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more FabricStockImportDocuments and only return the `id`
+     * const fabricStockImportDocumentWithIdOnly = await prisma.fabricStockImportDocument.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends FabricStockImportDocumentUpdateManyAndReturnArgs>(args: SelectSubset<T, FabricStockImportDocumentUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FabricStockImportDocumentPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one FabricStockImportDocument.
+     * @param {FabricStockImportDocumentUpsertArgs} args - Arguments to update or create a FabricStockImportDocument.
+     * @example
+     * // Update or create a FabricStockImportDocument
+     * const fabricStockImportDocument = await prisma.fabricStockImportDocument.upsert({
+     *   create: {
+     *     // ... data to create a FabricStockImportDocument
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the FabricStockImportDocument we want to update
+     *   }
+     * })
+     */
+    upsert<T extends FabricStockImportDocumentUpsertArgs>(args: SelectSubset<T, FabricStockImportDocumentUpsertArgs<ExtArgs>>): Prisma__FabricStockImportDocumentClient<$Result.GetResult<Prisma.$FabricStockImportDocumentPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of FabricStockImportDocuments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricStockImportDocumentCountArgs} args - Arguments to filter FabricStockImportDocuments to count.
+     * @example
+     * // Count the number of FabricStockImportDocuments
+     * const count = await prisma.fabricStockImportDocument.count({
+     *   where: {
+     *     // ... the filter for the FabricStockImportDocuments we want to count
+     *   }
+     * })
+    **/
+    count<T extends FabricStockImportDocumentCountArgs>(
+      args?: Subset<T, FabricStockImportDocumentCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], FabricStockImportDocumentCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a FabricStockImportDocument.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricStockImportDocumentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends FabricStockImportDocumentAggregateArgs>(args: Subset<T, FabricStockImportDocumentAggregateArgs>): Prisma.PrismaPromise<GetFabricStockImportDocumentAggregateType<T>>
+
+    /**
+     * Group by FabricStockImportDocument.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FabricStockImportDocumentGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends FabricStockImportDocumentGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: FabricStockImportDocumentGroupByArgs['orderBy'] }
+        : { orderBy?: FabricStockImportDocumentGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, FabricStockImportDocumentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFabricStockImportDocumentGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the FabricStockImportDocument model
+   */
+  readonly fields: FabricStockImportDocumentFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for FabricStockImportDocument.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__FabricStockImportDocumentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    import<T extends FabricStockImportDefaultArgs<ExtArgs> = {}>(args?: Subset<T, FabricStockImportDefaultArgs<ExtArgs>>): Prisma__FabricStockImportClient<$Result.GetResult<Prisma.$FabricStockImportPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the FabricStockImportDocument model
+   */
+  interface FabricStockImportDocumentFieldRefs {
+    readonly id: FieldRef<"FabricStockImportDocument", 'String'>
+    readonly importId: FieldRef<"FabricStockImportDocument", 'String'>
+    readonly kind: FieldRef<"FabricStockImportDocument", 'String'>
+    readonly sheetName: FieldRef<"FabricStockImportDocument", 'String'>
+    readonly mimeType: FieldRef<"FabricStockImportDocument", 'String'>
+    readonly size: FieldRef<"FabricStockImportDocument", 'Int'>
+    readonly sha256: FieldRef<"FabricStockImportDocument", 'String'>
+    readonly data: FieldRef<"FabricStockImportDocument", 'Bytes'>
+    readonly ocrStatus: FieldRef<"FabricStockImportDocument", 'String'>
+    readonly createdAt: FieldRef<"FabricStockImportDocument", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * FabricStockImportDocument findUnique
+   */
+  export type FabricStockImportDocumentFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImportDocument
+     */
+    select?: FabricStockImportDocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockImportDocument
+     */
+    omit?: FabricStockImportDocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockImportDocumentInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricStockImportDocument to fetch.
+     */
+    where: FabricStockImportDocumentWhereUniqueInput
+  }
+
+  /**
+   * FabricStockImportDocument findUniqueOrThrow
+   */
+  export type FabricStockImportDocumentFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImportDocument
+     */
+    select?: FabricStockImportDocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockImportDocument
+     */
+    omit?: FabricStockImportDocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockImportDocumentInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricStockImportDocument to fetch.
+     */
+    where: FabricStockImportDocumentWhereUniqueInput
+  }
+
+  /**
+   * FabricStockImportDocument findFirst
+   */
+  export type FabricStockImportDocumentFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImportDocument
+     */
+    select?: FabricStockImportDocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockImportDocument
+     */
+    omit?: FabricStockImportDocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockImportDocumentInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricStockImportDocument to fetch.
+     */
+    where?: FabricStockImportDocumentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricStockImportDocuments to fetch.
+     */
+    orderBy?: FabricStockImportDocumentOrderByWithRelationInput | FabricStockImportDocumentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FabricStockImportDocuments.
+     */
+    cursor?: FabricStockImportDocumentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricStockImportDocuments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricStockImportDocuments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FabricStockImportDocuments.
+     */
+    distinct?: FabricStockImportDocumentScalarFieldEnum | FabricStockImportDocumentScalarFieldEnum[]
+  }
+
+  /**
+   * FabricStockImportDocument findFirstOrThrow
+   */
+  export type FabricStockImportDocumentFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImportDocument
+     */
+    select?: FabricStockImportDocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockImportDocument
+     */
+    omit?: FabricStockImportDocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockImportDocumentInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricStockImportDocument to fetch.
+     */
+    where?: FabricStockImportDocumentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricStockImportDocuments to fetch.
+     */
+    orderBy?: FabricStockImportDocumentOrderByWithRelationInput | FabricStockImportDocumentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FabricStockImportDocuments.
+     */
+    cursor?: FabricStockImportDocumentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricStockImportDocuments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricStockImportDocuments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FabricStockImportDocuments.
+     */
+    distinct?: FabricStockImportDocumentScalarFieldEnum | FabricStockImportDocumentScalarFieldEnum[]
+  }
+
+  /**
+   * FabricStockImportDocument findMany
+   */
+  export type FabricStockImportDocumentFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImportDocument
+     */
+    select?: FabricStockImportDocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockImportDocument
+     */
+    omit?: FabricStockImportDocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockImportDocumentInclude<ExtArgs> | null
+    /**
+     * Filter, which FabricStockImportDocuments to fetch.
+     */
+    where?: FabricStockImportDocumentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FabricStockImportDocuments to fetch.
+     */
+    orderBy?: FabricStockImportDocumentOrderByWithRelationInput | FabricStockImportDocumentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing FabricStockImportDocuments.
+     */
+    cursor?: FabricStockImportDocumentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FabricStockImportDocuments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FabricStockImportDocuments.
+     */
+    skip?: number
+    distinct?: FabricStockImportDocumentScalarFieldEnum | FabricStockImportDocumentScalarFieldEnum[]
+  }
+
+  /**
+   * FabricStockImportDocument create
+   */
+  export type FabricStockImportDocumentCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImportDocument
+     */
+    select?: FabricStockImportDocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockImportDocument
+     */
+    omit?: FabricStockImportDocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockImportDocumentInclude<ExtArgs> | null
+    /**
+     * The data needed to create a FabricStockImportDocument.
+     */
+    data: XOR<FabricStockImportDocumentCreateInput, FabricStockImportDocumentUncheckedCreateInput>
+  }
+
+  /**
+   * FabricStockImportDocument createMany
+   */
+  export type FabricStockImportDocumentCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many FabricStockImportDocuments.
+     */
+    data: FabricStockImportDocumentCreateManyInput | FabricStockImportDocumentCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * FabricStockImportDocument createManyAndReturn
+   */
+  export type FabricStockImportDocumentCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImportDocument
+     */
+    select?: FabricStockImportDocumentSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockImportDocument
+     */
+    omit?: FabricStockImportDocumentOmit<ExtArgs> | null
+    /**
+     * The data used to create many FabricStockImportDocuments.
+     */
+    data: FabricStockImportDocumentCreateManyInput | FabricStockImportDocumentCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockImportDocumentIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * FabricStockImportDocument update
+   */
+  export type FabricStockImportDocumentUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImportDocument
+     */
+    select?: FabricStockImportDocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockImportDocument
+     */
+    omit?: FabricStockImportDocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockImportDocumentInclude<ExtArgs> | null
+    /**
+     * The data needed to update a FabricStockImportDocument.
+     */
+    data: XOR<FabricStockImportDocumentUpdateInput, FabricStockImportDocumentUncheckedUpdateInput>
+    /**
+     * Choose, which FabricStockImportDocument to update.
+     */
+    where: FabricStockImportDocumentWhereUniqueInput
+  }
+
+  /**
+   * FabricStockImportDocument updateMany
+   */
+  export type FabricStockImportDocumentUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update FabricStockImportDocuments.
+     */
+    data: XOR<FabricStockImportDocumentUpdateManyMutationInput, FabricStockImportDocumentUncheckedUpdateManyInput>
+    /**
+     * Filter which FabricStockImportDocuments to update
+     */
+    where?: FabricStockImportDocumentWhereInput
+    /**
+     * Limit how many FabricStockImportDocuments to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * FabricStockImportDocument updateManyAndReturn
+   */
+  export type FabricStockImportDocumentUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImportDocument
+     */
+    select?: FabricStockImportDocumentSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockImportDocument
+     */
+    omit?: FabricStockImportDocumentOmit<ExtArgs> | null
+    /**
+     * The data used to update FabricStockImportDocuments.
+     */
+    data: XOR<FabricStockImportDocumentUpdateManyMutationInput, FabricStockImportDocumentUncheckedUpdateManyInput>
+    /**
+     * Filter which FabricStockImportDocuments to update
+     */
+    where?: FabricStockImportDocumentWhereInput
+    /**
+     * Limit how many FabricStockImportDocuments to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockImportDocumentIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * FabricStockImportDocument upsert
+   */
+  export type FabricStockImportDocumentUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImportDocument
+     */
+    select?: FabricStockImportDocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockImportDocument
+     */
+    omit?: FabricStockImportDocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockImportDocumentInclude<ExtArgs> | null
+    /**
+     * The filter to search for the FabricStockImportDocument to update in case it exists.
+     */
+    where: FabricStockImportDocumentWhereUniqueInput
+    /**
+     * In case the FabricStockImportDocument found by the `where` argument doesn't exist, create a new FabricStockImportDocument with this data.
+     */
+    create: XOR<FabricStockImportDocumentCreateInput, FabricStockImportDocumentUncheckedCreateInput>
+    /**
+     * In case the FabricStockImportDocument was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<FabricStockImportDocumentUpdateInput, FabricStockImportDocumentUncheckedUpdateInput>
+  }
+
+  /**
+   * FabricStockImportDocument delete
+   */
+  export type FabricStockImportDocumentDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImportDocument
+     */
+    select?: FabricStockImportDocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockImportDocument
+     */
+    omit?: FabricStockImportDocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockImportDocumentInclude<ExtArgs> | null
+    /**
+     * Filter which FabricStockImportDocument to delete.
+     */
+    where: FabricStockImportDocumentWhereUniqueInput
+  }
+
+  /**
+   * FabricStockImportDocument deleteMany
+   */
+  export type FabricStockImportDocumentDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FabricStockImportDocuments to delete
+     */
+    where?: FabricStockImportDocumentWhereInput
+    /**
+     * Limit how many FabricStockImportDocuments to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * FabricStockImportDocument without action
+   */
+  export type FabricStockImportDocumentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FabricStockImportDocument
+     */
+    select?: FabricStockImportDocumentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FabricStockImportDocument
+     */
+    omit?: FabricStockImportDocumentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FabricStockImportDocumentInclude<ExtArgs> | null
   }
 
 
@@ -99902,6 +103073,1243 @@ export namespace Prisma {
 
 
   /**
+   * Model StockImport
+   */
+
+  export type AggregateStockImport = {
+    _count: StockImportCountAggregateOutputType | null
+    _avg: StockImportAvgAggregateOutputType | null
+    _sum: StockImportSumAggregateOutputType | null
+    _min: StockImportMinAggregateOutputType | null
+    _max: StockImportMaxAggregateOutputType | null
+  }
+
+  export type StockImportAvgAggregateOutputType = {
+    fileSize: number | null
+    rowCount: number | null
+    addedCount: number | null
+    skippedCount: number | null
+  }
+
+  export type StockImportSumAggregateOutputType = {
+    fileSize: number | null
+    rowCount: number | null
+    addedCount: number | null
+    skippedCount: number | null
+  }
+
+  export type StockImportMinAggregateOutputType = {
+    id: string | null
+    source: string | null
+    fileName: string | null
+    mimeType: string | null
+    fileSize: number | null
+    fileHash: string | null
+    fileData: Bytes | null
+    status: string | null
+    rowCount: number | null
+    engine: string | null
+    uploadedById: string | null
+    uploadedAt: Date | null
+    confirmKey: string | null
+    confirmedById: string | null
+    confirmedAt: Date | null
+    addedCount: number | null
+    skippedCount: number | null
+    updatedAt: Date | null
+  }
+
+  export type StockImportMaxAggregateOutputType = {
+    id: string | null
+    source: string | null
+    fileName: string | null
+    mimeType: string | null
+    fileSize: number | null
+    fileHash: string | null
+    fileData: Bytes | null
+    status: string | null
+    rowCount: number | null
+    engine: string | null
+    uploadedById: string | null
+    uploadedAt: Date | null
+    confirmKey: string | null
+    confirmedById: string | null
+    confirmedAt: Date | null
+    addedCount: number | null
+    skippedCount: number | null
+    updatedAt: Date | null
+  }
+
+  export type StockImportCountAggregateOutputType = {
+    id: number
+    source: number
+    fileName: number
+    mimeType: number
+    fileSize: number
+    fileHash: number
+    fileData: number
+    status: number
+    extractedJson: number
+    rowCount: number
+    engine: number
+    uploadedById: number
+    uploadedAt: number
+    confirmKey: number
+    confirmedById: number
+    confirmedAt: number
+    confirmedJson: number
+    resultJson: number
+    addedCount: number
+    skippedCount: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type StockImportAvgAggregateInputType = {
+    fileSize?: true
+    rowCount?: true
+    addedCount?: true
+    skippedCount?: true
+  }
+
+  export type StockImportSumAggregateInputType = {
+    fileSize?: true
+    rowCount?: true
+    addedCount?: true
+    skippedCount?: true
+  }
+
+  export type StockImportMinAggregateInputType = {
+    id?: true
+    source?: true
+    fileName?: true
+    mimeType?: true
+    fileSize?: true
+    fileHash?: true
+    fileData?: true
+    status?: true
+    rowCount?: true
+    engine?: true
+    uploadedById?: true
+    uploadedAt?: true
+    confirmKey?: true
+    confirmedById?: true
+    confirmedAt?: true
+    addedCount?: true
+    skippedCount?: true
+    updatedAt?: true
+  }
+
+  export type StockImportMaxAggregateInputType = {
+    id?: true
+    source?: true
+    fileName?: true
+    mimeType?: true
+    fileSize?: true
+    fileHash?: true
+    fileData?: true
+    status?: true
+    rowCount?: true
+    engine?: true
+    uploadedById?: true
+    uploadedAt?: true
+    confirmKey?: true
+    confirmedById?: true
+    confirmedAt?: true
+    addedCount?: true
+    skippedCount?: true
+    updatedAt?: true
+  }
+
+  export type StockImportCountAggregateInputType = {
+    id?: true
+    source?: true
+    fileName?: true
+    mimeType?: true
+    fileSize?: true
+    fileHash?: true
+    fileData?: true
+    status?: true
+    extractedJson?: true
+    rowCount?: true
+    engine?: true
+    uploadedById?: true
+    uploadedAt?: true
+    confirmKey?: true
+    confirmedById?: true
+    confirmedAt?: true
+    confirmedJson?: true
+    resultJson?: true
+    addedCount?: true
+    skippedCount?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type StockImportAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which StockImport to aggregate.
+     */
+    where?: StockImportWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StockImports to fetch.
+     */
+    orderBy?: StockImportOrderByWithRelationInput | StockImportOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: StockImportWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StockImports from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StockImports.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned StockImports
+    **/
+    _count?: true | StockImportCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: StockImportAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: StockImportSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: StockImportMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: StockImportMaxAggregateInputType
+  }
+
+  export type GetStockImportAggregateType<T extends StockImportAggregateArgs> = {
+        [P in keyof T & keyof AggregateStockImport]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateStockImport[P]>
+      : GetScalarType<T[P], AggregateStockImport[P]>
+  }
+
+
+
+
+  export type StockImportGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StockImportWhereInput
+    orderBy?: StockImportOrderByWithAggregationInput | StockImportOrderByWithAggregationInput[]
+    by: StockImportScalarFieldEnum[] | StockImportScalarFieldEnum
+    having?: StockImportScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: StockImportCountAggregateInputType | true
+    _avg?: StockImportAvgAggregateInputType
+    _sum?: StockImportSumAggregateInputType
+    _min?: StockImportMinAggregateInputType
+    _max?: StockImportMaxAggregateInputType
+  }
+
+  export type StockImportGroupByOutputType = {
+    id: string
+    source: string
+    fileName: string
+    mimeType: string
+    fileSize: number
+    fileHash: string
+    fileData: Bytes
+    status: string
+    extractedJson: JsonValue | null
+    rowCount: number
+    engine: string | null
+    uploadedById: string
+    uploadedAt: Date
+    confirmKey: string | null
+    confirmedById: string | null
+    confirmedAt: Date | null
+    confirmedJson: JsonValue | null
+    resultJson: JsonValue | null
+    addedCount: number
+    skippedCount: number
+    updatedAt: Date
+    _count: StockImportCountAggregateOutputType | null
+    _avg: StockImportAvgAggregateOutputType | null
+    _sum: StockImportSumAggregateOutputType | null
+    _min: StockImportMinAggregateOutputType | null
+    _max: StockImportMaxAggregateOutputType | null
+  }
+
+  type GetStockImportGroupByPayload<T extends StockImportGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<StockImportGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof StockImportGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], StockImportGroupByOutputType[P]>
+            : GetScalarType<T[P], StockImportGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type StockImportSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    source?: boolean
+    fileName?: boolean
+    mimeType?: boolean
+    fileSize?: boolean
+    fileHash?: boolean
+    fileData?: boolean
+    status?: boolean
+    extractedJson?: boolean
+    rowCount?: boolean
+    engine?: boolean
+    uploadedById?: boolean
+    uploadedAt?: boolean
+    confirmKey?: boolean
+    confirmedById?: boolean
+    confirmedAt?: boolean
+    confirmedJson?: boolean
+    resultJson?: boolean
+    addedCount?: boolean
+    skippedCount?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["stockImport"]>
+
+  export type StockImportSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    source?: boolean
+    fileName?: boolean
+    mimeType?: boolean
+    fileSize?: boolean
+    fileHash?: boolean
+    fileData?: boolean
+    status?: boolean
+    extractedJson?: boolean
+    rowCount?: boolean
+    engine?: boolean
+    uploadedById?: boolean
+    uploadedAt?: boolean
+    confirmKey?: boolean
+    confirmedById?: boolean
+    confirmedAt?: boolean
+    confirmedJson?: boolean
+    resultJson?: boolean
+    addedCount?: boolean
+    skippedCount?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["stockImport"]>
+
+  export type StockImportSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    source?: boolean
+    fileName?: boolean
+    mimeType?: boolean
+    fileSize?: boolean
+    fileHash?: boolean
+    fileData?: boolean
+    status?: boolean
+    extractedJson?: boolean
+    rowCount?: boolean
+    engine?: boolean
+    uploadedById?: boolean
+    uploadedAt?: boolean
+    confirmKey?: boolean
+    confirmedById?: boolean
+    confirmedAt?: boolean
+    confirmedJson?: boolean
+    resultJson?: boolean
+    addedCount?: boolean
+    skippedCount?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["stockImport"]>
+
+  export type StockImportSelectScalar = {
+    id?: boolean
+    source?: boolean
+    fileName?: boolean
+    mimeType?: boolean
+    fileSize?: boolean
+    fileHash?: boolean
+    fileData?: boolean
+    status?: boolean
+    extractedJson?: boolean
+    rowCount?: boolean
+    engine?: boolean
+    uploadedById?: boolean
+    uploadedAt?: boolean
+    confirmKey?: boolean
+    confirmedById?: boolean
+    confirmedAt?: boolean
+    confirmedJson?: boolean
+    resultJson?: boolean
+    addedCount?: boolean
+    skippedCount?: boolean
+    updatedAt?: boolean
+  }
+
+  export type StockImportOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "source" | "fileName" | "mimeType" | "fileSize" | "fileHash" | "fileData" | "status" | "extractedJson" | "rowCount" | "engine" | "uploadedById" | "uploadedAt" | "confirmKey" | "confirmedById" | "confirmedAt" | "confirmedJson" | "resultJson" | "addedCount" | "skippedCount" | "updatedAt", ExtArgs["result"]["stockImport"]>
+
+  export type $StockImportPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "StockImport"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      source: string
+      fileName: string
+      mimeType: string
+      fileSize: number
+      fileHash: string
+      fileData: Prisma.Bytes
+      status: string
+      extractedJson: Prisma.JsonValue | null
+      rowCount: number
+      engine: string | null
+      uploadedById: string
+      uploadedAt: Date
+      confirmKey: string | null
+      confirmedById: string | null
+      confirmedAt: Date | null
+      confirmedJson: Prisma.JsonValue | null
+      resultJson: Prisma.JsonValue | null
+      addedCount: number
+      skippedCount: number
+      updatedAt: Date
+    }, ExtArgs["result"]["stockImport"]>
+    composites: {}
+  }
+
+  type StockImportGetPayload<S extends boolean | null | undefined | StockImportDefaultArgs> = $Result.GetResult<Prisma.$StockImportPayload, S>
+
+  type StockImportCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<StockImportFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: StockImportCountAggregateInputType | true
+    }
+
+  export interface StockImportDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['StockImport'], meta: { name: 'StockImport' } }
+    /**
+     * Find zero or one StockImport that matches the filter.
+     * @param {StockImportFindUniqueArgs} args - Arguments to find a StockImport
+     * @example
+     * // Get one StockImport
+     * const stockImport = await prisma.stockImport.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends StockImportFindUniqueArgs>(args: SelectSubset<T, StockImportFindUniqueArgs<ExtArgs>>): Prisma__StockImportClient<$Result.GetResult<Prisma.$StockImportPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one StockImport that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {StockImportFindUniqueOrThrowArgs} args - Arguments to find a StockImport
+     * @example
+     * // Get one StockImport
+     * const stockImport = await prisma.stockImport.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends StockImportFindUniqueOrThrowArgs>(args: SelectSubset<T, StockImportFindUniqueOrThrowArgs<ExtArgs>>): Prisma__StockImportClient<$Result.GetResult<Prisma.$StockImportPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first StockImport that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StockImportFindFirstArgs} args - Arguments to find a StockImport
+     * @example
+     * // Get one StockImport
+     * const stockImport = await prisma.stockImport.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends StockImportFindFirstArgs>(args?: SelectSubset<T, StockImportFindFirstArgs<ExtArgs>>): Prisma__StockImportClient<$Result.GetResult<Prisma.$StockImportPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first StockImport that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StockImportFindFirstOrThrowArgs} args - Arguments to find a StockImport
+     * @example
+     * // Get one StockImport
+     * const stockImport = await prisma.stockImport.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends StockImportFindFirstOrThrowArgs>(args?: SelectSubset<T, StockImportFindFirstOrThrowArgs<ExtArgs>>): Prisma__StockImportClient<$Result.GetResult<Prisma.$StockImportPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more StockImports that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StockImportFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all StockImports
+     * const stockImports = await prisma.stockImport.findMany()
+     * 
+     * // Get first 10 StockImports
+     * const stockImports = await prisma.stockImport.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const stockImportWithIdOnly = await prisma.stockImport.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends StockImportFindManyArgs>(args?: SelectSubset<T, StockImportFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StockImportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a StockImport.
+     * @param {StockImportCreateArgs} args - Arguments to create a StockImport.
+     * @example
+     * // Create one StockImport
+     * const StockImport = await prisma.stockImport.create({
+     *   data: {
+     *     // ... data to create a StockImport
+     *   }
+     * })
+     * 
+     */
+    create<T extends StockImportCreateArgs>(args: SelectSubset<T, StockImportCreateArgs<ExtArgs>>): Prisma__StockImportClient<$Result.GetResult<Prisma.$StockImportPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many StockImports.
+     * @param {StockImportCreateManyArgs} args - Arguments to create many StockImports.
+     * @example
+     * // Create many StockImports
+     * const stockImport = await prisma.stockImport.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends StockImportCreateManyArgs>(args?: SelectSubset<T, StockImportCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many StockImports and returns the data saved in the database.
+     * @param {StockImportCreateManyAndReturnArgs} args - Arguments to create many StockImports.
+     * @example
+     * // Create many StockImports
+     * const stockImport = await prisma.stockImport.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many StockImports and only return the `id`
+     * const stockImportWithIdOnly = await prisma.stockImport.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends StockImportCreateManyAndReturnArgs>(args?: SelectSubset<T, StockImportCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StockImportPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a StockImport.
+     * @param {StockImportDeleteArgs} args - Arguments to delete one StockImport.
+     * @example
+     * // Delete one StockImport
+     * const StockImport = await prisma.stockImport.delete({
+     *   where: {
+     *     // ... filter to delete one StockImport
+     *   }
+     * })
+     * 
+     */
+    delete<T extends StockImportDeleteArgs>(args: SelectSubset<T, StockImportDeleteArgs<ExtArgs>>): Prisma__StockImportClient<$Result.GetResult<Prisma.$StockImportPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one StockImport.
+     * @param {StockImportUpdateArgs} args - Arguments to update one StockImport.
+     * @example
+     * // Update one StockImport
+     * const stockImport = await prisma.stockImport.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends StockImportUpdateArgs>(args: SelectSubset<T, StockImportUpdateArgs<ExtArgs>>): Prisma__StockImportClient<$Result.GetResult<Prisma.$StockImportPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more StockImports.
+     * @param {StockImportDeleteManyArgs} args - Arguments to filter StockImports to delete.
+     * @example
+     * // Delete a few StockImports
+     * const { count } = await prisma.stockImport.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends StockImportDeleteManyArgs>(args?: SelectSubset<T, StockImportDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more StockImports.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StockImportUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many StockImports
+     * const stockImport = await prisma.stockImport.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends StockImportUpdateManyArgs>(args: SelectSubset<T, StockImportUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more StockImports and returns the data updated in the database.
+     * @param {StockImportUpdateManyAndReturnArgs} args - Arguments to update many StockImports.
+     * @example
+     * // Update many StockImports
+     * const stockImport = await prisma.stockImport.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more StockImports and only return the `id`
+     * const stockImportWithIdOnly = await prisma.stockImport.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends StockImportUpdateManyAndReturnArgs>(args: SelectSubset<T, StockImportUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StockImportPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one StockImport.
+     * @param {StockImportUpsertArgs} args - Arguments to update or create a StockImport.
+     * @example
+     * // Update or create a StockImport
+     * const stockImport = await prisma.stockImport.upsert({
+     *   create: {
+     *     // ... data to create a StockImport
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the StockImport we want to update
+     *   }
+     * })
+     */
+    upsert<T extends StockImportUpsertArgs>(args: SelectSubset<T, StockImportUpsertArgs<ExtArgs>>): Prisma__StockImportClient<$Result.GetResult<Prisma.$StockImportPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of StockImports.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StockImportCountArgs} args - Arguments to filter StockImports to count.
+     * @example
+     * // Count the number of StockImports
+     * const count = await prisma.stockImport.count({
+     *   where: {
+     *     // ... the filter for the StockImports we want to count
+     *   }
+     * })
+    **/
+    count<T extends StockImportCountArgs>(
+      args?: Subset<T, StockImportCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], StockImportCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a StockImport.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StockImportAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends StockImportAggregateArgs>(args: Subset<T, StockImportAggregateArgs>): Prisma.PrismaPromise<GetStockImportAggregateType<T>>
+
+    /**
+     * Group by StockImport.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StockImportGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends StockImportGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: StockImportGroupByArgs['orderBy'] }
+        : { orderBy?: StockImportGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, StockImportGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetStockImportGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the StockImport model
+   */
+  readonly fields: StockImportFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for StockImport.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__StockImportClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the StockImport model
+   */
+  interface StockImportFieldRefs {
+    readonly id: FieldRef<"StockImport", 'String'>
+    readonly source: FieldRef<"StockImport", 'String'>
+    readonly fileName: FieldRef<"StockImport", 'String'>
+    readonly mimeType: FieldRef<"StockImport", 'String'>
+    readonly fileSize: FieldRef<"StockImport", 'Int'>
+    readonly fileHash: FieldRef<"StockImport", 'String'>
+    readonly fileData: FieldRef<"StockImport", 'Bytes'>
+    readonly status: FieldRef<"StockImport", 'String'>
+    readonly extractedJson: FieldRef<"StockImport", 'Json'>
+    readonly rowCount: FieldRef<"StockImport", 'Int'>
+    readonly engine: FieldRef<"StockImport", 'String'>
+    readonly uploadedById: FieldRef<"StockImport", 'String'>
+    readonly uploadedAt: FieldRef<"StockImport", 'DateTime'>
+    readonly confirmKey: FieldRef<"StockImport", 'String'>
+    readonly confirmedById: FieldRef<"StockImport", 'String'>
+    readonly confirmedAt: FieldRef<"StockImport", 'DateTime'>
+    readonly confirmedJson: FieldRef<"StockImport", 'Json'>
+    readonly resultJson: FieldRef<"StockImport", 'Json'>
+    readonly addedCount: FieldRef<"StockImport", 'Int'>
+    readonly skippedCount: FieldRef<"StockImport", 'Int'>
+    readonly updatedAt: FieldRef<"StockImport", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * StockImport findUnique
+   */
+  export type StockImportFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockImport
+     */
+    select?: StockImportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StockImport
+     */
+    omit?: StockImportOmit<ExtArgs> | null
+    /**
+     * Filter, which StockImport to fetch.
+     */
+    where: StockImportWhereUniqueInput
+  }
+
+  /**
+   * StockImport findUniqueOrThrow
+   */
+  export type StockImportFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockImport
+     */
+    select?: StockImportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StockImport
+     */
+    omit?: StockImportOmit<ExtArgs> | null
+    /**
+     * Filter, which StockImport to fetch.
+     */
+    where: StockImportWhereUniqueInput
+  }
+
+  /**
+   * StockImport findFirst
+   */
+  export type StockImportFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockImport
+     */
+    select?: StockImportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StockImport
+     */
+    omit?: StockImportOmit<ExtArgs> | null
+    /**
+     * Filter, which StockImport to fetch.
+     */
+    where?: StockImportWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StockImports to fetch.
+     */
+    orderBy?: StockImportOrderByWithRelationInput | StockImportOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for StockImports.
+     */
+    cursor?: StockImportWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StockImports from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StockImports.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of StockImports.
+     */
+    distinct?: StockImportScalarFieldEnum | StockImportScalarFieldEnum[]
+  }
+
+  /**
+   * StockImport findFirstOrThrow
+   */
+  export type StockImportFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockImport
+     */
+    select?: StockImportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StockImport
+     */
+    omit?: StockImportOmit<ExtArgs> | null
+    /**
+     * Filter, which StockImport to fetch.
+     */
+    where?: StockImportWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StockImports to fetch.
+     */
+    orderBy?: StockImportOrderByWithRelationInput | StockImportOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for StockImports.
+     */
+    cursor?: StockImportWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StockImports from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StockImports.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of StockImports.
+     */
+    distinct?: StockImportScalarFieldEnum | StockImportScalarFieldEnum[]
+  }
+
+  /**
+   * StockImport findMany
+   */
+  export type StockImportFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockImport
+     */
+    select?: StockImportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StockImport
+     */
+    omit?: StockImportOmit<ExtArgs> | null
+    /**
+     * Filter, which StockImports to fetch.
+     */
+    where?: StockImportWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StockImports to fetch.
+     */
+    orderBy?: StockImportOrderByWithRelationInput | StockImportOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing StockImports.
+     */
+    cursor?: StockImportWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StockImports from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StockImports.
+     */
+    skip?: number
+    distinct?: StockImportScalarFieldEnum | StockImportScalarFieldEnum[]
+  }
+
+  /**
+   * StockImport create
+   */
+  export type StockImportCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockImport
+     */
+    select?: StockImportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StockImport
+     */
+    omit?: StockImportOmit<ExtArgs> | null
+    /**
+     * The data needed to create a StockImport.
+     */
+    data: XOR<StockImportCreateInput, StockImportUncheckedCreateInput>
+  }
+
+  /**
+   * StockImport createMany
+   */
+  export type StockImportCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many StockImports.
+     */
+    data: StockImportCreateManyInput | StockImportCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * StockImport createManyAndReturn
+   */
+  export type StockImportCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockImport
+     */
+    select?: StockImportSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the StockImport
+     */
+    omit?: StockImportOmit<ExtArgs> | null
+    /**
+     * The data used to create many StockImports.
+     */
+    data: StockImportCreateManyInput | StockImportCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * StockImport update
+   */
+  export type StockImportUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockImport
+     */
+    select?: StockImportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StockImport
+     */
+    omit?: StockImportOmit<ExtArgs> | null
+    /**
+     * The data needed to update a StockImport.
+     */
+    data: XOR<StockImportUpdateInput, StockImportUncheckedUpdateInput>
+    /**
+     * Choose, which StockImport to update.
+     */
+    where: StockImportWhereUniqueInput
+  }
+
+  /**
+   * StockImport updateMany
+   */
+  export type StockImportUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update StockImports.
+     */
+    data: XOR<StockImportUpdateManyMutationInput, StockImportUncheckedUpdateManyInput>
+    /**
+     * Filter which StockImports to update
+     */
+    where?: StockImportWhereInput
+    /**
+     * Limit how many StockImports to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * StockImport updateManyAndReturn
+   */
+  export type StockImportUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockImport
+     */
+    select?: StockImportSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the StockImport
+     */
+    omit?: StockImportOmit<ExtArgs> | null
+    /**
+     * The data used to update StockImports.
+     */
+    data: XOR<StockImportUpdateManyMutationInput, StockImportUncheckedUpdateManyInput>
+    /**
+     * Filter which StockImports to update
+     */
+    where?: StockImportWhereInput
+    /**
+     * Limit how many StockImports to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * StockImport upsert
+   */
+  export type StockImportUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockImport
+     */
+    select?: StockImportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StockImport
+     */
+    omit?: StockImportOmit<ExtArgs> | null
+    /**
+     * The filter to search for the StockImport to update in case it exists.
+     */
+    where: StockImportWhereUniqueInput
+    /**
+     * In case the StockImport found by the `where` argument doesn't exist, create a new StockImport with this data.
+     */
+    create: XOR<StockImportCreateInput, StockImportUncheckedCreateInput>
+    /**
+     * In case the StockImport was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<StockImportUpdateInput, StockImportUncheckedUpdateInput>
+  }
+
+  /**
+   * StockImport delete
+   */
+  export type StockImportDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockImport
+     */
+    select?: StockImportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StockImport
+     */
+    omit?: StockImportOmit<ExtArgs> | null
+    /**
+     * Filter which StockImport to delete.
+     */
+    where: StockImportWhereUniqueInput
+  }
+
+  /**
+   * StockImport deleteMany
+   */
+  export type StockImportDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which StockImports to delete
+     */
+    where?: StockImportWhereInput
+    /**
+     * Limit how many StockImports to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * StockImport without action
+   */
+  export type StockImportDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StockImport
+     */
+    select?: StockImportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StockImport
+     */
+    omit?: StockImportOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Model ManualMigration
    */
 
@@ -101458,6 +105866,7 @@ export namespace Prisma {
     fabricOut: 'fabricOut',
     fabricUnit: 'fabricUnit',
     defectivePieces: 'defectivePieces',
+    defectiveUnit: 'defectiveUnit',
     defectiveShelfLocation: 'defectiveShelfLocation',
     defectReason: 'defectReason',
     detectedFromChallanId: 'detectedFromChallanId',
@@ -101738,6 +106147,7 @@ export namespace Prisma {
     itemDescription: 'itemDescription',
     severity: 'severity',
     quantity: 'quantity',
+    uom: 'uom',
     reason: 'reason',
     detectedById: 'detectedById',
     status: 'status',
@@ -101874,7 +106284,7 @@ export namespace Prisma {
     colorName: 'colorName',
     totalRolls: 'totalRolls',
     totalMeters: 'totalMeters',
-    totalPieces: 'totalPieces',
+    unit: 'unit',
     status: 'status',
     receivedAt: 'receivedAt',
     createdById: 'createdById',
@@ -101891,7 +106301,6 @@ export namespace Prisma {
     batchId: 'batchId',
     locationId: 'locationId',
     length: 'length',
-    unit: 'unit',
     width: 'width',
     weight: 'weight',
     status: 'status',
@@ -101919,7 +106328,6 @@ export namespace Prisma {
     supplierName: 'supplierName',
     totalRollsReceived: 'totalRollsReceived',
     totalMetersReceived: 'totalMetersReceived',
-    totalPiecesReceived: 'totalPiecesReceived',
     status: 'status',
     remarks: 'remarks',
     createdAt: 'createdAt',
@@ -101965,7 +106373,6 @@ export namespace Prisma {
     batchId: 'batchId',
     transactionType: 'transactionType',
     quantity: 'quantity',
-    uom: 'uom',
     referenceType: 'referenceType',
     referenceId: 'referenceId',
     fromLocationId: 'fromLocationId',
@@ -102160,6 +106567,17 @@ export namespace Prisma {
     hsnCode: 'hsnCode',
     taxPercent: 'taxPercent',
     remarks: 'remarks',
+    rollNumber: 'rollNumber',
+    rollKey: 'rollKey',
+    batchNumber: 'batchNumber',
+    shade: 'shade',
+    composition: 'composition',
+    width: 'width',
+    unitRate: 'unitRate',
+    storageLocation: 'storageLocation',
+    purchaseOrderNumber: 'purchaseOrderNumber',
+    importId: 'importId',
+    importRowNumber: 'importRowNumber',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -102189,6 +106607,51 @@ export namespace Prisma {
   };
 
   export type FabricOutwardScalarFieldEnum = (typeof FabricOutwardScalarFieldEnum)[keyof typeof FabricOutwardScalarFieldEnum]
+
+
+  export const FabricStockImportScalarFieldEnum: {
+    id: 'id',
+    status: 'status',
+    fileName: 'fileName',
+    fileHash: 'fileHash',
+    fileSize: 'fileSize',
+    fileData: 'fileData',
+    sheetsJson: 'sheetsJson',
+    selectedSheet: 'selectedSheet',
+    headerRow: 'headerRow',
+    mappingJson: 'mappingJson',
+    correctionsJson: 'correctionsJson',
+    resolutionsJson: 'resolutionsJson',
+    validationJson: 'validationJson',
+    payloadHash: 'payloadHash',
+    receiptNumber: 'receiptNumber',
+    confirmKey: 'confirmKey',
+    postedAt: 'postedAt',
+    postedById: 'postedById',
+    postedResultJson: 'postedResultJson',
+    failureReason: 'failureReason',
+    uploadedById: 'uploadedById',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type FabricStockImportScalarFieldEnum = (typeof FabricStockImportScalarFieldEnum)[keyof typeof FabricStockImportScalarFieldEnum]
+
+
+  export const FabricStockImportDocumentScalarFieldEnum: {
+    id: 'id',
+    importId: 'importId',
+    kind: 'kind',
+    sheetName: 'sheetName',
+    mimeType: 'mimeType',
+    size: 'size',
+    sha256: 'sha256',
+    data: 'data',
+    ocrStatus: 'ocrStatus',
+    createdAt: 'createdAt'
+  };
+
+  export type FabricStockImportDocumentScalarFieldEnum = (typeof FabricStockImportDocumentScalarFieldEnum)[keyof typeof FabricStockImportDocumentScalarFieldEnum]
 
 
   export const DeadlineAlertScalarFieldEnum: {
@@ -102273,6 +106736,33 @@ export namespace Prisma {
   };
 
   export type GarmentImageScalarFieldEnum = (typeof GarmentImageScalarFieldEnum)[keyof typeof GarmentImageScalarFieldEnum]
+
+
+  export const StockImportScalarFieldEnum: {
+    id: 'id',
+    source: 'source',
+    fileName: 'fileName',
+    mimeType: 'mimeType',
+    fileSize: 'fileSize',
+    fileHash: 'fileHash',
+    fileData: 'fileData',
+    status: 'status',
+    extractedJson: 'extractedJson',
+    rowCount: 'rowCount',
+    engine: 'engine',
+    uploadedById: 'uploadedById',
+    uploadedAt: 'uploadedAt',
+    confirmKey: 'confirmKey',
+    confirmedById: 'confirmedById',
+    confirmedAt: 'confirmedAt',
+    confirmedJson: 'confirmedJson',
+    resultJson: 'resultJson',
+    addedCount: 'addedCount',
+    skippedCount: 'skippedCount',
+    updatedAt: 'updatedAt'
+  };
+
+  export type StockImportScalarFieldEnum = (typeof StockImportScalarFieldEnum)[keyof typeof StockImportScalarFieldEnum]
 
 
   export const ManualMigrationScalarFieldEnum: {
@@ -102605,6 +107095,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationListRelationFilter
     garmentImagesUploaded?: GarmentImageListRelationFilter
     deadlineAlertDismissals?: DeadlineAlertDismissalListRelationFilter
+    fabricStockImportsUploaded?: FabricStockImportListRelationFilter
+    fabricStockImportsPosted?: FabricStockImportListRelationFilter
     departmentImagesUploaded?: DepartmentImageListRelationFilter
     brandingAssetsUploaded?: BrandingAssetListRelationFilter
   }
@@ -102654,6 +107146,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationOrderByRelationAggregateInput
     garmentImagesUploaded?: GarmentImageOrderByRelationAggregateInput
     deadlineAlertDismissals?: DeadlineAlertDismissalOrderByRelationAggregateInput
+    fabricStockImportsUploaded?: FabricStockImportOrderByRelationAggregateInput
+    fabricStockImportsPosted?: FabricStockImportOrderByRelationAggregateInput
     departmentImagesUploaded?: DepartmentImageOrderByRelationAggregateInput
     brandingAssetsUploaded?: BrandingAssetOrderByRelationAggregateInput
   }
@@ -102706,6 +107200,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationListRelationFilter
     garmentImagesUploaded?: GarmentImageListRelationFilter
     deadlineAlertDismissals?: DeadlineAlertDismissalListRelationFilter
+    fabricStockImportsUploaded?: FabricStockImportListRelationFilter
+    fabricStockImportsPosted?: FabricStockImportListRelationFilter
     departmentImagesUploaded?: DepartmentImageListRelationFilter
     brandingAssetsUploaded?: BrandingAssetListRelationFilter
   }, "id" | "username" | "email">
@@ -105635,6 +110131,7 @@ export namespace Prisma {
     fabricOut?: FloatNullableFilter<"Challan"> | number | null
     fabricUnit?: StringNullableFilter<"Challan"> | string | null
     defectivePieces?: FloatNullableFilter<"Challan"> | number | null
+    defectiveUnit?: StringNullableFilter<"Challan"> | string | null
     defectiveShelfLocation?: StringNullableFilter<"Challan"> | string | null
     defectReason?: StringNullableFilter<"Challan"> | string | null
     detectedFromChallanId?: StringNullableFilter<"Challan"> | string | null
@@ -105686,6 +110183,7 @@ export namespace Prisma {
     fabricOut?: SortOrderInput | SortOrder
     fabricUnit?: SortOrderInput | SortOrder
     defectivePieces?: SortOrderInput | SortOrder
+    defectiveUnit?: SortOrderInput | SortOrder
     defectiveShelfLocation?: SortOrderInput | SortOrder
     defectReason?: SortOrderInput | SortOrder
     detectedFromChallanId?: SortOrderInput | SortOrder
@@ -105740,6 +110238,7 @@ export namespace Prisma {
     fabricOut?: FloatNullableFilter<"Challan"> | number | null
     fabricUnit?: StringNullableFilter<"Challan"> | string | null
     defectivePieces?: FloatNullableFilter<"Challan"> | number | null
+    defectiveUnit?: StringNullableFilter<"Challan"> | string | null
     defectiveShelfLocation?: StringNullableFilter<"Challan"> | string | null
     defectReason?: StringNullableFilter<"Challan"> | string | null
     detectedFromChallanId?: StringNullableFilter<"Challan"> | string | null
@@ -105791,6 +110290,7 @@ export namespace Prisma {
     fabricOut?: SortOrderInput | SortOrder
     fabricUnit?: SortOrderInput | SortOrder
     defectivePieces?: SortOrderInput | SortOrder
+    defectiveUnit?: SortOrderInput | SortOrder
     defectiveShelfLocation?: SortOrderInput | SortOrder
     defectReason?: SortOrderInput | SortOrder
     detectedFromChallanId?: SortOrderInput | SortOrder
@@ -105829,6 +110329,7 @@ export namespace Prisma {
     fabricOut?: FloatNullableWithAggregatesFilter<"Challan"> | number | null
     fabricUnit?: StringNullableWithAggregatesFilter<"Challan"> | string | null
     defectivePieces?: FloatNullableWithAggregatesFilter<"Challan"> | number | null
+    defectiveUnit?: StringNullableWithAggregatesFilter<"Challan"> | string | null
     defectiveShelfLocation?: StringNullableWithAggregatesFilter<"Challan"> | string | null
     defectReason?: StringNullableWithAggregatesFilter<"Challan"> | string | null
     detectedFromChallanId?: StringNullableWithAggregatesFilter<"Challan"> | string | null
@@ -107240,7 +111741,8 @@ export namespace Prisma {
     bundleId?: StringNullableFilter<"DefectRecord"> | string | null
     itemDescription?: StringFilter<"DefectRecord"> | string
     severity?: StringFilter<"DefectRecord"> | string
-    quantity?: IntFilter<"DefectRecord"> | number
+    quantity?: FloatFilter<"DefectRecord"> | number
+    uom?: StringNullableFilter<"DefectRecord"> | string | null
     reason?: StringFilter<"DefectRecord"> | string
     detectedById?: StringFilter<"DefectRecord"> | string
     status?: StringFilter<"DefectRecord"> | string
@@ -107266,6 +111768,7 @@ export namespace Prisma {
     itemDescription?: SortOrder
     severity?: SortOrder
     quantity?: SortOrder
+    uom?: SortOrderInput | SortOrder
     reason?: SortOrder
     detectedById?: SortOrder
     status?: SortOrder
@@ -107293,7 +111796,8 @@ export namespace Prisma {
     bundleId?: StringNullableFilter<"DefectRecord"> | string | null
     itemDescription?: StringFilter<"DefectRecord"> | string
     severity?: StringFilter<"DefectRecord"> | string
-    quantity?: IntFilter<"DefectRecord"> | number
+    quantity?: FloatFilter<"DefectRecord"> | number
+    uom?: StringNullableFilter<"DefectRecord"> | string | null
     reason?: StringFilter<"DefectRecord"> | string
     detectedById?: StringFilter<"DefectRecord"> | string
     status?: StringFilter<"DefectRecord"> | string
@@ -107319,6 +111823,7 @@ export namespace Prisma {
     itemDescription?: SortOrder
     severity?: SortOrder
     quantity?: SortOrder
+    uom?: SortOrderInput | SortOrder
     reason?: SortOrder
     detectedById?: SortOrder
     status?: SortOrder
@@ -107345,7 +111850,8 @@ export namespace Prisma {
     bundleId?: StringNullableWithAggregatesFilter<"DefectRecord"> | string | null
     itemDescription?: StringWithAggregatesFilter<"DefectRecord"> | string
     severity?: StringWithAggregatesFilter<"DefectRecord"> | string
-    quantity?: IntWithAggregatesFilter<"DefectRecord"> | number
+    quantity?: FloatWithAggregatesFilter<"DefectRecord"> | number
+    uom?: StringNullableWithAggregatesFilter<"DefectRecord"> | string | null
     reason?: StringWithAggregatesFilter<"DefectRecord"> | string
     detectedById?: StringWithAggregatesFilter<"DefectRecord"> | string
     status?: StringWithAggregatesFilter<"DefectRecord"> | string
@@ -107960,7 +112466,7 @@ export namespace Prisma {
     colorName?: StringNullableFilter<"FabricBatch"> | string | null
     totalRolls?: IntFilter<"FabricBatch"> | number
     totalMeters?: DecimalFilter<"FabricBatch"> | Decimal | DecimalJsLike | number | string
-    totalPieces?: DecimalFilter<"FabricBatch"> | Decimal | DecimalJsLike | number | string
+    unit?: StringFilter<"FabricBatch"> | string
     status?: EnumFabricBatchStatusFilter<"FabricBatch"> | $Enums.FabricBatchStatus
     receivedAt?: DateTimeNullableFilter<"FabricBatch"> | Date | string | null
     createdById?: StringFilter<"FabricBatch"> | string
@@ -107984,7 +112490,7 @@ export namespace Prisma {
     colorName?: SortOrderInput | SortOrder
     totalRolls?: SortOrder
     totalMeters?: SortOrder
-    totalPieces?: SortOrder
+    unit?: SortOrder
     status?: SortOrder
     receivedAt?: SortOrderInput | SortOrder
     createdById?: SortOrder
@@ -108011,7 +112517,7 @@ export namespace Prisma {
     colorName?: StringNullableFilter<"FabricBatch"> | string | null
     totalRolls?: IntFilter<"FabricBatch"> | number
     totalMeters?: DecimalFilter<"FabricBatch"> | Decimal | DecimalJsLike | number | string
-    totalPieces?: DecimalFilter<"FabricBatch"> | Decimal | DecimalJsLike | number | string
+    unit?: StringFilter<"FabricBatch"> | string
     status?: EnumFabricBatchStatusFilter<"FabricBatch"> | $Enums.FabricBatchStatus
     receivedAt?: DateTimeNullableFilter<"FabricBatch"> | Date | string | null
     createdById?: StringFilter<"FabricBatch"> | string
@@ -108035,7 +112541,7 @@ export namespace Prisma {
     colorName?: SortOrderInput | SortOrder
     totalRolls?: SortOrder
     totalMeters?: SortOrder
-    totalPieces?: SortOrder
+    unit?: SortOrder
     status?: SortOrder
     receivedAt?: SortOrderInput | SortOrder
     createdById?: SortOrder
@@ -108062,7 +112568,7 @@ export namespace Prisma {
     colorName?: StringNullableWithAggregatesFilter<"FabricBatch"> | string | null
     totalRolls?: IntWithAggregatesFilter<"FabricBatch"> | number
     totalMeters?: DecimalWithAggregatesFilter<"FabricBatch"> | Decimal | DecimalJsLike | number | string
-    totalPieces?: DecimalWithAggregatesFilter<"FabricBatch"> | Decimal | DecimalJsLike | number | string
+    unit?: StringWithAggregatesFilter<"FabricBatch"> | string
     status?: EnumFabricBatchStatusWithAggregatesFilter<"FabricBatch"> | $Enums.FabricBatchStatus
     receivedAt?: DateTimeNullableWithAggregatesFilter<"FabricBatch"> | Date | string | null
     createdById?: StringWithAggregatesFilter<"FabricBatch"> | string
@@ -108079,7 +112585,6 @@ export namespace Prisma {
     batchId?: StringFilter<"FabricStoreRoll"> | string
     locationId?: StringNullableFilter<"FabricStoreRoll"> | string | null
     length?: DecimalFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string
-    unit?: StringFilter<"FabricStoreRoll"> | string
     width?: DecimalNullableFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string | null
     weight?: DecimalNullableFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFilter<"FabricStoreRoll"> | $Enums.FabricRollStatus
@@ -108106,7 +112611,6 @@ export namespace Prisma {
     batchId?: SortOrder
     locationId?: SortOrderInput | SortOrder
     length?: SortOrder
-    unit?: SortOrder
     width?: SortOrderInput | SortOrder
     weight?: SortOrderInput | SortOrder
     status?: SortOrder
@@ -108136,7 +112640,6 @@ export namespace Prisma {
     batchId?: StringFilter<"FabricStoreRoll"> | string
     locationId?: StringNullableFilter<"FabricStoreRoll"> | string | null
     length?: DecimalFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string
-    unit?: StringFilter<"FabricStoreRoll"> | string
     width?: DecimalNullableFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string | null
     weight?: DecimalNullableFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFilter<"FabricStoreRoll"> | $Enums.FabricRollStatus
@@ -108163,7 +112666,6 @@ export namespace Prisma {
     batchId?: SortOrder
     locationId?: SortOrderInput | SortOrder
     length?: SortOrder
-    unit?: SortOrder
     width?: SortOrderInput | SortOrder
     weight?: SortOrderInput | SortOrder
     status?: SortOrder
@@ -108191,7 +112693,6 @@ export namespace Prisma {
     batchId?: StringWithAggregatesFilter<"FabricStoreRoll"> | string
     locationId?: StringNullableWithAggregatesFilter<"FabricStoreRoll"> | string | null
     length?: DecimalWithAggregatesFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string
-    unit?: StringWithAggregatesFilter<"FabricStoreRoll"> | string
     width?: DecimalNullableWithAggregatesFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string | null
     weight?: DecimalNullableWithAggregatesFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusWithAggregatesFilter<"FabricStoreRoll"> | $Enums.FabricRollStatus
@@ -108219,7 +112720,6 @@ export namespace Prisma {
     supplierName?: StringFilter<"MaterialReceipt"> | string
     totalRollsReceived?: IntFilter<"MaterialReceipt"> | number
     totalMetersReceived?: DecimalFilter<"MaterialReceipt"> | Decimal | DecimalJsLike | number | string
-    totalPiecesReceived?: DecimalFilter<"MaterialReceipt"> | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFilter<"MaterialReceipt"> | $Enums.GRNStatus
     remarks?: StringNullableFilter<"MaterialReceipt"> | string | null
     createdAt?: DateTimeFilter<"MaterialReceipt"> | Date | string
@@ -108240,7 +112740,6 @@ export namespace Prisma {
     supplierName?: SortOrder
     totalRollsReceived?: SortOrder
     totalMetersReceived?: SortOrder
-    totalPiecesReceived?: SortOrder
     status?: SortOrder
     remarks?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -108264,7 +112763,6 @@ export namespace Prisma {
     supplierName?: StringFilter<"MaterialReceipt"> | string
     totalRollsReceived?: IntFilter<"MaterialReceipt"> | number
     totalMetersReceived?: DecimalFilter<"MaterialReceipt"> | Decimal | DecimalJsLike | number | string
-    totalPiecesReceived?: DecimalFilter<"MaterialReceipt"> | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFilter<"MaterialReceipt"> | $Enums.GRNStatus
     remarks?: StringNullableFilter<"MaterialReceipt"> | string | null
     createdAt?: DateTimeFilter<"MaterialReceipt"> | Date | string
@@ -108285,7 +112783,6 @@ export namespace Prisma {
     supplierName?: SortOrder
     totalRollsReceived?: SortOrder
     totalMetersReceived?: SortOrder
-    totalPiecesReceived?: SortOrder
     status?: SortOrder
     remarks?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -108311,7 +112808,6 @@ export namespace Prisma {
     supplierName?: StringWithAggregatesFilter<"MaterialReceipt"> | string
     totalRollsReceived?: IntWithAggregatesFilter<"MaterialReceipt"> | number
     totalMetersReceived?: DecimalWithAggregatesFilter<"MaterialReceipt"> | Decimal | DecimalJsLike | number | string
-    totalPiecesReceived?: DecimalWithAggregatesFilter<"MaterialReceipt"> | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusWithAggregatesFilter<"MaterialReceipt"> | $Enums.GRNStatus
     remarks?: StringNullableWithAggregatesFilter<"MaterialReceipt"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"MaterialReceipt"> | Date | string
@@ -108481,7 +112977,6 @@ export namespace Prisma {
     batchId?: StringFilter<"FabricStockLedger"> | string
     transactionType?: EnumStockTransactionTypeFilter<"FabricStockLedger"> | $Enums.StockTransactionType
     quantity?: DecimalFilter<"FabricStockLedger"> | Decimal | DecimalJsLike | number | string
-    uom?: StringFilter<"FabricStockLedger"> | string
     referenceType?: StringFilter<"FabricStockLedger"> | string
     referenceId?: StringFilter<"FabricStockLedger"> | string
     fromLocationId?: StringNullableFilter<"FabricStockLedger"> | string | null
@@ -108504,7 +112999,6 @@ export namespace Prisma {
     batchId?: SortOrder
     transactionType?: SortOrder
     quantity?: SortOrder
-    uom?: SortOrder
     referenceType?: SortOrder
     referenceId?: SortOrder
     fromLocationId?: SortOrderInput | SortOrder
@@ -108530,7 +113024,6 @@ export namespace Prisma {
     batchId?: StringFilter<"FabricStockLedger"> | string
     transactionType?: EnumStockTransactionTypeFilter<"FabricStockLedger"> | $Enums.StockTransactionType
     quantity?: DecimalFilter<"FabricStockLedger"> | Decimal | DecimalJsLike | number | string
-    uom?: StringFilter<"FabricStockLedger"> | string
     referenceType?: StringFilter<"FabricStockLedger"> | string
     referenceId?: StringFilter<"FabricStockLedger"> | string
     fromLocationId?: StringNullableFilter<"FabricStockLedger"> | string | null
@@ -108553,7 +113046,6 @@ export namespace Prisma {
     batchId?: SortOrder
     transactionType?: SortOrder
     quantity?: SortOrder
-    uom?: SortOrder
     referenceType?: SortOrder
     referenceId?: SortOrder
     fromLocationId?: SortOrderInput | SortOrder
@@ -108579,7 +113071,6 @@ export namespace Prisma {
     batchId?: StringWithAggregatesFilter<"FabricStockLedger"> | string
     transactionType?: EnumStockTransactionTypeWithAggregatesFilter<"FabricStockLedger"> | $Enums.StockTransactionType
     quantity?: DecimalWithAggregatesFilter<"FabricStockLedger"> | Decimal | DecimalJsLike | number | string
-    uom?: StringWithAggregatesFilter<"FabricStockLedger"> | string
     referenceType?: StringWithAggregatesFilter<"FabricStockLedger"> | string
     referenceId?: StringWithAggregatesFilter<"FabricStockLedger"> | string
     fromLocationId?: StringNullableWithAggregatesFilter<"FabricStockLedger"> | string | null
@@ -109511,8 +114002,20 @@ export namespace Prisma {
     hsnCode?: StringNullableFilter<"FabricInward"> | string | null
     taxPercent?: FloatNullableFilter<"FabricInward"> | number | null
     remarks?: StringNullableFilter<"FabricInward"> | string | null
+    rollNumber?: StringNullableFilter<"FabricInward"> | string | null
+    rollKey?: StringNullableFilter<"FabricInward"> | string | null
+    batchNumber?: StringNullableFilter<"FabricInward"> | string | null
+    shade?: StringNullableFilter<"FabricInward"> | string | null
+    composition?: StringNullableFilter<"FabricInward"> | string | null
+    width?: StringNullableFilter<"FabricInward"> | string | null
+    unitRate?: FloatNullableFilter<"FabricInward"> | number | null
+    storageLocation?: StringNullableFilter<"FabricInward"> | string | null
+    purchaseOrderNumber?: StringNullableFilter<"FabricInward"> | string | null
+    importId?: StringNullableFilter<"FabricInward"> | string | null
+    importRowNumber?: IntNullableFilter<"FabricInward"> | number | null
     createdAt?: DateTimeFilter<"FabricInward"> | Date | string
     updatedAt?: DateTimeFilter<"FabricInward"> | Date | string
+    import?: XOR<FabricStockImportNullableScalarRelationFilter, FabricStockImportWhereInput> | null
   }
 
   export type FabricInwardOrderByWithRelationInput = {
@@ -109533,12 +114036,25 @@ export namespace Prisma {
     hsnCode?: SortOrderInput | SortOrder
     taxPercent?: SortOrderInput | SortOrder
     remarks?: SortOrderInput | SortOrder
+    rollNumber?: SortOrderInput | SortOrder
+    rollKey?: SortOrderInput | SortOrder
+    batchNumber?: SortOrderInput | SortOrder
+    shade?: SortOrderInput | SortOrder
+    composition?: SortOrderInput | SortOrder
+    width?: SortOrderInput | SortOrder
+    unitRate?: SortOrderInput | SortOrder
+    storageLocation?: SortOrderInput | SortOrder
+    purchaseOrderNumber?: SortOrderInput | SortOrder
+    importId?: SortOrderInput | SortOrder
+    importRowNumber?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    import?: FabricStockImportOrderByWithRelationInput
   }
 
   export type FabricInwardWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    rollKey?: string
     AND?: FabricInwardWhereInput | FabricInwardWhereInput[]
     OR?: FabricInwardWhereInput[]
     NOT?: FabricInwardWhereInput | FabricInwardWhereInput[]
@@ -109558,9 +114074,20 @@ export namespace Prisma {
     hsnCode?: StringNullableFilter<"FabricInward"> | string | null
     taxPercent?: FloatNullableFilter<"FabricInward"> | number | null
     remarks?: StringNullableFilter<"FabricInward"> | string | null
+    rollNumber?: StringNullableFilter<"FabricInward"> | string | null
+    batchNumber?: StringNullableFilter<"FabricInward"> | string | null
+    shade?: StringNullableFilter<"FabricInward"> | string | null
+    composition?: StringNullableFilter<"FabricInward"> | string | null
+    width?: StringNullableFilter<"FabricInward"> | string | null
+    unitRate?: FloatNullableFilter<"FabricInward"> | number | null
+    storageLocation?: StringNullableFilter<"FabricInward"> | string | null
+    purchaseOrderNumber?: StringNullableFilter<"FabricInward"> | string | null
+    importId?: StringNullableFilter<"FabricInward"> | string | null
+    importRowNumber?: IntNullableFilter<"FabricInward"> | number | null
     createdAt?: DateTimeFilter<"FabricInward"> | Date | string
     updatedAt?: DateTimeFilter<"FabricInward"> | Date | string
-  }, "id">
+    import?: XOR<FabricStockImportNullableScalarRelationFilter, FabricStockImportWhereInput> | null
+  }, "id" | "rollKey">
 
   export type FabricInwardOrderByWithAggregationInput = {
     id?: SortOrder
@@ -109580,6 +114107,17 @@ export namespace Prisma {
     hsnCode?: SortOrderInput | SortOrder
     taxPercent?: SortOrderInput | SortOrder
     remarks?: SortOrderInput | SortOrder
+    rollNumber?: SortOrderInput | SortOrder
+    rollKey?: SortOrderInput | SortOrder
+    batchNumber?: SortOrderInput | SortOrder
+    shade?: SortOrderInput | SortOrder
+    composition?: SortOrderInput | SortOrder
+    width?: SortOrderInput | SortOrder
+    unitRate?: SortOrderInput | SortOrder
+    storageLocation?: SortOrderInput | SortOrder
+    purchaseOrderNumber?: SortOrderInput | SortOrder
+    importId?: SortOrderInput | SortOrder
+    importRowNumber?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: FabricInwardCountOrderByAggregateInput
@@ -109610,6 +114148,17 @@ export namespace Prisma {
     hsnCode?: StringNullableWithAggregatesFilter<"FabricInward"> | string | null
     taxPercent?: FloatNullableWithAggregatesFilter<"FabricInward"> | number | null
     remarks?: StringNullableWithAggregatesFilter<"FabricInward"> | string | null
+    rollNumber?: StringNullableWithAggregatesFilter<"FabricInward"> | string | null
+    rollKey?: StringNullableWithAggregatesFilter<"FabricInward"> | string | null
+    batchNumber?: StringNullableWithAggregatesFilter<"FabricInward"> | string | null
+    shade?: StringNullableWithAggregatesFilter<"FabricInward"> | string | null
+    composition?: StringNullableWithAggregatesFilter<"FabricInward"> | string | null
+    width?: StringNullableWithAggregatesFilter<"FabricInward"> | string | null
+    unitRate?: FloatNullableWithAggregatesFilter<"FabricInward"> | number | null
+    storageLocation?: StringNullableWithAggregatesFilter<"FabricInward"> | string | null
+    purchaseOrderNumber?: StringNullableWithAggregatesFilter<"FabricInward"> | string | null
+    importId?: StringNullableWithAggregatesFilter<"FabricInward"> | string | null
+    importRowNumber?: IntNullableWithAggregatesFilter<"FabricInward"> | number | null
     createdAt?: DateTimeWithAggregatesFilter<"FabricInward"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"FabricInward"> | Date | string
   }
@@ -109731,6 +114280,244 @@ export namespace Prisma {
     fabricType?: StringNullableWithAggregatesFilter<"FabricOutward"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"FabricOutward"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"FabricOutward"> | Date | string
+  }
+
+  export type FabricStockImportWhereInput = {
+    AND?: FabricStockImportWhereInput | FabricStockImportWhereInput[]
+    OR?: FabricStockImportWhereInput[]
+    NOT?: FabricStockImportWhereInput | FabricStockImportWhereInput[]
+    id?: StringFilter<"FabricStockImport"> | string
+    status?: StringFilter<"FabricStockImport"> | string
+    fileName?: StringFilter<"FabricStockImport"> | string
+    fileHash?: StringFilter<"FabricStockImport"> | string
+    fileSize?: IntFilter<"FabricStockImport"> | number
+    fileData?: BytesFilter<"FabricStockImport"> | Bytes
+    sheetsJson?: StringFilter<"FabricStockImport"> | string
+    selectedSheet?: StringNullableFilter<"FabricStockImport"> | string | null
+    headerRow?: IntNullableFilter<"FabricStockImport"> | number | null
+    mappingJson?: StringNullableFilter<"FabricStockImport"> | string | null
+    correctionsJson?: StringNullableFilter<"FabricStockImport"> | string | null
+    resolutionsJson?: StringNullableFilter<"FabricStockImport"> | string | null
+    validationJson?: StringNullableFilter<"FabricStockImport"> | string | null
+    payloadHash?: StringNullableFilter<"FabricStockImport"> | string | null
+    receiptNumber?: StringNullableFilter<"FabricStockImport"> | string | null
+    confirmKey?: StringNullableFilter<"FabricStockImport"> | string | null
+    postedAt?: DateTimeNullableFilter<"FabricStockImport"> | Date | string | null
+    postedById?: StringNullableFilter<"FabricStockImport"> | string | null
+    postedResultJson?: StringNullableFilter<"FabricStockImport"> | string | null
+    failureReason?: StringNullableFilter<"FabricStockImport"> | string | null
+    uploadedById?: StringFilter<"FabricStockImport"> | string
+    createdAt?: DateTimeFilter<"FabricStockImport"> | Date | string
+    updatedAt?: DateTimeFilter<"FabricStockImport"> | Date | string
+    postedBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    uploadedBy?: XOR<UserScalarRelationFilter, UserWhereInput>
+    inwards?: FabricInwardListRelationFilter
+    documents?: FabricStockImportDocumentListRelationFilter
+  }
+
+  export type FabricStockImportOrderByWithRelationInput = {
+    id?: SortOrder
+    status?: SortOrder
+    fileName?: SortOrder
+    fileHash?: SortOrder
+    fileSize?: SortOrder
+    fileData?: SortOrder
+    sheetsJson?: SortOrder
+    selectedSheet?: SortOrderInput | SortOrder
+    headerRow?: SortOrderInput | SortOrder
+    mappingJson?: SortOrderInput | SortOrder
+    correctionsJson?: SortOrderInput | SortOrder
+    resolutionsJson?: SortOrderInput | SortOrder
+    validationJson?: SortOrderInput | SortOrder
+    payloadHash?: SortOrderInput | SortOrder
+    receiptNumber?: SortOrderInput | SortOrder
+    confirmKey?: SortOrderInput | SortOrder
+    postedAt?: SortOrderInput | SortOrder
+    postedById?: SortOrderInput | SortOrder
+    postedResultJson?: SortOrderInput | SortOrder
+    failureReason?: SortOrderInput | SortOrder
+    uploadedById?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    postedBy?: UserOrderByWithRelationInput
+    uploadedBy?: UserOrderByWithRelationInput
+    inwards?: FabricInwardOrderByRelationAggregateInput
+    documents?: FabricStockImportDocumentOrderByRelationAggregateInput
+  }
+
+  export type FabricStockImportWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    receiptNumber?: string
+    confirmKey?: string
+    AND?: FabricStockImportWhereInput | FabricStockImportWhereInput[]
+    OR?: FabricStockImportWhereInput[]
+    NOT?: FabricStockImportWhereInput | FabricStockImportWhereInput[]
+    status?: StringFilter<"FabricStockImport"> | string
+    fileName?: StringFilter<"FabricStockImport"> | string
+    fileHash?: StringFilter<"FabricStockImport"> | string
+    fileSize?: IntFilter<"FabricStockImport"> | number
+    fileData?: BytesFilter<"FabricStockImport"> | Bytes
+    sheetsJson?: StringFilter<"FabricStockImport"> | string
+    selectedSheet?: StringNullableFilter<"FabricStockImport"> | string | null
+    headerRow?: IntNullableFilter<"FabricStockImport"> | number | null
+    mappingJson?: StringNullableFilter<"FabricStockImport"> | string | null
+    correctionsJson?: StringNullableFilter<"FabricStockImport"> | string | null
+    resolutionsJson?: StringNullableFilter<"FabricStockImport"> | string | null
+    validationJson?: StringNullableFilter<"FabricStockImport"> | string | null
+    payloadHash?: StringNullableFilter<"FabricStockImport"> | string | null
+    postedAt?: DateTimeNullableFilter<"FabricStockImport"> | Date | string | null
+    postedById?: StringNullableFilter<"FabricStockImport"> | string | null
+    postedResultJson?: StringNullableFilter<"FabricStockImport"> | string | null
+    failureReason?: StringNullableFilter<"FabricStockImport"> | string | null
+    uploadedById?: StringFilter<"FabricStockImport"> | string
+    createdAt?: DateTimeFilter<"FabricStockImport"> | Date | string
+    updatedAt?: DateTimeFilter<"FabricStockImport"> | Date | string
+    postedBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    uploadedBy?: XOR<UserScalarRelationFilter, UserWhereInput>
+    inwards?: FabricInwardListRelationFilter
+    documents?: FabricStockImportDocumentListRelationFilter
+  }, "id" | "receiptNumber" | "confirmKey">
+
+  export type FabricStockImportOrderByWithAggregationInput = {
+    id?: SortOrder
+    status?: SortOrder
+    fileName?: SortOrder
+    fileHash?: SortOrder
+    fileSize?: SortOrder
+    fileData?: SortOrder
+    sheetsJson?: SortOrder
+    selectedSheet?: SortOrderInput | SortOrder
+    headerRow?: SortOrderInput | SortOrder
+    mappingJson?: SortOrderInput | SortOrder
+    correctionsJson?: SortOrderInput | SortOrder
+    resolutionsJson?: SortOrderInput | SortOrder
+    validationJson?: SortOrderInput | SortOrder
+    payloadHash?: SortOrderInput | SortOrder
+    receiptNumber?: SortOrderInput | SortOrder
+    confirmKey?: SortOrderInput | SortOrder
+    postedAt?: SortOrderInput | SortOrder
+    postedById?: SortOrderInput | SortOrder
+    postedResultJson?: SortOrderInput | SortOrder
+    failureReason?: SortOrderInput | SortOrder
+    uploadedById?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: FabricStockImportCountOrderByAggregateInput
+    _avg?: FabricStockImportAvgOrderByAggregateInput
+    _max?: FabricStockImportMaxOrderByAggregateInput
+    _min?: FabricStockImportMinOrderByAggregateInput
+    _sum?: FabricStockImportSumOrderByAggregateInput
+  }
+
+  export type FabricStockImportScalarWhereWithAggregatesInput = {
+    AND?: FabricStockImportScalarWhereWithAggregatesInput | FabricStockImportScalarWhereWithAggregatesInput[]
+    OR?: FabricStockImportScalarWhereWithAggregatesInput[]
+    NOT?: FabricStockImportScalarWhereWithAggregatesInput | FabricStockImportScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"FabricStockImport"> | string
+    status?: StringWithAggregatesFilter<"FabricStockImport"> | string
+    fileName?: StringWithAggregatesFilter<"FabricStockImport"> | string
+    fileHash?: StringWithAggregatesFilter<"FabricStockImport"> | string
+    fileSize?: IntWithAggregatesFilter<"FabricStockImport"> | number
+    fileData?: BytesWithAggregatesFilter<"FabricStockImport"> | Bytes
+    sheetsJson?: StringWithAggregatesFilter<"FabricStockImport"> | string
+    selectedSheet?: StringNullableWithAggregatesFilter<"FabricStockImport"> | string | null
+    headerRow?: IntNullableWithAggregatesFilter<"FabricStockImport"> | number | null
+    mappingJson?: StringNullableWithAggregatesFilter<"FabricStockImport"> | string | null
+    correctionsJson?: StringNullableWithAggregatesFilter<"FabricStockImport"> | string | null
+    resolutionsJson?: StringNullableWithAggregatesFilter<"FabricStockImport"> | string | null
+    validationJson?: StringNullableWithAggregatesFilter<"FabricStockImport"> | string | null
+    payloadHash?: StringNullableWithAggregatesFilter<"FabricStockImport"> | string | null
+    receiptNumber?: StringNullableWithAggregatesFilter<"FabricStockImport"> | string | null
+    confirmKey?: StringNullableWithAggregatesFilter<"FabricStockImport"> | string | null
+    postedAt?: DateTimeNullableWithAggregatesFilter<"FabricStockImport"> | Date | string | null
+    postedById?: StringNullableWithAggregatesFilter<"FabricStockImport"> | string | null
+    postedResultJson?: StringNullableWithAggregatesFilter<"FabricStockImport"> | string | null
+    failureReason?: StringNullableWithAggregatesFilter<"FabricStockImport"> | string | null
+    uploadedById?: StringWithAggregatesFilter<"FabricStockImport"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"FabricStockImport"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"FabricStockImport"> | Date | string
+  }
+
+  export type FabricStockImportDocumentWhereInput = {
+    AND?: FabricStockImportDocumentWhereInput | FabricStockImportDocumentWhereInput[]
+    OR?: FabricStockImportDocumentWhereInput[]
+    NOT?: FabricStockImportDocumentWhereInput | FabricStockImportDocumentWhereInput[]
+    id?: StringFilter<"FabricStockImportDocument"> | string
+    importId?: StringFilter<"FabricStockImportDocument"> | string
+    kind?: StringFilter<"FabricStockImportDocument"> | string
+    sheetName?: StringNullableFilter<"FabricStockImportDocument"> | string | null
+    mimeType?: StringFilter<"FabricStockImportDocument"> | string
+    size?: IntFilter<"FabricStockImportDocument"> | number
+    sha256?: StringFilter<"FabricStockImportDocument"> | string
+    data?: BytesFilter<"FabricStockImportDocument"> | Bytes
+    ocrStatus?: StringFilter<"FabricStockImportDocument"> | string
+    createdAt?: DateTimeFilter<"FabricStockImportDocument"> | Date | string
+    import?: XOR<FabricStockImportScalarRelationFilter, FabricStockImportWhereInput>
+  }
+
+  export type FabricStockImportDocumentOrderByWithRelationInput = {
+    id?: SortOrder
+    importId?: SortOrder
+    kind?: SortOrder
+    sheetName?: SortOrderInput | SortOrder
+    mimeType?: SortOrder
+    size?: SortOrder
+    sha256?: SortOrder
+    data?: SortOrder
+    ocrStatus?: SortOrder
+    createdAt?: SortOrder
+    import?: FabricStockImportOrderByWithRelationInput
+  }
+
+  export type FabricStockImportDocumentWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: FabricStockImportDocumentWhereInput | FabricStockImportDocumentWhereInput[]
+    OR?: FabricStockImportDocumentWhereInput[]
+    NOT?: FabricStockImportDocumentWhereInput | FabricStockImportDocumentWhereInput[]
+    importId?: StringFilter<"FabricStockImportDocument"> | string
+    kind?: StringFilter<"FabricStockImportDocument"> | string
+    sheetName?: StringNullableFilter<"FabricStockImportDocument"> | string | null
+    mimeType?: StringFilter<"FabricStockImportDocument"> | string
+    size?: IntFilter<"FabricStockImportDocument"> | number
+    sha256?: StringFilter<"FabricStockImportDocument"> | string
+    data?: BytesFilter<"FabricStockImportDocument"> | Bytes
+    ocrStatus?: StringFilter<"FabricStockImportDocument"> | string
+    createdAt?: DateTimeFilter<"FabricStockImportDocument"> | Date | string
+    import?: XOR<FabricStockImportScalarRelationFilter, FabricStockImportWhereInput>
+  }, "id">
+
+  export type FabricStockImportDocumentOrderByWithAggregationInput = {
+    id?: SortOrder
+    importId?: SortOrder
+    kind?: SortOrder
+    sheetName?: SortOrderInput | SortOrder
+    mimeType?: SortOrder
+    size?: SortOrder
+    sha256?: SortOrder
+    data?: SortOrder
+    ocrStatus?: SortOrder
+    createdAt?: SortOrder
+    _count?: FabricStockImportDocumentCountOrderByAggregateInput
+    _avg?: FabricStockImportDocumentAvgOrderByAggregateInput
+    _max?: FabricStockImportDocumentMaxOrderByAggregateInput
+    _min?: FabricStockImportDocumentMinOrderByAggregateInput
+    _sum?: FabricStockImportDocumentSumOrderByAggregateInput
+  }
+
+  export type FabricStockImportDocumentScalarWhereWithAggregatesInput = {
+    AND?: FabricStockImportDocumentScalarWhereWithAggregatesInput | FabricStockImportDocumentScalarWhereWithAggregatesInput[]
+    OR?: FabricStockImportDocumentScalarWhereWithAggregatesInput[]
+    NOT?: FabricStockImportDocumentScalarWhereWithAggregatesInput | FabricStockImportDocumentScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"FabricStockImportDocument"> | string
+    importId?: StringWithAggregatesFilter<"FabricStockImportDocument"> | string
+    kind?: StringWithAggregatesFilter<"FabricStockImportDocument"> | string
+    sheetName?: StringNullableWithAggregatesFilter<"FabricStockImportDocument"> | string | null
+    mimeType?: StringWithAggregatesFilter<"FabricStockImportDocument"> | string
+    size?: IntWithAggregatesFilter<"FabricStockImportDocument"> | number
+    sha256?: StringWithAggregatesFilter<"FabricStockImportDocument"> | string
+    data?: BytesWithAggregatesFilter<"FabricStockImportDocument"> | Bytes
+    ocrStatus?: StringWithAggregatesFilter<"FabricStockImportDocument"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"FabricStockImportDocument"> | Date | string
   }
 
   export type DeadlineAlertWhereInput = {
@@ -110175,6 +114962,140 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"GarmentImage"> | Date | string
   }
 
+  export type StockImportWhereInput = {
+    AND?: StockImportWhereInput | StockImportWhereInput[]
+    OR?: StockImportWhereInput[]
+    NOT?: StockImportWhereInput | StockImportWhereInput[]
+    id?: StringFilter<"StockImport"> | string
+    source?: StringFilter<"StockImport"> | string
+    fileName?: StringFilter<"StockImport"> | string
+    mimeType?: StringFilter<"StockImport"> | string
+    fileSize?: IntFilter<"StockImport"> | number
+    fileHash?: StringFilter<"StockImport"> | string
+    fileData?: BytesFilter<"StockImport"> | Bytes
+    status?: StringFilter<"StockImport"> | string
+    extractedJson?: JsonNullableFilter<"StockImport">
+    rowCount?: IntFilter<"StockImport"> | number
+    engine?: StringNullableFilter<"StockImport"> | string | null
+    uploadedById?: StringFilter<"StockImport"> | string
+    uploadedAt?: DateTimeFilter<"StockImport"> | Date | string
+    confirmKey?: StringNullableFilter<"StockImport"> | string | null
+    confirmedById?: StringNullableFilter<"StockImport"> | string | null
+    confirmedAt?: DateTimeNullableFilter<"StockImport"> | Date | string | null
+    confirmedJson?: JsonNullableFilter<"StockImport">
+    resultJson?: JsonNullableFilter<"StockImport">
+    addedCount?: IntFilter<"StockImport"> | number
+    skippedCount?: IntFilter<"StockImport"> | number
+    updatedAt?: DateTimeFilter<"StockImport"> | Date | string
+  }
+
+  export type StockImportOrderByWithRelationInput = {
+    id?: SortOrder
+    source?: SortOrder
+    fileName?: SortOrder
+    mimeType?: SortOrder
+    fileSize?: SortOrder
+    fileHash?: SortOrder
+    fileData?: SortOrder
+    status?: SortOrder
+    extractedJson?: SortOrderInput | SortOrder
+    rowCount?: SortOrder
+    engine?: SortOrderInput | SortOrder
+    uploadedById?: SortOrder
+    uploadedAt?: SortOrder
+    confirmKey?: SortOrderInput | SortOrder
+    confirmedById?: SortOrderInput | SortOrder
+    confirmedAt?: SortOrderInput | SortOrder
+    confirmedJson?: SortOrderInput | SortOrder
+    resultJson?: SortOrderInput | SortOrder
+    addedCount?: SortOrder
+    skippedCount?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type StockImportWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    confirmKey?: string
+    AND?: StockImportWhereInput | StockImportWhereInput[]
+    OR?: StockImportWhereInput[]
+    NOT?: StockImportWhereInput | StockImportWhereInput[]
+    source?: StringFilter<"StockImport"> | string
+    fileName?: StringFilter<"StockImport"> | string
+    mimeType?: StringFilter<"StockImport"> | string
+    fileSize?: IntFilter<"StockImport"> | number
+    fileHash?: StringFilter<"StockImport"> | string
+    fileData?: BytesFilter<"StockImport"> | Bytes
+    status?: StringFilter<"StockImport"> | string
+    extractedJson?: JsonNullableFilter<"StockImport">
+    rowCount?: IntFilter<"StockImport"> | number
+    engine?: StringNullableFilter<"StockImport"> | string | null
+    uploadedById?: StringFilter<"StockImport"> | string
+    uploadedAt?: DateTimeFilter<"StockImport"> | Date | string
+    confirmedById?: StringNullableFilter<"StockImport"> | string | null
+    confirmedAt?: DateTimeNullableFilter<"StockImport"> | Date | string | null
+    confirmedJson?: JsonNullableFilter<"StockImport">
+    resultJson?: JsonNullableFilter<"StockImport">
+    addedCount?: IntFilter<"StockImport"> | number
+    skippedCount?: IntFilter<"StockImport"> | number
+    updatedAt?: DateTimeFilter<"StockImport"> | Date | string
+  }, "id" | "confirmKey">
+
+  export type StockImportOrderByWithAggregationInput = {
+    id?: SortOrder
+    source?: SortOrder
+    fileName?: SortOrder
+    mimeType?: SortOrder
+    fileSize?: SortOrder
+    fileHash?: SortOrder
+    fileData?: SortOrder
+    status?: SortOrder
+    extractedJson?: SortOrderInput | SortOrder
+    rowCount?: SortOrder
+    engine?: SortOrderInput | SortOrder
+    uploadedById?: SortOrder
+    uploadedAt?: SortOrder
+    confirmKey?: SortOrderInput | SortOrder
+    confirmedById?: SortOrderInput | SortOrder
+    confirmedAt?: SortOrderInput | SortOrder
+    confirmedJson?: SortOrderInput | SortOrder
+    resultJson?: SortOrderInput | SortOrder
+    addedCount?: SortOrder
+    skippedCount?: SortOrder
+    updatedAt?: SortOrder
+    _count?: StockImportCountOrderByAggregateInput
+    _avg?: StockImportAvgOrderByAggregateInput
+    _max?: StockImportMaxOrderByAggregateInput
+    _min?: StockImportMinOrderByAggregateInput
+    _sum?: StockImportSumOrderByAggregateInput
+  }
+
+  export type StockImportScalarWhereWithAggregatesInput = {
+    AND?: StockImportScalarWhereWithAggregatesInput | StockImportScalarWhereWithAggregatesInput[]
+    OR?: StockImportScalarWhereWithAggregatesInput[]
+    NOT?: StockImportScalarWhereWithAggregatesInput | StockImportScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"StockImport"> | string
+    source?: StringWithAggregatesFilter<"StockImport"> | string
+    fileName?: StringWithAggregatesFilter<"StockImport"> | string
+    mimeType?: StringWithAggregatesFilter<"StockImport"> | string
+    fileSize?: IntWithAggregatesFilter<"StockImport"> | number
+    fileHash?: StringWithAggregatesFilter<"StockImport"> | string
+    fileData?: BytesWithAggregatesFilter<"StockImport"> | Bytes
+    status?: StringWithAggregatesFilter<"StockImport"> | string
+    extractedJson?: JsonNullableWithAggregatesFilter<"StockImport">
+    rowCount?: IntWithAggregatesFilter<"StockImport"> | number
+    engine?: StringNullableWithAggregatesFilter<"StockImport"> | string | null
+    uploadedById?: StringWithAggregatesFilter<"StockImport"> | string
+    uploadedAt?: DateTimeWithAggregatesFilter<"StockImport"> | Date | string
+    confirmKey?: StringNullableWithAggregatesFilter<"StockImport"> | string | null
+    confirmedById?: StringNullableWithAggregatesFilter<"StockImport"> | string | null
+    confirmedAt?: DateTimeNullableWithAggregatesFilter<"StockImport"> | Date | string | null
+    confirmedJson?: JsonNullableWithAggregatesFilter<"StockImport">
+    resultJson?: JsonNullableWithAggregatesFilter<"StockImport">
+    addedCount?: IntWithAggregatesFilter<"StockImport"> | number
+    skippedCount?: IntWithAggregatesFilter<"StockImport"> | number
+    updatedAt?: DateTimeWithAggregatesFilter<"StockImport"> | Date | string
+  }
+
   export type ManualMigrationWhereInput = {
     AND?: ManualMigrationWhereInput | ManualMigrationWhereInput[]
     OR?: ManualMigrationWhereInput[]
@@ -110262,6 +115183,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -110311,6 +115234,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -110360,6 +115285,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -110409,6 +115336,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -113712,6 +118641,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -113763,6 +118693,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -113798,6 +118729,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -113849,6 +118781,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -113892,6 +118825,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -113914,6 +118848,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -113944,6 +118879,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -115527,6 +120463,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     status?: string
     resolutionNotes?: string | null
@@ -115551,6 +120488,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     detectedById: string
     status?: string
@@ -115568,7 +120506,8 @@ export namespace Prisma {
     departmentCode?: StringFieldUpdateOperationsInput | string
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -115592,7 +120531,8 @@ export namespace Prisma {
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -115614,6 +120554,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     detectedById: string
     status?: string
@@ -115629,7 +120570,8 @@ export namespace Prisma {
     departmentCode?: StringFieldUpdateOperationsInput | string
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -115647,7 +120589,8 @@ export namespace Prisma {
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -116313,7 +121256,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
-    totalPieces?: Decimal | DecimalJsLike | number | string
+    unit?: string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdAt?: Date | string
@@ -116336,7 +121279,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
-    totalPieces?: Decimal | DecimalJsLike | number | string
+    unit?: string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdById: string
@@ -116357,7 +121300,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -116380,7 +121323,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -116402,7 +121345,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
-    totalPieces?: Decimal | DecimalJsLike | number | string
+    unit?: string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdById: string
@@ -116420,7 +121363,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -116438,7 +121381,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -116450,7 +121393,6 @@ export namespace Prisma {
     id?: string
     rollNumber: string
     length: Decimal | DecimalJsLike | number | string
-    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -116475,7 +121417,6 @@ export namespace Prisma {
     batchId: string
     locationId?: string | null
     length: Decimal | DecimalJsLike | number | string
-    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -116496,7 +121437,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     rollNumber?: StringFieldUpdateOperationsInput | string
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -116521,7 +121461,6 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     locationId?: NullableStringFieldUpdateOperationsInput | string | null
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -116544,7 +121483,6 @@ export namespace Prisma {
     batchId: string
     locationId?: string | null
     length: Decimal | DecimalJsLike | number | string
-    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -116562,7 +121500,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     rollNumber?: StringFieldUpdateOperationsInput | string
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -116580,7 +121517,6 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     locationId?: NullableStringFieldUpdateOperationsInput | string | null
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -116603,7 +121539,6 @@ export namespace Prisma {
     supplierName: string
     totalRollsReceived?: number
     totalMetersReceived?: Decimal | DecimalJsLike | number | string
-    totalPiecesReceived?: Decimal | DecimalJsLike | number | string
     status?: $Enums.GRNStatus
     remarks?: string | null
     createdAt?: Date | string
@@ -116624,7 +121559,6 @@ export namespace Prisma {
     supplierName: string
     totalRollsReceived?: number
     totalMetersReceived?: Decimal | DecimalJsLike | number | string
-    totalPiecesReceived?: Decimal | DecimalJsLike | number | string
     status?: $Enums.GRNStatus
     remarks?: string | null
     createdAt?: Date | string
@@ -116641,7 +121575,6 @@ export namespace Prisma {
     supplierName?: StringFieldUpdateOperationsInput | string
     totalRollsReceived?: IntFieldUpdateOperationsInput | number
     totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalPiecesReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -116662,7 +121595,6 @@ export namespace Prisma {
     supplierName?: StringFieldUpdateOperationsInput | string
     totalRollsReceived?: IntFieldUpdateOperationsInput | number
     totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalPiecesReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -116681,7 +121613,6 @@ export namespace Prisma {
     supplierName: string
     totalRollsReceived?: number
     totalMetersReceived?: Decimal | DecimalJsLike | number | string
-    totalPiecesReceived?: Decimal | DecimalJsLike | number | string
     status?: $Enums.GRNStatus
     remarks?: string | null
     createdAt?: Date | string
@@ -116697,7 +121628,6 @@ export namespace Prisma {
     supplierName?: StringFieldUpdateOperationsInput | string
     totalRollsReceived?: IntFieldUpdateOperationsInput | number
     totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalPiecesReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -116715,7 +121645,6 @@ export namespace Prisma {
     supplierName?: StringFieldUpdateOperationsInput | string
     totalRollsReceived?: IntFieldUpdateOperationsInput | number
     totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalPiecesReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -116884,7 +121813,6 @@ export namespace Prisma {
     entryNumber: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
-    uom?: string
     referenceType: string
     referenceId: string
     transactedAt: Date | string
@@ -116904,7 +121832,6 @@ export namespace Prisma {
     batchId: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
-    uom?: string
     referenceType: string
     referenceId: string
     fromLocationId?: string | null
@@ -116920,7 +121847,6 @@ export namespace Prisma {
     entryNumber?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -116940,7 +121866,6 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -116958,7 +121883,6 @@ export namespace Prisma {
     batchId: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
-    uom?: string
     referenceType: string
     referenceId: string
     fromLocationId?: string | null
@@ -116974,7 +121898,6 @@ export namespace Prisma {
     entryNumber?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -116989,7 +121912,6 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -118043,8 +122965,19 @@ export namespace Prisma {
     hsnCode?: string | null
     taxPercent?: number | null
     remarks?: string | null
+    rollNumber?: string | null
+    rollKey?: string | null
+    batchNumber?: string | null
+    shade?: string | null
+    composition?: string | null
+    width?: string | null
+    unitRate?: number | null
+    storageLocation?: string | null
+    purchaseOrderNumber?: string | null
+    importRowNumber?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    import?: FabricStockImportCreateNestedOneWithoutInwardsInput
   }
 
   export type FabricInwardUncheckedCreateInput = {
@@ -118065,6 +122998,17 @@ export namespace Prisma {
     hsnCode?: string | null
     taxPercent?: number | null
     remarks?: string | null
+    rollNumber?: string | null
+    rollKey?: string | null
+    batchNumber?: string | null
+    shade?: string | null
+    composition?: string | null
+    width?: string | null
+    unitRate?: number | null
+    storageLocation?: string | null
+    purchaseOrderNumber?: string | null
+    importId?: string | null
+    importRowNumber?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -118087,8 +123031,19 @@ export namespace Prisma {
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
     taxPercent?: NullableFloatFieldUpdateOperationsInput | number | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    rollKey?: NullableStringFieldUpdateOperationsInput | string | null
+    batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    shade?: NullableStringFieldUpdateOperationsInput | string | null
+    composition?: NullableStringFieldUpdateOperationsInput | string | null
+    width?: NullableStringFieldUpdateOperationsInput | string | null
+    unitRate?: NullableFloatFieldUpdateOperationsInput | number | null
+    storageLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    purchaseOrderNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    importRowNumber?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    import?: FabricStockImportUpdateOneWithoutInwardsNestedInput
   }
 
   export type FabricInwardUncheckedUpdateInput = {
@@ -118109,6 +123064,17 @@ export namespace Prisma {
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
     taxPercent?: NullableFloatFieldUpdateOperationsInput | number | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    rollKey?: NullableStringFieldUpdateOperationsInput | string | null
+    batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    shade?: NullableStringFieldUpdateOperationsInput | string | null
+    composition?: NullableStringFieldUpdateOperationsInput | string | null
+    width?: NullableStringFieldUpdateOperationsInput | string | null
+    unitRate?: NullableFloatFieldUpdateOperationsInput | number | null
+    storageLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    purchaseOrderNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    importId?: NullableStringFieldUpdateOperationsInput | string | null
+    importRowNumber?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -118131,6 +123097,17 @@ export namespace Prisma {
     hsnCode?: string | null
     taxPercent?: number | null
     remarks?: string | null
+    rollNumber?: string | null
+    rollKey?: string | null
+    batchNumber?: string | null
+    shade?: string | null
+    composition?: string | null
+    width?: string | null
+    unitRate?: number | null
+    storageLocation?: string | null
+    purchaseOrderNumber?: string | null
+    importId?: string | null
+    importRowNumber?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -118153,6 +123130,16 @@ export namespace Prisma {
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
     taxPercent?: NullableFloatFieldUpdateOperationsInput | number | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    rollKey?: NullableStringFieldUpdateOperationsInput | string | null
+    batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    shade?: NullableStringFieldUpdateOperationsInput | string | null
+    composition?: NullableStringFieldUpdateOperationsInput | string | null
+    width?: NullableStringFieldUpdateOperationsInput | string | null
+    unitRate?: NullableFloatFieldUpdateOperationsInput | number | null
+    storageLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    purchaseOrderNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    importRowNumber?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -118175,6 +123162,17 @@ export namespace Prisma {
     hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
     taxPercent?: NullableFloatFieldUpdateOperationsInput | number | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    rollKey?: NullableStringFieldUpdateOperationsInput | string | null
+    batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    shade?: NullableStringFieldUpdateOperationsInput | string | null
+    composition?: NullableStringFieldUpdateOperationsInput | string | null
+    width?: NullableStringFieldUpdateOperationsInput | string | null
+    unitRate?: NullableFloatFieldUpdateOperationsInput | number | null
+    storageLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    purchaseOrderNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    importId?: NullableStringFieldUpdateOperationsInput | string | null
+    importRowNumber?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -118324,6 +123322,284 @@ export namespace Prisma {
     fabricType?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStockImportCreateInput = {
+    id?: string
+    status?: string
+    fileName: string
+    fileHash: string
+    fileSize: number
+    fileData: Bytes
+    sheetsJson: string
+    selectedSheet?: string | null
+    headerRow?: number | null
+    mappingJson?: string | null
+    correctionsJson?: string | null
+    resolutionsJson?: string | null
+    validationJson?: string | null
+    payloadHash?: string | null
+    receiptNumber?: string | null
+    confirmKey?: string | null
+    postedAt?: Date | string | null
+    postedResultJson?: string | null
+    failureReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    postedBy?: UserCreateNestedOneWithoutFabricStockImportsPostedInput
+    uploadedBy: UserCreateNestedOneWithoutFabricStockImportsUploadedInput
+    inwards?: FabricInwardCreateNestedManyWithoutImportInput
+    documents?: FabricStockImportDocumentCreateNestedManyWithoutImportInput
+  }
+
+  export type FabricStockImportUncheckedCreateInput = {
+    id?: string
+    status?: string
+    fileName: string
+    fileHash: string
+    fileSize: number
+    fileData: Bytes
+    sheetsJson: string
+    selectedSheet?: string | null
+    headerRow?: number | null
+    mappingJson?: string | null
+    correctionsJson?: string | null
+    resolutionsJson?: string | null
+    validationJson?: string | null
+    payloadHash?: string | null
+    receiptNumber?: string | null
+    confirmKey?: string | null
+    postedAt?: Date | string | null
+    postedById?: string | null
+    postedResultJson?: string | null
+    failureReason?: string | null
+    uploadedById: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    inwards?: FabricInwardUncheckedCreateNestedManyWithoutImportInput
+    documents?: FabricStockImportDocumentUncheckedCreateNestedManyWithoutImportInput
+  }
+
+  export type FabricStockImportUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    fileHash?: StringFieldUpdateOperationsInput | string
+    fileSize?: IntFieldUpdateOperationsInput | number
+    fileData?: BytesFieldUpdateOperationsInput | Bytes
+    sheetsJson?: StringFieldUpdateOperationsInput | string
+    selectedSheet?: NullableStringFieldUpdateOperationsInput | string | null
+    headerRow?: NullableIntFieldUpdateOperationsInput | number | null
+    mappingJson?: NullableStringFieldUpdateOperationsInput | string | null
+    correctionsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    resolutionsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    validationJson?: NullableStringFieldUpdateOperationsInput | string | null
+    payloadHash?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmKey?: NullableStringFieldUpdateOperationsInput | string | null
+    postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    postedResultJson?: NullableStringFieldUpdateOperationsInput | string | null
+    failureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    postedBy?: UserUpdateOneWithoutFabricStockImportsPostedNestedInput
+    uploadedBy?: UserUpdateOneRequiredWithoutFabricStockImportsUploadedNestedInput
+    inwards?: FabricInwardUpdateManyWithoutImportNestedInput
+    documents?: FabricStockImportDocumentUpdateManyWithoutImportNestedInput
+  }
+
+  export type FabricStockImportUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    fileHash?: StringFieldUpdateOperationsInput | string
+    fileSize?: IntFieldUpdateOperationsInput | number
+    fileData?: BytesFieldUpdateOperationsInput | Bytes
+    sheetsJson?: StringFieldUpdateOperationsInput | string
+    selectedSheet?: NullableStringFieldUpdateOperationsInput | string | null
+    headerRow?: NullableIntFieldUpdateOperationsInput | number | null
+    mappingJson?: NullableStringFieldUpdateOperationsInput | string | null
+    correctionsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    resolutionsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    validationJson?: NullableStringFieldUpdateOperationsInput | string | null
+    payloadHash?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmKey?: NullableStringFieldUpdateOperationsInput | string | null
+    postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    postedById?: NullableStringFieldUpdateOperationsInput | string | null
+    postedResultJson?: NullableStringFieldUpdateOperationsInput | string | null
+    failureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedById?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    inwards?: FabricInwardUncheckedUpdateManyWithoutImportNestedInput
+    documents?: FabricStockImportDocumentUncheckedUpdateManyWithoutImportNestedInput
+  }
+
+  export type FabricStockImportCreateManyInput = {
+    id?: string
+    status?: string
+    fileName: string
+    fileHash: string
+    fileSize: number
+    fileData: Bytes
+    sheetsJson: string
+    selectedSheet?: string | null
+    headerRow?: number | null
+    mappingJson?: string | null
+    correctionsJson?: string | null
+    resolutionsJson?: string | null
+    validationJson?: string | null
+    payloadHash?: string | null
+    receiptNumber?: string | null
+    confirmKey?: string | null
+    postedAt?: Date | string | null
+    postedById?: string | null
+    postedResultJson?: string | null
+    failureReason?: string | null
+    uploadedById: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FabricStockImportUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    fileHash?: StringFieldUpdateOperationsInput | string
+    fileSize?: IntFieldUpdateOperationsInput | number
+    fileData?: BytesFieldUpdateOperationsInput | Bytes
+    sheetsJson?: StringFieldUpdateOperationsInput | string
+    selectedSheet?: NullableStringFieldUpdateOperationsInput | string | null
+    headerRow?: NullableIntFieldUpdateOperationsInput | number | null
+    mappingJson?: NullableStringFieldUpdateOperationsInput | string | null
+    correctionsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    resolutionsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    validationJson?: NullableStringFieldUpdateOperationsInput | string | null
+    payloadHash?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmKey?: NullableStringFieldUpdateOperationsInput | string | null
+    postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    postedResultJson?: NullableStringFieldUpdateOperationsInput | string | null
+    failureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStockImportUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    fileHash?: StringFieldUpdateOperationsInput | string
+    fileSize?: IntFieldUpdateOperationsInput | number
+    fileData?: BytesFieldUpdateOperationsInput | Bytes
+    sheetsJson?: StringFieldUpdateOperationsInput | string
+    selectedSheet?: NullableStringFieldUpdateOperationsInput | string | null
+    headerRow?: NullableIntFieldUpdateOperationsInput | number | null
+    mappingJson?: NullableStringFieldUpdateOperationsInput | string | null
+    correctionsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    resolutionsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    validationJson?: NullableStringFieldUpdateOperationsInput | string | null
+    payloadHash?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmKey?: NullableStringFieldUpdateOperationsInput | string | null
+    postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    postedById?: NullableStringFieldUpdateOperationsInput | string | null
+    postedResultJson?: NullableStringFieldUpdateOperationsInput | string | null
+    failureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedById?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStockImportDocumentCreateInput = {
+    id?: string
+    kind: string
+    sheetName?: string | null
+    mimeType: string
+    size: number
+    sha256: string
+    data: Bytes
+    ocrStatus?: string
+    createdAt?: Date | string
+    import: FabricStockImportCreateNestedOneWithoutDocumentsInput
+  }
+
+  export type FabricStockImportDocumentUncheckedCreateInput = {
+    id?: string
+    importId: string
+    kind: string
+    sheetName?: string | null
+    mimeType: string
+    size: number
+    sha256: string
+    data: Bytes
+    ocrStatus?: string
+    createdAt?: Date | string
+  }
+
+  export type FabricStockImportDocumentUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kind?: StringFieldUpdateOperationsInput | string
+    sheetName?: NullableStringFieldUpdateOperationsInput | string | null
+    mimeType?: StringFieldUpdateOperationsInput | string
+    size?: IntFieldUpdateOperationsInput | number
+    sha256?: StringFieldUpdateOperationsInput | string
+    data?: BytesFieldUpdateOperationsInput | Bytes
+    ocrStatus?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    import?: FabricStockImportUpdateOneRequiredWithoutDocumentsNestedInput
+  }
+
+  export type FabricStockImportDocumentUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    importId?: StringFieldUpdateOperationsInput | string
+    kind?: StringFieldUpdateOperationsInput | string
+    sheetName?: NullableStringFieldUpdateOperationsInput | string | null
+    mimeType?: StringFieldUpdateOperationsInput | string
+    size?: IntFieldUpdateOperationsInput | number
+    sha256?: StringFieldUpdateOperationsInput | string
+    data?: BytesFieldUpdateOperationsInput | Bytes
+    ocrStatus?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStockImportDocumentCreateManyInput = {
+    id?: string
+    importId: string
+    kind: string
+    sheetName?: string | null
+    mimeType: string
+    size: number
+    sha256: string
+    data: Bytes
+    ocrStatus?: string
+    createdAt?: Date | string
+  }
+
+  export type FabricStockImportDocumentUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kind?: StringFieldUpdateOperationsInput | string
+    sheetName?: NullableStringFieldUpdateOperationsInput | string | null
+    mimeType?: StringFieldUpdateOperationsInput | string
+    size?: IntFieldUpdateOperationsInput | number
+    sha256?: StringFieldUpdateOperationsInput | string
+    data?: BytesFieldUpdateOperationsInput | Bytes
+    ocrStatus?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStockImportDocumentUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    importId?: StringFieldUpdateOperationsInput | string
+    kind?: StringFieldUpdateOperationsInput | string
+    sheetName?: NullableStringFieldUpdateOperationsInput | string | null
+    mimeType?: StringFieldUpdateOperationsInput | string
+    size?: IntFieldUpdateOperationsInput | number
+    sha256?: StringFieldUpdateOperationsInput | string
+    data?: BytesFieldUpdateOperationsInput | Bytes
+    ocrStatus?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type DeadlineAlertCreateInput = {
@@ -118826,6 +124102,174 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type StockImportCreateInput = {
+    id?: string
+    source: string
+    fileName: string
+    mimeType: string
+    fileSize: number
+    fileHash: string
+    fileData: Bytes
+    status?: string
+    extractedJson?: NullableJsonNullValueInput | InputJsonValue
+    rowCount?: number
+    engine?: string | null
+    uploadedById: string
+    uploadedAt?: Date | string
+    confirmKey?: string | null
+    confirmedById?: string | null
+    confirmedAt?: Date | string | null
+    confirmedJson?: NullableJsonNullValueInput | InputJsonValue
+    resultJson?: NullableJsonNullValueInput | InputJsonValue
+    addedCount?: number
+    skippedCount?: number
+    updatedAt?: Date | string
+  }
+
+  export type StockImportUncheckedCreateInput = {
+    id?: string
+    source: string
+    fileName: string
+    mimeType: string
+    fileSize: number
+    fileHash: string
+    fileData: Bytes
+    status?: string
+    extractedJson?: NullableJsonNullValueInput | InputJsonValue
+    rowCount?: number
+    engine?: string | null
+    uploadedById: string
+    uploadedAt?: Date | string
+    confirmKey?: string | null
+    confirmedById?: string | null
+    confirmedAt?: Date | string | null
+    confirmedJson?: NullableJsonNullValueInput | InputJsonValue
+    resultJson?: NullableJsonNullValueInput | InputJsonValue
+    addedCount?: number
+    skippedCount?: number
+    updatedAt?: Date | string
+  }
+
+  export type StockImportUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    mimeType?: StringFieldUpdateOperationsInput | string
+    fileSize?: IntFieldUpdateOperationsInput | number
+    fileHash?: StringFieldUpdateOperationsInput | string
+    fileData?: BytesFieldUpdateOperationsInput | Bytes
+    status?: StringFieldUpdateOperationsInput | string
+    extractedJson?: NullableJsonNullValueInput | InputJsonValue
+    rowCount?: IntFieldUpdateOperationsInput | number
+    engine?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedById?: StringFieldUpdateOperationsInput | string
+    uploadedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    confirmKey?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedById?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    confirmedJson?: NullableJsonNullValueInput | InputJsonValue
+    resultJson?: NullableJsonNullValueInput | InputJsonValue
+    addedCount?: IntFieldUpdateOperationsInput | number
+    skippedCount?: IntFieldUpdateOperationsInput | number
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StockImportUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    mimeType?: StringFieldUpdateOperationsInput | string
+    fileSize?: IntFieldUpdateOperationsInput | number
+    fileHash?: StringFieldUpdateOperationsInput | string
+    fileData?: BytesFieldUpdateOperationsInput | Bytes
+    status?: StringFieldUpdateOperationsInput | string
+    extractedJson?: NullableJsonNullValueInput | InputJsonValue
+    rowCount?: IntFieldUpdateOperationsInput | number
+    engine?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedById?: StringFieldUpdateOperationsInput | string
+    uploadedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    confirmKey?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedById?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    confirmedJson?: NullableJsonNullValueInput | InputJsonValue
+    resultJson?: NullableJsonNullValueInput | InputJsonValue
+    addedCount?: IntFieldUpdateOperationsInput | number
+    skippedCount?: IntFieldUpdateOperationsInput | number
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StockImportCreateManyInput = {
+    id?: string
+    source: string
+    fileName: string
+    mimeType: string
+    fileSize: number
+    fileHash: string
+    fileData: Bytes
+    status?: string
+    extractedJson?: NullableJsonNullValueInput | InputJsonValue
+    rowCount?: number
+    engine?: string | null
+    uploadedById: string
+    uploadedAt?: Date | string
+    confirmKey?: string | null
+    confirmedById?: string | null
+    confirmedAt?: Date | string | null
+    confirmedJson?: NullableJsonNullValueInput | InputJsonValue
+    resultJson?: NullableJsonNullValueInput | InputJsonValue
+    addedCount?: number
+    skippedCount?: number
+    updatedAt?: Date | string
+  }
+
+  export type StockImportUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    mimeType?: StringFieldUpdateOperationsInput | string
+    fileSize?: IntFieldUpdateOperationsInput | number
+    fileHash?: StringFieldUpdateOperationsInput | string
+    fileData?: BytesFieldUpdateOperationsInput | Bytes
+    status?: StringFieldUpdateOperationsInput | string
+    extractedJson?: NullableJsonNullValueInput | InputJsonValue
+    rowCount?: IntFieldUpdateOperationsInput | number
+    engine?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedById?: StringFieldUpdateOperationsInput | string
+    uploadedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    confirmKey?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedById?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    confirmedJson?: NullableJsonNullValueInput | InputJsonValue
+    resultJson?: NullableJsonNullValueInput | InputJsonValue
+    addedCount?: IntFieldUpdateOperationsInput | number
+    skippedCount?: IntFieldUpdateOperationsInput | number
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StockImportUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    mimeType?: StringFieldUpdateOperationsInput | string
+    fileSize?: IntFieldUpdateOperationsInput | number
+    fileHash?: StringFieldUpdateOperationsInput | string
+    fileData?: BytesFieldUpdateOperationsInput | Bytes
+    status?: StringFieldUpdateOperationsInput | string
+    extractedJson?: NullableJsonNullValueInput | InputJsonValue
+    rowCount?: IntFieldUpdateOperationsInput | number
+    engine?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedById?: StringFieldUpdateOperationsInput | string
+    uploadedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    confirmKey?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedById?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    confirmedJson?: NullableJsonNullValueInput | InputJsonValue
+    resultJson?: NullableJsonNullValueInput | InputJsonValue
+    addedCount?: IntFieldUpdateOperationsInput | number
+    skippedCount?: IntFieldUpdateOperationsInput | number
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type ManualMigrationCreateInput = {
     name: string
     checksum: string
@@ -119076,6 +124520,12 @@ export namespace Prisma {
     none?: DeadlineAlertDismissalWhereInput
   }
 
+  export type FabricStockImportListRelationFilter = {
+    every?: FabricStockImportWhereInput
+    some?: FabricStockImportWhereInput
+    none?: FabricStockImportWhereInput
+  }
+
   export type DepartmentImageListRelationFilter = {
     every?: DepartmentImageWhereInput
     some?: DepartmentImageWhereInput
@@ -119198,6 +124648,10 @@ export namespace Prisma {
   }
 
   export type DeadlineAlertDismissalOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type FabricStockImportOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -121362,6 +126816,7 @@ export namespace Prisma {
     fabricOut?: SortOrder
     fabricUnit?: SortOrder
     defectivePieces?: SortOrder
+    defectiveUnit?: SortOrder
     defectiveShelfLocation?: SortOrder
     defectReason?: SortOrder
     detectedFromChallanId?: SortOrder
@@ -121398,6 +126853,7 @@ export namespace Prisma {
     fabricOut?: SortOrder
     fabricUnit?: SortOrder
     defectivePieces?: SortOrder
+    defectiveUnit?: SortOrder
     defectiveShelfLocation?: SortOrder
     defectReason?: SortOrder
     detectedFromChallanId?: SortOrder
@@ -121428,6 +126884,7 @@ export namespace Prisma {
     fabricOut?: SortOrder
     fabricUnit?: SortOrder
     defectivePieces?: SortOrder
+    defectiveUnit?: SortOrder
     defectiveShelfLocation?: SortOrder
     defectReason?: SortOrder
     detectedFromChallanId?: SortOrder
@@ -122335,6 +127792,7 @@ export namespace Prisma {
     itemDescription?: SortOrder
     severity?: SortOrder
     quantity?: SortOrder
+    uom?: SortOrder
     reason?: SortOrder
     detectedById?: SortOrder
     status?: SortOrder
@@ -122358,6 +127816,7 @@ export namespace Prisma {
     itemDescription?: SortOrder
     severity?: SortOrder
     quantity?: SortOrder
+    uom?: SortOrder
     reason?: SortOrder
     detectedById?: SortOrder
     status?: SortOrder
@@ -122377,6 +127836,7 @@ export namespace Prisma {
     itemDescription?: SortOrder
     severity?: SortOrder
     quantity?: SortOrder
+    uom?: SortOrder
     reason?: SortOrder
     detectedById?: SortOrder
     status?: SortOrder
@@ -122753,7 +128213,7 @@ export namespace Prisma {
     colorName?: SortOrder
     totalRolls?: SortOrder
     totalMeters?: SortOrder
-    totalPieces?: SortOrder
+    unit?: SortOrder
     status?: SortOrder
     receivedAt?: SortOrder
     createdById?: SortOrder
@@ -122764,7 +128224,6 @@ export namespace Prisma {
   export type FabricBatchAvgOrderByAggregateInput = {
     totalRolls?: SortOrder
     totalMeters?: SortOrder
-    totalPieces?: SortOrder
   }
 
   export type FabricBatchMaxOrderByAggregateInput = {
@@ -122778,7 +128237,7 @@ export namespace Prisma {
     colorName?: SortOrder
     totalRolls?: SortOrder
     totalMeters?: SortOrder
-    totalPieces?: SortOrder
+    unit?: SortOrder
     status?: SortOrder
     receivedAt?: SortOrder
     createdById?: SortOrder
@@ -122797,7 +128256,7 @@ export namespace Prisma {
     colorName?: SortOrder
     totalRolls?: SortOrder
     totalMeters?: SortOrder
-    totalPieces?: SortOrder
+    unit?: SortOrder
     status?: SortOrder
     receivedAt?: SortOrder
     createdById?: SortOrder
@@ -122808,7 +128267,6 @@ export namespace Prisma {
   export type FabricBatchSumOrderByAggregateInput = {
     totalRolls?: SortOrder
     totalMeters?: SortOrder
-    totalPieces?: SortOrder
   }
 
   export type DecimalWithAggregatesFilter<$PrismaModel = never> = {
@@ -122888,7 +128346,6 @@ export namespace Prisma {
     batchId?: SortOrder
     locationId?: SortOrder
     length?: SortOrder
-    unit?: SortOrder
     width?: SortOrder
     weight?: SortOrder
     status?: SortOrder
@@ -122914,7 +128371,6 @@ export namespace Prisma {
     batchId?: SortOrder
     locationId?: SortOrder
     length?: SortOrder
-    unit?: SortOrder
     width?: SortOrder
     weight?: SortOrder
     status?: SortOrder
@@ -122934,7 +128390,6 @@ export namespace Prisma {
     batchId?: SortOrder
     locationId?: SortOrder
     length?: SortOrder
-    unit?: SortOrder
     width?: SortOrder
     weight?: SortOrder
     status?: SortOrder
@@ -123008,7 +128463,6 @@ export namespace Prisma {
     supplierName?: SortOrder
     totalRollsReceived?: SortOrder
     totalMetersReceived?: SortOrder
-    totalPiecesReceived?: SortOrder
     status?: SortOrder
     remarks?: SortOrder
     createdAt?: SortOrder
@@ -123018,7 +128472,6 @@ export namespace Prisma {
   export type MaterialReceiptAvgOrderByAggregateInput = {
     totalRollsReceived?: SortOrder
     totalMetersReceived?: SortOrder
-    totalPiecesReceived?: SortOrder
   }
 
   export type MaterialReceiptMaxOrderByAggregateInput = {
@@ -123032,7 +128485,6 @@ export namespace Prisma {
     supplierName?: SortOrder
     totalRollsReceived?: SortOrder
     totalMetersReceived?: SortOrder
-    totalPiecesReceived?: SortOrder
     status?: SortOrder
     remarks?: SortOrder
     createdAt?: SortOrder
@@ -123050,7 +128502,6 @@ export namespace Prisma {
     supplierName?: SortOrder
     totalRollsReceived?: SortOrder
     totalMetersReceived?: SortOrder
-    totalPiecesReceived?: SortOrder
     status?: SortOrder
     remarks?: SortOrder
     createdAt?: SortOrder
@@ -123060,7 +128511,6 @@ export namespace Prisma {
   export type MaterialReceiptSumOrderByAggregateInput = {
     totalRollsReceived?: SortOrder
     totalMetersReceived?: SortOrder
-    totalPiecesReceived?: SortOrder
   }
 
   export type EnumGRNStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -123257,7 +128707,6 @@ export namespace Prisma {
     batchId?: SortOrder
     transactionType?: SortOrder
     quantity?: SortOrder
-    uom?: SortOrder
     referenceType?: SortOrder
     referenceId?: SortOrder
     fromLocationId?: SortOrder
@@ -123279,7 +128728,6 @@ export namespace Prisma {
     batchId?: SortOrder
     transactionType?: SortOrder
     quantity?: SortOrder
-    uom?: SortOrder
     referenceType?: SortOrder
     referenceId?: SortOrder
     fromLocationId?: SortOrder
@@ -123297,7 +128745,6 @@ export namespace Prisma {
     batchId?: SortOrder
     transactionType?: SortOrder
     quantity?: SortOrder
-    uom?: SortOrder
     referenceType?: SortOrder
     referenceId?: SortOrder
     fromLocationId?: SortOrder
@@ -123870,6 +129317,11 @@ export namespace Prisma {
     reworkQuantity?: SortOrder
   }
 
+  export type FabricStockImportNullableScalarRelationFilter = {
+    is?: FabricStockImportWhereInput | null
+    isNot?: FabricStockImportWhereInput | null
+  }
+
   export type FabricInwardCountOrderByAggregateInput = {
     id?: SortOrder
     sNo?: SortOrder
@@ -123888,6 +129340,17 @@ export namespace Prisma {
     hsnCode?: SortOrder
     taxPercent?: SortOrder
     remarks?: SortOrder
+    rollNumber?: SortOrder
+    rollKey?: SortOrder
+    batchNumber?: SortOrder
+    shade?: SortOrder
+    composition?: SortOrder
+    width?: SortOrder
+    unitRate?: SortOrder
+    storageLocation?: SortOrder
+    purchaseOrderNumber?: SortOrder
+    importId?: SortOrder
+    importRowNumber?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -123898,6 +129361,8 @@ export namespace Prisma {
     pricePerUnit?: SortOrder
     boxThanQty?: SortOrder
     taxPercent?: SortOrder
+    unitRate?: SortOrder
+    importRowNumber?: SortOrder
   }
 
   export type FabricInwardMaxOrderByAggregateInput = {
@@ -123918,6 +129383,17 @@ export namespace Prisma {
     hsnCode?: SortOrder
     taxPercent?: SortOrder
     remarks?: SortOrder
+    rollNumber?: SortOrder
+    rollKey?: SortOrder
+    batchNumber?: SortOrder
+    shade?: SortOrder
+    composition?: SortOrder
+    width?: SortOrder
+    unitRate?: SortOrder
+    storageLocation?: SortOrder
+    purchaseOrderNumber?: SortOrder
+    importId?: SortOrder
+    importRowNumber?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -123940,6 +129416,17 @@ export namespace Prisma {
     hsnCode?: SortOrder
     taxPercent?: SortOrder
     remarks?: SortOrder
+    rollNumber?: SortOrder
+    rollKey?: SortOrder
+    batchNumber?: SortOrder
+    shade?: SortOrder
+    composition?: SortOrder
+    width?: SortOrder
+    unitRate?: SortOrder
+    storageLocation?: SortOrder
+    purchaseOrderNumber?: SortOrder
+    importId?: SortOrder
+    importRowNumber?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -123950,6 +129437,8 @@ export namespace Prisma {
     pricePerUnit?: SortOrder
     boxThanQty?: SortOrder
     taxPercent?: SortOrder
+    unitRate?: SortOrder
+    importRowNumber?: SortOrder
   }
 
   export type FabricOutwardCountOrderByAggregateInput = {
@@ -124027,6 +129516,183 @@ export namespace Prisma {
     issueQty?: SortOrder
     avgPerPcs?: SortOrder
     issuePcsQty?: SortOrder
+  }
+
+  export type BytesFilter<$PrismaModel = never> = {
+    equals?: Bytes | BytesFieldRefInput<$PrismaModel>
+    in?: Bytes[] | ListBytesFieldRefInput<$PrismaModel>
+    notIn?: Bytes[] | ListBytesFieldRefInput<$PrismaModel>
+    not?: NestedBytesFilter<$PrismaModel> | Bytes
+  }
+
+  export type FabricInwardListRelationFilter = {
+    every?: FabricInwardWhereInput
+    some?: FabricInwardWhereInput
+    none?: FabricInwardWhereInput
+  }
+
+  export type FabricStockImportDocumentListRelationFilter = {
+    every?: FabricStockImportDocumentWhereInput
+    some?: FabricStockImportDocumentWhereInput
+    none?: FabricStockImportDocumentWhereInput
+  }
+
+  export type FabricInwardOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type FabricStockImportDocumentOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type FabricStockImportCountOrderByAggregateInput = {
+    id?: SortOrder
+    status?: SortOrder
+    fileName?: SortOrder
+    fileHash?: SortOrder
+    fileSize?: SortOrder
+    fileData?: SortOrder
+    sheetsJson?: SortOrder
+    selectedSheet?: SortOrder
+    headerRow?: SortOrder
+    mappingJson?: SortOrder
+    correctionsJson?: SortOrder
+    resolutionsJson?: SortOrder
+    validationJson?: SortOrder
+    payloadHash?: SortOrder
+    receiptNumber?: SortOrder
+    confirmKey?: SortOrder
+    postedAt?: SortOrder
+    postedById?: SortOrder
+    postedResultJson?: SortOrder
+    failureReason?: SortOrder
+    uploadedById?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FabricStockImportAvgOrderByAggregateInput = {
+    fileSize?: SortOrder
+    headerRow?: SortOrder
+  }
+
+  export type FabricStockImportMaxOrderByAggregateInput = {
+    id?: SortOrder
+    status?: SortOrder
+    fileName?: SortOrder
+    fileHash?: SortOrder
+    fileSize?: SortOrder
+    fileData?: SortOrder
+    sheetsJson?: SortOrder
+    selectedSheet?: SortOrder
+    headerRow?: SortOrder
+    mappingJson?: SortOrder
+    correctionsJson?: SortOrder
+    resolutionsJson?: SortOrder
+    validationJson?: SortOrder
+    payloadHash?: SortOrder
+    receiptNumber?: SortOrder
+    confirmKey?: SortOrder
+    postedAt?: SortOrder
+    postedById?: SortOrder
+    postedResultJson?: SortOrder
+    failureReason?: SortOrder
+    uploadedById?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FabricStockImportMinOrderByAggregateInput = {
+    id?: SortOrder
+    status?: SortOrder
+    fileName?: SortOrder
+    fileHash?: SortOrder
+    fileSize?: SortOrder
+    fileData?: SortOrder
+    sheetsJson?: SortOrder
+    selectedSheet?: SortOrder
+    headerRow?: SortOrder
+    mappingJson?: SortOrder
+    correctionsJson?: SortOrder
+    resolutionsJson?: SortOrder
+    validationJson?: SortOrder
+    payloadHash?: SortOrder
+    receiptNumber?: SortOrder
+    confirmKey?: SortOrder
+    postedAt?: SortOrder
+    postedById?: SortOrder
+    postedResultJson?: SortOrder
+    failureReason?: SortOrder
+    uploadedById?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FabricStockImportSumOrderByAggregateInput = {
+    fileSize?: SortOrder
+    headerRow?: SortOrder
+  }
+
+  export type BytesWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Bytes | BytesFieldRefInput<$PrismaModel>
+    in?: Bytes[] | ListBytesFieldRefInput<$PrismaModel>
+    notIn?: Bytes[] | ListBytesFieldRefInput<$PrismaModel>
+    not?: NestedBytesWithAggregatesFilter<$PrismaModel> | Bytes
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBytesFilter<$PrismaModel>
+    _max?: NestedBytesFilter<$PrismaModel>
+  }
+
+  export type FabricStockImportScalarRelationFilter = {
+    is?: FabricStockImportWhereInput
+    isNot?: FabricStockImportWhereInput
+  }
+
+  export type FabricStockImportDocumentCountOrderByAggregateInput = {
+    id?: SortOrder
+    importId?: SortOrder
+    kind?: SortOrder
+    sheetName?: SortOrder
+    mimeType?: SortOrder
+    size?: SortOrder
+    sha256?: SortOrder
+    data?: SortOrder
+    ocrStatus?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type FabricStockImportDocumentAvgOrderByAggregateInput = {
+    size?: SortOrder
+  }
+
+  export type FabricStockImportDocumentMaxOrderByAggregateInput = {
+    id?: SortOrder
+    importId?: SortOrder
+    kind?: SortOrder
+    sheetName?: SortOrder
+    mimeType?: SortOrder
+    size?: SortOrder
+    sha256?: SortOrder
+    data?: SortOrder
+    ocrStatus?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type FabricStockImportDocumentMinOrderByAggregateInput = {
+    id?: SortOrder
+    importId?: SortOrder
+    kind?: SortOrder
+    sheetName?: SortOrder
+    mimeType?: SortOrder
+    size?: SortOrder
+    sha256?: SortOrder
+    data?: SortOrder
+    ocrStatus?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type FabricStockImportDocumentSumOrderByAggregateInput = {
+    size?: SortOrder
   }
 
   export type StringNullableListFilter<$PrismaModel = never> = {
@@ -124292,6 +129958,86 @@ export namespace Prisma {
     version?: SortOrder
   }
 
+  export type StockImportCountOrderByAggregateInput = {
+    id?: SortOrder
+    source?: SortOrder
+    fileName?: SortOrder
+    mimeType?: SortOrder
+    fileSize?: SortOrder
+    fileHash?: SortOrder
+    fileData?: SortOrder
+    status?: SortOrder
+    extractedJson?: SortOrder
+    rowCount?: SortOrder
+    engine?: SortOrder
+    uploadedById?: SortOrder
+    uploadedAt?: SortOrder
+    confirmKey?: SortOrder
+    confirmedById?: SortOrder
+    confirmedAt?: SortOrder
+    confirmedJson?: SortOrder
+    resultJson?: SortOrder
+    addedCount?: SortOrder
+    skippedCount?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type StockImportAvgOrderByAggregateInput = {
+    fileSize?: SortOrder
+    rowCount?: SortOrder
+    addedCount?: SortOrder
+    skippedCount?: SortOrder
+  }
+
+  export type StockImportMaxOrderByAggregateInput = {
+    id?: SortOrder
+    source?: SortOrder
+    fileName?: SortOrder
+    mimeType?: SortOrder
+    fileSize?: SortOrder
+    fileHash?: SortOrder
+    fileData?: SortOrder
+    status?: SortOrder
+    rowCount?: SortOrder
+    engine?: SortOrder
+    uploadedById?: SortOrder
+    uploadedAt?: SortOrder
+    confirmKey?: SortOrder
+    confirmedById?: SortOrder
+    confirmedAt?: SortOrder
+    addedCount?: SortOrder
+    skippedCount?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type StockImportMinOrderByAggregateInput = {
+    id?: SortOrder
+    source?: SortOrder
+    fileName?: SortOrder
+    mimeType?: SortOrder
+    fileSize?: SortOrder
+    fileHash?: SortOrder
+    fileData?: SortOrder
+    status?: SortOrder
+    rowCount?: SortOrder
+    engine?: SortOrder
+    uploadedById?: SortOrder
+    uploadedAt?: SortOrder
+    confirmKey?: SortOrder
+    confirmedById?: SortOrder
+    confirmedAt?: SortOrder
+    addedCount?: SortOrder
+    skippedCount?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type StockImportSumOrderByAggregateInput = {
+    fileSize?: SortOrder
+    rowCount?: SortOrder
+    addedCount?: SortOrder
+    skippedCount?: SortOrder
+  }
+
   export type ManualMigrationCountOrderByAggregateInput = {
     name?: SortOrder
     checksum?: SortOrder
@@ -124555,6 +130301,20 @@ export namespace Prisma {
     connect?: DeadlineAlertDismissalWhereUniqueInput | DeadlineAlertDismissalWhereUniqueInput[]
   }
 
+  export type FabricStockImportCreateNestedManyWithoutUploadedByInput = {
+    create?: XOR<FabricStockImportCreateWithoutUploadedByInput, FabricStockImportUncheckedCreateWithoutUploadedByInput> | FabricStockImportCreateWithoutUploadedByInput[] | FabricStockImportUncheckedCreateWithoutUploadedByInput[]
+    connectOrCreate?: FabricStockImportCreateOrConnectWithoutUploadedByInput | FabricStockImportCreateOrConnectWithoutUploadedByInput[]
+    createMany?: FabricStockImportCreateManyUploadedByInputEnvelope
+    connect?: FabricStockImportWhereUniqueInput | FabricStockImportWhereUniqueInput[]
+  }
+
+  export type FabricStockImportCreateNestedManyWithoutPostedByInput = {
+    create?: XOR<FabricStockImportCreateWithoutPostedByInput, FabricStockImportUncheckedCreateWithoutPostedByInput> | FabricStockImportCreateWithoutPostedByInput[] | FabricStockImportUncheckedCreateWithoutPostedByInput[]
+    connectOrCreate?: FabricStockImportCreateOrConnectWithoutPostedByInput | FabricStockImportCreateOrConnectWithoutPostedByInput[]
+    createMany?: FabricStockImportCreateManyPostedByInputEnvelope
+    connect?: FabricStockImportWhereUniqueInput | FabricStockImportWhereUniqueInput[]
+  }
+
   export type DepartmentImageCreateNestedManyWithoutUploadedByInput = {
     create?: XOR<DepartmentImageCreateWithoutUploadedByInput, DepartmentImageUncheckedCreateWithoutUploadedByInput> | DepartmentImageCreateWithoutUploadedByInput[] | DepartmentImageUncheckedCreateWithoutUploadedByInput[]
     connectOrCreate?: DepartmentImageCreateOrConnectWithoutUploadedByInput | DepartmentImageCreateOrConnectWithoutUploadedByInput[]
@@ -124812,6 +130572,20 @@ export namespace Prisma {
     connectOrCreate?: DeadlineAlertDismissalCreateOrConnectWithoutUserInput | DeadlineAlertDismissalCreateOrConnectWithoutUserInput[]
     createMany?: DeadlineAlertDismissalCreateManyUserInputEnvelope
     connect?: DeadlineAlertDismissalWhereUniqueInput | DeadlineAlertDismissalWhereUniqueInput[]
+  }
+
+  export type FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput = {
+    create?: XOR<FabricStockImportCreateWithoutUploadedByInput, FabricStockImportUncheckedCreateWithoutUploadedByInput> | FabricStockImportCreateWithoutUploadedByInput[] | FabricStockImportUncheckedCreateWithoutUploadedByInput[]
+    connectOrCreate?: FabricStockImportCreateOrConnectWithoutUploadedByInput | FabricStockImportCreateOrConnectWithoutUploadedByInput[]
+    createMany?: FabricStockImportCreateManyUploadedByInputEnvelope
+    connect?: FabricStockImportWhereUniqueInput | FabricStockImportWhereUniqueInput[]
+  }
+
+  export type FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput = {
+    create?: XOR<FabricStockImportCreateWithoutPostedByInput, FabricStockImportUncheckedCreateWithoutPostedByInput> | FabricStockImportCreateWithoutPostedByInput[] | FabricStockImportUncheckedCreateWithoutPostedByInput[]
+    connectOrCreate?: FabricStockImportCreateOrConnectWithoutPostedByInput | FabricStockImportCreateOrConnectWithoutPostedByInput[]
+    createMany?: FabricStockImportCreateManyPostedByInputEnvelope
+    connect?: FabricStockImportWhereUniqueInput | FabricStockImportWhereUniqueInput[]
   }
 
   export type DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput = {
@@ -125334,6 +131108,34 @@ export namespace Prisma {
     deleteMany?: DeadlineAlertDismissalScalarWhereInput | DeadlineAlertDismissalScalarWhereInput[]
   }
 
+  export type FabricStockImportUpdateManyWithoutUploadedByNestedInput = {
+    create?: XOR<FabricStockImportCreateWithoutUploadedByInput, FabricStockImportUncheckedCreateWithoutUploadedByInput> | FabricStockImportCreateWithoutUploadedByInput[] | FabricStockImportUncheckedCreateWithoutUploadedByInput[]
+    connectOrCreate?: FabricStockImportCreateOrConnectWithoutUploadedByInput | FabricStockImportCreateOrConnectWithoutUploadedByInput[]
+    upsert?: FabricStockImportUpsertWithWhereUniqueWithoutUploadedByInput | FabricStockImportUpsertWithWhereUniqueWithoutUploadedByInput[]
+    createMany?: FabricStockImportCreateManyUploadedByInputEnvelope
+    set?: FabricStockImportWhereUniqueInput | FabricStockImportWhereUniqueInput[]
+    disconnect?: FabricStockImportWhereUniqueInput | FabricStockImportWhereUniqueInput[]
+    delete?: FabricStockImportWhereUniqueInput | FabricStockImportWhereUniqueInput[]
+    connect?: FabricStockImportWhereUniqueInput | FabricStockImportWhereUniqueInput[]
+    update?: FabricStockImportUpdateWithWhereUniqueWithoutUploadedByInput | FabricStockImportUpdateWithWhereUniqueWithoutUploadedByInput[]
+    updateMany?: FabricStockImportUpdateManyWithWhereWithoutUploadedByInput | FabricStockImportUpdateManyWithWhereWithoutUploadedByInput[]
+    deleteMany?: FabricStockImportScalarWhereInput | FabricStockImportScalarWhereInput[]
+  }
+
+  export type FabricStockImportUpdateManyWithoutPostedByNestedInput = {
+    create?: XOR<FabricStockImportCreateWithoutPostedByInput, FabricStockImportUncheckedCreateWithoutPostedByInput> | FabricStockImportCreateWithoutPostedByInput[] | FabricStockImportUncheckedCreateWithoutPostedByInput[]
+    connectOrCreate?: FabricStockImportCreateOrConnectWithoutPostedByInput | FabricStockImportCreateOrConnectWithoutPostedByInput[]
+    upsert?: FabricStockImportUpsertWithWhereUniqueWithoutPostedByInput | FabricStockImportUpsertWithWhereUniqueWithoutPostedByInput[]
+    createMany?: FabricStockImportCreateManyPostedByInputEnvelope
+    set?: FabricStockImportWhereUniqueInput | FabricStockImportWhereUniqueInput[]
+    disconnect?: FabricStockImportWhereUniqueInput | FabricStockImportWhereUniqueInput[]
+    delete?: FabricStockImportWhereUniqueInput | FabricStockImportWhereUniqueInput[]
+    connect?: FabricStockImportWhereUniqueInput | FabricStockImportWhereUniqueInput[]
+    update?: FabricStockImportUpdateWithWhereUniqueWithoutPostedByInput | FabricStockImportUpdateWithWhereUniqueWithoutPostedByInput[]
+    updateMany?: FabricStockImportUpdateManyWithWhereWithoutPostedByInput | FabricStockImportUpdateManyWithWhereWithoutPostedByInput[]
+    deleteMany?: FabricStockImportScalarWhereInput | FabricStockImportScalarWhereInput[]
+  }
+
   export type DepartmentImageUpdateManyWithoutUploadedByNestedInput = {
     create?: XOR<DepartmentImageCreateWithoutUploadedByInput, DepartmentImageUncheckedCreateWithoutUploadedByInput> | DepartmentImageCreateWithoutUploadedByInput[] | DepartmentImageUncheckedCreateWithoutUploadedByInput[]
     connectOrCreate?: DepartmentImageCreateOrConnectWithoutUploadedByInput | DepartmentImageCreateOrConnectWithoutUploadedByInput[]
@@ -125850,6 +131652,34 @@ export namespace Prisma {
     update?: DeadlineAlertDismissalUpdateWithWhereUniqueWithoutUserInput | DeadlineAlertDismissalUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: DeadlineAlertDismissalUpdateManyWithWhereWithoutUserInput | DeadlineAlertDismissalUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: DeadlineAlertDismissalScalarWhereInput | DeadlineAlertDismissalScalarWhereInput[]
+  }
+
+  export type FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput = {
+    create?: XOR<FabricStockImportCreateWithoutUploadedByInput, FabricStockImportUncheckedCreateWithoutUploadedByInput> | FabricStockImportCreateWithoutUploadedByInput[] | FabricStockImportUncheckedCreateWithoutUploadedByInput[]
+    connectOrCreate?: FabricStockImportCreateOrConnectWithoutUploadedByInput | FabricStockImportCreateOrConnectWithoutUploadedByInput[]
+    upsert?: FabricStockImportUpsertWithWhereUniqueWithoutUploadedByInput | FabricStockImportUpsertWithWhereUniqueWithoutUploadedByInput[]
+    createMany?: FabricStockImportCreateManyUploadedByInputEnvelope
+    set?: FabricStockImportWhereUniqueInput | FabricStockImportWhereUniqueInput[]
+    disconnect?: FabricStockImportWhereUniqueInput | FabricStockImportWhereUniqueInput[]
+    delete?: FabricStockImportWhereUniqueInput | FabricStockImportWhereUniqueInput[]
+    connect?: FabricStockImportWhereUniqueInput | FabricStockImportWhereUniqueInput[]
+    update?: FabricStockImportUpdateWithWhereUniqueWithoutUploadedByInput | FabricStockImportUpdateWithWhereUniqueWithoutUploadedByInput[]
+    updateMany?: FabricStockImportUpdateManyWithWhereWithoutUploadedByInput | FabricStockImportUpdateManyWithWhereWithoutUploadedByInput[]
+    deleteMany?: FabricStockImportScalarWhereInput | FabricStockImportScalarWhereInput[]
+  }
+
+  export type FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput = {
+    create?: XOR<FabricStockImportCreateWithoutPostedByInput, FabricStockImportUncheckedCreateWithoutPostedByInput> | FabricStockImportCreateWithoutPostedByInput[] | FabricStockImportUncheckedCreateWithoutPostedByInput[]
+    connectOrCreate?: FabricStockImportCreateOrConnectWithoutPostedByInput | FabricStockImportCreateOrConnectWithoutPostedByInput[]
+    upsert?: FabricStockImportUpsertWithWhereUniqueWithoutPostedByInput | FabricStockImportUpsertWithWhereUniqueWithoutPostedByInput[]
+    createMany?: FabricStockImportCreateManyPostedByInputEnvelope
+    set?: FabricStockImportWhereUniqueInput | FabricStockImportWhereUniqueInput[]
+    disconnect?: FabricStockImportWhereUniqueInput | FabricStockImportWhereUniqueInput[]
+    delete?: FabricStockImportWhereUniqueInput | FabricStockImportWhereUniqueInput[]
+    connect?: FabricStockImportWhereUniqueInput | FabricStockImportWhereUniqueInput[]
+    update?: FabricStockImportUpdateWithWhereUniqueWithoutPostedByInput | FabricStockImportUpdateWithWhereUniqueWithoutPostedByInput[]
+    updateMany?: FabricStockImportUpdateManyWithWhereWithoutPostedByInput | FabricStockImportUpdateManyWithWhereWithoutPostedByInput[]
+    deleteMany?: FabricStockImportScalarWhereInput | FabricStockImportScalarWhereInput[]
   }
 
   export type DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput = {
@@ -131516,6 +137346,154 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutWorkInspectionsInput, UserUpdateWithoutWorkInspectionsInput>, UserUncheckedUpdateWithoutWorkInspectionsInput>
   }
 
+  export type FabricStockImportCreateNestedOneWithoutInwardsInput = {
+    create?: XOR<FabricStockImportCreateWithoutInwardsInput, FabricStockImportUncheckedCreateWithoutInwardsInput>
+    connectOrCreate?: FabricStockImportCreateOrConnectWithoutInwardsInput
+    connect?: FabricStockImportWhereUniqueInput
+  }
+
+  export type FabricStockImportUpdateOneWithoutInwardsNestedInput = {
+    create?: XOR<FabricStockImportCreateWithoutInwardsInput, FabricStockImportUncheckedCreateWithoutInwardsInput>
+    connectOrCreate?: FabricStockImportCreateOrConnectWithoutInwardsInput
+    upsert?: FabricStockImportUpsertWithoutInwardsInput
+    disconnect?: FabricStockImportWhereInput | boolean
+    delete?: FabricStockImportWhereInput | boolean
+    connect?: FabricStockImportWhereUniqueInput
+    update?: XOR<XOR<FabricStockImportUpdateToOneWithWhereWithoutInwardsInput, FabricStockImportUpdateWithoutInwardsInput>, FabricStockImportUncheckedUpdateWithoutInwardsInput>
+  }
+
+  export type UserCreateNestedOneWithoutFabricStockImportsPostedInput = {
+    create?: XOR<UserCreateWithoutFabricStockImportsPostedInput, UserUncheckedCreateWithoutFabricStockImportsPostedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutFabricStockImportsPostedInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutFabricStockImportsUploadedInput = {
+    create?: XOR<UserCreateWithoutFabricStockImportsUploadedInput, UserUncheckedCreateWithoutFabricStockImportsUploadedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutFabricStockImportsUploadedInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type FabricInwardCreateNestedManyWithoutImportInput = {
+    create?: XOR<FabricInwardCreateWithoutImportInput, FabricInwardUncheckedCreateWithoutImportInput> | FabricInwardCreateWithoutImportInput[] | FabricInwardUncheckedCreateWithoutImportInput[]
+    connectOrCreate?: FabricInwardCreateOrConnectWithoutImportInput | FabricInwardCreateOrConnectWithoutImportInput[]
+    createMany?: FabricInwardCreateManyImportInputEnvelope
+    connect?: FabricInwardWhereUniqueInput | FabricInwardWhereUniqueInput[]
+  }
+
+  export type FabricStockImportDocumentCreateNestedManyWithoutImportInput = {
+    create?: XOR<FabricStockImportDocumentCreateWithoutImportInput, FabricStockImportDocumentUncheckedCreateWithoutImportInput> | FabricStockImportDocumentCreateWithoutImportInput[] | FabricStockImportDocumentUncheckedCreateWithoutImportInput[]
+    connectOrCreate?: FabricStockImportDocumentCreateOrConnectWithoutImportInput | FabricStockImportDocumentCreateOrConnectWithoutImportInput[]
+    createMany?: FabricStockImportDocumentCreateManyImportInputEnvelope
+    connect?: FabricStockImportDocumentWhereUniqueInput | FabricStockImportDocumentWhereUniqueInput[]
+  }
+
+  export type FabricInwardUncheckedCreateNestedManyWithoutImportInput = {
+    create?: XOR<FabricInwardCreateWithoutImportInput, FabricInwardUncheckedCreateWithoutImportInput> | FabricInwardCreateWithoutImportInput[] | FabricInwardUncheckedCreateWithoutImportInput[]
+    connectOrCreate?: FabricInwardCreateOrConnectWithoutImportInput | FabricInwardCreateOrConnectWithoutImportInput[]
+    createMany?: FabricInwardCreateManyImportInputEnvelope
+    connect?: FabricInwardWhereUniqueInput | FabricInwardWhereUniqueInput[]
+  }
+
+  export type FabricStockImportDocumentUncheckedCreateNestedManyWithoutImportInput = {
+    create?: XOR<FabricStockImportDocumentCreateWithoutImportInput, FabricStockImportDocumentUncheckedCreateWithoutImportInput> | FabricStockImportDocumentCreateWithoutImportInput[] | FabricStockImportDocumentUncheckedCreateWithoutImportInput[]
+    connectOrCreate?: FabricStockImportDocumentCreateOrConnectWithoutImportInput | FabricStockImportDocumentCreateOrConnectWithoutImportInput[]
+    createMany?: FabricStockImportDocumentCreateManyImportInputEnvelope
+    connect?: FabricStockImportDocumentWhereUniqueInput | FabricStockImportDocumentWhereUniqueInput[]
+  }
+
+  export type BytesFieldUpdateOperationsInput = {
+    set?: Bytes
+  }
+
+  export type UserUpdateOneWithoutFabricStockImportsPostedNestedInput = {
+    create?: XOR<UserCreateWithoutFabricStockImportsPostedInput, UserUncheckedCreateWithoutFabricStockImportsPostedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutFabricStockImportsPostedInput
+    upsert?: UserUpsertWithoutFabricStockImportsPostedInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutFabricStockImportsPostedInput, UserUpdateWithoutFabricStockImportsPostedInput>, UserUncheckedUpdateWithoutFabricStockImportsPostedInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutFabricStockImportsUploadedNestedInput = {
+    create?: XOR<UserCreateWithoutFabricStockImportsUploadedInput, UserUncheckedCreateWithoutFabricStockImportsUploadedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutFabricStockImportsUploadedInput
+    upsert?: UserUpsertWithoutFabricStockImportsUploadedInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutFabricStockImportsUploadedInput, UserUpdateWithoutFabricStockImportsUploadedInput>, UserUncheckedUpdateWithoutFabricStockImportsUploadedInput>
+  }
+
+  export type FabricInwardUpdateManyWithoutImportNestedInput = {
+    create?: XOR<FabricInwardCreateWithoutImportInput, FabricInwardUncheckedCreateWithoutImportInput> | FabricInwardCreateWithoutImportInput[] | FabricInwardUncheckedCreateWithoutImportInput[]
+    connectOrCreate?: FabricInwardCreateOrConnectWithoutImportInput | FabricInwardCreateOrConnectWithoutImportInput[]
+    upsert?: FabricInwardUpsertWithWhereUniqueWithoutImportInput | FabricInwardUpsertWithWhereUniqueWithoutImportInput[]
+    createMany?: FabricInwardCreateManyImportInputEnvelope
+    set?: FabricInwardWhereUniqueInput | FabricInwardWhereUniqueInput[]
+    disconnect?: FabricInwardWhereUniqueInput | FabricInwardWhereUniqueInput[]
+    delete?: FabricInwardWhereUniqueInput | FabricInwardWhereUniqueInput[]
+    connect?: FabricInwardWhereUniqueInput | FabricInwardWhereUniqueInput[]
+    update?: FabricInwardUpdateWithWhereUniqueWithoutImportInput | FabricInwardUpdateWithWhereUniqueWithoutImportInput[]
+    updateMany?: FabricInwardUpdateManyWithWhereWithoutImportInput | FabricInwardUpdateManyWithWhereWithoutImportInput[]
+    deleteMany?: FabricInwardScalarWhereInput | FabricInwardScalarWhereInput[]
+  }
+
+  export type FabricStockImportDocumentUpdateManyWithoutImportNestedInput = {
+    create?: XOR<FabricStockImportDocumentCreateWithoutImportInput, FabricStockImportDocumentUncheckedCreateWithoutImportInput> | FabricStockImportDocumentCreateWithoutImportInput[] | FabricStockImportDocumentUncheckedCreateWithoutImportInput[]
+    connectOrCreate?: FabricStockImportDocumentCreateOrConnectWithoutImportInput | FabricStockImportDocumentCreateOrConnectWithoutImportInput[]
+    upsert?: FabricStockImportDocumentUpsertWithWhereUniqueWithoutImportInput | FabricStockImportDocumentUpsertWithWhereUniqueWithoutImportInput[]
+    createMany?: FabricStockImportDocumentCreateManyImportInputEnvelope
+    set?: FabricStockImportDocumentWhereUniqueInput | FabricStockImportDocumentWhereUniqueInput[]
+    disconnect?: FabricStockImportDocumentWhereUniqueInput | FabricStockImportDocumentWhereUniqueInput[]
+    delete?: FabricStockImportDocumentWhereUniqueInput | FabricStockImportDocumentWhereUniqueInput[]
+    connect?: FabricStockImportDocumentWhereUniqueInput | FabricStockImportDocumentWhereUniqueInput[]
+    update?: FabricStockImportDocumentUpdateWithWhereUniqueWithoutImportInput | FabricStockImportDocumentUpdateWithWhereUniqueWithoutImportInput[]
+    updateMany?: FabricStockImportDocumentUpdateManyWithWhereWithoutImportInput | FabricStockImportDocumentUpdateManyWithWhereWithoutImportInput[]
+    deleteMany?: FabricStockImportDocumentScalarWhereInput | FabricStockImportDocumentScalarWhereInput[]
+  }
+
+  export type FabricInwardUncheckedUpdateManyWithoutImportNestedInput = {
+    create?: XOR<FabricInwardCreateWithoutImportInput, FabricInwardUncheckedCreateWithoutImportInput> | FabricInwardCreateWithoutImportInput[] | FabricInwardUncheckedCreateWithoutImportInput[]
+    connectOrCreate?: FabricInwardCreateOrConnectWithoutImportInput | FabricInwardCreateOrConnectWithoutImportInput[]
+    upsert?: FabricInwardUpsertWithWhereUniqueWithoutImportInput | FabricInwardUpsertWithWhereUniqueWithoutImportInput[]
+    createMany?: FabricInwardCreateManyImportInputEnvelope
+    set?: FabricInwardWhereUniqueInput | FabricInwardWhereUniqueInput[]
+    disconnect?: FabricInwardWhereUniqueInput | FabricInwardWhereUniqueInput[]
+    delete?: FabricInwardWhereUniqueInput | FabricInwardWhereUniqueInput[]
+    connect?: FabricInwardWhereUniqueInput | FabricInwardWhereUniqueInput[]
+    update?: FabricInwardUpdateWithWhereUniqueWithoutImportInput | FabricInwardUpdateWithWhereUniqueWithoutImportInput[]
+    updateMany?: FabricInwardUpdateManyWithWhereWithoutImportInput | FabricInwardUpdateManyWithWhereWithoutImportInput[]
+    deleteMany?: FabricInwardScalarWhereInput | FabricInwardScalarWhereInput[]
+  }
+
+  export type FabricStockImportDocumentUncheckedUpdateManyWithoutImportNestedInput = {
+    create?: XOR<FabricStockImportDocumentCreateWithoutImportInput, FabricStockImportDocumentUncheckedCreateWithoutImportInput> | FabricStockImportDocumentCreateWithoutImportInput[] | FabricStockImportDocumentUncheckedCreateWithoutImportInput[]
+    connectOrCreate?: FabricStockImportDocumentCreateOrConnectWithoutImportInput | FabricStockImportDocumentCreateOrConnectWithoutImportInput[]
+    upsert?: FabricStockImportDocumentUpsertWithWhereUniqueWithoutImportInput | FabricStockImportDocumentUpsertWithWhereUniqueWithoutImportInput[]
+    createMany?: FabricStockImportDocumentCreateManyImportInputEnvelope
+    set?: FabricStockImportDocumentWhereUniqueInput | FabricStockImportDocumentWhereUniqueInput[]
+    disconnect?: FabricStockImportDocumentWhereUniqueInput | FabricStockImportDocumentWhereUniqueInput[]
+    delete?: FabricStockImportDocumentWhereUniqueInput | FabricStockImportDocumentWhereUniqueInput[]
+    connect?: FabricStockImportDocumentWhereUniqueInput | FabricStockImportDocumentWhereUniqueInput[]
+    update?: FabricStockImportDocumentUpdateWithWhereUniqueWithoutImportInput | FabricStockImportDocumentUpdateWithWhereUniqueWithoutImportInput[]
+    updateMany?: FabricStockImportDocumentUpdateManyWithWhereWithoutImportInput | FabricStockImportDocumentUpdateManyWithWhereWithoutImportInput[]
+    deleteMany?: FabricStockImportDocumentScalarWhereInput | FabricStockImportDocumentScalarWhereInput[]
+  }
+
+  export type FabricStockImportCreateNestedOneWithoutDocumentsInput = {
+    create?: XOR<FabricStockImportCreateWithoutDocumentsInput, FabricStockImportUncheckedCreateWithoutDocumentsInput>
+    connectOrCreate?: FabricStockImportCreateOrConnectWithoutDocumentsInput
+    connect?: FabricStockImportWhereUniqueInput
+  }
+
+  export type FabricStockImportUpdateOneRequiredWithoutDocumentsNestedInput = {
+    create?: XOR<FabricStockImportCreateWithoutDocumentsInput, FabricStockImportUncheckedCreateWithoutDocumentsInput>
+    connectOrCreate?: FabricStockImportCreateOrConnectWithoutDocumentsInput
+    upsert?: FabricStockImportUpsertWithoutDocumentsInput
+    connect?: FabricStockImportWhereUniqueInput
+    update?: XOR<XOR<FabricStockImportUpdateToOneWithWhereWithoutDocumentsInput, FabricStockImportUpdateWithoutDocumentsInput>, FabricStockImportUncheckedUpdateWithoutDocumentsInput>
+  }
+
   export type DeadlineAlertCreaterecipientDepartmentsInput = {
     set: string[]
   }
@@ -132171,6 +138149,23 @@ export namespace Prisma {
     _max?: NestedEnumStockTransactionTypeFilter<$PrismaModel>
   }
 
+  export type NestedBytesFilter<$PrismaModel = never> = {
+    equals?: Bytes | BytesFieldRefInput<$PrismaModel>
+    in?: Bytes[] | ListBytesFieldRefInput<$PrismaModel>
+    notIn?: Bytes[] | ListBytesFieldRefInput<$PrismaModel>
+    not?: NestedBytesFilter<$PrismaModel> | Bytes
+  }
+
+  export type NestedBytesWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Bytes | BytesFieldRefInput<$PrismaModel>
+    in?: Bytes[] | ListBytesFieldRefInput<$PrismaModel>
+    notIn?: Bytes[] | ListBytesFieldRefInput<$PrismaModel>
+    not?: NestedBytesWithAggregatesFilter<$PrismaModel> | Bytes
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBytesFilter<$PrismaModel>
+    _max?: NestedBytesFilter<$PrismaModel>
+  }
+
   export type UserRoleCreateWithoutUserInput = {
     id?: string
     assignedAt?: Date | string
@@ -132611,6 +138606,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -132660,6 +138656,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -132705,6 +138702,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -132754,6 +138752,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -132799,6 +138798,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -132848,6 +138848,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -132893,6 +138894,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -132942,6 +138944,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -133268,6 +139271,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     status?: string
     resolutionNotes?: string | null
@@ -133291,6 +139295,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     status?: string
     resolutionNotes?: string | null
@@ -133455,7 +139460,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
-    totalPieces?: Decimal | DecimalJsLike | number | string
+    unit?: string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdAt?: Date | string
@@ -133477,7 +139482,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
-    totalPieces?: Decimal | DecimalJsLike | number | string
+    unit?: string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdAt?: Date | string
@@ -133506,7 +139511,6 @@ export namespace Prisma {
     supplierName: string
     totalRollsReceived?: number
     totalMetersReceived?: Decimal | DecimalJsLike | number | string
-    totalPiecesReceived?: Decimal | DecimalJsLike | number | string
     status?: $Enums.GRNStatus
     remarks?: string | null
     createdAt?: Date | string
@@ -133525,7 +139529,6 @@ export namespace Prisma {
     supplierName: string
     totalRollsReceived?: number
     totalMetersReceived?: Decimal | DecimalJsLike | number | string
-    totalPiecesReceived?: Decimal | DecimalJsLike | number | string
     status?: $Enums.GRNStatus
     remarks?: string | null
     createdAt?: Date | string
@@ -133547,7 +139550,6 @@ export namespace Prisma {
     id?: string
     rollNumber: string
     length: Decimal | DecimalJsLike | number | string
-    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -133571,7 +139573,6 @@ export namespace Prisma {
     batchId: string
     locationId?: string | null
     length: Decimal | DecimalJsLike | number | string
-    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -133636,7 +139637,6 @@ export namespace Prisma {
     entryNumber: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
-    uom?: string
     referenceType: string
     referenceId: string
     transactedAt: Date | string
@@ -133655,7 +139655,6 @@ export namespace Prisma {
     batchId: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
-    uom?: string
     referenceType: string
     referenceId: string
     fromLocationId?: string | null
@@ -134323,6 +140322,134 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type FabricStockImportCreateWithoutUploadedByInput = {
+    id?: string
+    status?: string
+    fileName: string
+    fileHash: string
+    fileSize: number
+    fileData: Bytes
+    sheetsJson: string
+    selectedSheet?: string | null
+    headerRow?: number | null
+    mappingJson?: string | null
+    correctionsJson?: string | null
+    resolutionsJson?: string | null
+    validationJson?: string | null
+    payloadHash?: string | null
+    receiptNumber?: string | null
+    confirmKey?: string | null
+    postedAt?: Date | string | null
+    postedResultJson?: string | null
+    failureReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    postedBy?: UserCreateNestedOneWithoutFabricStockImportsPostedInput
+    inwards?: FabricInwardCreateNestedManyWithoutImportInput
+    documents?: FabricStockImportDocumentCreateNestedManyWithoutImportInput
+  }
+
+  export type FabricStockImportUncheckedCreateWithoutUploadedByInput = {
+    id?: string
+    status?: string
+    fileName: string
+    fileHash: string
+    fileSize: number
+    fileData: Bytes
+    sheetsJson: string
+    selectedSheet?: string | null
+    headerRow?: number | null
+    mappingJson?: string | null
+    correctionsJson?: string | null
+    resolutionsJson?: string | null
+    validationJson?: string | null
+    payloadHash?: string | null
+    receiptNumber?: string | null
+    confirmKey?: string | null
+    postedAt?: Date | string | null
+    postedById?: string | null
+    postedResultJson?: string | null
+    failureReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    inwards?: FabricInwardUncheckedCreateNestedManyWithoutImportInput
+    documents?: FabricStockImportDocumentUncheckedCreateNestedManyWithoutImportInput
+  }
+
+  export type FabricStockImportCreateOrConnectWithoutUploadedByInput = {
+    where: FabricStockImportWhereUniqueInput
+    create: XOR<FabricStockImportCreateWithoutUploadedByInput, FabricStockImportUncheckedCreateWithoutUploadedByInput>
+  }
+
+  export type FabricStockImportCreateManyUploadedByInputEnvelope = {
+    data: FabricStockImportCreateManyUploadedByInput | FabricStockImportCreateManyUploadedByInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type FabricStockImportCreateWithoutPostedByInput = {
+    id?: string
+    status?: string
+    fileName: string
+    fileHash: string
+    fileSize: number
+    fileData: Bytes
+    sheetsJson: string
+    selectedSheet?: string | null
+    headerRow?: number | null
+    mappingJson?: string | null
+    correctionsJson?: string | null
+    resolutionsJson?: string | null
+    validationJson?: string | null
+    payloadHash?: string | null
+    receiptNumber?: string | null
+    confirmKey?: string | null
+    postedAt?: Date | string | null
+    postedResultJson?: string | null
+    failureReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    uploadedBy: UserCreateNestedOneWithoutFabricStockImportsUploadedInput
+    inwards?: FabricInwardCreateNestedManyWithoutImportInput
+    documents?: FabricStockImportDocumentCreateNestedManyWithoutImportInput
+  }
+
+  export type FabricStockImportUncheckedCreateWithoutPostedByInput = {
+    id?: string
+    status?: string
+    fileName: string
+    fileHash: string
+    fileSize: number
+    fileData: Bytes
+    sheetsJson: string
+    selectedSheet?: string | null
+    headerRow?: number | null
+    mappingJson?: string | null
+    correctionsJson?: string | null
+    resolutionsJson?: string | null
+    validationJson?: string | null
+    payloadHash?: string | null
+    receiptNumber?: string | null
+    confirmKey?: string | null
+    postedAt?: Date | string | null
+    postedResultJson?: string | null
+    failureReason?: string | null
+    uploadedById: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    inwards?: FabricInwardUncheckedCreateNestedManyWithoutImportInput
+    documents?: FabricStockImportDocumentUncheckedCreateNestedManyWithoutImportInput
+  }
+
+  export type FabricStockImportCreateOrConnectWithoutPostedByInput = {
+    where: FabricStockImportWhereUniqueInput
+    create: XOR<FabricStockImportCreateWithoutPostedByInput, FabricStockImportUncheckedCreateWithoutPostedByInput>
+  }
+
+  export type FabricStockImportCreateManyPostedByInputEnvelope = {
+    data: FabricStockImportCreateManyPostedByInput | FabricStockImportCreateManyPostedByInput[]
+    skipDuplicates?: boolean
+  }
+
   export type DepartmentImageCreateWithoutUploadedByInput = {
     id?: string
     storageProvider: string
@@ -134637,6 +140764,7 @@ export namespace Prisma {
     fabricOut?: FloatNullableFilter<"Challan"> | number | null
     fabricUnit?: StringNullableFilter<"Challan"> | string | null
     defectivePieces?: FloatNullableFilter<"Challan"> | number | null
+    defectiveUnit?: StringNullableFilter<"Challan"> | string | null
     defectiveShelfLocation?: StringNullableFilter<"Challan"> | string | null
     defectReason?: StringNullableFilter<"Challan"> | string | null
     detectedFromChallanId?: StringNullableFilter<"Challan"> | string | null
@@ -134925,7 +141053,8 @@ export namespace Prisma {
     bundleId?: StringNullableFilter<"DefectRecord"> | string | null
     itemDescription?: StringFilter<"DefectRecord"> | string
     severity?: StringFilter<"DefectRecord"> | string
-    quantity?: IntFilter<"DefectRecord"> | number
+    quantity?: FloatFilter<"DefectRecord"> | number
+    uom?: StringNullableFilter<"DefectRecord"> | string | null
     reason?: StringFilter<"DefectRecord"> | string
     detectedById?: StringFilter<"DefectRecord"> | string
     status?: StringFilter<"DefectRecord"> | string
@@ -135055,7 +141184,7 @@ export namespace Prisma {
     colorName?: StringNullableFilter<"FabricBatch"> | string | null
     totalRolls?: IntFilter<"FabricBatch"> | number
     totalMeters?: DecimalFilter<"FabricBatch"> | Decimal | DecimalJsLike | number | string
-    totalPieces?: DecimalFilter<"FabricBatch"> | Decimal | DecimalJsLike | number | string
+    unit?: StringFilter<"FabricBatch"> | string
     status?: EnumFabricBatchStatusFilter<"FabricBatch"> | $Enums.FabricBatchStatus
     receivedAt?: DateTimeNullableFilter<"FabricBatch"> | Date | string | null
     createdById?: StringFilter<"FabricBatch"> | string
@@ -135093,7 +141222,6 @@ export namespace Prisma {
     supplierName?: StringFilter<"MaterialReceipt"> | string
     totalRollsReceived?: IntFilter<"MaterialReceipt"> | number
     totalMetersReceived?: DecimalFilter<"MaterialReceipt"> | Decimal | DecimalJsLike | number | string
-    totalPiecesReceived?: DecimalFilter<"MaterialReceipt"> | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFilter<"MaterialReceipt"> | $Enums.GRNStatus
     remarks?: StringNullableFilter<"MaterialReceipt"> | string | null
     createdAt?: DateTimeFilter<"MaterialReceipt"> | Date | string
@@ -135125,7 +141253,6 @@ export namespace Prisma {
     batchId?: StringFilter<"FabricStoreRoll"> | string
     locationId?: StringNullableFilter<"FabricStoreRoll"> | string | null
     length?: DecimalFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string
-    unit?: StringFilter<"FabricStoreRoll"> | string
     width?: DecimalNullableFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string | null
     weight?: DecimalNullableFilter<"FabricStoreRoll"> | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFilter<"FabricStoreRoll"> | $Enums.FabricRollStatus
@@ -135197,7 +141324,6 @@ export namespace Prisma {
     batchId?: StringFilter<"FabricStockLedger"> | string
     transactionType?: EnumStockTransactionTypeFilter<"FabricStockLedger"> | $Enums.StockTransactionType
     quantity?: DecimalFilter<"FabricStockLedger"> | Decimal | DecimalJsLike | number | string
-    uom?: StringFilter<"FabricStockLedger"> | string
     referenceType?: StringFilter<"FabricStockLedger"> | string
     referenceId?: StringFilter<"FabricStockLedger"> | string
     fromLocationId?: StringNullableFilter<"FabricStockLedger"> | string | null
@@ -135599,6 +141725,67 @@ export namespace Prisma {
     dismissedAt?: DateTimeFilter<"DeadlineAlertDismissal"> | Date | string
   }
 
+  export type FabricStockImportUpsertWithWhereUniqueWithoutUploadedByInput = {
+    where: FabricStockImportWhereUniqueInput
+    update: XOR<FabricStockImportUpdateWithoutUploadedByInput, FabricStockImportUncheckedUpdateWithoutUploadedByInput>
+    create: XOR<FabricStockImportCreateWithoutUploadedByInput, FabricStockImportUncheckedCreateWithoutUploadedByInput>
+  }
+
+  export type FabricStockImportUpdateWithWhereUniqueWithoutUploadedByInput = {
+    where: FabricStockImportWhereUniqueInput
+    data: XOR<FabricStockImportUpdateWithoutUploadedByInput, FabricStockImportUncheckedUpdateWithoutUploadedByInput>
+  }
+
+  export type FabricStockImportUpdateManyWithWhereWithoutUploadedByInput = {
+    where: FabricStockImportScalarWhereInput
+    data: XOR<FabricStockImportUpdateManyMutationInput, FabricStockImportUncheckedUpdateManyWithoutUploadedByInput>
+  }
+
+  export type FabricStockImportScalarWhereInput = {
+    AND?: FabricStockImportScalarWhereInput | FabricStockImportScalarWhereInput[]
+    OR?: FabricStockImportScalarWhereInput[]
+    NOT?: FabricStockImportScalarWhereInput | FabricStockImportScalarWhereInput[]
+    id?: StringFilter<"FabricStockImport"> | string
+    status?: StringFilter<"FabricStockImport"> | string
+    fileName?: StringFilter<"FabricStockImport"> | string
+    fileHash?: StringFilter<"FabricStockImport"> | string
+    fileSize?: IntFilter<"FabricStockImport"> | number
+    fileData?: BytesFilter<"FabricStockImport"> | Bytes
+    sheetsJson?: StringFilter<"FabricStockImport"> | string
+    selectedSheet?: StringNullableFilter<"FabricStockImport"> | string | null
+    headerRow?: IntNullableFilter<"FabricStockImport"> | number | null
+    mappingJson?: StringNullableFilter<"FabricStockImport"> | string | null
+    correctionsJson?: StringNullableFilter<"FabricStockImport"> | string | null
+    resolutionsJson?: StringNullableFilter<"FabricStockImport"> | string | null
+    validationJson?: StringNullableFilter<"FabricStockImport"> | string | null
+    payloadHash?: StringNullableFilter<"FabricStockImport"> | string | null
+    receiptNumber?: StringNullableFilter<"FabricStockImport"> | string | null
+    confirmKey?: StringNullableFilter<"FabricStockImport"> | string | null
+    postedAt?: DateTimeNullableFilter<"FabricStockImport"> | Date | string | null
+    postedById?: StringNullableFilter<"FabricStockImport"> | string | null
+    postedResultJson?: StringNullableFilter<"FabricStockImport"> | string | null
+    failureReason?: StringNullableFilter<"FabricStockImport"> | string | null
+    uploadedById?: StringFilter<"FabricStockImport"> | string
+    createdAt?: DateTimeFilter<"FabricStockImport"> | Date | string
+    updatedAt?: DateTimeFilter<"FabricStockImport"> | Date | string
+  }
+
+  export type FabricStockImportUpsertWithWhereUniqueWithoutPostedByInput = {
+    where: FabricStockImportWhereUniqueInput
+    update: XOR<FabricStockImportUpdateWithoutPostedByInput, FabricStockImportUncheckedUpdateWithoutPostedByInput>
+    create: XOR<FabricStockImportCreateWithoutPostedByInput, FabricStockImportUncheckedCreateWithoutPostedByInput>
+  }
+
+  export type FabricStockImportUpdateWithWhereUniqueWithoutPostedByInput = {
+    where: FabricStockImportWhereUniqueInput
+    data: XOR<FabricStockImportUpdateWithoutPostedByInput, FabricStockImportUncheckedUpdateWithoutPostedByInput>
+  }
+
+  export type FabricStockImportUpdateManyWithWhereWithoutPostedByInput = {
+    where: FabricStockImportScalarWhereInput
+    data: XOR<FabricStockImportUpdateManyMutationInput, FabricStockImportUncheckedUpdateManyWithoutPostedByInput>
+  }
+
   export type DepartmentImageUpsertWithWhereUniqueWithoutUploadedByInput = {
     where: DepartmentImageWhereUniqueInput
     update: XOR<DepartmentImageUpdateWithoutUploadedByInput, DepartmentImageUncheckedUpdateWithoutUploadedByInput>
@@ -135953,6 +142140,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -136001,6 +142190,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -136092,6 +142283,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -136140,6 +142333,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -136293,6 +142488,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -136342,6 +142538,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -136387,6 +142584,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -136436,6 +142634,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -138718,6 +144917,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -138766,6 +144967,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -138819,6 +145022,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -138867,6 +145072,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -139106,6 +145313,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -139155,6 +145363,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -139403,6 +145612,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     status?: string
     resolutionNotes?: string | null
@@ -139425,6 +145635,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     detectedById: string
     status?: string
@@ -139602,7 +145813,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
-    totalPieces?: Decimal | DecimalJsLike | number | string
+    unit?: string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdAt?: Date | string
@@ -139623,7 +145834,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
-    totalPieces?: Decimal | DecimalJsLike | number | string
+    unit?: string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdById: string
@@ -139648,7 +145859,6 @@ export namespace Prisma {
     id?: string
     rollNumber: string
     length: Decimal | DecimalJsLike | number | string
-    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -139672,7 +145882,6 @@ export namespace Prisma {
     batchId: string
     locationId?: string | null
     length: Decimal | DecimalJsLike | number | string
-    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -140147,6 +146356,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -140195,6 +146406,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -140254,6 +146467,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -140302,6 +146517,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -143443,6 +149660,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -143491,6 +149710,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -143555,6 +149776,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -143603,6 +149826,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -143689,6 +149914,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
 
@@ -143737,6 +149964,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
 
@@ -143844,6 +150073,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
 
@@ -143892,6 +150123,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
 
@@ -143940,6 +150173,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
   }
 
@@ -143988,6 +150223,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
   }
 
@@ -144052,6 +150289,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
   }
 
@@ -144100,6 +150339,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
   }
 
@@ -144147,6 +150388,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -144195,6 +150438,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -144259,6 +150504,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -144307,6 +150554,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -144490,6 +150739,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -144540,6 +150790,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -144579,6 +150830,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -144628,6 +150880,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -144775,6 +151028,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -144823,6 +151078,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -144876,6 +151133,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -144924,6 +151183,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -144977,6 +151238,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -145025,6 +151288,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -145078,6 +151343,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -145126,6 +151393,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -145392,6 +151661,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     status?: string
     resolutionNotes?: string | null
@@ -145414,6 +151684,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     detectedById: string
     status?: string
@@ -146053,6 +152324,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -146103,6 +152375,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -146278,6 +152551,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -146326,6 +152601,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -146385,6 +152662,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -146433,6 +152712,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -146492,6 +152773,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -146540,6 +152823,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -146599,6 +152884,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -146647,6 +152934,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -146891,6 +153180,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -146941,6 +153231,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -146991,6 +153282,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -147041,6 +153333,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -147238,6 +153531,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -147288,6 +153582,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -147355,6 +153650,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -147403,6 +153700,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -147608,6 +153907,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -147658,6 +153958,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -147731,6 +154032,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -147779,6 +154082,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -147799,6 +154104,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -147849,6 +154155,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -147916,6 +154223,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -147964,6 +154273,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -148060,6 +154371,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -148110,6 +154422,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -148183,6 +154496,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -148231,6 +154546,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -148379,6 +154696,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -148429,6 +154747,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -148496,6 +154815,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -148544,6 +154865,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -148580,6 +154903,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -148630,6 +154954,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -148703,6 +155028,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -148751,6 +155078,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -148962,6 +155291,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -149010,6 +155341,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -149243,6 +155576,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -149291,6 +155626,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -149974,6 +156311,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -150024,6 +156362,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -150099,6 +156438,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     status?: string
     resolutionNotes?: string | null
@@ -150121,6 +156461,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     detectedById: string
     status?: string
@@ -150454,6 +156795,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -150504,6 +156846,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -151361,6 +157704,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -151409,6 +157754,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -151462,6 +157809,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -151510,6 +157859,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -151643,6 +157994,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -151691,6 +158044,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -151750,6 +158105,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -151798,6 +158155,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -152193,6 +158552,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -152243,6 +158603,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -152365,6 +158726,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -152413,6 +158776,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -152706,6 +159071,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -152756,6 +159122,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -152890,6 +159257,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -152938,6 +159307,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -152981,6 +159352,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     status?: string
     resolutionNotes?: string | null
@@ -153004,6 +159376,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     detectedById: string
     status?: string
@@ -153226,6 +159599,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -153274,6 +159649,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -153300,7 +159677,8 @@ export namespace Prisma {
     departmentCode?: StringFieldUpdateOperationsInput | string
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -153323,7 +159701,8 @@ export namespace Prisma {
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -153558,6 +159937,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -153606,6 +159987,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -153780,6 +160163,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     status?: string
     resolutionNotes?: string | null
@@ -153803,6 +160187,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     detectedById: string
     status?: string
@@ -153917,6 +160302,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -153965,6 +160352,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -154018,6 +160407,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -154066,6 +160457,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -154316,7 +160709,8 @@ export namespace Prisma {
     departmentCode?: StringFieldUpdateOperationsInput | string
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -154339,7 +160733,8 @@ export namespace Prisma {
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -154466,6 +160861,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -154514,6 +160911,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -154573,6 +160972,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -154621,6 +161022,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -154758,7 +161161,6 @@ export namespace Prisma {
     id?: string
     rollNumber: string
     length: Decimal | DecimalJsLike | number | string
-    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -154781,7 +161183,6 @@ export namespace Prisma {
     rollNumber: string
     batchId: string
     length: Decimal | DecimalJsLike | number | string
-    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -154813,7 +161214,6 @@ export namespace Prisma {
     entryNumber: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
-    uom?: string
     referenceType: string
     referenceId: string
     transactedAt: Date | string
@@ -154832,7 +161232,6 @@ export namespace Prisma {
     batchId: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
-    uom?: string
     referenceType: string
     referenceId: string
     toLocationId?: string | null
@@ -154857,7 +161256,6 @@ export namespace Prisma {
     entryNumber: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
-    uom?: string
     referenceType: string
     referenceId: string
     transactedAt: Date | string
@@ -154876,7 +161274,6 @@ export namespace Prisma {
     batchId: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
-    uom?: string
     referenceType: string
     referenceId: string
     fromLocationId?: string | null
@@ -155151,6 +161548,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -155199,6 +161598,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -155212,7 +161613,6 @@ export namespace Prisma {
     id?: string
     rollNumber: string
     length: Decimal | DecimalJsLike | number | string
-    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -155235,7 +161635,6 @@ export namespace Prisma {
     rollNumber: string
     locationId?: string | null
     length: Decimal | DecimalJsLike | number | string
-    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -155271,7 +161670,6 @@ export namespace Prisma {
     supplierName: string
     totalRollsReceived?: number
     totalMetersReceived?: Decimal | DecimalJsLike | number | string
-    totalPiecesReceived?: Decimal | DecimalJsLike | number | string
     status?: $Enums.GRNStatus
     remarks?: string | null
     createdAt?: Date | string
@@ -155290,7 +161688,6 @@ export namespace Prisma {
     supplierName: string
     totalRollsReceived?: number
     totalMetersReceived?: Decimal | DecimalJsLike | number | string
-    totalPiecesReceived?: Decimal | DecimalJsLike | number | string
     status?: $Enums.GRNStatus
     remarks?: string | null
     createdAt?: Date | string
@@ -155313,7 +161710,6 @@ export namespace Prisma {
     entryNumber: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
-    uom?: string
     referenceType: string
     referenceId: string
     transactedAt: Date | string
@@ -155331,7 +161727,6 @@ export namespace Prisma {
     rollId: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
-    uom?: string
     referenceType: string
     referenceId: string
     fromLocationId?: string | null
@@ -155576,6 +161971,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -155624,6 +162021,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -155686,7 +162085,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
-    totalPieces?: Decimal | DecimalJsLike | number | string
+    unit?: string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdAt?: Date | string
@@ -155708,7 +162107,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
-    totalPieces?: Decimal | DecimalJsLike | number | string
+    unit?: string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdById: string
@@ -155796,6 +162195,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -155844,6 +162245,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -156083,7 +162486,6 @@ export namespace Prisma {
     entryNumber: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
-    uom?: string
     referenceType: string
     referenceId: string
     transactedAt: Date | string
@@ -156101,7 +162503,6 @@ export namespace Prisma {
     batchId: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
-    uom?: string
     referenceType: string
     referenceId: string
     fromLocationId?: string | null
@@ -156143,7 +162544,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -156165,7 +162566,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -156265,6 +162666,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -156313,6 +162716,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -156557,7 +162962,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
-    totalPieces?: Decimal | DecimalJsLike | number | string
+    unit?: string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdAt?: Date | string
@@ -156579,7 +162984,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
-    totalPieces?: Decimal | DecimalJsLike | number | string
+    unit?: string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdById: string
@@ -156638,6 +163043,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -156686,6 +163093,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -156744,7 +163153,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -156766,7 +163175,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -156831,6 +163240,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -156879,6 +163290,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -156908,7 +163321,6 @@ export namespace Prisma {
     supplierName: string
     totalRollsReceived?: number
     totalMetersReceived?: Decimal | DecimalJsLike | number | string
-    totalPiecesReceived?: Decimal | DecimalJsLike | number | string
     status?: $Enums.GRNStatus
     remarks?: string | null
     createdAt?: Date | string
@@ -156928,7 +163340,6 @@ export namespace Prisma {
     supplierName: string
     totalRollsReceived?: number
     totalMetersReceived?: Decimal | DecimalJsLike | number | string
-    totalPiecesReceived?: Decimal | DecimalJsLike | number | string
     status?: $Enums.GRNStatus
     remarks?: string | null
     createdAt?: Date | string
@@ -156944,7 +163355,6 @@ export namespace Prisma {
     id?: string
     rollNumber: string
     length: Decimal | DecimalJsLike | number | string
-    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -156968,7 +163378,6 @@ export namespace Prisma {
     batchId: string
     locationId?: string | null
     length: Decimal | DecimalJsLike | number | string
-    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -157009,7 +163418,6 @@ export namespace Prisma {
     supplierName?: StringFieldUpdateOperationsInput | string
     totalRollsReceived?: IntFieldUpdateOperationsInput | number
     totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalPiecesReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -157029,7 +163437,6 @@ export namespace Prisma {
     supplierName?: StringFieldUpdateOperationsInput | string
     totalRollsReceived?: IntFieldUpdateOperationsInput | number
     totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalPiecesReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -157051,7 +163458,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     rollNumber?: StringFieldUpdateOperationsInput | string
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -157075,7 +163481,6 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     locationId?: NullableStringFieldUpdateOperationsInput | string | null
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -157095,7 +163500,6 @@ export namespace Prisma {
     id?: string
     rollNumber: string
     length: Decimal | DecimalJsLike | number | string
-    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -157119,7 +163523,6 @@ export namespace Prisma {
     batchId: string
     locationId?: string | null
     length: Decimal | DecimalJsLike | number | string
-    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -157184,6 +163587,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -157232,6 +163637,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -157256,7 +163663,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     rollNumber?: StringFieldUpdateOperationsInput | string
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -157280,7 +163686,6 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     locationId?: NullableStringFieldUpdateOperationsInput | string | null
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -157351,6 +163756,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -157399,6 +163806,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -157407,7 +163816,6 @@ export namespace Prisma {
     id?: string
     rollNumber: string
     length: Decimal | DecimalJsLike | number | string
-    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -157431,7 +163839,6 @@ export namespace Prisma {
     batchId: string
     locationId?: string | null
     length: Decimal | DecimalJsLike | number | string
-    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -157462,7 +163869,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
-    totalPieces?: Decimal | DecimalJsLike | number | string
+    unit?: string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdAt?: Date | string
@@ -157484,7 +163891,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
-    totalPieces?: Decimal | DecimalJsLike | number | string
+    unit?: string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdById: string
@@ -157601,6 +164008,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -157649,6 +164058,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -157673,7 +164084,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     rollNumber?: StringFieldUpdateOperationsInput | string
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -157697,7 +164107,6 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     locationId?: NullableStringFieldUpdateOperationsInput | string | null
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -157734,7 +164143,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -157756,7 +164165,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -157891,6 +164300,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -157939,6 +164350,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -158122,6 +164535,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -158172,6 +164586,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -158239,6 +164654,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -158287,6 +164704,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -158340,6 +164759,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -158388,6 +164809,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -158473,6 +164896,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -158521,6 +164946,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -158546,6 +164973,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -158596,6 +165024,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -158815,6 +165244,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -158865,6 +165295,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -158938,6 +165369,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -158986,6 +165419,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -159045,6 +165480,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -159093,6 +165530,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -159168,6 +165607,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -159216,6 +165657,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -159247,6 +165690,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -159297,6 +165741,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -159418,6 +165863,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -159468,6 +165914,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -159535,6 +165982,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -159583,6 +166032,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -159712,6 +166163,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -159762,6 +166214,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -159835,6 +166288,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -159883,6 +166338,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -160066,6 +166523,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -160116,6 +166574,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -160431,6 +166890,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -160479,6 +166940,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -160856,6 +167319,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -160906,6 +167370,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -161153,6 +167618,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -161201,6 +167668,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -161382,6 +167851,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -161432,6 +167902,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -161548,6 +168019,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -161596,6 +168069,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -161735,6 +168210,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -161785,6 +168261,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -161913,6 +168390,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -161961,6 +168440,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -162106,6 +168587,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -162154,6 +168637,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -162459,6 +168944,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -162507,6 +168994,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -162684,6 +169173,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -162732,6 +169223,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -162899,6 +169392,8 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -162947,8 +169442,882 @@ export namespace Prisma {
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
+  }
+
+  export type FabricStockImportCreateWithoutInwardsInput = {
+    id?: string
+    status?: string
+    fileName: string
+    fileHash: string
+    fileSize: number
+    fileData: Bytes
+    sheetsJson: string
+    selectedSheet?: string | null
+    headerRow?: number | null
+    mappingJson?: string | null
+    correctionsJson?: string | null
+    resolutionsJson?: string | null
+    validationJson?: string | null
+    payloadHash?: string | null
+    receiptNumber?: string | null
+    confirmKey?: string | null
+    postedAt?: Date | string | null
+    postedResultJson?: string | null
+    failureReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    postedBy?: UserCreateNestedOneWithoutFabricStockImportsPostedInput
+    uploadedBy: UserCreateNestedOneWithoutFabricStockImportsUploadedInput
+    documents?: FabricStockImportDocumentCreateNestedManyWithoutImportInput
+  }
+
+  export type FabricStockImportUncheckedCreateWithoutInwardsInput = {
+    id?: string
+    status?: string
+    fileName: string
+    fileHash: string
+    fileSize: number
+    fileData: Bytes
+    sheetsJson: string
+    selectedSheet?: string | null
+    headerRow?: number | null
+    mappingJson?: string | null
+    correctionsJson?: string | null
+    resolutionsJson?: string | null
+    validationJson?: string | null
+    payloadHash?: string | null
+    receiptNumber?: string | null
+    confirmKey?: string | null
+    postedAt?: Date | string | null
+    postedById?: string | null
+    postedResultJson?: string | null
+    failureReason?: string | null
+    uploadedById: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    documents?: FabricStockImportDocumentUncheckedCreateNestedManyWithoutImportInput
+  }
+
+  export type FabricStockImportCreateOrConnectWithoutInwardsInput = {
+    where: FabricStockImportWhereUniqueInput
+    create: XOR<FabricStockImportCreateWithoutInwardsInput, FabricStockImportUncheckedCreateWithoutInwardsInput>
+  }
+
+  export type FabricStockImportUpsertWithoutInwardsInput = {
+    update: XOR<FabricStockImportUpdateWithoutInwardsInput, FabricStockImportUncheckedUpdateWithoutInwardsInput>
+    create: XOR<FabricStockImportCreateWithoutInwardsInput, FabricStockImportUncheckedCreateWithoutInwardsInput>
+    where?: FabricStockImportWhereInput
+  }
+
+  export type FabricStockImportUpdateToOneWithWhereWithoutInwardsInput = {
+    where?: FabricStockImportWhereInput
+    data: XOR<FabricStockImportUpdateWithoutInwardsInput, FabricStockImportUncheckedUpdateWithoutInwardsInput>
+  }
+
+  export type FabricStockImportUpdateWithoutInwardsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    fileHash?: StringFieldUpdateOperationsInput | string
+    fileSize?: IntFieldUpdateOperationsInput | number
+    fileData?: BytesFieldUpdateOperationsInput | Bytes
+    sheetsJson?: StringFieldUpdateOperationsInput | string
+    selectedSheet?: NullableStringFieldUpdateOperationsInput | string | null
+    headerRow?: NullableIntFieldUpdateOperationsInput | number | null
+    mappingJson?: NullableStringFieldUpdateOperationsInput | string | null
+    correctionsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    resolutionsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    validationJson?: NullableStringFieldUpdateOperationsInput | string | null
+    payloadHash?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmKey?: NullableStringFieldUpdateOperationsInput | string | null
+    postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    postedResultJson?: NullableStringFieldUpdateOperationsInput | string | null
+    failureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    postedBy?: UserUpdateOneWithoutFabricStockImportsPostedNestedInput
+    uploadedBy?: UserUpdateOneRequiredWithoutFabricStockImportsUploadedNestedInput
+    documents?: FabricStockImportDocumentUpdateManyWithoutImportNestedInput
+  }
+
+  export type FabricStockImportUncheckedUpdateWithoutInwardsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    fileHash?: StringFieldUpdateOperationsInput | string
+    fileSize?: IntFieldUpdateOperationsInput | number
+    fileData?: BytesFieldUpdateOperationsInput | Bytes
+    sheetsJson?: StringFieldUpdateOperationsInput | string
+    selectedSheet?: NullableStringFieldUpdateOperationsInput | string | null
+    headerRow?: NullableIntFieldUpdateOperationsInput | number | null
+    mappingJson?: NullableStringFieldUpdateOperationsInput | string | null
+    correctionsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    resolutionsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    validationJson?: NullableStringFieldUpdateOperationsInput | string | null
+    payloadHash?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmKey?: NullableStringFieldUpdateOperationsInput | string | null
+    postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    postedById?: NullableStringFieldUpdateOperationsInput | string | null
+    postedResultJson?: NullableStringFieldUpdateOperationsInput | string | null
+    failureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedById?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    documents?: FabricStockImportDocumentUncheckedUpdateManyWithoutImportNestedInput
+  }
+
+  export type UserCreateWithoutFabricStockImportsPostedInput = {
+    id?: string
+    username: string
+    email: string
+    fullName: string
+    passwordHash: string
+    departmentCode?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userRoles?: UserRoleCreateNestedManyWithoutUserInput
+    createdPrograms?: ProgramCreateNestedManyWithoutCreatedByInput
+    approvedPrograms?: ProgramCreateNestedManyWithoutApprovedByInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    attachments?: AttachmentCreateNestedManyWithoutUploadedByInput
+    createdChallans?: ChallanCreateNestedManyWithoutCreatedByInput
+    issuedChallans?: ChallanCreateNestedManyWithoutIssuedByInput
+    receivedChallans?: ChallanCreateNestedManyWithoutReceivedByInput
+    approvedChallans?: ChallanCreateNestedManyWithoutApprovedByInput
+    productionRecords?: ProductionTransactionCreateNestedManyWithoutOperatorInput
+    inspections?: QualityInspectionCreateNestedManyWithoutInspectorInput
+    challanEvents?: ChallanEventCreateNestedManyWithoutActorInput
+    stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutActorInput
+    dispatchesApproved?: DispatchOrderCreateNestedManyWithoutApprovedByInput
+    dispatchesOperated?: DispatchOrderCreateNestedManyWithoutDispatchedByInput
+    defectsDetected?: DefectRecordCreateNestedManyWithoutDetectedByInput
+    reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
+    recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
+    recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    dyeingOrdersReceived?: DyeingOrderCreateNestedManyWithoutReceivedByInput
+    dyeingColorReviews?: DyeingOrderCreateNestedManyWithoutColorReviewedByInput
+    dyeingQcTransfers?: DyeingQcTransferCreateNestedManyWithoutCreatedByInput
+    workItemsReceived?: DepartmentWorkItemCreateNestedManyWithoutReceivedByInput
+    workTransfers?: DepartmentWorkTransferCreateNestedManyWithoutCreatedByInput
+    workInspections?: WorkItemInspectionCreateNestedManyWithoutInspectorInput
+    workAllocations?: WorkItemAllocationCreateNestedManyWithoutCreatedByInput
+    packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
+    garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
+    brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
+  }
+
+  export type UserUncheckedCreateWithoutFabricStockImportsPostedInput = {
+    id?: string
+    username: string
+    email: string
+    fullName: string
+    passwordHash: string
+    departmentCode?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userRoles?: UserRoleUncheckedCreateNestedManyWithoutUserInput
+    createdPrograms?: ProgramUncheckedCreateNestedManyWithoutCreatedByInput
+    approvedPrograms?: ProgramUncheckedCreateNestedManyWithoutApprovedByInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    attachments?: AttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+    createdChallans?: ChallanUncheckedCreateNestedManyWithoutCreatedByInput
+    issuedChallans?: ChallanUncheckedCreateNestedManyWithoutIssuedByInput
+    receivedChallans?: ChallanUncheckedCreateNestedManyWithoutReceivedByInput
+    approvedChallans?: ChallanUncheckedCreateNestedManyWithoutApprovedByInput
+    productionRecords?: ProductionTransactionUncheckedCreateNestedManyWithoutOperatorInput
+    inspections?: QualityInspectionUncheckedCreateNestedManyWithoutInspectorInput
+    challanEvents?: ChallanEventUncheckedCreateNestedManyWithoutActorInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutActorInput
+    dispatchesApproved?: DispatchOrderUncheckedCreateNestedManyWithoutApprovedByInput
+    dispatchesOperated?: DispatchOrderUncheckedCreateNestedManyWithoutDispatchedByInput
+    defectsDetected?: DefectRecordUncheckedCreateNestedManyWithoutDetectedByInput
+    reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
+    recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
+    recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    dyeingOrdersReceived?: DyeingOrderUncheckedCreateNestedManyWithoutReceivedByInput
+    dyeingColorReviews?: DyeingOrderUncheckedCreateNestedManyWithoutColorReviewedByInput
+    dyeingQcTransfers?: DyeingQcTransferUncheckedCreateNestedManyWithoutCreatedByInput
+    workItemsReceived?: DepartmentWorkItemUncheckedCreateNestedManyWithoutReceivedByInput
+    workTransfers?: DepartmentWorkTransferUncheckedCreateNestedManyWithoutCreatedByInput
+    workInspections?: WorkItemInspectionUncheckedCreateNestedManyWithoutInspectorInput
+    workAllocations?: WorkItemAllocationUncheckedCreateNestedManyWithoutCreatedByInput
+    packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
+    garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
+    brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
+  }
+
+  export type UserCreateOrConnectWithoutFabricStockImportsPostedInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutFabricStockImportsPostedInput, UserUncheckedCreateWithoutFabricStockImportsPostedInput>
+  }
+
+  export type UserCreateWithoutFabricStockImportsUploadedInput = {
+    id?: string
+    username: string
+    email: string
+    fullName: string
+    passwordHash: string
+    departmentCode?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userRoles?: UserRoleCreateNestedManyWithoutUserInput
+    createdPrograms?: ProgramCreateNestedManyWithoutCreatedByInput
+    approvedPrograms?: ProgramCreateNestedManyWithoutApprovedByInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    attachments?: AttachmentCreateNestedManyWithoutUploadedByInput
+    createdChallans?: ChallanCreateNestedManyWithoutCreatedByInput
+    issuedChallans?: ChallanCreateNestedManyWithoutIssuedByInput
+    receivedChallans?: ChallanCreateNestedManyWithoutReceivedByInput
+    approvedChallans?: ChallanCreateNestedManyWithoutApprovedByInput
+    productionRecords?: ProductionTransactionCreateNestedManyWithoutOperatorInput
+    inspections?: QualityInspectionCreateNestedManyWithoutInspectorInput
+    challanEvents?: ChallanEventCreateNestedManyWithoutActorInput
+    stockLedgerEntries?: StockLedgerEntryCreateNestedManyWithoutActorInput
+    dispatchesApproved?: DispatchOrderCreateNestedManyWithoutApprovedByInput
+    dispatchesOperated?: DispatchOrderCreateNestedManyWithoutDispatchedByInput
+    defectsDetected?: DefectRecordCreateNestedManyWithoutDetectedByInput
+    reworkOperations?: ReworkTransactionCreateNestedManyWithoutOperatorInput
+    recutsRequested?: RecutRequestCreateNestedManyWithoutRequestedByInput
+    recutsApproved?: RecutRequestCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderCreateNestedManyWithoutInchargeInput
+    dyeingOrdersReceived?: DyeingOrderCreateNestedManyWithoutReceivedByInput
+    dyeingColorReviews?: DyeingOrderCreateNestedManyWithoutColorReviewedByInput
+    dyeingQcTransfers?: DyeingQcTransferCreateNestedManyWithoutCreatedByInput
+    workItemsReceived?: DepartmentWorkItemCreateNestedManyWithoutReceivedByInput
+    workTransfers?: DepartmentWorkTransferCreateNestedManyWithoutCreatedByInput
+    workInspections?: WorkItemInspectionCreateNestedManyWithoutInspectorInput
+    workAllocations?: WorkItemAllocationCreateNestedManyWithoutCreatedByInput
+    packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
+    garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
+    departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
+    brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
+  }
+
+  export type UserUncheckedCreateWithoutFabricStockImportsUploadedInput = {
+    id?: string
+    username: string
+    email: string
+    fullName: string
+    passwordHash: string
+    departmentCode?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userRoles?: UserRoleUncheckedCreateNestedManyWithoutUserInput
+    createdPrograms?: ProgramUncheckedCreateNestedManyWithoutCreatedByInput
+    approvedPrograms?: ProgramUncheckedCreateNestedManyWithoutApprovedByInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    attachments?: AttachmentUncheckedCreateNestedManyWithoutUploadedByInput
+    createdChallans?: ChallanUncheckedCreateNestedManyWithoutCreatedByInput
+    issuedChallans?: ChallanUncheckedCreateNestedManyWithoutIssuedByInput
+    receivedChallans?: ChallanUncheckedCreateNestedManyWithoutReceivedByInput
+    approvedChallans?: ChallanUncheckedCreateNestedManyWithoutApprovedByInput
+    productionRecords?: ProductionTransactionUncheckedCreateNestedManyWithoutOperatorInput
+    inspections?: QualityInspectionUncheckedCreateNestedManyWithoutInspectorInput
+    challanEvents?: ChallanEventUncheckedCreateNestedManyWithoutActorInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedCreateNestedManyWithoutActorInput
+    dispatchesApproved?: DispatchOrderUncheckedCreateNestedManyWithoutApprovedByInput
+    dispatchesOperated?: DispatchOrderUncheckedCreateNestedManyWithoutDispatchedByInput
+    defectsDetected?: DefectRecordUncheckedCreateNestedManyWithoutDetectedByInput
+    reworkOperations?: ReworkTransactionUncheckedCreateNestedManyWithoutOperatorInput
+    recutsRequested?: RecutRequestUncheckedCreateNestedManyWithoutRequestedByInput
+    recutsApproved?: RecutRequestUncheckedCreateNestedManyWithoutApprovedByInput
+    fabricBatchesCreated?: FabricBatchUncheckedCreateNestedManyWithoutCreatedByInput
+    grnReceived?: MaterialReceiptUncheckedCreateNestedManyWithoutReceivedByInput
+    fabricRollsInspected?: FabricStoreRollUncheckedCreateNestedManyWithoutQcInspectedByInput
+    fabricQCInspections?: FabricQCInspectionUncheckedCreateNestedManyWithoutInspectedByInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedCreateNestedManyWithoutTransactedByInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedCreateNestedManyWithoutInchargeInput
+    dyeingOrdersReceived?: DyeingOrderUncheckedCreateNestedManyWithoutReceivedByInput
+    dyeingColorReviews?: DyeingOrderUncheckedCreateNestedManyWithoutColorReviewedByInput
+    dyeingQcTransfers?: DyeingQcTransferUncheckedCreateNestedManyWithoutCreatedByInput
+    workItemsReceived?: DepartmentWorkItemUncheckedCreateNestedManyWithoutReceivedByInput
+    workTransfers?: DepartmentWorkTransferUncheckedCreateNestedManyWithoutCreatedByInput
+    workInspections?: WorkItemInspectionUncheckedCreateNestedManyWithoutInspectorInput
+    workAllocations?: WorkItemAllocationUncheckedCreateNestedManyWithoutCreatedByInput
+    packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
+    garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
+    departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
+    brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
+  }
+
+  export type UserCreateOrConnectWithoutFabricStockImportsUploadedInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutFabricStockImportsUploadedInput, UserUncheckedCreateWithoutFabricStockImportsUploadedInput>
+  }
+
+  export type FabricInwardCreateWithoutImportInput = {
+    id?: string
+    sNo?: number
+    entryType: string
+    itemName: string
+    billNo: string
+    billDate: Date | string
+    receivingDate: Date | string
+    billQty: number
+    unit?: string
+    colour?: string | null
+    supplierName?: string | null
+    billerStateCity?: string | null
+    pricePerUnit?: number | null
+    boxThanQty?: number | null
+    hsnCode?: string | null
+    taxPercent?: number | null
+    remarks?: string | null
+    rollNumber?: string | null
+    rollKey?: string | null
+    batchNumber?: string | null
+    shade?: string | null
+    composition?: string | null
+    width?: string | null
+    unitRate?: number | null
+    storageLocation?: string | null
+    purchaseOrderNumber?: string | null
+    importRowNumber?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FabricInwardUncheckedCreateWithoutImportInput = {
+    id?: string
+    sNo?: number
+    entryType: string
+    itemName: string
+    billNo: string
+    billDate: Date | string
+    receivingDate: Date | string
+    billQty: number
+    unit?: string
+    colour?: string | null
+    supplierName?: string | null
+    billerStateCity?: string | null
+    pricePerUnit?: number | null
+    boxThanQty?: number | null
+    hsnCode?: string | null
+    taxPercent?: number | null
+    remarks?: string | null
+    rollNumber?: string | null
+    rollKey?: string | null
+    batchNumber?: string | null
+    shade?: string | null
+    composition?: string | null
+    width?: string | null
+    unitRate?: number | null
+    storageLocation?: string | null
+    purchaseOrderNumber?: string | null
+    importRowNumber?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FabricInwardCreateOrConnectWithoutImportInput = {
+    where: FabricInwardWhereUniqueInput
+    create: XOR<FabricInwardCreateWithoutImportInput, FabricInwardUncheckedCreateWithoutImportInput>
+  }
+
+  export type FabricInwardCreateManyImportInputEnvelope = {
+    data: FabricInwardCreateManyImportInput | FabricInwardCreateManyImportInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type FabricStockImportDocumentCreateWithoutImportInput = {
+    id?: string
+    kind: string
+    sheetName?: string | null
+    mimeType: string
+    size: number
+    sha256: string
+    data: Bytes
+    ocrStatus?: string
+    createdAt?: Date | string
+  }
+
+  export type FabricStockImportDocumentUncheckedCreateWithoutImportInput = {
+    id?: string
+    kind: string
+    sheetName?: string | null
+    mimeType: string
+    size: number
+    sha256: string
+    data: Bytes
+    ocrStatus?: string
+    createdAt?: Date | string
+  }
+
+  export type FabricStockImportDocumentCreateOrConnectWithoutImportInput = {
+    where: FabricStockImportDocumentWhereUniqueInput
+    create: XOR<FabricStockImportDocumentCreateWithoutImportInput, FabricStockImportDocumentUncheckedCreateWithoutImportInput>
+  }
+
+  export type FabricStockImportDocumentCreateManyImportInputEnvelope = {
+    data: FabricStockImportDocumentCreateManyImportInput | FabricStockImportDocumentCreateManyImportInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type UserUpsertWithoutFabricStockImportsPostedInput = {
+    update: XOR<UserUpdateWithoutFabricStockImportsPostedInput, UserUncheckedUpdateWithoutFabricStockImportsPostedInput>
+    create: XOR<UserCreateWithoutFabricStockImportsPostedInput, UserUncheckedCreateWithoutFabricStockImportsPostedInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutFabricStockImportsPostedInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutFabricStockImportsPostedInput, UserUncheckedUpdateWithoutFabricStockImportsPostedInput>
+  }
+
+  export type UserUpdateWithoutFabricStockImportsPostedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    departmentCode?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userRoles?: UserRoleUpdateManyWithoutUserNestedInput
+    createdPrograms?: ProgramUpdateManyWithoutCreatedByNestedInput
+    approvedPrograms?: ProgramUpdateManyWithoutApprovedByNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    attachments?: AttachmentUpdateManyWithoutUploadedByNestedInput
+    createdChallans?: ChallanUpdateManyWithoutCreatedByNestedInput
+    issuedChallans?: ChallanUpdateManyWithoutIssuedByNestedInput
+    receivedChallans?: ChallanUpdateManyWithoutReceivedByNestedInput
+    approvedChallans?: ChallanUpdateManyWithoutApprovedByNestedInput
+    productionRecords?: ProductionTransactionUpdateManyWithoutOperatorNestedInput
+    inspections?: QualityInspectionUpdateManyWithoutInspectorNestedInput
+    challanEvents?: ChallanEventUpdateManyWithoutActorNestedInput
+    stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutActorNestedInput
+    dispatchesApproved?: DispatchOrderUpdateManyWithoutApprovedByNestedInput
+    dispatchesOperated?: DispatchOrderUpdateManyWithoutDispatchedByNestedInput
+    defectsDetected?: DefectRecordUpdateManyWithoutDetectedByNestedInput
+    reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
+    recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
+    recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    dyeingOrdersReceived?: DyeingOrderUpdateManyWithoutReceivedByNestedInput
+    dyeingColorReviews?: DyeingOrderUpdateManyWithoutColorReviewedByNestedInput
+    dyeingQcTransfers?: DyeingQcTransferUpdateManyWithoutCreatedByNestedInput
+    workItemsReceived?: DepartmentWorkItemUpdateManyWithoutReceivedByNestedInput
+    workTransfers?: DepartmentWorkTransferUpdateManyWithoutCreatedByNestedInput
+    workInspections?: WorkItemInspectionUpdateManyWithoutInspectorNestedInput
+    workAllocations?: WorkItemAllocationUpdateManyWithoutCreatedByNestedInput
+    packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
+    garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
+    brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutFabricStockImportsPostedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    departmentCode?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userRoles?: UserRoleUncheckedUpdateManyWithoutUserNestedInput
+    createdPrograms?: ProgramUncheckedUpdateManyWithoutCreatedByNestedInput
+    approvedPrograms?: ProgramUncheckedUpdateManyWithoutApprovedByNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    attachments?: AttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+    createdChallans?: ChallanUncheckedUpdateManyWithoutCreatedByNestedInput
+    issuedChallans?: ChallanUncheckedUpdateManyWithoutIssuedByNestedInput
+    receivedChallans?: ChallanUncheckedUpdateManyWithoutReceivedByNestedInput
+    approvedChallans?: ChallanUncheckedUpdateManyWithoutApprovedByNestedInput
+    productionRecords?: ProductionTransactionUncheckedUpdateManyWithoutOperatorNestedInput
+    inspections?: QualityInspectionUncheckedUpdateManyWithoutInspectorNestedInput
+    challanEvents?: ChallanEventUncheckedUpdateManyWithoutActorNestedInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutActorNestedInput
+    dispatchesApproved?: DispatchOrderUncheckedUpdateManyWithoutApprovedByNestedInput
+    dispatchesOperated?: DispatchOrderUncheckedUpdateManyWithoutDispatchedByNestedInput
+    defectsDetected?: DefectRecordUncheckedUpdateManyWithoutDetectedByNestedInput
+    reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
+    recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+    recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    dyeingOrdersReceived?: DyeingOrderUncheckedUpdateManyWithoutReceivedByNestedInput
+    dyeingColorReviews?: DyeingOrderUncheckedUpdateManyWithoutColorReviewedByNestedInput
+    dyeingQcTransfers?: DyeingQcTransferUncheckedUpdateManyWithoutCreatedByNestedInput
+    workItemsReceived?: DepartmentWorkItemUncheckedUpdateManyWithoutReceivedByNestedInput
+    workTransfers?: DepartmentWorkTransferUncheckedUpdateManyWithoutCreatedByNestedInput
+    workInspections?: WorkItemInspectionUncheckedUpdateManyWithoutInspectorNestedInput
+    workAllocations?: WorkItemAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
+    packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
+    garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
+    brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
+  }
+
+  export type UserUpsertWithoutFabricStockImportsUploadedInput = {
+    update: XOR<UserUpdateWithoutFabricStockImportsUploadedInput, UserUncheckedUpdateWithoutFabricStockImportsUploadedInput>
+    create: XOR<UserCreateWithoutFabricStockImportsUploadedInput, UserUncheckedCreateWithoutFabricStockImportsUploadedInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutFabricStockImportsUploadedInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutFabricStockImportsUploadedInput, UserUncheckedUpdateWithoutFabricStockImportsUploadedInput>
+  }
+
+  export type UserUpdateWithoutFabricStockImportsUploadedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    departmentCode?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userRoles?: UserRoleUpdateManyWithoutUserNestedInput
+    createdPrograms?: ProgramUpdateManyWithoutCreatedByNestedInput
+    approvedPrograms?: ProgramUpdateManyWithoutApprovedByNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    attachments?: AttachmentUpdateManyWithoutUploadedByNestedInput
+    createdChallans?: ChallanUpdateManyWithoutCreatedByNestedInput
+    issuedChallans?: ChallanUpdateManyWithoutIssuedByNestedInput
+    receivedChallans?: ChallanUpdateManyWithoutReceivedByNestedInput
+    approvedChallans?: ChallanUpdateManyWithoutApprovedByNestedInput
+    productionRecords?: ProductionTransactionUpdateManyWithoutOperatorNestedInput
+    inspections?: QualityInspectionUpdateManyWithoutInspectorNestedInput
+    challanEvents?: ChallanEventUpdateManyWithoutActorNestedInput
+    stockLedgerEntries?: StockLedgerEntryUpdateManyWithoutActorNestedInput
+    dispatchesApproved?: DispatchOrderUpdateManyWithoutApprovedByNestedInput
+    dispatchesOperated?: DispatchOrderUpdateManyWithoutDispatchedByNestedInput
+    defectsDetected?: DefectRecordUpdateManyWithoutDetectedByNestedInput
+    reworkOperations?: ReworkTransactionUpdateManyWithoutOperatorNestedInput
+    recutsRequested?: RecutRequestUpdateManyWithoutRequestedByNestedInput
+    recutsApproved?: RecutRequestUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUpdateManyWithoutInchargeNestedInput
+    dyeingOrdersReceived?: DyeingOrderUpdateManyWithoutReceivedByNestedInput
+    dyeingColorReviews?: DyeingOrderUpdateManyWithoutColorReviewedByNestedInput
+    dyeingQcTransfers?: DyeingQcTransferUpdateManyWithoutCreatedByNestedInput
+    workItemsReceived?: DepartmentWorkItemUpdateManyWithoutReceivedByNestedInput
+    workTransfers?: DepartmentWorkTransferUpdateManyWithoutCreatedByNestedInput
+    workInspections?: WorkItemInspectionUpdateManyWithoutInspectorNestedInput
+    workAllocations?: WorkItemAllocationUpdateManyWithoutCreatedByNestedInput
+    packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
+    garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
+    departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
+    brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutFabricStockImportsUploadedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    fullName?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    departmentCode?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userRoles?: UserRoleUncheckedUpdateManyWithoutUserNestedInput
+    createdPrograms?: ProgramUncheckedUpdateManyWithoutCreatedByNestedInput
+    approvedPrograms?: ProgramUncheckedUpdateManyWithoutApprovedByNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    attachments?: AttachmentUncheckedUpdateManyWithoutUploadedByNestedInput
+    createdChallans?: ChallanUncheckedUpdateManyWithoutCreatedByNestedInput
+    issuedChallans?: ChallanUncheckedUpdateManyWithoutIssuedByNestedInput
+    receivedChallans?: ChallanUncheckedUpdateManyWithoutReceivedByNestedInput
+    approvedChallans?: ChallanUncheckedUpdateManyWithoutApprovedByNestedInput
+    productionRecords?: ProductionTransactionUncheckedUpdateManyWithoutOperatorNestedInput
+    inspections?: QualityInspectionUncheckedUpdateManyWithoutInspectorNestedInput
+    challanEvents?: ChallanEventUncheckedUpdateManyWithoutActorNestedInput
+    stockLedgerEntries?: StockLedgerEntryUncheckedUpdateManyWithoutActorNestedInput
+    dispatchesApproved?: DispatchOrderUncheckedUpdateManyWithoutApprovedByNestedInput
+    dispatchesOperated?: DispatchOrderUncheckedUpdateManyWithoutDispatchedByNestedInput
+    defectsDetected?: DefectRecordUncheckedUpdateManyWithoutDetectedByNestedInput
+    reworkOperations?: ReworkTransactionUncheckedUpdateManyWithoutOperatorNestedInput
+    recutsRequested?: RecutRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+    recutsApproved?: RecutRequestUncheckedUpdateManyWithoutApprovedByNestedInput
+    fabricBatchesCreated?: FabricBatchUncheckedUpdateManyWithoutCreatedByNestedInput
+    grnReceived?: MaterialReceiptUncheckedUpdateManyWithoutReceivedByNestedInput
+    fabricRollsInspected?: FabricStoreRollUncheckedUpdateManyWithoutQcInspectedByNestedInput
+    fabricQCInspections?: FabricQCInspectionUncheckedUpdateManyWithoutInspectedByNestedInput
+    fabricLedgerEntries?: FabricStockLedgerUncheckedUpdateManyWithoutTransactedByNestedInput
+    dyeingOrdersIncharge?: DyeingOrderUncheckedUpdateManyWithoutInchargeNestedInput
+    dyeingOrdersReceived?: DyeingOrderUncheckedUpdateManyWithoutReceivedByNestedInput
+    dyeingColorReviews?: DyeingOrderUncheckedUpdateManyWithoutColorReviewedByNestedInput
+    dyeingQcTransfers?: DyeingQcTransferUncheckedUpdateManyWithoutCreatedByNestedInput
+    workItemsReceived?: DepartmentWorkItemUncheckedUpdateManyWithoutReceivedByNestedInput
+    workTransfers?: DepartmentWorkTransferUncheckedUpdateManyWithoutCreatedByNestedInput
+    workInspections?: WorkItemInspectionUncheckedUpdateManyWithoutInspectorNestedInput
+    workAllocations?: WorkItemAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
+    packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
+    garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
+    deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
+    departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
+    brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
+  }
+
+  export type FabricInwardUpsertWithWhereUniqueWithoutImportInput = {
+    where: FabricInwardWhereUniqueInput
+    update: XOR<FabricInwardUpdateWithoutImportInput, FabricInwardUncheckedUpdateWithoutImportInput>
+    create: XOR<FabricInwardCreateWithoutImportInput, FabricInwardUncheckedCreateWithoutImportInput>
+  }
+
+  export type FabricInwardUpdateWithWhereUniqueWithoutImportInput = {
+    where: FabricInwardWhereUniqueInput
+    data: XOR<FabricInwardUpdateWithoutImportInput, FabricInwardUncheckedUpdateWithoutImportInput>
+  }
+
+  export type FabricInwardUpdateManyWithWhereWithoutImportInput = {
+    where: FabricInwardScalarWhereInput
+    data: XOR<FabricInwardUpdateManyMutationInput, FabricInwardUncheckedUpdateManyWithoutImportInput>
+  }
+
+  export type FabricInwardScalarWhereInput = {
+    AND?: FabricInwardScalarWhereInput | FabricInwardScalarWhereInput[]
+    OR?: FabricInwardScalarWhereInput[]
+    NOT?: FabricInwardScalarWhereInput | FabricInwardScalarWhereInput[]
+    id?: StringFilter<"FabricInward"> | string
+    sNo?: IntFilter<"FabricInward"> | number
+    entryType?: StringFilter<"FabricInward"> | string
+    itemName?: StringFilter<"FabricInward"> | string
+    billNo?: StringFilter<"FabricInward"> | string
+    billDate?: DateTimeFilter<"FabricInward"> | Date | string
+    receivingDate?: DateTimeFilter<"FabricInward"> | Date | string
+    billQty?: FloatFilter<"FabricInward"> | number
+    unit?: StringFilter<"FabricInward"> | string
+    colour?: StringNullableFilter<"FabricInward"> | string | null
+    supplierName?: StringNullableFilter<"FabricInward"> | string | null
+    billerStateCity?: StringNullableFilter<"FabricInward"> | string | null
+    pricePerUnit?: FloatNullableFilter<"FabricInward"> | number | null
+    boxThanQty?: FloatNullableFilter<"FabricInward"> | number | null
+    hsnCode?: StringNullableFilter<"FabricInward"> | string | null
+    taxPercent?: FloatNullableFilter<"FabricInward"> | number | null
+    remarks?: StringNullableFilter<"FabricInward"> | string | null
+    rollNumber?: StringNullableFilter<"FabricInward"> | string | null
+    rollKey?: StringNullableFilter<"FabricInward"> | string | null
+    batchNumber?: StringNullableFilter<"FabricInward"> | string | null
+    shade?: StringNullableFilter<"FabricInward"> | string | null
+    composition?: StringNullableFilter<"FabricInward"> | string | null
+    width?: StringNullableFilter<"FabricInward"> | string | null
+    unitRate?: FloatNullableFilter<"FabricInward"> | number | null
+    storageLocation?: StringNullableFilter<"FabricInward"> | string | null
+    purchaseOrderNumber?: StringNullableFilter<"FabricInward"> | string | null
+    importId?: StringNullableFilter<"FabricInward"> | string | null
+    importRowNumber?: IntNullableFilter<"FabricInward"> | number | null
+    createdAt?: DateTimeFilter<"FabricInward"> | Date | string
+    updatedAt?: DateTimeFilter<"FabricInward"> | Date | string
+  }
+
+  export type FabricStockImportDocumentUpsertWithWhereUniqueWithoutImportInput = {
+    where: FabricStockImportDocumentWhereUniqueInput
+    update: XOR<FabricStockImportDocumentUpdateWithoutImportInput, FabricStockImportDocumentUncheckedUpdateWithoutImportInput>
+    create: XOR<FabricStockImportDocumentCreateWithoutImportInput, FabricStockImportDocumentUncheckedCreateWithoutImportInput>
+  }
+
+  export type FabricStockImportDocumentUpdateWithWhereUniqueWithoutImportInput = {
+    where: FabricStockImportDocumentWhereUniqueInput
+    data: XOR<FabricStockImportDocumentUpdateWithoutImportInput, FabricStockImportDocumentUncheckedUpdateWithoutImportInput>
+  }
+
+  export type FabricStockImportDocumentUpdateManyWithWhereWithoutImportInput = {
+    where: FabricStockImportDocumentScalarWhereInput
+    data: XOR<FabricStockImportDocumentUpdateManyMutationInput, FabricStockImportDocumentUncheckedUpdateManyWithoutImportInput>
+  }
+
+  export type FabricStockImportDocumentScalarWhereInput = {
+    AND?: FabricStockImportDocumentScalarWhereInput | FabricStockImportDocumentScalarWhereInput[]
+    OR?: FabricStockImportDocumentScalarWhereInput[]
+    NOT?: FabricStockImportDocumentScalarWhereInput | FabricStockImportDocumentScalarWhereInput[]
+    id?: StringFilter<"FabricStockImportDocument"> | string
+    importId?: StringFilter<"FabricStockImportDocument"> | string
+    kind?: StringFilter<"FabricStockImportDocument"> | string
+    sheetName?: StringNullableFilter<"FabricStockImportDocument"> | string | null
+    mimeType?: StringFilter<"FabricStockImportDocument"> | string
+    size?: IntFilter<"FabricStockImportDocument"> | number
+    sha256?: StringFilter<"FabricStockImportDocument"> | string
+    data?: BytesFilter<"FabricStockImportDocument"> | Bytes
+    ocrStatus?: StringFilter<"FabricStockImportDocument"> | string
+    createdAt?: DateTimeFilter<"FabricStockImportDocument"> | Date | string
+  }
+
+  export type FabricStockImportCreateWithoutDocumentsInput = {
+    id?: string
+    status?: string
+    fileName: string
+    fileHash: string
+    fileSize: number
+    fileData: Bytes
+    sheetsJson: string
+    selectedSheet?: string | null
+    headerRow?: number | null
+    mappingJson?: string | null
+    correctionsJson?: string | null
+    resolutionsJson?: string | null
+    validationJson?: string | null
+    payloadHash?: string | null
+    receiptNumber?: string | null
+    confirmKey?: string | null
+    postedAt?: Date | string | null
+    postedResultJson?: string | null
+    failureReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    postedBy?: UserCreateNestedOneWithoutFabricStockImportsPostedInput
+    uploadedBy: UserCreateNestedOneWithoutFabricStockImportsUploadedInput
+    inwards?: FabricInwardCreateNestedManyWithoutImportInput
+  }
+
+  export type FabricStockImportUncheckedCreateWithoutDocumentsInput = {
+    id?: string
+    status?: string
+    fileName: string
+    fileHash: string
+    fileSize: number
+    fileData: Bytes
+    sheetsJson: string
+    selectedSheet?: string | null
+    headerRow?: number | null
+    mappingJson?: string | null
+    correctionsJson?: string | null
+    resolutionsJson?: string | null
+    validationJson?: string | null
+    payloadHash?: string | null
+    receiptNumber?: string | null
+    confirmKey?: string | null
+    postedAt?: Date | string | null
+    postedById?: string | null
+    postedResultJson?: string | null
+    failureReason?: string | null
+    uploadedById: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    inwards?: FabricInwardUncheckedCreateNestedManyWithoutImportInput
+  }
+
+  export type FabricStockImportCreateOrConnectWithoutDocumentsInput = {
+    where: FabricStockImportWhereUniqueInput
+    create: XOR<FabricStockImportCreateWithoutDocumentsInput, FabricStockImportUncheckedCreateWithoutDocumentsInput>
+  }
+
+  export type FabricStockImportUpsertWithoutDocumentsInput = {
+    update: XOR<FabricStockImportUpdateWithoutDocumentsInput, FabricStockImportUncheckedUpdateWithoutDocumentsInput>
+    create: XOR<FabricStockImportCreateWithoutDocumentsInput, FabricStockImportUncheckedCreateWithoutDocumentsInput>
+    where?: FabricStockImportWhereInput
+  }
+
+  export type FabricStockImportUpdateToOneWithWhereWithoutDocumentsInput = {
+    where?: FabricStockImportWhereInput
+    data: XOR<FabricStockImportUpdateWithoutDocumentsInput, FabricStockImportUncheckedUpdateWithoutDocumentsInput>
+  }
+
+  export type FabricStockImportUpdateWithoutDocumentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    fileHash?: StringFieldUpdateOperationsInput | string
+    fileSize?: IntFieldUpdateOperationsInput | number
+    fileData?: BytesFieldUpdateOperationsInput | Bytes
+    sheetsJson?: StringFieldUpdateOperationsInput | string
+    selectedSheet?: NullableStringFieldUpdateOperationsInput | string | null
+    headerRow?: NullableIntFieldUpdateOperationsInput | number | null
+    mappingJson?: NullableStringFieldUpdateOperationsInput | string | null
+    correctionsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    resolutionsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    validationJson?: NullableStringFieldUpdateOperationsInput | string | null
+    payloadHash?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmKey?: NullableStringFieldUpdateOperationsInput | string | null
+    postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    postedResultJson?: NullableStringFieldUpdateOperationsInput | string | null
+    failureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    postedBy?: UserUpdateOneWithoutFabricStockImportsPostedNestedInput
+    uploadedBy?: UserUpdateOneRequiredWithoutFabricStockImportsUploadedNestedInput
+    inwards?: FabricInwardUpdateManyWithoutImportNestedInput
+  }
+
+  export type FabricStockImportUncheckedUpdateWithoutDocumentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    fileHash?: StringFieldUpdateOperationsInput | string
+    fileSize?: IntFieldUpdateOperationsInput | number
+    fileData?: BytesFieldUpdateOperationsInput | Bytes
+    sheetsJson?: StringFieldUpdateOperationsInput | string
+    selectedSheet?: NullableStringFieldUpdateOperationsInput | string | null
+    headerRow?: NullableIntFieldUpdateOperationsInput | number | null
+    mappingJson?: NullableStringFieldUpdateOperationsInput | string | null
+    correctionsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    resolutionsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    validationJson?: NullableStringFieldUpdateOperationsInput | string | null
+    payloadHash?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmKey?: NullableStringFieldUpdateOperationsInput | string | null
+    postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    postedById?: NullableStringFieldUpdateOperationsInput | string | null
+    postedResultJson?: NullableStringFieldUpdateOperationsInput | string | null
+    failureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedById?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    inwards?: FabricInwardUncheckedUpdateManyWithoutImportNestedInput
   }
 
   export type ProgramCreateWithoutDeadlineAlertsInput = {
@@ -163130,6 +170499,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -163180,6 +170550,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -163421,6 +170792,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -163471,6 +170843,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -163612,6 +170985,8 @@ export namespace Prisma {
     workAllocations?: WorkItemAllocationCreateNestedManyWithoutCreatedByInput
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -163660,6 +171035,8 @@ export namespace Prisma {
     workAllocations?: WorkItemAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -163793,6 +171170,8 @@ export namespace Prisma {
     workAllocations?: WorkItemAllocationUpdateManyWithoutCreatedByNestedInput
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -163841,6 +171220,8 @@ export namespace Prisma {
     workAllocations?: WorkItemAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -163986,6 +171367,8 @@ export namespace Prisma {
     workAllocations?: WorkItemAllocationCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -164034,6 +171417,8 @@ export namespace Prisma {
     workAllocations?: WorkItemAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     garmentImagesUploaded?: GarmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -164201,6 +171586,8 @@ export namespace Prisma {
     workAllocations?: WorkItemAllocationUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -164249,6 +171636,8 @@ export namespace Prisma {
     workAllocations?: WorkItemAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     garmentImagesUploaded?: GarmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -164460,6 +171849,8 @@ export namespace Prisma {
     workAllocations?: WorkItemAllocationCreateNestedManyWithoutCreatedByInput
     packingAllocations?: PackingAllocationCreateNestedManyWithoutCreatedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetCreateNestedManyWithoutUploadedByInput
   }
@@ -164508,6 +171899,8 @@ export namespace Prisma {
     workAllocations?: WorkItemAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     packingAllocations?: PackingAllocationUncheckedCreateNestedManyWithoutCreatedByInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedCreateNestedManyWithoutUserInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedCreateNestedManyWithoutUploadedByInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedCreateNestedManyWithoutPostedByInput
     departmentImagesUploaded?: DepartmentImageUncheckedCreateNestedManyWithoutUploadedByInput
     brandingAssetsUploaded?: BrandingAssetUncheckedCreateNestedManyWithoutUploadedByInput
   }
@@ -164741,6 +172134,8 @@ export namespace Prisma {
     workAllocations?: WorkItemAllocationUpdateManyWithoutCreatedByNestedInput
     packingAllocations?: PackingAllocationUpdateManyWithoutCreatedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUpdateManyWithoutUploadedByNestedInput
   }
@@ -164789,6 +172184,8 @@ export namespace Prisma {
     workAllocations?: WorkItemAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     packingAllocations?: PackingAllocationUncheckedUpdateManyWithoutCreatedByNestedInput
     deadlineAlertDismissals?: DeadlineAlertDismissalUncheckedUpdateManyWithoutUserNestedInput
+    fabricStockImportsUploaded?: FabricStockImportUncheckedUpdateManyWithoutUploadedByNestedInput
+    fabricStockImportsPosted?: FabricStockImportUncheckedUpdateManyWithoutPostedByNestedInput
     departmentImagesUploaded?: DepartmentImageUncheckedUpdateManyWithoutUploadedByNestedInput
     brandingAssetsUploaded?: BrandingAssetUncheckedUpdateManyWithoutUploadedByNestedInput
   }
@@ -164961,6 +172358,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -164990,6 +172388,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -165019,6 +172418,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -165048,6 +172448,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -165175,6 +172576,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     status?: string
     resolutionNotes?: string | null
@@ -165246,7 +172648,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
-    totalPieces?: Decimal | DecimalJsLike | number | string
+    unit?: string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdAt?: Date | string
@@ -165263,7 +172665,6 @@ export namespace Prisma {
     supplierName: string
     totalRollsReceived?: number
     totalMetersReceived?: Decimal | DecimalJsLike | number | string
-    totalPiecesReceived?: Decimal | DecimalJsLike | number | string
     status?: $Enums.GRNStatus
     remarks?: string | null
     createdAt?: Date | string
@@ -165276,7 +172677,6 @@ export namespace Prisma {
     batchId: string
     locationId?: string | null
     length: Decimal | DecimalJsLike | number | string
-    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -165308,7 +172708,6 @@ export namespace Prisma {
     batchId: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
-    uom?: string
     referenceType: string
     referenceId: string
     fromLocationId?: string | null
@@ -165575,6 +172974,56 @@ export namespace Prisma {
     id?: string
     alertId: string
     dismissedAt?: Date | string
+  }
+
+  export type FabricStockImportCreateManyUploadedByInput = {
+    id?: string
+    status?: string
+    fileName: string
+    fileHash: string
+    fileSize: number
+    fileData: Bytes
+    sheetsJson: string
+    selectedSheet?: string | null
+    headerRow?: number | null
+    mappingJson?: string | null
+    correctionsJson?: string | null
+    resolutionsJson?: string | null
+    validationJson?: string | null
+    payloadHash?: string | null
+    receiptNumber?: string | null
+    confirmKey?: string | null
+    postedAt?: Date | string | null
+    postedById?: string | null
+    postedResultJson?: string | null
+    failureReason?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FabricStockImportCreateManyPostedByInput = {
+    id?: string
+    status?: string
+    fileName: string
+    fileHash: string
+    fileSize: number
+    fileData: Bytes
+    sheetsJson: string
+    selectedSheet?: string | null
+    headerRow?: number | null
+    mappingJson?: string | null
+    correctionsJson?: string | null
+    resolutionsJson?: string | null
+    validationJson?: string | null
+    payloadHash?: string | null
+    receiptNumber?: string | null
+    confirmKey?: string | null
+    postedAt?: Date | string | null
+    postedResultJson?: string | null
+    failureReason?: string | null
+    uploadedById: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type DepartmentImageCreateManyUploadedByInput = {
@@ -166146,6 +173595,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -166195,6 +173645,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -166237,6 +173688,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -166259,6 +173711,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -166308,6 +173761,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -166350,6 +173804,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -166372,6 +173827,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -166421,6 +173877,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -166463,6 +173920,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -166485,6 +173943,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -166534,6 +173993,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -166576,6 +174036,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -166929,7 +174390,8 @@ export namespace Prisma {
     departmentCode?: StringFieldUpdateOperationsInput | string
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -166952,7 +174414,8 @@ export namespace Prisma {
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -166972,7 +174435,8 @@ export namespace Prisma {
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -167147,7 +174611,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -167169,7 +174633,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -167190,7 +174654,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -167206,7 +174670,6 @@ export namespace Prisma {
     supplierName?: StringFieldUpdateOperationsInput | string
     totalRollsReceived?: IntFieldUpdateOperationsInput | number
     totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalPiecesReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -167225,7 +174688,6 @@ export namespace Prisma {
     supplierName?: StringFieldUpdateOperationsInput | string
     totalRollsReceived?: IntFieldUpdateOperationsInput | number
     totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalPiecesReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -167243,7 +174705,6 @@ export namespace Prisma {
     supplierName?: StringFieldUpdateOperationsInput | string
     totalRollsReceived?: IntFieldUpdateOperationsInput | number
     totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalPiecesReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -167254,7 +174715,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     rollNumber?: StringFieldUpdateOperationsInput | string
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -167278,7 +174738,6 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     locationId?: NullableStringFieldUpdateOperationsInput | string | null
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -167300,7 +174759,6 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     locationId?: NullableStringFieldUpdateOperationsInput | string | null
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -167354,7 +174812,6 @@ export namespace Prisma {
     entryNumber?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -167373,7 +174830,6 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -167390,7 +174846,6 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -168197,6 +175652,164 @@ export namespace Prisma {
     dismissedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type FabricStockImportUpdateWithoutUploadedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    fileHash?: StringFieldUpdateOperationsInput | string
+    fileSize?: IntFieldUpdateOperationsInput | number
+    fileData?: BytesFieldUpdateOperationsInput | Bytes
+    sheetsJson?: StringFieldUpdateOperationsInput | string
+    selectedSheet?: NullableStringFieldUpdateOperationsInput | string | null
+    headerRow?: NullableIntFieldUpdateOperationsInput | number | null
+    mappingJson?: NullableStringFieldUpdateOperationsInput | string | null
+    correctionsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    resolutionsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    validationJson?: NullableStringFieldUpdateOperationsInput | string | null
+    payloadHash?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmKey?: NullableStringFieldUpdateOperationsInput | string | null
+    postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    postedResultJson?: NullableStringFieldUpdateOperationsInput | string | null
+    failureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    postedBy?: UserUpdateOneWithoutFabricStockImportsPostedNestedInput
+    inwards?: FabricInwardUpdateManyWithoutImportNestedInput
+    documents?: FabricStockImportDocumentUpdateManyWithoutImportNestedInput
+  }
+
+  export type FabricStockImportUncheckedUpdateWithoutUploadedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    fileHash?: StringFieldUpdateOperationsInput | string
+    fileSize?: IntFieldUpdateOperationsInput | number
+    fileData?: BytesFieldUpdateOperationsInput | Bytes
+    sheetsJson?: StringFieldUpdateOperationsInput | string
+    selectedSheet?: NullableStringFieldUpdateOperationsInput | string | null
+    headerRow?: NullableIntFieldUpdateOperationsInput | number | null
+    mappingJson?: NullableStringFieldUpdateOperationsInput | string | null
+    correctionsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    resolutionsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    validationJson?: NullableStringFieldUpdateOperationsInput | string | null
+    payloadHash?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmKey?: NullableStringFieldUpdateOperationsInput | string | null
+    postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    postedById?: NullableStringFieldUpdateOperationsInput | string | null
+    postedResultJson?: NullableStringFieldUpdateOperationsInput | string | null
+    failureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    inwards?: FabricInwardUncheckedUpdateManyWithoutImportNestedInput
+    documents?: FabricStockImportDocumentUncheckedUpdateManyWithoutImportNestedInput
+  }
+
+  export type FabricStockImportUncheckedUpdateManyWithoutUploadedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    fileHash?: StringFieldUpdateOperationsInput | string
+    fileSize?: IntFieldUpdateOperationsInput | number
+    fileData?: BytesFieldUpdateOperationsInput | Bytes
+    sheetsJson?: StringFieldUpdateOperationsInput | string
+    selectedSheet?: NullableStringFieldUpdateOperationsInput | string | null
+    headerRow?: NullableIntFieldUpdateOperationsInput | number | null
+    mappingJson?: NullableStringFieldUpdateOperationsInput | string | null
+    correctionsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    resolutionsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    validationJson?: NullableStringFieldUpdateOperationsInput | string | null
+    payloadHash?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmKey?: NullableStringFieldUpdateOperationsInput | string | null
+    postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    postedById?: NullableStringFieldUpdateOperationsInput | string | null
+    postedResultJson?: NullableStringFieldUpdateOperationsInput | string | null
+    failureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStockImportUpdateWithoutPostedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    fileHash?: StringFieldUpdateOperationsInput | string
+    fileSize?: IntFieldUpdateOperationsInput | number
+    fileData?: BytesFieldUpdateOperationsInput | Bytes
+    sheetsJson?: StringFieldUpdateOperationsInput | string
+    selectedSheet?: NullableStringFieldUpdateOperationsInput | string | null
+    headerRow?: NullableIntFieldUpdateOperationsInput | number | null
+    mappingJson?: NullableStringFieldUpdateOperationsInput | string | null
+    correctionsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    resolutionsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    validationJson?: NullableStringFieldUpdateOperationsInput | string | null
+    payloadHash?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmKey?: NullableStringFieldUpdateOperationsInput | string | null
+    postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    postedResultJson?: NullableStringFieldUpdateOperationsInput | string | null
+    failureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    uploadedBy?: UserUpdateOneRequiredWithoutFabricStockImportsUploadedNestedInput
+    inwards?: FabricInwardUpdateManyWithoutImportNestedInput
+    documents?: FabricStockImportDocumentUpdateManyWithoutImportNestedInput
+  }
+
+  export type FabricStockImportUncheckedUpdateWithoutPostedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    fileHash?: StringFieldUpdateOperationsInput | string
+    fileSize?: IntFieldUpdateOperationsInput | number
+    fileData?: BytesFieldUpdateOperationsInput | Bytes
+    sheetsJson?: StringFieldUpdateOperationsInput | string
+    selectedSheet?: NullableStringFieldUpdateOperationsInput | string | null
+    headerRow?: NullableIntFieldUpdateOperationsInput | number | null
+    mappingJson?: NullableStringFieldUpdateOperationsInput | string | null
+    correctionsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    resolutionsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    validationJson?: NullableStringFieldUpdateOperationsInput | string | null
+    payloadHash?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmKey?: NullableStringFieldUpdateOperationsInput | string | null
+    postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    postedResultJson?: NullableStringFieldUpdateOperationsInput | string | null
+    failureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedById?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    inwards?: FabricInwardUncheckedUpdateManyWithoutImportNestedInput
+    documents?: FabricStockImportDocumentUncheckedUpdateManyWithoutImportNestedInput
+  }
+
+  export type FabricStockImportUncheckedUpdateManyWithoutPostedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    fileHash?: StringFieldUpdateOperationsInput | string
+    fileSize?: IntFieldUpdateOperationsInput | number
+    fileData?: BytesFieldUpdateOperationsInput | Bytes
+    sheetsJson?: StringFieldUpdateOperationsInput | string
+    selectedSheet?: NullableStringFieldUpdateOperationsInput | string | null
+    headerRow?: NullableIntFieldUpdateOperationsInput | number | null
+    mappingJson?: NullableStringFieldUpdateOperationsInput | string | null
+    correctionsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    resolutionsJson?: NullableStringFieldUpdateOperationsInput | string | null
+    validationJson?: NullableStringFieldUpdateOperationsInput | string | null
+    payloadHash?: NullableStringFieldUpdateOperationsInput | string | null
+    receiptNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    confirmKey?: NullableStringFieldUpdateOperationsInput | string | null
+    postedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    postedResultJson?: NullableStringFieldUpdateOperationsInput | string | null
+    failureReason?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedById?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type DepartmentImageUpdateWithoutUploadedByInput = {
     id?: StringFieldUpdateOperationsInput | string
     storageProvider?: StringFieldUpdateOperationsInput | string
@@ -168427,6 +176040,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -168456,6 +176070,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -168581,6 +176196,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -168630,6 +176246,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -168672,6 +176289,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -168694,6 +176312,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -168743,6 +176362,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -168785,6 +176405,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -170274,6 +177895,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -170368,6 +177990,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     detectedById: string
     status?: string
@@ -170445,7 +178068,7 @@ export namespace Prisma {
     colorName?: string | null
     totalRolls?: number
     totalMeters?: Decimal | DecimalJsLike | number | string
-    totalPieces?: Decimal | DecimalJsLike | number | string
+    unit?: string
     status?: $Enums.FabricBatchStatus
     receivedAt?: Date | string | null
     createdById: string
@@ -170459,7 +178082,6 @@ export namespace Prisma {
     batchId: string
     locationId?: string | null
     length: Decimal | DecimalJsLike | number | string
-    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -170844,6 +178466,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -170893,6 +178516,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -170935,6 +178559,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -171198,7 +178823,8 @@ export namespace Prisma {
     departmentCode?: StringFieldUpdateOperationsInput | string
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -171220,7 +178846,8 @@ export namespace Prisma {
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -171240,7 +178867,8 @@ export namespace Prisma {
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -171434,7 +179062,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -171455,7 +179083,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -171476,7 +179104,7 @@ export namespace Prisma {
     colorName?: NullableStringFieldUpdateOperationsInput | string | null
     totalRolls?: IntFieldUpdateOperationsInput | number
     totalMeters?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalPieces?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    unit?: StringFieldUpdateOperationsInput | string
     status?: EnumFabricBatchStatusFieldUpdateOperationsInput | $Enums.FabricBatchStatus
     receivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdById?: StringFieldUpdateOperationsInput | string
@@ -171488,7 +179116,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     rollNumber?: StringFieldUpdateOperationsInput | string
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -171512,7 +179139,6 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     locationId?: NullableStringFieldUpdateOperationsInput | string | null
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -171534,7 +179160,6 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     locationId?: NullableStringFieldUpdateOperationsInput | string | null
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -172026,6 +179651,7 @@ export namespace Prisma {
     fabricOut?: number | null
     fabricUnit?: string | null
     defectivePieces?: number | null
+    defectiveUnit?: string | null
     defectiveShelfLocation?: string | null
     defectReason?: string | null
     detectedFromChallanId?: string | null
@@ -172135,6 +179761,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     detectedById: string
     status?: string
@@ -172333,6 +179960,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -172382,6 +180010,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -172424,6 +180053,7 @@ export namespace Prisma {
     fabricOut?: NullableFloatFieldUpdateOperationsInput | number | null
     fabricUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectivePieces?: NullableFloatFieldUpdateOperationsInput | number | null
+    defectiveUnit?: NullableStringFieldUpdateOperationsInput | string | null
     defectiveShelfLocation?: NullableStringFieldUpdateOperationsInput | string | null
     defectReason?: NullableStringFieldUpdateOperationsInput | string | null
     detectedFromChallanId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -172730,7 +180360,8 @@ export namespace Prisma {
     departmentCode?: StringFieldUpdateOperationsInput | string
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -172752,7 +180383,8 @@ export namespace Prisma {
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -172772,7 +180404,8 @@ export namespace Prisma {
     bundleId?: NullableStringFieldUpdateOperationsInput | string | null
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -173498,6 +181131,7 @@ export namespace Prisma {
     itemDescription: string
     severity: string
     quantity: number
+    uom?: string | null
     reason: string
     detectedById: string
     status?: string
@@ -173556,7 +181190,8 @@ export namespace Prisma {
     departmentCode?: StringFieldUpdateOperationsInput | string
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -173578,7 +181213,8 @@ export namespace Prisma {
     departmentCode?: StringFieldUpdateOperationsInput | string
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -173598,7 +181234,8 @@ export namespace Prisma {
     departmentCode?: StringFieldUpdateOperationsInput | string
     itemDescription?: StringFieldUpdateOperationsInput | string
     severity?: StringFieldUpdateOperationsInput | string
-    quantity?: IntFieldUpdateOperationsInput | number
+    quantity?: FloatFieldUpdateOperationsInput | number
+    uom?: NullableStringFieldUpdateOperationsInput | string | null
     reason?: StringFieldUpdateOperationsInput | string
     detectedById?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
@@ -173954,7 +181591,6 @@ export namespace Prisma {
     rollNumber: string
     batchId: string
     length: Decimal | DecimalJsLike | number | string
-    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -173975,7 +181611,6 @@ export namespace Prisma {
     batchId: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
-    uom?: string
     referenceType: string
     referenceId: string
     toLocationId?: string | null
@@ -173992,7 +181627,6 @@ export namespace Prisma {
     batchId: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
-    uom?: string
     referenceType: string
     referenceId: string
     fromLocationId?: string | null
@@ -174006,7 +181640,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     rollNumber?: StringFieldUpdateOperationsInput | string
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -174029,7 +181662,6 @@ export namespace Prisma {
     rollNumber?: StringFieldUpdateOperationsInput | string
     batchId?: StringFieldUpdateOperationsInput | string
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -174051,7 +181683,6 @@ export namespace Prisma {
     rollNumber?: StringFieldUpdateOperationsInput | string
     batchId?: StringFieldUpdateOperationsInput | string
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -174070,7 +181701,6 @@ export namespace Prisma {
     entryNumber?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -174089,7 +181719,6 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     toLocationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -174106,7 +181735,6 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     toLocationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -174121,7 +181749,6 @@ export namespace Prisma {
     entryNumber?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -174140,7 +181767,6 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -174157,7 +181783,6 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -174172,7 +181797,6 @@ export namespace Prisma {
     rollNumber: string
     locationId?: string | null
     length: Decimal | DecimalJsLike | number | string
-    unit?: string
     width?: Decimal | DecimalJsLike | number | string | null
     weight?: Decimal | DecimalJsLike | number | string | null
     status?: $Enums.FabricRollStatus
@@ -174196,7 +181820,6 @@ export namespace Prisma {
     supplierName: string
     totalRollsReceived?: number
     totalMetersReceived?: Decimal | DecimalJsLike | number | string
-    totalPiecesReceived?: Decimal | DecimalJsLike | number | string
     status?: $Enums.GRNStatus
     remarks?: string | null
     createdAt?: Date | string
@@ -174209,7 +181832,6 @@ export namespace Prisma {
     rollId: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
-    uom?: string
     referenceType: string
     referenceId: string
     fromLocationId?: string | null
@@ -174224,7 +181846,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     rollNumber?: StringFieldUpdateOperationsInput | string
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -174247,7 +181868,6 @@ export namespace Prisma {
     rollNumber?: StringFieldUpdateOperationsInput | string
     locationId?: NullableStringFieldUpdateOperationsInput | string | null
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -174269,7 +181889,6 @@ export namespace Prisma {
     rollNumber?: StringFieldUpdateOperationsInput | string
     locationId?: NullableStringFieldUpdateOperationsInput | string | null
     length?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    unit?: StringFieldUpdateOperationsInput | string
     width?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     weight?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     status?: EnumFabricRollStatusFieldUpdateOperationsInput | $Enums.FabricRollStatus
@@ -174292,7 +181911,6 @@ export namespace Prisma {
     supplierName?: StringFieldUpdateOperationsInput | string
     totalRollsReceived?: IntFieldUpdateOperationsInput | number
     totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalPiecesReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -174311,7 +181929,6 @@ export namespace Prisma {
     supplierName?: StringFieldUpdateOperationsInput | string
     totalRollsReceived?: IntFieldUpdateOperationsInput | number
     totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalPiecesReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -174329,7 +181946,6 @@ export namespace Prisma {
     supplierName?: StringFieldUpdateOperationsInput | string
     totalRollsReceived?: IntFieldUpdateOperationsInput | number
     totalMetersReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalPiecesReceived?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     status?: EnumGRNStatusFieldUpdateOperationsInput | $Enums.GRNStatus
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -174341,7 +181957,6 @@ export namespace Prisma {
     entryNumber?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -174359,7 +181974,6 @@ export namespace Prisma {
     rollId?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -174376,7 +181990,6 @@ export namespace Prisma {
     rollId?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -174414,7 +182027,6 @@ export namespace Prisma {
     batchId: string
     transactionType: $Enums.StockTransactionType
     quantity: Decimal | DecimalJsLike | number | string
-    uom?: string
     referenceType: string
     referenceId: string
     fromLocationId?: string | null
@@ -174493,7 +182105,6 @@ export namespace Prisma {
     entryNumber?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     transactedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -174511,7 +182122,6 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -174528,7 +182138,6 @@ export namespace Prisma {
     batchId?: StringFieldUpdateOperationsInput | string
     transactionType?: EnumStockTransactionTypeFieldUpdateOperationsInput | $Enums.StockTransactionType
     quantity?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    uom?: StringFieldUpdateOperationsInput | string
     referenceType?: StringFieldUpdateOperationsInput | string
     referenceId?: StringFieldUpdateOperationsInput | string
     fromLocationId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -175277,6 +182886,182 @@ export namespace Prisma {
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricInwardCreateManyImportInput = {
+    id?: string
+    sNo?: number
+    entryType: string
+    itemName: string
+    billNo: string
+    billDate: Date | string
+    receivingDate: Date | string
+    billQty: number
+    unit?: string
+    colour?: string | null
+    supplierName?: string | null
+    billerStateCity?: string | null
+    pricePerUnit?: number | null
+    boxThanQty?: number | null
+    hsnCode?: string | null
+    taxPercent?: number | null
+    remarks?: string | null
+    rollNumber?: string | null
+    rollKey?: string | null
+    batchNumber?: string | null
+    shade?: string | null
+    composition?: string | null
+    width?: string | null
+    unitRate?: number | null
+    storageLocation?: string | null
+    purchaseOrderNumber?: string | null
+    importRowNumber?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FabricStockImportDocumentCreateManyImportInput = {
+    id?: string
+    kind: string
+    sheetName?: string | null
+    mimeType: string
+    size: number
+    sha256: string
+    data: Bytes
+    ocrStatus?: string
+    createdAt?: Date | string
+  }
+
+  export type FabricInwardUpdateWithoutImportInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sNo?: IntFieldUpdateOperationsInput | number
+    entryType?: StringFieldUpdateOperationsInput | string
+    itemName?: StringFieldUpdateOperationsInput | string
+    billNo?: StringFieldUpdateOperationsInput | string
+    billDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    receivingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    billQty?: FloatFieldUpdateOperationsInput | number
+    unit?: StringFieldUpdateOperationsInput | string
+    colour?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: NullableStringFieldUpdateOperationsInput | string | null
+    billerStateCity?: NullableStringFieldUpdateOperationsInput | string | null
+    pricePerUnit?: NullableFloatFieldUpdateOperationsInput | number | null
+    boxThanQty?: NullableFloatFieldUpdateOperationsInput | number | null
+    hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
+    taxPercent?: NullableFloatFieldUpdateOperationsInput | number | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    rollKey?: NullableStringFieldUpdateOperationsInput | string | null
+    batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    shade?: NullableStringFieldUpdateOperationsInput | string | null
+    composition?: NullableStringFieldUpdateOperationsInput | string | null
+    width?: NullableStringFieldUpdateOperationsInput | string | null
+    unitRate?: NullableFloatFieldUpdateOperationsInput | number | null
+    storageLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    purchaseOrderNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    importRowNumber?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricInwardUncheckedUpdateWithoutImportInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sNo?: IntFieldUpdateOperationsInput | number
+    entryType?: StringFieldUpdateOperationsInput | string
+    itemName?: StringFieldUpdateOperationsInput | string
+    billNo?: StringFieldUpdateOperationsInput | string
+    billDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    receivingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    billQty?: FloatFieldUpdateOperationsInput | number
+    unit?: StringFieldUpdateOperationsInput | string
+    colour?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: NullableStringFieldUpdateOperationsInput | string | null
+    billerStateCity?: NullableStringFieldUpdateOperationsInput | string | null
+    pricePerUnit?: NullableFloatFieldUpdateOperationsInput | number | null
+    boxThanQty?: NullableFloatFieldUpdateOperationsInput | number | null
+    hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
+    taxPercent?: NullableFloatFieldUpdateOperationsInput | number | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    rollKey?: NullableStringFieldUpdateOperationsInput | string | null
+    batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    shade?: NullableStringFieldUpdateOperationsInput | string | null
+    composition?: NullableStringFieldUpdateOperationsInput | string | null
+    width?: NullableStringFieldUpdateOperationsInput | string | null
+    unitRate?: NullableFloatFieldUpdateOperationsInput | number | null
+    storageLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    purchaseOrderNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    importRowNumber?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricInwardUncheckedUpdateManyWithoutImportInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    sNo?: IntFieldUpdateOperationsInput | number
+    entryType?: StringFieldUpdateOperationsInput | string
+    itemName?: StringFieldUpdateOperationsInput | string
+    billNo?: StringFieldUpdateOperationsInput | string
+    billDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    receivingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    billQty?: FloatFieldUpdateOperationsInput | number
+    unit?: StringFieldUpdateOperationsInput | string
+    colour?: NullableStringFieldUpdateOperationsInput | string | null
+    supplierName?: NullableStringFieldUpdateOperationsInput | string | null
+    billerStateCity?: NullableStringFieldUpdateOperationsInput | string | null
+    pricePerUnit?: NullableFloatFieldUpdateOperationsInput | number | null
+    boxThanQty?: NullableFloatFieldUpdateOperationsInput | number | null
+    hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
+    taxPercent?: NullableFloatFieldUpdateOperationsInput | number | null
+    remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    rollKey?: NullableStringFieldUpdateOperationsInput | string | null
+    batchNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    shade?: NullableStringFieldUpdateOperationsInput | string | null
+    composition?: NullableStringFieldUpdateOperationsInput | string | null
+    width?: NullableStringFieldUpdateOperationsInput | string | null
+    unitRate?: NullableFloatFieldUpdateOperationsInput | number | null
+    storageLocation?: NullableStringFieldUpdateOperationsInput | string | null
+    purchaseOrderNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    importRowNumber?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStockImportDocumentUpdateWithoutImportInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kind?: StringFieldUpdateOperationsInput | string
+    sheetName?: NullableStringFieldUpdateOperationsInput | string | null
+    mimeType?: StringFieldUpdateOperationsInput | string
+    size?: IntFieldUpdateOperationsInput | number
+    sha256?: StringFieldUpdateOperationsInput | string
+    data?: BytesFieldUpdateOperationsInput | Bytes
+    ocrStatus?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStockImportDocumentUncheckedUpdateWithoutImportInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kind?: StringFieldUpdateOperationsInput | string
+    sheetName?: NullableStringFieldUpdateOperationsInput | string | null
+    mimeType?: StringFieldUpdateOperationsInput | string
+    size?: IntFieldUpdateOperationsInput | number
+    sha256?: StringFieldUpdateOperationsInput | string
+    data?: BytesFieldUpdateOperationsInput | Bytes
+    ocrStatus?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FabricStockImportDocumentUncheckedUpdateManyWithoutImportInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    kind?: StringFieldUpdateOperationsInput | string
+    sheetName?: NullableStringFieldUpdateOperationsInput | string | null
+    mimeType?: StringFieldUpdateOperationsInput | string
+    size?: IntFieldUpdateOperationsInput | number
+    sha256?: StringFieldUpdateOperationsInput | string
+    data?: BytesFieldUpdateOperationsInput | Bytes
+    ocrStatus?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type DeadlineAlertDismissalCreateManyAlertInput = {

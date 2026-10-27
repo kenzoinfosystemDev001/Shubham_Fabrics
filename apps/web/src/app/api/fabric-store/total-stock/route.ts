@@ -4,6 +4,7 @@ import { requireDepartment } from '@/lib/auth/department-access';
 import { cleanFabricName, normalizeFabricStockType } from '@/lib/fabric-stock';
 import { isChallanMirror, loadStockBook } from '@/lib/fabric-stock-ledger';
 import { challanStockLines, roundQty, summarizeBuckets } from '@/lib/fabric-stock-rules.mjs';
+import { addTotals, totalsByUnit, unitOf } from '@/lib/challan-units.mjs';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,7 +25,7 @@ export async function GET(request: Request) {
         departmentCode: 'STORE',
         status: 'OPEN',
       },
-      select: { quantity: true, challanId: true },
+      select: { quantity: true, uom: true, challanId: true, challan: { select: { defectiveUnit: true, fabricUnit: true } } },
     });
     const defectiveReturnChallans = await prisma.challan.findMany({
       where: {
@@ -36,6 +37,7 @@ export async function GET(request: Request) {
         id: true,
         defectivePieces: true,
         fabricUnit: true,
+        defectiveUnit: true,
         items: {
           select: { quantity: true, uom: true },
         },
@@ -46,13 +48,17 @@ export async function GET(request: Request) {
     const defectiveStockByUnit: Record<string, number> = {};
     for (const record of defectiveRecords) {
       if (record.challanId && returnChallanIds.has(record.challanId)) continue;
-      defectiveStockByUnit.PCS = (defectiveStockByUnit.PCS || 0) + (Number(record.quantity) || 0);
+      // Older records have no unit; they took their challan's unit, or were counted as pieces.
+      const unit = unitOf(record.uom) || unitOf(record.challan?.defectiveUnit) || unitOf(record.challan?.fabricUnit) || 'PCS';
+      addTotals(defectiveStockByUnit, { [unit]: Number(record.quantity) || 0 });
     }
     for (const challan of defectiveReturnChallans) {
-      const quantity = Number(challan.defectivePieces) ||
-        challan.items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
-      const unit = (challan.fabricUnit || challan.items[0]?.uom || 'PCS').toUpperCase();
-      defectiveStockByUnit[unit] = (defectiveStockByUnit[unit] || 0) + quantity;
+      // The header defect is in defectiveUnit (older rows: fabricUnit); otherwise each line in its own unit.
+      const unit = unitOf(challan.defectiveUnit) || unitOf(challan.fabricUnit);
+      addTotals(
+        defectiveStockByUnit,
+        Number(challan.defectivePieces) > 0 ? { [unit || 'PCS']: Number(challan.defectivePieces) } : totalsByUnit(challan.items, challan.fabricUnit),
+      );
     }
     const defectiveTotal = defectiveStockByUnit.PCS || 0;
 

@@ -1,5 +1,6 @@
 import { prisma } from '@subham/database';
 import { isFabricStoreDepartment } from '@/lib/fabric-stock';
+import { unitOf } from '@/lib/challan-units.mjs';
 
 export interface FabricAvailabilityStatus {
   programId: string;
@@ -130,16 +131,20 @@ export async function checkFabricStoreAvailability(
     select: {
       id: true,
       length: true,
-      unit: true,
       rollNumber: true,
+      batch: { select: { unit: true } },
     },
   });
 
-  // Each roll is counted in its own unit; meters and pieces are never added together.
-  const rollStockOf = (unit: 'MTR' | 'PCS') =>
-    matchingRolls.filter((r) => (r.unit || 'MTR') === unit).reduce((sum, r) => sum + (Number(r.length) || 0), 0);
-  const rollStockMeters = rollStockOf('MTR');
-  const rollStockPcs = rollStockOf('PCS');
+  // A roll is in its batch's unit: pieces rolls never count as meters (and the other way round).
+  const rollStockMeters = matchingRolls.reduce(
+    (sum, r) => sum + ((unitOf(r.batch?.unit) || 'MTR') === 'MTR' ? Number(r.length) || 0 : 0),
+    0
+  );
+  const rollStockPcs = matchingRolls.reduce(
+    (sum, r) => sum + (unitOf(r.batch?.unit) === 'PCS' ? Number(r.length) || 0 : 0),
+    0
+  );
 
   // 2. Check FabricInward stock entries
   let inwardStockMeters = 0;
@@ -159,8 +164,8 @@ export async function checkFabricStoreAvailability(
         : undefined,
     });
 
-    const meterInwardEntries = inwardEntries.filter((it: any) => (it.unit || 'MTR').toUpperCase() === 'MTR');
-    const pieceInwardEntries = inwardEntries.filter((it: any) => (it.unit || 'MTR').toUpperCase() === 'PCS');
+    const meterInwardEntries = inwardEntries.filter((it: any) => (unitOf(it.unit) || 'MTR') === 'MTR');
+    const pieceInwardEntries = inwardEntries.filter((it: any) => unitOf(it.unit) === 'PCS');
     inwardEntriesCount = inwardEntries.length;
     matchingInwardEntryCount = requiredUnit === 'PCS' ? pieceInwardEntries.length : meterInwardEntries.length;
     const totalInwardMeters = meterInwardEntries.reduce(
@@ -179,13 +184,13 @@ export async function checkFabricStoreAvailability(
       },
     });
     const totalManualOutwardMeters = outwardEntries
-      .filter((it: any) => (it.unit || 'MTR').toUpperCase() === 'MTR')
+      .filter((it: any) => (unitOf(it.unit) || 'MTR') === 'MTR')
       .reduce(
       (sum: number, it: any) => sum + (Number(it.issueQty) || 0),
       0
     );
     const totalManualOutwardPcs = outwardEntries
-      .filter((it: any) => (it.unit || 'MTR').toUpperCase() === 'PCS')
+      .filter((it: any) => unitOf(it.unit) === 'PCS')
       .reduce(
         (sum: number, it: any) => sum + (Number(it.issueQty) || 0),
         0
@@ -207,13 +212,13 @@ export async function checkFabricStoreAvailability(
     const challanOutwardByUnit = issuedChallans.reduce((totals, challan) => {
       if (challan.items.length > 0) {
         for (const item of challan.items) {
-          const unit = String(item.uom || challan.fabricUnit || 'MTR').toUpperCase();
+          const unit = unitOf(item.uom) || unitOf(challan.fabricUnit) || 'MTR';
           if (unit === 'PCS') totals.pcs += Number(item.quantity) || 0;
           else if (unit === 'MTR') totals.meters += Number(item.quantity) || 0;
         }
         return totals;
       }
-      const unit = String(challan.fabricUnit || 'MTR').toUpperCase();
+      const unit = unitOf(challan.fabricUnit);
       const quantity = Number(challan.fabricOut ?? challan.fabricIn) || 0;
       if (unit === 'PCS') totals.pcs += quantity;
       else if (unit === 'MTR') totals.meters += quantity;
@@ -273,7 +278,7 @@ export async function checkFabricStoreAvailability(
     message = `Fabric availability verified by Fabric Store Incharge. Production sheet is cleared to move to ${destDept}.`;
   } else if (
     fabricColorAvailable === 'IN_STOCK' &&
-    (matchingRolls.some((r) => (r.unit || 'MTR') === requiredUnit) || matchingInwardEntryCount > 0)
+    ((requiredUnit === 'MTR' && matchingRolls.length > 0) || matchingInwardEntryCount > 0)
   ) {
     isAvailable = true;
     statusLabel = 'AVAILABLE';

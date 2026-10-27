@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
-import { loadStockBook } from '@/lib/fabric-stock-ledger';
-import { addToUnitTotals, normalizeStockUnit, unitTotals, type UnitTotals } from '@/lib/fabric-stock';
-import { roundQty } from '@/lib/fabric-stock-rules.mjs';
+import { MIXED_UNIT, addTotals, challanTotalsByUnit, unitOf } from '@/lib/challan-units.mjs';
+
+type Totals = Record<string, number>;
+const round2 = (n: number) => Math.round((Number(n) || 0) * 100) / 100;
 
 export const dynamic = 'force-dynamic';
 
@@ -137,148 +138,184 @@ export async function GET(request: Request) {
       take: 400,
     });
 
-    // 2. Fabric Store stock: the same per-unit balances as Total Stock (inward entries less Fabric Store
-    //    challans and manual outward), plus QC-passed rolls in stock, each in its own unit.
-    const [{ book }, storeRolls] = await Promise.all([
-      loadStockBook(prisma),
-      prisma.fabricStoreRoll.findMany({
-        where: { status: 'IN_STOCK', qcStatus: 'PASSED' },
-        select: { length: true, unit: true },
-      }),
-    ]);
-
-    // 3. Per-department balances. Every quantity is kept per unit (MTR / PCS); never added together.
-    type Totals = UnitTotals;
-    interface DeptStat {
-      totalReceived: Totals;
-      pendingInTransit: Totals;
-      pendingBatches: number;
-      totalDispatched: Totals;
-      totalDefective: Totals;
-      activeWip: number;
-      currentStockOnHand: Totals;
-      unit: 'MTR' | 'PCS';
-      activeBatches: number;
-      inventoryItems: any[];
-    }
-    const newStat = (code: string): DeptStat => ({
-      totalReceived: unitTotals(),
-      pendingInTransit: unitTotals(),
-      pendingBatches: 0,
-      totalDispatched: unitTotals(),
-      totalDefective: unitTotals(),
-      activeWip: 0,
-      currentStockOnHand: unitTotals(),
-      unit: DEPT_CONFIG[code].defaultUnit,
-      activeBatches: 0,
-      inventoryItems: [],
+    // 2. Fetch Fabric Store Raw Rolls Stock (for Store specific balance)
+    const storeRolls = await prisma.fabricStoreRoll.findMany({
+      where: {
+        status: 'IN_STOCK',
+        qcStatus: 'PASSED',
+      },
+      include: {
+        batch: {
+          select: {
+            batchNumber: true,
+            fabricType: true,
+            fabricDescription: true,
+            colorName: true,
+            unit: true,
+          },
+        },
+      },
     });
-    const deptStats: Record<string, DeptStat> = Object.fromEntries(Object.keys(DEPT_CONFIG).map((code) => [code, newStat(code)]));
 
-    const store = deptStats.STORE;
-    for (const bucket of book.buckets.values()) {
-      addToUnitTotals(store.totalReceived, bucket.unit, bucket.totalInward);
-      addToUnitTotals(store.totalDispatched, bucket.unit, bucket.totalOutward);
-      addToUnitTotals(store.currentStockOnHand, bucket.unit, Math.max(0, bucket.totalInward - bucket.totalOutward));
-    }
-    for (const roll of storeRolls) {
-      addToUnitTotals(store.totalReceived, roll.unit, Number(roll.length) || 0);
-      addToUnitTotals(store.currentStockOnHand, roll.unit, Number(roll.length) || 0);
-    }
-    store.activeWip = storeRolls.length;
+    // Rolls in stock per unit: a roll is in its batch's unit (MTR or PCS); the two are never added.
+    const storeRollsByUnit: Totals = {};
+    for (const r of storeRolls) addTotals(storeRollsByUnit, { [unitOf(r.batch?.unit) || 'MTR']: Number(r.length) || 0 });
 
-    const RECEIVED_STATUSES = [
-      'RECEIVED',
-      'UNDER_INSPECTION',
-      'IN_PROCESS',
-      'IN_PROGRESS',
-      'IN_DYEING',
-      'PARTIALLY_DYED',
-      'DYED',
-      'READY_FOR_QC1',
-      'QC_APPROVED',
-      'COMPLETED',
-    ];
+    // 3. Compute Per-Department Stock Balances. Every quantity is kept per unit (MTR / PCS); the
+    // single-number fields are the department's main unit only (`unit`), kept for older readers.
+    const emptyStat = (unit: 'MTR' | 'PCS', received: Totals = {}, activeWip = 0) => ({
+      totalReceived: 0,
+      pendingInTransit: 0,
+      pendingBatches: 0,
+      totalDispatched: 0,
+      totalDefective: 0,
+      activeWip,
+      currentStockOnHand: 0,
+      unit,
+      activeBatches: 0,
+      inventoryItems: [] as any[],
+      byUnit: {
+        totalReceived: { ...received } as Totals,
+        pendingInTransit: {} as Totals,
+        totalDispatched: {} as Totals,
+        totalDefective: {} as Totals,
+        currentStockOnHand: {} as Totals,
+      },
+    });
+    const deptStats: Record<string, ReturnType<typeof emptyStat>> = Object.fromEntries(
+      Object.entries(DEPT_CONFIG).map(([key, cfg]) => [
+        key,
+        key === 'STORE' ? emptyStat(cfg.defaultUnit, storeRollsByUnit, storeRolls.length) : emptyStat(cfg.defaultUnit),
+      ])
+    );
 
-    // Challan transactions: each challan's lines are counted in their own unit.
+    const minus = (a: Totals, b: Totals): Totals =>
+      Object.fromEntries(Object.entries(a).map(([u, q]) => [u, round2(Math.max(0, q - (b[u] || 0)))]));
+
+    // Calculate Inflows and Outflows based on Challan transactions
     for (const ch of inboundChallans) {
       const fromD = normalizeDept(ch.fromDepartment);
       const toD = normalizeDept(ch.toDepartment);
-      const challanUnit = normalizeStockUnit(ch.fabricUnit) || DEPT_CONFIG[toD]?.defaultUnit || 'MTR';
 
-      const inByUnit = unitTotals();
-      if (ch.items.length > 0) {
-        for (const it of ch.items) addToUnitTotals(inByUnit, normalizeStockUnit(it.uom) || challanUnit, Number(it.quantity) || 0);
-      } else {
-        addToUnitTotals(inByUnit, challanUnit, Number(ch.fabricIn) || Number(ch.program?.targetQuantity) || 0);
-      }
-      // Defective quantity is recorded in the challan's unit; the rest of a unit goes on.
-      const defByUnit = addToUnitTotals(unitTotals(), challanUnit, Number(ch.defectivePieces) || 0);
-      const units = Object.keys(inByUnit).filter((u) => inByUnit[u] > 0 || defByUnit[u] > 0);
-      const outByUnit = unitTotals();
-      for (const u of units) {
-        const out = units.length === 1 && Number(ch.fabricOut) > 0 ? Number(ch.fabricOut) : Math.max(0, (inByUnit[u] || 0) - (defByUnit[u] || 0));
-        addToUnitTotals(outByUnit, u, out);
-      }
+      // A challan's header quantities hold one unit; a MIXED challan (lines in both units) has none,
+      // so its quantities come from its lines, each in its own unit.
+      const headerUnit = unitOf(ch.fabricUnit);
+      const itemTotals = challanTotalsByUnit({ items: ch.items, fabricUnit: ch.fabricUnit });
+      const programUnit = unitOf(ch.program?.quantityMeasurement) || 'PCS';
+      const inTotals: Totals =
+        headerUnit && Number(ch.fabricIn) > 0
+          ? { [headerUnit]: Number(ch.fabricIn) }
+          : Object.keys(itemTotals).length > 0
+          ? itemTotals
+          : Number(ch.program?.targetQuantity) > 0
+          ? { [programUnit]: Number(ch.program?.targetQuantity) }
+          : {};
+      const defectUnit = unitOf(ch.defectiveUnit) || headerUnit;
+      const defTotals: Totals = Number(ch.defectivePieces) > 0 && defectUnit ? { [defectUnit]: Number(ch.defectivePieces) } : {};
+      const outTotals: Totals =
+        headerUnit && Number(ch.fabricOut) > 0
+          ? { [headerUnit]: Number(ch.fabricOut) }
+          : ch.fabricUnit === MIXED_UNIT
+          ? itemTotals
+          : minus(inTotals, defTotals);
 
-      const isReceived = RECEIVED_STATUSES.includes(ch.status);
+      // Determine whether destination department has officially RECEIVED the material
+      const isReceived = [
+        'RECEIVED',
+        'UNDER_INSPECTION',
+        'IN_PROCESS',
+        'IN_PROGRESS',
+        'IN_DYEING',
+        'PARTIALLY_DYED',
+        'DYED',
+        'READY_FOR_QC1',
+        'QC_APPROVED',
+        'COMPLETED',
+      ].includes(ch.status);
 
-      // Inflow to the destination department
-      const dest = deptStats[toD];
-      if (dest) {
-        for (const u of units) addToUnitTotals(isReceived ? dest.totalReceived : dest.pendingInTransit, u, inByUnit[u] || 0);
-        if (isReceived) dest.activeBatches += 1;
-        else dest.pendingBatches += 1;
-
-        // One stock row per challan and unit
-        for (const u of units) {
-          dest.inventoryItems.push({
-            id: ch.id,
-            challanNumber: ch.challanNumber,
-            programId: ch.programId,
-            programSerialNo: ch.program?.programSerialNo || ch.program?.programNumber || 'N/A',
-            clientName: ch.program?.clientName || ch.program?.buyerName || 'Standard Client',
-            style: ch.program?.mainStyle || ch.program?.wilcomDesignNumber || 'Main Style',
-            fabricDescription: ch.program?.fabricName || ch.items[0]?.itemDescription || 'Fabric Lot',
-            color: ch.program?.fabricColor || ch.items[0]?.colour || 'Standard',
-            quantityIn: inByUnit[u] || 0,
-            quantityOut: outByUnit[u] || 0,
-            defectiveQuantity: defByUnit[u] || 0,
-            balanceOnHand: isReceived ? Math.max(0, (inByUnit[u] || 0) - (defByUnit[u] || 0)) : 0,
-            uom: u,
-            fromDepartment: fromD,
-            toDepartment: toD,
-            status: isReceived ? ch.status : 'IN_TRANSIT',
-            originalStatus: ch.status,
-            isReceived,
-            receivedDate: ch.receivedDate,
-            date: ch.issuedDate || ch.createdAt,
-            remarks: ch.remarks,
-          });
+      // Inflow to destination department
+      if (deptStats[toD]) {
+        if (isReceived) {
+          addTotals(deptStats[toD].byUnit.totalReceived, inTotals);
+          deptStats[toD].activeBatches += 1;
+        } else {
+          // Status is ISSUED / IN_TRANSIT / SUBMITTED -> awaiting receive
+          addTotals(deptStats[toD].byUnit.pendingInTransit, inTotals);
+          deptStats[toD].pendingBatches += 1;
         }
+
+        const rowUnits = Array.from(new Set([...Object.keys(inTotals), ...Object.keys(defTotals), ...Object.keys(outTotals)]));
+        const rowUnit = rowUnits.length === 1 ? rowUnits[0] : rowUnits.length > 1 ? MIXED_UNIT : headerUnit || DEPT_CONFIG[toD]?.defaultUnit || 'MTR';
+        const single = (t: Totals) => (rowUnit === MIXED_UNIT ? null : t[rowUnit] || 0);
+        const balanceTotals = isReceived ? minus(inTotals, defTotals) : {};
+
+        // Add to inventory items list. Quantities are per unit (`...ByUnit`); the single numbers are
+        // set only when the lot is in one unit.
+        deptStats[toD].inventoryItems.push({
+          id: ch.id,
+          challanNumber: ch.challanNumber,
+          programId: ch.programId,
+          programSerialNo: ch.program?.programSerialNo || ch.program?.programNumber || 'N/A',
+          clientName: ch.program?.clientName || ch.program?.buyerName || 'Standard Client',
+          style: ch.program?.mainStyle || ch.program?.wilcomDesignNumber || 'Main Style',
+          fabricDescription: ch.program?.fabricName || ch.items[0]?.itemDescription || 'Fabric Lot',
+          color: ch.program?.fabricColor || ch.items[0]?.colour || 'Standard',
+          quantityIn: single(inTotals),
+          quantityOut: single(outTotals),
+          defectiveQuantity: single(defTotals),
+          balanceOnHand: single(balanceTotals),
+          quantityInByUnit: inTotals,
+          quantityOutByUnit: outTotals,
+          defectiveByUnit: defTotals,
+          balanceByUnit: balanceTotals,
+          uom: rowUnit,
+          fromDepartment: fromD,
+          toDepartment: toD,
+          status: isReceived ? ch.status : 'IN_TRANSIT',
+          originalStatus: ch.status,
+          isReceived,
+          receivedDate: ch.receivedDate,
+          date: ch.issuedDate || ch.createdAt,
+          remarks: ch.remarks,
+        });
       }
 
-      // Outflow from the source department (the Fabric Store's own issues are already in its stock book)
-      const source = deptStats[fromD];
-      if (source && fromD !== 'STORE') {
-        for (const u of units) {
-          addToUnitTotals(source.totalDispatched, u, outByUnit[u] || 0);
-          addToUnitTotals(source.totalDefective, u, defByUnit[u] || 0);
-        }
+      // Outflow from source department:
+      // Once issued/dispatched downstream, source department stock is reduced
+      if (deptStats[fromD]) {
+        addTotals(deptStats[fromD].byUnit.totalDispatched, outTotals);
+        addTotals(deptStats[fromD].byUnit.totalDefective, defTotals);
       }
     }
 
-    // Net on hand per unit for each department (the Fabric Store's was set from its stock book)
+    // Compute Net On Hand for each department, per unit
     for (const [key, stat] of Object.entries(deptStats)) {
-      if (key !== 'STORE') {
-        for (const u of new Set([...Object.keys(stat.totalReceived), ...Object.keys(stat.totalDispatched), ...Object.keys(stat.totalDefective)])) {
-          stat.currentStockOnHand[u] = Math.max(0, roundQty((stat.totalReceived[u] || 0) - (stat.totalDispatched[u] || 0) - (stat.totalDefective[u] || 0)));
-        }
-        stat.activeWip = stat.inventoryItems.filter((i) => i.isReceived && i.status !== 'COMPLETED').length;
+      const b = stat.byUnit;
+      if (key === 'STORE') {
+        // Store has warehouse rolls minus issues, unit by unit (PCS issues never reduce meter rolls)
+        b.currentStockOnHand = minus(storeRollsByUnit, b.totalDispatched);
+      } else {
+        const units = new Set([...Object.keys(b.totalReceived), ...Object.keys(b.totalDispatched), ...Object.keys(b.totalDefective)]);
+        b.currentStockOnHand = Object.fromEntries(
+          Array.from(units).map((u) => [u, round2(Math.max(0, (b.totalReceived[u] || 0) - (b.totalDispatched[u] || 0) - (b.totalDefective[u] || 0)))])
+        );
       }
+      stat.totalReceived = round2(b.totalReceived[stat.unit] || 0);
+      stat.pendingInTransit = round2(b.pendingInTransit[stat.unit] || 0);
+      stat.totalDispatched = round2(b.totalDispatched[stat.unit] || 0);
+      stat.totalDefective = round2(b.totalDefective[stat.unit] || 0);
+      stat.currentStockOnHand = round2(b.currentStockOnHand[stat.unit] || 0);
+      stat.activeWip = Math.max(
+        0,
+        stat.inventoryItems.filter((i) => i.isReceived && i.status !== 'COMPLETED').length
+      );
     }
 
-    const selectedStats = filterDept !== 'ALL' && deptStats[filterDept] ? deptStats[filterDept] : deptStats.DYEING;
+    // Prepare response data
+    const selectedStats =
+      filterDept !== 'ALL' && deptStats[filterDept]
+        ? deptStats[filterDept]
+        : deptStats.DYEING;
 
     return NextResponse.json({
       success: true,
@@ -286,6 +323,7 @@ export async function GET(request: Request) {
         department: filterDept,
         departmentConfig: DEPT_CONFIG[filterDept] || DEPT_CONFIG.DYEING,
         summary: {
+          // Single numbers are in `unit` only; byUnit holds every unit separately.
           totalReceived: selectedStats.totalReceived,
           pendingInTransit: selectedStats.pendingInTransit,
           pendingBatches: selectedStats.pendingBatches,
@@ -295,6 +333,7 @@ export async function GET(request: Request) {
           activeWip: selectedStats.activeWip,
           activeBatches: selectedStats.activeBatches,
           unit: selectedStats.unit,
+          byUnit: selectedStats.byUnit,
           shelfCode: DEPT_CONFIG[filterDept]?.shelfCode || 'DEF-SHELF-CENTRAL',
           shelfName: DEPT_CONFIG[filterDept]?.shelfName || 'Department Defective Shelf',
         },

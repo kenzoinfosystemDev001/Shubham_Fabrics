@@ -28,7 +28,7 @@ export async function GET(request: Request) {
       prisma.fabricStoreRoll.findMany({
         where,
         include: {
-          batch: { select: { batchNumber: true, fabricType: true, fabricDescription: true, colorName: true } },
+          batch: { select: { batchNumber: true, fabricType: true, fabricDescription: true, colorName: true, unit: true } },
           location: { select: { locationCode: true, locationName: true } },
           qcInspectedBy: { select: { fullName: true } },
           programIssuedTo: { select: { programNumber: true, clientName: true } },

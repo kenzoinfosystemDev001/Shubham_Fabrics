@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
+import { totalsByUnit } from '@/lib/challan-units.mjs';
 
 export const dynamic = 'force-dynamic';
 
@@ -81,7 +82,7 @@ export async function POST(
           metadata: JSON.stringify({
             receivedAt: new Date(),
             itemsCount: ch.items.length,
-            totalQuantity: ch.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0),
+            quantitiesByUnit: totalsByUnit(ch.items, ch.fabricUnit),
           }),
         },
       });

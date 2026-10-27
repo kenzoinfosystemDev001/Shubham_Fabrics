@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
-import { addToUnitTotals, lineTotals, unitTotals } from '@/lib/fabric-stock';
+import { addTotals, formatTotals, totalsByUnit, unitOf } from '@/lib/challan-units.mjs';
 
 export const dynamic = 'force-dynamic';
 
@@ -110,23 +110,27 @@ export async function GET(request: Request) {
     const hold = qc1Challans.filter((c) => c.status === 'ON_HOLD').length;
     const completed = passed + failed + rework;
 
-    // Quantities per unit ({ MTR, PCS }); meters and pieces are never added together.
-    const totalQuantityReceived = unitTotals();
-    for (const ch of qc1Challans) {
-      for (const it of ch.items) addToUnitTotals(totalQuantityReceived, it.uom || ch.fabricUnit || 'MTR', it.quantity);
-    }
-    const byUnit = (field: 'inputQuantity' | 'goodQuantity' | 'rejectQuantity' | 'reworkQuantity' | 'balanceQuantity') =>
-      qc1Transactions.reduce((totals, tx) => addToUnitTotals(totals, tx.unitOfMeasure || 'MTR', Number(tx[field]) || 0), unitTotals());
-    const totalQuantityInspected = byUnit('inputQuantity');
-    const passedQuantity = byUnit('goodQuantity');
-    const failedQuantity = byUnit('rejectQuantity');
-    const reworkQuantity = byUnit('reworkQuantity');
-    const holdQuantity = byUnit('balanceQuantity');
-    // One challan's total: a plain number in its unit, or "30 MTR · 10 PCS" when it carries both.
-    const challanQuantity = (c: (typeof qc1Challans)[number]) => {
-      const t = lineTotals(c.items, c.fabricUnit || 'MTR');
-      return t.single ? { quantity: t.single.quantity, uom: t.single.unit } : { quantity: t.label, uom: '' };
+    // Quantities are kept per unit (MTR / PCS), never added across units.
+    const receivedByUnit = qc1Challans.reduce<Record<string, number>>((acc, ch) => addTotals(acc, totalsByUnit(ch.items, ch.fabricUnit)), {});
+    const totalsOf = (field: 'inputQuantity' | 'goodQuantity' | 'rejectQuantity' | 'reworkQuantity' | 'balanceQuantity') =>
+      totalsByUnit(qc1Transactions.map((tx) => ({ quantity: tx[field], uom: tx.unitOfMeasure })));
+    // The plain numbers are the meter figures (QC1 receives dyed fabric, normally in meters); the
+    // *Text fields show every unit, e.g. "1,200 MTR · 40 PCS".
+    const quantityKpis = {
+      totalQuantityReceived: receivedByUnit,
+      totalQuantityInspected: totalsOf('inputQuantity'),
+      passedQuantity: totalsOf('goodQuantity'),
+      failedQuantity: totalsOf('rejectQuantity'),
+      reworkQuantity: totalsOf('reworkQuantity'),
+      holdQuantity: totalsOf('balanceQuantity'),
     };
+    const totalQuantityReceived = quantityKpis.totalQuantityReceived.MTR || 0;
+    const totalQuantityInspected = quantityKpis.totalQuantityInspected.MTR || 0;
+    const passedQuantity = quantityKpis.passedQuantity.MTR || 0;
+    const failedQuantity = quantityKpis.failedQuantity.MTR || 0;
+    const reworkQuantity = quantityKpis.reworkQuantity.MTR || 0;
+    const holdQuantity = quantityKpis.holdQuantity.MTR || 0;
+    const quantityText = Object.fromEntries(Object.entries(quantityKpis).map(([k, v]) => [`${k}Text`, formatTotals(v)]));
 
     // 4. Priority Work Items (Urgent / High priority awaiting or under inspection)
     const priorityWork = qc1Challans
@@ -138,7 +142,9 @@ export async function GET(request: Request) {
         productionSheetNumber: c.program?.programSerialNo || c.program?.programNumber || '—',
         fabric: c.items[0]?.itemDescription || c.program?.fabricName || '—',
         color: c.items[0]?.colour || c.program?.fabricColor || '—',
-        ...challanQuantity(c),
+        quantity: totalsByUnit(c.items, c.fabricUnit)[unitOf(c.items[0]?.uom) || 'MTR'] || 0,
+        quantityText: formatTotals(totalsByUnit(c.items, c.fabricUnit)),
+        uom: c.items[0]?.uom || 'MTR',
         priority: c.priority,
         status: c.status,
         issuedDate: c.issuedDate,
@@ -155,7 +161,9 @@ export async function GET(request: Request) {
         productionSheetNumber: c.program?.programSerialNo || c.program?.programNumber || '—',
         clientName: c.program?.clientName || c.program?.buyerName || 'Standard Client',
         deliveryDate: c.program.deliveryDate,
-        ...challanQuantity(c),
+        quantity: totalsByUnit(c.items, c.fabricUnit)[unitOf(c.items[0]?.uom) || 'MTR'] || 0,
+        quantityText: formatTotals(totalsByUnit(c.items, c.fabricUnit)),
+        uom: c.items[0]?.uom || 'MTR',
         status: c.status,
       }));
 
@@ -193,6 +201,7 @@ export async function GET(request: Request) {
           failedQuantity,
           reworkQuantity,
           holdQuantity,
+          ...quantityText,
         },
         priorityWork,
         upcomingDelivery,

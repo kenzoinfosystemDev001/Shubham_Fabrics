@@ -9,7 +9,7 @@ import {
   LogOut,
   UserCircle,
   Menu,
-  X
+  X,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { isAdminUser } from '@/lib/rbac';

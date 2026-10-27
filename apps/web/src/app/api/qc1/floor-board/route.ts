@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
+import { formatTotals, totalsByUnit, unitOf } from '@/lib/challan-units.mjs';
 
 export const dynamic = 'force-dynamic';
 
@@ -71,7 +72,9 @@ export async function GET(request: Request) {
 
     const items = challans.map((c) => {
       const primaryItem = c.items[0];
-      const totalQty = c.items.reduce((sum, it) => sum + (Number(it.quantity) || 0), 0);
+      // Per unit: meters and pieces are never added together.
+      const qtyByUnit = totalsByUnit(c.items, c.fabricUnit);
+      const totalQty = qtyByUnit[unitOf(primaryItem?.uom) || 'MTR'] || 0;
       const latestInspection = c.inspections[0];
       const latestProdLog = c.productionLogs[0];
 
@@ -87,6 +90,7 @@ export async function GET(request: Request) {
         fabricType: primaryItem?.fabricCode || c.program?.fabricType || null,
         color: primaryItem?.colour || c.program?.fabricColor || 'Standard',
         quantity: totalQty,
+        quantityText: formatTotals(qtyByUnit),
         quantityInspected: latestProdLog ? latestProdLog.inputQuantity : (latestInspection?.sampleSize || 0),
         quantityPassed: latestProdLog ? latestProdLog.goodQuantity : 0,
         quantityFailed: latestProdLog ? latestProdLog.rejectQuantity : 0,

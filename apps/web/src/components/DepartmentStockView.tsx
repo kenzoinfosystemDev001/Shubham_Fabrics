@@ -20,10 +20,7 @@ import {
   Truck,
   Check,
 } from 'lucide-react';
-import { formatUnitTotals } from '@/lib/fabric-stock';
-
-/** Any quantity in any unit. */
-const hasQuantity = (totals: Record<string, number> | null | undefined) => Object.values(totals || {}).some((q) => Number(q) > 0);
+import { formatTotals } from '@/lib/challan-units.mjs';
 
 interface DepartmentStockViewProps {
   department: 'STORE' | 'DYEING' | 'QC1' | 'EMBROIDERY' | 'THREAD_CUTTING' | 'QC2' | 'WASHING' | 'QC3' | 'PROGRAMMING';
@@ -89,14 +86,13 @@ export function DepartmentStockView({
     }
   };
 
-  // Quantities are per unit ({ MTR, PCS }); meters and pieces are never added together.
-  const summary = data?.summary || {
-    totalReceived: {},
-    pendingInTransit: {},
+  const summary: any = data?.summary || {
+    totalReceived: 0,
+    pendingInTransit: 0,
     pendingBatches: 0,
-    totalDispatched: {},
-    totalDefective: {},
-    currentStockOnHand: {},
+    totalDispatched: 0,
+    totalDefective: 0,
+    currentStockOnHand: 0,
     activeWip: 0,
     activeBatches: 0,
     unit: 'MTR',
@@ -105,6 +101,12 @@ export function DepartmentStockView({
   };
 
   const inventory: any[] = data?.inventory || [];
+
+  // Each unit is shown on its own ("120 MTR · 40 PCS"); meters and pieces are never added together.
+  const byUnitOf = (key: string): Record<string, number> =>
+    summary.byUnit?.[key] || (Number(summary[key]) > 0 ? { [summary.unit]: Number(summary[key]) } : {});
+  const qty = (key: string) => formatTotals(byUnitOf(key), `0 ${summary.unit}`);
+  const hasQty = (key: string) => Object.values(byUnitOf(key)).some((q) => q > 0);
 
   const filteredInventory = inventory.filter((item) => {
     if (statusFilter === 'IN_TRANSIT') {
@@ -173,7 +175,7 @@ export function DepartmentStockView({
       </div>
 
       {/* IN-TRANSIT NOTIFICATION BANNER IF MATERIAL IS WAITING FOR RECEIPT */}
-      {hasQuantity(summary.pendingInTransit) && (
+      {hasQty("pendingInTransit") && (
         <div className="p-4 bg-accent-50 border border-accent-300 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-accent-800 shadow-xs">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-accent-100 border border-accent-200 flex items-center justify-center shrink-0">
@@ -181,7 +183,7 @@ export function DepartmentStockView({
             </div>
             <div>
               <div className="font-bold text-xs">
-                {formatUnitTotals(summary.pendingInTransit)} Incoming In-Transit ({summary.pendingBatches} Challan{summary.pendingBatches === 1 ? '' : 's'})
+                {qty("pendingInTransit")} Incoming In-Transit ({summary.pendingBatches} Challan{summary.pendingBatches === 1 ? '' : 's'})
               </div>
               <p className="text-[11px] text-accent-800 mt-0.5">
                 Material has moved to this department. Click <strong>Receive Material</strong> on the lot below to officially update on-hand stock.
@@ -207,23 +209,23 @@ export function DepartmentStockView({
             <CheckCircle2 className="w-4 h-4 text-brand-600" />
           </div>
           <div className="text-2xl font-bold font-mono text-brand-900">
-            {formatUnitTotals(summary.totalReceived)}
+            <span>{qty("totalReceived")}</span>
           </div>
           <p className="text-[10px] text-brand-600">Accepted onto floor</p>
         </div>
 
         {/* 2. In-Transit / Pending Inward */}
         <div className={`p-4 rounded-xl space-y-1 border transition ${
-          hasQuantity(summary.pendingInTransit)
+          hasQty("pendingInTransit")
             ? 'bg-accent-50 border-accent-300 shadow-xs'
             : 'bg-neutral-50 border-neutral-200'
         }`}>
           <div className="flex items-center justify-between text-accent-800">
             <span className="text-[10px] font-bold uppercase tracking-wider">In-Transit</span>
-            <Truck className={`w-4 h-4 ${hasQuantity(summary.pendingInTransit) ? 'text-accent-700 animate-pulse' : 'text-neutral-500'}`} />
+            <Truck className={`w-4 h-4 ${hasQty("pendingInTransit") ? 'text-accent-700 animate-pulse' : 'text-neutral-500'}`} />
           </div>
           <div className="text-2xl font-bold font-mono text-neutral-900">
-            {formatUnitTotals(summary.pendingInTransit)}
+            <span>{qty("pendingInTransit")}</span>
           </div>
           <p className="text-[10px] text-accent-800">
             {summary.pendingBatches} Challan{summary.pendingBatches === 1 ? '' : 's'} awaiting receive
@@ -249,7 +251,7 @@ export function DepartmentStockView({
             <ArrowUpRight className="w-4 h-4 text-accent-700" />
           </div>
           <div className="text-2xl font-bold font-mono text-neutral-900">
-            {formatUnitTotals(summary.totalDispatched)}
+            <span>{qty("totalDispatched")}</span>
           </div>
           <p className="text-[10px] text-accent-700">Moved downstream</p>
         </div>
@@ -261,7 +263,7 @@ export function DepartmentStockView({
             <AlertTriangle className="w-4 h-4 text-danger-600" />
           </div>
           <div className="text-2xl font-bold font-mono text-danger-900">
-            {formatUnitTotals(summary.totalDefective)}
+            <span>{qty("totalDefective")}</span>
           </div>
           <p className="text-[10px] text-danger-700 font-mono truncate" title={summary.shelfCode}>
             On {summary.shelfCode}
@@ -275,7 +277,7 @@ export function DepartmentStockView({
             <Package className="w-4 h-4 text-accent-700" />
           </div>
           <div className="text-2xl font-bold font-mono text-neutral-900">
-            {formatUnitTotals(summary.currentStockOnHand)}
+            <span>{qty("currentStockOnHand")}</span>
           </div>
           <p className="text-[10px] text-neutral-500">Physical floor stock</p>
         </div>
@@ -338,7 +340,7 @@ export function DepartmentStockView({
             <tbody className="divide-y divide-neutral-100">
               {filteredInventory.map((item, idx) => (
                 <tr
-                  key={`${item.id || idx}-${item.uom}`}
+                  key={item.id || idx}
                   className={`transition ${!item.isReceived ? 'bg-accent-50/40 hover:bg-accent-50/70' : 'hover:bg-neutral-50/80'}`}
                 >
                   <td className="py-3 px-3 font-mono">
@@ -362,25 +364,25 @@ export function DepartmentStockView({
                     <span className="text-[10px] text-neutral-500">{item.color}</span>
                   </td>
                   <td className="py-3 px-3 text-right font-mono font-bold text-brand-700">
-                    {item.quantityIn} {item.uom}
+                    {formatTotals(item.quantityInByUnit, "0")}
                   </td>
                   <td className="py-3 px-3 text-right font-mono text-danger-700">
-                    {item.defectiveQuantity > 0 ? (
-                      <span className="font-bold">-{item.defectiveQuantity} {item.uom}</span>
+                    {Object.keys(item.defectiveByUnit || {}).length > 0 ? (
+                      <span className="font-bold">-{formatTotals(item.defectiveByUnit)}</span>
                     ) : (
                       <span className="text-neutral-500">0</span>
                     )}
                   </td>
                   <td className="py-3 px-3 text-right font-mono text-accent-800">
-                    {item.quantityOut > 0 ? (
-                      <span>{item.quantityOut} {item.uom}</span>
+                    {Object.keys(item.quantityOutByUnit || {}).length > 0 ? (
+                      <span>{formatTotals(item.quantityOutByUnit)}</span>
                     ) : (
                       <span className="text-neutral-500">0</span>
                     )}
                   </td>
                   <td className="py-3 px-3 text-right font-mono font-bold text-neutral-900 bg-neutral-50/60">
                     {item.isReceived ? (
-                      <span className="text-neutral-900">{item.balanceOnHand} {item.uom}</span>
+                      <span className="text-neutral-900">{formatTotals(item.balanceByUnit, `0 ${item.uom === "MIXED" ? "" : item.uom}`.trim())}</span>
                     ) : (
                       <span className="text-accent-800 font-semibold text-[11px]">0 (In-Transit)</span>
                     )}

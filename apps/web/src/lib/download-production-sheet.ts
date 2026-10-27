@@ -379,8 +379,10 @@ export function extractSubStylesAndGrid(program: any, category: GarmentCategory 
 
     if (programItems.length > 0) {
       productionGrid = programItems.map((it, idx) => {
-        const pcs = Number(it.measurement) || 0;
-        const mtr = it.mtr !== undefined && it.mtr !== '' ? it.mtr : '';
+        // A legacy item goes in the column of its own unit; meters are never shown as pieces.
+        const isMtr = String(it.unit || '').toUpperCase() === 'MTR';
+        const pcs = isMtr ? 0 : Number(it.measurement) || 0;
+        const mtr = it.mtr !== undefined && it.mtr !== '' ? it.mtr : isMtr ? Number(it.measurement) || '' : '';
         const sizes: Record<string, string> = {};
         for (const sub of subStylesWithAverages) {
           sizes[sub.name] = it.fabricWidth || 'Free';
