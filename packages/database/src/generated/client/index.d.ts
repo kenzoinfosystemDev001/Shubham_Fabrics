@@ -92864,6 +92864,9 @@ export namespace Prisma {
   export type FabricInwardAvgAggregateOutputType = {
     sNo: number | null
     billQty: number | null
+    pricePerUnit: number | null
+    boxThanQty: number | null
+    taxPercent: number | null
     unitRate: number | null
     importRowNumber: number | null
   }
@@ -92871,6 +92874,9 @@ export namespace Prisma {
   export type FabricInwardSumAggregateOutputType = {
     sNo: number | null
     billQty: number | null
+    pricePerUnit: number | null
+    boxThanQty: number | null
+    taxPercent: number | null
     unitRate: number | null
     importRowNumber: number | null
   }
@@ -92887,6 +92893,11 @@ export namespace Prisma {
     unit: string | null
     colour: string | null
     supplierName: string | null
+    billerStateCity: string | null
+    pricePerUnit: number | null
+    boxThanQty: number | null
+    hsnCode: string | null
+    taxPercent: number | null
     remarks: string | null
     rollNumber: string | null
     rollKey: string | null
@@ -92915,6 +92926,11 @@ export namespace Prisma {
     unit: string | null
     colour: string | null
     supplierName: string | null
+    billerStateCity: string | null
+    pricePerUnit: number | null
+    boxThanQty: number | null
+    hsnCode: string | null
+    taxPercent: number | null
     remarks: string | null
     rollNumber: string | null
     rollKey: string | null
@@ -92943,6 +92959,11 @@ export namespace Prisma {
     unit: number
     colour: number
     supplierName: number
+    billerStateCity: number
+    pricePerUnit: number
+    boxThanQty: number
+    hsnCode: number
+    taxPercent: number
     remarks: number
     rollNumber: number
     rollKey: number
@@ -92964,6 +92985,9 @@ export namespace Prisma {
   export type FabricInwardAvgAggregateInputType = {
     sNo?: true
     billQty?: true
+    pricePerUnit?: true
+    boxThanQty?: true
+    taxPercent?: true
     unitRate?: true
     importRowNumber?: true
   }
@@ -92971,6 +92995,9 @@ export namespace Prisma {
   export type FabricInwardSumAggregateInputType = {
     sNo?: true
     billQty?: true
+    pricePerUnit?: true
+    boxThanQty?: true
+    taxPercent?: true
     unitRate?: true
     importRowNumber?: true
   }
@@ -92987,6 +93014,11 @@ export namespace Prisma {
     unit?: true
     colour?: true
     supplierName?: true
+    billerStateCity?: true
+    pricePerUnit?: true
+    boxThanQty?: true
+    hsnCode?: true
+    taxPercent?: true
     remarks?: true
     rollNumber?: true
     rollKey?: true
@@ -93015,6 +93047,11 @@ export namespace Prisma {
     unit?: true
     colour?: true
     supplierName?: true
+    billerStateCity?: true
+    pricePerUnit?: true
+    boxThanQty?: true
+    hsnCode?: true
+    taxPercent?: true
     remarks?: true
     rollNumber?: true
     rollKey?: true
@@ -93043,6 +93080,11 @@ export namespace Prisma {
     unit?: true
     colour?: true
     supplierName?: true
+    billerStateCity?: true
+    pricePerUnit?: true
+    boxThanQty?: true
+    hsnCode?: true
+    taxPercent?: true
     remarks?: true
     rollNumber?: true
     rollKey?: true
@@ -93158,6 +93200,11 @@ export namespace Prisma {
     unit: string
     colour: string | null
     supplierName: string | null
+    billerStateCity: string | null
+    pricePerUnit: number | null
+    boxThanQty: number | null
+    hsnCode: string | null
+    taxPercent: number | null
     remarks: string | null
     rollNumber: string | null
     rollKey: string | null
@@ -93205,6 +93252,11 @@ export namespace Prisma {
     unit?: boolean
     colour?: boolean
     supplierName?: boolean
+    billerStateCity?: boolean
+    pricePerUnit?: boolean
+    boxThanQty?: boolean
+    hsnCode?: boolean
+    taxPercent?: boolean
     remarks?: boolean
     rollNumber?: boolean
     rollKey?: boolean
@@ -93234,6 +93286,11 @@ export namespace Prisma {
     unit?: boolean
     colour?: boolean
     supplierName?: boolean
+    billerStateCity?: boolean
+    pricePerUnit?: boolean
+    boxThanQty?: boolean
+    hsnCode?: boolean
+    taxPercent?: boolean
     remarks?: boolean
     rollNumber?: boolean
     rollKey?: boolean
@@ -93263,6 +93320,11 @@ export namespace Prisma {
     unit?: boolean
     colour?: boolean
     supplierName?: boolean
+    billerStateCity?: boolean
+    pricePerUnit?: boolean
+    boxThanQty?: boolean
+    hsnCode?: boolean
+    taxPercent?: boolean
     remarks?: boolean
     rollNumber?: boolean
     rollKey?: boolean
@@ -93292,6 +93354,11 @@ export namespace Prisma {
     unit?: boolean
     colour?: boolean
     supplierName?: boolean
+    billerStateCity?: boolean
+    pricePerUnit?: boolean
+    boxThanQty?: boolean
+    hsnCode?: boolean
+    taxPercent?: boolean
     remarks?: boolean
     rollNumber?: boolean
     rollKey?: boolean
@@ -93308,7 +93375,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type FabricInwardOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sNo" | "entryType" | "itemName" | "billNo" | "billDate" | "receivingDate" | "billQty" | "unit" | "colour" | "supplierName" | "remarks" | "rollNumber" | "rollKey" | "batchNumber" | "shade" | "composition" | "width" | "unitRate" | "storageLocation" | "purchaseOrderNumber" | "importId" | "importRowNumber" | "createdAt" | "updatedAt", ExtArgs["result"]["fabricInward"]>
+  export type FabricInwardOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sNo" | "entryType" | "itemName" | "billNo" | "billDate" | "receivingDate" | "billQty" | "unit" | "colour" | "supplierName" | "billerStateCity" | "pricePerUnit" | "boxThanQty" | "hsnCode" | "taxPercent" | "remarks" | "rollNumber" | "rollKey" | "batchNumber" | "shade" | "composition" | "width" | "unitRate" | "storageLocation" | "purchaseOrderNumber" | "importId" | "importRowNumber" | "createdAt" | "updatedAt", ExtArgs["result"]["fabricInward"]>
   export type FabricInwardInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     import?: boolean | FabricInward$importArgs<ExtArgs>
   }
@@ -93336,6 +93403,11 @@ export namespace Prisma {
       unit: string
       colour: string | null
       supplierName: string | null
+      billerStateCity: string | null
+      pricePerUnit: number | null
+      boxThanQty: number | null
+      hsnCode: string | null
+      taxPercent: number | null
       remarks: string | null
       rollNumber: string | null
       rollKey: string | null
@@ -93785,6 +93857,11 @@ export namespace Prisma {
     readonly unit: FieldRef<"FabricInward", 'String'>
     readonly colour: FieldRef<"FabricInward", 'String'>
     readonly supplierName: FieldRef<"FabricInward", 'String'>
+    readonly billerStateCity: FieldRef<"FabricInward", 'String'>
+    readonly pricePerUnit: FieldRef<"FabricInward", 'Float'>
+    readonly boxThanQty: FieldRef<"FabricInward", 'Float'>
+    readonly hsnCode: FieldRef<"FabricInward", 'String'>
+    readonly taxPercent: FieldRef<"FabricInward", 'Float'>
     readonly remarks: FieldRef<"FabricInward", 'String'>
     readonly rollNumber: FieldRef<"FabricInward", 'String'>
     readonly rollKey: FieldRef<"FabricInward", 'String'>
@@ -106484,6 +106561,11 @@ export namespace Prisma {
     unit: 'unit',
     colour: 'colour',
     supplierName: 'supplierName',
+    billerStateCity: 'billerStateCity',
+    pricePerUnit: 'pricePerUnit',
+    boxThanQty: 'boxThanQty',
+    hsnCode: 'hsnCode',
+    taxPercent: 'taxPercent',
     remarks: 'remarks',
     rollNumber: 'rollNumber',
     rollKey: 'rollKey',
@@ -113914,6 +113996,11 @@ export namespace Prisma {
     unit?: StringFilter<"FabricInward"> | string
     colour?: StringNullableFilter<"FabricInward"> | string | null
     supplierName?: StringNullableFilter<"FabricInward"> | string | null
+    billerStateCity?: StringNullableFilter<"FabricInward"> | string | null
+    pricePerUnit?: FloatNullableFilter<"FabricInward"> | number | null
+    boxThanQty?: FloatNullableFilter<"FabricInward"> | number | null
+    hsnCode?: StringNullableFilter<"FabricInward"> | string | null
+    taxPercent?: FloatNullableFilter<"FabricInward"> | number | null
     remarks?: StringNullableFilter<"FabricInward"> | string | null
     rollNumber?: StringNullableFilter<"FabricInward"> | string | null
     rollKey?: StringNullableFilter<"FabricInward"> | string | null
@@ -113943,6 +114030,11 @@ export namespace Prisma {
     unit?: SortOrder
     colour?: SortOrderInput | SortOrder
     supplierName?: SortOrderInput | SortOrder
+    billerStateCity?: SortOrderInput | SortOrder
+    pricePerUnit?: SortOrderInput | SortOrder
+    boxThanQty?: SortOrderInput | SortOrder
+    hsnCode?: SortOrderInput | SortOrder
+    taxPercent?: SortOrderInput | SortOrder
     remarks?: SortOrderInput | SortOrder
     rollNumber?: SortOrderInput | SortOrder
     rollKey?: SortOrderInput | SortOrder
@@ -113976,6 +114068,11 @@ export namespace Prisma {
     unit?: StringFilter<"FabricInward"> | string
     colour?: StringNullableFilter<"FabricInward"> | string | null
     supplierName?: StringNullableFilter<"FabricInward"> | string | null
+    billerStateCity?: StringNullableFilter<"FabricInward"> | string | null
+    pricePerUnit?: FloatNullableFilter<"FabricInward"> | number | null
+    boxThanQty?: FloatNullableFilter<"FabricInward"> | number | null
+    hsnCode?: StringNullableFilter<"FabricInward"> | string | null
+    taxPercent?: FloatNullableFilter<"FabricInward"> | number | null
     remarks?: StringNullableFilter<"FabricInward"> | string | null
     rollNumber?: StringNullableFilter<"FabricInward"> | string | null
     batchNumber?: StringNullableFilter<"FabricInward"> | string | null
@@ -114004,6 +114101,11 @@ export namespace Prisma {
     unit?: SortOrder
     colour?: SortOrderInput | SortOrder
     supplierName?: SortOrderInput | SortOrder
+    billerStateCity?: SortOrderInput | SortOrder
+    pricePerUnit?: SortOrderInput | SortOrder
+    boxThanQty?: SortOrderInput | SortOrder
+    hsnCode?: SortOrderInput | SortOrder
+    taxPercent?: SortOrderInput | SortOrder
     remarks?: SortOrderInput | SortOrder
     rollNumber?: SortOrderInput | SortOrder
     rollKey?: SortOrderInput | SortOrder
@@ -114040,6 +114142,11 @@ export namespace Prisma {
     unit?: StringWithAggregatesFilter<"FabricInward"> | string
     colour?: StringNullableWithAggregatesFilter<"FabricInward"> | string | null
     supplierName?: StringNullableWithAggregatesFilter<"FabricInward"> | string | null
+    billerStateCity?: StringNullableWithAggregatesFilter<"FabricInward"> | string | null
+    pricePerUnit?: FloatNullableWithAggregatesFilter<"FabricInward"> | number | null
+    boxThanQty?: FloatNullableWithAggregatesFilter<"FabricInward"> | number | null
+    hsnCode?: StringNullableWithAggregatesFilter<"FabricInward"> | string | null
+    taxPercent?: FloatNullableWithAggregatesFilter<"FabricInward"> | number | null
     remarks?: StringNullableWithAggregatesFilter<"FabricInward"> | string | null
     rollNumber?: StringNullableWithAggregatesFilter<"FabricInward"> | string | null
     rollKey?: StringNullableWithAggregatesFilter<"FabricInward"> | string | null
@@ -122852,6 +122959,11 @@ export namespace Prisma {
     unit?: string
     colour?: string | null
     supplierName?: string | null
+    billerStateCity?: string | null
+    pricePerUnit?: number | null
+    boxThanQty?: number | null
+    hsnCode?: string | null
+    taxPercent?: number | null
     remarks?: string | null
     rollNumber?: string | null
     rollKey?: string | null
@@ -122880,6 +122992,11 @@ export namespace Prisma {
     unit?: string
     colour?: string | null
     supplierName?: string | null
+    billerStateCity?: string | null
+    pricePerUnit?: number | null
+    boxThanQty?: number | null
+    hsnCode?: string | null
+    taxPercent?: number | null
     remarks?: string | null
     rollNumber?: string | null
     rollKey?: string | null
@@ -122908,6 +123025,11 @@ export namespace Prisma {
     unit?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     supplierName?: NullableStringFieldUpdateOperationsInput | string | null
+    billerStateCity?: NullableStringFieldUpdateOperationsInput | string | null
+    pricePerUnit?: NullableFloatFieldUpdateOperationsInput | number | null
+    boxThanQty?: NullableFloatFieldUpdateOperationsInput | number | null
+    hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
+    taxPercent?: NullableFloatFieldUpdateOperationsInput | number | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
     rollKey?: NullableStringFieldUpdateOperationsInput | string | null
@@ -122936,6 +123058,11 @@ export namespace Prisma {
     unit?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     supplierName?: NullableStringFieldUpdateOperationsInput | string | null
+    billerStateCity?: NullableStringFieldUpdateOperationsInput | string | null
+    pricePerUnit?: NullableFloatFieldUpdateOperationsInput | number | null
+    boxThanQty?: NullableFloatFieldUpdateOperationsInput | number | null
+    hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
+    taxPercent?: NullableFloatFieldUpdateOperationsInput | number | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
     rollKey?: NullableStringFieldUpdateOperationsInput | string | null
@@ -122964,6 +123091,11 @@ export namespace Prisma {
     unit?: string
     colour?: string | null
     supplierName?: string | null
+    billerStateCity?: string | null
+    pricePerUnit?: number | null
+    boxThanQty?: number | null
+    hsnCode?: string | null
+    taxPercent?: number | null
     remarks?: string | null
     rollNumber?: string | null
     rollKey?: string | null
@@ -122992,6 +123124,11 @@ export namespace Prisma {
     unit?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     supplierName?: NullableStringFieldUpdateOperationsInput | string | null
+    billerStateCity?: NullableStringFieldUpdateOperationsInput | string | null
+    pricePerUnit?: NullableFloatFieldUpdateOperationsInput | number | null
+    boxThanQty?: NullableFloatFieldUpdateOperationsInput | number | null
+    hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
+    taxPercent?: NullableFloatFieldUpdateOperationsInput | number | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
     rollKey?: NullableStringFieldUpdateOperationsInput | string | null
@@ -123019,6 +123156,11 @@ export namespace Prisma {
     unit?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     supplierName?: NullableStringFieldUpdateOperationsInput | string | null
+    billerStateCity?: NullableStringFieldUpdateOperationsInput | string | null
+    pricePerUnit?: NullableFloatFieldUpdateOperationsInput | number | null
+    boxThanQty?: NullableFloatFieldUpdateOperationsInput | number | null
+    hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
+    taxPercent?: NullableFloatFieldUpdateOperationsInput | number | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
     rollKey?: NullableStringFieldUpdateOperationsInput | string | null
@@ -129192,6 +129334,11 @@ export namespace Prisma {
     unit?: SortOrder
     colour?: SortOrder
     supplierName?: SortOrder
+    billerStateCity?: SortOrder
+    pricePerUnit?: SortOrder
+    boxThanQty?: SortOrder
+    hsnCode?: SortOrder
+    taxPercent?: SortOrder
     remarks?: SortOrder
     rollNumber?: SortOrder
     rollKey?: SortOrder
@@ -129211,6 +129358,9 @@ export namespace Prisma {
   export type FabricInwardAvgOrderByAggregateInput = {
     sNo?: SortOrder
     billQty?: SortOrder
+    pricePerUnit?: SortOrder
+    boxThanQty?: SortOrder
+    taxPercent?: SortOrder
     unitRate?: SortOrder
     importRowNumber?: SortOrder
   }
@@ -129227,6 +129377,11 @@ export namespace Prisma {
     unit?: SortOrder
     colour?: SortOrder
     supplierName?: SortOrder
+    billerStateCity?: SortOrder
+    pricePerUnit?: SortOrder
+    boxThanQty?: SortOrder
+    hsnCode?: SortOrder
+    taxPercent?: SortOrder
     remarks?: SortOrder
     rollNumber?: SortOrder
     rollKey?: SortOrder
@@ -129255,6 +129410,11 @@ export namespace Prisma {
     unit?: SortOrder
     colour?: SortOrder
     supplierName?: SortOrder
+    billerStateCity?: SortOrder
+    pricePerUnit?: SortOrder
+    boxThanQty?: SortOrder
+    hsnCode?: SortOrder
+    taxPercent?: SortOrder
     remarks?: SortOrder
     rollNumber?: SortOrder
     rollKey?: SortOrder
@@ -129274,6 +129434,9 @@ export namespace Prisma {
   export type FabricInwardSumOrderByAggregateInput = {
     sNo?: SortOrder
     billQty?: SortOrder
+    pricePerUnit?: SortOrder
+    boxThanQty?: SortOrder
+    taxPercent?: SortOrder
     unitRate?: SortOrder
     importRowNumber?: SortOrder
   }
@@ -169631,6 +169794,11 @@ export namespace Prisma {
     unit?: string
     colour?: string | null
     supplierName?: string | null
+    billerStateCity?: string | null
+    pricePerUnit?: number | null
+    boxThanQty?: number | null
+    hsnCode?: string | null
+    taxPercent?: number | null
     remarks?: string | null
     rollNumber?: string | null
     rollKey?: string | null
@@ -169658,6 +169826,11 @@ export namespace Prisma {
     unit?: string
     colour?: string | null
     supplierName?: string | null
+    billerStateCity?: string | null
+    pricePerUnit?: number | null
+    boxThanQty?: number | null
+    hsnCode?: string | null
+    taxPercent?: number | null
     remarks?: string | null
     rollNumber?: string | null
     rollKey?: string | null
@@ -169970,6 +170143,11 @@ export namespace Prisma {
     unit?: StringFilter<"FabricInward"> | string
     colour?: StringNullableFilter<"FabricInward"> | string | null
     supplierName?: StringNullableFilter<"FabricInward"> | string | null
+    billerStateCity?: StringNullableFilter<"FabricInward"> | string | null
+    pricePerUnit?: FloatNullableFilter<"FabricInward"> | number | null
+    boxThanQty?: FloatNullableFilter<"FabricInward"> | number | null
+    hsnCode?: StringNullableFilter<"FabricInward"> | string | null
+    taxPercent?: FloatNullableFilter<"FabricInward"> | number | null
     remarks?: StringNullableFilter<"FabricInward"> | string | null
     rollNumber?: StringNullableFilter<"FabricInward"> | string | null
     rollKey?: StringNullableFilter<"FabricInward"> | string | null
@@ -182722,6 +182900,11 @@ export namespace Prisma {
     unit?: string
     colour?: string | null
     supplierName?: string | null
+    billerStateCity?: string | null
+    pricePerUnit?: number | null
+    boxThanQty?: number | null
+    hsnCode?: string | null
+    taxPercent?: number | null
     remarks?: string | null
     rollNumber?: string | null
     rollKey?: string | null
@@ -182761,6 +182944,11 @@ export namespace Prisma {
     unit?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     supplierName?: NullableStringFieldUpdateOperationsInput | string | null
+    billerStateCity?: NullableStringFieldUpdateOperationsInput | string | null
+    pricePerUnit?: NullableFloatFieldUpdateOperationsInput | number | null
+    boxThanQty?: NullableFloatFieldUpdateOperationsInput | number | null
+    hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
+    taxPercent?: NullableFloatFieldUpdateOperationsInput | number | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
     rollKey?: NullableStringFieldUpdateOperationsInput | string | null
@@ -182788,6 +182976,11 @@ export namespace Prisma {
     unit?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     supplierName?: NullableStringFieldUpdateOperationsInput | string | null
+    billerStateCity?: NullableStringFieldUpdateOperationsInput | string | null
+    pricePerUnit?: NullableFloatFieldUpdateOperationsInput | number | null
+    boxThanQty?: NullableFloatFieldUpdateOperationsInput | number | null
+    hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
+    taxPercent?: NullableFloatFieldUpdateOperationsInput | number | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
     rollKey?: NullableStringFieldUpdateOperationsInput | string | null
@@ -182815,6 +183008,11 @@ export namespace Prisma {
     unit?: StringFieldUpdateOperationsInput | string
     colour?: NullableStringFieldUpdateOperationsInput | string | null
     supplierName?: NullableStringFieldUpdateOperationsInput | string | null
+    billerStateCity?: NullableStringFieldUpdateOperationsInput | string | null
+    pricePerUnit?: NullableFloatFieldUpdateOperationsInput | number | null
+    boxThanQty?: NullableFloatFieldUpdateOperationsInput | number | null
+    hsnCode?: NullableStringFieldUpdateOperationsInput | string | null
+    taxPercent?: NullableFloatFieldUpdateOperationsInput | number | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     rollNumber?: NullableStringFieldUpdateOperationsInput | string | null
     rollKey?: NullableStringFieldUpdateOperationsInput | string | null

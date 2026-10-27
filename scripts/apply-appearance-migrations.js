@@ -41,6 +41,7 @@ const MIGRATIONS = [
   '20261026_stock_imports.sql',
   '20261026_grn_unit.sql',
   '20261026_mtr_pcs_per_item.sql',
+  '20261027_inward_bill_details.sql',
 ];
 
 const args = new Set(process.argv.slice(2));

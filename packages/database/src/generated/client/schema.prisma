@@ -1696,7 +1696,12 @@ model FabricInward {
   billQty             Float // Quantity
   unit                String             @default("MTR") // "MTR" or "PCS"; never converted
   colour              String? // null on entries recorded before colour tracking
-  supplierName        String?
+  supplierName        String? // Party name
+  billerStateCity     String? // Biller state / city
+  pricePerUnit        Float? // per MTR or PCS, as billed
+  boxThanQty          Float? // boxes / thans received
+  hsnCode             String?
+  taxPercent          Float?
   remarks             String?
   // Roll / commercial details (Excel stock import; null on manual entries)
   rollNumber          String?

@@ -9,4 +9,11 @@ export {
   getChallanItemFabricType,
   isFabricStoreDepartment,
   normalizeStockUnit,
+  unitTotals,
+  addToUnitTotals,
+  formatUnitTotals,
+  lineTotals,
 } from './fabric-stock-rules.mjs';
+
+/** Quantities per unit; meters and pieces are never added together. */
+export type UnitTotals = Record<string, number>;
