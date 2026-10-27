@@ -7,6 +7,8 @@ import {
   fabricStockErrorBody,
   syncInwardStock,
 } from '@/lib/fabric-stock-ledger';
+import { FIELD_LABELS, inwardLineDetails } from '@/lib/stock-import-rules.mjs';
+import { apiErrorResponse } from '@/lib/api-errors';
 
 export const dynamic = 'force-dynamic';
 
@@ -50,6 +52,11 @@ export async function PATCH(
     if (!['MTR', 'PCS'].includes(unit)) {
       return NextResponse.json({ error: 'unit must be MTR or PCS' }, { status: 400 });
     }
+    const { details, problems } = inwardLineDetails(body);
+    if (problems.length) {
+      const names = problems.map((field) => FIELD_LABELS[field as keyof typeof FIELD_LABELS]).join(', ');
+      return NextResponse.json({ error: `${names} must be a number of zero or more (tax at most 100)` }, { status: 400 });
+    }
 
     // The ledger posts only the difference; a reduction below what was already issued is refused.
     const data = await prisma.$transaction(async (tx) => {
@@ -65,6 +72,8 @@ export async function PATCH(
         unit,
         colour: body.colour ? String(body.colour).trim() : null,
         supplierName: body.supplierName ? String(body.supplierName).trim() : null,
+        billerStateCity: body.billerStateCity ? String(body.billerStateCity).trim() : null,
+        ...details,
         remarks: body.remarks ? String(body.remarks).trim() : null,
       },
       });
@@ -80,7 +89,6 @@ export async function PATCH(
     if (error.code === 'P2025') {
       return NextResponse.json({ error: 'Inward record not found' }, { status: 404 });
     }
-    console.error('Error updating inward fabric stock:', error);
-    return NextResponse.json({ error: error.message || 'Failed to update inward stock' }, { status: 500 });
+    return apiErrorResponse(error, error.message || 'Failed to update inward stock', 'Error updating inward fabric stock:');
   }
 }

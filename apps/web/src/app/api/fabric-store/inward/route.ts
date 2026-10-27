@@ -8,6 +8,8 @@ import {
   syncInwardStock,
 } from '@/lib/fabric-stock-ledger';
 import { normalizeStockUnit } from '@/lib/fabric-stock';
+import { FIELD_LABELS, inwardLineDetails } from '@/lib/stock-import-rules.mjs';
+import { apiErrorResponse } from '@/lib/api-errors';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,6 +36,8 @@ export async function GET(request: Request) {
         { billNo: { contains: search, mode: 'insensitive' } },
         { colour: { contains: search, mode: 'insensitive' } },
         { supplierName: { contains: search, mode: 'insensitive' } },
+        { hsnCode: { contains: search, mode: 'insensitive' } },
+        { billerStateCity: { contains: search, mode: 'insensitive' } },
       ];
     }
 
@@ -66,8 +70,7 @@ export async function GET(request: Request) {
       summary,
     });
   } catch (error: any) {
-    console.error('Error fetching inward stock:', error);
-    return NextResponse.json({ error: error.message || 'Failed to fetch inward stock' }, { status: 500 });
+    return apiErrorResponse(error, error.message || 'Failed to fetch inward stock', 'Error fetching inward stock:');
   }
 }
 
@@ -78,7 +81,7 @@ export async function POST(request: Request) {
   if (!authUser) return authResponse;
   try {
     const body = await request.json();
-    const { entryType, billNo, billDate, receivingDate, supplierName, remarks } = body;
+    const { entryType, billNo, billDate, receivingDate, supplierName, billerStateCity, remarks } = body;
 
     if (!entryType || !billNo || !billDate || !receivingDate) {
       return NextResponse.json(
@@ -102,12 +105,14 @@ export async function POST(request: Request) {
     // Older clients send one line as top-level fields.
     const rawLines: any[] = Array.isArray(body.lines)
       ? body.lines
-      : [{ itemName: body.itemName, colour: body.colour, billQty: body.billQty, unit: body.unit ?? 'MTR' }];
+      : [{ ...body, unit: body.unit ?? 'MTR' }];
     if (rawLines.length === 0) {
       return NextResponse.json({ error: 'Add at least one fabric line' }, { status: 400 });
     }
 
-    const lines: Array<{ itemName: string; colour: string | null; billQty: number; unit: string }> = [];
+    const lines: Array<
+      { itemName: string; colour: string | null; billQty: number; unit: string } & ReturnType<typeof inwardLineDetails>['details']
+    > = [];
     for (const [index, line] of rawLines.entries()) {
       const itemName = String(line?.itemName || '').trim();
       const qty = Number(line?.billQty);
@@ -121,7 +126,12 @@ export async function POST(request: Request) {
       if (!unit) {
         return NextResponse.json({ error: `Line ${index + 1}: unit must be MTR or PCS` }, { status: 400 });
       }
-      lines.push({ itemName, colour: String(line?.colour || '').trim() || null, billQty: qty, unit });
+      const { details, problems } = inwardLineDetails(line);
+      if (problems.length) {
+        const names = problems.map((field) => FIELD_LABELS[field as keyof typeof FIELD_LABELS]).join(', ');
+        return NextResponse.json({ error: `Line ${index + 1}: ${names} must be a number of zero or more (tax at most 100)` }, { status: 400 });
+      }
+      lines.push({ itemName, colour: String(line?.colour || '').trim() || null, billQty: qty, unit, ...details });
     }
 
     const created = await prisma.$transaction(async (tx) => {
@@ -137,7 +147,12 @@ export async function POST(request: Request) {
             receivingDate: parsedReceivingDate,
             billQty: line.billQty,
             unit: line.unit,
+            pricePerUnit: line.pricePerUnit,
+            boxThanQty: line.boxThanQty,
+            hsnCode: line.hsnCode,
+            taxPercent: line.taxPercent,
             supplierName: supplierName ? String(supplierName).trim() : null,
+            billerStateCity: billerStateCity ? String(billerStateCity).trim() : null,
             remarks: remarks ? String(remarks).trim() : null,
           },
         });
@@ -152,7 +167,6 @@ export async function POST(request: Request) {
     if (error instanceof FabricStockError) {
       return NextResponse.json(fabricStockErrorBody(error), { status: 400 });
     }
-    console.error('Error creating inward fabric stock:', error);
-    return NextResponse.json({ error: error.message || 'Failed to create inward stock' }, { status: 500 });
+    return apiErrorResponse(error, error.message || 'Failed to create inward stock', 'Error creating inward fabric stock:');
   }
 }

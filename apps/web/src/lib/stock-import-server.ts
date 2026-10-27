@@ -21,6 +21,12 @@ export interface ImportRow {
   billNo: string | null;
   billDate: string | null;
   billDateText: string | null;
+  receivingDate: string | null;
+  pricePerUnit: number | string | null;
+  boxThanQty: number | string | null;
+  hsnCode: number | string | null;
+  taxPercent: number | string | null;
+  billerStateCity: string | null;
   remarks: string | null;
 }
 
@@ -44,7 +50,7 @@ export class ImportFileError extends Error {
   }
 }
 
-const EXPECTED_COLUMNS = 'Fabric (or Item / Quality / Description) and Qty (or Meters / Pcs); optionally Colour, Unit, Fabric Code, Dyeing Colour, Supplier, Challan No., Date';
+const EXPECTED_COLUMNS = 'Fabric (or Item / Quality / Description) and Qty (or Meters / Pcs); optionally Colour, Unit, Fabric Code, Dyeing Colour, Supplier / Party, Challan No., Date, Receiving Date, Price Per Unit, Box/Than Qty, HSN Code, Tax %, Biller State/City';
 
 export function readExcel(bytes: Buffer): ExtractionResult {
   let workbook: XLSX.WorkBook;

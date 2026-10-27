@@ -34,6 +34,7 @@ const MIGRATIONS = [
   '20261026_inventory_packing.sql',
   '20261026_inventory_department.sql',
   '20261027_roll_units.sql',
+  '20261027_inward_bill_details.sql',
 ];
 
 const args = new Set(process.argv.slice(2));

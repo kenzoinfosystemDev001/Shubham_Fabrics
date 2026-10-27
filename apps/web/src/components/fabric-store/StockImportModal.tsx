@@ -194,7 +194,7 @@ export default function StockImportModal({ open, onClose, onImported, onManualEn
             />
             <UploadCloud className="w-8 h-8 mx-auto text-brand-600" />
             <p className="mt-2 text-sm font-bold text-neutral-900">{file ? file.name : 'Drop an Excel file here, or click to choose'}</p>
-            <p className="mt-1 text-[11px] text-neutral-500">.xlsx or .xls · up to 10 MB · columns such as Fabric, Colour, Qty, Unit, Challan No, Date, Supplier</p>
+            <p className="mt-1 text-[11px] text-neutral-500">.xlsx or .xls · up to 10 MB · columns such as Item Name, Colour, Qty, Unit, Bill/Ch. No, Bill/Ch. Date, Receiving Date, Price Per Unit, Box/Than Qty, HSN Code, Tax %, Party Name, Biller State/City</p>
           </div>
 
           <p className="text-[11px] text-neutral-500">

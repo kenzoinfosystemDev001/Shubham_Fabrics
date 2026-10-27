@@ -1193,6 +1193,11 @@ exports.Prisma.FabricInwardScalarFieldEnum = {
   unit: 'unit',
   colour: 'colour',
   supplierName: 'supplierName',
+  billerStateCity: 'billerStateCity',
+  pricePerUnit: 'pricePerUnit',
+  boxThanQty: 'boxThanQty',
+  hsnCode: 'hsnCode',
+  taxPercent: 'taxPercent',
   remarks: 'remarks',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

@@ -17,6 +17,7 @@ import {
   Boxes,
   Pencil,
   UploadCloud,
+  Download,
 } from 'lucide-react';
 import StockImportModal from '@/components/fabric-store/StockImportModal';
 
@@ -32,6 +33,11 @@ interface InwardItem {
   unit: 'MTR' | 'PCS' | string;
   colour?: string | null;
   supplierName?: string | null;
+  billerStateCity?: string | null;
+  pricePerUnit?: number | null;
+  boxThanQty?: number | null;
+  hsnCode?: string | null;
+  taxPercent?: number | null;
   remarks?: string | null;
   createdAt: string;
 }
@@ -42,6 +48,10 @@ interface InwardLine {
   colour: string;
   billQty: string;
   unit: 'MTR' | 'PCS';
+  pricePerUnit: string;
+  boxThanQty: string;
+  hsnCode: string;
+  taxPercent: string;
 }
 
 const createInwardLine = (seed: Partial<InwardLine> = {}): InwardLine => ({
@@ -50,6 +60,10 @@ const createInwardLine = (seed: Partial<InwardLine> = {}): InwardLine => ({
   colour: '',
   billQty: '',
   unit: 'MTR',
+  pricePerUnit: '',
+  boxThanQty: '',
+  hsnCode: '',
+  taxPercent: '',
   ...seed,
 });
 
@@ -59,6 +73,7 @@ const createEmptyFormData = () => ({
   billDate: new Date().toISOString().split('T')[0],
   receivingDate: new Date().toISOString().split('T')[0],
   supplierName: '',
+  billerStateCity: '',
   remarks: '',
   lines: [createInwardLine()],
 });
@@ -86,6 +101,60 @@ export default function InwardStockPage() {
 
   // Form State
   const [formData, setFormData] = useState(createEmptyFormData);
+
+  // Excel download: receiving dates from / to (both included), default this month so far
+  const [exportOpen, setExportOpen] = useState(false);
+  const [exportFrom, setExportFrom] = useState(() => {
+    const today = new Date().toISOString().split('T')[0];
+    return `${today.slice(0, 8)}01`;
+  });
+  const [exportTo, setExportTo] = useState(() => new Date().toISOString().split('T')[0]);
+  const [exportType, setExportType] = useState<'ALL' | 'UNDYED' | 'DYED'>('ALL');
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState('');
+
+  const openExport = () => {
+    setExportType(typeFilter === 'KORA' ? 'UNDYED' : typeFilter);
+    setExportError('');
+    setExportOpen(true);
+  };
+
+  const handleExport = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setExportError('');
+    if (!exportFrom || !exportTo) {
+      setExportError('Choose a From date and a To date.');
+      return;
+    }
+    if (exportFrom > exportTo) {
+      setExportError('The From date must be on or before the To date.');
+      return;
+    }
+    setExporting(true);
+    try {
+      const params = new URLSearchParams({ from: exportFrom, to: exportTo });
+      if (exportType !== 'ALL') params.set('entryType', exportType);
+      const res = await fetch(`/api/fabric-store/inward/export?${params.toString()}`);
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}));
+        throw new Error(json.error || 'Could not create the Excel file.');
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Inward_Stock_${exportFrom}_to_${exportTo}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      setExportOpen(false);
+    } catch (err: any) {
+      setExportError(err.message || 'Could not create the Excel file.');
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -125,7 +194,9 @@ export default function InwardStockPage() {
       if (!formData.billNo.trim()) {
         throw new Error('Bill No. is required.');
       }
-      const lines = formData.lines.filter((line) => line.itemName.trim() || line.colour.trim() || line.billQty);
+      const lines = formData.lines.filter((line) =>
+        line.itemName.trim() || line.colour.trim() || line.billQty || line.pricePerUnit || line.boxThanQty || line.hsnCode.trim() || line.taxPercent
+      );
       if (lines.length === 0) {
         throw new Error('Add at least one fabric line.');
       }
@@ -135,11 +206,15 @@ export default function InwardStockPage() {
       }
 
       const { lines: _lines, ...header } = formData;
-      const payloadLines = lines.map(({ itemName, colour, billQty, unit }) => ({
+      const payloadLines = lines.map(({ itemName, colour, billQty, unit, pricePerUnit, boxThanQty, hsnCode, taxPercent }) => ({
         itemName: itemName.trim(),
         colour: colour.trim() || null,
         billQty: Number(billQty),
         unit,
+        pricePerUnit: pricePerUnit === '' ? null : Number(pricePerUnit),
+        boxThanQty: boxThanQty === '' ? null : Number(boxThanQty),
+        hsnCode: hsnCode.trim() || null,
+        taxPercent: taxPercent === '' ? null : Number(taxPercent),
       }));
       const res = await fetch(
         editingItemId ? `/api/fabric-store/inward/${editingItemId}` : '/api/fabric-store/inward',
@@ -181,6 +256,7 @@ export default function InwardStockPage() {
       billDate: new Date(item.billDate).toISOString().split('T')[0],
       receivingDate: new Date(item.receivingDate).toISOString().split('T')[0],
       supplierName: item.supplierName || '',
+      billerStateCity: item.billerStateCity || '',
       remarks: item.remarks || '',
       lines: [
         createInwardLine({
@@ -188,6 +264,10 @@ export default function InwardStockPage() {
           colour: item.colour || '',
           billQty: String(item.billQty),
           unit: item.unit === 'PCS' ? 'PCS' : 'MTR',
+          pricePerUnit: item.pricePerUnit != null ? String(item.pricePerUnit) : '',
+          boxThanQty: item.boxThanQty != null ? String(item.boxThanQty) : '',
+          hsnCode: item.hsnCode || '',
+          taxPercent: item.taxPercent != null ? String(item.taxPercent) : '',
         }),
       ],
     });
@@ -259,6 +339,13 @@ export default function InwardStockPage() {
               aria-label="Refresh"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            </button>
+            <button
+              onClick={openExport}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-neutral-50 text-neutral-900 text-xs font-semibold rounded-lg shadow-xs border border-neutral-300 transition cursor-pointer"
+            >
+              <Download className="w-4 h-4" />
+              <span>Download Excel</span>
             </button>
             <button
               onClick={() => setImportOpen(true)}
@@ -357,7 +444,12 @@ export default function InwardStockPage() {
                   <th className={th}>Bill Date</th>
                   <th className={th}>Received</th>
                   <th className={`${th} text-right`}>Quantity</th>
-                  <th className={th}>Supplier</th>
+                  <th className={`${th} text-right`}>Price / Unit</th>
+                  <th className={`${th} text-right`}>Box / Than</th>
+                  <th className={th}>HSN</th>
+                  <th className={`${th} text-right`}>Tax %</th>
+                  <th className={th}>Party</th>
+                  <th className={th}>Remarks</th>
                   <th className={th}>
                     <span className="sr-only">Edit</span>
                   </th>
@@ -366,7 +458,7 @@ export default function InwardStockPage() {
               <tbody className="divide-y divide-neutral-100">
                 {items.length === 0 ? (
                   <tr>
-                    <td colSpan={10} className="px-4 py-14 text-center">
+                    <td colSpan={15} className="px-4 py-14 text-center">
                       <ArrowDownToLine className="w-8 h-8 mx-auto text-neutral-300" />
                       <p className="text-sm font-medium text-neutral-500 mt-3">{loading ? 'Loading…' : 'No inward entries yet'}</p>
                     </td>
@@ -395,9 +487,22 @@ export default function InwardStockPage() {
                           <span className="font-bold text-neutral-900">{fmt(Number(item.billQty))}</span>{' '}
                           <span className="text-[11px] font-semibold text-neutral-400">{item.unit || 'MTR'}</span>
                         </td>
+                        <td className="py-3 px-4 text-right tabular-nums whitespace-nowrap text-neutral-900">
+                          {item.pricePerUnit != null ? `₹${fmt(Number(item.pricePerUnit))}` : <span className="text-neutral-400">—</span>}
+                        </td>
+                        <td className="py-3 px-4 text-right tabular-nums text-neutral-900">
+                          {item.boxThanQty != null ? fmt(Number(item.boxThanQty)) : <span className="text-neutral-400">—</span>}
+                        </td>
+                        <td className="py-3 px-4 font-mono text-xs text-neutral-700">{item.hsnCode || <span className="text-neutral-400">—</span>}</td>
+                        <td className="py-3 px-4 text-right tabular-nums text-neutral-900">
+                          {item.taxPercent != null ? `${fmt(Number(item.taxPercent))}%` : <span className="text-neutral-400">—</span>}
+                        </td>
                         <td className="py-3 px-4">
-                          <div className="text-neutral-900">{item.supplierName || <span className="text-neutral-400">—</span>}</div>
-                          {item.remarks && <div className="text-[11px] text-neutral-500 truncate max-w-[14rem]">{item.remarks}</div>}
+                          <div className="text-neutral-900 whitespace-nowrap">{item.supplierName || <span className="text-neutral-400">—</span>}</div>
+                          {item.billerStateCity && <div className="text-[11px] text-neutral-500 whitespace-nowrap">{item.billerStateCity}</div>}
+                        </td>
+                        <td className="py-3 px-4 text-xs text-neutral-600">
+                          {item.remarks ? <div className="truncate max-w-[14rem]" title={item.remarks}>{item.remarks}</div> : <span className="text-neutral-400">—</span>}
                         </td>
                         <td className="py-3 px-4 text-right">
                           <button
@@ -434,10 +539,108 @@ export default function InwardStockPage() {
         onManualEntry={openNewArrival}
       />
 
+      {/* MODAL: DOWNLOAD INWARD STOCK AS EXCEL */}
+      {exportOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-900/60 backdrop-blur-xs p-3">
+          <div className="bg-white rounded-xl shadow-2xl border border-neutral-300 w-full max-w-md overflow-hidden" role="dialog" aria-modal="true" aria-label="Download Inward Stock">
+            <div className="px-5 py-3.5 border-b border-neutral-200 bg-neutral-50 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Download className="w-5 h-5 text-brand-700" />
+                <h3 className="font-black text-sm text-neutral-900 uppercase tracking-wide">Download Inward Stock</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setExportOpen(false)}
+                className="text-neutral-500 hover:text-neutral-700 p-1 rounded-lg"
+                aria-label="Close"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleExport} className="p-5 space-y-4">
+              {exportError && (
+                <div className="p-3 bg-danger-50 border border-danger-200 rounded-lg text-xs text-danger-800 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-danger-600 shrink-0" />
+                  <span>{exportError}</span>
+                </div>
+              )}
+
+              <p className="text-xs text-neutral-600">
+                Entries received between these dates (both days included) are downloaded as an Excel sheet with every field.
+              </p>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-black uppercase text-neutral-700 mb-1">FROM DATE *</label>
+                  <input
+                    type="date"
+                    required
+                    value={exportFrom}
+                    max={exportTo || undefined}
+                    onChange={(e) => setExportFrom(e.target.value)}
+                    className="w-full h-10 px-3 border-[1.5px] border-neutral-200 rounded-lg text-xs font-bold text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-black uppercase text-neutral-700 mb-1">TO DATE *</label>
+                  <input
+                    type="date"
+                    required
+                    value={exportTo}
+                    min={exportFrom || undefined}
+                    onChange={(e) => setExportTo(e.target.value)}
+                    className="w-full h-10 px-3 border-[1.5px] border-neutral-200 rounded-lg text-xs font-bold text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-black uppercase text-neutral-700 mb-1">FABRIC TYPE</label>
+                <div role="radiogroup" aria-label="Fabric type" className="grid grid-cols-3 gap-1.5 p-1 bg-neutral-100 rounded-lg">
+                  {tabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      role="radio"
+                      aria-checked={exportType === tab.id}
+                      onClick={() => setExportType(tab.id)}
+                      className={`py-1.5 rounded-md text-xs font-semibold transition cursor-pointer ${
+                        exportType === tab.id ? 'bg-white text-brand-800 shadow-xs' : 'text-neutral-500 hover:text-neutral-900'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-3 border-t border-neutral-200">
+                <button
+                  type="button"
+                  onClick={() => setExportOpen(false)}
+                  className="px-4 py-2 border border-neutral-300 text-neutral-700 text-xs font-semibold rounded-lg hover:bg-neutral-50 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={exporting}
+                  className="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-lg shadow-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                >
+                  {exporting ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
+                  <span>{exporting ? 'Preparing...' : 'Download Excel'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* MODAL: CREATE OR EDIT FABRIC ARRIVAL */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-900/60 backdrop-blur-xs p-3 overflow-y-auto">
-          <div className="bg-white rounded-xl shadow-2xl border border-neutral-300 w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-xl shadow-2xl border border-neutral-300 w-full max-w-4xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="px-5 py-3.5 border-b border-neutral-200 bg-neutral-50 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <ArrowDownToLine className="w-5 h-5 text-accent-700" />
@@ -555,16 +758,21 @@ export default function InwardStockPage() {
                     </button>
                   )}
                 </div>
-                <div className="border border-neutral-200 rounded-lg overflow-hidden">
-                  <div className="grid grid-cols-[1fr_7rem_6rem_5.5rem_2rem] gap-2 px-2 py-1.5 bg-neutral-50 text-[10px] font-black uppercase text-neutral-500">
+                <div className="border border-neutral-200 rounded-lg overflow-x-auto">
+                  <div className="min-w-[50rem]">
+                  <div className="grid grid-cols-[minmax(10rem,1fr)_6.5rem_5.5rem_4.75rem_5.5rem_5rem_5.5rem_4.5rem_2rem] gap-2 px-2 py-1.5 bg-neutral-50 text-[10px] font-black uppercase text-neutral-500">
                     <span>Item name (fabric)</span>
                     <span>Colour</span>
                     <span className="text-right">Qty</span>
                     <span>Unit</span>
+                    <span className="text-right">Price / unit</span>
+                    <span className="text-right">Box / than</span>
+                    <span>HSN code</span>
+                    <span className="text-right">Tax %</span>
                     <span />
                   </div>
                   {formData.lines.map((line, idx) => (
-                    <div key={line.key} className="grid grid-cols-[1fr_7rem_6rem_5.5rem_2rem] gap-2 px-2 py-1.5 border-t border-neutral-200 items-center">
+                    <div key={line.key} className="grid grid-cols-[minmax(10rem,1fr)_6.5rem_5.5rem_4.75rem_5.5rem_5rem_5.5rem_4.5rem_2rem] gap-2 px-2 py-1.5 border-t border-neutral-200 items-center">
                       <input
                         type="text"
                         value={line.itemName}
@@ -600,6 +808,45 @@ export default function InwardStockPage() {
                         <option value="MTR">MTR</option>
                         <option value="PCS">PCS</option>
                       </select>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={line.pricePerUnit}
+                        onChange={(e) => updateLine(line.key, { pricePerUnit: e.target.value })}
+                        placeholder="₹"
+                        aria-label={`Line ${idx + 1} price per unit`}
+                        className="h-8 px-2 border border-neutral-300 rounded-md text-xs text-right text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white"
+                      />
+                      <input
+                        type="number"
+                        step="any"
+                        min="0"
+                        value={line.boxThanQty}
+                        onChange={(e) => updateLine(line.key, { boxThanQty: e.target.value })}
+                        aria-label={`Line ${idx + 1} box or than quantity`}
+                        className="h-8 px-2 border border-neutral-300 rounded-md text-xs text-right text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white"
+                      />
+                      <input
+                        type="text"
+                        value={line.hsnCode}
+                        onChange={(e) => updateLine(line.key, { hsnCode: e.target.value })}
+                        placeholder="e.g. 5407"
+                        maxLength={20}
+                        aria-label={`Line ${idx + 1} HSN code`}
+                        className="h-8 px-2 border border-neutral-300 rounded-md text-xs font-mono text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white"
+                      />
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        max="100"
+                        value={line.taxPercent}
+                        onChange={(e) => updateLine(line.key, { taxPercent: e.target.value })}
+                        placeholder="%"
+                        aria-label={`Line ${idx + 1} tax percent`}
+                        className="h-8 px-2 border border-neutral-300 rounded-md text-xs text-right text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white"
+                      />
                       <button
                         type="button"
                         disabled={formData.lines.length === 1}
@@ -612,16 +859,18 @@ export default function InwardStockPage() {
                       </button>
                     </div>
                   ))}
+                  </div>
                 </div>
                 <p className="text-[10px] text-neutral-500 mt-1">
                   Meters and pieces are stocked separately and never converted.
                 </p>
               </div>
 
-              {/* Supplier Name */}
+              {/* Party (supplier) and biller state / city */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-black uppercase text-neutral-700 mb-1">
-                  SUPPLIER / MILL NAME
+                  PARTY NAME (SUPPLIER / MILL)
                 </label>
                 <input
                   type="text"
@@ -630,6 +879,19 @@ export default function InwardStockPage() {
                   placeholder="e.g. Vardhman Textiles, Arvind Mills"
                   className="w-full h-10 px-3 border border-neutral-300 rounded-lg text-xs font-bold text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white"
                 />
+              </div>
+              <div>
+                <label className="block text-xs font-black uppercase text-neutral-700 mb-1">
+                  BILLER STATE / CITY
+                </label>
+                <input
+                  type="text"
+                  value={formData.billerStateCity}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, billerStateCity: e.target.value }))}
+                  placeholder="e.g. Gujarat / Surat"
+                  className="w-full h-10 px-3 border border-neutral-300 rounded-lg text-xs font-bold text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white"
+                />
+              </div>
               </div>
 
               {/* Remarks */}

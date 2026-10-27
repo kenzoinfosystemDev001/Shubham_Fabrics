@@ -672,6 +672,49 @@ test('rules: Excel columns are found under title rows; merged cells fill the row
   assert.deepEqual([d.quantity, d.quantityText, d.unit], [null, 'illegible', 'PCS']);
 });
 
+// Layout of the "Daily Stock Inwards Report" sheet the Fabric Store keeps.
+const DAILY_INWARDS_SHEET = [
+  ['Shubham Fabrics India Pvt. Ltd. Daily Stock Inwards Report For The Month Jul 2026'],
+  ['S.No', 'Item Name', 'Bill/Ch. No', 'Bill/Ch. Date', 'Receiving Date', 'Bill/Ch. Qty.', 'Price Per Unit', 'Box/Than Qty', 'HSN Code', 'Tax %', 'Party Name', 'Biller State/Citi', 'Remarks'],
+  [1, 'Rayon Slub 14kg', 'B-221', '02/07/2026', '04/07/2026', '1,250.5 mtr', 118.5, 9, 5407, '5%', 'Vardhman Mills', 'Gujarat / Surat', 'Lot 7'],
+  [2, 'Lining', 'B-222', '03/07/2026', null, '40 pcs', '₹ 32', null, '6217', 'GST', 'Arvind', 'Ahmedabad', null],
+];
+
+test('rules: the Daily Stock Inwards Report columns are all read, bill / ch. headings included', () => {
+  const read = stockImport.rowsFromSheet(DAILY_INWARDS_SHEET.map((r) => [...r]), 'Jul');
+  assert.equal(read.error, null);
+  assert.equal(read.headerRow, 2);
+  const [a, b] = read.rows;
+  assert.deepEqual(
+    [a.itemName, a.billNo, a.billDate, a.receivingDate, a.quantity, a.unit, a.pricePerUnit, a.boxThanQty, a.hsnCode, a.taxPercent, a.supplierName, a.billerStateCity, a.remarks],
+    ['Rayon Slub 14kg', 'B-221', '2026-07-02', '2026-07-04', 1250.5, 'MTR', 118.5, 9, 5407, '5%', 'Vardhman Mills', 'Gujarat / Surat', 'Lot 7'],
+  );
+  const ok = stockImport.validateConfirmRows({ entryType: 'UNDYED', receivingDate: '2026-07-10', header: {}, rows: read.rows });
+  assert.deepEqual(ok.errors, []);
+  const [la, lb] = ok.lines;
+  assert.deepEqual(
+    [la.pricePerUnit, la.boxThanQty, la.hsnCode, la.taxPercent, la.billerStateCity, la.receivingDate.toISOString().slice(0, 10), la.remarks],
+    [118.5, 9, '5407', 5, 'Gujarat / Surat', '2026-07-04', 'Lot 7'],
+  );
+  // No receiving date in the row: the upload's date. An unclear tax is kept in remarks, never guessed.
+  assert.deepEqual(
+    [lb.unit, lb.pricePerUnit, lb.boxThanQty, lb.hsnCode, lb.taxPercent, lb.receivingDate.toISOString().slice(0, 10), lb.remarks],
+    ['PCS', 32, null, '6217', null, '2026-07-10', 'Tax %: GST'],
+  );
+});
+
+test('rules: optional bill details are numbers of zero or more; tax at most 100', () => {
+  assert.equal(stockImport.parseOptionalAmount(''), null);
+  assert.equal(stockImport.parseOptionalAmount(null), null);
+  assert.equal(stockImport.parseOptionalAmount('1,200.50'), 1200.5);
+  assert.equal(stockImport.parseOptionalAmount('Rs. 40'), 40);
+  assert.equal(stockImport.parseOptionalAmount(0), 0);
+  for (const bad of ['abc', '-5', -1, '5 kg', NaN]) assert.ok(Number.isNaN(stockImport.parseOptionalAmount(bad)), `${bad}`);
+  const { details, problems } = stockImport.inwardLineDetails({ pricePerUnit: '10', boxThanQty: 'x', taxPercent: 120, hsnCode: ' 5407 ' });
+  assert.deepEqual(details, { pricePerUnit: 10, boxThanQty: null, hsnCode: '5407', taxPercent: null });
+  assert.deepEqual(problems, ['boxThanQty', 'taxPercent']);
+});
+
 test('rules: a sheet with no fabric/quantity headings is refused; a missing unit stays empty', () => {
   assert.equal(stockImport.rowsFromSheet([['Name', 'Phone'], ['A', '1']], 'S').error, 'no-header');
   const read = stockImport.rowsFromSheet([['Item', 'Quantity'], ['Georgette', 10]], 'S');

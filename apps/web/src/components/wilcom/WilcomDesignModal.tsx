@@ -32,12 +32,9 @@ export function WilcomDesignModal({
 }: WilcomDesignModalProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [category, setCategory] = useState<GarmentCategory>(activeCategory);
+  // Added styles have internal ids (CUSTOM_...); the user-facing category is the style's name.
   const [customCategory, setCustomCategory] = useState(
-    activeCategory === 'OTHER'
-      ? defaultStyleName
-      : !['TOP', 'BOTTOM', 'DUPATTA'].includes(activeCategory)
-        ? activeCategory
-        : ''
+    !['TOP', 'BOTTOM', 'DUPATTA'].includes(activeCategory) ? defaultStyleName : ''
   );
   const [isCustomCategory, setIsCustomCategory] = useState(
     activeCategory === 'OTHER' || !['TOP', 'BOTTOM', 'DUPATTA'].includes(activeCategory)
@@ -55,13 +52,7 @@ export function WilcomDesignModal({
       const isCustom = activeCategory === 'OTHER' || !['TOP', 'BOTTOM', 'DUPATTA'].includes(activeCategory);
       setIsCustomCategory(isCustom);
       setCategory(isCustom ? 'OTHER' : activeCategory);
-      if (activeCategory === 'OTHER') {
-        setCustomCategory(defaultStyleName);
-      } else if (!['TOP', 'BOTTOM', 'DUPATTA', 'OTHER'].includes(activeCategory)) {
-        setCustomCategory(activeCategory);
-      } else {
-        setCustomCategory('');
-      }
+      setCustomCategory(isCustom ? defaultStyleName : '');
       setStyleName('');
     }
   }, [isOpen, activeCategory, defaultStyleName, editingId]);
@@ -168,13 +159,7 @@ export function WilcomDesignModal({
     const isCustom = activeCategory === 'OTHER' || !['TOP', 'BOTTOM', 'DUPATTA'].includes(activeCategory);
     setIsCustomCategory(isCustom);
     setCategory(isCustom ? 'OTHER' : activeCategory);
-    setCustomCategory(
-      activeCategory === 'OTHER'
-        ? defaultStyleName
-        : !['TOP', 'BOTTOM', 'DUPATTA'].includes(activeCategory)
-          ? activeCategory
-          : ''
-    );
+    setCustomCategory(isCustom ? defaultStyleName : '');
     setStyleName('');
     setDesignNumber('');
     setPhotoUrl('');

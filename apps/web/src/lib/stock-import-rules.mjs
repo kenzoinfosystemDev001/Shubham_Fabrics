@@ -19,6 +19,12 @@ export const IMPORT_FIELDS = [
   'supplierName',
   'billNo',
   'billDate',
+  'receivingDate',
+  'pricePerUnit',
+  'boxThanQty',
+  'hsnCode',
+  'taxPercent',
+  'billerStateCity',
   'remarks',
 ];
 
@@ -33,6 +39,12 @@ export const FIELD_LABELS = {
   supplierName: 'Supplier',
   billNo: 'Challan / bill no.',
   billDate: 'Challan / bill date',
+  receivingDate: 'Receiving date',
+  pricePerUnit: 'Price per unit',
+  boxThanQty: 'Box / than qty',
+  hsnCode: 'HSN code',
+  taxPercent: 'Tax %',
+  billerStateCity: 'Biller state / city',
   remarks: 'Remarks',
 };
 
@@ -101,6 +113,41 @@ export function parseQuantity(value) {
   return { value: Number.isFinite(number) && number > 0 ? number : null, unit, raw };
 }
 
+/**
+ * An optional amount from a bill: "1,200.50", "₹ 120", "5%", 12. Returns null when empty and NaN when it
+ * is not a clear number of zero or more.
+ */
+export function parseOptionalAmount(value) {
+  if (typeof value === 'number') return Number.isFinite(value) && value >= 0 ? value : NaN;
+  const text = cleanText(value);
+  if (!text) return null;
+  const match = text
+    .replace(/^(₹|rs\.?|inr)\s*/i, '')
+    .replace(/\s*%$/, '')
+    .match(/^(?:[0-9][0-9,]*(?:\.[0-9]+)?|\.[0-9]+)$/);
+  return match ? Number(match[0].replace(/,/g, '')) : NaN;
+}
+
+const DETAIL_NUMBERS = ['pricePerUnit', 'boxThanQty', 'taxPercent'];
+
+/**
+ * The optional bill details of one inward line (price per unit, box/than qty, HSN code, tax %).
+ * `problems` lists the number fields whose value is not clear (tax must be 0-100); those stay empty.
+ */
+export function inwardLineDetails(src) {
+  const details = { pricePerUnit: null, boxThanQty: null, hsnCode: null, taxPercent: null };
+  const problems = [];
+  for (const field of DETAIL_NUMBERS) {
+    const n = parseOptionalAmount(src?.[field]);
+    if (n === null) continue;
+    if (Number.isNaN(n) || (field === 'taxPercent' && n > 100)) problems.push(field);
+    else details[field] = Math.round(n * 1000) / 1000;
+  }
+  const hsn = src?.hsnCode;
+  details.hsnCode = cleanText(typeof hsn === 'number' ? String(hsn) : hsn)?.slice(0, 20) || null;
+  return { details, problems };
+}
+
 const pad = (n) => String(n).padStart(2, '0');
 
 function isoDate(year, month, day) {
@@ -143,13 +190,20 @@ export function parseSheetDate(value) {
 
 // Checked in order; the first field whose pattern matches a heading takes that column.
 const HEADER_PATTERNS = [
+  ['receivingDate', /receiv(ing|ed)\s*date|recd\s*date|inward\s*date|grn\s*date/],
+  ['pricePerUnit', /price|rate/],
+  ['boxThanQty', /\b(box(es)?|thans?|thaans?|bundles?)\b/],
+  ['hsnCode', /\b(hsn|sac)\b/],
+  ['taxPercent', /\b(tax|gst|igst|cgst|sgst)\b|%/],
+  ['billerStateCity', /state|city|place\s*of\s*supply/],
   ['dyeColour', /(dye|dyeing|req(uired)?|to\s*be)\s*(colou?r|shade)|colou?r\s*(to\s*dye|required|req)/],
   ['fabricCode', /(fabric|item|quality|article|design)\s*(code|no|number|#)|^(code|art(icle)?\s*no|quality\s*no)$/],
-  ['billNo', /(challan|chalan|bill|invoice|inv|dc|lr|gr)\s*(no|number|#)|^(challan|chalan|bill|invoice)$/],
-  ['billDate', /(challan|chalan|bill|invoice|inv|dc)\s*date|^date$|^dated$/],
+  // "Bill/Ch. No" reads "bill ch no": "ch" is short for challan.
+  ['billNo', /(challan|chalan|bill|invoice|inv|dc|lr|gr|\bch)\s*(no|number|#)|^(challan|chalan|bill|invoice)$/],
+  ['billDate', /(challan|chalan|bill|invoice|inv|dc|\bch)\s*date|^date$|^dated$/],
   ['supplierName', /supplier|party|mill|vendor|seller|^from$|received\s*from|weaver/],
   ['colour', /^(colou?r|shade|clr)(\s*name)?$|colou?r|shade/],
-  ['unit', /^(unit|uom|units|measure(ment)?|u\/m)$/],
+  ['unit', /^(unit|uom|units|measure(ment)?|u ?m)$/],
   ['quantity', /qty|quantity|meters?|metres?|mtrs?|pcs|pieces|^nos?$|^total$/],
   ['itemName', /fabric|item|quality|description|particulars?|material|cloth|product|name/],
   ['remarks', /remark|note|comment|lot|bale|roll/],
@@ -158,7 +212,7 @@ const HEADER_PATTERNS = [
 const normalHeading = (text) =>
   String(text || '')
     .toLowerCase()
-    .replace(/[_.:()\-]/g, ' ')
+    .replace(/[_.:()\/\-]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 
@@ -215,7 +269,9 @@ export function expandMerges(matrix, merges = []) {
   return matrix;
 }
 
-const LINE_FIELDS = ['itemName', 'fabricCode', 'colour', 'dyeColour', 'quantity'];
+const sheetValue = (value) => (typeof value === 'number' ? value : cleanText(value instanceof Date ? null : value));
+
+const LINE_FIELDS =['itemName', 'fabricCode', 'colour', 'dyeColour', 'quantity'];
 const TOTAL_ROW = /^(grand\s*)?(sub\s*)?total\b|^g\.?\s*total/i;
 
 /**
@@ -268,6 +324,13 @@ export function rowsFromSheet(matrix, sheetName) {
       billNo: cleanText(raw.billNo),
       billDate,
       billDateText: billDate ? null : cleanText(rawDate instanceof Date ? null : rawDate),
+      receivingDate: parseSheetDate(raw.receivingDate),
+      // Bill details stay as written (numbers or text); validateConfirmRows reads them.
+      pricePerUnit: sheetValue(raw.pricePerUnit),
+      boxThanQty: sheetValue(raw.boxThanQty),
+      hsnCode: sheetValue(raw.hsnCode),
+      taxPercent: sheetValue(raw.taxPercent),
+      billerStateCity: cleanText(raw.billerStateCity),
       remarks: cleanText(raw.remarks),
       confidence: {},
     };
@@ -296,11 +359,15 @@ function toDate(iso) {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
-/** Fabric code and dyeing colour have no columns of their own on an inward entry; they go in remarks. */
-export function inwardRemarks(row) {
+/**
+ * Fabric code and dyeing colour have no columns of their own on an inward entry; they go in remarks, as
+ * do bill details that were not a clear number (kept as written rather than lost).
+ */
+export function inwardRemarks(row, unclearDetails = []) {
   const parts = [];
   if (cleanText(row.fabricCode)) parts.push(`Code: ${cleanText(row.fabricCode)}`);
   if (cleanText(row.dyeColour)) parts.push(`Dye to: ${cleanText(row.dyeColour)}`);
+  for (const field of unclearDetails) parts.push(`${FIELD_LABELS[field]}: ${cleanText(String(row[field]))}`);
   if (cleanText(row.remarks)) parts.push(cleanText(row.remarks));
   return parts.length ? parts.join(' · ').slice(0, 500) : null;
 }
@@ -338,6 +405,7 @@ export function validateConfirmRows(body) {
       errors.push(`${label}: ${problems.join(', ')}.`);
       return;
     }
+    const { details, problems: unclearDetails } = inwardLineDetails(row);
     lines.push({
       rowNo: row?.rowNo ?? index + 1,
       itemName: itemName.slice(0, 200),
@@ -346,8 +414,12 @@ export function validateConfirmRows(body) {
       unit,
       billNo: billNo.slice(0, 100),
       billDate,
+      // A Receiving Date column in the sheet wins over the date chosen for the upload.
+      receivingDate: toDate(row?.receivingDate) || receivingDate,
       supplierName: (cleanText(row?.supplierName) || cleanText(header.supplierName))?.slice(0, 200) || null,
-      remarks: inwardRemarks(row || {}),
+      billerStateCity: cleanText(row?.billerStateCity)?.slice(0, 120) || null,
+      ...details,
+      remarks: inwardRemarks(row || {}, unclearDetails),
       allowDuplicate: row?.allowDuplicate === true,
     });
   });

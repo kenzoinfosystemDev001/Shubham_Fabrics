@@ -1142,12 +1142,14 @@ export default function CreateProductionSheetPage() {
 
   // Real-time fabric availability check
   useEffect(() => {
-    const trimmedFabric = (fabricName || components.TOP.fabricName).trim();
+    // Check against the active sheet (a custom style may have replaced TOP).
+    const primaryComp = components[selectedCategory] || components.TOP;
+    const trimmedFabric = (primaryComp.fabricName || fabricName).trim();
     setFabricAvailability(null);
     setFabricAvailabilityError(null);
 
-    const primaryColor = components.TOP.productionGrid[0]?.color || '';
-    const topAvg = getTotalMtrAverage('TOP');
+    const primaryColor = primaryComp.productionGrid[0]?.color || '';
+    const topAvg = getTotalMtrAverage(components[selectedCategory] ? selectedCategory : 'TOP');
 
     if (!trimmedFabric || overallFabricMeters <= 0 || overallTotalPieces <= 0) {
       setCheckingFabricAvailability(false);
@@ -1178,7 +1180,7 @@ export default function CreateProductionSheetPage() {
       active = false;
       window.clearTimeout(timeout);
     };
-  }, [fabricName, components, overallTotalPieces, overallFabricMeters]);
+  }, [fabricName, components, selectedCategory, overallTotalPieces, overallFabricMeters]);
 
   // Form Submission
   const handleSubmit = async (targetStatus: 'DRAFT' | 'IN_PROGRESS' | 'READY_FOR_ISSUE') => {
@@ -1224,7 +1226,8 @@ export default function CreateProductionSheetPage() {
 
     for (const fCat of forwardedComponents) {
       if (!components[fCat].enabled) {
-        setError(`Cannot forward ${fCat} Production Sheet because it is not enabled.`);
+        const fCatName = fCat === 'OTHER' || isCustomCategory(fCat) ? components[fCat].styleName.trim() || 'New Style' : fCat;
+        setError(`Cannot forward ${fCatName} Production Sheet because it is not enabled.`);
         if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
@@ -1483,14 +1486,9 @@ export default function CreateProductionSheetPage() {
         {/* ========================================================================= */}
         <section className="space-y-6">
           <div className="flex items-center justify-between border-b border-neutral-200 pb-2">
-            <div>
-              <span className="text-[10px] font-black uppercase tracking-wider text-neutral-700 block">
-                STAGE 1 &middot; PRODUCTION SHEET MANAGEMENT
-              </span>
-              <h2 className="text-base font-black text-neutral-900 uppercase">
-                Garment Component Production Sheet
-              </h2>
-            </div>
+            <h2 className="text-base font-black text-neutral-900 uppercase">
+              Stage 1 Production Sheet
+            </h2>
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold text-neutral-500">Active Category:</span>
               <span
@@ -1547,14 +1545,26 @@ export default function CreateProductionSheetPage() {
                       <button
                         type="button"
                         onClick={() => {
+                          const removedName = comp.styleName.trim().toUpperCase();
+                          // Land on another enabled sheet; fall back to TOP, enabled as the STYLE dropdown would.
+                          const nextCat =
+                            componentCategories.find((category) => category !== cat && components[category].enabled) || 'TOP';
                           setComponents((prev) => {
                             const next = { ...prev };
                             delete next[cat];
+                            next[nextCat] = { ...next[nextCat], enabled: true };
                             return next;
                           });
-                          setForwardedComponents((prev) => prev.filter((category) => category !== cat));
-                          setSelectedCategory('TOP');
-                          setWilcomEntries((prev) => prev.filter((entry) => entry.category !== cat));
+                          setForwardedComponents((prev) => {
+                            const remaining = prev.filter((category) => category !== cat);
+                            return components[nextCat].enabled && remaining.length > 0
+                              ? remaining
+                              : Array.from(new Set([...remaining, nextCat]));
+                          });
+                          setSelectedCategory(nextCat);
+                          setWilcomEntries((prev) => prev.filter((entry) =>
+                            entry.category !== cat && !(removedName && entry.category === removedName)
+                          ));
                         }}
                         className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-bold text-danger-700 border border-danger-200 hover:bg-danger-50 rounded cursor-pointer"
                       >
@@ -1602,7 +1612,7 @@ export default function CreateProductionSheetPage() {
                         </div>
                         {(() => {
                           // Wilcom designs saved for this sheet (an "Other" style's designs are stored under its name).
-                          const customName = cat === 'OTHER' ? comp.styleName.trim().toUpperCase() : null;
+                          const customName = cat === 'OTHER' || isCustomCategory(cat) ? comp.styleName.trim().toUpperCase() || null : null;
                           const catEntries = wilcomEntries.filter((e) => e.category === cat || (customName !== null && e.category === customName));
                           const withPhoto = catEntries.filter((e) => e.photoUrl);
                           const openWilcom = () => {
@@ -1751,8 +1761,8 @@ export default function CreateProductionSheetPage() {
                           </label>
                           <input
                             type="text"
-                            value={programSerialNo ? `${programSerialNo}${cat === 'TOP' ? '' : `-${cat}`}` : ''}
-                            onChange={(e) => setProgramSerialNo(e.target.value.replace(new RegExp(`-${cat}$`, 'i'), ''))}
+                            value={programSerialNo}
+                            onChange={(e) => setProgramSerialNo(e.target.value)}
                             onFocus={(e) => e.target.select()}
                             placeholder="e.g. 101"
                             className="w-full border-[1.5px] border-neutral-200 px-3 py-1.5 h-10 font-black text-center text-xs bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 font-mono shadow-2xs"
@@ -2211,7 +2221,7 @@ export default function CreateProductionSheetPage() {
                           <tfoot>
                             <tr className="bg-neutral-100 font-bold border-t-[1.5px] border-neutral-200 text-xs">
                               <td className="border-[1.5px] border-neutral-200 p-1.5 text-right font-black uppercase text-[10px]">
-                                {cat} TOTALS:
+                                {categoryDisplayName} TOTALS:
                               </td>
                               <td className="border-[1.5px] border-neutral-200 p-1.5 text-center font-black text-sm text-accent-800">
                                 {catMeters > 0 ? catMeters.toFixed(2) : ''}
