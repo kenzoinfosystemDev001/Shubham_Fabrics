@@ -412,6 +412,46 @@ export async function syncManualOutwardStock(tx: Tx, outwardId: string, actorId:
   });
 }
 
+/**
+ * Removes what is left of one stock bucket (Total Stock delete). When nothing has been issued from
+ * it, its inward entries are deleted and the bucket disappears. Otherwise the issues keep their
+ * history and the remaining balance is written off with a manual outward row ("STOCK REMOVED").
+ */
+export async function removeStockBucket(tx: Tx, key: string, actor: { id: string; name: string }) {
+  await lockFabricStock(tx);
+  const { book, inwardEntries } = await loadStockBook(tx);
+  const bucket = book.buckets.get(key);
+  if (!bucket) throw new FabricStockError('This stock item no longer exists. Refresh the page.');
+
+  if (bucket.outwardCount === 0 && bucket.totalOutward === 0) {
+    const ids = inwardEntries
+      .filter((row) => {
+        const unit = normalizeStockUnit(row.unit);
+        return unit && stockKey({ fabric: row.itemName, type: row.entryType, colour: row.colour, unit }) === key;
+      })
+      .map((row) => row.id);
+    await tx.fabricInward.deleteMany({ where: { id: { in: ids } } });
+    for (const id of ids) await syncInwardStock(tx, id, actor.id);
+    return { mode: 'DELETED' as const, entries: ids.length, quantity: bucket.totalInward, unit: bucket.unit as string };
+  }
+
+  const balance = bucketBalance(book, key);
+  if (balance <= 0) throw new FabricStockError(`No ${bucket.unit} of "${bucket.itemName}" is left in stock to remove.`);
+  const outward = await tx.fabricOutward.create({
+    data: {
+      itemName: bucket.itemName,
+      issueQty: balance,
+      unit: bucket.unit,
+      colour: bucket.colour,
+      fabricType: bucket.fabricType,
+      destination: 'STOCK REMOVED',
+      remarks: `Removed from Total Stock by ${actor.name}`,
+    },
+  });
+  await syncManualOutwardStock(tx, outward.id, actor.id);
+  return { mode: 'WRITTEN_OFF' as const, entries: 0, quantity: balance, unit: bucket.unit as string };
+}
+
 /** JSON body for a refused stock change. */
 export function fabricStockErrorBody(error: FabricStockError) {
   return { error: [error.message, ...error.details].join(' '), details: error.details, code: 'INSUFFICIENT_STOCK' };

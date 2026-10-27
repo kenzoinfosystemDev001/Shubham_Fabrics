@@ -12,7 +12,13 @@ import {
   Send,
   AlertTriangle,
   ArrowRight,
+  Download,
+  Trash2,
+  CheckCircle2,
+  AlertCircle,
+  X,
 } from 'lucide-react';
+import { downloadSheet } from '@/lib/download-sheet';
 
 interface StockSummary {
   overall: {
@@ -57,6 +63,7 @@ interface StockSummary {
 
 interface StockItem {
   sNo: number;
+  key: string;
   itemName: string;
   fabricType: 'UNDYED' | 'DYED' | 'KORA';
   colour?: string | null;
@@ -108,6 +115,9 @@ function TotalStockContent() {
       : 'ALL'
   );
   const [search, setSearch] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
+  const [pageError, setPageError] = useState('');
+  const [removingKey, setRemovingKey] = useState<string | null>(null);
 
   const loadData = async () => {
     try {
@@ -175,6 +185,47 @@ function TotalStockContent() {
 
   const fmt = (n: number) => n.toLocaleString('en-IN', { maximumFractionDigits: 2 });
 
+  const handleRemoveStock = async (item: StockItem) => {
+    const label = `${item.itemName}${item.colour ? ` (${item.colour})` : ''}`;
+    const effect = item.outwardCount === 0
+      ? `Its ${item.inwardCount} inward entr${item.inwardCount === 1 ? 'y is' : 'ies are'} deleted (${fmt(item.totalInward)} ${item.unit}).`
+      : `The ${fmt(item.balance)} ${item.unit} still available is removed. Fabric already issued stays in the outward history.`;
+    if (!window.confirm(`Delete the current stock of ${label}?\n\n${effect}`)) return;
+    setPageError('');
+    setRemovingKey(item.key);
+    try {
+      const res = await fetch(`/api/fabric-store/total-stock?key=${encodeURIComponent(item.key)}`, { method: 'DELETE' });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json.error || 'Could not delete this stock.');
+      setSuccessMsg(`Stock of ${label} deleted: ${fmt(json.data?.quantity ?? item.balance)} ${item.unit}.`);
+      loadData();
+      setTimeout(() => setSuccessMsg(''), 4000);
+    } catch (err: any) {
+      setPageError(err.message || 'Could not delete this stock.');
+    } finally {
+      setRemovingKey(null);
+    }
+  };
+
+  const handleDownload = () =>
+    downloadSheet(
+      `total-stock-${new Date().toISOString().split('T')[0]}.xlsx`,
+      'Total Stock',
+      items.map((item, index) => ({
+        '#': item.sNo ?? index + 1,
+        Fabric: item.itemName,
+        Colour: item.colour || '',
+        Category: item.fabricType === 'DYED' ? 'Dyed' : 'Undyed',
+        Unit: item.unit,
+        Inward: item.totalInward,
+        Outward: item.totalOutward,
+        Available: item.balance,
+        Short: item.shortfall || '',
+        Status: item.balance > 0 ? 'In stock' : 'Exhausted',
+        'Last Movement': formatDate(item.lastActivity),
+      }))
+    );
+
   const stockCards = [
     { label: 'All Stock', data: summary.overall, tone: 'bg-brand-50 text-brand-700', icon: Boxes },
     { label: 'Undyed', data: undyedData, tone: 'bg-accent-100 text-neutral-900', icon: Layers },
@@ -206,6 +257,15 @@ function TotalStockContent() {
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             </button>
+            <button
+              onClick={handleDownload}
+              disabled={items.length === 0}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-brand-50 text-brand-800 border border-brand-300 text-xs font-semibold rounded-lg transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Download the stock shown as an Excel file"
+            >
+              <Download className="w-4 h-4" />
+              <span>Download</span>
+            </button>
             <Link
               href="/fabric-store/inventory/inward"
               className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-lg shadow-xs transition"
@@ -225,6 +285,22 @@ function TotalStockContent() {
       </header>
 
       <main className="p-4 sm:p-8 max-w-7xl mx-auto space-y-6">
+        {successMsg && (
+          <div className="px-4 py-3 bg-white border border-accent-300 rounded-xl text-sm text-neutral-900 flex items-center gap-2.5 shadow-xs">
+            <CheckCircle2 className="w-4 h-4 text-accent-700 shrink-0" />
+            <span className="font-medium">{successMsg}</span>
+          </div>
+        )}
+        {pageError && (
+          <div className="px-4 py-3 bg-danger-50 border border-danger-200 rounded-xl text-sm text-danger-800 flex items-start gap-2.5">
+            <AlertCircle className="w-4 h-4 text-danger-600 shrink-0 mt-0.5" />
+            <span className="flex-1">{pageError}</span>
+            <button type="button" onClick={() => setPageError('')} aria-label="Dismiss" className="text-danger-600 hover:text-danger-800">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
         {/* SUMMARY */}
         <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {stockCards.map((card) => (
@@ -401,6 +477,18 @@ function TotalStockContent() {
                             <span>{isUndyed ? 'To Dyeing' : 'To Embroidery'}</span>
                             <ArrowRight className="w-3.5 h-3.5" />
                           </Link>
+                          {(item.balance > 0 || item.outwardCount === 0) && (
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveStock(item)}
+                              disabled={removingKey === item.key}
+                              aria-label={`Delete stock of ${item.itemName}`}
+                              title="Delete current stock"
+                              className="ml-2 p-2 align-middle text-neutral-400 hover:text-danger-700 hover:bg-danger-50 rounded-lg transition cursor-pointer disabled:opacity-40"
+                            >
+                              {removingKey === item.key ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                            </button>
+                          )}
                         </td>
                       </tr>
                     );

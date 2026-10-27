@@ -2,7 +2,14 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@subham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
 import { cleanFabricName, normalizeFabricStockType } from '@/lib/fabric-stock';
-import { isChallanMirror, loadStockBook } from '@/lib/fabric-stock-ledger';
+import {
+  FabricStockError,
+  STOCK_TRANSACTION_OPTIONS,
+  fabricStockErrorBody,
+  isChallanMirror,
+  loadStockBook,
+  removeStockBucket,
+} from '@/lib/fabric-stock-ledger';
 import { challanStockLines, roundQty, summarizeBuckets } from '@/lib/fabric-stock-rules.mjs';
 import { addTotals, totalsByUnit, unitOf } from '@/lib/challan-units.mjs';
 
@@ -106,6 +113,7 @@ export async function GET(request: Request) {
       const balance = roundQty(it.totalInward - it.totalOutward);
       return {
         sNo: idx + 1,
+        key: it.key,
         itemName: it.itemName,
         fabricType: it.fabricType,
         colour: it.colour,
@@ -161,5 +169,26 @@ export async function GET(request: Request) {
   } catch (error: any) {
     console.error('Error fetching total fabric stock:', error);
     return NextResponse.json({ error: error.message || 'Failed to fetch total stock' }, { status: 500 });
+  }
+}
+
+// DELETE /api/fabric-store/total-stock?key=<bucket key> - removes the current stock of one item.
+export async function DELETE(request: Request) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE');
+  if (!authUser) return authResponse;
+  try {
+    const key = new URL(request.url).searchParams.get('key');
+    if (!key) return NextResponse.json({ error: 'Choose the stock item to remove.' }, { status: 400 });
+    const result = await prisma.$transaction(
+      (tx) => removeStockBucket(tx, key, { id: authUser.id, name: authUser.fullName || authUser.username }),
+      STOCK_TRANSACTION_OPTIONS,
+    );
+    return NextResponse.json({ success: true, data: result });
+  } catch (error: any) {
+    if (error instanceof FabricStockError) {
+      return NextResponse.json(fabricStockErrorBody(error), { status: 400 });
+    }
+    console.error('Error removing fabric stock:', error);
+    return NextResponse.json({ error: error.message || 'Failed to remove stock' }, { status: 500 });
   }
 }

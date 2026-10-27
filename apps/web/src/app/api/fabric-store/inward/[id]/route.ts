@@ -92,3 +92,34 @@ export async function PATCH(
     return apiErrorResponse(error, error.message || 'Failed to update inward stock', 'Error updating inward fabric stock:');
   }
 }
+
+// Removes an inward entry and takes its quantity back out of stock. Refused when that stock has
+// already been issued (the ledger would go below zero); the whole change then rolls back.
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { user: authUser, response: authResponse } = await requireDepartment(request, 'STORE');
+  if (!authUser) return authResponse;
+  try {
+    const { id } = await params;
+    const removed = await prisma.$transaction(async (tx) => {
+      const row = await tx.fabricInward.delete({ where: { id } });
+      await syncInwardStock(tx, id, authUser.id);
+      return row;
+    }, STOCK_TRANSACTION_OPTIONS);
+    return NextResponse.json({ success: true, data: removed });
+  } catch (error: any) {
+    if (error instanceof FabricStockError) {
+      return NextResponse.json(
+        { ...fabricStockErrorBody(error), error: `This entry's stock has already been issued, so it cannot be deleted. ${error.details.join(' ')}`.trim() },
+        { status: 400 }
+      );
+    }
+    if (error.code === 'P2025') {
+      return NextResponse.json({ error: 'Inward record not found' }, { status: 404 });
+    }
+    console.error('Error deleting inward fabric stock:', error);
+    return NextResponse.json({ error: error.message || 'Failed to delete inward stock' }, { status: 500 });
+  }
+}

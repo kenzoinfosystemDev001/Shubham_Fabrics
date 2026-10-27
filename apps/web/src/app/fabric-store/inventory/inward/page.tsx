@@ -17,8 +17,10 @@ import {
   Pencil,
   UploadCloud,
   Download,
+  Trash2,
 } from 'lucide-react';
 import StockImportModal from '@/components/fabric-store/StockImportModal';
+import { downloadSheet } from '@/lib/download-sheet';
 
 interface InwardItem {
   id: string;
@@ -97,6 +99,8 @@ export default function InwardStockPage() {
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [pageError, setPageError] = useState('');
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Form State
   const [formData, setFormData] = useState(createEmptyFormData);
@@ -284,6 +288,44 @@ export default function InwardStockPage() {
     setModalOpen(true);
   };
 
+  const handleDeleteInward = async (item: InwardItem) => {
+    const label = `${item.itemName}${item.colour ? ` (${item.colour})` : ''}, ${fmt(Number(item.billQty))} ${item.unit || 'MTR'}, bill ${item.billNo}`;
+    if (!window.confirm(`Delete this inward entry?\n\n${label}\n\nIts quantity is taken out of stock.`)) return;
+    setPageError('');
+    setDeletingId(item.id);
+    try {
+      const res = await fetch(`/api/fabric-store/inward/${item.id}`, { method: 'DELETE' });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json.error || 'Could not delete the inward entry.');
+      setSuccessMsg(`Inward entry deleted: ${label}.`);
+      loadData();
+      setTimeout(() => setSuccessMsg(''), 4000);
+    } catch (err: any) {
+      setPageError(err.message || 'Could not delete the inward entry.');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const handleDownload = () =>
+    downloadSheet(
+      `inward-stock-${new Date().toISOString().split('T')[0]}.xlsx`,
+      'Inward Stock',
+      items.map((item, index) => ({
+        '#': item.sNo ?? index + 1,
+        Type: item.entryType === 'DYED' ? 'Dyed' : 'Undyed',
+        Fabric: item.itemName,
+        Colour: item.colour || '',
+        'Bill No.': item.billNo,
+        'Bill Date': formatDate(item.billDate),
+        Received: formatDate(item.receivingDate),
+        Quantity: Number(item.billQty),
+        Unit: item.unit || 'MTR',
+        Supplier: item.supplierName || '',
+        Remarks: item.remarks || '',
+      }))
+    );
+
   const updateLine = (key: string, patch: Partial<InwardLine>) => {
     setFormData((prev) => ({
       ...prev,
@@ -351,11 +393,13 @@ export default function InwardStockPage() {
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             </button>
             <button
-              onClick={openExport}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-neutral-50 text-neutral-900 text-xs font-semibold rounded-lg shadow-xs border border-neutral-300 transition cursor-pointer"
+              onClick={handleDownload}
+              disabled={items.length === 0}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-brand-50 text-brand-800 border border-brand-300 text-xs font-semibold rounded-lg transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Download the entries shown as an Excel file"
             >
               <Download className="w-4 h-4" />
-              <span>Download Excel</span>
+              <span>Download</span>
             </button>
             <button
               onClick={() => setImportOpen(true)}
@@ -381,6 +425,15 @@ export default function InwardStockPage() {
           <div className="px-4 py-3 bg-white border border-accent-300 rounded-xl text-sm text-neutral-900 flex items-center gap-2.5 shadow-xs">
             <CheckCircle2 className="w-4 h-4 text-accent-700 shrink-0" />
             <span className="font-medium">{successMsg}</span>
+          </div>
+        )}
+        {pageError && (
+          <div className="px-4 py-3 bg-danger-50 border border-danger-200 rounded-xl text-sm text-danger-800 flex items-start gap-2.5">
+            <AlertCircle className="w-4 h-4 text-danger-600 shrink-0 mt-0.5" />
+            <span className="flex-1">{pageError}</span>
+            <button type="button" onClick={() => setPageError('')} aria-label="Dismiss" className="text-danger-600 hover:text-danger-800">
+              <X className="w-4 h-4" />
+            </button>
           </div>
         )}
 
@@ -461,7 +514,7 @@ export default function InwardStockPage() {
                   <th className={th}>Party</th>
                   <th className={th}>Remarks</th>
                   <th className={th}>
-                    <span className="sr-only">Edit</span>
+                    <span className="sr-only">Actions</span>
                   </th>
                 </tr>
               </thead>
@@ -514,7 +567,7 @@ export default function InwardStockPage() {
                         <td className="py-3 px-4 text-xs text-neutral-600">
                           {item.remarks ? <div className="truncate max-w-[14rem]" title={item.remarks}>{item.remarks}</div> : <span className="text-neutral-400">—</span>}
                         </td>
-                        <td className="py-3 px-4 text-right">
+                        <td className="py-3 px-4 text-right whitespace-nowrap">
                           <button
                             type="button"
                             onClick={() => handleEditInward(item)}
@@ -523,6 +576,16 @@ export default function InwardStockPage() {
                             className="p-2 text-neutral-400 hover:text-brand-700 hover:bg-brand-50 rounded-lg transition cursor-pointer"
                           >
                             <Pencil className="w-4 h-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteInward(item)}
+                            disabled={deletingId === item.id}
+                            aria-label={`Delete inward record ${item.billNo}`}
+                            title="Delete"
+                            className="p-2 text-neutral-400 hover:text-danger-700 hover:bg-danger-50 rounded-lg transition cursor-pointer disabled:opacity-40"
+                          >
+                            {deletingId === item.id ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                           </button>
                         </td>
                       </tr>

@@ -1759,14 +1759,21 @@ export default function CreateProductionSheetPage() {
                           <label className="block text-[11px] font-black uppercase tracking-wider text-neutral-900 mb-1">
                             SERIAL NO.
                           </label>
-                          <input
-                            type="text"
-                            value={programSerialNo}
-                            onChange={(e) => setProgramSerialNo(e.target.value)}
-                            onFocus={(e) => e.target.select()}
-                            placeholder="e.g. 101"
-                            className="w-full border-[1.5px] border-neutral-200 px-3 py-1.5 h-10 font-black text-center text-xs bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 font-mono shadow-2xs"
-                          />
+                          {/* Only the base serial is editable; the category suffix is shown beside it, never typed into it */}
+                          <div className="flex items-stretch h-10 border-[1.5px] border-neutral-200 bg-white shadow-2xs focus-within:ring-1 focus-within:ring-brand-500">
+                            <input
+                              type="text"
+                              value={programSerialNo}
+                              onChange={(e) => setProgramSerialNo(e.target.value)}
+                              placeholder="e.g. 101"
+                              className="flex-1 min-w-0 px-3 py-1.5 font-black text-center text-xs bg-transparent text-neutral-900 focus:outline-none font-mono"
+                            />
+                            {cat !== 'TOP' && (
+                              <span className="flex items-center px-3 border-l border-neutral-200 bg-neutral-50 font-black text-xs text-neutral-500 font-mono select-none">
+                                -{cat}
+                              </span>
+                            )}
+                          </div>
                         </div>
 
                         <div>
