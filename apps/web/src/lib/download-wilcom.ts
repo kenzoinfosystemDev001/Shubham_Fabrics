@@ -76,6 +76,41 @@ export async function compressImageForUpload(file: File, maxDim = 1600, quality 
 }
 
 /**
+ * The Wilcom category a production sheet's designs are saved under.
+ * Added styles have internal ids (CUSTOM_...); their designs are stored under the style's name.
+ */
+export function wilcomCategoryFor(category: GarmentCategory | 'ALL', meta?: any): string {
+  const cat = String(category || 'ALL').trim().toUpperCase();
+  if (cat === 'ALL' || cat === 'TOP' || cat === 'BOTTOM' || cat === 'DUPATTA') return cat;
+  const styleName = String(meta?.components?.[category]?.styleName || '').trim().toUpperCase();
+  return styleName || cat;
+}
+
+/**
+ * Only the designs of one production sheet; another sheet's designs never stand in for a sheet that has none.
+ */
+export function filterWilcomEntriesByCategory<T extends { category?: string }>(
+  entries: T[],
+  category: GarmentCategory | 'ALL',
+  meta?: any
+): T[] {
+  const id = String(category || 'ALL').trim().toUpperCase();
+  const name = wilcomCategoryFor(category, meta);
+  if (id === 'ALL') return entries;
+  return entries.filter((e) => {
+    const cat = String(e.category || '').trim().toUpperCase();
+    return cat === id || cat === name;
+  });
+}
+
+/**
+ * The root Wilcom photo is the TOP sheet's legacy artwork; another sheet's design never borrows it.
+ */
+export function inheritedWilcomPhoto(entry: { category?: string } | null | undefined, rootPhoto: string): string {
+  return String(entry?.category || 'TOP').trim().toUpperCase() === 'TOP' ? rootPhoto : '';
+}
+
+/**
  * Resolves the primary Wilcom photo from any known field or nested structure.
  */
 export function extractRootWilcomPhoto(program: any, meta?: any): string {
@@ -228,11 +263,12 @@ export async function prepareWilcomImages(program: any) {
       meta = meta || {};
       meta.wilcomEntries = await Promise.all(
         entries.map(async (entry: any) => {
-          const rawPhoto = entry.photoUrl || entry.photo || entry.imageUrl || entry.image || fallbackPhoto || '';
+          const ownFallback = inheritedWilcomPhoto(entry, fallbackPhoto);
+          const rawPhoto = entry.photoUrl || entry.photo || entry.imageUrl || entry.image || ownFallback || '';
           const embedded = rawPhoto ? await embedImage(rawPhoto, 'Wilcom entry photo') : '';
           return {
             ...entry,
-            photoUrl: embedded || rawPhoto || fallbackPhoto,
+            photoUrl: embedded || rawPhoto || ownFallback,
           };
         })
       );
@@ -273,12 +309,12 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
   if (Array.isArray(program.wilcomEntries) && program.wilcomEntries.length > 0) {
     wilcomEntries = program.wilcomEntries.map((e: any) => ({
       ...e,
-      photoUrl: e.photoUrl || e.photo || e.imageUrl || e.image || rootWilcomPhoto || '',
+      photoUrl: e.photoUrl || e.photo || e.imageUrl || e.image || inheritedWilcomPhoto(e, rootWilcomPhoto) || '',
     }));
   } else if (Array.isArray(meta?.wilcomEntries) && meta.wilcomEntries.length > 0) {
     wilcomEntries = meta.wilcomEntries.map((e: any) => ({
       ...e,
-      photoUrl: e.photoUrl || e.photo || e.imageUrl || e.image || rootWilcomPhoto || '',
+      photoUrl: e.photoUrl || e.photo || e.imageUrl || e.image || inheritedWilcomPhoto(e, rootWilcomPhoto) || '',
     }));
   }
 
@@ -295,29 +331,23 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
       },
     ];
   } else {
-    // Ensure any entry missing a photo inherits rootWilcomPhoto
+    // A TOP entry missing a photo inherits rootWilcomPhoto
     wilcomEntries = wilcomEntries.map((e) => ({
       ...e,
-      photoUrl: e.photoUrl || rootWilcomPhoto || '',
+      photoUrl: e.photoUrl || inheritedWilcomPhoto(e, rootWilcomPhoto) || '',
     }));
   }
 
-  const normFilter = String(filterCategory || 'ALL').trim().toUpperCase();
-  const filtered = (normFilter === 'ALL' || !normFilter)
-    ? wilcomEntries
-    : wilcomEntries.filter((e) => {
-        const cat = String(e.category || '').trim().toUpperCase();
-        return cat === normFilter || cat.includes(normFilter) || normFilter.includes(cat);
-      });
-
-  const finalEntries = filtered.length > 0 ? filtered : wilcomEntries;
+  const finalEntries = filterWilcomEntriesByCategory(wilcomEntries, filterCategory, meta);
+  const categoryLabel = wilcomCategoryFor(filterCategory, meta);
+  const categoryPrefix = categoryLabel === 'ALL' ? '' : categoryLabel + ' ';
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wilcom ${filterCategory === 'ALL' ? '' : filterCategory + ' '}Sheet - ${serialNo}</title>
+  <title>Wilcom ${categoryPrefix}Sheet - ${serialNo}</title>
   <style>
     @page {
       size: A4 portrait;
@@ -516,14 +546,14 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
 <body>
   <div class="no-print-bar">
     <div>
-      <strong>Wilcom ${filterCategory === 'ALL' ? '' : filterCategory + ' '}Embroidery Sheet</strong> &middot; Design ${designNo} &middot; Serial No. ${serialNo}
+      <strong>Wilcom ${categoryPrefix}Embroidery Sheet</strong> &middot; Design ${designNo} &middot; Serial No. ${serialNo}
     </div>
     <div style="display: flex; gap: 8px;">
       <button class="btn btn-primary" onclick="window.print()">
-        Print Wilcom ${filterCategory === 'ALL' ? '' : filterCategory + ' '}Sheet (A4)
+        Print Wilcom ${categoryPrefix}Sheet (A4)
       </button>
       <button class="btn btn-primary" style="background: #8e55c4;" onclick="window.downloadSelf()">
-        Download Wilcom ${filterCategory === 'ALL' ? '' : filterCategory + ' '}Sheet
+        Download Wilcom ${categoryPrefix}Sheet
       </button>
       <button class="btn btn-outline" onclick="window.close()">
         Close
@@ -534,7 +564,7 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
   <div class="card-wrapper" id="wilcom-document">
     <div class="header-box">
       <div class="company-title">SHUBHAM FABRICS INDIA PVT. LTD.</div>
-      <div class="doc-title">WILCOM ${filterCategory === 'ALL' ? '' : filterCategory + ' '}EMBROIDERY SPECIFICATION SHEET</div>
+      <div class="doc-title">WILCOM ${categoryPrefix}EMBROIDERY SPECIFICATION SHEET</div>
     </div>
 
     <div class="meta-grid">
@@ -558,7 +588,7 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
 
     ${finalEntries.length === 0 ? `
       <div style="padding: 40px; text-align: center; border: 2px dashed #8f8a96; border-radius: 6px; color: #6b6872; font-weight: 700;">
-        No Wilcom embroidery designs recorded for ${filterCategory === 'ALL' ? 'this production order' : filterCategory}.
+        No Wilcom embroidery designs recorded for ${categoryLabel === 'ALL' ? 'this production order' : categoryLabel}.
       </div>
     ` : `
       <div class="entries-grid">
@@ -626,7 +656,7 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
       a.href = url;
-      a.download = "Wilcom_Form_${filterCategory}_${designNo}_${serialNo}.html";
+      a.download = "Wilcom_Form_${categoryLabel.replace(/[^a-z0-9_-]+/gi, '_')}_${designNo}_${serialNo}.html";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -650,7 +680,12 @@ export async function downloadWilcomFormHtml(program: any, filterCategory: Garme
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Wilcom_${filterCategory}_Sheet_${serialNo}.html`;
+    let meta: any = null;
+    try {
+      meta = typeof preparedProgram.metadataJson === 'string' ? JSON.parse(preparedProgram.metadataJson) : preparedProgram.metadataJson;
+    } catch {}
+    const categoryLabel = wilcomCategoryFor(filterCategory, meta).replace(/[^a-z0-9_-]+/gi, '_');
+    a.download = `Wilcom_${categoryLabel}_Sheet_${serialNo}.html`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

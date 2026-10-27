@@ -16,7 +16,8 @@ import {
   printWilcomForm,
   downloadWilcomFormHtml,
   compressImageForUpload,
-  extractRootWilcomPhoto
+  extractRootWilcomPhoto,
+  inheritedWilcomPhoto
 } from '@/lib/download-wilcom';
 import { useProgramDocument } from '@/hooks/useProgramDocument';
 
@@ -80,9 +81,9 @@ export function WilcomSheetView({
       ];
     }
 
-    return entries.map((e, idx) => ({
+    return entries.map((e) => ({
       ...e,
-      photoUrl: e.photoUrl || (idx === 0 ? rootWilcomPhoto : '') || rootWilcomPhoto || '',
+      photoUrl: e.photoUrl || inheritedWilcomPhoto(e, rootWilcomPhoto) || '',
     }));
   };
 
