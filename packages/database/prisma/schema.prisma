@@ -2041,15 +2041,15 @@ model FabricPhoto {
   @@index([workItemId])
 }
 
-// Quantity a department keeps back (HOLD) from one line it received: a work item, a dyeing order, a Dyeing QC
-// challan's MTR or PCS lines, or a Production Sheet's quantity in Programming / Fabric Store (lib/holds-server.ts).
+// Quantity a department (Dyeing to Inventory) keeps back (HOLD) from one line it received: a work item, a dyeing
+// order, or a Dyeing QC challan's MTR or PCS lines (lib/holds-server.ts).
 // Remaining on HOLD is never more than the line still has unforwarded, so forwarding through the normal
 // challan screens lowers it without a second deduction. One active HOLD per line (activeKey).
 model DepartmentHold {
   id                    String                @id @default(uuid())
   holdNumber            String                @unique // e.g. HLD-2026-0001
   departmentCode        String
-  sourceType            String // PROGRAM | STORE_PROGRAM | DYEING_ORDER | QC1_CHALLAN | WORK_ITEM
+  sourceType            String // DYEING_ORDER | QC1_CHALLAN | WORK_ITEM
   sourceId              String
   sourceKey             String // sourceType:sourceId:unit
   activeKey             String?               @unique // departmentCode|sourceKey while the HOLD is open; null once closed
