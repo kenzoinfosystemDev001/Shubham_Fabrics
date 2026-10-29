@@ -104,15 +104,14 @@ export async function DELETE(
             where: { OR: [{ programId: id }, { inboundChallanId: { in: challanIds } }] },
           });
 
-          // Unlink DyeingOrder references to these challans
+          // Unlink DyeingOrder references to these challans, clearing only the link that points at one
           await tx.dyeingOrder.updateMany({
-            where: {
-              OR: [
-                { inboundChallanId: { in: challanIds } },
-                { qc1ChallanId: { in: challanIds } },
-              ],
-            },
-            data: { inboundChallanId: null, qc1ChallanId: null },
+            where: { inboundChallanId: { in: challanIds } },
+            data: { inboundChallanId: null },
+          });
+          await tx.dyeingOrder.updateMany({
+            where: { qc1ChallanId: { in: challanIds } },
+            data: { qc1ChallanId: null },
           });
 
           // Delete production transactions linked to these challans

@@ -287,11 +287,30 @@ export async function POST(request: Request) {
     metadataObj.swatches = Array.isArray(data.swatches) ? data.swatches : [];
 
     // Store multi-component sheets (TOP, BOTTOM, DUPATTA), forwarded list, and Wilcom design entries
-    if (data.components && typeof data.components === 'object') {
-      metadataObj.components = data.components;
+    const submittedComponents = data.components && typeof data.components === 'object' ? data.components : null;
+    if (submittedComponents) {
+      metadataObj.components = submittedComponents;
     }
     if (Array.isArray(data.forwardedComponents)) {
-      metadataObj.forwardedComponents = data.forwardedComponents;
+      // Only enabled sheets can be forwarded; sheets kept back are saved unchanged and not forwarded.
+      const forwarded: string[] = data.forwardedComponents.filter((key: any) =>
+        typeof key === 'string' &&
+        (!submittedComponents || (key in submittedComponents && submittedComponents[key]?.enabled !== false))
+      );
+      if (forwarded.length === 0) {
+        return NextResponse.json(
+          { error: 'Select at least one enabled Production Sheet to forward to the next department.' },
+          { status: 400 },
+        );
+      }
+      metadataObj.forwardedComponents = forwarded;
+      if (submittedComponents) {
+        for (const key of Object.keys(submittedComponents)) {
+          if (submittedComponents[key] && typeof submittedComponents[key] === 'object') {
+            submittedComponents[key].forwarded = forwarded.includes(key);
+          }
+        }
+      }
     }
     // Resolve wilcom photo and design number across all entries and root fields
     const submittedWilcomEntries = Array.isArray(data.wilcomEntries)

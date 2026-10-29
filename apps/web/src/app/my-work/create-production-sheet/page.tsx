@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { Suspense, useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { 
   ArrowLeft, 
   CheckCircle2, 
@@ -557,7 +557,43 @@ function BatchSubStylesModal({
   );
 }
 
+/**
+ * Every visit to this page gets a fresh form, so a new sheet never saves over the sheet the form
+ * was last showing. Once a new sheet is saved the URL becomes its edit link; the form stays as it is.
+ */
 export default function CreateProductionSheetPage() {
+  return (
+    <Suspense fallback={null}>
+      <CreateProductionSheetRoute />
+    </Suspense>
+  );
+}
+
+function CreateProductionSheetRoute() {
+  const router = useRouter();
+  const editParam = useSearchParams().get('edit');
+  const [form, setForm] = useState<{ editParam: string | null; key: number; savedId: string | null }>({
+    editParam,
+    key: 0,
+    savedId: null,
+  });
+  if (form.editParam !== editParam) {
+    const ownSave = editParam !== null && editParam === form.savedId;
+    setForm(ownSave ? { ...form, editParam } : { editParam, key: form.key + 1, savedId: null });
+  }
+
+  return (
+    <CreateProductionSheetForm
+      key={form.key}
+      onCreated={(id) => {
+        setForm((prev) => ({ ...prev, savedId: id }));
+        router.replace(`/my-work/create-production-sheet?edit=${encodeURIComponent(id)}`);
+      }}
+    />
+  );
+}
+
+function CreateProductionSheetForm({ onCreated }: { onCreated: (id: string) => void }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -920,6 +956,8 @@ export default function CreateProductionSheetPage() {
     const oldCategoryIsBlank =
       !isCustomCategory(selectedCategory) &&
       !hasComponentInput(components[selectedCategory]);
+    // Only a sheet opened for the first time starts as included; viewing a sheet never changes its forwarding.
+    const newCatIsNew = !components[newCat].enabled;
     setSelectedCategory(newCat);
     setComponents((prev) => ({
       ...prev,
@@ -930,7 +968,7 @@ export default function CreateProductionSheetPage() {
     }));
     setForwardedComponents((prev) => [
       ...(oldCategoryIsBlank ? prev.filter((category) => category !== selectedCategory) : prev),
-      ...(prev.includes(newCat) ? [] : [newCat]),
+      ...(newCatIsNew && !prev.includes(newCat) ? [newCat] : []),
     ]);
   };
 
@@ -1364,8 +1402,24 @@ export default function CreateProductionSheetPage() {
       return;
     }
 
-    // Verify pieces in enabled components
-    for (const cat of enabledCats) {
+    // Verify forwarded components
+    if (forwardedComponents.length === 0) {
+      setError('Please select at least one Production Sheet to forward to the next department.');
+      if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    for (const fCat of forwardedComponents) {
+      if (!components[fCat]?.enabled) {
+        const fCatName = fCat === 'OTHER' || isCustomCategory(fCat) ? components[fCat]?.styleName.trim() || 'New Style' : fCat;
+        setError(`Cannot forward ${fCatName} Production Sheet because it is not enabled.`);
+        if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+    }
+
+    // Only the sheets selected for forwarding must be complete; the others are saved as they are.
+    for (const cat of forwardedComponents) {
       if ((cat === 'OTHER' || isCustomCategory(cat)) && !components[cat].styleName.trim()) {
         setError(`Enter a name for the ${cat === 'OTHER' ? 'custom' : 'style'} Production Sheet.`);
         if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1391,22 +1445,6 @@ export default function CreateProductionSheetPage() {
       if (pcs <= 0) {
         const categoryName = cat === 'OTHER' || isCustomCategory(cat) ? components[cat].styleName.trim() : cat;
         setError(`Please enter at least one color row with positive PCS quantity for ${categoryName} Production Sheet.`);
-        if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
-        return;
-      }
-    }
-
-    // Verify forwarded components
-    if (forwardedComponents.length === 0) {
-      setError('Please select at least one Production Sheet to forward to the next department.');
-      if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
-
-    for (const fCat of forwardedComponents) {
-      if (!components[fCat].enabled) {
-        const fCatName = fCat === 'OTHER' || isCustomCategory(fCat) ? components[fCat].styleName.trim() || 'New Style' : fCat;
-        setError(`Cannot forward ${fCatName} Production Sheet because it is not enabled.`);
         if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
@@ -1439,7 +1477,10 @@ export default function CreateProductionSheetPage() {
           return payload;
         }, {});
 
-      const primaryCat: GarmentCategory = selectedCategory;
+      // The sheet-level quantity and colours come from a forwarded sheet, never from one kept back.
+      const primaryCat: GarmentCategory = forwardedComponents.includes(selectedCategory)
+        ? selectedCategory
+        : forwardedComponents[0];
       const primary = components[primaryCat];
       const primaryAvg = getTotalMtrAverage(primaryCat);
       const primaryPieces = getTotalPieces(primaryCat);
@@ -1495,6 +1536,7 @@ export default function CreateProductionSheetPage() {
         result?.wilcomDesignPhoto;
       if (result?.id) {
         setCreatedProgramId(result.id);
+        if (!createdProgramId) onCreated(result.id);
       }
       if (result?.updatedAt) {
         setExpectedUpdatedAt(result.updatedAt);
@@ -1765,8 +1807,15 @@ export default function CreateProductionSheetPage() {
                               : Array.from(new Set([...remaining, nextCat]));
                           });
                           setSelectedCategory(nextCat);
+                          // Designs are filed under the style's name; keep them while another sheet still has that name.
+                          const nameStillUsed =
+                            !removedName ||
+                            componentCategories.some((category) =>
+                              category !== cat &&
+                              (category === removedName || components[category].styleName.trim().toUpperCase() === removedName)
+                            );
                           setWilcomEntries((prev) => prev.filter((entry) =>
-                            entry.category !== cat && !(removedName && entry.category === removedName)
+                            entry.category !== cat && (nameStillUsed || entry.category !== removedName)
                           ));
                         }}
                         className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-bold text-danger-700 border border-danger-200 hover:bg-danger-50 rounded cursor-pointer"
