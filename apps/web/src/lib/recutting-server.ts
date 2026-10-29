@@ -10,6 +10,7 @@ import {
   WorkRequestError,
   guarded,
   inboundWhere,
+  lineAverageOf,
   round,
   syncWorkItems,
   textOf,
@@ -17,6 +18,7 @@ import {
 } from '@/lib/work-items-server';
 import { OPEN_WORK_STATUSES, receivedBasis } from '@/lib/work-items.mjs';
 import { MIXED_UNIT } from '@/lib/challan-units.mjs';
+import { canStoreChallanAverage } from '@/lib/challan-item-average';
 import {
   CATEGORY_LABEL,
   GARMENT_CATEGORIES,
@@ -403,7 +405,7 @@ const listStitchingChallans = (request: Request) =>
   }, 'Failed to load Stitching challans.');
 
 /**
- * POST stitching-challans  { idempotencyKey, challanNumber, issuedDate?, remarks?, lines: [{ allocationId, quantity, remarks? }] }
+ * POST stitching-challans  { idempotencyKey, challanNumber, issuedDate?, remarks?, lines: [{ allocationId, quantity, average?, averageUnit?, remarks? }] }
  * Issues only cut quantity not yet sent, category/style-wise, in the allocation's cut unit.
  */
 const issueStitchingChallan = (request: Request) =>
@@ -423,7 +425,7 @@ const issueStitchingChallan = (request: Request) =>
     let challanNumber = '';
     try {
       challanNumber = requireChallanNumber(body.challanNumber);
-      const lines: Array<{ allocationId: string; quantity: unknown; remarks?: unknown }> = Array.isArray(body.lines) ? body.lines : [];
+      const lines: Array<{ allocationId: string; quantity: unknown; average?: unknown; averageUnit?: unknown; remarks?: unknown }> = Array.isArray(body.lines) ? body.lines : [];
       const allocations = await prisma.workItemAllocation.findMany({
         where: { id: { in: lines.map((l) => l.allocationId) } },
         include: {
@@ -449,7 +451,8 @@ const issueStitchingChallan = (request: Request) =>
       await assertChallanNumbersAvailable(prisma, cfg.code, [{ value: challanNumber }]);
       const issuedDate = body.issuedDate ? new Date(String(body.issuedDate)) : new Date();
       if (Number.isNaN(issuedDate.getTime())) throw new WorkRequestError('Challan date is not a valid date.');
-      const prepared = lines.map((l) => ({ a: byId.get(l.allocationId)!, quantity: round(Number(l.quantity)), remarks: textOf(l.remarks, 300) }));
+      const prepared = lines.map((l, index) => ({ a: byId.get(l.allocationId)!, quantity: round(Number(l.quantity)), ...lineAverageOf(l, index), remarks: textOf(l.remarks, 300) }));
+      const storeAverage = prepared.some((p) => p.average !== null) ? await canStoreChallanAverage() : false;
       const total = round(prepared.reduce((s, p) => s + p.quantity, 0));
       const now = new Date();
 
@@ -473,7 +476,7 @@ const issueStitchingChallan = (request: Request) =>
             remarks: textOf(body.remarks),
           },
         });
-        for (const { a, quantity, remarks } of prepared) {
+        for (const { a, quantity, average, averageUnit, remarks } of prepared) {
           const after = round(a.transferredQuantity + quantity);
           // Guards on the sent and cut totals mean the same cut quantity is never issued twice.
           const moved = await tx.workItemAllocation.updateMany({
@@ -494,6 +497,7 @@ const issueStitchingChallan = (request: Request) =>
               unitType: a.cutUom === 'PCS' ? 'PCS' : 'ROLL',
               quantity,
               uom: a.cutUom,
+              ...(storeAverage && average !== null ? { average, averageUnit } : {}),
               remarks: [
                 `Category: ${categoryName(a)}`,
                 a.styleRef ? `Style: ${a.styleRef}` : null,

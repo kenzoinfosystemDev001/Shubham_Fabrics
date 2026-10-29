@@ -17,7 +17,7 @@ import { loadProgramDocument } from '@/lib/program-document';
 import { extractRootWilcomPhoto, prepareWilcomImages } from '@/lib/download-wilcom';
 import { generateProductionSheetHtml } from '@/lib/download-production-sheet';
 import { garmentImageUrl, groupGarments, imageFor, isFinishedGoodsChallan } from '@/lib/finished-garments.mjs';
-import { challanTotalsByUnit, formatTotals, unitOf } from '@/lib/challan-units.mjs';
+import { averageBeforeUnit, averageText, challanTotalsByUnit, formatTotals, unitOf } from '@/lib/challan-units.mjs';
 
 /** A finished garment as printed on the challan: its name and image (a data URL, so the file works offline). */
 export interface PrintedGarment {
@@ -117,6 +117,8 @@ export function generateChallanHtml(challan: any): string {
   const items: ChallanItem[] = Array.isArray(challan.items) ? challan.items : [];
   // Store → Dyeing lines carry the colour Dyeing must achieve next to the current (base) colour.
   const hasDyeColour = items.some((i: any) => String(i.requiredColour || '').trim());
+  // Programming to Recutting: Size | Average | Unit | Remarks; later challans: Size | Unit | Average | Remarks.
+  const averageFirst = averageBeforeUnit(fromDept);
   // Each line keeps its unit: totals are per unit, never MTR + PCS.
   const unitTotals = challanTotalsByUnit(challan);
   const totalUnits = Object.keys(unitTotals);
@@ -259,8 +261,9 @@ export function generateChallanHtml(challan: any): string {
             <th style="width: 15%;">${hasDyeColour ? 'Base Colour' : 'Colour'}</th>
             ${hasDyeColour ? '<th style="width: 15%;">Dye Colour</th>' : ''}
             <th class="num" style="width: 12%;">Size</th>
+            ${averageFirst ? '<th class="num" style="width: 11%;">Average</th>' : ''}
             <th style="width: 9%;">Unit</th>
-            <th class="num" style="width: 11%;">Average</th>
+            ${averageFirst ? '' : '<th class="num" style="width: 11%;">Average</th>'}
             <th style="width: 24%;">Remarks</th>
           </tr>
         </thead>
@@ -271,8 +274,9 @@ export function generateChallanHtml(challan: any): string {
             <td>${esc(it.colour || '—')}</td>
             ${hasDyeColour ? `<td style="font-weight: 700;">${esc(it.requiredColour || '—')}</td>` : ''}
             <td class="num" style="font-weight: 700;">${esc(it.quantity ?? '')}</td>
+            ${averageFirst ? `<td class="num">${esc(averageText(it))}</td>` : ''}
             <td>${esc(it.uom || '—')}</td>
-            <td class="num">${it.average != null ? esc(`${it.average}${it.averageUnit ? ` ${it.averageUnit}` : ''}`) : '—'}</td>
+            ${averageFirst ? '' : `<td class="num">${esc(averageText(it))}</td>`}
             <td class="muted">${esc([it.rollNumber ? `Roll ${it.rollNumber}` : '', userChallanRemarks(it.remarks)].filter(Boolean).join(' · ') || '—')}</td>
           </tr>`).join('')}
           ${items.length === 0 ? `<tr><td colspan="${hasDyeColour ? 7 : 6}" class="muted" style="text-align: center;">No items on this challan.</td></tr>` : ''}

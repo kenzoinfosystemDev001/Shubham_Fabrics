@@ -3,7 +3,7 @@
 import React from 'react';
 import { CopyPlus, Plus, Trash2 } from 'lucide-react';
 
-// The Items section (Fabric -> Colour -> entries of Size, Unit, Average, Remarks), same layout as the
+// The Items section (Fabric -> Colour -> entries of Size, Average, Unit, Remarks), same layout as the
 // Programming / Fabric Store challan form, for departments that send material they hold. Fabric and Colour
 // are chosen from the department's own ready lines, so every entry stays linked to its stock line and the
 // existing quantity checks; an entry's Size is the quantity sent, in that line's unit (MTR and PCS are never
@@ -237,8 +237,8 @@ export function StockItemsSection({
                           <thead className="bg-neutral-50 border-b border-neutral-200 text-[11px] font-semibold uppercase tracking-wide text-neutral-500 whitespace-nowrap">
                             <tr>
                               <th className="py-2.5 pl-3 pr-2 w-36">Size{REQUIRED}</th>
-                              <th className="py-2.5 px-2 w-40">Unit{REQUIRED}</th>
                               <th className="py-2.5 px-2 w-56">Average</th>
+                              <th className="py-2.5 px-2 w-40">Unit{REQUIRED}</th>
                               <th className="py-2.5 px-2">Remarks</th>
                               <th className="py-2.5 pl-2 pr-3 w-14"><span className="sr-only">Remove</span></th>
                             </tr>
@@ -249,41 +249,27 @@ export function StockItemsSection({
                               return (
                                 <tr key={e.key} className="hover:bg-neutral-50/60 transition">
                                   <td className="py-2 pl-3 pr-2">
-                                    <input
-                                      type="number"
-                                      step="any"
-                                      min="0.001"
-                                      max={src?.available}
-                                      required
-                                      aria-label="Size"
-                                      value={e.size}
-                                      onChange={(ev) => setEntry(f.key, c.key, e.key, { size: ev.target.value })}
-                                      disabled={!src}
-                                      className={`${FIELD} tabular-nums font-semibold disabled:bg-neutral-50`}
-                                    />
-                                  </td>
-                                  {/* Unit: the stock line's own unit (meters are never converted to pieces) */}
-                                  <td className="py-2 px-2">
-                                    <div role="radiogroup" aria-label="Unit" className={`inline-flex h-9 p-0.5 rounded-lg ${src ? 'bg-neutral-100' : 'bg-danger-50 ring-1 ring-danger-300'}`}>
-                                      {(['MTR', 'PCS'] as const).map((unit) => {
-                                        const active = src?.uom === unit;
-                                        return (
-                                          <span
-                                            key={unit}
-                                            role="radio"
-                                            aria-checked={active}
-                                            aria-disabled={!active}
-                                            title={src && !active ? `This line is recorded in ${src.uom}` : unit === 'MTR' ? 'Meters' : 'Pieces'}
-                                            className={`px-2.5 flex items-center rounded-md text-xs font-semibold ${
-                                              active ? 'bg-white text-brand-800 shadow-xs' : 'text-neutral-400'
-                                            }`}
-                                          >
-                                            {unit}
-                                          </span>
-                                        );
-                                      })}
+                                    <div className="relative">
+                                      <input
+                                        type="number"
+                                        step="any"
+                                        min="0.001"
+                                        max={src?.available}
+                                        required
+                                        aria-label={src ? `Size in ${src.uom}` : 'Size'}
+                                        value={e.size}
+                                        onChange={(ev) => setEntry(f.key, c.key, e.key, { size: ev.target.value })}
+                                        disabled={!src}
+                                        className={`${FIELD} tabular-nums font-semibold disabled:bg-neutral-50 ${src ? 'pr-11' : ''}`}
+                                      />
+                                      {src && (
+                                        <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-[11px] font-semibold text-neutral-400">
+                                          {src.uom}
+                                        </span>
+                                      )}
                                     </div>
                                   </td>
+                                  {/* Average, with its own MTR / PCS */}
                                   <td className="py-2 px-2">
                                     <div className="flex items-center gap-1.5">
                                       <input
@@ -316,6 +302,28 @@ export function StockItemsSection({
                                           </button>
                                         ))}
                                       </div>
+                                    </div>
+                                  </td>
+                                  {/* Unit: the stock line's own unit (meters are never converted to pieces) */}
+                                  <td className="py-2 px-2">
+                                    <div role="radiogroup" aria-label="Unit" className={`inline-flex h-9 p-0.5 rounded-lg ${src ? 'bg-neutral-100' : 'bg-danger-50 ring-1 ring-danger-300'}`}>
+                                      {(['MTR', 'PCS'] as const).map((unit) => {
+                                        const active = src?.uom === unit;
+                                        return (
+                                          <span
+                                            key={unit}
+                                            role="radio"
+                                            aria-checked={active}
+                                            aria-disabled={!active}
+                                            title={src && !active ? `This line is recorded in ${src.uom}` : unit === 'MTR' ? 'Meters' : 'Pieces'}
+                                            className={`px-2.5 flex items-center rounded-md text-xs font-semibold ${
+                                              active ? 'bg-white text-brand-800 shadow-xs' : 'text-neutral-400'
+                                            }`}
+                                          >
+                                            {unit}
+                                          </span>
+                                        );
+                                      })}
                                     </div>
                                   </td>
                                   <td className="py-2 px-2">

@@ -1698,11 +1698,11 @@ export default function QC1MyWorkPage() {
                             <span className="text-accent-800 font-semibold flex items-center gap-2">
                               <span>Dyeing Process Shrinkage:</span>
                               <span className="font-mono font-bold text-accent-800">
-                                {selectedChallanForInspect.remarks.match(/Shrinkage:\s*([^\s·|]+)\s*MTR/i)?.[0] || 'Reported'}
+                                {selectedChallanForInspect.remarks.match(/Shrinkage:\s*([^\s·|]+)\s*(?:MTR|PCS)/i)?.[0] || 'Reported'}
                               </span>
                             </span>
                             <span className="text-[10px] text-accent-800 bg-accent-100/90 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
-                              Verified in Net Meters ({selectedChallanForInspect.sentText ?? `${selectedChallanForInspect.totalSentQuantity} ${selectedChallanForInspect.uom}`})
+                              Verified net quantity ({selectedChallanForInspect.sentText ?? `${selectedChallanForInspect.totalSentQuantity} ${selectedChallanForInspect.uom}`})
                             </span>
                           </div>
                         )}
