@@ -39,6 +39,7 @@ import {
   extractSubStylesAndGrid,
   GarmentCategory,
   productionSheetCategoriesForViewer,
+  widthInInches,
 } from '@/lib/download-production-sheet';
 import { WilcomPrintModal } from '@/components/wilcom/WilcomPrintModal';
 import { 
@@ -203,7 +204,7 @@ export default function ProgramDetailPage() {
         measurement: program.colorQuantity || program.targetQuantity || 1,
         unit: program.quantityMeasurement || 'PCS',
         fabricAverage: program.fabricAverage || 1.25,
-        fabricWidth: program.fabricWidthInches ? `${program.fabricWidthInches} Inches` : (program.fabricWidth || '58 Inches'),
+        fabricWidth: widthInInches(program.fabricWidth || program.fabricWidthInches),
         specialMaterial: program.specialMaterial || 'None',
         remarks: program.comments || '',
       },
@@ -361,29 +362,16 @@ export default function ProgramDetailPage() {
             size="sm"
           />
 
-          {(isProgrammingUser(currentUser) || isAdminUser(currentUser)) && (() => {
-            // Editable until the first challan is issued from it; the server enforces the same rule.
-            const issued = challans.find((ch) => !['DRAFT', 'CANCELLED'].includes(String(ch.status || '').toUpperCase()));
-            const lockReason = issued ? `Challan ${issued.challanNumber} has already been issued from this sheet, so it can no longer be edited.` : null;
-            return lockReason ? (
-              <span
-                title={lockReason}
-                aria-disabled="true"
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-neutral-100 text-neutral-400 text-xs font-semibold rounded-md border border-neutral-200 cursor-not-allowed"
-              >
-                <Lock className="w-3.5 h-3.5" />
-                <span>Edit</span>
-              </span>
-            ) : (
-              <Link
-                href={`/my-work/create-production-sheet?edit=${encodeURIComponent(program.id)}`}
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-neutral-50 text-neutral-900 text-xs font-semibold rounded-md border border-neutral-300 shadow-xs transition"
-              >
-                <Pencil className="w-3.5 h-3.5" />
-                <span>Edit</span>
-              </Link>
-            );
-          })()}
+          {/* Always editable, also after challans are issued (to correct mistakes); the sheet keeps its status. */}
+          {(isProgrammingUser(currentUser) || isAdminUser(currentUser)) && (
+            <Link
+              href={`/my-work/create-production-sheet?edit=${encodeURIComponent(program.id)}`}
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-neutral-50 text-neutral-900 text-xs font-semibold rounded-md border border-neutral-300 shadow-xs transition"
+            >
+              <Pencil className="w-3.5 h-3.5" />
+              <span>Edit</span>
+            </Link>
+          )}
 
           {isDraft && (
             <button
@@ -530,7 +518,7 @@ export default function ProgramDetailPage() {
             <span className="text-neutral-500 block text-[10px] font-semibold uppercase tracking-wider">Client</span>
             <span className="font-bold text-neutral-900 text-sm">{program.clientName || program.buyerName || 'Standard Client'}</span>
             {isClientCodeVisible && (
-              <span className="inline-flex items-center gap-1 mt-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-accent-50 text-accent-800 border border-accent-200 block w-fit">
+              <span className="inline-flex items-center gap-1 mt-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-accent-50 text-accent-800 border border-accent-200 w-fit">
                 <span>Code:</span>
                 <span>{program.clientCode}</span>
               </span>
@@ -794,7 +782,7 @@ export default function ProgramDetailPage() {
               </div>
               <div>
                 <span className="text-neutral-500 block text-[11px]">Fabric Width</span>
-                <span className="font-mono text-neutral-900">{program.fabricWidthInches || '58'} Inches</span>
+                <span className="font-mono text-neutral-900">{widthInInches(program.fabricWidth || program.fabricWidthInches) || '—'}</span>
               </div>
               <div>
                 <span className="text-neutral-500 block text-[11px]">Fabric Color</span>

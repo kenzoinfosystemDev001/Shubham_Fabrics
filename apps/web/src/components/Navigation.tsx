@@ -112,6 +112,7 @@ export function Navigation() {
   const isMyWorkRootActive = pathname === '/my-work';
   const isFloorBoardActive = pathname === '/floor-board';
   const isHistoryActive = pathname === '/production-history';
+  const isHoldActive = pathname === '/programming/hold';
 
   return (
     <>
@@ -279,6 +280,19 @@ export function Navigation() {
             }`}
           >
             <span>Production History</span>
+          </Link>
+
+          {/* HOLD: Production Sheet quantity kept back from issuing */}
+          <Link
+            href="/programming/hold"
+            onClick={() => setMobileOpen(false)}
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition ${
+              isHoldActive
+                ? 'bg-brand-50 text-brand-800 border-l-2 border-brand-500 pl-2.5'
+                : 'text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900'
+            }`}
+          >
+            <span>HOLD</span>
           </Link>
 
           {/* 4. Floor Board */}

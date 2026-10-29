@@ -220,6 +220,14 @@ export function DyeingNavigation() {
             <span>Dyeing History</span>
           </Link>
 
+          {/* HOLD: fabric kept back from forwarding */}
+          <Link
+            href="/dyeing/hold"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/dyeing/hold', true)}
+          >
+            <span>HOLD</span>
+          </Link>
           {/* 4. Floor Board */}
           <Link
             href="/dyeing/floor-board"

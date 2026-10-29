@@ -134,9 +134,11 @@ export async function POST(request: Request) {
       // Strict stock gating will be re-enabled later once stock management is maintained.
     }
 
-    // Editing a submitted sheet: only by its own ID, only before its first challan is issued, and only
-    // from the version the editor loaded (a newer save by someone else is never overwritten).
+    // Editing a submitted sheet: only by its own ID, and only from the version the editor loaded (a newer save
+    // by someone else is never overwritten). A sheet with challans issued stays editable to correct mistakes; its
+    // status is kept (the form cannot send it back to Draft) and its challans and stock are not changed.
     let existing: any = null;
+    let keepStatus: string | null = null;
     if (data.id) {
       existing = await prisma.program.findUnique({
         where: { id: data.id },
@@ -150,12 +152,7 @@ export async function POST(request: Request) {
         select: { challanNumber: true },
         orderBy: { createdAt: 'asc' },
       });
-      if (issued) {
-        return NextResponse.json(
-          { error: `Challan ${issued.challanNumber} has already been issued from this production sheet, so it can no longer be edited.` },
-          { status: 409 },
-        );
-      }
+      if (issued) keepStatus = existing.status;
       if (data.expectedUpdatedAt && new Date(data.expectedUpdatedAt).getTime() !== new Date(existing.updatedAt).getTime()) {
         return NextResponse.json(
           { error: 'Someone else saved this production sheet after you opened it. Reload the sheet to see their changes, then make your edit again.' },
@@ -369,7 +366,7 @@ export async function POST(request: Request) {
       styleCode: data.mainStyle || data.styleCode || data.topName || '',
       productCategory: data.productCategory || 'GARMENT',
       targetQuantity: targetQty,
-      status: targetStatus,
+      status: keepStatus || targetStatus,
       remarks: data.note || data.comments || data.remarks || null,
       createdById: actorId,
 

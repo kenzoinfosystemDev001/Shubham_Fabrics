@@ -65,6 +65,8 @@ model User {
   workAllocations      WorkItemAllocation[] @relation("AllocationCreator")
   packingAllocations   PackingAllocation[]  @relation("PackingAllocationCreator")
   garmentImagesUploaded GarmentImage[]      @relation("GarmentImageUploader")
+  holdsPlaced           DepartmentHold[]      @relation("HoldPlacer")
+  holdEvents            DepartmentHoldEvent[] @relation("HoldEventActor")
 
   // Smart Deadline Alerts
   deadlineAlertDismissals DeadlineAlertDismissal[]
@@ -491,6 +493,7 @@ model Program {
   @@index([status])
   departmentWorkItems DepartmentWorkItem[]
   garmentImages       GarmentImage[]
+  departmentHolds     DepartmentHold[]
 }
 
 model ProgramFabric {
@@ -1527,6 +1530,9 @@ model DyeingOrder {
 
   // Receipt: what physically arrived (null until received; legacy orders received before this existed).
   receivedQuantity     Float?
+  // The line's second quantity (its Unit quantity in the other unit) as received; never converted.
+  receivedUnitQuantity    Float?
+  receivedUnitQuantityUom String?
   receivedAt           DateTime?
   receivedById         String?
   receivedBy           User?      @relation("DyeingReceiver", fields: [receivedById], references: [id])
@@ -1610,6 +1616,9 @@ model DepartmentWorkItem {
   uom                    String
   expectedQuantity       Float
   receivedQuantity       Float?
+  // The line's second quantity (its Unit quantity in the other unit, MTR or PCS) as received; never converted.
+  receivedUnitQuantity    Float?
+  receivedUnitQuantityUom String?
   processedQuantity      Float     @default(0) // QC departments: inspected
   transferredQuantity    Float     @default(0) // QC departments: PASS sent onward
   // Garment lines (Stitching onward): category and style from the Recutting allocation.
@@ -2030,4 +2039,71 @@ model FabricPhoto {
   @@unique([workItemId, fileHash])
   @@index([programId])
   @@index([workItemId])
+}
+
+// Quantity a department keeps back (HOLD) from one line it received: a work item, a dyeing order, a Dyeing QC
+// challan's MTR or PCS lines, or a Production Sheet's quantity in Programming / Fabric Store (lib/holds-server.ts).
+// Remaining on HOLD is never more than the line still has unforwarded, so forwarding through the normal
+// challan screens lowers it without a second deduction. One active HOLD per line (activeKey).
+model DepartmentHold {
+  id                    String                @id @default(uuid())
+  holdNumber            String                @unique // e.g. HLD-2026-0001
+  departmentCode        String
+  sourceType            String // PROGRAM | STORE_PROGRAM | DYEING_ORDER | QC1_CHALLAN | WORK_ITEM
+  sourceId              String
+  sourceKey             String // sourceType:sourceId:unit
+  activeKey             String?               @unique // departmentCode|sourceKey while the HOLD is open; null once closed
+  programId             String
+  program               Program               @relation(fields: [programId], references: [id], onDelete: Cascade)
+  // Identifiers as they were when the HOLD was placed (kept after release).
+  challanId             String?
+  challanNumber         String?
+  designNumber          String
+  serialNumber          String
+  productionSheetNumber String
+  fabricName            String
+  colour                String?
+  size                  String?
+  unit                  String // MTR | PCS, the line's own unit; never converted
+  receivedQuantity      Float
+  forwardedQuantity     Float // forwarded from the line, as last computed
+  forwardedAtHold       Float // forwarded from the line when the HOLD was placed
+  holdQuantity          Float
+  releasedQuantity      Float                 @default(0)
+  remainingQuantity     Float // still on HOLD, as last computed
+  reason                String // PRODUCTION_PENDING, QUALITY_ISSUE ... OTHER (lib/holds.mjs)
+  reasonOther           String? // the typed reason when reason is OTHER
+  remarks               String?
+  status                String                @default("ON_HOLD") // ON_HOLD, PARTIALLY_RELEASED, PARTIALLY_FORWARDED, RELEASED, FORWARDED, CLEARED
+  heldById              String?
+  heldBy                User?                 @relation("HoldPlacer", fields: [heldById], references: [id], onDelete: SetNull)
+  heldByName            String
+  heldAt                DateTime              @default(now())
+  closedAt              DateTime?
+  events                DepartmentHoldEvent[]
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+
+  @@index([departmentCode, status])
+  @@index([programId])
+  @@index([sourceKey])
+}
+
+// History of a HOLD: placed, released (in part or in full) and closed. Forwarding is read from the line's
+// own transfer records (challans, allocations, packing), so it is never recorded twice.
+model DepartmentHoldEvent {
+  id             String         @id @default(uuid())
+  holdId         String
+  hold           DepartmentHold @relation(fields: [holdId], references: [id], onDelete: Cascade)
+  action         String // HOLD | RELEASE | CLOSE
+  quantity       Float
+  remainingAfter Float
+  unit           String
+  remarks        String?
+  actorId        String?
+  actor          User?          @relation("HoldEventActor", fields: [actorId], references: [id], onDelete: SetNull)
+  actorName      String
+  createdAt      DateTime       @default(now())
+
+  @@index([holdId])
 }

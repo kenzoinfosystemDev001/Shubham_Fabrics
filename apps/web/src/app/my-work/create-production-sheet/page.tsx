@@ -798,12 +798,7 @@ function CreateProductionSheetForm({ onCreated }: { onCreated: (id: string) => v
           setSelectedCategory(savedCats.find((cat) => loaded[cat].enabled) || savedCats[0]);
         }
 
-        const issued = (Array.isArray(program.challans) ? program.challans : []).find(
-          (ch: any) => !['DRAFT', 'CANCELLED'].includes(String(ch.status || '').toUpperCase())
-        );
-        if (issued) {
-          setEditLockReason(`Challan ${issued.challanNumber} has already been issued from this production sheet, so it can no longer be edited.`);
-        }
+        // A sheet with challans issued stays editable; saving keeps its status and does not change its challans.
       } catch (err: any) {
         setEditLockReason(err.message || 'This production sheet could not be loaded.');
       } finally {
@@ -2186,10 +2181,12 @@ function CreateProductionSheetForm({ onCreated }: { onCreated: (id: string) => v
 
                       <div>
                         <label className="block text-[11px] font-black uppercase tracking-wider text-neutral-900 mb-1">
-                          WIDTH:
+                          WIDTH (INCH):
                         </label>
+                        <div className="relative">
                         <input
                           type="text"
+                          inputMode="decimal"
                           value={comp.fabricWidth || fabricWidth}
                           onChange={(e) => {
                             const val = e.target.value;
@@ -2199,9 +2196,12 @@ function CreateProductionSheetForm({ onCreated }: { onCreated: (id: string) => v
                             }));
                           }}
                           onFocus={(e) => e.target.select()}
-                          placeholder=""
-                          className="w-full border-[1.5px] border-neutral-200 px-3 py-1.5 h-10 font-bold text-xs bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 shadow-2xs"
+                          placeholder="e.g. 58"
+                          aria-label="Fabric width in inches"
+                          className="w-full border-[1.5px] border-neutral-200 pl-3 pr-12 py-1.5 h-10 font-bold text-xs bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 shadow-2xs"
                         />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-bold text-neutral-500 pointer-events-none">inch</span>
+                        </div>
                       </div>
                     </div>
 

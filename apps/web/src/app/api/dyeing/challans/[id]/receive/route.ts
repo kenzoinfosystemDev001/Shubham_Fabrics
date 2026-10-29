@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@shubham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
 import { DyeingRequestError, TX_OPTIONS, dyeingErrorResponse } from '@/lib/dyeing-server';
+import { WorkRequestError, secondReceipt } from '@/lib/work-items-server';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,7 +10,8 @@ const round = (n: number) => Math.round(n * 1000) / 1000;
 
 /**
  * POST /api/dyeing/challans/:id/receive
- * Body: { lines: [{ orderId, receivedQuantity, remarks? }], remarks? }
+ * Body: { lines: [{ orderId, receivedQuantity, receivedUnitQuantity?, remarks? }], remarks? }
+ * receivedUnitQuantity is the line's second quantity (its Unit quantity in the other unit), recorded apart.
  * Records what physically arrived for every line still awaiting receipt on this challan.
  * A line can be received once; repeating the request is rejected, not counted twice.
  */
@@ -18,7 +20,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   if (!user) return response;
 
   const body = await request.json().catch(() => null);
-  const lines: Array<{ orderId: string; receivedQuantity: unknown; remarks?: unknown }> = Array.isArray(body?.lines) ? body.lines : [];
+  const lines: Array<{ orderId: string; receivedQuantity: unknown; receivedUnitQuantity?: unknown; remarks?: unknown }> = Array.isArray(body?.lines) ? body.lines : [];
   const challanRemarks = typeof body?.remarks === 'string' ? body.remarks.trim().slice(0, 500) : '';
 
   try {
@@ -30,8 +32,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         challanNumber: true,
         toDepartment: true,
         status: true,
+        items: { select: { id: true, unitQuantity: true, unitQuantityUom: true, uom: true } },
         dyeingInboundOrders: {
-          select: { id: true, orderNumber: true, status: true, requiredQuantity: true, uom: true, fabricName: true, targetColor: true },
+          select: { id: true, orderNumber: true, status: true, requiredQuantity: true, uom: true, fabricName: true, targetColor: true, inboundChallanItemId: true },
         },
       },
     });
@@ -57,6 +60,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       if (!Number.isFinite(qty) || qty < 0) throw new DyeingRequestError(`Line ${index + 1}: received quantity must be zero or more.`);
       const received = round(qty);
       const difference = round(received - order.requiredQuantity);
+      let second: ReturnType<typeof secondReceipt>;
+      try {
+        second = secondReceipt(challan.items.find((l) => l.id === order.inboundChallanItemId), line.receivedUnitQuantity, `Line ${index + 1} (${order.fabricName})`, false);
+      } catch (e) {
+        throw e instanceof WorkRequestError ? new DyeingRequestError(e.message) : e;
+      }
       const note = typeof line.remarks === 'string' ? line.remarks.trim().slice(0, 300) : '';
       const discrepancy =
         difference < 0
@@ -64,7 +73,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
           : difference > 0
           ? `Excess of ${difference} ${order.uom}`
           : null;
-      return { order, received, difference, remarks: [discrepancy, note].filter(Boolean).join(' · ') || null };
+      return { order, received, difference, second, remarks: [discrepancy, second.discrepancy, note].filter(Boolean).join(' · ') || null };
     });
     if (lines.some((l) => !pending.some((o) => o.id === l.orderId))) {
       throw new DyeingRequestError('A line does not belong to this challan or was already received.', 409);
@@ -79,6 +88,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
           data: {
             status: 'RECEIVED',
             receivedQuantity: r.received,
+            receivedUnitQuantity: r.second.quantity,
+            receivedUnitQuantityUom: r.second.unit,
             undyedQuantity: r.received,
             receivedAt: now,
             receivedById: user.id,
@@ -109,6 +120,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
               expected: r.order.requiredQuantity,
               received: r.received,
               uom: r.order.uom,
+              receivedSecond: r.second.quantity,
+              secondUom: r.second.unit,
               remarks: r.remarks,
             })),
           ),

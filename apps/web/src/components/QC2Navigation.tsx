@@ -227,6 +227,14 @@ export function QC2Navigation() {
             <span>Threadcut QC History</span>
           </Link>
 
+          {/* HOLD: fabric kept back from forwarding */}
+          <Link
+            href="/qc2/hold"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/qc2/hold', true)}
+          >
+            <span>HOLD</span>
+          </Link>
           {/* 4. Floor Board */}
           <Link
             href="/qc2/floor-board"

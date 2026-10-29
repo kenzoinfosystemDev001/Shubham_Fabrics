@@ -52,6 +52,8 @@ import {
 } from '@/lib/download-challan';
 import { FinishedGarmentList, useGarmentImages } from '@/components/workflow/FinishedGarments';
 import { isFinishedGoodsChallan } from '@/lib/finished-garments.mjs';
+import { EditChallanDialog } from '@/components/challan/EditChallanDialog';
+import { Pencil } from 'lucide-react';
 
 export default function ChallanDetailPage() {
   const { id } = useParams() as { id: string };
@@ -62,6 +64,8 @@ export default function ChallanDetailPage() {
   const [user, setUser] = useState<any>(null);
   const [downloadingBarcode, setDownloadingBarcode] = useState(false);
   const [showSheetModal, setShowSheetModal] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
   // Finished garments (Finishing onward) are shown by name and image only, without colour or quantity.
   const finishedGoods = isFinishedGoodsChallan(challan);
   const { images: garmentImages } = useGarmentImages(finishedGoods ? [challan?.programId] : []);
@@ -282,6 +286,15 @@ export default function ChallanDetailPage() {
           <div className="flex items-center gap-2 flex-wrap justify-end">
             <button
               type="button"
+              onClick={() => setEditing(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-neutral-50 text-neutral-800 text-xs font-semibold rounded-md ring-1 ring-neutral-300 transition cursor-pointer"
+              title="Correct this challan"
+            >
+              <Pencil className="w-3.5 h-3.5" />
+              <span>Edit</span>
+            </button>
+            <button
+              type="button"
               onClick={handleDownloadBarcodePng}
               disabled={downloadingBarcode}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-neutral-50 text-neutral-800 text-xs font-semibold rounded-md ring-1 ring-neutral-300 transition cursor-pointer disabled:opacity-50"
@@ -464,6 +477,24 @@ export default function ChallanDetailPage() {
           </div>
         </article>
       </main>
+
+      {notice && (
+        <div className="fixed bottom-4 right-4 z-40 px-4 py-3 bg-white border border-accent-300 rounded-xl shadow-lg text-sm text-neutral-900 print:hidden" role="status">
+          {notice}
+          <button type="button" onClick={() => setNotice(null)} className="ml-3 text-xs font-semibold opacity-70 hover:opacity-100">Close</button>
+        </div>
+      )}
+      {editing && (
+        <EditChallanDialog
+          challan={challan}
+          onClose={() => setEditing(false)}
+          onSaved={(message) => {
+            setEditing(false);
+            setNotice(message);
+            loadChallan();
+          }}
+        />
+      )}
 
       {/* PRODUCTION SHEET PREVIEW */}
       {challan?.program && (
