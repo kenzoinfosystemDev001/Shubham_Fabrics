@@ -801,6 +801,8 @@ model ChallanItem {
   uom             String
   average         Float?   // Average entered with the line on the issuing form; null when not given
   averageUnit     String?  // MTR or PCS: the unit of `average` (chosen with it); null when no average
+  unitQuantity    Float?   // Unit quantity entered with the line (Items: Size | Average | Unit); information only, stock moves by `quantity`
+  unitQuantityUom String?  // MTR or PCS: the unit of `unitQuantity` (chosen with it); null when none
   remarks         String?
 
   sourceLotId     String?

@@ -5,7 +5,7 @@ import { assertChallanNumbersAvailable, challanNumberErrorResponse, requireChall
 import { DyeingRequestError, TX_OPTIONS, dyeingErrorResponse } from '@/lib/dyeing-server';
 import { isColorMismatch, statusAfterTransfer, validateQcTransferLines } from '@/lib/dyeing-workflow.mjs';
 import { MIXED_UNIT } from '@/lib/challan-units.mjs';
-import { canStoreChallanAverage, canWriteColumns } from '@/lib/challan-item-average';
+import { canWriteColumns, lineExtrasOf, lineExtrasWriter } from '@/lib/challan-item-average';
 
 const ENDPOINT = 'DYEING_QC_CHALLAN';
 const round = (n: number) => Math.round(n * 1000) / 1000;
@@ -17,6 +17,8 @@ export interface QcTransferLineInput {
   actualDyedColor?: unknown;
   average?: unknown; // optional Average of the entry, with averageUnit (MTR | PCS)
   averageUnit?: unknown;
+  unitQuantity?: unknown; // optional Unit quantity of the entry, with unitQuantityUom (MTR | PCS)
+  unitQuantityUom?: unknown;
   remarks?: unknown;
 }
 
@@ -101,15 +103,9 @@ export async function issueDyeingQcChallan(user: AuthenticatedUser, input: Issue
           `Line ${index + 1}: "${actual}" differs from the required colour "${order.targetColor}". Record and review it in Dyeing Process first.`,
         );
       }
-      const rawAverage = line.average === undefined || line.average === null ? '' : String(line.average).trim();
-      const average = rawAverage === '' ? null : Number(rawAverage);
-      if (average !== null && (!Number.isFinite(average) || average < 0)) throw new DyeingRequestError(`Line ${index + 1}: Average must be 0 or more.`);
-      const averageUnit = average === null ? null : String(line.averageUnit || '').toUpperCase();
-      if (averageUnit !== null && averageUnit !== 'MTR' && averageUnit !== 'PCS') throw new DyeingRequestError(`Line ${index + 1}: choose MTR or PCS for the Average.`);
       return {
         order,
-        average,
-        averageUnit,
+        extras: lineExtrasOf(line, index, (m) => new DyeingRequestError(m)),
         quantity: round(Number(line.quantity)),
         actual,
         base: order.inboundChallanItemId ? baseColour.get(order.inboundChallanItemId) ?? null : null,
@@ -126,7 +122,7 @@ export async function issueDyeingQcChallan(user: AuthenticatedUser, input: Issue
     // Typed incharge name: its own column, or an "Incharge:" remarks note while that column is not in the database.
     const inchargeName = typeof input.inchargeName === 'string' ? input.inchargeName.trim().slice(0, 100) : '';
     const storeInchargeColumn = inchargeName ? await canWriteColumns('Challan', ['inchargeName']) : false;
-    const storeAverage = prepared.some((p) => p.average !== null) ? await canStoreChallanAverage() : false;
+    const extrasOf = await lineExtrasWriter(prepared.map((p) => p.extras));
     const userRemarks = typeof input.remarks === 'string' ? input.remarks.trim().slice(0, 500) : '';
 
     const challanId = await prisma.$transaction(async (tx) => {
@@ -183,7 +179,7 @@ export async function issueDyeingQcChallan(user: AuthenticatedUser, input: Issue
             unitType: 'ROLL',
             quantity: p.quantity,
             uom: p.order.uom,
-            ...(storeAverage && p.average !== null ? { average: p.average, averageUnit: p.averageUnit } : {}),
+            ...extrasOf(p.extras),
             remarks:
               [p.base ? `Base colour: ${p.base}` : null, `Dyeing ref: ${p.order.orderNumber}`, p.remarks || null]
                 .filter(Boolean)

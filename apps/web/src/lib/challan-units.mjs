@@ -7,19 +7,42 @@ export const QUANTITY_UNITS = /** @type {const} */ (['MTR', 'PCS']);
 /** Header unit of a challan whose lines carry more than one unit; its header quantities stay empty. */
 export const MIXED_UNIT = 'MIXED';
 
-// Challans from Programming to Recutting list their Items as Size | Average | Unit | Remarks; challans issued
-// after Recutting (Stitching onward) keep Size | Unit | Average | Remarks.
+// Challans from Programming to Recutting list their Items as Size | Average | Unit | Remarks, each of Size,
+// Average and Unit a quantity with its own MTR / PCS; challans issued after Recutting (Stitching onward) keep
+// Size | Unit | Average | Remarks, where Unit is the unit of the Size.
 const AFTER_RECUTTING = new Set(['STITCHING', 'FINISHING', 'STEAM_PRESS', 'FINAL_CHECK', 'INVENTORY', 'PACKING']);
 
-/** Whether a challan from this department shows Average before Unit in its Items. */
-export function averageBeforeUnit(fromDepartment) {
+/** Whether a challan from this department uses the Programming-to-Recutting Items layout. */
+export function isProgrammingToRecutting(fromDepartment) {
   return !AFTER_RECUTTING.has(String(fromDepartment || '').toUpperCase());
 }
 
+const pairText = (value, unit) =>
+  value === undefined || value === null || String(value) === '' ? '—' : `${value}${unit ? ` ${unit}` : ''}`;
+
 /** A challan line's Average with its own unit, e.g. "2.5 MTR"; "—" when none was entered. */
 export function averageText(item) {
-  if (item?.average === undefined || item?.average === null || String(item.average) === '') return '—';
-  return `${item.average}${item.averageUnit ? ` ${item.averageUnit}` : ''}`;
+  return pairText(item?.average, item?.averageUnit);
+}
+
+/** A challan line's Unit quantity with its own unit, e.g. "40 PCS"; "—" when none was entered. */
+export function unitQuantityText(item) {
+  return pairText(item?.unitQuantity, item?.unitQuantityUom);
+}
+
+/**
+ * An optional quantity entered with its own MTR / PCS (a line's Average or Unit quantity). Blank gives
+ * { value: null, unit: null }; an entered value needs a unit. Never converted to the line's own unit.
+ * @returns {{ value: number | null, unit: 'MTR' | 'PCS' | null } | { error: string }}
+ */
+export function quantityPairOf(rawValue, rawUnit, label) {
+  const raw = rawValue === undefined || rawValue === null ? '' : String(rawValue).trim();
+  if (raw === '') return { value: null, unit: null };
+  const value = Number(raw);
+  if (!Number.isFinite(value) || value < 0) return { error: `${label} must be 0 or more.` };
+  const unit = unitOf(rawUnit);
+  if (!unit) return { error: `choose MTR or PCS for the ${label}.` };
+  return { value, unit };
 }
 
 /** "MTR" / "PCS" for any spelling (m, meters, pieces ...); null when it is neither. */

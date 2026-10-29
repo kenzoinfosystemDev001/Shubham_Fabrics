@@ -1,4 +1,5 @@
 import { Prisma, prisma } from '@shubham/database';
+import { quantityPairOf } from '@/lib/challan-units.mjs';
 
 const confirmed = new Set<string>();
 
@@ -29,4 +30,40 @@ export async function canWriteColumns(model: string, columns: string[]): Promise
 /** A challan line's Average and its MTR / PCS unit (manual migration 20261028_challan_item_average.sql). */
 export function canStoreChallanAverage(): Promise<boolean> {
   return canWriteColumns('ChallanItem', ['average', 'averageUnit']);
+}
+
+/** A challan line's Unit quantity and its MTR / PCS unit (manual migration 20261029_challan_item_unit_quantity.sql). */
+export function canStoreChallanUnitQuantity(): Promise<boolean> {
+  return canWriteColumns('ChallanItem', ['unitQuantity', 'unitQuantityUom']);
+}
+
+/** A challan entry's optional Average and Unit quantity (Items section), each with its own MTR / PCS; never converted. */
+export interface LineExtras {
+  average: number | null;
+  averageUnit: 'MTR' | 'PCS' | null;
+  unitQuantity: number | null;
+  unitQuantityUom: 'MTR' | 'PCS' | null;
+}
+
+/** Reads a line's extras; `fail` builds the caller's own request error for a bad value. */
+export function lineExtrasOf(
+  line: { average?: unknown; averageUnit?: unknown; unitQuantity?: unknown; unitQuantityUom?: unknown },
+  index: number,
+  fail: (message: string) => Error,
+): LineExtras {
+  const average = quantityPairOf(line.average, line.averageUnit, 'Average');
+  if ('error' in average) throw fail(`Line ${index + 1}: ${average.error}`);
+  const unitQuantity = quantityPairOf(line.unitQuantity, line.unitQuantityUom, 'Unit quantity');
+  if ('error' in unitQuantity) throw fail(`Line ${index + 1}: ${unitQuantity.error}`);
+  return { average: average.value, averageUnit: average.unit, unitQuantity: unitQuantity.value, unitQuantityUom: unitQuantity.unit };
+}
+
+/** ChallanItem fields for the entered extras only, each written once its columns exist (manual migrations). */
+export async function lineExtrasWriter(lines: LineExtras[]) {
+  const storeAverage = lines.some((l) => l.average !== null) ? await canStoreChallanAverage() : false;
+  const storeUnitQuantity = lines.some((l) => l.unitQuantity !== null) ? await canStoreChallanUnitQuantity() : false;
+  return (l: LineExtras) => ({
+    ...(storeAverage && l.average !== null ? { average: l.average, averageUnit: l.averageUnit } : {}),
+    ...(storeUnitQuantity && l.unitQuantity !== null ? { unitQuantity: l.unitQuantity, unitQuantityUom: l.unitQuantityUom } : {}),
+  });
 }

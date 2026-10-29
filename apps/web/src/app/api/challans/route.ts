@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@shubham/database';
 import { syncInboundChallansToDyeingOrders } from '@/lib/dyeing-sync';
 import { requireUser } from '@/lib/auth/require-user';
-import { canStoreChallanAverage, canWriteColumns } from '@/lib/challan-item-average';
+import { canWriteColumns, lineExtrasOf, lineExtrasWriter } from '@/lib/challan-item-average';
 import { userBelongsToDepartment } from '@/lib/auth/department-access';
 import { workflowIssuing } from '@/lib/work-items-server';
 import {
@@ -145,13 +145,8 @@ export async function GET(request: Request) {
   }
 }
 
-/** A line's optional Average: null when blank, undefined when it is not a number of zero or more. */
-function averageOf(item: any): number | null | undefined {
-  const raw = item?.average;
-  if (raw === undefined || raw === null || String(raw).trim() === '') return null;
-  const value = Number(raw);
-  return Number.isFinite(value) && value >= 0 ? value : undefined;
-}
+/** A line's optional Average and Unit quantity, each with its own MTR / PCS (values checked when the items are). */
+const extrasOfItem = (item: any, index = 0) => lineExtrasOf(item ?? {}, index, (message) => new Error(message));
 
 function parseSafeDate(val: any, fallback?: Date | null): Date | null {
   if (!val) {
@@ -420,11 +415,10 @@ export async function POST(request: Request) {
       if (!Number.isFinite(qty) || qty <= 0) {
         return NextResponse.json({ error: `Item ${index + 1}: enter a quantity greater than zero.` }, { status: 400 });
       }
-      if (averageOf(item) === undefined) {
-        return NextResponse.json({ error: `Item ${index + 1}: Average must be a number of zero or more.` }, { status: 400 });
-      }
-      if (averageOf(item) !== null && !unitOf(item?.averageUnit)) {
-        return NextResponse.json({ error: `Item ${index + 1}: choose MTR or PCS for the Average.` }, { status: 400 });
+      try {
+        extrasOfItem(item, index);
+      } catch (e: any) {
+        return NextResponse.json({ error: e.message }, { status: 400 });
       }
     }
     const itemUnit = headerUnitOf(itemUnits); // MTR | PCS | MIXED | null (no lines)
@@ -499,9 +493,9 @@ export async function POST(request: Request) {
     // 6. Transactional challan creation
     const isDyeingToQc1Challan = fromDept === 'DYEING' && toDept === 'QC1';
     const isStoreOutward = (fromDept === 'STORE' || fromDept.includes('FABRIC')) && toDept !== 'STORE';
-    // A line's Average is saved once the database and the loaded client both have the column;
-    // until then the challan is still issued, just without it.
-    const storeAverage = await canStoreChallanAverage();
+    // A line's Average and Unit quantity are saved once the database and the loaded client both have their
+    // columns; until then the challan is still issued, just without them.
+    const extrasOf = await lineExtrasWriter(bodyItems.map((item, index) => extrasOfItem(item, index)));
     // The incharge's name as typed on the form. Saved in its own column once it exists; until then it
     // is kept as an "Incharge:" note in the remarks (hidden from displayed remarks, read by inchargeNameOf).
     const inchargeName = typeof body.inchargeName === 'string' ? body.inchargeName.trim().slice(0, 100) : '';
@@ -613,10 +607,8 @@ export async function POST(request: Request) {
               : null,
             size: item.size || null,
             rollNumber: item.rollNumber || null,
-            // Only written when entered, so challans without an Average never touch the column.
-            ...(storeAverage && averageOf(item) !== null
-              ? { average: averageOf(item), averageUnit: unitOf(item.averageUnit) }
-              : {}),
+            // Only written when entered, so challans without an Average / Unit quantity never touch those columns.
+            ...extrasOf(extrasOfItem(item)),
             remarks: itemRemarks || null,
           },
         });

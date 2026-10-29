@@ -29,6 +29,7 @@ import {
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { printProductionSheet, downloadProductionSheetHtml } from '@/lib/download-production-sheet';
 import { ChallanNumberField, newSubmissionKey } from '@/components/challan/ChallanNumberField';
+import { quantityPairError } from '@/components/challan/AverageField';
 
 function getWilcomDesignEntries(program: any): Array<{ styleName?: string; category?: string; wilcomDesignNumber: string }> {
   let metadata: any = {};
@@ -231,6 +232,11 @@ function IssueChallanContent() {
         setError(`Item #${i + 1}: Select MTR or PCS for the Average.`);
         return;
       }
+      const unitQuantityError = quantityPairError(String(it.unitQuantity ?? ''), it.unitQuantityUnit || '', 'Unit quantity', true);
+      if (unitQuantityError) {
+        setError(`Item #${i + 1}: ${unitQuantityError[0].toUpperCase()}${unitQuantityError.slice(1)}.`);
+        return;
+      }
     }
 
     // Meters and pieces are totalled separately; header totals exist only for a single-unit challan.
@@ -270,6 +276,8 @@ function IssueChallanContent() {
           fabricCode: it.fabric,
           average: String(it.average ?? '').trim() === '' ? null : Number(it.average),
           averageUnit: String(it.average ?? '').trim() === '' ? null : it.averageUnit || null,
+          unitQuantity: Number(it.unitQuantity),
+          unitQuantityUom: it.unitQuantityUnit || null,
           remarks: it.remarks || null,
         })),
       };
