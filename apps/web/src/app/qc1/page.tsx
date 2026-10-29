@@ -159,10 +159,10 @@ export default function QC1Dashboard() {
           ))}
         </section>
 
-        {/* QUANTITIES (MTR) */}
+        {/* QUANTITIES (each in its own unit) */}
         <section className={panel}>
           <div className={panelHeader}>
-            <h2 className="text-sm font-bold text-neutral-900">Quantities (MTR)</h2>
+            <h2 className="text-sm font-bold text-neutral-900">Quantities</h2>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
             {quantityStats.map((s) => (

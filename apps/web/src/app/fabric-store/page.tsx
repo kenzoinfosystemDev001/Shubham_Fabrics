@@ -286,7 +286,7 @@ export default function FabricStoreDashboard() {
                     <th className="py-3 px-4">Entry #</th>
                     <th className="py-3 px-4">Roll</th>
                     <th className="py-3 px-4">Fabric</th>
-                    <th className="py-3 px-4">Meters</th>
+                    <th className="py-3 px-4">Quantity</th>
                     <th className="py-3 px-4">By</th>
                     <th className="py-3 px-4">Date</th>
                   </tr>
@@ -297,7 +297,7 @@ export default function FabricStoreDashboard() {
                       <td className="py-2.5 px-4 font-mono text-[11px] text-brand-800">{entry.entryNumber}</td>
                       <td className="py-2.5 px-4 font-mono text-[11px]">{entry.roll?.rollNumber}</td>
                       <td className="py-2.5 px-4 text-[11px]">{entry.batch?.fabricDescription}</td>
-                      <td className="py-2.5 px-4 font-mono font-semibold">{parseFloat(entry.quantity).toFixed(2)} m</td>
+                      <td className="py-2.5 px-4 font-mono font-semibold">{parseFloat(entry.quantity).toFixed(2)} {entry.batch?.unit || 'MTR'}</td>
                       <td className="py-2.5 px-4 text-[11px]">{entry.transactedBy?.fullName}</td>
                       <td className="py-2.5 px-4 text-[10px] text-neutral-500">
                         {new Date(entry.transactedAt).toLocaleDateString()}

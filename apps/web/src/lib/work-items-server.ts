@@ -268,6 +268,16 @@ export class WorkRequestError extends Error {
   }
 }
 
+/** A challan entry's optional Average (Items section) with its own MTR / PCS unit; never converted. */
+export function lineAverageOf(line: { average?: unknown; averageUnit?: unknown }, index: number): { average: number | null; averageUnit: string | null } {
+  const raw = line.average === undefined || line.average === null ? '' : String(line.average).trim();
+  const average = raw === '' ? null : Number(raw);
+  if (average !== null && (!Number.isFinite(average) || average < 0)) throw new WorkRequestError(`Line ${index + 1}: Average must be 0 or more.`);
+  const averageUnit = average === null ? null : String(line.averageUnit || '').toUpperCase();
+  if (averageUnit !== null && averageUnit !== 'MTR' && averageUnit !== 'PCS') throw new WorkRequestError(`Line ${index + 1}: choose MTR or PCS for the Average.`);
+  return { average, averageUnit };
+}
+
 export function errorResponse(error: unknown, fallback: string) {
   if (error instanceof WorkRequestError) return NextResponse.json({ error: error.message }, { status: error.status });
   return apiErrorResponse(error, fallback);
@@ -1024,12 +1034,7 @@ export function workflowHandlers(cfg: WorkflowConfig) {
         if (Number.isNaN(issuedDate.getTime())) throw new WorkRequestError('Challan date is not a valid date.');
         const prepared = lines.map((l, index) => {
           const item = byId.get(l.workItemId)!;
-          // Optional Average of the entry (Items section), with its unit.
-          const rawAverage = l.average === undefined || l.average === null ? '' : String(l.average).trim();
-          const average = rawAverage === '' ? null : Number(rawAverage);
-          if (average !== null && (!Number.isFinite(average) || average < 0)) throw new WorkRequestError(`Line ${index + 1}: Average must be 0 or more.`);
-          const averageUnit = average === null ? null : String(l.averageUnit || '').toUpperCase();
-          if (averageUnit !== null && averageUnit !== 'MTR' && averageUnit !== 'PCS') throw new WorkRequestError(`Line ${index + 1}: choose MTR or PCS for the Average.`);
+          const { average, averageUnit } = lineAverageOf(l, index);
           return { item, quantity: round(Number(l.quantity)), average, averageUnit, remarks: textOf(l.remarks, 300), reason: kind === 'PASS' ? '' : reasonsOf(item) };
         });
         const storeAverage = prepared.some((p) => p.average !== null) ? await canStoreChallanAverage() : false;

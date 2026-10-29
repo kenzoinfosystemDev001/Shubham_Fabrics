@@ -22,16 +22,20 @@ import {
   sheetRef,
 } from '@/components/workflow/WorkflowUi';
 import { CategoryBadge } from '@/components/recutting/RecuttingUi';
+import { AverageField, averageError, type AverageUnit } from '@/components/challan/AverageField';
 import { CATEGORY_LABEL, GARMENT_CATEGORIES, categoryName, readyForStitching } from '@/lib/recutting.mjs';
 
 interface Row {
   key: string;
   allocationId: string;
   quantity: string;
+  /** Optional Average of the entry, with its own MTR / PCS (never pre-selected). */
+  average: string;
+  averageUnit: AverageUnit;
   remarks: string;
 }
 
-const newRow = (): Row => ({ key: Math.random().toString(36).slice(2), allocationId: '', quantity: '', remarks: '' });
+const newRow = (): Row => ({ key: Math.random().toString(36).slice(2), allocationId: '', quantity: '', average: '', averageUnit: '', remarks: '' });
 
 function StitchingChallanContent() {
   const params = useSearchParams();
@@ -107,6 +111,8 @@ function StitchingChallanContent() {
     if (!program) return setError('Choose a Production Sheet.');
     if (!challanNumber.trim()) return setNumberError('Challan Number is required.');
     if (filled.length === 0) return setError('Add at least one item.');
+    const badAverage = filled.findIndex((r) => averageError(r.average, r.averageUnit));
+    if (badAverage >= 0) return setError(`Item ${badAverage + 1}: ${averageError(filled[badAverage].average, filled[badAverage].averageUnit)}.`);
     setSubmitting(true);
     try {
       const body = await fetchJson('/api/recutting/stitching-challans', {
@@ -117,7 +123,12 @@ function StitchingChallanContent() {
           challanNumber: challanNumber.trim(),
           issuedDate: challanDate,
           remarks,
-          lines: filled.map((r) => ({ allocationId: r.allocationId, quantity: r.quantity, remarks: r.remarks })),
+          lines: filled.map((r) => ({
+            allocationId: r.allocationId,
+            quantity: r.quantity,
+            ...(r.average.trim() !== '' ? { average: r.average, averageUnit: r.averageUnit } : {}),
+            remarks: r.remarks,
+          })),
         }),
       });
       setIssued(body.data);
@@ -232,13 +243,14 @@ function StitchingChallanContent() {
                     <th className="py-3 px-3">Dyed / Undyed</th>
                     <th className="py-3 px-3 text-right">Ready</th>
                     <th className="py-3 px-3 min-w-[130px] text-right">Stitching Qty</th>
+                    <th className="py-3 px-3 min-w-[200px]">Average</th>
                     <th className="py-3 px-3">Unit</th>
                     <th className="py-3 px-3 min-w-[140px]">Remarks</th>
                     <th className="py-3 px-3"><span className="sr-only">Remove</span></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-neutral-100">
-                  {!program && <EmptyRow colSpan={11} text="Choose a Production Sheet to add items" />}
+                  {!program && <EmptyRow colSpan={12} text="Choose a Production Sheet to add items" />}
                   {program &&
                     rows.map((r) => {
                       const a = byId(r.allocationId);
@@ -275,6 +287,9 @@ function StitchingChallanContent() {
                               className={`${FIELD} text-right tabular-nums ${over ? 'border-danger-500' : ''}`}
                               aria-label="Quantity to stitch"
                             />
+                          </td>
+                          <td className="py-2.5 px-3">
+                            <AverageField average={r.average} averageUnit={r.averageUnit} onChange={(patch) => updateRow(r.key, patch)} disabled={!a} />
                           </td>
                           <td className="py-2.5 px-3 text-xs font-semibold">{a?.cutUom || '—'}</td>
                           <td className="py-2.5 px-3">

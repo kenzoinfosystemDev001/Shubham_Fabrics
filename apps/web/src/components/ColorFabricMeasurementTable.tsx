@@ -899,8 +899,8 @@ export function ColorFabricMeasurementTable({
                                 Qty to dye{REQUIRED}
                               </th>
                             )}
-                            <th className="py-2.5 px-2 w-40">Unit{REQUIRED}</th>
                             <th className="py-2.5 px-2 w-56">Average</th>
+                            <th className="py-2.5 px-2 w-40">Unit{REQUIRED}</th>
                             <th className="py-2.5 px-2">Remarks</th>
                             {!readOnly && (
                               <th className="py-2.5 pl-2 pr-3 w-14">
@@ -912,22 +912,32 @@ export function ColorFabricMeasurementTable({
                         <tbody className="divide-y divide-neutral-100">
                           {colourGroup.entries.map(({ item, index: idx }, entryIndex) => (
                             <tr key={item.id || idx} className="hover:bg-neutral-50/60 transition">
-                              {/* SIZE (the line quantity) */}
+                              {/* SIZE (the line quantity, shown in the unit chosen in the Unit column) */}
                               <td className="py-2 pl-3 pr-2">
                                 {readOnly ? (
-                                  <span className="block font-semibold tabular-nums text-neutral-900">{item.measurement || '0'}</span>
+                                  <span className="block font-semibold tabular-nums text-neutral-900">
+                                    {item.measurement || '0'}
+                                    {item.unit ? <span className="ml-1 text-xs font-medium text-neutral-500">{item.unit}</span> : null}
+                                  </span>
                                 ) : (
-                                  <input
-                                    type="number"
-                                    step="any"
-                                    min="0.01"
-                                    required
-                                    aria-label="Size"
-                                    value={item.measurement}
-                                    onChange={(e) => handleFieldChange(idx, 'measurement', e.target.value)}
-                                    onFocus={(e) => e.target.select()}
-                                    className={`${FIELD} tabular-nums font-semibold`}
-                                  />
+                                  <div className="relative">
+                                    <input
+                                      type="number"
+                                      step="any"
+                                      min="0.01"
+                                      required
+                                      aria-label={item.unit ? `Size in ${item.unit}` : 'Size'}
+                                      value={item.measurement}
+                                      onChange={(e) => handleFieldChange(idx, 'measurement', e.target.value)}
+                                      onFocus={(e) => e.target.select()}
+                                      className={`${FIELD} tabular-nums font-semibold ${item.unit ? 'pr-11' : ''}`}
+                                    />
+                                    {item.unit && (
+                                      <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-[11px] font-semibold text-neutral-400">
+                                        {item.unit}
+                                      </span>
+                                    )}
+                                  </div>
                                 )}
                               </td>
 
@@ -953,39 +963,6 @@ export function ColorFabricMeasurementTable({
                                   )}
                                 </td>
                               )}
-
-                              {/* UNIT (MTR or PCS strictly, never pre-selected) */}
-                              <td className="py-2 px-2">
-                                {readOnly ? (
-                                  <span className="font-semibold text-neutral-700">{item.unit || '—'}</span>
-                                ) : (
-                                  <div
-                                    role="radiogroup"
-                                    aria-label="Unit"
-                                    title={item.unit ? undefined : 'Select MTR or PCS'}
-                                    className={`inline-flex h-9 p-0.5 rounded-lg ${item.unit ? 'bg-neutral-100' : 'bg-danger-50 ring-1 ring-danger-300'}`}
-                                  >
-                                    {(['MTR', 'PCS'] as const).map((unit) => {
-                                      const active = item.unit === unit;
-                                      return (
-                                        <button
-                                          key={unit}
-                                          type="button"
-                                          role="radio"
-                                          aria-checked={active}
-                                          title={unit === 'MTR' ? 'Meters' : 'Pieces'}
-                                          onClick={() => handleFieldChange(idx, 'unit', unit)}
-                                          className={`px-2.5 rounded-md text-xs font-semibold transition cursor-pointer ${
-                                            active ? 'bg-white text-brand-800 shadow-xs' : 'text-neutral-500 hover:text-neutral-900'
-                                          }`}
-                                        >
-                                          {unit}
-                                        </button>
-                                      );
-                                    })}
-                                  </div>
-                                )}
-                              </td>
 
                               {/* AVERAGE */}
                               <td className="py-2 px-2">
@@ -1037,6 +1014,39 @@ export function ColorFabricMeasurementTable({
                                         </div>
                                       );
                                     })()}
+                                  </div>
+                                )}
+                              </td>
+
+                              {/* UNIT (MTR or PCS strictly, never pre-selected) */}
+                              <td className="py-2 px-2">
+                                {readOnly ? (
+                                  <span className="font-semibold text-neutral-700">{item.unit || '—'}</span>
+                                ) : (
+                                  <div
+                                    role="radiogroup"
+                                    aria-label="Unit"
+                                    title={item.unit ? undefined : 'Select MTR or PCS'}
+                                    className={`inline-flex h-9 p-0.5 rounded-lg ${item.unit ? 'bg-neutral-100' : 'bg-danger-50 ring-1 ring-danger-300'}`}
+                                  >
+                                    {(['MTR', 'PCS'] as const).map((unit) => {
+                                      const active = item.unit === unit;
+                                      return (
+                                        <button
+                                          key={unit}
+                                          type="button"
+                                          role="radio"
+                                          aria-checked={active}
+                                          title={unit === 'MTR' ? 'Meters' : 'Pieces'}
+                                          onClick={() => handleFieldChange(idx, 'unit', unit)}
+                                          className={`px-2.5 rounded-md text-xs font-semibold transition cursor-pointer ${
+                                            active ? 'bg-white text-brand-800 shadow-xs' : 'text-neutral-500 hover:text-neutral-900'
+                                          }`}
+                                        >
+                                          {unit}
+                                        </button>
+                                      );
+                                    })}
                                   </div>
                                 )}
                               </td>

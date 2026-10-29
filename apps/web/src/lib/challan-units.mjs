@@ -7,6 +7,21 @@ export const QUANTITY_UNITS = /** @type {const} */ (['MTR', 'PCS']);
 /** Header unit of a challan whose lines carry more than one unit; its header quantities stay empty. */
 export const MIXED_UNIT = 'MIXED';
 
+// Challans from Programming to Recutting list their Items as Size | Average | Unit | Remarks; challans issued
+// after Recutting (Stitching onward) keep Size | Unit | Average | Remarks.
+const AFTER_RECUTTING = new Set(['STITCHING', 'FINISHING', 'STEAM_PRESS', 'FINAL_CHECK', 'INVENTORY', 'PACKING']);
+
+/** Whether a challan from this department shows Average before Unit in its Items. */
+export function averageBeforeUnit(fromDepartment) {
+  return !AFTER_RECUTTING.has(String(fromDepartment || '').toUpperCase());
+}
+
+/** A challan line's Average with its own unit, e.g. "2.5 MTR"; "—" when none was entered. */
+export function averageText(item) {
+  if (item?.average === undefined || item?.average === null || String(item.average) === '') return '—';
+  return `${item.average}${item.averageUnit ? ` ${item.averageUnit}` : ''}`;
+}
+
 /** "MTR" / "PCS" for any spelling (m, meters, pieces ...); null when it is neither. */
 export function unitOf(raw) {
   return normalizeStockUnit(raw);

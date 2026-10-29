@@ -21,7 +21,7 @@ import { departmentName } from '@/lib/workflow-views';
 import { useProgramDocument } from '@/hooks/useProgramDocument';
 import { FinishedGarmentList, useGarmentImages } from '@/components/workflow/FinishedGarments';
 import { isFinishedGoodsChallan } from '@/lib/finished-garments.mjs';
-import { challanTotalsByUnit, formatTotals, unitOf } from '@/lib/challan-units.mjs';
+import { averageBeforeUnit, averageText, challanTotalsByUnit, formatTotals, unitOf } from '@/lib/challan-units.mjs';
 
 interface ChallanPrintModalProps {
   challan: any;
@@ -105,6 +105,8 @@ export function ChallanPrintModal({
   const items: ChallanItem[] = Array.isArray(challan.items) ? challan.items : [];
   // Store → Dyeing lines carry the colour Dyeing must achieve next to the current (base) colour.
   const hasDyeColour = items.some((i: any) => String(i.requiredColour || '').trim());
+  // Programming to Recutting: Size | Average | Unit | Remarks; later challans: Size | Unit | Average | Remarks.
+  const averageFirst = averageBeforeUnit(fromDept);
   // Each line keeps its unit: totals are per unit, never MTR + PCS.
   const unitTotals = challanTotalsByUnit(challan);
   const totalUnits = Object.keys(unitTotals);
@@ -282,8 +284,9 @@ export function ChallanPrintModal({
                         <th className="py-2.5 px-3 font-medium">{hasDyeColour ? 'Base Colour' : 'Colour'}</th>
                         {hasDyeColour && <th className="py-2.5 px-3 font-medium">Dye Colour</th>}
                         <th className="py-2.5 px-3 font-medium text-right">Size</th>
+                        {averageFirst && <th className="py-2.5 px-3 font-medium text-right">Average</th>}
                         <th className="py-2.5 px-3 font-medium">Unit</th>
-                        <th className="py-2.5 px-3 font-medium text-right">Average</th>
+                        {!averageFirst && <th className="py-2.5 px-3 font-medium text-right">Average</th>}
                         <th className="py-2.5 pl-3 pr-4 font-medium">Remarks</th>
                       </tr>
                     </thead>
@@ -294,8 +297,9 @@ export function ChallanPrintModal({
                           <td className="py-3 px-3">{it.colour || '—'}</td>
                           {hasDyeColour && <td className="py-3 px-3 font-semibold text-brand-800">{it.requiredColour || '—'}</td>}
                           <td className="py-3 px-3 text-right tabular-nums font-semibold">{it.quantity}</td>
+                          {averageFirst && <td className="py-3 px-3 text-right tabular-nums">{averageText(it)}</td>}
                           <td className="py-3 px-3">{it.uom || '—'}</td>
-                          <td className="py-3 px-3 text-right tabular-nums">{it.average != null ? `${it.average}${it.averageUnit ? ` ${it.averageUnit}` : ''}` : '—'}</td>
+                          {!averageFirst && <td className="py-3 px-3 text-right tabular-nums">{averageText(it)}</td>}
                           <td className="py-3 pl-3 pr-4 text-neutral-600">
                             {[it.rollNumber ? `Roll ${it.rollNumber}` : null, userChallanRemarks(it.remarks)].filter(Boolean).join(' · ') || '—'}
                           </td>

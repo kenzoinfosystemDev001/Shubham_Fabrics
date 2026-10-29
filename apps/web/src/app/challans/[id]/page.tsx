@@ -45,7 +45,7 @@ import {
   printBarcodeSticker,
   generateCode128SvgBars 
 } from '@/lib/barcode';
-import { challanTotalsByUnit, formatTotals, unitOf } from '@/lib/challan-units.mjs';
+import { averageBeforeUnit, averageText, challanTotalsByUnit, formatTotals, unitOf } from '@/lib/challan-units.mjs';
 import { 
   downloadChallanHtml, 
   printChallan 
@@ -256,6 +256,8 @@ export default function ChallanDetailPage() {
   const items: any[] = challan.items || [];
   // Store → Dyeing lines carry the colour Dyeing must achieve next to the current (base) colour.
   const hasDyeColour = items.some((i: any) => String(i.requiredColour || '').trim());
+  // Programming to Recutting: Size | Average | Unit | Remarks; later challans: Size | Unit | Average | Remarks.
+  const averageFirst = averageBeforeUnit(challan.fromDepartment);
   const { svgBars, totalWidth: barW, totalHeight: barH } = generateCode128SvgBars(challan.challanNumber, 1.4, 30);
   const sheetFields = [
     { label: 'Design No.', value: designNumber },
@@ -392,8 +394,9 @@ export default function ChallanDetailPage() {
                       <th className="py-2.5 px-3 font-medium">{hasDyeColour ? 'Base Colour' : 'Colour'}</th>
                       {hasDyeColour && <th className="py-2.5 px-3 font-medium">Dye Colour</th>}
                       <th className="py-2.5 px-3 font-medium text-right">Size</th>
+                      {averageFirst && <th className="py-2.5 px-3 font-medium text-right">Average</th>}
                       <th className="py-2.5 px-3 font-medium">Unit</th>
-                      <th className="py-2.5 px-3 font-medium text-right">Average</th>
+                      {!averageFirst && <th className="py-2.5 px-3 font-medium text-right">Average</th>}
                       <th className="py-2.5 pl-3 pr-4 font-medium">Remarks</th>
                     </tr>
                   </thead>
@@ -404,8 +407,9 @@ export default function ChallanDetailPage() {
                         <td className="py-3 px-3">{item.colour || '—'}</td>
                         {hasDyeColour && <td className="py-3 px-3 font-semibold text-brand-800">{item.requiredColour || '—'}</td>}
                         <td className="py-3 px-3 text-right tabular-nums font-semibold">{item.quantity}</td>
+                        {averageFirst && <td className="py-3 px-3 text-right tabular-nums">{averageText(item)}</td>}
                         <td className="py-3 px-3">{item.uom || '—'}</td>
-                        <td className="py-3 px-3 text-right tabular-nums">{item.average != null ? `${item.average}${item.averageUnit ? ` ${item.averageUnit}` : ''}` : '—'}</td>
+                        {!averageFirst && <td className="py-3 px-3 text-right tabular-nums">{averageText(item)}</td>}
                         <td className="py-3 pl-3 pr-4 text-neutral-600">
                           {[item.rollNumber ? `Roll ${item.rollNumber}` : null, userChallanRemarks(item.remarks)].filter(Boolean).join(' · ') || '—'}
                         </td>

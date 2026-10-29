@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Plus, Send, Trash2 } from 'lucide-react';
 import { ChallanNumberField, newSubmissionKey } from '@/components/challan/ChallanNumberField';
+import { AverageField, averageError, type AverageUnit } from '@/components/challan/AverageField';
 import {
   BTN_PRIMARY,
   BTN_SECONDARY,
@@ -41,10 +42,16 @@ interface Row {
   key: string;
   itemId: string;
   quantity: string;
+  /** Optional Average of the entry, with its own MTR / PCS (never pre-selected). */
+  average: string;
+  averageUnit: AverageUnit;
   remarks: string;
 }
 
-const newRow = (): Row => ({ key: Math.random().toString(36).slice(2), itemId: '', quantity: '', remarks: '' });
+const newRow = (): Row => ({ key: Math.random().toString(36).slice(2), itemId: '', quantity: '', average: '', averageUnit: '', remarks: '' });
+
+// Challans from Programming to Recutting share one Items order: Size (quantity) | Average | Unit | Remarks.
+const ENTRY_AVERAGE_FLOWS = new Set(['EMBROIDERY', 'THREAD_CUTTING', 'QC2', 'WASHING', 'QC3']);
 
 function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: TransferKind }) {
   const params = useSearchParams();
@@ -125,6 +132,7 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
   // Finished garments (Finishing onward): rows choose a garment (all its lines and pieces), not a line.
   const finished = Boolean(flow.finishedGoods);
   const canAddImages = finished && flow.code === 'FINISHING' && kind === 'PASS';
+  const showAverage = !finished && ENTRY_AVERAGE_FLOWS.has(flow.code);
   const garments = useMemo(() => (finished ? groupGarments(sheetItems) : []), [finished, sheetItems]);
   const garmentByKey = (key: string) => garments.find((g) => g.key === key);
   const { images, reload: reloadImages } = useGarmentImages(finished ? [programId, ...recent.map((c) => c.programId)] : []);
@@ -168,6 +176,8 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
     if (!program) return setError('Choose a Production Sheet.');
     if (!challanNumber.trim()) return setNumberError('Challan Number is required.');
     if (filled.length === 0) return setError(finished ? 'Add at least one finished garment.' : 'Add at least one item.');
+    const badAverage = showAverage ? filled.findIndex((r) => averageError(r.average, r.averageUnit)) : -1;
+    if (badAverage >= 0) return setError(`Item ${badAverage + 1}: ${averageError(filled[badAverage].average, filled[badAverage].averageUnit)}.`);
     if (withoutImage.length > 0) return setError(`Add the image of ${withoutImage.map((g) => g!.name).join(', ')} before issuing the challan.`);
     setSubmitting(true);
     try {
@@ -184,7 +194,12 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
           // Finished garments send no quantity: the server sends every available piece of each line.
           lines: finished
             ? filled.flatMap((r) => (garmentByKey(r.itemId)?.items || []).map((i: any) => ({ workItemId: i.id, remarks: r.remarks })))
-            : filled.map((r) => ({ workItemId: r.itemId, quantity: r.quantity, remarks: r.remarks })),
+            : filled.map((r) => ({
+                workItemId: r.itemId,
+                quantity: r.quantity,
+                ...(showAverage && r.average.trim() !== '' ? { average: r.average, averageUnit: r.averageUnit } : {}),
+                remarks: r.remarks,
+              })),
         }),
       });
       setIssued(body.data);
@@ -374,13 +389,14 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
                     <th className="py-3 px-3">Incoming</th>
                     <th className="py-3 px-3 text-right">{AVAILABLE_LABEL[kind]}</th>
                     <th className="py-3 px-3 min-w-[130px] text-right">Transfer Qty</th>
+                    {showAverage && <th className="py-3 px-3 min-w-[200px]">Average</th>}
                     <th className="py-3 px-3">Unit</th>
                     <th className="py-3 px-3 min-w-[140px]">Remarks</th>
                     <th className="py-3 px-3"><span className="sr-only">Remove</span></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-neutral-100">
-                  {!program && <EmptyRow colSpan={kind === 'PASS' ? 10 : 11} text="Choose a Production Sheet to add items" />}
+                  {!program && <EmptyRow colSpan={(kind === 'PASS' ? 10 : 11) + (showAverage ? 1 : 0)} text="Choose a Production Sheet to add items" />}
                   {program &&
                     rows.map((r) => {
                       const i = itemById(r.itemId);
@@ -418,6 +434,11 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
                               aria-label="Quantity to transfer"
                             />
                           </td>
+                          {showAverage && (
+                            <td className="py-2.5 px-3">
+                              <AverageField average={r.average} averageUnit={r.averageUnit} onChange={(patch) => updateRow(r.key, patch)} disabled={!i} />
+                            </td>
+                          )}
                           <td className="py-2.5 px-3 text-xs font-semibold">{i?.uom || '—'}</td>
                           <td className="py-2.5 px-3">
                             <input value={r.remarks} onChange={(e) => updateRow(r.key, { remarks: e.target.value })} maxLength={300} className={FIELD} aria-label="Remarks" />

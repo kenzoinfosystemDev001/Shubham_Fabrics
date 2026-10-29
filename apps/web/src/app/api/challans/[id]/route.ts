@@ -3,7 +3,7 @@ import { prisma } from '@shubham/database';
 import { requireUser } from '@/lib/auth/require-user';
 import { canUpdateChallan } from '@/lib/auth/department-access';
 import { workflowReceiving } from '@/lib/work-items-server';
-import { unitOf } from '@/lib/challan-units.mjs';
+import { MIXED_UNIT, unitOf } from '@/lib/challan-units.mjs';
 
 import {
   FabricStockError,
@@ -269,11 +269,19 @@ export async function PATCH(
     if (fromDepartment) updateData.fromDepartment = fromDepartment;
 
     if (fabricIn !== undefined && fabricIn !== null) updateData.fabricIn = Number(fabricIn);
-    if (fabricUnit !== undefined) updateData.fabricUnit = fabricUnit;
+    if (fabricUnit !== undefined && fabricUnit !== null) {
+      // MTR, PCS, or MIXED (lines in both units); anything else would be read as the wrong unit later.
+      const headerUnit = String(fabricUnit).toUpperCase() === MIXED_UNIT ? MIXED_UNIT : unitOf(fabricUnit);
+      if (!headerUnit) return NextResponse.json({ error: 'Choose MTR or PCS for the challan quantity.' }, { status: 400 });
+      updateData.fabricUnit = headerUnit;
+    }
     if (defectivePieces !== undefined && defectivePieces !== null) {
       updateData.defectivePieces = Number(defectivePieces);
       // The defective quantity keeps its own unit (a MIXED challan has no single header unit).
       updateData.defectiveUnit = Number(defectivePieces) > 0 ? unitOf(defectiveUnit) || unitOf(fabricUnit) || unitOf(current?.defectiveUnit) || unitOf(current?.fabricUnit) || null : null;
+      if (Number(defectivePieces) > 0 && !updateData.defectiveUnit) {
+        return NextResponse.json({ error: 'Choose MTR or PCS for the defective quantity.' }, { status: 400 });
+      }
       if (Number(defectivePieces) > 0) {
         const upDept = (fromDepartment || '').toUpperCase();
         let defaultDeptShelf = 'DEF-SHELF-STORE (Fabric Store Quarantined Shelf)';
