@@ -353,6 +353,19 @@ export async function holdCandidates(code: string) {
   return lines.filter((l) => !held.has(l.key) && outstandingOf(l) > 0 && l.unit && (l.unit === 'MTR' || l.unit === 'PCS')).map(lineFields);
 }
 
+/** The lines of one source (a dyeing order or work item) with their open HOLD, for the Hold section of a processing form. */
+export async function holdsOfSource(code: string, sourceId: string) {
+  const lines = await loadLines(code, [sourceId]);
+  const open = await prisma.departmentHold.findMany({
+    where: { departmentCode: code, sourceId, status: { in: ACTIVE_HOLD_STATUSES } },
+  });
+  const rows = await withLines(open);
+  return lines.map((line) => {
+    const found = rows.find((r) => r.hold.sourceKey === line.key && ACTIVE_HOLD_STATUSES.includes(r.hold.status));
+    return { line: lineFields(line), hold: found ? shapeHold(found.hold, found.line) : null };
+  });
+}
+
 /** A HOLD as screens show it; `line` (live figures) is absent for closed HOLDs and for lines no longer found. */
 function shapeHold(hold: HoldRow, line: HoldLine | null) {
   const active = ACTIVE_HOLD_STATUSES.includes(hold.status);

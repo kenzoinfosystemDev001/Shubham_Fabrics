@@ -23,6 +23,7 @@ import {
   sheetRef,
 } from '@/components/dyeing/DyeingUi';
 import { availableForQc, isColorMismatch, receivedBasis, remainingToDye } from '@/lib/dyeing-workflow.mjs';
+import { HoldSection } from '@/components/hold/HoldSection';
 
 const WORKING = 'RECEIVED,IN_DYEING,PARTIALLY_DYED,DYED,READY_FOR_QC1,PARTIALLY_SENT_TO_QC1';
 const FILTERS = [
@@ -351,6 +352,8 @@ function ProcessEditor({ order, onClose, onSaved }: { order: any; onClose: () =>
                   )}
                 </div>
               )}
+
+              <HoldSection department="DYEING" sourceId={order.id} holdPage="/dyeing/hold" />
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <label className="block">

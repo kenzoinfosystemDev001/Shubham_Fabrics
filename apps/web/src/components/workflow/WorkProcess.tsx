@@ -29,6 +29,7 @@ import { isAdminUser } from '@/lib/rbac';
 import { departmentName, type WorkflowView } from '@/lib/workflow-views';
 import { GarmentTag } from '@/components/recutting/RecuttingUi';
 import { FabricPhotos } from '@/components/workflow/FabricPhotos';
+import { HoldSection } from '@/components/hold/HoldSection';
 
 const WORKING = 'RECEIVED,IN_PROGRESS,COMPLETED,READY_FOR_TRANSFER,PARTIALLY_TRANSFERRED';
 
@@ -447,6 +448,7 @@ function ProcessEditor({
                   <input type="date" value={expected} onChange={(e) => setExpected(e.target.value)} className={`${FIELD} mt-1`} />
                 </label>
               </div>
+              <HoldSection department={flow.code} sourceId={item.id} holdPage={`${flow.base}/hold`} />
               <label className="block">
                 <span className="text-xs font-semibold text-neutral-600">Remarks / observations</span>
                 <textarea value={remarks} onChange={(e) => setRemarks(e.target.value)} maxLength={500} rows={2} className={`${FIELD} h-auto py-2 mt-1`} />
