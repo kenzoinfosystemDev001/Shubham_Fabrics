@@ -27,6 +27,7 @@ const NAV_ITEMS = [
   { label: 'Outgoing Challans', href: '/final-check/my-work/outgoing' },
   { label: 'Inspection History', href: '/final-check/history' },
   { label: 'Defective Shelf', href: '/final-check/my-work/defective' },
+  { label: 'HOLD', href: '/final-check/hold' },
   { label: 'Floor Board', href: '/final-check/floor-board' },
 ];
 

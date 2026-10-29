@@ -29,6 +29,8 @@ interface Row {
   key: string;
   allocationId: string;
   quantity: string;
+  /** Unit of the Size: the allocation's cut unit unless the other one is chosen (then the line sends all still to send). */
+  sizeUnit: QtyUnit;
   /** Optional Average of the entry, with its own MTR / PCS (never pre-selected). */
   average: string;
   averageUnit: QtyUnit;
@@ -38,7 +40,7 @@ interface Row {
   remarks: string;
 }
 
-const newRow = (): Row => ({ key: Math.random().toString(36).slice(2), allocationId: '', quantity: '', average: '', averageUnit: '', unitQuantity: '', unitQuantityUom: '', remarks: '' });
+const newRow = (): Row => ({ key: Math.random().toString(36).slice(2), allocationId: '', quantity: '', sizeUnit: '', average: '', averageUnit: '', unitQuantity: '', unitQuantityUom: '', remarks: '' });
 
 function StitchingChallanContent() {
   const params = useSearchParams();
@@ -95,13 +97,14 @@ function StitchingChallanContent() {
   const updateRow = (key: string, patch: Partial<Row>) => setRows((rs) => rs.map((r) => (r.key === key ? { ...r, ...patch } : r)));
   const choose = (key: string, allocationId: string) => {
     const a = byId(allocationId);
-    updateRow(key, { allocationId, quantity: a ? String(readyForStitching(a)) : '' });
+    updateRow(key, { allocationId, quantity: a ? String(readyForStitching(a)) : '', sizeUnit: a?.cutUom === 'MTR' || a?.cutUom === 'PCS' ? a.cutUom : '' });
   };
 
   const filled = rows.filter((r) => r.allocationId);
   const totals = filled.reduce<Record<string, number>>((acc, r) => {
     const a = byId(r.allocationId);
-    if (a) acc[a.cutUom] = (acc[a.cutUom] || 0) + (Number(r.quantity) || 0);
+    const unit = r.sizeUnit || a?.cutUom;
+    if (a && unit) acc[unit] = (acc[unit] || 0) + (Number(r.quantity) || 0);
     return acc;
   }, {});
   const incomingRefs = Array.from(new Set(filled.map((r) => byId(r.allocationId)?.workItem?.inboundChallan?.challanNumber).filter(Boolean)));
@@ -130,6 +133,7 @@ function StitchingChallanContent() {
           lines: filled.map((r) => ({
             allocationId: r.allocationId,
             quantity: r.quantity,
+            uom: r.sizeUnit || undefined,
             ...(r.average.trim() !== '' ? { average: r.average, averageUnit: r.averageUnit } : {}),
             unitQuantity: r.unitQuantity,
             unitQuantityUom: r.unitQuantityUom,
@@ -261,7 +265,8 @@ function StitchingChallanContent() {
                     rows.map((r) => {
                       const a = byId(r.allocationId);
                       const taken = new Set(rows.filter((x) => x.key !== r.key).map((x) => x.allocationId));
-                      const over = a && Number(r.quantity) > readyForStitching(a);
+                      const otherUnit = Boolean(a && r.sizeUnit && r.sizeUnit !== a.cutUom);
+                      const over = a && !otherUnit && Number(r.quantity) > readyForStitching(a);
                       return (
                         <tr key={r.key}>
                           <td className="py-2.5 px-4">
@@ -284,15 +289,23 @@ function StitchingChallanContent() {
                             <QuantityUnitField
                               label="Size"
                               value={r.quantity}
-                              unit={a?.cutUom === 'MTR' || a?.cutUom === 'PCS' ? a.cutUom : ''}
+                              unit={r.sizeUnit}
                               onValue={(quantity) => updateRow(r.key, { quantity })}
+                              onUnit={(sizeUnit) =>
+                                // Back in the cut unit the quantity is checked against the cut balance again; start from it.
+                                updateRow(r.key, sizeUnit === a?.cutUom ? { sizeUnit, quantity: String(readyForStitching(a)) } : { sizeUnit, quantity: '' })
+                              }
                               required={Boolean(a)}
                               disabled={!a}
                               min="0.001"
-                              max={a ? readyForStitching(a) : undefined}
-                              lockedTitle={a ? `This allocation is cut in ${a.cutUom}; meters and pieces are never converted` : undefined}
+                              max={a && !otherUnit ? readyForStitching(a) : undefined}
                               inputClassName={`${FIELD} text-right ${over ? 'border-danger-500' : ''}`}
                             />
+                            {otherUnit && a && (
+                              <span className="block mt-1 text-[11px] text-neutral-600 max-w-[220px]">
+                                Cut in {a.cutUom}: this line sends all {fmtQty(readyForStitching(a), a.cutUom)} still to send of {a.allocationNumber}. Enter the {r.sizeUnit} Stitching receives; units are never converted.
+                              </span>
+                            )}
                           </td>
                           <td className="py-2.5 px-3">
                             <AverageField average={r.average} averageUnit={r.averageUnit} onChange={(patch) => updateRow(r.key, patch)} disabled={!a} />

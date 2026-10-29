@@ -32,10 +32,12 @@ import {
   Trash2,
 } from 'lucide-react';
 import { DepartmentStockView } from '@/components/DepartmentStockView';
+import { ReceiveChallanConfirm } from '@/components/challan/ReceiptLines';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { 
   downloadProductionSheetHtml, 
-  printProductionSheet 
+  printProductionSheet,
+  widthInInches,
 } from '@/lib/download-production-sheet';
 import { 
   downloadChallanHtml, 
@@ -280,8 +282,11 @@ export default function QC1MyWorkPage() {
     loadChallans();
   };
 
-  // Receive Material Handler
+  // Receive Material: the challan's fabrics with MTR and PCS are shown first, then received.
+  const [confirmReceive, setConfirmReceive] = useState<QC1Challan | null>(null);
+  const [receiveError, setReceiveError] = useState<string | null>(null);
   const handleReceiveChallan = async (challan: QC1Challan) => {
+    setReceiveError(null);
     try {
       setReceivingId(challan.id);
       const res = await fetch(`/api/qc1/challans/${challan.id}/receive`, {
@@ -296,9 +301,10 @@ export default function QC1MyWorkPage() {
       if (!res.ok) {
         throw new Error(json.error || 'Failed to receive Challan.');
       }
+      setConfirmReceive(null);
       await loadChallans();
     } catch (err: any) {
-      alert(err.message || 'Error receiving Challan');
+      setReceiveError(err.message || 'Error receiving Challan');
     } finally {
       setReceivingId(null);
     }
@@ -728,7 +734,7 @@ export default function QC1MyWorkPage() {
                         <td className="py-3 px-4">
                           <button
                             onClick={() => setSelectedSheetForModal(challan.program)}
-                            className="font-mono font-bold text-neutral-900 hover:text-accent-800 text-left block flex items-center gap-1 group"
+                            className="font-mono font-bold text-neutral-900 hover:text-accent-800 text-left flex items-center gap-1 group"
                           >
                             <span>{challan.productionSheetNumber}</span>
                             <ExternalLink className="w-3 h-3 text-neutral-500 group-hover:text-accent-800 opacity-0 group-hover:opacity-100 transition" />
@@ -863,7 +869,10 @@ export default function QC1MyWorkPage() {
                             {/* RECEIVE MATERIAL BUTTON (If status === 'ISSUED') */}
                             {isIssued && (
                               <button
-                                onClick={() => handleReceiveChallan(challan)}
+                                onClick={() => {
+                                  setReceiveError(null);
+                                  setConfirmReceive(challan);
+                                }}
                                 disabled={receivingId === challan.id}
                                 className="flex items-center gap-1 px-2.5 py-1 bg-brand-700 hover:bg-brand-800 text-white rounded text-xs font-semibold shadow-xs transition cursor-pointer"
                               >
@@ -1166,7 +1175,7 @@ export default function QC1MyWorkPage() {
                     <div>
                       <span className="text-neutral-500 text-[10px] block">Fabric Width</span>
                       <span className="font-medium text-neutral-900">
-                        {selectedSheetForModal.fabricWidth || (selectedSheetForModal.fabricWidthInches ? `${selectedSheetForModal.fabricWidthInches} Inches` : '—')}
+                        {widthInInches(selectedSheetForModal.fabricWidth || selectedSheetForModal.fabricWidthInches) || '—'}
                       </span>
                     </div>
                     <div>
@@ -1760,7 +1769,7 @@ export default function QC1MyWorkPage() {
 
                           {/* Passed Quantity */}
                           <div>
-                            <label className="block text-[11px] font-bold text-accent-800 mb-1 flex items-center justify-between">
+                            <label className="text-[11px] font-bold text-accent-800 mb-1 flex items-center justify-between">
                               <span>Passed Qty</span>
                               <span className="text-[9px] text-accent-800 bg-accent-100 px-1 py-0.2 rounded">Embroidery</span>
                             </label>
@@ -1778,7 +1787,7 @@ export default function QC1MyWorkPage() {
 
                           {/* Rework Quantity */}
                           <div>
-                            <label className="block text-[11px] font-bold text-brand-800 mb-1 flex items-center justify-between">
+                            <label className="text-[11px] font-bold text-brand-800 mb-1 flex items-center justify-between">
                               <span>Rework Qty</span>
                               <span className="text-[9px] text-brand-700 bg-brand-100 px-1 py-0.2 rounded">To Dyeing</span>
                             </label>
@@ -1796,7 +1805,7 @@ export default function QC1MyWorkPage() {
 
                           {/* Shrinkage: fabric lost in dyeing; saved as this line's shrinkage record */}
                           <div>
-                            <label className="block text-[11px] font-bold text-brand-800 mb-1 flex items-center justify-between">
+                            <label className="text-[11px] font-bold text-brand-800 mb-1 flex items-center justify-between">
                               <span>Shrinkage</span>
                               <span className="text-[9px] text-brand-800 bg-brand-100 px-1 py-0.2 rounded">{inspectUnit || selectedChallanForInspect.uom}</span>
                             </label>
@@ -2018,6 +2027,16 @@ export default function QC1MyWorkPage() {
           </div>
         )}
       </main>
+
+      {confirmReceive && (
+        <ReceiveChallanConfirm
+          challan={confirmReceive}
+          busy={receivingId === confirmReceive.id}
+          error={receiveError}
+          onConfirm={() => handleReceiveChallan(confirmReceive)}
+          onClose={() => setConfirmReceive(null)}
+        />
+      )}
 
       {/* ACCOMPANYING PRODUCTION SHEET PREVIEW & PRINT MODAL */}
       {selectedSheetForModal && (

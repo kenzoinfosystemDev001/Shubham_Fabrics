@@ -102,3 +102,38 @@ export function formatTotals(totals, empty = '0') {
     .map((u) => `${Number(totals[u]).toLocaleString('en-IN', { maximumFractionDigits: u === 'PCS' ? 0 : 2 })} ${u}`);
   return parts.length ? parts.join(' · ') : empty;
 }
+
+/**
+ * What a challan line carries in meters and in pieces, for receiving screens: its quantity (the figure stock moves
+ * by) in its own unit, and its Unit quantity when that is in the other unit. A unit the line does not carry is
+ * null. The two are never added or converted.
+ * @returns {{ MTR: number | null, PCS: number | null }}
+ */
+export function lineQuantitiesByUnit(line) {
+  const out = /** @type {{ MTR: number | null, PCS: number | null }} */ ({ MTR: null, PCS: null });
+  const unit = unitOf(line?.uom);
+  if (unit === 'MTR' || unit === 'PCS') out[unit] = round(Number(line?.quantity) || 0);
+  const other = unitOf(line?.unitQuantityUom);
+  if ((other === 'MTR' || other === 'PCS') && out[other] === null && line?.unitQuantity !== null && line?.unitQuantity !== undefined) {
+    out[other] = round(Number(line.unitQuantity) || 0);
+  }
+  return out;
+}
+
+/** The unit of a line's second quantity (its Unit quantity in the other unit), or null when it has none. */
+export function secondUnitOf(line) {
+  const unit = unitOf(line?.uom);
+  const other = unitOf(line?.unitQuantityUom);
+  return other && other !== unit && (other === 'MTR' || other === 'PCS') && line?.unitQuantity !== null && line?.unitQuantity !== undefined ? other : null;
+}
+
+/** Total MTR and total PCS over lines, each added on its own (see lineQuantitiesByUnit). */
+export function linesTotalsMtrPcs(lines) {
+  const totals = { MTR: 0, PCS: 0 };
+  for (const line of lines || []) {
+    const q = lineQuantitiesByUnit(line);
+    totals.MTR = round(totals.MTR + (q.MTR || 0));
+    totals.PCS = round(totals.PCS + (q.PCS || 0));
+  }
+  return totals;
+}

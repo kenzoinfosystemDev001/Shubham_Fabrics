@@ -219,6 +219,14 @@ export function EmbroideryNavigation() {
             <span>Embroidery History</span>
           </Link>
 
+          {/* HOLD: fabric kept back from forwarding */}
+          <Link
+            href="/embroidery/hold"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/embroidery/hold', true)}
+          >
+            <span>HOLD</span>
+          </Link>
           {/* 4. Floor Board */}
           <Link
             href="/embroidery/floor-board"

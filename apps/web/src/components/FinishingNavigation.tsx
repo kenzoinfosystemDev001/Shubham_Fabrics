@@ -175,9 +175,9 @@ export function FinishingNavigation() {
         <nav className="flex-1 px-3 space-y-1 overflow-y-auto pt-2">
           {/* 1. Dashboard */}
           <Link
-            href="C:/Users/PiyushSharma/AppData/Local/Programs/Git/finishing"
+            href="/finishing"
             onClick={() => setMobileOpen(false)}
-            className={linkClass('C:/Users/PiyushSharma/AppData/Local/Programs/Git/finishing', true)}
+            className={linkClass('/finishing', true)}
           >
             <span>Dashboard</span>
           </Link>
@@ -186,7 +186,7 @@ export function FinishingNavigation() {
           <div>
             <div
               className={`px-3 py-2.5 text-xs font-semibold ${
-                pathname.startsWith('C:/Users/PiyushSharma/AppData/Local/Programs/Git/finishing/my-work') ? 'text-neutral-900' : 'text-neutral-700'
+                pathname.startsWith('/finishing/my-work') ? 'text-neutral-900' : 'text-neutral-700'
               }`}
             >
               My Work
@@ -220,18 +220,26 @@ export function FinishingNavigation() {
 
           {/* 3. Finishing History */}
           <Link
-            href="C:/Users/PiyushSharma/AppData/Local/Programs/Git/finishing/history"
+            href="/finishing/history"
             onClick={() => setMobileOpen(false)}
-            className={linkClass('C:/Users/PiyushSharma/AppData/Local/Programs/Git/finishing/history', true)}
+            className={linkClass('/finishing/history', true)}
           >
             <span>Finishing History</span>
           </Link>
 
+          {/* HOLD: fabric kept back from forwarding */}
+          <Link
+            href="/finishing/hold"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/finishing/hold', true)}
+          >
+            <span>HOLD</span>
+          </Link>
           {/* 4. Floor Board */}
           <Link
-            href="C:/Users/PiyushSharma/AppData/Local/Programs/Git/finishing/floor-board"
+            href="/finishing/floor-board"
             onClick={() => setMobileOpen(false)}
-            className={linkClass('C:/Users/PiyushSharma/AppData/Local/Programs/Git/finishing/floor-board', true)}
+            className={linkClass('/finishing/floor-board', true)}
           >
             <span>Floor Board</span>
           </Link>

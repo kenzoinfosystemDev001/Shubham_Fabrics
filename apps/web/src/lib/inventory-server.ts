@@ -184,8 +184,14 @@ function challanView(c: any, imageOf: ImageMap) {
     issuedBy: c.issuedBy,
     receivedBy: c.receivedBy,
     events: c.events,
+    // The challan's own lines (MTR and PCS as sent), for the receiving table.
+    items: c.items || [],
     lines: (c.workItemsInbound || []).map((w: any) => ({
       id: w.id,
+      inboundChallanItemId: w.inboundChallanItemId,
+      fabricName: w.fabricName,
+      receivedUnitQuantity: w.receivedUnitQuantity,
+      receivedUnitQuantityUom: w.receivedUnitQuantityUom,
       itemNumber: w.itemNumber,
       status: w.status,
       inventoryStatus: inventoryStatus(w),

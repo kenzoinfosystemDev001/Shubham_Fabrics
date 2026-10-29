@@ -185,6 +185,14 @@ export function QC1Navigation() {
             <span>My Work</span>
           </Link>
 
+          {/* HOLD: fabric kept back from forwarding */}
+          <Link
+            href="/qc1/hold"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/qc1/hold', true)}
+          >
+            <span>HOLD</span>
+          </Link>
           {/* 3. Floor Board */}
           <Link
             href="/qc1/floor-board"

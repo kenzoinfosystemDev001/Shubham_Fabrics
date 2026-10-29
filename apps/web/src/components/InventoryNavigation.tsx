@@ -21,6 +21,7 @@ const NAV_ITEMS = [
   { label: 'Received Finished Garments', href: '/inventory/received' },
   { label: 'Finished Garment Inventory', href: '/inventory/stock' },
   { label: 'Packing Management', href: '/inventory/packing' },
+  { label: 'HOLD', href: '/inventory/hold' },
   { label: 'Challan History', href: '/inventory/challans' },
   { label: 'Transaction History', href: '/inventory/transactions' },
 ];

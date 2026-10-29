@@ -4,7 +4,7 @@
 // never converted automatically) -> transferred to Stitching.
 
 import { receivedBasis } from './work-items.mjs';
-import { headerUnitOf } from './challan-units.mjs';
+import { headerUnitOf, unitOf } from './challan-units.mjs';
 
 export const GARMENT_CATEGORIES = /** @type {const} */ (['TOP', 'BOTTOM', 'DUPATTA', 'OTHERS']);
 export const CATEGORY_LABEL = { TOP: 'Top', BOTTOM: 'Bottom', DUPATTA: 'Dupatta', OTHERS: 'Others' };
@@ -132,9 +132,21 @@ export function validateCancel(allocation, reason) {
 }
 
 /**
+ * How much of an allocation's cut balance (in its cut unit) a Stitching challan line uses. A line in the cut
+ * unit uses its own quantity; a line sent in the other unit (e.g. cut in PCS, sent as MTR) cannot be converted,
+ * so it carries everything of the allocation still to send and its quantity is what Stitching receives.
+ * @returns {{ unit: string, consumes: number }}
+ */
+export function stitchingLineUse(allocation, line) {
+  const unit = unitOf(line?.uom) || allocation.cutUom;
+  return { unit, consumes: unit === allocation.cutUom ? round(Number(line?.quantity)) : readyForStitching(allocation) };
+}
+
+/**
  * Validates Stitching challan lines against their allocations: one Production Sheet, each line in its
- * own unit, only cut quantity not yet sent.
- * @param {Array<{ allocationId: string, quantity: unknown }>} lines
+ * own unit (the allocation's cut unit unless MTR / PCS is chosen, see stitchingLineUse), only cut quantity
+ * not yet sent.
+ * @param {Array<{ allocationId: string, quantity: unknown, uom?: unknown }>} lines
  * @param {Map<string, any>} allocationsById allocation with workItem { programId, departmentCode }
  * @returns {{ ok: true, unit: string, programId: string } | { ok: false, error: string }}
  */
@@ -152,12 +164,17 @@ export function validateStitchingLines(lines, allocationsById) {
     if (a.status === 'CANCELLED') return { ok: false, error: `Line ${n}: ${a.allocationNumber} was cancelled.` };
     if (programId && a.workItem.programId !== programId) return { ok: false, error: 'All items on one challan must belong to the same Production Sheet.' };
     programId = a.workItem.programId;
+    if (line.uom !== undefined && line.uom !== null && line.uom !== '' && !CUT_UNITS.includes(/** @type {any} */ (unitOf(line.uom)))) {
+      return { ok: false, error: `Line ${n}: choose MTR or PCS for the Size.` };
+    }
+    const { unit } = stitchingLineUse(a, line);
     // Each line keeps its own unit; meters and pieces are never added together.
-    units.push(a.cutUom);
+    units.push(unit);
     const quantity = Number(line.quantity);
     if (!Number.isFinite(quantity) || quantity <= 0) return { ok: false, error: `Line ${n}: enter a quantity greater than zero.` };
     const ready = readyForStitching(a);
-    if (round(quantity) > ready) return { ok: false, error: `Line ${n}: only ${ready} ${a.cutUom} of ${a.allocationNumber} is cut and not yet issued.` };
+    if (ready <= 0) return { ok: false, error: `Line ${n}: nothing of ${a.allocationNumber} is cut and not yet issued.` };
+    if (unit === a.cutUom && round(quantity) > ready) return { ok: false, error: `Line ${n}: only ${ready} ${a.cutUom} of ${a.allocationNumber} is cut and not yet issued.` };
   }
   return { ok: true, unit: /** @type {string} */ (headerUnitOf(units)), programId: /** @type {string} */ (programId) };
 }

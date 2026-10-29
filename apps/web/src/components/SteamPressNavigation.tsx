@@ -245,6 +245,14 @@ export function SteamPressNavigation() {
             <span>Department Defective Shelf</span>
           </Link>
 
+          {/* HOLD: fabric kept back from forwarding */}
+          <Link
+            href="/steam-press/hold"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/steam-press/hold', true)}
+          >
+            <span>HOLD</span>
+          </Link>
           {/* 9. Floor Board */}
           <Link
             href="/steam-press/floor-board"

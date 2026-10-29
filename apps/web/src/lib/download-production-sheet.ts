@@ -303,6 +303,13 @@ export function getDefaultSubStylesForCategory(category: GarmentCategory): SubSt
   return DEFAULT_SUB_STYLES.map(s => ({ ...s }));
 }
 
+/** Fabric width is entered in inches: a plain number reads "58 inch"; text that already names its unit stays as typed. */
+export function widthInInches(value: unknown): string {
+  const raw = String(value ?? '').trim();
+  if (!raw) return '';
+  return /^\d+(\.\d+)?$/.test(raw) ? `${raw} inch` : raw;
+}
+
 export function extractSubStylesAndGrid(program: any, category: GarmentCategory = 'TOP'): {
   subStylesWithAverages: SubStyleAverage[];
   productionGrid: ProductionGridItem[];
@@ -336,7 +343,7 @@ export function extractSubStylesAndGrid(program: any, category: GarmentCategory 
   let remarksText = program.remarks || '';
   let clientCode = program.clientCode || '';
   let fabricName = program.fabricName || program.fabric || (program.fabrics?.[0]?.fabricName) || '';
-  let fabricWidth = program.fabricWidth || (program.fabricWidthInches ? `${program.fabricWidthInches}"` : '') || '';
+  let fabricWidth = program.fabricWidth || (program.fabricWidthInches ? String(program.fabricWidthInches) : '') || '';
   let allComponents: Record<string, ComponentSheetData> | undefined;
   let forwardedComponents: string[] = ['TOP'];
   let isEnabled = true;
@@ -487,7 +494,7 @@ export function extractSubStylesAndGrid(program: any, category: GarmentCategory 
     totalMtrAverage,
     clientCode,
     fabricName,
-    fabricWidth,
+    fabricWidth: widthInInches(fabricWidth),
     category,
     allComponents,
     forwardedComponents,

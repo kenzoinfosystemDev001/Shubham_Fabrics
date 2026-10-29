@@ -41,3 +41,20 @@ export function userChallanRemarks(remarks) {
     .filter((part) => part && !SYSTEM_PART.test(part))
     .join(' | ');
 }
+
+/**
+ * Remarks with the user's part replaced and any older system details (see userChallanRemarks) kept, so
+ * correcting the remarks never loses them.
+ * @param {unknown} previous
+ * @param {string | null | undefined} userText
+ * @returns {string | null}
+ */
+export function withUserRemarks(previous, userText) {
+  const system = String(previous ?? '')
+    .trim()
+    .split(/\s+[|·]\s+/)
+    .map((part) => part.trim())
+    .filter((part) => part && SYSTEM_PART.test(part));
+  const all = [...system, String(userText ?? '').trim()].filter(Boolean);
+  return all.length ? all.join(' | ') : null;
+}
