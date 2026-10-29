@@ -200,7 +200,7 @@ export default function ProductionHistoryPage() {
               Active In Plant
             </span>
             <p className="text-2xl font-bold text-brand-600 mt-1">{inProductionCount}</p>
-            <span className="text-[10px] text-neutral-500 mt-0.5 block">Store / Dyeing / QC1</span>
+            <span className="text-[10px] text-neutral-500 mt-0.5 block">Store / Dyeing / Dyeing QC</span>
           </div>
 
           <div className="bg-white border border-neutral-200/90 rounded-lg p-3.5 shadow-xs">

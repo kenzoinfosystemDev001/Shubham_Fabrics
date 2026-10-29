@@ -15,6 +15,7 @@ import {
   WorkStatusBadge,
   fetchJson,
   fmtQty,
+  challanRef,
   sheetRef,
 } from '@/components/workflow/WorkflowUi';
 import { readyToTransfer, receivedBasis } from '@/lib/work-items.mjs';
@@ -132,7 +133,7 @@ export function WorkPassed({ flow }: { flow: WorkflowView }) {
                         <Link href={`/programs/${i.program?.id}`} className="font-mono text-xs font-semibold text-neutral-900 hover:underline">
                           {sheetRef(i.program)}
                         </Link>
-                        <span className="block font-mono text-[11px] text-neutral-500">{i.itemNumber}</span>
+                        <span className="block font-mono text-[11px] text-neutral-500">{challanRef(i)}</span>
                       </td>
                       <td className="py-3 px-3 text-xs">
                         {i.inboundChallan ? (

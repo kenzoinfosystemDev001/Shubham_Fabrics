@@ -6,11 +6,46 @@
  * layout (Production Sheet format) with sub-style averages and multi-color breakdown grid.
  */
 import { getCurrentUser, canViewClientCode, isAdminUser, isProgrammingUser } from '@/lib/rbac';
+import { printWhenReady } from '@/lib/print-window';
 import { loadProgramDocument } from '@/lib/program-document';
+
+export interface SubStyleAverageRow {
+  part: string;
+  mtr: number | string;
+}
+
+export type SubStyleAverageUnit = 'MTR' | 'PCS';
 
 export interface SubStyleAverage {
   name: string;
+  /** Sum of the rows in meters ('' for a PCS section); the figure used for Total MTR everywhere. */
   average: number | string;
+  /** Part / quantity rows entered under this section (sheets saved before rows existed have only `average`). */
+  rows?: SubStyleAverageRow[];
+  /** Unit of the rows' quantity; missing means MTR. PCS sections never count toward Total MTR. */
+  unit?: SubStyleAverageUnit;
+}
+
+/** Units used by a set of sections; a sheet with no PCS sections reads as MTR only. */
+export function getSubStyleUnits(subStyles: SubStyleAverage[]): { hasMtr: boolean; hasPcs: boolean } {
+  const hasPcs = subStyles.some((s) => s.unit === 'PCS');
+  const hasMtr = subStyles.some((s) => s.unit !== 'PCS');
+  return { hasMtr: hasMtr || !hasPcs, hasPcs };
+}
+
+/** Total pieces across the PCS sections. */
+export function getTotalPcsAverage(subStyles: SubStyleAverage[]): number {
+  const sum = subStyles
+    .filter((s) => s.unit === 'PCS')
+    .reduce((acc, s) => acc + (sumSubStyleRowQuantities(s.rows) || 0), 0);
+  return Math.round(sum * 100) / 100;
+}
+
+/** Sum of a section's row quantities in its own unit, or null when every row is blank. */
+export function sumSubStyleRowQuantities(rows: SubStyleAverageRow[] | undefined): number | null {
+  const filled = (rows || []).filter((row) => String(row.mtr ?? '').trim() !== '');
+  if (filled.length === 0) return null;
+  return Math.round(filled.reduce((acc: number, row) => acc + (Number(row.mtr) || 0), 0) * 100) / 100;
 }
 
 export interface ProductionGridItem {
@@ -22,6 +57,7 @@ export interface ProductionGridItem {
   subStyles?: string[];
   size?: string;
   sizes?: Record<string, string>;
+  measurement?: string;
 }
 
 export function calculateSizeExpressionTotal(expression?: unknown): number | null {
@@ -223,6 +259,11 @@ export interface ComponentSheetData {
   productionGrid: ProductionGridItem[];
   swatches?: SwatchItem[];
   note?: string;
+  /** Fabric quantity requested alongside the note; either, both or neither may be filled. */
+  noteQtyMtr?: number | string;
+  noteQtyPcs?: number | string;
+  /** Unit chosen for the note quantity; the value itself is stored in noteQtyMtr or noteQtyPcs. */
+  noteQtyUnit?: string;
   remarks?: string;
   totalMtrAverage?: number;
   totalPieces?: number;
@@ -232,7 +273,7 @@ export interface ComponentSheetData {
 export const DEFAULT_SUB_STYLES: SubStyleAverage[] = [
   { name: 'FRONT', average: '' },
   { name: 'BACK', average: '' },
-  { name: 'SLEAVE', average: '' },
+  { name: 'SLEEVE', average: '' },
   { name: 'COLLAR', average: '' },
   { name: 'GHERA', average: '' },
   { name: 'PATTI', average: '' },
@@ -270,6 +311,8 @@ export function extractSubStylesAndGrid(program: any, category: GarmentCategory 
   pattern: string;
   serialNoCounter: string;
   noteText: string;
+  noteQtyMtr: string;
+  noteQtyPcs: string;
   remarksText: string;
   totalMtrAverage: number;
   clientCode?: string;
@@ -288,6 +331,8 @@ export function extractSubStylesAndGrid(program: any, category: GarmentCategory 
   let pattern = program.pattern || '';
   let serialNoCounter = program.serialNoCounter || '';
   let noteText = program.note || program.comments || '';
+  let noteQtyMtr = '';
+  let noteQtyPcs = '';
   let remarksText = program.remarks || '';
   let clientCode = program.clientCode || '';
   let fabricName = program.fabricName || program.fabric || (program.fabrics?.[0]?.fabricName) || '';
@@ -327,6 +372,8 @@ export function extractSubStylesAndGrid(program: any, category: GarmentCategory 
           swatches = comp.swatches;
         }
         if (comp.note) noteText = comp.note;
+        if (comp.noteQtyMtr !== undefined && comp.noteQtyMtr !== null) noteQtyMtr = String(comp.noteQtyMtr).trim();
+        if (comp.noteQtyPcs !== undefined && comp.noteQtyPcs !== null) noteQtyPcs = String(comp.noteQtyPcs).trim();
         if (comp.remarks) remarksText = comp.remarks;
       } else {
         // Fallback for single sheet legacy metadata
@@ -434,6 +481,8 @@ export function extractSubStylesAndGrid(program: any, category: GarmentCategory 
     pattern,
     serialNoCounter,
     noteText,
+    noteQtyMtr,
+    noteQtyPcs,
     remarksText,
     totalMtrAverage,
     clientCode,
@@ -482,11 +531,15 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       topName,
       pattern,
       noteText,
+      noteQtyMtr,
+      noteQtyPcs,
       remarksText,
       totalMtrAverage,
       fabricName,
       fabricWidth,
     } = extractSubStylesAndGrid(program, activeCategory);
+    const averageUnits = getSubStyleUnits(subStylesWithAverages);
+    const totalPcsAverage = getTotalPcsAverage(subStylesWithAverages);
     const totalMtr = productionGrid.reduce((sum, row) => sum + (Number(row.mtr) || 0), 0);
     const totalPcs = productionGrid.reduce((sum, row) => sum + (Number(row.pcs) || 0), 0);
     const totalMeasurement = calculateProductionMeasurementTotal(productionGrid);
@@ -505,6 +558,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       subStyles?: string[];
       size?: string;
       sizes: Record<string, string>;
+      measurement?: string;
     }[] = [];
 
     for (let i = 0; i < TOTAL_GRID_ROWS; i++) {
@@ -524,6 +578,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
           subStyles: itemSubStyles,
           size: item.size || item.sizes?.['SIZE'] || '',
           sizes: item.sizes || {},
+          measurement: item.measurement || '',
         });
       } else {
         gridRows.push({
@@ -616,17 +671,24 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
           <thead>
             <tr>
               ${subStylesWithAverages.map((s) => `<th>${s.name}</th>`).join('')}
-              <th>TOTAL MTR</th>
+              ${averageUnits.hasMtr ? '<th>TOTAL MTR</th>' : ''}
+              ${averageUnits.hasPcs ? '<th>TOTAL PCS</th>' : ''}
             </tr>
           </thead>
           <tbody>
             <tr class="average-val-row">
-              ${subStylesWithAverages.map((s) => `<td>${s.average ? Number(s.average).toFixed(2) : ''}</td>`).join('')}
-              <td style="font-weight: 900;">${totalMtrAverage > 0 ? totalMtrAverage.toFixed(2) : ''}</td>
+              ${subStylesWithAverages.map((s) => {
+                if (s.unit !== 'PCS') return `<td>${s.average ? Number(s.average).toFixed(2) : ''}</td>`;
+                const pcs = sumSubStyleRowQuantities(s.rows);
+                return `<td>${pcs !== null ? `${pcs} PCS` : ''}</td>`;
+              }).join('')}
+              ${averageUnits.hasMtr ? `<td style="font-weight: 900;">${totalMtrAverage > 0 ? totalMtrAverage.toFixed(2) : ''}</td>` : ''}
+              ${averageUnits.hasPcs ? `<td style="font-weight: 900;">${totalPcsAverage > 0 ? totalPcsAverage : ''}</td>` : ''}
             </tr>
             <tr class="average-empty-row">
               ${subStylesWithAverages.map(() => `<td></td>`).join('')}
-              <td></td>
+              ${averageUnits.hasMtr ? '<td></td>' : ''}
+              ${averageUnits.hasPcs ? '<td></td>' : ''}
             </tr>
           </tbody>
         </table>
@@ -640,6 +702,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
               <th colspan="2">QTY</th>
               <th rowspan="2" style="width: 25%;">SUB STYLE</th>
               <th rowspan="2" style="width: 15%;">SIZE</th>
+              <th rowspan="2" style="width: 15%;">MEASUREMENT</th>
             </tr>
             <tr>
               <th class="col-qty-mtr">MTR</th>
@@ -657,6 +720,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
                   ${row.subStyles && row.subStyles.length > 1 && row.sizes ? row.subStyles.map(s => row.sizes[s] ? `${s}: ${row.sizes[s]}` : '').filter(Boolean).join('<br>') || row.size || '' : row.size || (row.subStyles?.[0] ? row.sizes?.[row.subStyles[0]] : '') || row.sizes?.['SIZE'] || ''}
                   ${calculateProductionMeasurementTotal([row]) !== null ? `<div class="size-total">TOTAL ${formatSizeExpressionTotal(calculateProductionMeasurementTotal([row])!)}</div>` : ''}
                 </td>
+                <td class="cell-size">${escapeHtmlText(row.measurement || '')}</td>
               </tr>
             `).join('')}
           </tbody>
@@ -665,7 +729,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
               <td class="cell-color">${safeActiveCategoryName} TOTALS:</td>
               <td class="cell-number">${totalMtr > 0 ? totalMtr.toFixed(2) : ''}</td>
               <td class="cell-number">${totalPcs > 0 ? totalPcs : ''}</td>
-              <td colspan="2" class="grid-total-details">
+              <td colspan="3" class="grid-total-details">
                 <span>TOTAL MEASUREMENT: ${totalMeasurement !== null ? formatSizeExpressionTotal(totalMeasurement) : '—'}</span>
                 ${totalMtrAverage > 0 ? `<span>Fabric consumption @ ${totalMtrAverage.toFixed(2)} Mtr/Pc</span>` : ''}
               </td>
@@ -681,6 +745,10 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
             <div style="flex: 1; border: 1.5px solid #000; padding: 4px 6px; min-height: 40px; box-sizing: border-box;">
               <div class="note-heading">NOTE:-</div>
               <div class="note-content">${noteText || ''}</div>
+              ${noteQtyMtr || noteQtyPcs ? `<div class="note-content">${[
+                noteQtyMtr ? `<b>QTY (MTR):</b> ${escapeHtmlText(noteQtyMtr)}` : '',
+                noteQtyPcs ? `<b>QTY (PCS):</b> ${escapeHtmlText(noteQtyPcs)}` : '',
+              ].filter(Boolean).join(' &nbsp;&nbsp; ')}</div>` : ''}
             </div>
             <div style="flex: 1; border: 1.5px solid #000; padding: 4px 6px; min-height: 40px; box-sizing: border-box;">
               <div class="note-heading">REMARKS:-</div>
@@ -1178,16 +1246,24 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
       .no-print-bar {
         display: none !important;
       }
+      /* One sheet per printed page, on A4 or Letter: the box fits its content (no fixed height that
+         pushes the notes / swatches / signature onto a second page) and the empty grid rows are shorter. */
       .sheet-wrapper {
         border: 2px solid #000000 !important;
-        margin: 0 0 20px 0;
+        margin: 0;
         padding: 14px 18px;
         width: 100%;
         max-width: 100%;
-        min-height: 285mm;
+        min-height: 0;
+        justify-content: flex-start;
+        gap: 14px;
         box-shadow: none;
         page-break-after: always;
         break-after: page;
+      }
+      .grid-data-row,
+      .grid-data-row td {
+        height: 20px;
       }
       .sheet-wrapper:last-child {
         page-break-after: auto;
@@ -1199,39 +1275,7 @@ export function generateProductionSheetHtml(program: any, category: GarmentCateg
 </head>
 <body>
 
-  <!-- Top Action Bar for interactive browser preview -->
-  <div class="no-print-bar">
-    <div>
-      <strong>Production Sheet &middot; ${safeCategoryLabel}</strong> &middot; Serial No. ${serialNo}
-    </div>
-    <div style="display: flex; gap: 8px;">
-      <button class="btn btn-primary" onclick="window.print()">
-        Print ${safeCategoryLabel} Sheet (A4)
-      </button>
-      <button class="btn btn-primary" style="background: #8e55c4;" onclick="window.downloadSelf()">
-        Download ${safeCategoryLabel} Sheet
-      </button>
-      <button class="btn btn-outline" onclick="window.close()">
-        Close
-      </button>
-    </div>
-  </div>
-
   ${targetCategories.map((cat) => renderSingleSheet(cat)).join('\n')}
-
-  <script>
-    window.downloadSelf = function() {
-      var blob = new Blob([document.documentElement.outerHTML], { type: 'text/html;charset=utf-8' });
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement('a');
-      a.href = url;
-      a.download = 'Production_Sheet_${safeFilenameCategory}_${serialNo}.html';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
-    };
-  </script>
 </body>
 </html>`;
 }
@@ -1274,8 +1318,7 @@ export function printProductionSheet(program: any, category: GarmentCategory | '
         printWindow.document.open();
         printWindow.document.write(generateProductionSheetHtml(completeProgram, category));
         printWindow.document.close();
-        printWindow.focus();
-        printWindow.print();
+        printWhenReady(printWindow);
       } catch (error) {
         printWindow.close();
         const message = error instanceof Error ? error.message : 'Failed to print production sheet.';

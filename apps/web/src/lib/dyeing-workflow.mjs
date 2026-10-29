@@ -201,15 +201,15 @@ export function validateProcessUpdate(order, input) {
  */
 export function validateQcTransferLines(lines, ordersById) {
   if (!Array.isArray(lines) || lines.length === 0) return { ok: false, error: 'Add at least one item to transfer.' };
-  const seen = new Set();
+  // A dyeing record may appear on several challan lines (entries of one colour); together they may not
+  // exceed what it has available.
+  const sent = new Map();
   const units = [];
   let programId = null;
   for (const [index, line] of lines.entries()) {
     const n = index + 1;
     const order = ordersById.get(line.orderId);
     if (!order) return { ok: false, error: `Line ${n}: dyeing record not found.` };
-    if (seen.has(line.orderId)) return { ok: false, error: `Line ${n}: the same dyeing record is listed twice.` };
-    seen.add(line.orderId);
     if (programId && order.programId !== programId) {
       return { ok: false, error: 'All items on one challan must belong to the same Production Sheet.' };
     }
@@ -217,16 +217,18 @@ export function validateQcTransferLines(lines, ordersById) {
     // Each line keeps its own unit; meters and pieces are never added together.
     units.push(order.uom);
     if (!['DYED', 'READY_FOR_QC1', 'PARTIALLY_SENT_TO_QC1'].includes(order.status)) {
-      return { ok: false, error: `Line ${n}: ${order.orderNumber} is not ready for QC.` };
+      return { ok: false, error: `Line ${n}: ${order.fabricName} is not ready for QC.` };
     }
     if (needsColorReview(order)) {
-      return { ok: false, error: `Line ${n}: ${order.orderNumber} has an unreviewed colour difference.` };
+      return { ok: false, error: `Line ${n}: ${order.fabricName} has an unreviewed colour difference.` };
     }
     const quantity = Number(line.quantity);
     if (!Number.isFinite(quantity) || quantity <= 0) return { ok: false, error: `Line ${n}: enter a quantity greater than zero.` };
     const available = availableForQc(order);
-    if (round(quantity) > available) {
-      return { ok: false, error: `Line ${n}: only ${available} ${order.uom} of ${order.orderNumber} is available to transfer.` };
+    const total = round((sent.get(line.orderId) || 0) + quantity);
+    sent.set(line.orderId, total);
+    if (total > available) {
+      return { ok: false, error: `Line ${n}: only ${available} ${order.uom} of ${order.fabricName} is available to transfer.` };
     }
   }
   return { ok: true, unit: /** @type {string} */ (headerUnitOf(units)), programId: /** @type {string} */ (programId) };

@@ -1,6 +1,6 @@
 # Phase 1 Architectural Audit & Gap Analysis
 
-**System**: Subham Fabrics Garment Manufacturing Execution System (MES)  
+**System**: Shubham Fabrics Garment Manufacturing Execution System (MES)  
 **Date**: September 29, 2026  
 **Auditor**: Principal MES Architect & Senior Engineering Team  
 

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { departmentName } from '@/lib/workflow-views';
 import Link from 'next/link';
 import { 
   RefreshCw, 
@@ -202,7 +203,7 @@ export default function IncomingChallansPage() {
                               PROGRAMMING
                             </span>
                           ) : (
-                            <span className="font-semibold text-neutral-900">{ch.fromDepartment}</span>
+                            <span className="font-semibold text-neutral-900">{departmentName(ch.fromDepartment)}</span>
                           )}
                         </td>
 

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
@@ -70,7 +70,7 @@ export async function GET(
 
     if (challan.toDepartment !== 'QC1') {
       return NextResponse.json(
-        { error: `Challan ${challan.challanNumber} is not routed to QC1.` },
+        { error: `Challan ${challan.challanNumber} is not routed to Dyeing QC.` },
         { status: 400 }
       );
     }
@@ -79,7 +79,7 @@ export async function GET(
   } catch (error: any) {
     console.error('Error fetching QC1 challan details:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to fetch QC1 challan details' },
+      { error: error.message || 'Failed to fetch Dyeing QC challan details' },
       { status: 500 }
     );
   }

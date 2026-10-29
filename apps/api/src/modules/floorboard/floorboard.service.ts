@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma.service';
 import { FloorBoardGateway } from './floorboard.gateway';
-import { ProgramStatus, ChallanStatus } from '@subham/types';
+import { ProgramStatus, ChallanStatus } from '@shubham/types';
 
 @Injectable()
 export class FloorBoardService {

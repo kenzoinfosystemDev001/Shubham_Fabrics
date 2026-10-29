@@ -1,6 +1,7 @@
 'use client';
 
 import React, { Suspense, useEffect, useState } from 'react';
+import { userChallanRemarks } from '@/lib/challan-remarks.mjs';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { PackageCheck } from 'lucide-react';
@@ -292,7 +293,7 @@ function IncomingChallans() {
                     </button>
                   </div>
                 </div>
-                {c.remarks && <p className="text-[11px] text-neutral-600">Remarks: {c.remarks}</p>}
+                {userChallanRemarks(c.remarks) && <p className="text-[11px] text-neutral-600">Remarks: {userChallanRemarks(c.remarks)}</p>}
                 <div className="flex flex-wrap gap-3">
                   {c.lines.map((l: any) => (
                     <div key={l.id} className="flex items-center gap-2.5 border border-neutral-200 rounded-xl p-2 pr-3">

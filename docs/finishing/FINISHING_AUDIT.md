@@ -11,7 +11,7 @@ $$\text{QC Washing (QC3)} \longrightarrow \text{Recutting (RECUTTING)} \longrigh
 4. **Physical Transfer Material:** Stitched garments assembled from precision-cut embroidered components.
 
 ## 3. Core Capabilities Discovered in Codebase
-- **Standard Factory Route:** In `@subham/config`, `STANDARD_FACTORY_ROUTE` specifies `... RECUTTING -> STITCHING -> FINISHING -> BUTTON_ATTACHMENT -> STEAM_PRESS -> FINAL_CHECK -> PACKING -> FINISHED_GOODS -> DISPATCH`.
+- **Standard Factory Route:** In `@shubham/config`, `STANDARD_FACTORY_ROUTE` specifies `... RECUTTING -> STITCHING -> FINISHING -> BUTTON_ATTACHMENT -> STEAM_PRESS -> FINAL_CHECK -> PACKING -> FINISHED_GOODS -> DISPATCH`.
 - **Department Label:** `DepartmentCode.FINISHING` maps to `'Finishing & Thread Trimming'`.
 - **Existing Models:**
   - `Challan` & `ChallanItem`: Tracks physical transfer between departments.

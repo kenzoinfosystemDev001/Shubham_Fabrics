@@ -1,5 +1,4 @@
-// Manual challan number rules. Pure, no database or framework imports, so
-// scripts/test-production-fixes.mjs can run them with node:test.
+// Manual challan number rules. Pure, no database or framework imports.
 //
 // Challan numbers are typed by the issuing department. The server stores exactly what was
 // typed (surrounding whitespace removed) and never generates or overwrites one.
@@ -35,7 +34,7 @@ export function challanNumberKey(raw) {
 }
 
 export function duplicateChallanNumberMessage(value) {
-  return `Challan Number "${value}" is already used by another challan. Enter a different number.`;
+  return `Challan Number "${value}" is already used by this department. Enter a different number.`;
 }
 
 /**

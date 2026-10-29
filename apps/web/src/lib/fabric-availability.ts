@@ -1,4 +1,4 @@
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { isFabricStoreDepartment } from '@/lib/fabric-stock';
 import { unitOf } from '@/lib/challan-units.mjs';
 

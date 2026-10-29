@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Patch, Param, Body, Query, UseGuards } from '@nestjs/common';
 import { ProgramsService } from './programs.service';
-import { CreateProgramSchema } from '@subham/validation';
+import { CreateProgramSchema } from '@shubham/validation';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { UserRole, ProgramStatus } from '@subham/types';
+import { UserRole, ProgramStatus } from '@shubham/types';
 
 @Controller('programs')
 @UseGuards(JwtAuthGuard, RolesGuard)

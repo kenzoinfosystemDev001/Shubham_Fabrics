@@ -20,7 +20,7 @@ import {
   CreateOperationSchema,
   CreateDefectCodeSchema,
   AssignUserRoleSchema,
-} from '@subham/validation';
+} from '@shubham/validation';
 
 @Controller('masters')
 @UseGuards(JwtAuthGuard, PermissionsGuard)

@@ -3,7 +3,7 @@ import { InventoryService } from './inventory.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../../common/guards/permissions.guard';
 import { RequirePermission } from '../../common/decorators/permissions.decorator';
-import { CreateStockLedgerEntrySchema, RegisterFabricRollSchema } from '@subham/validation';
+import { CreateStockLedgerEntrySchema, RegisterFabricRollSchema } from '@shubham/validation';
 
 @Controller('inventory')
 @UseGuards(JwtAuthGuard, PermissionsGuard)

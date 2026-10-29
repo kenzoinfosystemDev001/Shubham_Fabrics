@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ImageOff, PackageCheck, Play, Send, Undo2, Upload, X } from 'lucide-react';
 import { newSubmissionKey } from '@/components/challan/ChallanNumberField';
+import { FabricPhotos } from '@/components/workflow/FabricPhotos';
 import {
   BTN_PRIMARY,
   BTN_QUIET,
@@ -212,7 +213,7 @@ export function SendForPackingDialog({ record, onClose, onDone }: { record: any;
   return (
     <Modal
       title="Send for Packing"
-      subtitle={`${record.itemNumber} · ${record.garment}`}
+      subtitle={[record.inboundChallan?.challanNumber ? `Challan ${record.inboundChallan.challanNumber}` : '', record.garment].filter(Boolean).join(' · ')}
       onClose={onClose}
       wide
       footer={
@@ -251,7 +252,7 @@ export function SendForPackingDialog({ record, onClose, onDone }: { record: any;
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <ReadOnly label="Packing reference" value="Assigned when saved (PKG-YYYY-NNNN)" />
-        <ReadOnly label="Inventory record" value={record.itemNumber} />
+        <ReadOnly label="Challan" value={record.inboundChallan?.challanNumber || '—'} />
         <ReadOnly label="Final QC challan" value={record.inboundChallan?.challanNumber || '—'} />
         <ReadOnly label="Responsible staff" value={staff || '—'} />
         <label className="block">
@@ -279,7 +280,7 @@ export function SendForPackingDialog({ record, onClose, onDone }: { record: any;
       </div>
       {confirming && (
         <Notice kind="success">
-          Send {pcs(q)} of {record.garment} ({record.itemNumber}) for packing on {fmtDate(packingDate)}. {pcs(s.available - q)} will stay available.
+          Send {pcs(q)} of {record.garment} for packing on {fmtDate(packingDate)}. {pcs(s.available - q)} will stay available.
         </Notice>
       )}
     </Modal>
@@ -492,7 +493,7 @@ export function RecordDrawer({ id, onClose, onChanged }: { id: string; onClose: 
         <div className="px-5 py-4 border-b border-neutral-200 flex items-start justify-between gap-3 sticky top-0 bg-white z-10">
           <div>
             <h3 className="text-sm font-bold text-neutral-900">{record?.garment || 'Garment'}</h3>
-            <p className="text-xs text-neutral-500 font-mono">{record?.itemNumber}</p>
+            <p className="text-xs text-neutral-500 font-mono">{record?.inboundChallan?.challanNumber ? `Challan ${record.inboundChallan.challanNumber}` : ''}</p>
           </div>
           <button type="button" onClick={onClose} className="p-1.5 text-neutral-500 hover:bg-neutral-100 rounded-lg" aria-label="Close">
             <X className="w-4 h-4" />
@@ -546,6 +547,9 @@ export function RecordDrawer({ id, onClose, onChanged }: { id: string; onClose: 
                 <Fact label="Packed" value={pcs(s.packed)} />
                 <Fact label="Remaining" value={pcs(s.remaining)} />
               </dl>
+
+              {/* Fabric photos from Embroidery, Threadcut QC and Stitching for this Production Sheet. */}
+              <FabricPhotos workItemId={record.id} />
 
               <section>
                 <h4 className="text-xs font-semibold text-neutral-600 mb-2">Packing References</h4>

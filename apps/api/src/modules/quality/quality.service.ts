@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma.service';
-import { QualityInspectionInput } from '@subham/validation';
-import { ChallanStatus, QualityStatus } from '@subham/types';
+import { QualityInspectionInput } from '@shubham/validation';
+import { ChallanStatus, QualityStatus } from '@shubham/types';
 
 @Injectable()
 export class QualityService {

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import bcrypt from 'bcryptjs';
 import { requireUser } from '@/lib/auth/require-user';
 import { validatePin } from '@/lib/auth/pin';
@@ -35,21 +35,33 @@ export async function DELETE(
       );
     }
 
-    // Try deleting cascade or deactivate
+    // Delete the account; roles and account go together or not at all.
+    let retired = false;
     try {
-      await prisma.userRole.deleteMany({ where: { userId: id } });
-      await prisma.user.delete({ where: { id } });
+      await prisma.$transaction([
+        prisma.userRole.deleteMany({ where: { userId: id } }),
+        prisma.user.delete({ where: { id } }),
+      ]);
     } catch {
-      // If referenced in audit or transactions, deactivate instead
+      // Challans, inspections or audit records still name this user: keep the account for that history,
+      // switched off and renamed "<name>-old" (hidden from Users & RBAC), which also frees its username.
+      retired = true;
+      const base = user.username.replace(/-old(-[a-z0-9]+)?$/i, '');
+      const taken = await prisma.user.findUnique({ where: { username: `${base}-old` }, select: { id: true } });
       await prisma.user.update({
         where: { id },
-        data: { isActive: false },
+        data: {
+          isActive: false,
+          username: taken && taken.id !== id ? `${base}-old-${Date.now().toString(36)}` : `${base}-old`,
+        },
       });
     }
 
     return NextResponse.json({
       success: true,
-      message: `User ${user.username} deleted / deactivated successfully.`,
+      message: retired
+        ? `User ${user.username} removed. Older records still name this account, so it is kept for history, switched off and hidden.`
+        : `User ${user.username} deleted.`,
     });
   } catch (error: any) {
     console.error('Error deleting user:', error);

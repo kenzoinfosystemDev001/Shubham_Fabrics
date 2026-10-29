@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { userChallanRemarks } from '@/lib/challan-remarks.mjs';
 import Link from 'next/link';
 import { Search } from 'lucide-react';
 import { CategoryBadge } from '@/components/recutting/RecuttingUi';
@@ -154,7 +155,7 @@ export function WorkOutgoing({ flow }: { flow: WorkflowView }) {
                               {finished ? (
                                 <div className="flex-1 bg-white border border-neutral-200 rounded-xl">
                                   <FinishedGarmentList items={c.items || []} programId={c.programId} images={images} />
-                                  {c.remarks && <p className="px-4 pb-3 text-[11px] text-neutral-600">Remarks: {c.remarks}</p>}
+                                  {userChallanRemarks(c.remarks) && <p className="px-4 pb-3 text-[11px] text-neutral-600">Remarks: {userChallanRemarks(c.remarks)}</p>}
                                 </div>
                               ) : (
                               <div className="flex-1 overflow-x-auto">
@@ -183,14 +184,14 @@ export function WorkOutgoing({ flow }: { flow: WorkflowView }) {
                                           <td className="py-2.5 px-3 font-semibold">{i.fabricCode || i.itemDescription}</td>
                                           <td className="py-2.5 px-3"><FabricStatusBadge status={i.fabricProcessingStatus} /></td>
                                           <td className="py-2.5 px-3 text-right tabular-nums">{fmtQty(i.quantity, i.uom)}</td>
-                                          <td className="py-2.5 px-3 font-mono">{t?.workItem?.itemNumber || '—'}</td>
+                                          <td className="py-2.5 px-3">{t?.workItem?.fabricName || '—'}</td>
                                           <td className="py-2.5 px-3 font-mono">{t?.workItem?.inboundChallan?.challanNumber || c.parentChallan?.challanNumber || '—'}</td>
                                         </tr>
                                       );
                                     })}
                                   </tbody>
                                 </table>
-                                {c.remarks && <p className="mt-2 text-[11px] text-neutral-600">Remarks: {c.remarks}</p>}
+                                {userChallanRemarks(c.remarks) && <p className="mt-2 text-[11px] text-neutral-600">Remarks: {userChallanRemarks(c.remarks)}</p>}
                               </div>
                               )}
                             </div>

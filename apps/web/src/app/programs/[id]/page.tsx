@@ -25,10 +25,11 @@ import {
   Building,
   RefreshCw,
   Upload,
-  X
+  X,
+  Pencil
 } from 'lucide-react';
 import { api } from '@/lib/api';
-import { getCurrentUser, canViewClientCode } from '@/lib/rbac';
+import { getCurrentUser, canViewClientCode, isAdminUser, isProgrammingUser } from '@/lib/rbac';
 import { ProductionSheetPrintModal } from '@/components/production-sheet/ProductionSheetPrintModal';
 import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
 import { ProductionSheetView } from '@/components/production-sheet/ProductionSheetView';
@@ -359,6 +360,30 @@ export default function ProgramDetailPage() {
             challan={challans?.[0]}
             size="sm"
           />
+
+          {(isProgrammingUser(currentUser) || isAdminUser(currentUser)) && (() => {
+            // Editable until the first challan is issued from it; the server enforces the same rule.
+            const issued = challans.find((ch) => !['DRAFT', 'CANCELLED'].includes(String(ch.status || '').toUpperCase()));
+            const lockReason = issued ? `Challan ${issued.challanNumber} has already been issued from this sheet, so it can no longer be edited.` : null;
+            return lockReason ? (
+              <span
+                title={lockReason}
+                aria-disabled="true"
+                className="flex items-center gap-1.5 px-3.5 py-2 bg-neutral-100 text-neutral-400 text-xs font-semibold rounded-md border border-neutral-200 cursor-not-allowed"
+              >
+                <Lock className="w-3.5 h-3.5" />
+                <span>Edit</span>
+              </span>
+            ) : (
+              <Link
+                href={`/my-work/create-production-sheet?edit=${encodeURIComponent(program.id)}`}
+                className="flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-neutral-50 text-neutral-900 text-xs font-semibold rounded-md border border-neutral-300 shadow-xs transition"
+              >
+                <Pencil className="w-3.5 h-3.5" />
+                <span>Edit</span>
+              </Link>
+            );
+          })()}
 
           {isDraft && (
             <button

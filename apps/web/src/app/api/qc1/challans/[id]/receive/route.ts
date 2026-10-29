@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
 import { totalsByUnit } from '@/lib/challan-units.mjs';
 
@@ -30,7 +30,7 @@ export async function POST(
 
     if (challan.toDepartment !== 'QC1') {
       return NextResponse.json(
-        { error: `Challan ${challan.challanNumber} is addressed to ${challan.toDepartment}, not QC1.` },
+        { error: `Challan ${challan.challanNumber} is addressed to ${challan.toDepartment}, not Dyeing QC.` },
         { status: 400 }
       );
     }
@@ -59,7 +59,7 @@ export async function POST(
           receivedDate: new Date(),
           receivedById: actorId,
           remarks: notes
-            ? `${challan.remarks ? challan.remarks + ' | ' : ''}Received by QC1: ${notes}`
+            ? `${challan.remarks ? challan.remarks + ' | ' : ''}Received by Dyeing QC: ${notes}`
             : challan.remarks,
         },
         include: {
@@ -107,13 +107,13 @@ export async function POST(
     }, { maxWait: 15000, timeout: 30000 });
 
     return NextResponse.json({
-      message: `Challan ${updatedChallan.challanNumber} received successfully at QC1.`,
+      message: `Challan ${updatedChallan.challanNumber} received successfully at Dyeing QC.`,
       data: updatedChallan,
     });
   } catch (error: any) {
     console.error('Error receiving QC1 challan:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to receive Challan at QC1.' },
+      { error: error.message || 'Failed to receive Challan at Dyeing QC.' },
       { status: 500 }
     );
   }

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
 import { syncInboundChallansToDyeingOrders } from '@/lib/dyeing-sync';
 import { DYEING_ORDER_INCLUDE, dyeingErrorResponse } from '@/lib/dyeing-server';

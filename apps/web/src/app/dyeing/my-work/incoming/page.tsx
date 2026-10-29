@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { departmentName } from '@/lib/workflow-views';
 import Link from 'next/link';
 import { ChevronDown, ChevronRight, PackageCheck, Search, X } from 'lucide-react';
 import {
@@ -162,7 +163,7 @@ export default function DyeingIncomingChallansPage() {
                         </td>
                         <td className="py-3 px-3 text-xs text-neutral-600 whitespace-nowrap">{fmtDate(ch.issuedDate || ch.createdAt)}</td>
                         <td className="py-3 px-3 text-xs text-neutral-700 whitespace-nowrap">
-                          {ch.fromDepartment} to {ch.toDepartment}
+                          {departmentName(ch.fromDepartment)} to {departmentName(ch.toDepartment)}
                         </td>
                         <td className="py-3 px-3"><PriorityBadge priority={ch.priority} /></td>
                         <td className="py-3 px-3">
@@ -274,7 +275,7 @@ export default function DyeingIncomingChallansPage() {
 function ReceiveDialog({ challan, onClose, onDone }: { challan: any; onClose: () => void; onDone: (message: string) => void }) {
   const lines: any[] = (challan.dyeingInboundOrders || []).filter((o: any) => o.status === 'AWAITING_RECEIPT');
   const [values, setValues] = useState<Record<string, { qty: string; remarks: string }>>(() =>
-    Object.fromEntries(lines.map((o) => [o.id, { qty: String(o.requiredQuantity), remarks: '' }])),
+    Object.fromEntries(lines.map((o) => [o.id, { qty: o.requiredQuantity ? String(o.requiredQuantity) : '', remarks: '' }])),
   );
   const [remarks, setRemarks] = useState('');
   const [saving, setSaving] = useState(false);

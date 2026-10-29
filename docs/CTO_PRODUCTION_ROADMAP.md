@@ -1,4 +1,4 @@
-# Subham Fabrics MES: Production Readiness Assessment & Roadmap
+# Shubham Fabrics MES: Production Readiness Assessment & Roadmap
 
 **Date:** 2026-10-24  **Branch reviewed:** `feature/packing-inventory-department` (incl. commits e374ee6, f97a5a4)
 **Companion document:** [PRODUCTION_READINESS_AUDIT.md](PRODUCTION_READINESS_AUDIT.md) has the bug-level findings with file and line references.
@@ -28,7 +28,7 @@ The main risk is no longer the UI. It is **the trustworthiness of the numbers**.
 | Prisma models | 60 | Reasonable domain model; integrity rules missing |
 | Automated tests | **0** (and `.gitignore` bans test files) | No safety net for any change |
 | `any` types | 1,086 | Types don't protect against contract bugs, which already broke Packing |
-| Runtime input validation (zod) | 0 web routes (the `@subham/validation` package is used only by the dead NestJS API) | Bad input reaches the database |
+| Runtime input validation (zod) | 0 web routes (the `@shubham/validation` package is used only by the dead NestJS API) | Bad input reaches the database |
 | Error tracking / logging / alerting | None (261 `console.*` calls) | Production failures will be invisible |
 | DB migrations | None (`prisma db push`) | Schema changes are unreviewed and can't be rolled back |
 | Navigation components | 15 near-identical copies | Every UI change has to be made 15 times |
@@ -141,7 +141,7 @@ Fabric Store keeps three stock models that disagree with each other.
   - repository = Prisma.
 
   No business logic in React pages.
-- **Contracts:** zod schemas in `@subham/validation`, shared by the routes and the pages, with typed DTOs. This removes the class of bug that broke Packing (`quantity` vs `packingQuantity`) and the QC2/Washing "Failed" message (`data.success`). Use one response envelope everywhere.
+- **Contracts:** zod schemas in `@shubham/validation`, shared by the routes and the pages, with typed DTOs. This removes the class of bug that broke Packing (`quantity` vs `packingQuantity`) and the QC2/Washing "Failed" message (`data.success`). Use one response envelope everywhere.
 - **De-duplicate:**
   - 15 Navigation components → 1 configurable component;
   - Finishing/Steam Press and QC2/QC-Washing route clones → shared modules;

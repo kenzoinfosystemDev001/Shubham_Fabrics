@@ -4,8 +4,8 @@ import {
   CreateDefectRecordInput,
   CreateReworkTransactionInput,
   CreateRecutRequestInput,
-} from '@subham/validation';
-import { DefectStatus, ReworkStatus, RecutStatus, BundleStatus, DepartmentCode } from '@subham/types';
+} from '@shubham/validation';
+import { DefectStatus, ReworkStatus, RecutStatus, BundleStatus, DepartmentCode } from '@shubham/types';
 
 @Injectable()
 export class DefectsService {

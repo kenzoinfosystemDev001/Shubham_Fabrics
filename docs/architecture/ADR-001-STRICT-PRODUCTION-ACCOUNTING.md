@@ -5,7 +5,7 @@
 In garment and textile manufacturing, material loss, scrap, end-bits, and rework are frequently untracked or misattributed. Many legacy systems allow operators to log arbitrary output numbers that do not match inward raw material weight or bundle count, leading to phantom inventory and untraceable shrinkage.
 
 ### Decision
-The Subham Fabrics MES architecture enforces the invariant:
+The Shubham Fabrics MES architecture enforces the invariant:
 
 $$\mathbf{Input = Good + Rework + Reject + Waste + Balance}$$
 

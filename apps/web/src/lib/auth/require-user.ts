@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { buildSessionUser, type SessionUser } from './session-user';
 import {
   AuthConfigError,

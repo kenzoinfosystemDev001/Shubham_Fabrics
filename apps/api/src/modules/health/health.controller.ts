@@ -18,7 +18,7 @@ export class HealthController {
 
     return {
       status: dbStatus === 'healthy' ? 'ok' : 'degraded',
-      service: 'Subham Fabrics MES API Gateway',
+      service: 'Shubham Fabrics MES API Gateway',
       version: '1.0.0',
       timestamp: new Date().toISOString(),
       uptimeSeconds: process.uptime(),

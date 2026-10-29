@@ -332,6 +332,70 @@ export async function downloadBarcodeStickerPng(
 }
 
 /**
+ * Downloads only the barcode (bars with the challan number under them) as a sharp PNG,
+ * without the sticker's department, design and quantity details.
+ */
+export async function downloadBarcodePng(barcodeData: string, filename?: string): Promise<void> {
+  // Sized to the barcode itself: a white margin on every side (the side quiet zones are part of the
+  // bars), the bars, then the number. Nothing is clipped or stretched.
+  const { svgBars, totalWidth, totalHeight: barHeight } = generateCode128SvgBars(barcodeData, 2, 80);
+  const marginTop = 16;
+  const textSize = 18;
+  const textGap = 10;
+  const marginBottom = 14;
+  const width = totalWidth;
+  const height = marginTop + barHeight + textGap + textSize + marginBottom;
+  const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
+    <rect width="${width}" height="${height}" fill="#ffffff" />
+    <g transform="translate(0 ${marginTop})">${svgBars}</g>
+    <text x="${width / 2}" y="${marginTop + barHeight + textGap + textSize - 3}" text-anchor="middle" font-family="'Courier New', monospace" font-size="${textSize}" font-weight="bold" fill="#000000" letter-spacing="2">${escapeXml(barcodeData)}</text>
+  </svg>`;
+  const safeFilename = filename || `barcode-${(barcodeData || 'challan').replace(/[^a-zA-Z0-9_-]/g, '_')}.png`;
+
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' }));
+    img.onload = () => {
+      try {
+        const scale = 5;
+        const canvas = document.createElement('canvas');
+        canvas.width = width * scale;
+        canvas.height = height * scale;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error('Canvas context not available');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        URL.revokeObjectURL(url);
+        canvas.toBlob((pngBlob) => {
+          if (!pngBlob) {
+            reject(new Error('Failed to create PNG blob'));
+            return;
+          }
+          const downloadUrl = URL.createObjectURL(pngBlob);
+          const a = document.createElement('a');
+          a.href = downloadUrl;
+          a.download = safeFilename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(downloadUrl);
+          resolve();
+        }, 'image/png');
+      } catch (err) {
+        URL.revokeObjectURL(url);
+        reject(err);
+      }
+    };
+    img.onerror = (err) => {
+      URL.revokeObjectURL(url);
+      reject(err);
+    };
+    img.src = url;
+  });
+}
+
+/**
  * Downloads the barcode sticker as an SVG vector file.
  */
 export function downloadBarcodeStickerSvg(

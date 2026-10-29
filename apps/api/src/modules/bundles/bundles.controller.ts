@@ -4,7 +4,7 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../../common/guards/permissions.guard';
 import { RequirePermission } from '../../common/decorators/permissions.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { CreateBundleSchema } from '@subham/validation';
+import { CreateBundleSchema } from '@shubham/validation';
 import { z } from 'zod';
 
 @Controller('bundles')

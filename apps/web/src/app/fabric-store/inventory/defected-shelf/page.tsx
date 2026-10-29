@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { departmentName } from '@/lib/workflow-views';
 import Link from 'next/link';
 import { formatTotals, totalsByUnit, unitOf } from '@/lib/challan-units.mjs';
 import {
@@ -403,7 +404,7 @@ export default function DefectedShelfPage() {
               6 Stations
             </p>
             <span className="text-[10px] text-neutral-500">
-              Store · Dyeing · QC1 · Emb · THC · Threadcut QC
+              Store · Dyeing · Dyeing QC · Emb · THC · Threadcut QC
             </span>
           </div>
 
@@ -669,7 +670,7 @@ export default function DefectedShelfPage() {
 
                             <td className="py-3.5 px-3.5">
                               <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-neutral-100 text-neutral-900 border border-neutral-200">
-                                {ch.fromDepartment}
+                                {departmentName(ch.fromDepartment)}
                               </span>
                             </td>
 
@@ -928,7 +929,7 @@ export default function DefectedShelfPage() {
                               <td className="py-3 px-4 font-mono font-bold text-neutral-900">
                                 {challan.challanNumber}
                               </td>
-                              <td className="py-3 px-4">{challan.fromDepartment}</td>
+                              <td className="py-3 px-4">{departmentName(challan.fromDepartment)}</td>
                               <td className="py-3 px-4">
                                 {challan.items?.[0]?.itemDescription || challan.program?.fabricName || challan.program?.mainStyle || challan.program?.clientName || 'General Style'}
                                 <span className="block text-[10px] text-neutral-500">
@@ -1023,7 +1024,7 @@ export default function DefectedShelfPage() {
                           </td>
                           <td className="py-3 px-3">
                             <span className="px-2 py-0.5 rounded-full bg-brand-100 text-brand-800 border border-brand-200 text-[10px] font-bold">
-                              {ch.fromDepartment}
+                              {departmentName(ch.fromDepartment)}
                             </span>
                           </td>
                           <td className="py-3 px-3">

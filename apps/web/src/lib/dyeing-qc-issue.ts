@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import type { AuthenticatedUser } from '@/lib/auth/require-user';
 import { assertChallanNumbersAvailable, challanNumberErrorResponse, requireChallanNumber } from '@/lib/challan-number-server';
 import { DyeingRequestError, TX_OPTIONS, dyeingErrorResponse } from '@/lib/dyeing-server';
 import { isColorMismatch, statusAfterTransfer, validateQcTransferLines } from '@/lib/dyeing-workflow.mjs';
 import { MIXED_UNIT } from '@/lib/challan-units.mjs';
+import { canStoreChallanAverage, canWriteColumns } from '@/lib/challan-item-average';
 
 const ENDPOINT = 'DYEING_QC_CHALLAN';
 const round = (n: number) => Math.round(n * 1000) / 1000;
@@ -14,6 +15,8 @@ export interface QcTransferLineInput {
   orderId: string;
   quantity: unknown;
   actualDyedColor?: unknown;
+  average?: unknown; // optional Average of the entry, with averageUnit (MTR | PCS)
+  averageUnit?: unknown;
   remarks?: unknown;
 }
 
@@ -23,6 +26,7 @@ export interface IssueQcChallanInput {
   issuedDate?: unknown;
   priority?: unknown;
   remarks?: unknown;
+  inchargeName?: unknown; // the Dyeing incharge name typed on the form
   lines: QcTransferLineInput[];
 }
 
@@ -97,8 +101,15 @@ export async function issueDyeingQcChallan(user: AuthenticatedUser, input: Issue
           `Line ${index + 1}: "${actual}" differs from the required colour "${order.targetColor}". Record and review it in Dyeing Process first.`,
         );
       }
+      const rawAverage = line.average === undefined || line.average === null ? '' : String(line.average).trim();
+      const average = rawAverage === '' ? null : Number(rawAverage);
+      if (average !== null && (!Number.isFinite(average) || average < 0)) throw new DyeingRequestError(`Line ${index + 1}: Average must be 0 or more.`);
+      const averageUnit = average === null ? null : String(line.averageUnit || '').toUpperCase();
+      if (averageUnit !== null && averageUnit !== 'MTR' && averageUnit !== 'PCS') throw new DyeingRequestError(`Line ${index + 1}: choose MTR or PCS for the Average.`);
       return {
         order,
+        average,
+        averageUnit,
         quantity: round(Number(line.quantity)),
         actual,
         base: order.inboundChallanItemId ? baseColour.get(order.inboundChallanItemId) ?? null : null,
@@ -106,12 +117,17 @@ export async function issueDyeingQcChallan(user: AuthenticatedUser, input: Issue
       };
     });
 
-    await assertChallanNumbersAvailable(prisma, [{ value: challanNumber }]);
+    await assertChallanNumbersAvailable(prisma, 'DYEING', [{ value: challanNumber }]);
     const issuedDate = input.issuedDate ? new Date(String(input.issuedDate)) : new Date();
     if (Number.isNaN(issuedDate.getTime())) throw new DyeingRequestError('Challan date is not a valid date.');
     const priority = ['LOW', 'NORMAL', 'HIGH', 'URGENT'].includes(String(input.priority)) ? String(input.priority) : prepared[0].order.priority;
     const total = round(prepared.reduce((s, p) => s + p.quantity, 0));
     const now = new Date();
+    // Typed incharge name: its own column, or an "Incharge:" remarks note while that column is not in the database.
+    const inchargeName = typeof input.inchargeName === 'string' ? input.inchargeName.trim().slice(0, 100) : '';
+    const storeInchargeColumn = inchargeName ? await canWriteColumns('Challan', ['inchargeName']) : false;
+    const storeAverage = prepared.some((p) => p.average !== null) ? await canStoreChallanAverage() : false;
+    const userRemarks = typeof input.remarks === 'string' ? input.remarks.trim().slice(0, 500) : '';
 
     const challanId = await prisma.$transaction(async (tx) => {
       const challan = await tx.challan.create({
@@ -129,15 +145,21 @@ export async function issueDyeingQcChallan(user: AuthenticatedUser, input: Issue
           issuedDate,
           fabricOut: check.unit === MIXED_UNIT ? null : total, // mixed units: totals come from the lines
           fabricUnit: check.unit,
-          remarks: typeof input.remarks === 'string' && input.remarks.trim() ? input.remarks.trim().slice(0, 500) : null,
+          remarks:
+            [userRemarks || null, inchargeName && !storeInchargeColumn ? `Incharge: ${inchargeName}` : null].filter(Boolean).join(' | ') || null,
+          ...(storeInchargeColumn ? { inchargeName } : {}),
         },
       });
 
+      // A record sent on several entries is updated once per entry, from what was sent before it.
+      const sentBefore = new Map<string, number>();
       for (const p of prepared) {
-        const sentAfter = round(p.order.sentToQc1Quantity + p.quantity);
+        const was = sentBefore.get(p.order.id) ?? p.order.sentToQc1Quantity;
+        const sentAfter = round(was + p.quantity);
+        sentBefore.set(p.order.id, sentAfter);
         // Applies only if nothing changed since validation; otherwise another transfer won the race.
         const moved = await tx.dyeingOrder.updateMany({
-          where: { id: p.order.id, sentToQc1Quantity: p.order.sentToQc1Quantity, dyedQuantity: p.order.dyedQuantity },
+          where: { id: p.order.id, sentToQc1Quantity: was, dyedQuantity: p.order.dyedQuantity },
           data: {
             sentToQc1Quantity: sentAfter,
             readyForQc1Quantity: Math.max(0, round(p.order.dyedQuantity - sentAfter)),
@@ -148,7 +170,7 @@ export async function issueDyeingQcChallan(user: AuthenticatedUser, input: Issue
           },
         });
         if (moved.count !== 1) {
-          throw new DyeingRequestError(`${p.order.orderNumber} changed while this challan was being issued. Refresh and try again.`, 409);
+          throw new DyeingRequestError(`${p.order.fabricName} changed while this challan was being issued. Refresh and try again.`, 409);
         }
 
         const item = await tx.challanItem.create({
@@ -161,6 +183,7 @@ export async function issueDyeingQcChallan(user: AuthenticatedUser, input: Issue
             unitType: 'ROLL',
             quantity: p.quantity,
             uom: p.order.uom,
+            ...(storeAverage && p.average !== null ? { average: p.average, averageUnit: p.averageUnit } : {}),
             remarks:
               [p.base ? `Base colour: ${p.base}` : null, `Dyeing ref: ${p.order.orderNumber}`, p.remarks || null]
                 .filter(Boolean)

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { userChallanRemarks } from '@/lib/challan-remarks.mjs';
 import Link from 'next/link';
 import { Search } from 'lucide-react';
 import { BTN_PRIMARY, ChallanBarcode, DocumentsButton, EmptyRow, FIELD, FabricStatusBadge, Notice, PageHeader, Panel, THEAD, fetchJson, fmtDate, fmtQty, sheetRef } from '@/components/workflow/WorkflowUi';
@@ -152,7 +153,7 @@ export function RecuttingIssuedChallans() {
                                     })}
                                   </tbody>
                                 </table>
-                                {c.remarks && <p className="mt-2 text-[11px] text-neutral-600">Remarks: {c.remarks}</p>}
+                                {userChallanRemarks(c.remarks) && <p className="mt-2 text-[11px] text-neutral-600">Remarks: {userChallanRemarks(c.remarks)}</p>}
                               </div>
                             </div>
                           </td>

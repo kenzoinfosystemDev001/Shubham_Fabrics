@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
@@ -29,7 +29,7 @@ export async function POST(
 
     if (challan.toDepartment !== 'QC1') {
       return NextResponse.json(
-        { error: `Challan ${challan.challanNumber} is not routed to QC1.` },
+        { error: `Challan ${challan.challanNumber} is not routed to Dyeing QC.` },
         { status: 400 }
       );
     }

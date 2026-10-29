@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { apiErrorResponse } from '@/lib/api-errors';
 
 export const dynamic = 'force-dynamic';

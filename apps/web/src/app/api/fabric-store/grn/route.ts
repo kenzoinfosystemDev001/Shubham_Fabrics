@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
@@ -100,10 +100,10 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    // Older clients send no unit; GRNs were meters-only before the unit dropdown.
-    const unit = rawUnit === undefined || rawUnit === null || rawUnit === '' ? 'MTR' : String(rawUnit).toUpperCase();
+    // The unit is never assumed; a GRN without MTR or PCS is refused.
+    const unit = String(rawUnit ?? '').toUpperCase();
     if (unit !== 'MTR' && unit !== 'PCS') {
-      return NextResponse.json({ error: 'unit must be MTR or PCS' }, { status: 400 });
+      return NextResponse.json({ error: 'Select MTR or PCS for the roll quantities' }, { status: 400 });
     }
     if (!Array.isArray(rollInputs) || rollInputs.length === 0) {
       return NextResponse.json({ error: 'At least one roll entry is required' }, { status: 400 });

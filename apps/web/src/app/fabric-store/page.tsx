@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { departmentName } from '@/lib/workflow-views';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -209,7 +210,7 @@ export default function FabricStoreDashboard() {
                           </Link>
                         </td>
                         <td className="py-3 px-4 font-semibold text-neutral-900">
-                          {ch.fromDepartment}
+                          {departmentName(ch.fromDepartment)}
                         </td>
                         <td className="py-3 px-4">
                           <span className="font-mono font-semibold block">

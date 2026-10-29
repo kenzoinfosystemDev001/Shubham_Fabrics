@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma.service';
-import { DepartmentCode } from '@subham/types';
+import { DepartmentCode } from '@shubham/types';
 
 @Injectable()
 export class FinalCheckService {

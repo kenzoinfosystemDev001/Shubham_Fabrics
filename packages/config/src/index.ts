@@ -1,8 +1,8 @@
-import { DepartmentCode } from '@subham/types';
+import { DepartmentCode } from '@shubham/types';
 
 export const SYSTEM_CONFIG = {
-  APP_NAME: 'Subham Fabrics MES',
-  COMPANY_NAME: 'Subham Fabrics & Apparel Ltd.',
+  APP_NAME: 'Shubham Fabrics MES',
+  COMPANY_NAME: 'Shubham Fabrics & Apparel Ltd.',
   DEFAULT_TIMEZONE: 'Asia/Kolkata',
   PAGINATION_DEFAULT_LIMIT: 25,
   PAGINATION_MAX_LIMIT: 100,

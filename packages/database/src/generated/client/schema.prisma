@@ -1,4 +1,4 @@
-// Subham Fabrics MES - Enterprise PostgreSQL Schema (Neon Cloud)
+// Shubham Fabrics MES - Enterprise PostgreSQL Schema (Neon Cloud)
 
 generator client {
   provider      = "prisma-client-js"
@@ -702,7 +702,7 @@ model AuditLog {
 
 model Challan {
   id              String    @id @default(uuid())
-  challanNumber   String    @unique
+  challanNumber   String // unique per issuing department: see @@unique([fromDepartment, challanNumber])
   challanType     String // FABRIC_ISSUE, INTER_DEPARTMENT, etc.
   programId       String
   program         Program   @relation(fields: [programId], references: [id])
@@ -731,9 +731,10 @@ model Challan {
   approvedById String?
   approvedBy   User?   @relation("ChallanApprover", fields: [approvedById], references: [id])
 
-  remarks   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  remarks      String?
+  inchargeName String? // the issuing department incharge's name as typed on the form
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   // Fabric / Piece In & Out Auto-Detection Tracking across Departments
   fabricIn               Float?
@@ -762,6 +763,10 @@ model Challan {
 
   // Smart Deadline Alerts
   deadlineAlerts DeadlineAlert[]
+
+  // A department cannot reuse its own challan number; another department may use the same number.
+  @@unique([fromDepartment, challanNumber])
+  @@index([challanNumber])
 }
 
 model ChallanItem {
@@ -787,6 +792,8 @@ model ChallanItem {
   grossWeightKg          Float?
   netWeightKg            Float?
   uom                    String
+  average                Float? // Average entered with the line on the issuing form; null when not given
+  averageUnit            String? // MTR or PCS: the unit of `average` (chosen with it); null when no average
   remarks                String?
 
   sourceLotId    String?
@@ -1426,7 +1433,7 @@ model FabricStockLedger {
   batchId         String
   batch           FabricBatch          @relation(fields: [batchId], references: [id])
   transactionType StockTransactionType
-  quantity        Decimal              @db.Decimal(10, 2) // meters moved
+  quantity        Decimal              @db.Decimal(10, 2) // amount moved, in batch.unit (MTR or PCS)
   referenceType   String // "GRN", "ISSUE_CHALLAN", "RETURN_CHALLAN", "QC_HOLD"
   referenceId     String // the relevant document ID
   fromLocationId  String?
@@ -1740,6 +1747,7 @@ model FabricOutward {
   issuePcsQty   Float? // pcs quantity
   byOrderName   String? // by order name / client name
   remarks       String?
+  inchargeName  String? // the Fabric Store incharge's name as typed on the form
   destination   String? // "DYEING", "EMBROIDERY", "OTHER"
   fabricType    String? // "KORA", "DYED"
   createdAt     DateTime @default(now())

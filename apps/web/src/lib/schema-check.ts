@@ -1,4 +1,4 @@
-import { Prisma, prisma } from '@subham/database';
+import { Prisma, prisma } from '@shubham/database';
 import { MIGRATION_COMMAND } from '@/lib/api-errors';
 
 export interface SchemaCheckResult {

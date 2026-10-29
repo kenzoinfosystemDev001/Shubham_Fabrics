@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
 import {
   FabricStockError,
@@ -107,7 +107,7 @@ export async function POST(request: Request) {
     // Older clients send one line as top-level fields.
     const rawLines: any[] = Array.isArray(body.lines)
       ? body.lines
-      : [{ ...body, unit: body.unit ?? 'MTR' }];
+      : [body];
     if (rawLines.length === 0) {
       return NextResponse.json({ error: 'Add at least one fabric line' }, { status: 400 });
     }
@@ -118,7 +118,8 @@ export async function POST(request: Request) {
     for (const [index, line] of rawLines.entries()) {
       const itemName = String(line?.itemName || '').trim();
       const qty = Number(line?.billQty);
-      const unit = normalizeStockUnit(line?.unit ?? 'MTR');
+      // The unit is never assumed: a line without MTR or PCS is rejected below.
+      const unit = normalizeStockUnit(line?.unit);
       if (!itemName) {
         return NextResponse.json({ error: `Line ${index + 1}: item name is required` }, { status: 400 });
       }
@@ -126,7 +127,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: `Line ${index + 1}: quantity must be a positive number` }, { status: 400 });
       }
       if (!unit) {
-        return NextResponse.json({ error: `Line ${index + 1}: unit must be MTR or PCS` }, { status: 400 });
+        return NextResponse.json({ error: `Line ${index + 1}: select MTR or PCS` }, { status: 400 });
       }
       const { details, problems } = inwardLineDetails(line);
       if (problems.length) {

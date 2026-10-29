@@ -154,7 +154,7 @@ export function WorkProgress({ flow }: { flow: WorkflowView }) {
               <table className="w-full text-left text-sm">
                 <thead className={THEAD}>
                   <tr>
-                    <th className="py-2.5 px-4">Line</th>
+                    <th className="py-2.5 px-4">Challan</th>
                     <th className="py-2.5 px-3">Fabric / Colour</th>
                     <th className="py-2.5 px-3 text-right">Received</th>
                     <th className="py-2.5 px-3 text-right">Not taken in</th>
@@ -170,8 +170,8 @@ export function WorkProgress({ flow }: { flow: WorkflowView }) {
                   {g.items.map((i) => (
                     <tr key={i.id} className="hover:bg-neutral-50/60">
                       <td className="py-2.5 px-4">
-                        <Link href={`${workPath(flow)}?itemId=${i.id}`} className="font-mono text-xs font-semibold text-brand-800 hover:underline">{i.itemNumber}</Link>
-                        <span className="block font-mono text-[11px] text-neutral-500">{sheetRef(i.program)} · {i.inboundChallan?.challanNumber || '—'}</span>
+                        <Link href={`${workPath(flow)}?itemId=${i.id}`} className="font-mono text-xs font-semibold text-brand-800 hover:underline">{i.inboundChallan?.challanNumber || '—'}</Link>
+                        <span className="block font-mono text-[11px] text-neutral-500">{sheetRef(i.program)}</span>
                       </td>
                       <td className="py-2.5 px-3 text-xs">
                         <span className="font-semibold text-neutral-900">{i.fabricName}</span>

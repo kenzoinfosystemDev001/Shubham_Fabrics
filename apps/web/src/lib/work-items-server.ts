@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { departmentKeyFor, requireDepartment, type DepartmentKey } from '@/lib/auth/department-access';
 import type { AuthenticatedUser } from '@/lib/auth/require-user';
 import { apiErrorResponse } from '@/lib/api-errors';
@@ -29,6 +29,7 @@ import {
 import { INVENTORY_UNIT, LEDGER, garmentLabel } from '@/lib/inventory.mjs';
 import { garmentName } from '@/lib/finished-garments.mjs';
 import { MIXED_UNIT } from '@/lib/challan-units.mjs';
+import { canStoreChallanAverage } from '@/lib/challan-item-average';
 
 /** How a department receives and passes on work. Add an entry to bring a new department online. */
 export interface WorkflowConfig {
@@ -299,7 +300,7 @@ export const WORK_ITEM_INCLUDE = {
   inspections: { orderBy: { createdAt: 'asc' as const }, include: { inspector: { select: USER_SELECT } } },
   allocations: { orderBy: { createdAt: 'asc' as const } },
   sourceAllocation: { select: { id: true, allocationNumber: true, category: true, otherName: true } },
-  sourceWorkItem: { select: { id: true, itemNumber: true, departmentCode: true } },
+  sourceWorkItem: { select: { id: true, itemNumber: true, departmentCode: true, inboundChallan: { select: { challanNumber: true } } } },
 };
 
 export function inboundWhere(cfg: WorkflowConfig) {
@@ -515,7 +516,7 @@ export function workflowHandlers(cfg: WorkflowConfig) {
             where: { id: r.item.id, status: 'AWAITING_RECEIPT' },
             data: { status: 'RECEIVED', receivedQuantity: r.received, receivedAt: now, receivedById: user.id, receiptRemarks: r.remarks },
           });
-          if (res.count !== 1) throw new WorkRequestError(`${r.item.itemNumber} was received by someone else just now.`, 409);
+          if (res.count !== 1) throw new WorkRequestError(`${r.item.fabricName} was received by someone else just now.`, 409);
           if (cfg.garmentStock) {
             // One receipt per line: the key makes a retried or concurrent receipt impossible to post twice.
             await tx.stockLedgerEntry.create({
@@ -813,7 +814,7 @@ export function workflowHandlers(cfg: WorkflowConfig) {
               completedAt: fullyInspected ? item.completedAt ?? now : null,
             },
           });
-          if (res.count !== 1) throw new WorkRequestError(`${item.itemNumber} was inspected by someone else just now. Refresh and try again.`, 409);
+          if (res.count !== 1) throw new WorkRequestError(`${item.fabricName} was inspected by someone else just now. Refresh and try again.`, 409);
           await tx.workItemInspection.create({
             data: {
               workItemId: id,
@@ -924,7 +925,7 @@ export function workflowHandlers(cfg: WorkflowConfig) {
         program: { select: PROGRAM_SELECT },
         parentChallan: { select: { id: true, challanNumber: true } },
         issuedBy: { select: USER_SELECT },
-        workTransfers: { include: { workItem: { select: { id: true, itemNumber: true, inboundChallanId: true } } } },
+        workTransfers: { include: { workItem: { select: { id: true, itemNumber: true, fabricName: true, inboundChallanId: true, inboundChallan: { select: { challanNumber: true } } } } } },
       },
     });
 
@@ -988,7 +989,7 @@ export function workflowHandlers(cfg: WorkflowConfig) {
         const kind = kindOf(body.kind);
         const to = destinationOf(cfg, kind);
         challanNumber = requireChallanNumber(body.challanNumber);
-        let lines: Array<{ workItemId: string; quantity: unknown; remarks?: unknown }> = Array.isArray(body.lines) ? body.lines : [];
+        let lines: Array<{ workItemId: string; quantity: unknown; remarks?: unknown; average?: unknown; averageUnit?: unknown }> = Array.isArray(body.lines) ? body.lines : [];
         const items = await prisma.departmentWorkItem.findMany({
           where: { id: { in: lines.map((l) => l.workItemId) }, ...dept },
           include: {
@@ -1002,7 +1003,7 @@ export function workflowHandlers(cfg: WorkflowConfig) {
         if (cfg.finishedGoods) {
           lines = lines.map((l) => {
             const item = byId.get(l.workItemId);
-            if (item && !(availableFor(item, kind) > 0)) throw new WorkRequestError(`${garmentName(item)} (${item.itemNumber}) has nothing left to send.`);
+            if (item && !(availableFor(item, kind) > 0)) throw new WorkRequestError(`${garmentName(item)} has nothing left to send.`);
             return { ...l, quantity: item ? availableFor(item, kind) : 0 };
           });
         }
@@ -1015,16 +1016,23 @@ export function workflowHandlers(cfg: WorkflowConfig) {
         const reasonsOf = (item: (typeof items)[number]) =>
           Array.from(new Set(item.inspections.map((x) => (kind === 'REJECT' ? x.rejectReason : x.reworkReason)).filter(Boolean))).join('; ');
         const counter = kind === 'REJECT' ? 'rejectSentQuantity' : kind === 'REWORK' ? 'reworkSentQuantity' : 'transferredQuantity';
-        await assertChallanNumbersAvailable(prisma, [{ value: challanNumber }]);
+        await assertChallanNumbersAvailable(prisma, cfg.code, [{ value: challanNumber }]);
         const issuedDate = body.issuedDate ? new Date(String(body.issuedDate)) : new Date();
         // Optional; the existing options only. Blank keeps the line's own priority.
         const priority = body.priority ? String(body.priority).toUpperCase() : null;
         if (priority && !['LOW', 'NORMAL', 'HIGH', 'URGENT'].includes(priority)) throw new WorkRequestError('Choose a valid priority.');
         if (Number.isNaN(issuedDate.getTime())) throw new WorkRequestError('Challan date is not a valid date.');
-        const prepared = lines.map((l) => {
+        const prepared = lines.map((l, index) => {
           const item = byId.get(l.workItemId)!;
-          return { item, quantity: round(Number(l.quantity)), remarks: textOf(l.remarks, 300), reason: kind === 'PASS' ? '' : reasonsOf(item) };
+          // Optional Average of the entry (Items section), with its unit.
+          const rawAverage = l.average === undefined || l.average === null ? '' : String(l.average).trim();
+          const average = rawAverage === '' ? null : Number(rawAverage);
+          if (average !== null && (!Number.isFinite(average) || average < 0)) throw new WorkRequestError(`Line ${index + 1}: Average must be 0 or more.`);
+          const averageUnit = average === null ? null : String(l.averageUnit || '').toUpperCase();
+          if (averageUnit !== null && averageUnit !== 'MTR' && averageUnit !== 'PCS') throw new WorkRequestError(`Line ${index + 1}: choose MTR or PCS for the Average.`);
+          return { item, quantity: round(Number(l.quantity)), average, averageUnit, remarks: textOf(l.remarks, 300), reason: kind === 'PASS' ? '' : reasonsOf(item) };
         });
+        const storeAverage = prepared.some((p) => p.average !== null) ? await canStoreChallanAverage() : false;
         const total = round(prepared.reduce((s, p) => s + p.quantity, 0));
         const reasons = Array.from(new Set(prepared.map((p) => p.reason).filter(Boolean))).join('; ');
         const now = new Date();
@@ -1059,18 +1067,22 @@ export function workflowHandlers(cfg: WorkflowConfig) {
                   .join(' | ') || null,
             },
           });
+          // A work line sent on several entries is updated once per entry, from its running state.
+          const current = new Map<string, (typeof prepared)[number]['item']>();
           for (const p of prepared) {
-            const after = round(p.item[counter] + p.quantity);
-            const updated = { ...p.item, [counter]: after };
+            const was = current.get(p.item.id) ?? p.item;
+            const after = round(was[counter] + p.quantity);
+            const updated = { ...was, [counter]: after };
+            current.set(p.item.id, updated);
             const moved = await tx.departmentWorkItem.updateMany({
-              where: { id: p.item.id, [counter]: p.item[counter], processedQuantity: p.item.processedQuantity },
+              where: { id: p.item.id, [counter]: was[counter], processedQuantity: p.item.processedQuantity },
               data: {
                 [counter]: after,
-                status: cfg.qc ? qcStatusOf(updated) : statusAfterTransfer(p.item, after),
+                status: cfg.qc ? qcStatusOf(updated) : statusAfterTransfer(was, after),
                 lastTransferredAt: now,
               },
             });
-            if (moved.count !== 1) throw new WorkRequestError(`${p.item.itemNumber} changed while this challan was being issued. Refresh and try again.`, 409);
+            if (moved.count !== 1) throw new WorkRequestError(`${p.item.fabricName} changed while this challan was being issued. Refresh and try again.`, 409);
             const status = p.item.fabricProcessingStatus === 'DYED' ? 'Dyed' : 'Undyed';
             const ci = await tx.challanItem.create({
               data: {
@@ -1086,11 +1098,11 @@ export function workflowHandlers(cfg: WorkflowConfig) {
                 unitType: p.item.uom === 'PCS' ? 'PCS' : 'ROLL',
                 quantity: p.quantity,
                 uom: p.item.uom,
+                ...(storeAverage && p.average !== null ? { average: p.average, averageUnit: p.averageUnit } : {}),
                 // "Status:" keeps the convention the stock rules already read.
                 remarks: [
                   `Status: ${status}`,
                   `Incoming: ${p.item.inboundChallan.challanNumber}`,
-                  `Ref: ${p.item.itemNumber}`,
                   p.item.sourceAllocation ? `Allocation: ${p.item.sourceAllocation.allocationNumber}` : null,
                   kind === 'REJECT' ? `Rejected at ${cfg.label}${p.reason ? `: ${p.reason}` : ''}` : null,
                   kind === 'REWORK' ? `Rework${p.reason ? `: ${p.reason}` : ''}` : null,

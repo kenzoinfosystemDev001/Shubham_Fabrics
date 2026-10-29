@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { userChallanRemarks } from '@/lib/challan-remarks.mjs';
 import Link from 'next/link';
 import { ChevronDown, ChevronRight, PackageCheck, Search, X } from 'lucide-react';
 import {
@@ -21,6 +22,7 @@ import {
   fetchJson,
   fmtDate,
   fmtQty,
+  challanRef,
   sheetRef,
 } from '@/components/workflow/WorkflowUi';
 import { departmentName, type WorkflowView } from '@/lib/workflow-views';
@@ -224,13 +226,13 @@ export function WorkIncoming({ flow }: { flow: WorkflowView }) {
                                     Previous challan <span className="font-mono">{ch.parentChallan.challanNumber}</span>
                                   </p>
                                 )}
-                                {ch.remarks && <p className="text-[11px] text-neutral-700 max-w-[240px]">Remarks: {ch.remarks}</p>}
+                                {userChallanRemarks(ch.remarks) && <p className="text-[11px] text-neutral-700 max-w-[240px]">Remarks: {userChallanRemarks(ch.remarks)}</p>}
                               </div>
                               <div className="flex-1 overflow-x-auto">
                                 <table className="w-full text-left text-xs bg-white border border-neutral-200 rounded-xl overflow-hidden">
                                   <thead className={THEAD}>
                                     <tr>
-                                      <th className="py-2.5 px-3">{flow.label} Ref</th>
+                                      <th className="py-2.5 px-3">From</th>
                                       <th className="py-2.5 px-3">Fabric</th>
                                       <th className="py-2.5 px-3">Colour</th>
                                       <th className="py-2.5 px-3">Dyed / Undyed</th>
@@ -244,12 +246,14 @@ export function WorkIncoming({ flow }: { flow: WorkflowView }) {
                                     {items.map((i) => (
                                       <tr key={i.id}>
                                         <td className="py-2.5 px-3 font-mono text-neutral-600">
-                                          {i.itemNumber}
-                                          {i.sourceWorkItem && <span className="block text-[11px] text-neutral-500">from {i.sourceWorkItem.itemNumber}</span>}
+                                          {i.sourceWorkItem ? <span className="block text-[11px]">{departmentName(i.sourceWorkItem.departmentCode)}{challanRef(i.sourceWorkItem) ? ` · ${challanRef(i.sourceWorkItem)}` : ''}</span> : !i.sourceAllocation && '—'}
                                           {i.sourceAllocation && <span className="block text-[11px] text-neutral-500">{i.sourceAllocation.allocationNumber}</span>}
                                         </td>
                                         <td className="py-2.5 px-3 font-semibold text-neutral-900">{i.fabricName}<GarmentTag item={i} /></td>
-                                        <td className="py-2.5 px-3">{i.colour || '—'}</td>
+                                        <td className="py-2.5 px-3">
+                                          {i.colour || '—'}
+                                          {senderNoteOf(ch, i) && <span className="block text-[11px] text-neutral-500 max-w-[260px]">{senderNoteOf(ch, i)}</span>}
+                                        </td>
                                         <td className="py-2.5 px-3"><FabricStatusBadge status={i.fabricProcessingStatus} /></td>
                                         <td className="py-2.5 px-3 text-right tabular-nums">{fmtQty(i.expectedQuantity, i.uom)}</td>
                                         <td className="py-2.5 px-3 text-right tabular-nums">
@@ -294,11 +298,25 @@ export function WorkIncoming({ flow }: { flow: WorkflowView }) {
   );
 }
 
+/** The sender's Average, Remarks and Roll # for the challan line a work item came from (the line itself is never edited). */
+function senderNoteOf(challan: any, item: any): string {
+  const line = (challan.items || []).find((l: any) => l.id === item.inboundChallanItemId);
+  if (!line) return '';
+  const hasAverage = line.average !== null && line.average !== undefined;
+  return [
+    hasAverage ? `Average ${line.average}${line.averageUnit ? ` ${line.averageUnit}` : ''}` : null,
+    line.rollNumber ? `Roll ${line.rollNumber}` : null,
+    userChallanRemarks(line.remarks) || null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+}
+
 function ReceiveDialog({ flow, challan, onClose, onDone }: { flow: WorkflowView; challan: any; onClose: () => void; onDone: (message: string) => void }) {
   const lines: any[] = (challan.workItemsInbound || []).filter((i: any) => i.status === 'AWAITING_RECEIPT');
   const [values, setValues] = useState<Record<string, { qty: string; remarks: string }>>(() =>
     // Strict receipt: the receiver counts and enters the actual quantity rather than confirming the dispatched one.
-    Object.fromEntries(lines.map((i) => [i.id, { qty: flow.strictReceipt ? '' : String(i.expectedQuantity), remarks: '' }])),
+    Object.fromEntries(lines.map((i) => [i.id, { qty: flow.strictReceipt || !i.expectedQuantity ? '' : String(i.expectedQuantity), remarks: '' }])),
   );
   const [remarks, setRemarks] = useState('');
   const [saving, setSaving] = useState(false);
@@ -360,7 +378,10 @@ function ReceiveDialog({ flow, challan, onClose, onDone }: { flow: WorkflowView;
                   return (
                     <tr key={i.id}>
                       <td className="py-2.5 px-3 font-semibold text-neutral-900">{i.fabricName}<GarmentTag item={i} /></td>
-                      <td className="py-2.5 px-3 text-neutral-700">{i.colour || '—'}</td>
+                      <td className="py-2.5 px-3 text-neutral-700">
+                        {i.colour || '—'}
+                        {senderNoteOf(challan, i) && <span className="block text-[11px] text-neutral-500 max-w-[260px]">{senderNoteOf(challan, i)}</span>}
+                      </td>
                       <td className="py-2.5 px-3"><FabricStatusBadge status={i.fabricProcessingStatus} /></td>
                       <td className="py-2.5 px-3 text-right tabular-nums text-neutral-600">{fmtQty(i.expectedQuantity, i.uom)}</td>
                       <td className="py-2.5 px-3">
