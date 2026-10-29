@@ -2,12 +2,14 @@
 
 import React from 'react';
 import { CopyPlus, Plus, Trash2 } from 'lucide-react';
+import { QuantityUnitField, averageError, quantityPairError, type QtyUnit } from '@/components/challan/AverageField';
 
 // The Items section (Fabric -> Colour -> entries of Size, Average, Unit, Remarks), same layout as the
 // Programming / Fabric Store challan form, for departments that send material they hold. Fabric and Colour
 // are chosen from the department's own ready lines, so every entry stays linked to its stock line and the
 // existing quantity checks; an entry's Size is the quantity sent, in that line's unit (MTR and PCS are never
-// converted). Several entries of one colour are sent as separate challan lines of the same stock line.
+// converted). Average and Unit are quantities with their own MTR / PCS, saved with the line. Several entries
+// of one colour are sent as separate challan lines of the same stock line.
 
 /** A stock line the department can send from (a work line, or a dyeing record). */
 export interface StockSource {
@@ -24,7 +26,9 @@ export interface StockEntry {
   key: string;
   size: string;
   average: string;
-  averageUnit: 'MTR' | 'PCS' | '';
+  averageUnit: QtyUnit;
+  unitQuantity: string;
+  unitQuantityUom: QtyUnit;
   remarks: string;
 }
 export interface StockColour {
@@ -38,17 +42,19 @@ export interface StockFabric {
   colours: StockColour[];
 }
 
-/** One challan line to send: the stock line, quantity (Size) and the entry's Average and Remarks. */
+/** One challan line to send: the stock line, quantity (Size) and the entry's Average, Unit quantity and Remarks. */
 export interface StockLine {
   sourceId: string;
   quantity: number;
   average: number | null;
   averageUnit: 'MTR' | 'PCS' | null;
+  unitQuantity: number;
+  unitQuantityUom: 'MTR' | 'PCS';
   remarks: string;
 }
 
 const uid = () => Math.random().toString(36).slice(2);
-export const newStockEntry = (): StockEntry => ({ key: uid(), size: '', average: '', averageUnit: '', remarks: '' });
+export const newStockEntry = (): StockEntry => ({ key: uid(), size: '', average: '', averageUnit: '', unitQuantity: '', unitQuantityUom: '', remarks: '' });
 export const newStockColour = (): StockColour => ({ key: uid(), sourceId: '', entries: [newStockEntry()] });
 export const newStockFabric = (): StockFabric => ({ key: uid(), fabric: '', colours: [newStockColour()] });
 
@@ -75,12 +81,19 @@ export function stockLinesOf(fabrics: StockFabric[], sources: StockSource[]): { 
         const where = `${f.fabric} · ${src.colour || 'colour'} · entry ${ei + 1}`;
         const size = Number(e.size);
         if (e.size.trim() === '' || !Number.isFinite(size) || size <= 0) return { error: `${where}: enter the Size (quantity) greater than 0.` };
+        const extrasError = averageError(e.average, e.averageUnit) || quantityPairError(e.unitQuantity, e.unitQuantityUom, 'Unit quantity', true);
+        if (extrasError) return { error: `${where}: ${extrasError}.` };
         const hasAverage = e.average.trim() !== '';
-        const average = hasAverage ? Number(e.average) : null;
-        if (hasAverage && (!Number.isFinite(average) || (average as number) < 0)) return { error: `${where}: Average must be 0 or more.` };
-        if (hasAverage && !e.averageUnit) return { error: `${where}: choose MTR or PCS for the Average.` };
         used.set(src.id, round((used.get(src.id) || 0) + size));
-        lines.push({ sourceId: src.id, quantity: round(size), average, averageUnit: hasAverage ? (e.averageUnit as 'MTR' | 'PCS') : null, remarks: e.remarks.trim() });
+        lines.push({
+          sourceId: src.id,
+          quantity: round(size),
+          average: hasAverage ? Number(e.average) : null,
+          averageUnit: hasAverage ? (e.averageUnit as 'MTR' | 'PCS') : null,
+          unitQuantity: Number(e.unitQuantity),
+          unitQuantityUom: e.unitQuantityUom as 'MTR' | 'PCS',
+          remarks: e.remarks.trim(),
+        });
       }
     }
   }
@@ -233,98 +246,58 @@ export function StockItemsSection({
 
                       {/* Entries */}
                       <div className="overflow-x-auto px-4 pb-2">
-                        <table className="w-full table-fixed text-left text-sm border-collapse border border-neutral-200 rounded-lg min-w-[640px]">
+                        <table className="w-full table-fixed text-left text-sm border-collapse border border-neutral-200 rounded-lg min-w-[900px]">
                           <thead className="bg-neutral-50 border-b border-neutral-200 text-[11px] font-semibold uppercase tracking-wide text-neutral-500 whitespace-nowrap">
                             <tr>
-                              <th className="py-2.5 pl-3 pr-2 w-36">Size{REQUIRED}</th>
+                              <th className="py-2.5 pl-3 pr-2 w-56">Size{REQUIRED}</th>
                               <th className="py-2.5 px-2 w-56">Average</th>
-                              <th className="py-2.5 px-2 w-40">Unit{REQUIRED}</th>
+                              <th className="py-2.5 px-2 w-56">Unit{REQUIRED}</th>
                               <th className="py-2.5 px-2">Remarks</th>
                               <th className="py-2.5 pl-2 pr-3 w-14"><span className="sr-only">Remove</span></th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-neutral-100">
                             {c.entries.map((e, ei) => {
-                              const needsAvgUnit = e.average.trim() !== '' && !e.averageUnit;
                               return (
                                 <tr key={e.key} className="hover:bg-neutral-50/60 transition">
+                                  {/* Size: the quantity sent, in the stock line's own unit (never converted) */}
                                   <td className="py-2 pl-3 pr-2">
-                                    <div className="relative">
-                                      <input
-                                        type="number"
-                                        step="any"
-                                        min="0.001"
-                                        max={src?.available}
-                                        required
-                                        aria-label={src ? `Size in ${src.uom}` : 'Size'}
-                                        value={e.size}
-                                        onChange={(ev) => setEntry(f.key, c.key, e.key, { size: ev.target.value })}
-                                        disabled={!src}
-                                        className={`${FIELD} tabular-nums font-semibold disabled:bg-neutral-50 ${src ? 'pr-11' : ''}`}
-                                      />
-                                      {src && (
-                                        <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-[11px] font-semibold text-neutral-400">
-                                          {src.uom}
-                                        </span>
-                                      )}
-                                    </div>
+                                    <QuantityUnitField
+                                      label="Size"
+                                      value={e.size}
+                                      unit={src?.uom === 'MTR' || src?.uom === 'PCS' ? src.uom : ''}
+                                      onValue={(size) => setEntry(f.key, c.key, e.key, { size })}
+                                      required
+                                      disabled={!src}
+                                      min="0.001"
+                                      max={src?.available}
+                                      lockedTitle={src ? `This line is recorded in ${src.uom}; meters and pieces are never converted` : undefined}
+                                      inputClassName={`${FIELD} font-semibold`}
+                                    />
                                   </td>
                                   {/* Average, with its own MTR / PCS */}
                                   <td className="py-2 px-2">
-                                    <div className="flex items-center gap-1.5">
-                                      <input
-                                        type="number"
-                                        step="any"
-                                        min="0"
-                                        aria-label="Average"
-                                        value={e.average}
-                                        onChange={(ev) => setEntry(f.key, c.key, e.key, { average: ev.target.value })}
-                                        className={`${FIELD} tabular-nums min-w-0`}
-                                      />
-                                      <div
-                                        role="radiogroup"
-                                        aria-label="Average unit"
-                                        title={needsAvgUnit ? 'Select MTR or PCS for the Average' : undefined}
-                                        className={`inline-flex h-9 p-0.5 rounded-lg shrink-0 ${needsAvgUnit ? 'bg-danger-50 ring-1 ring-danger-300' : 'bg-neutral-100'}`}
-                                      >
-                                        {(['MTR', 'PCS'] as const).map((unit) => (
-                                          <button
-                                            key={unit}
-                                            type="button"
-                                            role="radio"
-                                            aria-checked={e.averageUnit === unit}
-                                            onClick={() => setEntry(f.key, c.key, e.key, { averageUnit: unit })}
-                                            className={`px-2 rounded-md text-[11px] font-semibold transition cursor-pointer ${
-                                              e.averageUnit === unit ? 'bg-white text-brand-800 shadow-xs' : 'text-neutral-500 hover:text-neutral-900'
-                                            }`}
-                                          >
-                                            {unit}
-                                          </button>
-                                        ))}
-                                      </div>
-                                    </div>
+                                    <QuantityUnitField
+                                      label="Average"
+                                      value={e.average}
+                                      unit={e.averageUnit}
+                                      onValue={(average) => setEntry(f.key, c.key, e.key, { average })}
+                                      onUnit={(averageUnit) => setEntry(f.key, c.key, e.key, { averageUnit })}
+                                      inputClassName={FIELD}
+                                    />
                                   </td>
-                                  {/* Unit: the stock line's own unit (meters are never converted to pieces) */}
+                                  {/* Unit quantity, with its own MTR / PCS */}
                                   <td className="py-2 px-2">
-                                    <div role="radiogroup" aria-label="Unit" className={`inline-flex h-9 p-0.5 rounded-lg ${src ? 'bg-neutral-100' : 'bg-danger-50 ring-1 ring-danger-300'}`}>
-                                      {(['MTR', 'PCS'] as const).map((unit) => {
-                                        const active = src?.uom === unit;
-                                        return (
-                                          <span
-                                            key={unit}
-                                            role="radio"
-                                            aria-checked={active}
-                                            aria-disabled={!active}
-                                            title={src && !active ? `This line is recorded in ${src.uom}` : unit === 'MTR' ? 'Meters' : 'Pieces'}
-                                            className={`px-2.5 flex items-center rounded-md text-xs font-semibold ${
-                                              active ? 'bg-white text-brand-800 shadow-xs' : 'text-neutral-400'
-                                            }`}
-                                          >
-                                            {unit}
-                                          </span>
-                                        );
-                                      })}
-                                    </div>
+                                    <QuantityUnitField
+                                      label="Unit quantity"
+                                      value={e.unitQuantity}
+                                      unit={e.unitQuantityUom}
+                                      onValue={(unitQuantity) => setEntry(f.key, c.key, e.key, { unitQuantity })}
+                                      onUnit={(unitQuantityUom) => setEntry(f.key, c.key, e.key, { unitQuantityUom })}
+                                      required
+                                      disabled={!src}
+                                      inputClassName={FIELD}
+                                    />
                                   </td>
                                   <td className="py-2 px-2">
                                     <input

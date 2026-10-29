@@ -32,6 +32,7 @@ import {
 } from '@/lib/download-production-sheet';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { newSubmissionKey } from '@/components/challan/ChallanNumberField';
+import { quantityPairError } from '@/components/challan/AverageField';
 import { addTotals, formatTotals, totalsByUnit } from '@/lib/challan-units.mjs';
 
 import {
@@ -281,6 +282,14 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
       setError('Select MTR or PCS for every Average.');
       return;
     }
+    const unitQuantityErrorOf = (item: ChallanItemData) =>
+      quantityPairError(String(item.unitQuantity ?? ''), item.unitQuantityUnit || '', 'Unit quantity', true);
+    const badUnitQuantity = rowsWithDetails.findIndex((item) => unitQuantityErrorOf(item));
+    if (badUnitQuantity >= 0) {
+      const message = unitQuantityErrorOf(rowsWithDetails[badUnitQuantity])!;
+      setError(`Item #${badUnitQuantity + 1}: ${message[0].toUpperCase()}${message.slice(1)}.`);
+      return;
+    }
     const validItems = rowsWithDetails.filter((item) => Number(item.measurement) > 0);
 
     if (validItems.length === 0) {
@@ -329,6 +338,8 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
         rollNumber: item.rollNumber || null,
         average: String(item.average ?? '').trim() === '' ? null : Number(item.average),
         averageUnit: String(item.average ?? '').trim() === '' ? null : item.averageUnit || null,
+        unitQuantity: Number(item.unitQuantity),
+        unitQuantityUom: item.unitQuantityUnit || null,
         remarks: item.remarks || null,
       }));
 

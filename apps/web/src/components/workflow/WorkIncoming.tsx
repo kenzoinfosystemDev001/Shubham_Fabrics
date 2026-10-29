@@ -27,6 +27,7 @@ import {
 } from '@/components/workflow/WorkflowUi';
 import { departmentName, type WorkflowView } from '@/lib/workflow-views';
 import { GarmentTag } from '@/components/recutting/RecuttingUi';
+import { averageText, unitQuantityText } from '@/lib/challan-units.mjs';
 
 type View = 'pending' | 'received' | 'all';
 const VIEWS: Array<{ id: View; label: string }> = [
@@ -298,13 +299,15 @@ export function WorkIncoming({ flow }: { flow: WorkflowView }) {
   );
 }
 
-/** The sender's Average, Remarks and Roll # for the challan line a work item came from (the line itself is never edited). */
+/** The sender's Average, Unit quantity, Remarks and Roll # for the challan line a work item came from (the line itself is never edited). */
 function senderNoteOf(challan: any, item: any): string {
   const line = (challan.items || []).find((l: any) => l.id === item.inboundChallanItemId);
   if (!line) return '';
-  const hasAverage = line.average !== null && line.average !== undefined;
+  const average = averageText(line);
+  const unitQuantity = unitQuantityText(line);
   return [
-    hasAverage ? `Average ${line.average}${line.averageUnit ? ` ${line.averageUnit}` : ''}` : null,
+    average !== '—' ? `Average ${average}` : null,
+    unitQuantity !== '—' ? `Unit ${unitQuantity}` : null,
     line.rollNumber ? `Roll ${line.rollNumber}` : null,
     userChallanRemarks(line.remarks) || null,
   ]

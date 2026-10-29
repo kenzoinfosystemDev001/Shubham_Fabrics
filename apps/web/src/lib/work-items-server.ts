@@ -29,7 +29,7 @@ import {
 import { INVENTORY_UNIT, LEDGER, garmentLabel } from '@/lib/inventory.mjs';
 import { garmentName } from '@/lib/finished-garments.mjs';
 import { MIXED_UNIT } from '@/lib/challan-units.mjs';
-import { canStoreChallanAverage } from '@/lib/challan-item-average';
+import { lineExtrasOf, lineExtrasWriter } from '@/lib/challan-item-average';
 
 /** How a department receives and passes on work. Add an entry to bring a new department online. */
 export interface WorkflowConfig {
@@ -266,16 +266,6 @@ export class WorkRequestError extends Error {
     super(message);
     this.name = 'WorkRequestError';
   }
-}
-
-/** A challan entry's optional Average (Items section) with its own MTR / PCS unit; never converted. */
-export function lineAverageOf(line: { average?: unknown; averageUnit?: unknown }, index: number): { average: number | null; averageUnit: string | null } {
-  const raw = line.average === undefined || line.average === null ? '' : String(line.average).trim();
-  const average = raw === '' ? null : Number(raw);
-  if (average !== null && (!Number.isFinite(average) || average < 0)) throw new WorkRequestError(`Line ${index + 1}: Average must be 0 or more.`);
-  const averageUnit = average === null ? null : String(line.averageUnit || '').toUpperCase();
-  if (averageUnit !== null && averageUnit !== 'MTR' && averageUnit !== 'PCS') throw new WorkRequestError(`Line ${index + 1}: choose MTR or PCS for the Average.`);
-  return { average, averageUnit };
 }
 
 export function errorResponse(error: unknown, fallback: string) {
@@ -973,7 +963,7 @@ export function workflowHandlers(cfg: WorkflowConfig) {
     }, 'Failed to load outgoing challans.');
 
   /**
-   * POST transfer-challans  { idempotencyKey, kind?, challanNumber, issuedDate?, remarks?, lines: [{ workItemId, quantity, remarks? }] }
+   * POST transfer-challans  { idempotencyKey, kind?, challanNumber, issuedDate?, remarks?, lines: [{ workItemId, quantity, average?, averageUnit?, unitQuantity?, unitQuantityUom?, remarks? }] }
    * Moves only the quantities actually transferred, never more than processed (QC: of that outcome) and
    * not yet sent. kind (QC only): PASS -> next department, REJECT -> defective shelf, REWORK -> back for rework.
    */
@@ -999,7 +989,7 @@ export function workflowHandlers(cfg: WorkflowConfig) {
         const kind = kindOf(body.kind);
         const to = destinationOf(cfg, kind);
         challanNumber = requireChallanNumber(body.challanNumber);
-        let lines: Array<{ workItemId: string; quantity: unknown; remarks?: unknown; average?: unknown; averageUnit?: unknown }> = Array.isArray(body.lines) ? body.lines : [];
+        let lines: Array<{ workItemId: string; quantity: unknown; remarks?: unknown; average?: unknown; averageUnit?: unknown; unitQuantity?: unknown; unitQuantityUom?: unknown }> = Array.isArray(body.lines) ? body.lines : [];
         const items = await prisma.departmentWorkItem.findMany({
           where: { id: { in: lines.map((l) => l.workItemId) }, ...dept },
           include: {
@@ -1034,10 +1024,9 @@ export function workflowHandlers(cfg: WorkflowConfig) {
         if (Number.isNaN(issuedDate.getTime())) throw new WorkRequestError('Challan date is not a valid date.');
         const prepared = lines.map((l, index) => {
           const item = byId.get(l.workItemId)!;
-          const { average, averageUnit } = lineAverageOf(l, index);
-          return { item, quantity: round(Number(l.quantity)), average, averageUnit, remarks: textOf(l.remarks, 300), reason: kind === 'PASS' ? '' : reasonsOf(item) };
+          return { item, quantity: round(Number(l.quantity)), extras: lineExtrasOf(l, index, (m) => new WorkRequestError(m)), remarks: textOf(l.remarks, 300), reason: kind === 'PASS' ? '' : reasonsOf(item) };
         });
-        const storeAverage = prepared.some((p) => p.average !== null) ? await canStoreChallanAverage() : false;
+        const extrasOf = await lineExtrasWriter(prepared.map((p) => p.extras));
         const total = round(prepared.reduce((s, p) => s + p.quantity, 0));
         const reasons = Array.from(new Set(prepared.map((p) => p.reason).filter(Boolean))).join('; ');
         const now = new Date();
@@ -1103,7 +1092,7 @@ export function workflowHandlers(cfg: WorkflowConfig) {
                 unitType: p.item.uom === 'PCS' ? 'PCS' : 'ROLL',
                 quantity: p.quantity,
                 uom: p.item.uom,
-                ...(storeAverage && p.average !== null ? { average: p.average, averageUnit: p.averageUnit } : {}),
+                ...extrasOf(p.extras),
                 // "Status:" keeps the convention the stock rules already read.
                 remarks: [
                   `Status: ${status}`,

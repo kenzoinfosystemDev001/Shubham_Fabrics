@@ -128,6 +128,8 @@ function IssueChallanContent() {
             actualDyedColor: colourOf(orderById(l.sourceId)),
             average: l.average,
             averageUnit: l.averageUnit,
+            unitQuantity: l.unitQuantity,
+            unitQuantityUom: l.unitQuantityUom,
             remarks: l.remarks,
           })),
         }),

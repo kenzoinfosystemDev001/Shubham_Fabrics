@@ -22,7 +22,7 @@ import {
   sheetRef,
 } from '@/components/workflow/WorkflowUi';
 import { CategoryBadge } from '@/components/recutting/RecuttingUi';
-import { AverageField, averageError, type AverageUnit } from '@/components/challan/AverageField';
+import { AverageField, QuantityUnitField, averageError, quantityPairError, type QtyUnit } from '@/components/challan/AverageField';
 import { CATEGORY_LABEL, GARMENT_CATEGORIES, categoryName, readyForStitching } from '@/lib/recutting.mjs';
 
 interface Row {
@@ -31,11 +31,14 @@ interface Row {
   quantity: string;
   /** Optional Average of the entry, with its own MTR / PCS (never pre-selected). */
   average: string;
-  averageUnit: AverageUnit;
+  averageUnit: QtyUnit;
+  /** Required Unit quantity of the entry, with its own MTR / PCS. */
+  unitQuantity: string;
+  unitQuantityUom: QtyUnit;
   remarks: string;
 }
 
-const newRow = (): Row => ({ key: Math.random().toString(36).slice(2), allocationId: '', quantity: '', average: '', averageUnit: '', remarks: '' });
+const newRow = (): Row => ({ key: Math.random().toString(36).slice(2), allocationId: '', quantity: '', average: '', averageUnit: '', unitQuantity: '', unitQuantityUom: '', remarks: '' });
 
 function StitchingChallanContent() {
   const params = useSearchParams();
@@ -111,8 +114,9 @@ function StitchingChallanContent() {
     if (!program) return setError('Choose a Production Sheet.');
     if (!challanNumber.trim()) return setNumberError('Challan Number is required.');
     if (filled.length === 0) return setError('Add at least one item.');
-    const badAverage = filled.findIndex((r) => averageError(r.average, r.averageUnit));
-    if (badAverage >= 0) return setError(`Item ${badAverage + 1}: ${averageError(filled[badAverage].average, filled[badAverage].averageUnit)}.`);
+    const entryError = (r: Row) => averageError(r.average, r.averageUnit) || quantityPairError(r.unitQuantity, r.unitQuantityUom, 'Unit quantity', true);
+    const bad = filled.findIndex((r) => entryError(r));
+    if (bad >= 0) return setError(`Item ${bad + 1}: ${entryError(filled[bad])}.`);
     setSubmitting(true);
     try {
       const body = await fetchJson('/api/recutting/stitching-challans', {
@@ -127,6 +131,8 @@ function StitchingChallanContent() {
             allocationId: r.allocationId,
             quantity: r.quantity,
             ...(r.average.trim() !== '' ? { average: r.average, averageUnit: r.averageUnit } : {}),
+            unitQuantity: r.unitQuantity,
+            unitQuantityUom: r.unitQuantityUom,
             remarks: r.remarks,
           })),
         }),
@@ -242,9 +248,9 @@ function StitchingChallanContent() {
                     <th className="py-3 px-3">Fabric</th>
                     <th className="py-3 px-3">Dyed / Undyed</th>
                     <th className="py-3 px-3 text-right">Ready</th>
-                    <th className="py-3 px-3 min-w-[130px] text-right">Stitching Qty</th>
+                    <th className="py-3 px-3 min-w-[220px]">Size</th>
                     <th className="py-3 px-3 min-w-[200px]">Average</th>
-                    <th className="py-3 px-3">Unit</th>
+                    <th className="py-3 px-3 min-w-[200px]">Unit</th>
                     <th className="py-3 px-3 min-w-[140px]">Remarks</th>
                     <th className="py-3 px-3"><span className="sr-only">Remove</span></th>
                   </tr>
@@ -275,23 +281,33 @@ function StitchingChallanContent() {
                           <td className="py-2.5 px-3">{a ? <FabricStatusBadge status={a.workItem?.fabricProcessingStatus} /> : '—'}</td>
                           <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">{a ? fmtQty(readyForStitching(a), a.cutUom) : '—'}</td>
                           <td className="py-2.5 px-3">
-                            <input
-                              type="number"
-                              min="0.001"
-                              step="any"
-                              max={a ? readyForStitching(a) : undefined}
+                            <QuantityUnitField
+                              label="Size"
                               value={r.quantity}
-                              onChange={(e) => updateRow(r.key, { quantity: e.target.value })}
-                              disabled={!a}
+                              unit={a?.cutUom === 'MTR' || a?.cutUom === 'PCS' ? a.cutUom : ''}
+                              onValue={(quantity) => updateRow(r.key, { quantity })}
                               required={Boolean(a)}
-                              className={`${FIELD} text-right tabular-nums ${over ? 'border-danger-500' : ''}`}
-                              aria-label="Quantity to stitch"
+                              disabled={!a}
+                              min="0.001"
+                              max={a ? readyForStitching(a) : undefined}
+                              lockedTitle={a ? `This allocation is cut in ${a.cutUom}; meters and pieces are never converted` : undefined}
+                              inputClassName={`${FIELD} text-right ${over ? 'border-danger-500' : ''}`}
                             />
                           </td>
                           <td className="py-2.5 px-3">
                             <AverageField average={r.average} averageUnit={r.averageUnit} onChange={(patch) => updateRow(r.key, patch)} disabled={!a} />
                           </td>
-                          <td className="py-2.5 px-3 text-xs font-semibold">{a?.cutUom || '—'}</td>
+                          <td className="py-2.5 px-3">
+                            <QuantityUnitField
+                              label="Unit quantity"
+                              value={r.unitQuantity}
+                              unit={r.unitQuantityUom}
+                              onValue={(unitQuantity) => updateRow(r.key, { unitQuantity })}
+                              onUnit={(unitQuantityUom) => updateRow(r.key, { unitQuantityUom })}
+                              required={Boolean(a)}
+                              disabled={!a}
+                            />
+                          </td>
                           <td className="py-2.5 px-3">
                             <input value={r.remarks} onChange={(e) => updateRow(r.key, { remarks: e.target.value })} maxLength={300} className={FIELD} aria-label="Remarks" />
                           </td>

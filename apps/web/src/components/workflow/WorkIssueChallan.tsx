@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Plus, Send, Trash2 } from 'lucide-react';
 import { ChallanNumberField, newSubmissionKey } from '@/components/challan/ChallanNumberField';
-import { AverageField, averageError, type AverageUnit } from '@/components/challan/AverageField';
+import { AverageField, QuantityUnitField, averageError, quantityPairError, type QtyUnit } from '@/components/challan/AverageField';
 import {
   BTN_PRIMARY,
   BTN_SECONDARY,
@@ -44,13 +44,17 @@ interface Row {
   quantity: string;
   /** Optional Average of the entry, with its own MTR / PCS (never pre-selected). */
   average: string;
-  averageUnit: AverageUnit;
+  averageUnit: QtyUnit;
+  /** Unit quantity of the entry, with its own MTR / PCS (Programming to Recutting; required there). */
+  unitQuantity: string;
+  unitQuantityUom: QtyUnit;
   remarks: string;
 }
 
-const newRow = (): Row => ({ key: Math.random().toString(36).slice(2), itemId: '', quantity: '', average: '', averageUnit: '', remarks: '' });
+const newRow = (): Row => ({ key: Math.random().toString(36).slice(2), itemId: '', quantity: '', average: '', averageUnit: '', unitQuantity: '', unitQuantityUom: '', remarks: '' });
 
-// Challans from Programming to Recutting share one Items order: Size (quantity) | Average | Unit | Remarks.
+// Challans from Programming to Recutting share one Items layout: Size | Average | Unit | Remarks, each of the
+// first three a quantity with its own MTR / PCS (the Size keeps the line's own unit: it is what moves).
 const ENTRY_AVERAGE_FLOWS = new Set(['EMBROIDERY', 'THREAD_CUTTING', 'QC2', 'WASHING', 'QC3']);
 
 function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: TransferKind }) {
@@ -176,8 +180,11 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
     if (!program) return setError('Choose a Production Sheet.');
     if (!challanNumber.trim()) return setNumberError('Challan Number is required.');
     if (filled.length === 0) return setError(finished ? 'Add at least one finished garment.' : 'Add at least one item.');
-    const badAverage = showAverage ? filled.findIndex((r) => averageError(r.average, r.averageUnit)) : -1;
-    if (badAverage >= 0) return setError(`Item ${badAverage + 1}: ${averageError(filled[badAverage].average, filled[badAverage].averageUnit)}.`);
+    if (showAverage) {
+      const entryError = (r: Row) => averageError(r.average, r.averageUnit) || quantityPairError(r.unitQuantity, r.unitQuantityUom, 'Unit quantity', true);
+      const bad = filled.findIndex((r) => entryError(r));
+      if (bad >= 0) return setError(`Item ${bad + 1}: ${entryError(filled[bad])}.`);
+    }
     if (withoutImage.length > 0) return setError(`Add the image of ${withoutImage.map((g) => g!.name).join(', ')} before issuing the challan.`);
     setSubmitting(true);
     try {
@@ -198,6 +205,7 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
                 workItemId: r.itemId,
                 quantity: r.quantity,
                 ...(showAverage && r.average.trim() !== '' ? { average: r.average, averageUnit: r.averageUnit } : {}),
+                ...(showAverage ? { unitQuantity: r.unitQuantity, unitQuantityUom: r.unitQuantityUom } : {}),
                 remarks: r.remarks,
               })),
         }),
@@ -388,9 +396,9 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
                     {kind !== 'PASS' && <th className="py-3 px-3">Reason</th>}
                     <th className="py-3 px-3">Incoming</th>
                     <th className="py-3 px-3 text-right">{AVAILABLE_LABEL[kind]}</th>
-                    <th className="py-3 px-3 min-w-[130px] text-right">Transfer Qty</th>
+                    <th className={`py-3 px-3 ${showAverage ? 'min-w-[220px]' : 'min-w-[130px] text-right'}`}>{showAverage ? 'Size' : 'Transfer Qty'}</th>
                     {showAverage && <th className="py-3 px-3 min-w-[200px]">Average</th>}
-                    <th className="py-3 px-3">Unit</th>
+                    <th className={`py-3 px-3 ${showAverage ? 'min-w-[200px]' : ''}`}>Unit</th>
                     <th className="py-3 px-3 min-w-[140px]">Remarks</th>
                     <th className="py-3 px-3"><span className="sr-only">Remove</span></th>
                   </tr>
@@ -421,25 +429,54 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
                           <td className="py-2.5 px-3 font-mono text-xs text-neutral-600">{i?.inboundChallan?.challanNumber || '—'}</td>
                           <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">{i ? fmtQty(available(i), i.uom) : '—'}</td>
                           <td className="py-2.5 px-3">
-                            <input
-                              type="number"
-                              min="0.001"
-                              step="any"
-                              max={i ? available(i) : undefined}
-                              value={r.quantity}
-                              onChange={(e) => updateRow(r.key, { quantity: e.target.value })}
-                              disabled={!i}
-                              required={Boolean(i)}
-                              className={`${FIELD} text-right tabular-nums ${over ? 'border-danger-500' : ''}`}
-                              aria-label="Quantity to transfer"
-                            />
+                            {showAverage ? (
+                              <QuantityUnitField
+                                label="Size"
+                                value={r.quantity}
+                                unit={i?.uom === 'MTR' || i?.uom === 'PCS' ? i.uom : ''}
+                                onValue={(quantity) => updateRow(r.key, { quantity })}
+                                required={Boolean(i)}
+                                disabled={!i}
+                                min="0.001"
+                                max={i ? available(i) : undefined}
+                                lockedTitle={i ? `This line is recorded in ${i.uom}; meters and pieces are never converted` : undefined}
+                                inputClassName={`${FIELD} text-right ${over ? 'border-danger-500' : ''}`}
+                              />
+                            ) : (
+                              <input
+                                type="number"
+                                min="0.001"
+                                step="any"
+                                max={i ? available(i) : undefined}
+                                value={r.quantity}
+                                onChange={(e) => updateRow(r.key, { quantity: e.target.value })}
+                                disabled={!i}
+                                required={Boolean(i)}
+                                className={`${FIELD} text-right tabular-nums ${over ? 'border-danger-500' : ''}`}
+                                aria-label="Quantity to transfer"
+                              />
+                            )}
                           </td>
                           {showAverage && (
                             <td className="py-2.5 px-3">
                               <AverageField average={r.average} averageUnit={r.averageUnit} onChange={(patch) => updateRow(r.key, patch)} disabled={!i} />
                             </td>
                           )}
-                          <td className="py-2.5 px-3 text-xs font-semibold">{i?.uom || '—'}</td>
+                          {showAverage ? (
+                            <td className="py-2.5 px-3">
+                              <QuantityUnitField
+                                label="Unit quantity"
+                                value={r.unitQuantity}
+                                unit={r.unitQuantityUom}
+                                onValue={(unitQuantity) => updateRow(r.key, { unitQuantity })}
+                                onUnit={(unitQuantityUom) => updateRow(r.key, { unitQuantityUom })}
+                                required={Boolean(i)}
+                                disabled={!i}
+                              />
+                            </td>
+                          ) : (
+                            <td className="py-2.5 px-3 text-xs font-semibold">{i?.uom || '—'}</td>
+                          )}
                           <td className="py-2.5 px-3">
                             <input value={r.remarks} onChange={(e) => updateRow(r.key, { remarks: e.target.value })} maxLength={300} className={FIELD} aria-label="Remarks" />
                           </td>
