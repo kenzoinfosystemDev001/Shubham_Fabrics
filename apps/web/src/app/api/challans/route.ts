@@ -99,6 +99,7 @@ export async function GET(request: Request) {
             buyerName: true,
             clientName: true,
             mainStyle: true,
+            designNumber: true,
             wilcomDesignNumber: true,
             fabricName: true,
             fabricColor: true,

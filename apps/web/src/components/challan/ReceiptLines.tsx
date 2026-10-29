@@ -90,7 +90,8 @@ export function ReceiptLinesTable({
     }
   }
   const p = challan?.program;
-  const design = p?.designNumber || p?.designName || p?.wilcomDesignNumber || '—';
+  // The production sheet's design number only: designName holds the embroidery (Wilcom) design, not this.
+  const design = p?.designNumber || '—';
   const serial = p?.programSerialNo || p?.programNumber || '—';
 
   return (
