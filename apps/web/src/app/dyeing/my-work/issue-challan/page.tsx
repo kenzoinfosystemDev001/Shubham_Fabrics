@@ -23,18 +23,9 @@ import {
 } from '@/components/dyeing/DyeingUi';
 import { availableForQc, needsColorReview } from '@/lib/dyeing-workflow.mjs';
 import { formatTotals, totalsByUnit } from '@/lib/challan-units.mjs';
+import { StockItemsSection, newStockFabric, stockLinesOf, type StockFabric, type StockSource } from '@/components/challan/StockItemsSection';
 
 const READY = ['DYED', 'READY_FOR_QC1', 'PARTIALLY_SENT_TO_QC1'];
-
-interface Row {
-  key: string;
-  orderId: string;
-  quantity: string;
-  actualDyedColor: string;
-  remarks: string;
-}
-
-const newRow = (): Row => ({ key: Math.random().toString(36).slice(2), orderId: '', quantity: '', actualDyedColor: '', remarks: '' });
 
 function IssueChallanContent() {
   const params = useSearchParams();
@@ -47,19 +38,12 @@ function IssueChallanContent() {
   const [challanDate, setChallanDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [priority, setPriority] = useState('');
   const [remarks, setRemarks] = useState('');
-  const [rows, setRows] = useState<Row[]>([newRow()]);
   const [submissionKey, setSubmissionKey] = useState(newSubmissionKey);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [issued, setIssued] = useState<any | null>(null);
+  // Typed by the user (e.g. the incharge on duty); left empty, the challan shows the issuing account.
   const [incharge, setIncharge] = useState('');
-
-  useEffect(() => {
-    try {
-      const u = JSON.parse(localStorage.getItem('subham_mes_user') || 'null');
-      setIncharge(u?.fullName || u?.username || '');
-    } catch {}
-  }, []);
 
   const load = async () => {
     setLoading(true);
@@ -88,27 +72,33 @@ function IssueChallanContent() {
   const program = sheets.find((p) => p.id === programId) || null;
   const sheetOrders = eligible.filter((o) => o.programId === programId);
   const orderById = (id: string) => sheetOrders.find((o) => o.id === id);
+  // Items section: each colour is a dyed line (colour as recorded in Dyeing Process).
+  const [fabrics, setFabrics] = useState<StockFabric[]>([newStockFabric()]);
+  const colourOf = (o: any) => o.dyedColor || o.targetColor || '';
+  const sources: StockSource[] = sheetOrders.map((o) => ({
+    id: o.id,
+    fabric: o.fabricName,
+    colour: colourOf(o),
+    uom: o.uom,
+    available: availableForQc(o),
+    detail: [baseColour(o) ? `Base ${baseColour(o)}` : '', o.targetColor && o.targetColor !== colourOf(o) ? `Required ${o.targetColor}` : ''].filter(Boolean).join(' · '),
+  }));
+  const itemsCheck = stockLinesOf(fabrics, sources);
+  const itemLines = 'lines' in itemsCheck ? itemsCheck.lines : [];
 
   useEffect(() => {
     if (!programId && sheets.length === 1) setProgramId(sheets[0].id);
   }, [sheets, programId]);
 
-  const updateRow = (key: string, patch: Partial<Row>) => setRows((rs) => rs.map((r) => (r.key === key ? { ...r, ...patch } : r)));
-  const chooseOrder = (key: string, orderId: string) => {
-    const o = orderById(orderId);
-    updateRow(key, { orderId, quantity: o ? String(availableForQc(o)) : '', actualDyedColor: o?.dyedColor || '' });
-  };
-
-  const filled = rows.filter((r) => r.orderId);
-  const totals = filled.reduce<Record<string, number>>((acc, r) => {
-    const o = orderById(r.orderId);
-    if (o) acc[o.uom] = (acc[o.uom] || 0) + (Number(r.quantity) || 0);
+  const totals = itemLines.reduce<Record<string, number>>((acc, l) => {
+    const o = orderById(l.sourceId);
+    if (o) acc[o.uom] = (acc[o.uom] || 0) + l.quantity;
     return acc;
   }, {});
 
   const resetForm = () => {
     setChallanNumber('');
-    setRows([newRow()]);
+    setFabrics([newStockFabric()]);
     setRemarks('');
     setSubmissionKey(newSubmissionKey());
   };
@@ -119,7 +109,7 @@ function IssueChallanContent() {
     setNumberError(null);
     if (!program) return setError('Choose a Production Sheet.');
     if (!challanNumber.trim()) return setNumberError('Challan Number is required.');
-    if (filled.length === 0) return setError('Add at least one item.');
+    if ('error' in itemsCheck) return setError(itemsCheck.error);
     setSubmitting(true);
     try {
       const body = await fetchJson('/api/dyeing/qc-challans', {
@@ -131,7 +121,15 @@ function IssueChallanContent() {
           issuedDate: challanDate,
           priority: priority || undefined,
           remarks,
-          lines: filled.map((r) => ({ orderId: r.orderId, quantity: r.quantity, actualDyedColor: r.actualDyedColor, remarks: r.remarks })),
+          inchargeName: incharge.trim(),
+          lines: itemLines.map((l) => ({
+            orderId: l.sourceId,
+            quantity: l.quantity,
+            actualDyedColor: colourOf(orderById(l.sourceId)),
+            average: l.average,
+            averageUnit: l.averageUnit,
+            remarks: l.remarks,
+          })),
         }),
       });
       setIssued(body.data);
@@ -183,7 +181,7 @@ function IssueChallanContent() {
                   value={programId}
                   onChange={(e) => {
                     setProgramId(e.target.value);
-                    setRows([newRow()]);
+                    setFabrics([newStockFabric()]);
                   }}
                   className={`${FIELD} mt-1`}
                   required
@@ -210,7 +208,10 @@ function IssueChallanContent() {
               <ReadOnly label="Destination" value="Dyeing QC" />
               <ReadOnly label="Design / Serial" value={program ? `${program.designNumber || program.wilcomDesignNumber || '—'} · ${program.programSerialNo || '—'}` : '—'} />
               <ReadOnly label="Delivery date" value={program ? fmtDate(program.deliveryDate) : '—'} />
-              <ReadOnly label="Department incharge" value={incharge || '—'} />
+              <label className="block">
+                <span className="text-xs font-semibold text-neutral-600">Department incharge</span>
+                <input value={incharge} onChange={(e) => setIncharge(e.target.value)} maxLength={100} placeholder="Incharge name" className={`${FIELD} mt-1`} />
+              </label>
               <label className="block sm:col-span-2 lg:col-span-3">
                 <span className="text-xs font-semibold text-neutral-600">Remarks</span>
                 <input value={remarks} onChange={(e) => setRemarks(e.target.value)} maxLength={500} className={`${FIELD} mt-1`} />
@@ -218,104 +219,9 @@ function IssueChallanContent() {
             </div>
           </Panel>
 
-          <Panel
-            title="Color / Fabric / Measurement"
-            count={filled.length}
-            actions={
-              <button
-                type="button"
-                onClick={() => setRows((rs) => [...rs, newRow()])}
-                disabled={!program || rows.length >= sheetOrders.length}
-                className={BTN_SECONDARY}
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Add item</span>
-              </button>
-            }
-          >
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead className={THEAD}>
-                  <tr>
-                    <th className="py-3 px-4 min-w-[200px]">Dyeing Line</th>
-                    <th className="py-3 px-3">Colour</th>
-                    <th className="py-3 px-3">Fabric</th>
-                    <th className="py-3 px-3">Required Dye Colour</th>
-                    <th className="py-3 px-3 min-w-[150px]">Actual Dyed Colour</th>
-                    <th className="py-3 px-3 text-right">Available</th>
-                    <th className="py-3 px-3 min-w-[130px] text-right">Transfer Qty</th>
-                    <th className="py-3 px-3">Unit</th>
-                    <th className="py-3 px-3 min-w-[140px]">Remarks</th>
-                    <th className="py-3 px-3"><span className="sr-only">Remove</span></th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-neutral-100">
-                  {!program && <EmptyRow colSpan={10} text="Choose a Production Sheet to add items" />}
-                  {program &&
-                    rows.map((r) => {
-                      const o = orderById(r.orderId);
-                      const taken = new Set(rows.filter((x) => x.key !== r.key).map((x) => x.orderId));
-                      const over = o && Number(r.quantity) > availableForQc(o);
-                      return (
-                        <tr key={r.key}>
-                          <td className="py-2.5 px-4">
-                            <select value={r.orderId} onChange={(e) => chooseOrder(r.key, e.target.value)} className={FIELD} aria-label="Dyeing line">
-                              <option value="">Choose a dyed line</option>
-                              {sheetOrders.filter((x) => !taken.has(x.id)).map((x) => (
-                                <option key={x.id} value={x.id}>
-                                  {x.orderNumber} · {x.fabricName} · {x.dyedColor || x.targetColor || '—'}
-                                </option>
-                              ))}
-                            </select>
-                          </td>
-                          <td className="py-2.5 px-3 text-neutral-700">{o ? baseColour(o) || '—' : '—'}</td>
-                          <td className="py-2.5 px-3 font-semibold text-neutral-900">{o?.fabricName || '—'}</td>
-                          <td className="py-2.5 px-3 text-brand-900">{o?.targetColor || '—'}</td>
-                          <td className="py-2.5 px-3">
-                            <input
-                              value={r.actualDyedColor}
-                              onChange={(e) => updateRow(r.key, { actualDyedColor: e.target.value })}
-                              readOnly={Boolean(o?.dyedColor)}
-                              required={Boolean(o)}
-                              className={`${FIELD} ${o?.dyedColor ? 'bg-neutral-50' : ''}`}
-                              aria-label="Actual dyed colour"
-                            />
-                          </td>
-                          <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">{o ? fmtQty(availableForQc(o), o.uom) : '—'}</td>
-                          <td className="py-2.5 px-3">
-                            <input
-                              type="number"
-                              min="0.001"
-                              step="any"
-                              max={o ? availableForQc(o) : undefined}
-                              value={r.quantity}
-                              onChange={(e) => updateRow(r.key, { quantity: e.target.value })}
-                              disabled={!o}
-                              required={Boolean(o)}
-                              className={`${FIELD} text-right tabular-nums ${over ? 'border-danger-500' : ''}`}
-                              aria-label="Quantity to transfer"
-                            />
-                          </td>
-                          <td className="py-2.5 px-3 text-xs font-semibold">{o?.uom || '—'}</td>
-                          <td className="py-2.5 px-3">
-                            <input value={r.remarks} onChange={(e) => updateRow(r.key, { remarks: e.target.value })} maxLength={300} className={FIELD} aria-label="Remarks" />
-                          </td>
-                          <td className="py-2.5 px-3 text-right">
-                            <button
-                              type="button"
-                              onClick={() => setRows((rs) => (rs.length > 1 ? rs.filter((x) => x.key !== r.key) : [newRow()]))}
-                              className="p-2 text-neutral-400 hover:text-danger-600 hover:bg-danger-50 rounded-lg"
-                              aria-label="Remove item"
-                              title="Remove item"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              </table>
+          <Panel title="Color / Fabric / Measurement" count={itemLines.length}>
+            <div className="p-5">
+              <StockItemsSection sources={sources} value={fabrics} onChange={setFabrics} disabled={!program} />
             </div>
             <div className="px-5 py-4 border-t border-neutral-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <span className="text-sm text-neutral-600">

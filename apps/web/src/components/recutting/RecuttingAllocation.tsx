@@ -20,6 +20,7 @@ import {
   WorkStatusBadge,
   fetchJson,
   fmtQty,
+  challanRef,
   sheetRef,
 } from '@/components/workflow/WorkflowUi';
 import { AllocationStatusBadge, CATEGORY_TONE, CategoryBadge, sheetStyles } from '@/components/recutting/RecuttingUi';
@@ -192,7 +193,7 @@ function AllocationContent() {
                     <tr key={i.id} className={`hover:bg-neutral-50/60 ${openId === i.id ? 'bg-brand-50/40' : ''}`}>
                       <td className="py-3 px-4">
                         <span className="font-mono text-xs font-semibold text-neutral-900">{sheetRef(i.program)}</span>
-                        <span className="block font-mono text-[11px] text-neutral-500">{i.itemNumber}</span>
+                        <span className="block font-mono text-[11px] text-neutral-500">{challanRef(i)}</span>
                       </td>
                       <td className="py-3 px-3 text-xs">
                         <span className="font-mono text-brand-800">{i.inboundChallan?.challanNumber || '—'}</span>
@@ -294,7 +295,7 @@ function AllocationWorkspace({
       });
       setRows([]);
       setSubmissionKey(newSubmissionKey());
-      onChanged(`${item.itemNumber}: ${rows.length} allocation${rows.length === 1 ? '' : 's'} saved (${fmtQty(adding, item.uom)}).`);
+      onChanged(`${item.fabricName}: ${rows.length} allocation${rows.length === 1 ? '' : 's'} saved (${fmtQty(adding, item.uom)}).`);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -311,7 +312,7 @@ function AllocationWorkspace({
             <span className="font-normal text-neutral-600">{item.colour || ''}</span>
             <FabricStatusBadge status={item.fabricProcessingStatus} />
           </h2>
-          <p className="text-xs text-neutral-500 font-mono">{item.itemNumber}</p>
+          <p className="text-xs text-neutral-500 font-mono">{challanRef(item)}</p>
         </div>
         <button type="button" onClick={onClose} className="p-1.5 text-neutral-500 hover:bg-neutral-100 rounded-lg" aria-label="Close">
           <X className="w-4 h-4" />

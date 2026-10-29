@@ -1,4 +1,4 @@
-# Subham Fabrics - Production-Grade Garment MES
+# Shubham Fabrics - Production-Grade Garment MES
 
 A real, database-backed, secure, traceable, enterprise Manufacturing Execution System (MES) engineered specifically for high-volume garment and textile manufacturing plants.
 

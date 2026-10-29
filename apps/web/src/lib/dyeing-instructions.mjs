@@ -1,5 +1,5 @@
 // Dyeing instructions carried from Fabric Store challan lines to Dyeing. Pure, no database or
-// framework imports, so scripts/test-production-fixes.mjs can run them with node:test.
+// framework imports.
 //
 // Every challan line keeps its own current colour/shade, required dyeing colour, quantity and
 // unit. A required colour is only ever what the Fabric Store entered: lines recorded before the

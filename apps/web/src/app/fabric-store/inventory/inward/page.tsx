@@ -48,7 +48,8 @@ interface InwardLine {
   itemName: string;
   colour: string;
   billQty: string;
-  unit: 'MTR' | 'PCS';
+  /** '' until the user picks MTR or PCS; new lines never default to a unit. */
+  unit: 'MTR' | 'PCS' | '';
   pricePerUnit: string;
   boxThanQty: string;
   hsnCode: string;
@@ -60,7 +61,7 @@ const createInwardLine = (seed: Partial<InwardLine> = {}): InwardLine => ({
   itemName: '',
   colour: '',
   billQty: '',
-  unit: 'MTR',
+  unit: '',
   pricePerUnit: '',
   boxThanQty: '',
   hsnCode: '',
@@ -218,6 +219,10 @@ export default function InwardStockPage() {
       if (invalidLine >= 0) {
         throw new Error(`Line ${invalidLine + 1}: enter the fabric name and a quantity greater than zero.`);
       }
+      const unitlessLine = lines.findIndex((line) => !line.unit);
+      if (unitlessLine >= 0) {
+        throw new Error(`Line ${unitlessLine + 1}: select MTR or PCS.`);
+      }
 
       const { lines: _lines, ...header } = formData;
       const payloadLines = lines.map(({ itemName, colour, billQty, unit, pricePerUnit, boxThanQty, hsnCode, taxPercent }) => ({
@@ -277,7 +282,8 @@ export default function InwardStockPage() {
           itemName: item.itemName,
           colour: item.colour || '',
           billQty: String(item.billQty),
-          unit: item.unit === 'PCS' ? 'PCS' : 'MTR',
+          // Show the saved unit as it is; anything unrecognised must be picked again, never guessed.
+          unit: item.unit === 'PCS' || item.unit === 'MTR' ? item.unit : '',
           pricePerUnit: item.pricePerUnit != null ? String(item.pricePerUnit) : '',
           boxThanQty: item.boxThanQty != null ? String(item.boxThanQty) : '',
           hsnCode: item.hsnCode || '',
@@ -831,7 +837,7 @@ export default function InwardStockPage() {
                   {!editingItemId && (
                     <button
                       type="button"
-                      onClick={() => setFormData((prev) => ({ ...prev, lines: [...prev.lines, createInwardLine({ unit: prev.lines[prev.lines.length - 1]?.unit || 'MTR' })] }))}
+                      onClick={() => setFormData((prev) => ({ ...prev, lines: [...prev.lines, createInwardLine()] }))}
                       className="inline-flex items-center gap-1 px-2 py-1 rounded-md border border-brand-200 text-[11px] font-bold text-brand-800 hover:bg-brand-50 transition"
                     >
                       <Plus className="w-3 h-3" />
@@ -882,10 +888,11 @@ export default function InwardStockPage() {
                       />
                       <select
                         value={line.unit}
-                        onChange={(e) => updateLine(line.key, { unit: e.target.value === 'PCS' ? 'PCS' : 'MTR' })}
+                        onChange={(e) => updateLine(line.key, { unit: e.target.value as InwardLine['unit'] })}
                         aria-label={`Line ${idx + 1} unit`}
-                        className="h-8 px-1.5 border border-neutral-300 rounded-md text-xs font-bold text-neutral-900 bg-white focus:outline-none"
+                        className={`h-8 px-1.5 border rounded-md text-xs font-bold bg-white focus:outline-none ${line.unit ? 'border-neutral-300 text-neutral-900' : 'border-danger-300 text-danger-600'}`}
                       >
+                        <option value="" disabled>Select</option>
                         <option value="MTR">MTR</option>
                         <option value="PCS">PCS</option>
                       </select>

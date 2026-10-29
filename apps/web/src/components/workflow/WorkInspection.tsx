@@ -22,11 +22,13 @@ import {
   fetchJson,
   fmtDate,
   fmtQty,
+  challanRef,
   sheetRef,
 } from '@/components/workflow/WorkflowUi';
 import { availableToProcess, pendingReject, pendingRework, readyToTransfer, receivedBasis } from '@/lib/work-items.mjs';
 import { departmentName, transferPath, workPath, type WorkflowView } from '@/lib/workflow-views';
 import { GarmentTag } from '@/components/recutting/RecuttingUi';
+import { FabricPhotos } from '@/components/workflow/FabricPhotos';
 
 const HELD = 'RECEIVED,IN_PROGRESS,COMPLETED,PARTIALLY_TRANSFERRED';
 const FILTERS = [
@@ -160,7 +162,7 @@ function InspectionContent({ flow }: { flow: WorkflowView }) {
                   <tr key={i.id} className={`hover:bg-neutral-50/60 ${openId === i.id ? 'bg-brand-50/40' : ''}`}>
                     <td className="py-3 px-4">
                       <span className="font-mono text-xs font-semibold text-neutral-900">{sheetRef(i.program)}</span>
-                      <span className="block font-mono text-[11px] text-neutral-500">{i.itemNumber}</span>
+                      <span className="block font-mono text-[11px] text-neutral-500">{challanRef(i)}</span>
                     </td>
                     <td className="py-3 px-3 text-xs">
                       <span className="font-mono text-brand-800">{i.inboundChallan?.challanNumber || '—'}</span>
@@ -267,7 +269,7 @@ function InspectionDrawer({ flow, item, onClose, onSaved }: { flow: WorkflowView
           ...(flow.checkpoints ? { checkpoints: checks } : {}),
         }),
       });
-      onSaved(body.data, `${item.itemNumber}: inspection of ${fmtQty(n(inspected), item.uom)} recorded.`);
+      onSaved(body.data, `${item.fabricName}: inspection of ${fmtQty(n(inspected), item.uom)} recorded.`);
     } catch (err: any) {
       setError(err.message);
       setSaving(false);
@@ -285,7 +287,6 @@ function InspectionDrawer({ flow, item, onClose, onSaved }: { flow: WorkflowView
               <FabricStatusBadge status={item.fabricProcessingStatus} />
             </h3>
             <p className="text-xs text-neutral-500 font-mono">
-              {item.itemNumber} ·{' '}
               <Link href={`/programs/${item.program?.id}`} className="hover:underline">{sheetRef(item.program)}</Link> ·{' '}
               <Link href={`/challans/${item.inboundChallan?.id}`} className="hover:underline">{item.inboundChallan?.challanNumber || '—'}</Link>
             </p>
@@ -324,6 +325,9 @@ function InspectionDrawer({ flow, item, onClose, onSaved }: { flow: WorkflowView
               </>
             )}
           </dl>
+
+          {/* Fabric photos: Threadcut QC sees Embroidery's and uploads its own. */}
+          <FabricPhotos workItemId={item.id} />
 
           {open <= 0 ? (
             <Notice kind="success">All received material on this line has been inspected.</Notice>

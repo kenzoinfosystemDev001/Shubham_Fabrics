@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { canViewClientCode, getSessionUser } from '@/lib/auth/require-user';
 import { productionSheetCategories } from '@/lib/download-production-sheet';
 

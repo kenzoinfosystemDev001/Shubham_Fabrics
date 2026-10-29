@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import bcrypt from 'bcryptjs';
 import { destructiveAdminActionsDisabled, requireUser } from '@/lib/auth/require-user';
 import { randomBytes } from 'crypto';
@@ -69,7 +69,7 @@ export async function POST(request: Request) {
           { code: 'STORE', name: 'Fabric Store Department', sequenceOrder: 2 },
           { code: 'DYEING', name: 'Dyeing Department', sequenceOrder: 3 },
           { code: 'EMBROIDERY', name: 'Embroidery Department', sequenceOrder: 4 },
-          { code: 'QC1', name: 'Quality Control 1', sequenceOrder: 5 },
+          { code: 'QC1', name: 'Dyeing QC', sequenceOrder: 5 },
           { code: 'FINISHING', name: 'Finishing & Packing', sequenceOrder: 6 },
         ];
 

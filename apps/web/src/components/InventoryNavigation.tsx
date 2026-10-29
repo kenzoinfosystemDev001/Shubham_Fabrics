@@ -184,7 +184,7 @@ export function InventoryNavigation() {
             <UserCircle className="h-8 w-8 shrink-0 text-brand-700" />
             <div className="min-w-0 flex-1">
               <span className="block truncate text-xs font-semibold text-neutral-900">
-                {currentUser.fullName || (isAdmin ? 'System Administrator' : 'Inventory Supervisor')}
+                {(currentUser.fullName && currentUser.fullName.trim().toLowerCase() !== 'inventory department' ? currentUser.fullName : '') || (isAdmin ? 'System Administrator' : 'Inventory Supervisor')}
               </span>
               <span className="block truncate text-[10px] font-bold tracking-wide text-brand-700">
                 Inventory Department

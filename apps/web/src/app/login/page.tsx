@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { checkRouteAccess, getUserStationHome } from '@/lib/rbac';
@@ -76,12 +76,27 @@ export default function LoginPage() {
     setError(null);
   };
 
+  // Reaching the login page ends any session still open (e.g. pressing Back out of a department), so
+  // Back / Forward from here cannot reopen protected pages. Signing in waits for that sign-out first.
+  const endingSession = useRef<Promise<void> | null>(null);
+  useEffect(() => {
+    if (!localStorage.getItem('subham_mes_user')) return;
+    localStorage.removeItem('subham_mes_user');
+    localStorage.removeItem('subham_mes_token');
+    sessionStorage.removeItem('active_department');
+    sessionStorage.removeItem('active_department_root');
+    endingSession.current = fetch('/api/auth/logout', { method: 'POST' })
+      .then(() => undefined)
+      .catch(() => undefined);
+  }, []);
+
   const handleLogin = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setError(null);
     setLoading(true);
 
     try {
+      await endingSession.current;
       const res = await api.login({
         usernameOrEmail: username.trim(),
         password: pin.trim(),

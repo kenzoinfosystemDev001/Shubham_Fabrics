@@ -160,16 +160,6 @@ export function WilcomPrintModal({
                 <span>View Sheet</span>
               </button>
             )}
-            {onViewChallan && (
-              <button
-                type="button"
-                onClick={onViewChallan}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent-50 hover:bg-accent-100 text-accent-800 rounded-lg text-xs font-bold border border-accent-200 transition cursor-pointer"
-              >
-                <FileText className="w-3.5 h-3.5 text-accent-800" />
-                <span>View Challan</span>
-              </button>
-            )}
             <button
               type="button"
               onClick={handlePrint}

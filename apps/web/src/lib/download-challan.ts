@@ -9,6 +9,9 @@
  */
 
 import { generateCode128SvgBars } from '@/lib/barcode';
+import { printWhenReady } from '@/lib/print-window';
+import { inchargeNameOf, userChallanRemarks } from '@/lib/challan-remarks.mjs';
+import { departmentName } from '@/lib/workflow-views';
 import { getCurrentUser, canViewClientCode } from '@/lib/rbac';
 import { loadProgramDocument } from '@/lib/program-document';
 import { extractRootWilcomPhoto, prepareWilcomImages } from '@/lib/download-wilcom';
@@ -73,7 +76,7 @@ export function generateChallanHtml(challan: any): string {
     STORE: 'FABRIC STORE',
     FABRIC_STORE: 'FABRIC STORE',
     DYEING: 'DYEING DEPARTMENT',
-    QC1: 'QC1 (QUALITY CHECK 1)',
+    QC1: 'DYEING QC',
     EMBROIDERY: 'EMBROIDERY DEPARTMENT',
     THREAD_CUTTING: 'THREAD CUTTING DEPARTMENT',
     CUTTING: 'CUTTING DEPARTMENT',
@@ -99,7 +102,7 @@ export function generateChallanHtml(challan: any): string {
   if (fromDept === 'STORE' && (toDept === 'DYEING' || toDept.includes('DYE'))) {
     voucherTitle = 'FABRIC STORE → DYEING MATERIAL DISPATCH CHALLAN';
   } else if (fromDept === 'DYEING' || toDept === 'QC1' || challanNo.startsWith('CH-DYE-')) {
-    voucherTitle = 'DYEING → QC1 QUALITY INSPECTION CHALLAN';
+    voucherTitle = 'DYEING → DYEING QC INSPECTION CHALLAN';
   } else if (fromDept === 'THREAD_CUTTING' && toDept === 'QC2') {
     voucherTitle = 'THREAD CUTTING → THREADCUT QC INSPECTION CHALLAN';
   } else if (fromDept === 'QC2' && toDept === 'WASHING') {
@@ -112,12 +115,15 @@ export function generateChallanHtml(challan: any): string {
 
   // Items
   const items: ChallanItem[] = Array.isArray(challan.items) ? challan.items : [];
+  // Store → Dyeing lines carry the colour Dyeing must achieve next to the current (base) colour.
+  const hasDyeColour = items.some((i: any) => String(i.requiredColour || '').trim());
   // Each line keeps its unit: totals are per unit, never MTR + PCS.
   const unitTotals = challanTotalsByUnit(challan);
   const totalUnits = Object.keys(unitTotals);
   const singleUnit = totalUnits.length === 1 ? totalUnits[0] : null;
   const totalQtyText = singleUnit ? String(unitTotals[singleUnit]) : formatTotals(unitTotals);
-  const uom = singleUnit || unitOf(challan.fabricUnit) || unitOf(items[0]?.uom) || 'PCS';
+  // Printed exactly as recorded; a challan with no recorded unit shows none rather than a guess.
+  const uom = singleUnit || unitOf(challan.fabricUnit) || unitOf(items[0]?.uom) || '';
   const totalUnitLabel = singleUnit || '';
   // Finished garments (Finishing onward): name and image only; the Production Sheet pages follow.
   const garments: PrintedGarment[] | null = Array.isArray(challan.finishedGarments) ? challan.finishedGarments : null;
@@ -135,630 +141,162 @@ export function generateChallanHtml(challan: any): string {
   // Issuer name
   const issuerName = challan.issuedBy?.fullName || challan.createdBy?.fullName || challan.createdBy?.username || 'Department Incharge';
 
+  const esc = (value: unknown) => escapeHtml(String(value ?? ''));
+  const fromName = departmentName(fromDept);
+  const toName = departmentName(toDept);
+  const totalsText = formatTotals(unitTotals) || '—';
+  const sheetFields = [
+    { label: 'Design No.', value: prog.designNumber || prog.designName || prog.mainStyle || '—' },
+    { label: 'Serial No.', value: programSerial },
+    // The issuing department's incharge (the account that issued the challan), not the client.
+    { label: 'Incharge', value: inchargeNameOf(challan) || issuerName },
+  ];
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Challan - ${challanNo}</title>
+  <title>Challan - ${esc(challanNo)}</title>
   <style>
-    @page {
-      size: A4 portrait;
-      margin: 10mm;
-    }
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
-    }
-    body {
-      background-color: #f1eff4;
-      color: #25232a;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      padding: 16px;
-      font-size: 12px;
-      line-height: 1.4;
-    }
-    .no-print-bar {
-      max-width: 820px;
-      margin: 0 auto 16px auto;
-      background: #25232a;
-      color: #ffffff;
-      padding: 12px 20px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-    }
-    .no-print-bar h3 {
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-    }
-    .btn-group {
-      display: flex;
-      gap: 10px;
-    }
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 14px;
-      font-size: 12px;
-      font-weight: 600;
-      border-radius: 6px;
-      cursor: pointer;
-      border: none;
-      text-decoration: none;
-      transition: background 0.15s;
-    }
-    .btn-print {
-      background: #8e55c4;
-      color: #ffffff;
-    }
-    .btn-print:hover { background: #7442a6; }
-    .btn-download {
-      background: #ffffff;
-      color: #7442a6;
-      border: 1px solid #8e55c4;
-    }
-    .btn-download:hover { background: #f7f1fc; }
-
-    /* CHALLAN SHEET CONTAINER */
-    .challan-container {
-      max-width: 820px;
-      margin: 0 auto;
-      background: #ffffff;
-      border: 2px solid #000000;
-      padding: 20px;
-    }
-
-    /* HEADER */
-    .company-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      border-bottom: 2px solid #000000;
-      padding-bottom: 12px;
-      margin-bottom: 12px;
-      gap: 16px;
-    }
-    .company-title {
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing: 1.5px;
-      color: #000000;
-      text-transform: uppercase;
-      margin-bottom: 2px;
-    }
-    .main-title {
-      font-size: 18px;
-      font-weight: 900;
-      color: #000000;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      line-height: 1.2;
-    }
-    .sub-route-badge {
-      display: inline-block;
-      margin-top: 4px;
-      padding: 2px 6px;
-      background: #f1eff4;
-      border: 1px solid #d3ced8;
-      color: #000000;
-      font-size: 10px;
-      font-weight: 800;
-      font-family: monospace;
-      border-radius: 3px;
-    }
-
-    /* BARCODE SECTION */
-    .barcode-box {
-      text-align: right;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-    }
-    .barcode-svg-wrap {
-      background: #ffffff;
-      padding: 4px;
-      border: 1px solid #d3ced8;
-      border-radius: 4px;
-      display: inline-block;
-      margin-bottom: 4px;
-    }
-    .barcode-text {
-      font-family: monospace;
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: 1px;
-      color: #25232a;
-    }
-    .design-tag {
-      font-size: 10px;
-      font-weight: 700;
-      color: #57545e;
-      margin-top: 2px;
-    }
-
-    /* SUMMARY INFO GRID */
-    .meta-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      background: #f8f7fa;
-      border: 1.5px solid #000000;
-      padding: 8px 12px;
-      margin-bottom: 8px;
-    }
-    .meta-cell {
-      display: flex;
-      flex-direction: column;
-    }
-    .meta-label {
-      font-size: 9px;
-      font-weight: 900;
-      text-transform: uppercase;
-      color: #57545e;
-      letter-spacing: 0.5px;
-      margin-bottom: 1px;
-    }
-    .meta-val {
-      font-size: 11px;
-      font-weight: 800;
-      color: #000000;
-    }
-
-    /* FLOW AUDIT LEDGER */
-    .flow-ledger {
-      background: #ffffff;
-      color: #000000;
-      border: 1.5px solid #000000;
-      border-radius: 6px;
-      padding: 12px 14px;
-      margin-bottom: 14px;
-    }
-    .flow-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #000000;
-      padding-bottom: 6px;
-      margin-bottom: 8px;
-      font-size: 10px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #000000;
-    }
-    .flow-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
-    .flow-card {
-      background: #ffffff;
-      border: 1px solid #6b6872;
-      border-radius: 4px;
-      padding: 8px 10px;
-    }
-    .flow-card.defect {
-      background: #ffffff;
-      border: 2px dashed #c93a22;
-    }
-    .flow-card.out {
-      background: #ffffff;
-      border: 2px solid #000000;
-    }
-    .flow-card-label {
-      font-size: 9px;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: #43404a;
-    }
-    .flow-card.defect .flow-card-label { color: #a52e1a; }
-    .flow-card.out .flow-card-label { color: #000000; }
-    .flow-card-val {
-      font-family: monospace;
-      font-size: 16px;
-      font-weight: 900;
-      margin-top: 2px;
-    }
-    .flow-card.defect .flow-card-val { color: #a52e1a; }
-    .flow-card.out .flow-card-val { color: #000000; }
-    .flow-card-sub {
-      font-size: 9px;
-      color: #43404a;
-      margin-top: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* ITEMS TABLE */
-    .table-container {
-      margin-bottom: 14px;
-    }
-    .table-title {
-      font-size: 10px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #43404a;
-      margin-bottom: 6px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .challan-container table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 11px;
-    }
-    .challan-container th, .challan-container td {
-      border: 1.5px solid #d3ced8;
-      padding: 6px 10px;
-      text-align: left;
-    }
-    .challan-container th {
-      background: #f1eff4;
-      font-weight: 800;
-      text-transform: uppercase;
-      font-size: 9px;
-      color: #57545e;
-      letter-spacing: 0.5px;
-    }
-    .challan-container td.num {
-      text-align: right;
-      font-family: monospace;
-      font-weight: 700;
-    }
-    .challan-container tr.totals-row td {
-      background: #f8f7fa;
-      font-weight: 800;
-      font-size: 11px;
-      border-top: 2px solid #25232a;
-    }
-
-    /* FINISHED GARMENTS */
-    .garment-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
-    .garment-card {
-      border: 1.5px solid #000000;
-      border-radius: 6px;
-      padding: 8px;
-      text-align: center;
-      break-inside: avoid;
-    }
-    .garment-card img, .garment-card .no-image {
-      width: 100%;
-      height: 150px;
-      object-fit: contain;
-      background: #f8f7fa;
-      border-radius: 4px;
-    }
-    .garment-card .no-image {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      color: #6b6872;
-      border: 1px dashed #b8b2bf;
-    }
-    .garment-name {
-      margin-top: 6px;
-      font-size: 12px;
-      font-weight: 900;
-      color: #000000;
-    }
-
-    /* PRODUCTION SHEET ATTACHMENT CARD */
-    .sheet-ref-card {
-      background: #ffffff;
-      border: 1.5px dashed #000000;
-      border-radius: 6px;
-      padding: 10px 14px;
-      margin-bottom: 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .sheet-ref-title {
-      font-size: 11px;
-      font-weight: 800;
-      color: #000000;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .sheet-ref-sub {
-      font-size: 10px;
-      color: #000000;
-      margin-top: 2px;
-    }
-
-
-    /* SIGNATURE BLOCK */
-    .sign-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 32px;
-      padding-top: 14px;
-      border-top: 1.5px solid #e5e1e8;
-    }
-    .sign-box {
-      border-top: 1.5px dashed #6b6872;
-      padding-top: 8px;
-      text-align: center;
-    }
-    .sign-title {
-      font-weight: 800;
-      font-size: 11px;
-      color: #25232a;
-      text-transform: uppercase;
-    }
-    .sign-sub {
-      font-size: 9px;
-      color: #6b6872;
-      margin-top: 2px;
-    }
-
-    /* FOOTER NOTICE */
-    .footer-notice {
-      margin-top: 14px;
-      padding-top: 10px;
-      border-top: 1px solid #e5e1e8;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 9px;
-      color: #6b6872;
-      font-family: monospace;
-    }
-
+    @page { size: A4 portrait; margin: 12mm; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    body { background: #f1eff4; color: #1c1a20; font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; font-size: 12px; padding: 16px; }
+    .no-print-bar { max-width: 186mm; margin: 0 auto 12px; display: flex; justify-content: flex-end; gap: 8px; }
+    .btn { cursor: pointer; padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; border: 1px solid #d3ced8; background: #fff; color: #1c1a20; }
+    .btn-primary { background: #7442a6; border-color: #7442a6; color: #fff; }
+    .challan-container { max-width: 186mm; margin: 0 auto; background: #fff; padding: 28px; border-radius: 8px; }
+    .head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+    .company { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: #57545e; }
+    .title { font-size: 26px; font-weight: 800; margin-top: 2px; }
+    .ref { text-align: right; }
+    .ref-no { font-size: 17px; font-weight: 800; font-family: monospace; margin-top: 4px; }
+    .ref-date { font-size: 12px; color: #6b6872; }
+    .route { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; margin-top: 22px; padding: 12px 16px; background: #faf9fb; border: 1px solid #e4e0e8; border-radius: 8px; }
+    .label { font-size: 10px; color: #6b6872; }
+    .value { font-size: 14px; font-weight: 700; margin-top: 1px; overflow-wrap: anywhere; }
+    .arrow { font-size: 18px; color: #7442a6; }
+    .section { margin-top: 20px; }
+    .section-title { font-size: 12px; font-weight: 700; margin-bottom: 6px; }
+    .fields { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid #e4e0e8; border-radius: 8px; }
+    .fields > div { padding: 10px 14px; border-left: 1px solid #e4e0e8; min-width: 0; }
+    .fields > div:first-child { border-left: none; }
+    table { width: 100%; border-collapse: collapse; border: 1px solid #e4e0e8; }
+    th { background: #faf9fb; font-size: 10px; font-weight: 700; color: #57545e; text-align: left; padding: 8px 10px; border-bottom: 1px solid #e4e0e8; }
+    td { padding: 9px 10px; border-bottom: 1px solid #efedf1; vertical-align: top; }
+    .num { text-align: right; font-variant-numeric: tabular-nums; }
+    .total td { background: #faf9fb; font-weight: 800; border-bottom: none; }
+    .muted { color: #57545e; }
+    .defect { margin-top: 10px; color: #a52e1a; font-weight: 700; }
+    .garment-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .garment-card { border: 1px solid #e4e0e8; border-radius: 8px; padding: 6px; text-align: center; page-break-inside: avoid; }
+    .garment-card img { width: 100%; height: 110px; object-fit: contain; }
+    .no-image { height: 110px; display: flex; align-items: center; justify-content: center; color: #8f8a96; }
+    .garment-name { font-size: 11px; font-weight: 700; margin-top: 4px; }
+    .signs { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 56px; }
+    .sign { border-top: 1px solid #1c1a20; padding-top: 6px; text-align: center; }
+    .sign strong { display: block; font-size: 12px; }
+    .sign span { font-size: 11px; color: #6b6872; }
     @media print {
-      body {
-        background: #ffffff;
-        padding: 0;
-      }
-      .no-print-bar {
-        display: none !important;
-      }
-      .challan-container {
-        border: 2px solid #000000;
-        box-shadow: none;
-        padding: 12px;
-        margin: 0;
-        max-width: 100%;
-      }
+      body { background: #fff; padding: 0; }
+      .no-print-bar { display: none !important; }
+      .challan-container { max-width: none; padding: 0; border-radius: 0; }
     }
   </style>
   ${attachedSheets ? `<style>${attachedSheets.styles}</style>
   <style>
     /* The challan keeps its own type over the Production Sheet's page styles, and the sheets start on a new page. */
-    .challan-container { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 400; letter-spacing: normal; line-height: 1.4; color: #25232a; margin-bottom: 20px; }
+    .challan-container { font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; font-size: 12px; font-weight: 400; letter-spacing: normal; line-height: 1.4; color: #1c1a20; margin-bottom: 20px; }
     .challan-page-break { break-after: page; page-break-after: always; }
   </style>` : ''}
 </head>
 <body>
 
-  <!-- Screen Navigation / Download Controls -->
-  <div class="no-print-bar">
-    <div>
-      <h3>MATERIAL DISPATCH CHALLAN · ${challanNo}</h3>
-      <span style="font-size: 10px; color: #8f8a96; font-family: monospace;">
-        Shubham Fabrics India Pvt. Ltd. · ${fromDept} → ${toDept}
-      </span>
-    </div>
-    <div class="btn-group">
-      <button class="btn btn-print" onclick="window.print()">
-        Print Slip
-      </button>
-      <button class="btn btn-download" onclick="window.downloadSelf()">
-        Save HTML
-      </button>
-    </div>
-  </div>
-
   <div class="challan-container${attachedSheets ? ' challan-page-break' : ''}" id="challan-document">
-    
-    <!-- TOP HEADER -->
-    <div class="company-header">
+    <div class="head">
       <div>
-        <div class="company-title">SHUBHAM FABRICS INDIA PVT. LTD.</div>
-        <h1 class="main-title">DEPARTMENT TRANSFER CHALLAN</h1>
-        <div class="sub-route-badge">
-          ${fromLabel} &rarr; ${toLabel}
-        </div>
+        <div class="company">SHUBHAM FABRICS INDIA PVT. LTD.</div>
+        <div class="title">Challan</div>
       </div>
-
-      <div class="barcode-box">
-        <div class="barcode-svg-wrap">
-          <svg viewBox="0 0 ${barW} ${barH}" width="160" height="38">
-            <g>${svgBars}</g>
-          </svg>
-        </div>
-        <div class="barcode-text">${challanNo}</div>
-        <div class="design-tag">DESIGN: ${designNo}</div>
+      <div class="ref">
+        <svg viewBox="0 0 ${barW} ${barH}" width="170" height="40"><g>${svgBars}</g></svg>
+        <div class="ref-no">${esc(challanNo)}</div>
+        <div class="ref-date">${esc(dateStr)}</div>
       </div>
     </div>
 
-    <!-- METADATA FORM GRID -->
-    <div class="meta-grid">
-      <div class="meta-cell">
-        <span class="meta-label">CHALLAN NO</span>
-        <span class="meta-val font-mono">${challanNo}</span>
-      </div>
-      <div class="meta-cell">
-        <span class="meta-label">DISPATCH DATE</span>
-        <span class="meta-val">${dateStr}</span>
-      </div>
-      <div class="meta-cell">
-        <span class="meta-label">FROM STATION</span>
-        <span class="meta-val">${fromLabel}</span>
-      </div>
-      <div class="meta-cell">
-        <span class="meta-label">TO STATION</span>
-        <span class="meta-val">${toLabel}</span>
-      </div>
+    <div class="route">
+      <div><div class="label">From</div><div class="value">${esc(fromName)}</div></div>
+      <div class="arrow">&rarr;</div>
+      <div style="text-align: right;"><div class="label">To</div><div class="value">${esc(toName)}</div></div>
     </div>
 
-    <!-- PROGRAM / ORDER DETAILS (ONLY ACTUAL FILLED DETAILS) -->
-    <div class="meta-grid" style="margin-top: -4px;">
-      <div class="meta-cell">
-        <span class="meta-label">PRODUCTION SHEET #</span>
-        <span class="meta-val font-mono">${programSerial}</span>
+    ${challan.program ? `
+    <div class="section">
+      <div class="section-title">Production Sheet</div>
+      <div class="fields">
+        ${sheetFields.map((f) => `<div><div class="label">${f.label}</div><div class="value">${esc(f.value)}</div></div>`).join('')}
       </div>
-      <div class="meta-cell">
-        <span class="meta-label">DESIGN NO</span>
-        <span class="meta-val font-mono">${designNo}</span>
-      </div>
-      <div class="meta-cell">
-        <span class="meta-label">STYLE / PATTERN</span>
-        <span class="meta-val">${styleCode}${pattern && pattern !== '—' ? ` (${pattern})` : ''}</span>
-      </div>
-      <div class="meta-cell">
-        <span class="meta-label">FABRIC</span>
-        <span class="meta-val">${fabricName}</span>
-      </div>
-    </div>
+    </div>` : ''}
 
-    ${artworkPhoto ? `
-    <div style="display:flex;align-items:center;gap:12px;border:1px solid #111;padding:6px;margin-top:6px;">
-      <strong style="font-size:9px;text-transform:uppercase;">Wilcom Artwork Reference</strong>
-      <img src="${artworkPhoto}" alt="Wilcom artwork for design ${designNo}" style="max-height:72px;max-width:180px;object-fit:contain;">
-    </div>
-    ` : ''}
-
-    ${clientName && clientName !== 'Standard Client' ? `
-    <div class="meta-grid" style="margin-top: -4px;">
-      <div class="meta-cell" style="grid-column: span 2;">
-        <span class="meta-label">BUYER / CLIENT</span>
-        <span class="meta-val">${clientName}${canSeeClientCode && clientCode ? ` (Code: ${clientCode})` : ''}</span>
-      </div>
-      <div class="meta-cell">
-        <span class="meta-label">PRIORITY</span>
-        <span class="meta-val">${priority}</span>
-      </div>
-      <div class="meta-cell">
-        <span class="meta-label">STATUS</span>
-        <span class="meta-val">${status}</span>
-      </div>
-    </div>
-    ` : ''}
-
-    ${defectivePieces > 0 ? `
-    <div style="border: 1.5px solid #a52e1a; background: #fff4f2; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; font-size: 11px; font-weight: bold; color: #a52e1a;">
-      DEFECTIVE CUT (TO SHELF): ${defectivePieces} ${fabricUnit} [Location: ${defectiveShelf}]${defectReason ? ` &middot; Reason: ${defectReason}` : ''}
-    </div>
-    ` : ''}
-
-    <!-- TRANSFERRED ITEMS TABLE -->
     ${garments ? `
-    <div class="table-container">
-      <div class="table-title">
-        <span>FINISHED GARMENTS</span>
-        <span>${garments.length} garment${garments.length === 1 ? '' : 's'}${attachedSheets ? ' &middot; Production Sheet attached' : ''}</span>
-      </div>
+    <div class="section">
+      <div class="section-title">Garments</div>
       <div class="garment-grid">
         ${garments.map((g) => `
         <div class="garment-card">
-          ${g.image ? `<img src="${g.image}" alt="${escapeHtml(g.name)}">` : '<div class="no-image">No image</div>'}
-          <div class="garment-name">${escapeHtml(g.name)}</div>
+          ${g.image ? `<img src="${esc(g.image)}" alt="${esc(g.name)}">` : '<div class="no-image">No image</div>'}
+          <div class="garment-name">${esc(g.name)}</div>
         </div>`).join('')}
       </div>
     </div>` : `
-    <div class="table-container">
-      <div class="table-title">
-        <span>ITEMS / MATERIALS</span>
-        <span style="font-family: monospace; font-size: 11px;">Total: ${totalQtyText} ${totalUnitLabel}</span>
-      </div>
+    <div class="section">
+      <div class="section-title">Items</div>
       <table>
         <thead>
           <tr>
-            <th style="width: 35px; text-align: center;">#</th>
-            <th>ITEM DESCRIPTION</th>
-            <th style="width: 140px;">COLOR / SHADE</th>
-            <th style="width: 120px;">ROLL / LOT #</th>
-            <th style="width: 90px; text-align: right;">QUANTITY</th>
-            <th style="width: 60px; text-align: center;">UOM</th>
+            <th>Fabric</th>
+            <th style="width: 15%;">${hasDyeColour ? 'Base Colour' : 'Colour'}</th>
+            ${hasDyeColour ? '<th style="width: 15%;">Dye Colour</th>' : ''}
+            <th class="num" style="width: 12%;">Size</th>
+            <th style="width: 9%;">Unit</th>
+            <th class="num" style="width: 11%;">Average</th>
+            <th style="width: 24%;">Remarks</th>
           </tr>
         </thead>
         <tbody>
-          ${items.length > 0 ? items.map((it, idx) => `
-            <tr>
-              <td style="text-align: center; font-family: monospace;">${idx + 1}</td>
-              <td style="font-weight: 700;">${it.itemDescription || fabricName || styleCode || 'Fabric Lot'}</td>
-              <td>${it.colour || prog.fabricColor || 'Standard'}</td>
-              <td style="font-family: monospace;">${it.rollNumber || it.lotNumber || '—'}</td>
-              <td class="num">${it.quantity || 0}</td>
-              <td style="text-align: center;">${it.uom || uom}</td>
-            </tr>
-          `).join('') : `
-            <tr>
-              <td style="text-align: center; font-family: monospace;">1</td>
-              <td style="font-weight: 700;">${fabricName || styleCode || 'Production Material'}</td>
-              <td>${prog.fabricColor || 'Standard'}</td>
-              <td style="font-family: monospace;">—</td>
-              <td class="num">${totalQtyText}</td>
-              <td style="text-align: center;">${totalUnitLabel}</td>
-            </tr>
-          `}
-          <tr class="totals-row">
-            <td colspan="4" style="text-align: right; text-transform: uppercase; font-size: 10px; font-weight: 900;">
-              TOTAL QUANTITY:
-            </td>
-            <td class="num" style="font-size: 13px; font-weight: 900;">
-              ${totalQtyText}
-            </td>
-            <td style="text-align: center; font-weight: 900;">${totalUnitLabel}</td>
+          ${items.map((it: any) => `
+          <tr>
+            <td style="font-weight: 700;">${esc(it.fabricCode || it.itemDescription || '—')}</td>
+            <td>${esc(it.colour || '—')}</td>
+            ${hasDyeColour ? `<td style="font-weight: 700;">${esc(it.requiredColour || '—')}</td>` : ''}
+            <td class="num" style="font-weight: 700;">${esc(it.quantity ?? '')}</td>
+            <td>${esc(it.uom || '—')}</td>
+            <td class="num">${it.average != null ? esc(`${it.average}${it.averageUnit ? ` ${it.averageUnit}` : ''}`) : '—'}</td>
+            <td class="muted">${esc([it.rollNumber ? `Roll ${it.rollNumber}` : '', userChallanRemarks(it.remarks)].filter(Boolean).join(' · ') || '—')}</td>
+          </tr>`).join('')}
+          ${items.length === 0 ? `<tr><td colspan="${hasDyeColour ? 7 : 6}" class="muted" style="text-align: center;">No items on this challan.</td></tr>` : ''}
+          <tr class="total">
+            <td colspan="2">Total</td>
+            <td colspan="${hasDyeColour ? 5 : 4}">${esc(totalsText)}</td>
           </tr>
         </tbody>
       </table>
+      ${defectivePieces > 0 ? `<div class="defect">Defective: ${esc(defectivePieces)} ${esc(fabricUnit)}${defectReason ? ` &mdash; ${esc(defectReason)}` : ''}</div>` : ''}
     </div>`}
 
+    ${userChallanRemarks(challan.remarks) ? `
+    <div class="section">
+      <div class="section-title">Remarks</div>
+      <div class="muted">${esc(userChallanRemarks(challan.remarks))}</div>
+    </div>` : ''}
 
-    <!-- DUAL PHYSICAL HANDOVER AUTHORIZATION SIGNATURES -->
-    <div class="sign-grid">
-      <div class="sign-box">
-        <div class="sign-title">DISPATCHED BY</div>
-        <div class="sign-sub">${issuerName} (${fromLabel})</div>
-        <div class="sign-sub" style="margin-top: 24px; font-weight: 700;">Signature: _______________________</div>
-      </div>
-      <div class="sign-box">
-        <div class="sign-title">RECEIVED BY</div>
-        <div class="sign-sub">Station Incharge (${toLabel})</div>
-        <div class="sign-sub" style="margin-top: 24px; font-weight: 700;">Signature: _______________________</div>
-      </div>
+    <div class="signs">
+      <div class="sign"><strong>Issued by</strong><span>${esc(fromName)}</span></div>
+      <div class="sign"><strong>Received by</strong><span>${esc(toName)}</span></div>
     </div>
-
-    <!-- FOOTER -->
-    <div class="footer-notice">
-      <span>SHUBHAM FABRICS INDIA PVT. LTD. &middot; MES SHOP-FLOOR LOGISTICS</span>
-      <span>CHALLAN ID: ${challan.id || challanNo}${attachedSheets ? '' : ' &middot; PAGE 1 OF 1'}</span>
-    </div>
-
   </div>
   ${attachedSheets ? attachedSheets.html : ''}
-
-  <script>
-    window.downloadSelf = function() {
-      var blob = new Blob([document.documentElement.outerHTML], { type: 'text/html;charset=utf-8' });
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement('a');
-      a.href = url;
-      a.download = "Challan_${challanNo}_${fromDept}_TO_${toDept}.html";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
-    };
-  </script>
 </body>
 </html>`;
 }
@@ -858,8 +396,7 @@ export function printChallan(challan: any): void {
         printWindow.document.open();
         printWindow.document.write(generateChallanHtml(completeChallan));
         printWindow.document.close();
-        printWindow.focus();
-        printWindow.print();
+        printWhenReady(printWindow);
       } catch (error) {
         printWindow.close();
         const message = error instanceof Error ? error.message : 'Failed to print challan.';

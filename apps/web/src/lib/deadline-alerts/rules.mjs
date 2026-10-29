@@ -1,5 +1,5 @@
 // Pure date / threshold / dedup rules for Smart Deadline Alerts.
-// No database or framework imports, so scripts/test-deadline-alerts.mjs can run them with node:test.
+// No database or framework imports.
 
 export const ALERT_TYPES = Object.freeze({
   OVERDUE: 'OVERDUE',

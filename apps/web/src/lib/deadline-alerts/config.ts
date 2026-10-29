@@ -77,7 +77,7 @@ export const DEPARTMENT_ALERTS: Partial<Record<DepartmentKey, DepartmentAlertCon
   },
   QC1: {
     enabled: false,
-    label: 'QC 1',
+    label: 'Dyeing QC',
     recipients: ['QC1'],
     source: {
       kind: 'inboundChallans',

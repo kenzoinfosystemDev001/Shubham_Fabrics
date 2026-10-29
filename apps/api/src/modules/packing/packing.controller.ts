@@ -4,7 +4,7 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../../common/guards/permissions.guard';
 import { RequirePermission } from '../../common/decorators/permissions.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { CreateCartonSchema } from '@subham/validation';
+import { CreateCartonSchema } from '@shubham/validation';
 
 @Controller('packing')
 @UseGuards(JwtAuthGuard, PermissionsGuard)

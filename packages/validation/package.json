@@ -1,5 +1,5 @@
 {
-  "name": "@subham/validation",
+  "name": "@shubham/validation",
   "version": "1.0.0",
   "description": "Shared Zod schemas for request validation across API and UI",
   "main": "./dist/index.js",
@@ -9,7 +9,7 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
-    "@subham/types": "*",
+    "@shubham/types": "*",
     "zod": "^3.24.2"
   },
   "devDependencies": {

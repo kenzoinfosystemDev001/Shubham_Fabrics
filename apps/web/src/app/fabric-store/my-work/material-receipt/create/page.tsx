@@ -42,7 +42,8 @@ function CreateGRNContent() {
   const [colorName, setColorName] = useState('');
   const [programId, setProgramId] = useState('');
   // Every roll in one GRN shares this unit; meters and pieces are never combined.
-  const [unit, setUnit] = useState<'MTR' | 'PCS'>('MTR');
+  // Blank until chosen, or pre-filled from the linked challan's own unit.
+  const [unit, setUnit] = useState<'MTR' | 'PCS' | ''>('');
 
   // Dynamic rolls
   const [rolls, setRolls] = useState<RollRow[]>([
@@ -73,7 +74,7 @@ function CreateGRNContent() {
             if (ch.items?.[0]) {
               setFabricDescription(ch.items[0].itemDescription || '');
               if (ch.items[0].colour) setColorName(ch.items[0].colour);
-              if (ch.items[0].uom === 'PCS') setUnit('PCS');
+              if (ch.items[0].uom === 'PCS' || ch.items[0].uom === 'MTR') setUnit(ch.items[0].uom);
             }
             setRemarks(`Received via Challan ${ch.challanNumber}`);
           }
@@ -128,6 +129,11 @@ function CreateGRNContent() {
     }
     if (!fabricDescription.trim()) {
       setError('Fabric Description is required.');
+      return;
+    }
+
+    if (!unit) {
+      setError('Select MTR or PCS for the roll quantities.');
       return;
     }
 
@@ -355,9 +361,10 @@ function CreateGRNContent() {
                         <span>Quantity *</span>
                         <select
                           value={unit}
-                          onChange={(e) => setUnit(e.target.value === 'PCS' ? 'PCS' : 'MTR')}
-                          className="px-2 py-1 bg-white border border-neutral-300 rounded text-xs font-bold text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 cursor-pointer"
+                          onChange={(e) => setUnit(e.target.value as 'MTR' | 'PCS')}
+                          className={`px-2 py-1 bg-white border rounded text-xs font-bold focus:outline-none focus:ring-1 focus:ring-brand-500 cursor-pointer ${unit ? 'border-neutral-300 text-neutral-900' : 'border-danger-300 text-danger-600'}`}
                         >
+                          <option value="" disabled>Select unit</option>
                           <option value="MTR">MTR (Meters)</option>
                           <option value="PCS">PCS (Pieces)</option>
                         </select>

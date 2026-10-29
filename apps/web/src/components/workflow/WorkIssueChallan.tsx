@@ -19,6 +19,7 @@ import {
   fetchJson,
   fmtDate,
   fmtQty,
+  challanRef,
   sheetRef,
 } from '@/components/workflow/WorkflowUi';
 import { TRANSFERABLE_STATUSES, availableFor } from '@/lib/work-items.mjs';
@@ -135,7 +136,7 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
   const updateRow = (key: string, patch: Partial<Row>) => setRows((rs) => rs.map((r) => (r.key === key ? { ...r, ...patch } : r)));
   const chooseItem = (key: string, itemId: string) => {
     const i = itemById(itemId);
-    updateRow(key, { itemId, quantity: i ? String(available(i)) : '' });
+    updateRow(key, { itemId, quantity: i && available(i) ? String(available(i)) : '' });
   };
 
   const filled = rows.filter((r) => r.itemId);
@@ -216,7 +217,7 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
         {error && <Notice kind="error" onClose={() => setError(null)}>{error}</Notice>}
         {unitBlocked.length > 0 && (
           <Notice kind="error">
-            {unitBlocked.map((i) => i.itemNumber).join(', ')} {unitBlocked.length === 1 ? 'is' : 'are'} recorded in{' '}
+            {unitBlocked.map((i) => [i.fabricName, challanRef(i)].filter(Boolean).join(' · ')).join(', ')} {unitBlocked.length === 1 ? 'is' : 'are'} recorded in{' '}
             {Array.from(new Set(unitBlocked.map((i) => i.uom))).join(' / ')}. {dest} receives finished garments in {flow.passUnit} only, so{' '}
             {unitBlocked.length === 1 ? 'it is' : 'they are'} not listed here; meters are never converted to pieces.
           </Notice>
@@ -392,7 +393,7 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
                               <option value="">Choose a ready line</option>
                               {sheetItems.filter((x) => !taken.has(x.id)).map((x) => (
                                 <option key={x.id} value={x.id}>
-                                  {x.itemNumber} · {x.garmentCategory ? `${x.garmentCategory}${x.styleRef ? ` ${x.styleRef}` : ''} · ` : ''}{x.fabricName} · {x.colour || '—'} · {x.fabricProcessingStatus === 'DYED' ? 'Dyed' : 'Undyed'}
+                                  {challanRef(x) ? `${challanRef(x)} · ` : ''}{x.garmentCategory ? `${x.garmentCategory}${x.styleRef ? ` ${x.styleRef}` : ''} · ` : ''}{x.fabricName} · {x.colour || '—'} · {x.fabricProcessingStatus === 'DYED' ? 'Dyed' : 'Undyed'}
                                 </option>
                               ))}
                             </select>

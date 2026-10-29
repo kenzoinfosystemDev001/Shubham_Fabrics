@@ -34,6 +34,11 @@ import {
   DEFAULT_DUPATTA_SUB_STYLES,
   getDefaultSubStylesForCategory,
   SubStyleAverage,
+  SubStyleAverageRow,
+  SubStyleAverageUnit,
+  sumSubStyleRowQuantities,
+  getSubStyleUnits,
+  getTotalPcsAverage,
   ProductionGridItem,
   SWATCH_CLIP_PATH,
   getSwatchColorHex,
@@ -63,6 +68,8 @@ interface ComponentState {
   productionGrid: ProductionGridItem[];
   swatchColorOverrides: Record<string, string>;
   noteText: string;
+  noteQtyUnit?: SubStyleAverageUnit | '';
+  noteQty?: string;
   remarksText: string;
   signatureName: string;
 }
@@ -168,6 +175,17 @@ function createComponentState(category: GarmentCategory, rowId: string): Compone
   };
 }
 
+/** The Part / MTR-PCS rows shown under a section; older entries carry only a single `average`. */
+function getSubStyleRows(sub: SubStyleAverage): SubStyleAverageRow[] {
+  return Array.isArray(sub.rows) && sub.rows.length > 0 ? sub.rows : [{ part: '', mtr: sub.average ?? '' }];
+}
+
+/** A section's average is the meter sum of its rows; only MTR sections count, so PCS and unit-less sections give ''. */
+function getSubStyleAverage(rows: SubStyleAverageRow[], unit: SubStyleAverageUnit | undefined): number | string {
+  if (unit !== 'MTR') return '';
+  return sumSubStyleRowQuantities(rows) ?? '';
+}
+
 function hasComponentInput(component: ComponentState): boolean {
   return Boolean(
     component.styleName.trim() ||
@@ -175,8 +193,11 @@ function hasComponentInput(component: ComponentState): boolean {
     component.fabricName.trim() ||
     component.fabricWidth.trim() ||
     component.noteText.trim() ||
+    (component.noteQty || '').trim() ||
     component.remarksText.trim() ||
-    component.subStyles.some((style) => style.average !== '') ||
+    component.subStyles.some((style) =>
+      style.average !== '' || (style.rows || []).some((row) => row.part.trim() || String(row.mtr).trim())
+    ) ||
     component.productionGrid.some((row) => row.color.trim() || Number(row.pcs) > 0 || Number(row.mtr) > 0)
   );
 }
@@ -364,7 +385,7 @@ function SubStyleMultiSelectCell({
                       }
                     }
                   }}
-                  placeholder="e.g. POCKET"
+                  placeholder=""
                   className="flex-1 px-2 py-1 text-xs uppercase font-bold border border-neutral-300 rounded focus:outline-none focus:border-brand-500"
                 />
                 <button
@@ -390,7 +411,7 @@ function SubStyleMultiSelectCell({
                 type="text"
                 value={row.subStyle || ''}
                 onChange={(e) => onSubStyleTextChange(e.target.value)}
-                placeholder="Comma-separated: FRONT, SLEEVE"
+                placeholder=""
                 className="w-full px-2 py-1 text-xs uppercase font-bold border border-neutral-300 rounded focus:outline-none focus:border-brand-500"
               />
             </div>
@@ -509,7 +530,7 @@ function BatchSubStylesModal({
             rows={2}
             value={customInput}
             onChange={(e) => onCustomInputChange(e.target.value)}
-            placeholder="e.g. FRONT YOKE, BACK YOKE, INNER POCKET"
+            placeholder=""
             className="w-full px-2.5 py-1.5 border border-neutral-300 rounded text-xs uppercase font-bold focus:outline-none focus:border-brand-500 resize-none"
           />
         </div>
@@ -543,6 +564,11 @@ export default function CreateProductionSheetPage() {
   const [success, setSuccess] = useState<any | null>(null);
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [createdProgramId, setCreatedProgramId] = useState<string | null>(null);
+  // Edit mode (?edit=<sheet id>): the saved version this form was loaded from, and why it cannot be saved, if so.
+  const [isEditing, setIsEditing] = useState(false);
+  const [loadingSheet, setLoadingSheet] = useState(false);
+  const [expectedUpdatedAt, setExpectedUpdatedAt] = useState<string | null>(null);
+  const [editLockReason, setEditLockReason] = useState<string | null>(null);
   // Sub-style Multi-select Picker State
   const [activeSubStylePicker, setActiveSubStylePicker] = useState<{
     cat: GarmentCategory;
@@ -663,6 +689,92 @@ export default function CreateProductionSheetPage() {
   } | null>(null);
   const [checkingFabricAvailability, setCheckingFabricAvailability] = useState(false);
   const [fabricAvailabilityError, setFabricAvailabilityError] = useState<string | null>(null);
+
+  // Edit mode: load the submitted sheet into the form, exactly as it was saved.
+  useEffect(() => {
+    const editId = new URLSearchParams(window.location.search).get('edit');
+    if (!editId) return;
+    setIsEditing(true);
+    setLoadingSheet(true);
+    (async () => {
+      try {
+        const res = await fetch(`/api/programs/${encodeURIComponent(editId)}`);
+        const program = await res.json().catch(() => null);
+        if (!res.ok || !program?.id) throw new Error(program?.error || 'This production sheet could not be loaded.');
+        let meta: any = {};
+        try {
+          meta = program.metadataJson ? JSON.parse(program.metadataJson) : {};
+        } catch {}
+        const toDate = (value: any) => (value ? new Date(value).toISOString().split('T')[0] : '');
+
+        setCreatedProgramId(program.id);
+        setExpectedUpdatedAt(program.updatedAt || null);
+        setDesignNumber(program.designNumber || '');
+        setProgramSerialNo(program.programSerialNo || program.programNumber || '');
+        setSerialNoCounter(meta.serialNoCounter && meta.serialNoCounter !== '000' ? meta.serialNoCounter : '');
+        if (program.startDate || program.programDate) setSheetDate(toDate(program.startDate || program.programDate));
+        if (program.deliveryDate && !meta.deliveryDateDefaulted) setDeliveryDate(toDate(program.deliveryDate));
+        setClientName(program.clientName || program.buyerName || '');
+        setClientCode(program.clientCode || '');
+        setClientPriority(program.clientPriority || program.priority || 'NORMAL');
+        setFabricName(program.fabricName || '');
+        setFabricWidth(program.fabricWidth || '');
+        setFabricDyeingRequired(Boolean(program.fabricDyeingRequired));
+        if (program.fabricColorAvailable) setFabricColorAvailable(program.fabricColorAvailable);
+        setWilcomEntries(Array.isArray(program.wilcomEntries) ? program.wilcomEntries : []);
+
+        const saved: Record<string, any> = meta.components && typeof meta.components === 'object' ? meta.components : {};
+        const savedCats = Object.keys(saved) as GarmentCategory[];
+        if (savedCats.length > 0) {
+          const loaded = {} as Record<GarmentCategory, ComponentState>;
+          savedCats.forEach((cat, index) => {
+            const c = saved[cat] || {};
+            const base = createComponentState(cat, `${String(cat).toLowerCase()}-row-${index + 1}`);
+            const noteQtyUnit: SubStyleAverageUnit | '' =
+              c.noteQtyUnit === 'MTR' || c.noteQtyUnit === 'PCS'
+                ? c.noteQtyUnit
+                : String(c.noteQtyMtr ?? '').trim() ? 'MTR' : String(c.noteQtyPcs ?? '').trim() ? 'PCS' : '';
+            loaded[cat] = {
+              ...base,
+              enabled: c.enabled !== false,
+              styleName: c.styleName || '',
+              pattern: c.pattern || '',
+              fabricName: c.fabricName || '',
+              fabricWidth: c.fabricWidth || '',
+              subStyles: Array.isArray(c.subStyles) && c.subStyles.length > 0 ? c.subStyles : base.subStyles,
+              productionGrid: Array.isArray(c.productionGrid) && c.productionGrid.length > 0
+                ? c.productionGrid.map((row: any, rIdx: number) => ({ ...row, id: row.id || `${cat}-row-${rIdx + 1}` }))
+                : base.productionGrid,
+              swatchColorOverrides: Object.fromEntries(
+                (Array.isArray(c.swatches) ? c.swatches : []).filter((s: any) => s?.name && s?.color).map((s: any) => [s.name, s.color])
+              ),
+              noteText: c.note || '',
+              noteQtyUnit,
+              noteQty: noteQtyUnit === 'MTR' ? String(c.noteQtyMtr ?? '') : noteQtyUnit === 'PCS' ? String(c.noteQtyPcs ?? '') : '',
+              remarksText: c.remarks || '',
+            };
+          });
+          setComponents(loaded);
+          const forwarded = Array.isArray(meta.forwardedComponents)
+            ? (meta.forwardedComponents as GarmentCategory[]).filter((cat) => loaded[cat])
+            : [];
+          setForwardedComponents(forwarded.length > 0 ? forwarded : [savedCats[0]]);
+          setSelectedCategory(savedCats.find((cat) => loaded[cat].enabled) || savedCats[0]);
+        }
+
+        const issued = (Array.isArray(program.challans) ? program.challans : []).find(
+          (ch: any) => !['DRAFT', 'CANCELLED'].includes(String(ch.status || '').toUpperCase())
+        );
+        if (issued) {
+          setEditLockReason(`Challan ${issued.challanNumber} has already been issued from this production sheet, so it can no longer be edited.`);
+        }
+      } catch (err: any) {
+        setEditLockReason(err.message || 'This production sheet could not be loaded.');
+      } finally {
+        setLoadingSheet(false);
+      }
+    })();
+  }, []);
 
   // Component Helper Functions
   const getTotalMtrAverage = (cat: GarmentCategory): number => {
@@ -823,17 +935,65 @@ export default function CreateProductionSheetPage() {
   };
 
   // Component SubStyle Changes
-  const handleSubStyleAverageChange = (cat: GarmentCategory, index: number, newAverage: number | string) => {
-    const updatedSubStyles = [...components[cat].subStyles];
-    updatedSubStyles[index] = { ...updatedSubStyles[index], average: newAverage };
+  const updateSubStyleRows = (
+    cat: GarmentCategory,
+    index: number,
+    update: (rows: SubStyleAverageRow[]) => SubStyleAverageRow[]
+  ) => {
+    setComponents((prev) => {
+      const updatedSubStyles = [...prev[cat].subStyles];
+      const rows = update(getSubStyleRows(updatedSubStyles[index]).map((row) => ({ ...row })));
+      updatedSubStyles[index] = {
+        ...updatedSubStyles[index],
+        rows,
+        average: getSubStyleAverage(rows, updatedSubStyles[index].unit),
+      };
+      return {
+        ...prev,
+        [cat]: {
+          ...prev[cat],
+          subStyles: updatedSubStyles,
+        },
+      };
+    });
+  };
 
-    setComponents((prev) => ({
-      ...prev,
-      [cat]: {
-        ...prev[cat],
-        subStyles: updatedSubStyles,
-      },
-    }));
+  const handleSubStyleRowChange = (
+    cat: GarmentCategory,
+    index: number,
+    rowIndex: number,
+    field: keyof SubStyleAverageRow,
+    value: string
+  ) => {
+    updateSubStyleRows(cat, index, (rows) => {
+      rows[rowIndex] = { ...rows[rowIndex], [field]: value };
+      return rows;
+    });
+  };
+
+  const handleSubStyleUnitChange = (cat: GarmentCategory, index: number, unit: SubStyleAverageUnit) => {
+    setComponents((prev) => {
+      const updatedSubStyles = [...prev[cat].subStyles];
+      const rows = getSubStyleRows(updatedSubStyles[index]);
+      updatedSubStyles[index] = { ...updatedSubStyles[index], rows, unit, average: getSubStyleAverage(rows, unit) };
+      return {
+        ...prev,
+        [cat]: {
+          ...prev[cat],
+          subStyles: updatedSubStyles,
+        },
+      };
+    });
+  };
+
+  const handleAddSubStyleRow = (cat: GarmentCategory, index: number) => {
+    updateSubStyleRows(cat, index, (rows) => [...rows, { part: '', mtr: '' }]);
+  };
+
+  const handleRemoveSubStyleRow = (cat: GarmentCategory, index: number, rowIndex: number) => {
+    updateSubStyleRows(cat, index, (rows) =>
+      rows.length > 1 ? rows.filter((_, rIdx) => rIdx !== rowIndex) : rows
+    );
   };
 
   const handleSubStyleNameChange = (cat: GarmentCategory, index: number, newName: string) => {
@@ -866,7 +1026,7 @@ export default function CreateProductionSheetPage() {
   const handleAddSubStyle = (cat: GarmentCategory) => {
     const nextNum = components[cat].subStyles.length + 1;
     const newName = `PART-${nextNum}`;
-    const updatedSubStyles = [...components[cat].subStyles, { name: newName, average: '' }];
+    const updatedSubStyles = [...components[cat].subStyles, { name: newName, average: '', rows: [{ part: '', mtr: '' }] }];
 
     setComponents((prev) => ({
       ...prev,
@@ -905,7 +1065,7 @@ export default function CreateProductionSheetPage() {
   };
 
   // Component Grid Operations
-  const handleGridRowChange = (cat: GarmentCategory, index: number, field: 'color' | 'pcs' | 'mtr' | 'subStyle' | 'size', value: any) => {
+  const handleGridRowChange = (cat: GarmentCategory, index: number, field: 'color' | 'pcs' | 'mtr' | 'subStyle' | 'size' | 'measurement', value: any) => {
     const totalAvg = getTotalMtrAverage(cat);
     const updatedGrid = [...components[cat].productionGrid];
     const target = { ...updatedGrid[index] };
@@ -1185,6 +1345,10 @@ export default function CreateProductionSheetPage() {
   // Form Submission
   const handleSubmit = async (targetStatus: 'DRAFT' | 'IN_PROGRESS' | 'READY_FOR_ISSUE') => {
     setError(null);
+    if (editLockReason) {
+      setError(editLockReason);
+      return;
+    }
     setSuccess(null);
 
     if (!designNumber.trim()) {
@@ -1204,6 +1368,21 @@ export default function CreateProductionSheetPage() {
     for (const cat of enabledCats) {
       if ((cat === 'OTHER' || isCustomCategory(cat)) && !components[cat].styleName.trim()) {
         setError(`Enter a name for the ${cat === 'OTHER' ? 'custom' : 'style'} Production Sheet.`);
+        if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      const sheetName = cat === 'OTHER' || isCustomCategory(cat) ? components[cat].styleName.trim() : cat;
+      const unitlessSection = components[cat].subStyles.find((sub) =>
+        !sub.unit && (sub.rows || []).some((row) => String(row.mtr).trim() !== '')
+      );
+      if (unitlessSection) {
+        setError(`Select MTR or PCS for ${unitlessSection.name} in the ${sheetName} Average section.`);
+        if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+      if ((components[cat].noteQty || '').trim() && !components[cat].noteQtyUnit) {
+        setError(`Select MTR or PCS for the quantity in the ${sheetName} Note.`);
         if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
@@ -1249,6 +1428,9 @@ export default function CreateProductionSheetPage() {
             productionGrid: component.productionGrid,
             swatches: getDisplaySwatches(cat),
             note: component.noteText.trim(),
+            noteQtyUnit: component.noteQtyUnit || '',
+            noteQtyMtr: component.noteQtyUnit === 'MTR' ? (component.noteQty || '').trim() : '',
+            noteQtyPcs: component.noteQtyUnit === 'PCS' ? (component.noteQty || '').trim() : '',
             remarks: component.remarksText.trim(),
             totalMtrAverage: getTotalMtrAverage(cat),
             totalPieces: getTotalPieces(cat),
@@ -1268,6 +1450,8 @@ export default function CreateProductionSheetPage() {
       }));
       const payload: any = {
         id: createdProgramId || undefined,
+        // The version this form was loaded from or last saved as; a newer save by someone else is refused.
+        expectedUpdatedAt: createdProgramId ? expectedUpdatedAt || undefined : undefined,
         programNumber: programSerialNo.trim() || undefined,
         programSerialNo: programSerialNo.trim(),
         designNumber: designNumber.trim(),
@@ -1312,6 +1496,9 @@ export default function CreateProductionSheetPage() {
       if (result?.id) {
         setCreatedProgramId(result.id);
       }
+      if (result?.updatedAt) {
+        setExpectedUpdatedAt(result.updatedAt);
+      }
       if (payload.wilcomDesignPhoto && !persistedWilcomPhoto) {
         throw new Error('The production sheet was saved, but the Wilcom photo was not confirmed by the server. Please retry saving before leaving this page.');
       }
@@ -1352,7 +1539,7 @@ export default function CreateProductionSheetPage() {
           </Link>
           <div>
             <h1 className="text-lg font-black text-neutral-900 flex items-center gap-2">
-              <span>Production Sheet Management</span>
+              <span>{isEditing ? 'Edit Production Sheet' : 'Production Sheet Management'}</span>
               {designNumber && (
                 <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-neutral-100 text-neutral-700 border border-neutral-300">
                   {designNumber}
@@ -1366,8 +1553,9 @@ export default function CreateProductionSheetPage() {
           <button
             type="button"
             onClick={() => handleSubmit('DRAFT')}
-            disabled={loading}
-            className="px-3.5 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 text-xs font-bold rounded border border-neutral-300 shadow-2xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+            disabled={loading || loadingSheet || Boolean(editLockReason)}
+            title={editLockReason || undefined}
+            className="px-3.5 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 text-xs font-bold rounded border border-neutral-300 shadow-2xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? <RefreshCw className="w-3.5 h-3.5 animate-spin text-neutral-500" /> : null}
             <span>{loading ? 'Saving...' : 'Save Draft'}</span>
@@ -1375,11 +1563,12 @@ export default function CreateProductionSheetPage() {
           <button
             type="button"
             onClick={() => handleSubmit('READY_FOR_ISSUE')}
-            disabled={loading}
-            className="px-4 py-1.5 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white text-xs font-bold rounded shadow-2xs transition flex items-center gap-1.5 cursor-pointer"
+            disabled={loading || loadingSheet || Boolean(editLockReason)}
+            title={editLockReason || undefined}
+            className="px-4 py-1.5 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold rounded shadow-2xs transition flex items-center gap-1.5 cursor-pointer"
           >
             {loading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-            <span>{loading ? 'Submitting...' : 'Complete & Submit Ready'}</span>
+            <span>{loading ? (isEditing ? 'Updating...' : 'Submitting...') : isEditing ? 'Update Sheet' : 'Complete & Submit Ready'}</span>
           </button>
         </div>
       </header>
@@ -1387,6 +1576,20 @@ export default function CreateProductionSheetPage() {
       {/* MAIN CONTAINER */}
       <main className="p-4 sm:p-6 max-w-5xl mx-auto space-y-6">
         
+        {/* Edit mode: loading, or the reason the sheet can no longer be changed */}
+        {loadingSheet && (
+          <div className="p-3.5 bg-neutral-50 border border-neutral-200 rounded-lg text-neutral-700 text-xs flex items-center gap-2">
+            <RefreshCw className="w-4 h-4 shrink-0 animate-spin text-neutral-500" />
+            <span>Loading the saved production sheet...</span>
+          </div>
+        )}
+        {editLockReason && (
+          <div className="p-3.5 bg-danger-50 border border-danger-200 rounded-lg text-danger-800 text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 text-danger-600" />
+            <span>{editLockReason}</span>
+          </div>
+        )}
+
         {/* Error Banner */}
         {error && (
           <div className="p-3.5 bg-danger-50 border border-danger-200 rounded-lg text-danger-800 text-xs flex items-center gap-2">
@@ -1401,7 +1604,7 @@ export default function CreateProductionSheetPage() {
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-accent-700" />
               <h3 className="text-sm font-bold">
-                Production Sheet Submitted Successfully
+                {isEditing ? 'Production Sheet Updated Successfully' : 'Production Sheet Submitted Successfully'}
               </h3>
             </div>
 
@@ -1606,7 +1809,7 @@ export default function CreateProductionSheetPage() {
                             value={designNumber}
                             onChange={(e) => setDesignNumber(e.target.value)}
                             onFocus={(e) => e.target.select()}
-                            placeholder="Enter Design Number..."
+                            placeholder=""
                             className="w-full border-[1.5px] border-neutral-200 px-3 py-1.5 h-10 font-bold text-xs bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 shadow-2xs"
                           />
                         </div>
@@ -1725,7 +1928,7 @@ export default function CreateProductionSheetPage() {
                                 }));
                               }}
                               onFocus={(e) => e.target.select()}
-                              placeholder="Fill pattern manually..."
+                              placeholder=""
                               className="w-full border-[1.5px] border-neutral-200 px-3 py-1.5 h-10 font-bold text-xs bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 shadow-2xs"
                             />
                           </div>
@@ -1746,7 +1949,7 @@ export default function CreateProductionSheetPage() {
                                   [cat]: { ...prev[cat], styleName: value },
                                 }));
                               }}
-                              placeholder="Enter a production sheet name"
+                              placeholder=""
                               className="w-full border-[1.5px] border-neutral-200 px-3 py-1.5 h-10 font-bold text-xs bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 shadow-2xs"
                             />
                           </div>
@@ -1764,7 +1967,7 @@ export default function CreateProductionSheetPage() {
                             value={programSerialNo}
                             onChange={(e) => setProgramSerialNo(e.target.value)}
                             onFocus={(e) => e.target.select()}
-                            placeholder="e.g. 101"
+                            placeholder=""
                             className="w-full border-[1.5px] border-neutral-200 px-3 py-1.5 h-10 font-black text-center text-xs bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 font-mono shadow-2xs"
                           />
                         </div>
@@ -1808,7 +2011,7 @@ export default function CreateProductionSheetPage() {
                             value={clientName}
                             onChange={(e) => setClientName(e.target.value)}
                             onFocus={(e) => e.target.select()}
-                            placeholder="Client Name..."
+                            placeholder=""
                             className="w-full border-[1.5px] border-neutral-200 px-3 py-1.5 h-10 font-bold text-xs bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 shadow-2xs"
                           />
                         ) : (
@@ -1888,7 +2091,7 @@ export default function CreateProductionSheetPage() {
                               setActiveFabricPicker((current) => current === cat ? null : current);
                             }, 120);
                           }}
-                          placeholder="e.g. Cotton Viscose..."
+                          placeholder=""
                           className="w-full border-[1.5px] border-neutral-200 px-3 py-1.5 h-10 font-bold text-xs bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 shadow-2xs"
                         />
                         {activeFabricPicker === cat && (
@@ -1947,7 +2150,7 @@ export default function CreateProductionSheetPage() {
                             }));
                           }}
                           onFocus={(e) => e.target.select()}
-                          placeholder="e.g. 58 inches..."
+                          placeholder=""
                           className="w-full border-[1.5px] border-neutral-200 px-3 py-1.5 h-10 font-bold text-xs bg-white text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 shadow-2xs"
                         />
                       </div>
@@ -1963,65 +2166,128 @@ export default function CreateProductionSheetPage() {
                           className="text-[10px] font-bold text-brand-700 hover:text-brand-900 flex items-center gap-1 cursor-pointer"
                         >
                           <Plus className="w-3 h-3" />
-                          <span>Add Sub Style</span>
+                          <span>Add Substyle</span>
                         </button>
                       </div>
 
-                      <div className="overflow-x-auto">
-                        <table className="w-full border-collapse border-[1.5px] border-neutral-200 text-center text-xs">
-                          <thead>
-                            <tr className="bg-white">
-                              {comp.subStyles.map((sub, sIdx) => (
-                                <th key={sIdx} className="border-[1.5px] border-neutral-200 p-1.5 font-black text-[11px] tracking-wider uppercase relative">
-                                  <div className="flex items-center justify-center gap-1">
-                                    <input
-                                      type="text"
-                                      value={sub.name}
-                                      onChange={(e) => handleSubStyleNameChange(cat, sIdx, e.target.value)}
-                                      onFocus={(e) => e.target.select()}
-                                      placeholder=""
-                                      className="font-black text-[11px] text-center w-full uppercase bg-transparent border-none focus:outline-none focus:bg-brand-50"
-                                    />
-                                    {comp.subStyles.length > 1 && (
-                                      <button
-                                        type="button"
-                                        onClick={() => handleRemoveSubStyle(cat, sIdx)}
-                                        className="text-neutral-700 hover:text-danger-600 transition p-0.5 cursor-pointer"
-                                        title={`Remove ${sub.name}`}
+                      <div className="flex flex-wrap items-start gap-3">
+                        {comp.subStyles.map((sub, sIdx) => {
+                          const subRows = getSubStyleRows(sub);
+                          return (
+                            <div key={sIdx} className="flex-1 min-w-[200px] sm:max-w-[280px] flex flex-col">
+                              <div className="flex items-center gap-1 mb-1">
+                                <input
+                                  type="text"
+                                  value={sub.name}
+                                  onChange={(e) => handleSubStyleNameChange(cat, sIdx, e.target.value)}
+                                  onFocus={(e) => e.target.select()}
+                                  placeholder=""
+                                  className="font-black text-xs tracking-wider w-full min-w-0 uppercase bg-transparent border-none px-0.5 focus:outline-none focus:bg-brand-50"
+                                />
+                                {comp.subStyles.length > 1 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRemoveSubStyle(cat, sIdx)}
+                                    className="text-neutral-700 hover:text-danger-600 transition p-0.5 cursor-pointer"
+                                    title={`Remove ${sub.name}`}
+                                  >
+                                    &times;
+                                  </button>
+                                )}
+                              </div>
+                              <table className="w-full table-fixed border-collapse border-[1.5px] border-neutral-200 text-xs bg-white">
+                                <thead>
+                                  <tr className="bg-neutral-50">
+                                    <th className="border-[1.5px] border-neutral-200 px-1.5 py-1 font-black text-[11px] tracking-wider uppercase text-left">
+                                      Part
+                                    </th>
+                                    <th className="border-[1.5px] border-neutral-200 p-0.5 w-[42%]">
+                                      <select
+                                        value={sub.unit || ''}
+                                        onChange={(e) => handleSubStyleUnitChange(cat, sIdx, e.target.value as SubStyleAverageUnit)}
+                                        title="Unit for this section"
+                                        className={`w-full font-black text-[11px] tracking-wider uppercase text-center bg-transparent border-none cursor-pointer focus:outline-none focus:bg-brand-50 ${sub.unit ? '' : 'text-danger-600'}`}
                                       >
-                                        &times;
-                                      </button>
-                                    )}
+                                        <option value="" disabled>Select unit</option>
+                                        <option value="MTR">MTR</option>
+                                        <option value="PCS">PCS</option>
+                                      </select>
+                                    </th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {subRows.map((row, rIdx) => (
+                                    <tr key={rIdx} className="h-8">
+                                      <td className="border-[1.5px] border-neutral-200 p-0">
+                                        <input
+                                          type="text"
+                                          value={row.part}
+                                          onChange={(e) => handleSubStyleRowChange(cat, sIdx, rIdx, 'part', e.target.value)}
+                                          placeholder=""
+                                          className="w-full h-8 font-bold text-xs px-1.5 border-none focus:outline-none focus:bg-brand-50/60"
+                                        />
+                                      </td>
+                                      <td className="border-[1.5px] border-neutral-200 p-0 relative">
+                                        <input
+                                          type="number"
+                                          step="0.01"
+                                          min="0"
+                                          value={row.mtr}
+                                          disabled={!sub.unit}
+                                          title={sub.unit ? undefined : 'Select MTR or PCS first'}
+                                          onChange={(e) => handleSubStyleRowChange(cat, sIdx, rIdx, 'mtr', e.target.value)}
+                                          onFocus={(e) => e.target.select()}
+                                          placeholder=""
+                                          className="w-full h-8 text-center font-bold text-xs pl-1 pr-4 border-none focus:outline-none focus:bg-brand-50/60 disabled:bg-neutral-50 disabled:cursor-not-allowed"
+                                        />
+                                        {subRows.length > 1 && (
+                                          <button
+                                            type="button"
+                                            onClick={() => handleRemoveSubStyleRow(cat, sIdx, rIdx)}
+                                            className="absolute right-0.5 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-danger-600 transition px-0.5 cursor-pointer"
+                                            title="Remove row"
+                                          >
+                                            &times;
+                                          </button>
+                                        )}
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                              <button
+                                type="button"
+                                onClick={() => handleAddSubStyleRow(cat, sIdx)}
+                                className="self-center mt-1 text-[10px] font-bold text-brand-700 hover:text-brand-900 flex items-center gap-1 cursor-pointer"
+                              >
+                                <Plus className="w-3 h-3" />
+                                <span>Add</span>
+                              </button>
+                            </div>
+                          );
+                        })}
+                        {(() => {
+                          const { hasMtr, hasPcs } = getSubStyleUnits(comp.subStyles);
+                          const pcsTotal = getTotalPcsAverage(comp.subStyles);
+                          const totals = [
+                            ...(hasMtr ? [{ label: 'TOTAL MTR', value: catAvg > 0 ? catAvg.toFixed(2) : '' }] : []),
+                            ...(hasPcs ? [{ label: 'TOTAL PCS', value: pcsTotal > 0 ? String(pcsTotal) : '' }] : []),
+                          ];
+                          return (
+                            <div className="w-full sm:w-28 shrink-0 sm:mt-5 flex flex-col gap-2">
+                              {totals.map((total) => (
+                                <div key={total.label} className="border-[1.5px] border-neutral-200 bg-neutral-50 flex flex-col">
+                                  <div className="border-b-[1.5px] border-neutral-200 px-1.5 py-1 font-black text-[11px] tracking-wider uppercase text-center">
+                                    {total.label}
                                   </div>
-                                </th>
+                                  <div className="flex items-center justify-center p-2 min-h-10 font-black text-sm text-brand-900">
+                                    {total.value}
+                                  </div>
+                                </div>
                               ))}
-                              <th className="border-[1.5px] border-neutral-200 p-1.5 font-black text-[11px] tracking-wider uppercase bg-neutral-50 w-24">
-                                TOTAL MTR
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr className="h-8 font-bold text-xs">
-                              {comp.subStyles.map((sub, sIdx) => (
-                                <td key={sIdx} className="border-[1.5px] border-neutral-200 p-1">
-                                  <input
-                                    type="number"
-                                    step="0.01"
-                                    min="0"
-                                    value={sub.average}
-                                    onChange={(e) => handleSubStyleAverageChange(cat, sIdx, e.target.value)}
-                                    onFocus={(e) => e.target.select()}
-                                    placeholder=""
-                                    className="w-full text-center font-bold text-xs py-1 px-1 border-none focus:outline-none focus:bg-brand-50/60"
-                                  />
-                                </td>
-                              ))}
-                              <td className="border-[1.5px] border-neutral-200 p-1 font-black text-sm bg-neutral-50 text-brand-900">
-                                {catAvg > 0 ? catAvg.toFixed(2) : ''}
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
 
@@ -2029,7 +2295,7 @@ export default function CreateProductionSheetPage() {
                     <div className="pt-2">
                       <div className="flex items-center justify-between mb-1">
                         <span className="font-black text-xs uppercase tracking-wider">
-                          PRODUCTION BREAKDOWN GRID ({comp.productionGrid.length} COLOR LOTS)
+                          PRODUCTION BREAKDOWN GRID
                         </span>
                         <div className="flex items-center gap-2">
                           <button
@@ -2058,6 +2324,9 @@ export default function CreateProductionSheetPage() {
                               </th>
                               <th rowSpan={2} className="border-[1.5px] border-neutral-200 p-1 font-black text-xs tracking-wider uppercase w-36">
                                 SIZE
+                              </th>
+                              <th rowSpan={2} className="border-[1.5px] border-neutral-200 p-1 font-black text-xs tracking-wider uppercase w-36">
+                                MEASUREMENT
                               </th>
                               <th rowSpan={2} className="border-[1.5px] border-neutral-200 p-1 font-bold text-[10px] w-8">
                                 &nbsp;
@@ -2163,7 +2432,7 @@ export default function CreateProductionSheetPage() {
                                             value={row.sizes?.[sub] || ''}
                                             onChange={(e) => handleGridSizeChange(cat, rIdx, sub, e.target.value)}
                                             onFocus={(e) => e.target.select()}
-                                            placeholder="1 + 3 + 0.5"
+                                            placeholder=""
                                             className="min-w-0 flex-1 text-center font-bold text-xs text-neutral-900 border-none focus:outline-none uppercase bg-transparent"
                                           />
                                           {calculateSizeTotal(row.sizes?.[sub]) !== null && (
@@ -2188,7 +2457,7 @@ export default function CreateProductionSheetPage() {
                                           ? handleGridSizeChange(cat, rIdx, rowSubStyles[0], e.target.value)
                                           : handleGridRowChange(cat, rIdx, 'size', e.target.value)}
                                         onFocus={(e) => e.target.select()}
-                                        placeholder="1 + 3 + 0.5"
+                                        placeholder=""
                                         className="min-w-0 flex-1 px-1 py-1 text-center font-bold text-xs text-neutral-900 border-none focus:outline-none focus:bg-brand-50 uppercase"
                                       />
                                       {calculateSizeTotal(rowSizeExpression) !== null && (
@@ -2198,6 +2467,18 @@ export default function CreateProductionSheetPage() {
                                       )}
                                     </div>
                                   )}
+                                </td>
+
+                                {/* MEASUREMENT */}
+                                <td className="border-[1.5px] border-neutral-200 p-0.5">
+                                  <input
+                                    type="text"
+                                    value={row.measurement || ''}
+                                    onChange={(e) => handleGridRowChange(cat, rIdx, 'measurement', e.target.value)}
+                                    onFocus={(e) => e.target.select()}
+                                    placeholder=""
+                                    className="w-full px-1 py-1 font-bold text-center text-xs text-neutral-900 border-none focus:outline-none focus:bg-brand-50"
+                                  />
                                 </td>
 
                                 {/* REMOVE ROW */}
@@ -2229,7 +2510,7 @@ export default function CreateProductionSheetPage() {
                               <td className="border-[1.5px] border-neutral-200 p-1.5 text-center font-black text-sm text-brand-600">
                                 {catPieces > 0 ? catPieces : ''}
                               </td>
-                              <td colSpan={3} className="border-[1.5px] border-neutral-200 p-1.5 text-right text-[10px]">
+                              <td colSpan={4} className="border-[1.5px] border-neutral-200 p-1.5 text-right text-[10px]">
                                 <span className="font-black text-neutral-900 not-italic">
                                   TOTAL MEASUREMENT: {catMeasurementTotal !== null ? formatSizeTotal(catMeasurementTotal) : '—'}
                                 </span>
@@ -2253,6 +2534,7 @@ export default function CreateProductionSheetPage() {
                           <label className="font-black text-xs tracking-wider uppercase block mb-1">
                             NOTE:-
                           </label>
+                          <div className="border-[1.5px] border-neutral-200 bg-white focus-within:ring-1 focus-within:ring-brand-500">
                           <textarea
                             rows={2}
                             value={comp.noteText}
@@ -2264,8 +2546,55 @@ export default function CreateProductionSheetPage() {
                               }));
                             }}
                             placeholder=""
-                            className="w-full px-2.5 py-1.5 border-[1.5px] border-neutral-200 text-xs font-sans text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 resize-none bg-white"
+                            className="block w-full px-2.5 py-1.5 border-none text-xs font-sans text-neutral-900 focus:outline-none resize-none bg-white"
                           />
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 px-2.5 py-1.5 border-t border-neutral-200">
+                            <div className="flex items-center gap-2">
+                              <label className="font-black text-[11px] tracking-wider uppercase shrink-0">
+                                UNIT
+                              </label>
+                              <select
+                                value={comp.noteQtyUnit || ''}
+                                onChange={(e) => {
+                                  const val = e.target.value as SubStyleAverageUnit | '';
+                                  setComponents((prev) => ({
+                                    ...prev,
+                                    [cat]: { ...prev[cat], noteQtyUnit: val },
+                                  }));
+                                }}
+                                className="w-full min-w-0 h-7 px-1.5 border-[1.5px] border-neutral-200 text-xs font-bold text-neutral-900 focus:outline-none focus:border-brand-500 bg-white cursor-pointer"
+                              >
+                                <option value="">Select unit</option>
+                                <option value="MTR">MTR (Meters)</option>
+                                <option value="PCS">PCS (Pieces)</option>
+                              </select>
+                            </div>
+                            {comp.noteQtyUnit && (
+                              <div className="flex items-center gap-2">
+                                <label className="font-black text-[11px] tracking-wider uppercase shrink-0">
+                                  QTY ({comp.noteQtyUnit})
+                                </label>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  step={comp.noteQtyUnit === 'PCS' ? '1' : '0.01'}
+                                  value={comp.noteQty || ''}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    if (val !== '' && Number(val) < 0) return;
+                                    setComponents((prev) => ({
+                                      ...prev,
+                                      [cat]: { ...prev[cat], noteQty: val },
+                                    }));
+                                  }}
+                                  onFocus={(e) => e.target.select()}
+                                  placeholder=""
+                                  className="w-full min-w-0 h-7 px-2 border-[1.5px] border-neutral-200 text-xs font-bold text-neutral-900 focus:outline-none focus:border-brand-500 bg-white"
+                                />
+                              </div>
+                            )}
+                          </div>
+                          </div>
                         </div>
 
                         <div>
@@ -2376,8 +2705,9 @@ export default function CreateProductionSheetPage() {
           <button
             type="button"
             onClick={() => handleSubmit('DRAFT')}
-            disabled={loading}
-            className="px-4 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 text-xs font-bold rounded border border-neutral-300 shadow-2xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+            disabled={loading || loadingSheet || Boolean(editLockReason)}
+            title={editLockReason || undefined}
+            className="px-4 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 text-xs font-bold rounded border border-neutral-300 shadow-2xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? <RefreshCw className="w-3.5 h-3.5 animate-spin text-neutral-500" /> : null}
             <span>{loading ? 'Saving...' : 'Save as Draft'}</span>
@@ -2385,11 +2715,16 @@ export default function CreateProductionSheetPage() {
           <button
             type="button"
             onClick={() => handleSubmit('READY_FOR_ISSUE')}
-            disabled={loading}
-            className="px-6 py-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white text-xs font-bold rounded shadow-xs transition flex items-center gap-2 cursor-pointer"
+            disabled={loading || loadingSheet || Boolean(editLockReason)}
+            title={editLockReason || undefined}
+            className="px-6 py-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold rounded shadow-xs transition flex items-center gap-2 cursor-pointer"
           >
             {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-            <span>{loading ? 'Submitting Ready for Issue...' : 'Complete & Submit Ready for Issue'}</span>
+            <span>
+              {loading
+                ? isEditing ? 'Updating Sheet...' : 'Submitting Ready for Issue...'
+                : isEditing ? 'Update Sheet' : 'Complete & Submit Ready for Issue'}
+            </span>
           </button>
         </div>
 

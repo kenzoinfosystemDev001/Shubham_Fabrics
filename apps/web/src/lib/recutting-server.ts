@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { assertChallanNumbersAvailable, challanNumberErrorResponse, requireChallanNumber } from '@/lib/challan-number-server';
 import {
   PROGRAM_SELECT,
@@ -170,7 +170,7 @@ const createAllocations = (request: Request, itemId: string) =>
             where: { id: item.id, processedQuantity: item.processedQuantity, updatedAt: item.updatedAt },
             data: { processedQuantity: round(item.processedQuantity + check.total), startedAt: item.startedAt ?? new Date() },
           });
-          if (res.count !== 1) throw new WorkRequestError(`${item.itemNumber} was allocated by someone else just now. Refresh and try again.`, 409);
+          if (res.count !== 1) throw new WorkRequestError(`${item.fabricName} was allocated by someone else just now. Refresh and try again.`, 409);
           const latest = await tx.workItemAllocation.findFirst({
             where: { allocationNumber: { startsWith: `RCA-${year}-` } },
             orderBy: { allocationNumber: 'desc' },
@@ -446,7 +446,7 @@ const issueStitchingChallan = (request: Request) =>
       const byId = new Map(allocations.map((a) => [a.id, a]));
       const check = validateStitchingLines(lines, byId);
       if (!check.ok) throw new WorkRequestError(check.error);
-      await assertChallanNumbersAvailable(prisma, [{ value: challanNumber }]);
+      await assertChallanNumbersAvailable(prisma, cfg.code, [{ value: challanNumber }]);
       const issuedDate = body.issuedDate ? new Date(String(body.issuedDate)) : new Date();
       if (Number.isNaN(issuedDate.getTime())) throw new WorkRequestError('Challan date is not a valid date.');
       const prepared = lines.map((l) => ({ a: byId.get(l.allocationId)!, quantity: round(Number(l.quantity)), remarks: textOf(l.remarks, 300) }));

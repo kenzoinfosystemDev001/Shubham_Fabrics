@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { canViewClientCode, getSessionUser } from '@/lib/auth/require-user';
 import { requireDepartment } from '@/lib/auth/department-access';
 import { unitOf } from '@/lib/challan-units.mjs';
@@ -39,6 +39,9 @@ async function getFabricAvailability(
     sufficient: availableMeters >= requiredMeters,
   };
 }
+
+/** Another save landed first; the editor must reload rather than overwrite it. */
+class SheetConflictError extends Error {}
 
 function parseSafeDate(val: any, fallback?: Date | null): Date | null {
   if (!val) return fallback !== undefined ? fallback : null;
@@ -131,13 +134,34 @@ export async function POST(request: Request) {
       // Strict stock gating will be re-enabled later once stock management is maintained.
     }
 
-    // Check if updating an existing program by ID
+    // Editing a submitted sheet: only by its own ID, only before its first challan is issued, and only
+    // from the version the editor loaded (a newer save by someone else is never overwritten).
     let existing: any = null;
     if (data.id) {
       existing = await prisma.program.findUnique({
         where: { id: data.id },
-        select: { id: true, programNumber: true },
+        select: { id: true, programNumber: true, updatedAt: true, metadataJson: true, status: true, targetQuantity: true, designNumber: true },
       });
+      if (!existing) {
+        return NextResponse.json({ error: 'This production sheet no longer exists.' }, { status: 404 });
+      }
+      const issued = await prisma.challan.findFirst({
+        where: { programId: existing.id, status: { notIn: ['DRAFT', 'CANCELLED'] } },
+        select: { challanNumber: true },
+        orderBy: { createdAt: 'asc' },
+      });
+      if (issued) {
+        return NextResponse.json(
+          { error: `Challan ${issued.challanNumber} has already been issued from this production sheet, so it can no longer be edited.` },
+          { status: 409 },
+        );
+      }
+      if (data.expectedUpdatedAt && new Date(data.expectedUpdatedAt).getTime() !== new Date(existing.updatedAt).getTime()) {
+        return NextResponse.json(
+          { error: 'Someone else saved this production sheet after you opened it. Reload the sheet to see their changes, then make your edit again.' },
+          { status: 409 },
+        );
+      }
     }
 
     // Determine unique programNumber
@@ -145,13 +169,16 @@ export async function POST(request: Request) {
     if (existing) {
       programNumber = existing.programNumber;
     } else if (programNumber) {
-      // Check if user-provided programNumber already exists
+      // A new sheet never takes over another sheet's number.
       const conflict = await prisma.program.findUnique({
         where: { programNumber },
         select: { id: true },
       });
       if (conflict) {
-        existing = conflict;
+        return NextResponse.json(
+          { error: `Production sheet ${programNumber} already exists. Use a different serial number, or open that sheet and edit it.` },
+          { status: 409 },
+        );
       }
     } else if (data.programSerialNo) {
       // If user typed a serial number, see if it can be used as programNumber
@@ -227,6 +254,10 @@ export async function POST(request: Request) {
 
     // Prepare metadata with items & sub styles with averages
     const metadataObj: any = {};
+    try {
+      // An edit keeps every saved detail the form does not send.
+      if (existing?.metadataJson) Object.assign(metadataObj, JSON.parse(existing.metadataJson));
+    } catch {}
     try {
       if (typeof data.metadataJson === 'string') {
         Object.assign(metadataObj, JSON.parse(data.metadataJson));
@@ -371,9 +402,34 @@ export async function POST(request: Request) {
       let created;
       if (existing) {
         const { createdById: _author, ...updateData } = programData;
-        created = await tx.program.update({
-          where: { id: existing.id },
+        // Guarded on the loaded version, so two editors saving at once cannot both win.
+        const guarded = await tx.program.updateMany({
+          where: { id: existing.id, updatedAt: existing.updatedAt },
           data: updateData,
+        });
+        if (guarded.count !== 1) {
+          throw new SheetConflictError('Someone else saved this production sheet at the same moment. Reload the sheet and make your edit again.');
+        }
+        created = await tx.program.findUniqueOrThrow({ where: { id: existing.id } });
+        await tx.auditLog.create({
+          data: {
+            actorId,
+            action: 'PRODUCTION_SHEET_EDITED',
+            entity: 'Program',
+            entityId: existing.id,
+            beforeState: JSON.stringify({
+              status: existing.status,
+              designNumber: existing.designNumber,
+              targetQuantity: existing.targetQuantity,
+              metadataJson: existing.metadataJson,
+            }),
+            afterState: JSON.stringify({
+              status: updateData.status,
+              designNumber: updateData.designNumber,
+              targetQuantity: updateData.targetQuantity,
+              metadataJson: updateData.metadataJson,
+            }),
+          },
         });
         await tx.programFabric.deleteMany({ where: { programId: existing.id } });
         await tx.programColour.deleteMany({ where: { programId: existing.id } });
@@ -495,8 +551,11 @@ export async function POST(request: Request) {
       sanitizedProgram.clientCode = metadataObj.clientCode || null;
     }
 
-    return NextResponse.json(sanitizedProgram, { status: 201 });
+    return NextResponse.json(sanitizedProgram, { status: existing ? 200 : 201 });
   } catch (error: any) {
+    if (error instanceof SheetConflictError) {
+      return NextResponse.json({ error: error.message }, { status: 409 });
+    }
     console.error('Error creating production sheet:', error);
     return NextResponse.json({ error: error.message || 'Failed to create production sheet' }, { status: 500 });
   }

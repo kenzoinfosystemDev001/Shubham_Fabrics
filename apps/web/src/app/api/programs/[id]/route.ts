@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { getSessionUser } from '@/lib/auth/require-user';
 import { requireDepartment } from '@/lib/auth/department-access';
 import { programSheetInclude, shapeProgramSheet } from '@/lib/program-sheet';

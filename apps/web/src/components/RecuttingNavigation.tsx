@@ -244,7 +244,7 @@ export function RecuttingNavigation() {
             <UserCircle className="w-8 h-8 text-danger-600" />
             <div className="flex-1 min-w-0">
               <span className="text-xs font-semibold text-neutral-900 truncate block drop-shadow-xs">
-                {currentUser.fullName || (isAdmin ? 'System Administrator' : 'Recutting Supervisor')}
+                {(currentUser.fullName && currentUser.fullName.trim().toLowerCase() !== 'recutting department' ? currentUser.fullName : '') || (isAdmin ? 'System Administrator' : 'Recutting Supervisor')}
               </span>
               <span className="text-[10px] text-danger-600 font-bold tracking-wide block truncate drop-shadow-xs">
                 Recutting Department

@@ -13,14 +13,13 @@ import {
   RefreshCw,
   Printer,
   ChevronRight,
-  ShieldCheck,
   Eye,
   Calendar,
   User,
   Barcode as BarcodeIcon
 } from 'lucide-react';
 import { api } from '@/lib/api';
-import { formatTotals, totalsByUnit } from '@/lib/challan-units.mjs';
+import { formatTotals, totalsByUnit, unitOf } from '@/lib/challan-units.mjs';
 import {
   ColorFabricMeasurementTable,
   ChallanItemData, 
@@ -165,7 +164,8 @@ function IssueChallanContent() {
           fabric: prog.fabricName || it.itemName || prog.mainStyle || 'Cotton',
           color: it.color || 'Standard',
           measurement: it.measurement || 0,
-          unit: (it.unit === 'PCS' ? 'PCS' : 'MTR') as 'MTR' | 'PCS',
+          // Pre-filled only from a unit the production sheet actually stored; otherwise the user picks.
+          unit: (unitOf(it.unit) || '') as ChallanItemData['unit'],
           remarks: `${it.itemName || 'Part'} - Program #${prog.programSerialNo || prog.programNumber}`,
         }))
       );
@@ -176,7 +176,7 @@ function IssueChallanContent() {
           fabric: prog.fabricName || prog.mainStyle || '',
           color: prog.fabricColor || prog.color || '',
           measurement: prog.colorQuantity || prog.targetQuantity || '',
-          unit: (prog.quantityMeasurement === 'PCS' ? 'PCS' : 'MTR') as 'MTR' | 'PCS',
+          unit: (unitOf(prog.quantityMeasurement) || '') as ChallanItemData['unit'],
           remarks: `Program #${prog.programSerialNo || prog.programNumber}`,
         },
       ]);
@@ -219,10 +219,22 @@ function IssueChallanContent() {
         setError(`Item #${i + 1}: Measurement / Quantity must be a positive number.`);
         return;
       }
+      if (!it.unit) {
+        setError(`Item #${i + 1}: Select MTR or PCS.`);
+        return;
+      }
+      if (String(it.average ?? '').trim() !== '' && !(Number(it.average) >= 0)) {
+        setError(`Item #${i + 1}: Average must be a number of zero or more.`);
+        return;
+      }
+      if (String(it.average ?? '').trim() !== '' && !it.averageUnit) {
+        setError(`Item #${i + 1}: Select MTR or PCS for the Average.`);
+        return;
+      }
     }
 
     // Meters and pieces are totalled separately; header totals exist only for a single-unit challan.
-    const lineUnit = (it: ChallanItemData) => (it.unit === 'PCS' ? 'PCS' : 'MTR');
+    const lineUnit = (it: ChallanItemData) => it.unit as 'MTR' | 'PCS';
     const itemTotals = totalsByUnit(items.map((it) => ({ quantity: parseFloat(String(it.measurement)), uom: lineUnit(it) })));
     const itemUnits = Object.keys(itemTotals);
     const singleUnit = itemUnits.length === 1 ? itemUnits[0] : null;
@@ -247,24 +259,17 @@ function IssueChallanContent() {
         fabricOut: singleUnit ? tracking.fabricOut : undefined,
         fabricUnit: singleUnit || undefined,
         detectedFromDepartment: 'PROGRAMMING',
-        remarks: [
-          remarks,
-          designNumber ? `Design: ${designNumber}` : null,
-          serialNumber ? `Serial: ${serialNumber}` : null,
-          inchargeName ? `Incharge: ${inchargeName}` : null,
-          deliveryDate ? `Delivery Date: ${deliveryDate}` : null,
-          singleUnit
-            ? `Accounting: In: ${tracking.fabricIn} ${tracking.fabricUnit} | Defective Cut: ${tracking.defectivePieces} ${tracking.fabricUnit} | Leftover Out to Store: ${tracking.fabricOut} ${tracking.fabricUnit}`
-            : `Accounting: Out to Store: ${formatTotals(itemTotals)}`,
-        ]
-          .filter(Boolean)
-          .join(' | '),
+        // Only what the user typed; design, serial, dates and quantities are saved in their own fields.
+        remarks: remarks.trim() || undefined,
+        inchargeName: inchargeName.trim() || undefined,
         items: items.map((it) => ({
           itemDescription: `${it.fabric} (${it.color})`,
           quantity: parseFloat(String(it.measurement)),
           uom: lineUnit(it),
           colour: it.color,
           fabricCode: it.fabric,
+          average: String(it.average ?? '').trim() === '' ? null : Number(it.average),
+          averageUnit: String(it.average ?? '').trim() === '' ? null : it.averageUnit || null,
           remarks: it.remarks || null,
         })),
       };
@@ -455,70 +460,43 @@ function IssueChallanContent() {
                     const found = programs.find((p) => p.id === e.target.value);
                     if (found) handleSelectProgram(found);
                   }}
-                  className="w-full px-3 py-2.5 border border-neutral-300 rounded-lg text-xs text-neutral-900 font-medium focus:outline-none focus:ring-1 focus:ring-brand-500/40 bg-white"
+                  className="w-full px-3.5 py-2.5 border border-neutral-300 rounded-lg text-sm text-neutral-900 font-medium focus:outline-none focus:ring-2 focus:ring-brand-500/30 bg-white cursor-pointer"
                 >
-                  <option value="">-- Choose a Production Sheet --</option>
+                  <option value="">Choose a production sheet</option>
                   {programs.map((p) => (
                     <option key={p.id} value={p.id}>
-                      Sheet #{p.programSerialNo || p.programNumber} · {p.clientName || p.buyerName} · {p.mainStyle || p.styleCode} ({p.status})
+                      {[
+                        p.designNumber || p.mainStyle || p.styleCode,
+                        `Serial ${p.programSerialNo || p.programNumber}`,
+                        p.clientName || p.buyerName,
+                      ]
+                        .filter(Boolean)
+                        .join('   ·   ')}
                     </option>
                   ))}
                 </select>
               </div>
 
               {selectedProgram && (
-                <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-lg text-xs space-y-2 mt-2">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono font-bold text-neutral-900 text-sm">
-                      Sheet #{selectedProgram.programSerialNo || selectedProgram.programNumber}
-                    </span>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-brand-100 text-brand-900">
-                      {selectedProgram.status}
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-neutral-600">
-                    <div>
-                      <span className="text-neutral-500 block text-[10px]">Client</span>
-                      <span className="font-semibold text-neutral-900">{selectedProgram.clientName || selectedProgram.buyerName}</span>
+                <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 rounded-xl ring-1 ring-neutral-200 bg-white overflow-hidden divide-y sm:divide-y-0 sm:divide-x divide-neutral-200">
+                  {[
+                    { label: 'Production Design Number', value: selectedProgram.designNumber || selectedProgram.mainStyle || selectedProgram.styleCode },
+                    { label: 'Production Serial Number', value: selectedProgram.programSerialNo || selectedProgram.programNumber },
+                    { label: 'Client Name', value: selectedProgram.clientName || selectedProgram.buyerName },
+                  ].map((field) => (
+                    <div key={field.label} className="px-4 py-3 min-w-0">
+                      <span className="block text-[11px] font-medium text-neutral-500">{field.label}</span>
+                      <span className="block mt-0.5 text-sm font-semibold text-neutral-900 truncate">{field.value || '—'}</span>
                     </div>
-                    <div>
-                      <span className="text-neutral-500 block text-[10px]">Style &amp; Design</span>
-                      <span className="font-semibold text-neutral-900">{selectedProgram.mainStyle || selectedProgram.styleCode}</span>
-                    </div>
-                    <div>
-                      <span className="text-neutral-500 block text-[10px]">Fabric Name</span>
-                      <span className="font-semibold text-neutral-900">{selectedProgram.fabricName || 'Cotton'}</span>
-                    </div>
-                    <div className="min-w-0 sm:col-span-2">
-                      <span className="text-neutral-500 block text-[10px]">Wilcom Designs</span>
-                      {wilcomDesignEntries.length > 0 ? (
-                        <div className="mt-1 flex flex-wrap gap-1.5">
-                          {wilcomDesignEntries.map((entry, index) => (
-                            <span
-                              key={`${entry.wilcomDesignNumber}-${index}`}
-                              className="inline-flex min-w-0 max-w-full items-center gap-1 rounded bg-brand-50 px-1.5 py-0.5 font-mono text-[10px] font-bold text-brand-900"
-                            >
-                              <span className="shrink-0 font-sans font-semibold text-brand-700">
-                                {entry.styleName || entry.category || `Design ${index + 1}`}
-                              </span>
-                              <span className="break-all">{entry.wilcomDesignNumber}</span>
-                            </span>
-                          ))}
-                        </div>
-                      ) : (
-                        <span className="font-mono font-bold text-brand-900">WLC-N/A</span>
-                      )}
-                    </div>
-                  </div>
+                  ))}
                 </div>
               )}
             </div>
 
-            {/* STEP 2: CHALLAN METADATA & ROUTING */}
+            {/* STEP 2: CHALLAN */}
             <div className="bg-white border border-neutral-200/90 rounded-xl p-6 shadow-xs space-y-4">
               <div className="pb-3 border-b border-neutral-100">
-                <h2 className="text-sm font-bold text-neutral-900">Challan Metadata &amp; Routing</h2>
-                <p className="text-[11px] text-neutral-500">Fixed department routing and dispatch details</p>
+                <h2 className="text-sm font-bold text-neutral-900">Challan</h2>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
@@ -588,10 +566,10 @@ function IssueChallanContent() {
                   </select>
                 </div>
 
-                {/* Design Number */}
+                {/* Production Design Number */}
                 <div>
                   <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-1">
-                    Design Number
+                    Production Design Number
                   </label>
                   <input
                     type="text"
@@ -602,10 +580,10 @@ function IssueChallanContent() {
                   />
                 </div>
 
-                {/* Serial Number */}
+                {/* Production Serial Number */}
                 <div>
                   <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-1">
-                    Serial Number
+                    Production Serial Number
                   </label>
                   <input
                     type="text"
@@ -674,13 +652,7 @@ function IssueChallanContent() {
             </div>
 
             {/* AUDIT & SUBMIT BUTTON */}
-            <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex items-center gap-2 text-xs text-neutral-600">
-                <ShieldCheck className="w-4 h-4 text-accent-800 shrink-0" />
-                <span>
-                  Challan barcode and immutable transaction record will be created in the database.
-                </span>
-              </div>
+            <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-xl flex flex-col sm:flex-row sm:items-center sm:justify-end gap-4">
 
               <div className="flex items-center gap-3">
                 <Link

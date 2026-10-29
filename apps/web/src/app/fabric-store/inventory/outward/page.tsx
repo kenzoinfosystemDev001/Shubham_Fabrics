@@ -36,6 +36,8 @@ interface OutwardItem {
   destination: string;
   sourceDepartment?: string;
   issuedBy?: string | null;
+  /** The incharge name typed on the form; null on entries saved before it was recorded. */
+  inchargeName?: string | null;
   fabricType: 'UNDYED' | 'DYED' | 'KORA' | string;
   status: string;
   verifiedInwardDetails?: string;
@@ -71,10 +73,11 @@ export default function OutwardStockPage() {
     itemName: '',
     colour: '',
     issueQty: '',
-    unit: 'MTR',
+    unit: '',
     avgPerPcs: '',
     issuePcsQty: '',
     byOrderName: '',
+    inchargeName: '',
     destination: 'OTHER',
     fabricType: 'DYED',
     remarks: '',
@@ -118,6 +121,9 @@ export default function OutwardStockPage() {
       if (!formData.itemName || !formData.issueQty) {
         throw new Error('Item Name and Issue Qty are required.');
       }
+      if (!formData.unit) {
+        throw new Error('Select MTR or PCS for the Issue Qty.');
+      }
 
       const res = await fetch('/api/fabric-store/outward', {
         method: 'POST',
@@ -139,10 +145,11 @@ export default function OutwardStockPage() {
         itemName: '',
         colour: '',
         issueQty: '',
-        unit: 'MTR',
+        unit: '',
         avgPerPcs: '',
         issuePcsQty: '',
         byOrderName: '',
+        inchargeName: '',
         destination: 'OTHER',
         fabricType: 'DYED',
         remarks: '',
@@ -414,7 +421,7 @@ export default function OutwardStockPage() {
                     ISSUE PCS QTY
                   </th>
                   <th className="border-r-[1.5px] border-neutral-200 px-3 py-2 font-black w-36">
-                    ORDER / ISSUED BY
+                    ORDER BY
                   </th>
                   <th className="border-r-[1.5px] border-neutral-200 px-3 py-2 font-black w-56 bg-accent-50/50">
                     VERIFIED INWARD DETAILS
@@ -493,10 +500,17 @@ export default function OutwardStockPage() {
                           {item.issuePcsQty ? <span className="text-[10px] font-bold text-neutral-500 ml-0.5">PCS</span> : null}
                         </td>
                         <td className="border-r-[1.5px] border-neutral-200 px-3 py-2 font-semibold text-neutral-900">
-                          <div className="truncate max-w-[140px]" title={item.byOrderName}>
-                            {item.byOrderName}
-                          </div>
-                          {item.issuedBy && <span className="block text-[10px] font-normal text-neutral-500">Issued by {item.issuedBy}</span>}
+                          {(() => {
+                            // New entries show the incharge name typed on the form; earlier entries keep
+                            // showing their By Order name as before (the account name only if neither exists).
+                            const orderBy = item.byOrderName && item.byOrderName !== '—' ? item.byOrderName : '';
+                            const shown = item.inchargeName || orderBy || item.issuedBy || '—';
+                            return (
+                              <div className="truncate max-w-[140px]" title={shown}>
+                                {shown}
+                              </div>
+                            );
+                          })()}
                         </td>
                         <td className="border-r-[1.5px] border-neutral-200 px-3 py-2 text-neutral-900 text-xs bg-accent-50/30">
                           <div className="flex items-center gap-1.5 font-semibold text-accent-800">
@@ -570,7 +584,7 @@ export default function OutwardStockPage() {
                     type="text"
                     value={formData.challanNumber}
                     onChange={(e) => setFormData((prev) => ({ ...prev, challanNumber: e.target.value }))}
-                    placeholder="e.g. CH-STR-2026-0001"
+                    placeholder=""
                     className="w-full h-10 px-3 border-[1.5px] border-neutral-200 rounded-lg text-xs font-bold text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white"
                   />
                 </div>
@@ -636,9 +650,11 @@ export default function OutwardStockPage() {
                     />
                     <select
                       value={formData.unit}
+                      required
                       onChange={(e) => setFormData((prev) => ({ ...prev, unit: e.target.value }))}
-                      className="h-10 px-2.5 border-[1.5px] border-neutral-200 rounded-lg text-xs font-bold text-neutral-900 bg-white focus:outline-none"
+                      className={`h-10 px-2.5 border-[1.5px] rounded-lg text-xs font-bold bg-white focus:outline-none ${formData.unit ? 'border-neutral-200 text-neutral-900' : 'border-danger-300 text-danger-600'}`}
                     >
+                      <option value="" disabled>Select unit</option>
                       <option value="MTR">MTR</option>
                       <option value="PCS">PCS</option>
                     </select>
@@ -686,6 +702,20 @@ export default function OutwardStockPage() {
                     className="w-full h-10 px-3 border border-neutral-300 rounded-lg text-xs font-bold text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white"
                   />
                 </div>
+              </div>
+
+              {/* Department Incharge Name */}
+              <div>
+                <label className="block text-xs font-black uppercase text-neutral-700 mb-1">
+                  DEPARTMENT INCHARGE NAME
+                </label>
+                <input
+                  type="text"
+                  value={formData.inchargeName}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, inchargeName: e.target.value }))}
+                  maxLength={100}
+                  className="w-full h-10 px-3 border border-neutral-300 rounded-lg text-xs font-bold text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500 bg-white"
+                />
               </div>
 
               {/* Destination & Fabric Type */}

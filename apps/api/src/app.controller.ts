@@ -7,7 +7,7 @@ export class AppController {
   getRoot() {
     return {
       status: 'ok',
-      service: 'Subham Fabrics MES API Gateway',
+      service: 'Shubham Fabrics MES API Gateway',
       timestamp: new Date().toISOString(),
     };
   }

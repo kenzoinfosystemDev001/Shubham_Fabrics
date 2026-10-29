@@ -1,6 +1,5 @@
 // Fabric Store stock rules: stock buckets per fabric, type, colour and unit, issue resolution,
-// and ledger reconciliation. Pure, no database or framework imports, so
-// scripts/test-production-fixes.mjs can run them with node:test.
+// and ledger reconciliation. Pure, no database or framework imports.
 //
 // Meters (MTR) and pieces (PCS) are separate stock. Nothing here converts or adds one to the other.
 

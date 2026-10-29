@@ -49436,6 +49436,7 @@ export namespace Prisma {
     receivedById: string | null
     approvedById: string | null
     remarks: string | null
+    inchargeName: string | null
     createdAt: Date | null
     updatedAt: Date | null
     fabricIn: number | null
@@ -49467,6 +49468,7 @@ export namespace Prisma {
     receivedById: string | null
     approvedById: string | null
     remarks: string | null
+    inchargeName: string | null
     createdAt: Date | null
     updatedAt: Date | null
     fabricIn: number | null
@@ -49498,6 +49500,7 @@ export namespace Prisma {
     receivedById: number
     approvedById: number
     remarks: number
+    inchargeName: number
     createdAt: number
     updatedAt: number
     fabricIn: number
@@ -49543,6 +49546,7 @@ export namespace Prisma {
     receivedById?: true
     approvedById?: true
     remarks?: true
+    inchargeName?: true
     createdAt?: true
     updatedAt?: true
     fabricIn?: true
@@ -49574,6 +49578,7 @@ export namespace Prisma {
     receivedById?: true
     approvedById?: true
     remarks?: true
+    inchargeName?: true
     createdAt?: true
     updatedAt?: true
     fabricIn?: true
@@ -49605,6 +49610,7 @@ export namespace Prisma {
     receivedById?: true
     approvedById?: true
     remarks?: true
+    inchargeName?: true
     createdAt?: true
     updatedAt?: true
     fabricIn?: true
@@ -49723,6 +49729,7 @@ export namespace Prisma {
     receivedById: string | null
     approvedById: string | null
     remarks: string | null
+    inchargeName: string | null
     createdAt: Date
     updatedAt: Date
     fabricIn: number | null
@@ -49773,6 +49780,7 @@ export namespace Prisma {
     receivedById?: boolean
     approvedById?: boolean
     remarks?: boolean
+    inchargeName?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     fabricIn?: boolean
@@ -49826,6 +49834,7 @@ export namespace Prisma {
     receivedById?: boolean
     approvedById?: boolean
     remarks?: boolean
+    inchargeName?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     fabricIn?: boolean
@@ -49865,6 +49874,7 @@ export namespace Prisma {
     receivedById?: boolean
     approvedById?: boolean
     remarks?: boolean
+    inchargeName?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     fabricIn?: boolean
@@ -49904,6 +49914,7 @@ export namespace Prisma {
     receivedById?: boolean
     approvedById?: boolean
     remarks?: boolean
+    inchargeName?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     fabricIn?: boolean
@@ -49917,7 +49928,7 @@ export namespace Prisma {
     detectedFromDepartment?: boolean
   }
 
-  export type ChallanOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "challanNumber" | "challanType" | "programId" | "parentChallanId" | "fromDepartment" | "toDepartment" | "status" | "priority" | "issuedDate" | "receivedDate" | "completedDate" | "createdById" | "issuedById" | "receivedById" | "approvedById" | "remarks" | "createdAt" | "updatedAt" | "fabricIn" | "fabricOut" | "fabricUnit" | "defectivePieces" | "defectiveUnit" | "defectiveShelfLocation" | "defectReason" | "detectedFromChallanId" | "detectedFromDepartment", ExtArgs["result"]["challan"]>
+  export type ChallanOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "challanNumber" | "challanType" | "programId" | "parentChallanId" | "fromDepartment" | "toDepartment" | "status" | "priority" | "issuedDate" | "receivedDate" | "completedDate" | "createdById" | "issuedById" | "receivedById" | "approvedById" | "remarks" | "inchargeName" | "createdAt" | "updatedAt" | "fabricIn" | "fabricOut" | "fabricUnit" | "defectivePieces" | "defectiveUnit" | "defectiveShelfLocation" | "defectReason" | "detectedFromChallanId" | "detectedFromDepartment", ExtArgs["result"]["challan"]>
   export type ChallanInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     program?: boolean | ProgramDefaultArgs<ExtArgs>
     parentChallan?: boolean | Challan$parentChallanArgs<ExtArgs>
@@ -50006,6 +50017,7 @@ export namespace Prisma {
       receivedById: string | null
       approvedById: string | null
       remarks: string | null
+      inchargeName: string | null
       createdAt: Date
       updatedAt: Date
       fabricIn: number | null
@@ -50478,6 +50490,7 @@ export namespace Prisma {
     readonly receivedById: FieldRef<"Challan", 'String'>
     readonly approvedById: FieldRef<"Challan", 'String'>
     readonly remarks: FieldRef<"Challan", 'String'>
+    readonly inchargeName: FieldRef<"Challan", 'String'>
     readonly createdAt: FieldRef<"Challan", 'DateTime'>
     readonly updatedAt: FieldRef<"Challan", 'DateTime'>
     readonly fabricIn: FieldRef<"Challan", 'Float'>
@@ -51308,6 +51321,7 @@ export namespace Prisma {
     quantity: number | null
     grossWeightKg: number | null
     netWeightKg: number | null
+    average: number | null
   }
 
   export type ChallanItemSumAggregateOutputType = {
@@ -51315,6 +51329,7 @@ export namespace Prisma {
     quantity: number | null
     grossWeightKg: number | null
     netWeightKg: number | null
+    average: number | null
   }
 
   export type ChallanItemMinAggregateOutputType = {
@@ -51339,6 +51354,8 @@ export namespace Prisma {
     grossWeightKg: number | null
     netWeightKg: number | null
     uom: string | null
+    average: number | null
+    averageUnit: string | null
     remarks: string | null
     sourceLotId: string | null
     sourceRollId: string | null
@@ -51368,6 +51385,8 @@ export namespace Prisma {
     grossWeightKg: number | null
     netWeightKg: number | null
     uom: string | null
+    average: number | null
+    averageUnit: string | null
     remarks: string | null
     sourceLotId: string | null
     sourceRollId: string | null
@@ -51397,6 +51416,8 @@ export namespace Prisma {
     grossWeightKg: number
     netWeightKg: number
     uom: number
+    average: number
+    averageUnit: number
     remarks: number
     sourceLotId: number
     sourceRollId: number
@@ -51411,6 +51432,7 @@ export namespace Prisma {
     quantity?: true
     grossWeightKg?: true
     netWeightKg?: true
+    average?: true
   }
 
   export type ChallanItemSumAggregateInputType = {
@@ -51418,6 +51440,7 @@ export namespace Prisma {
     quantity?: true
     grossWeightKg?: true
     netWeightKg?: true
+    average?: true
   }
 
   export type ChallanItemMinAggregateInputType = {
@@ -51442,6 +51465,8 @@ export namespace Prisma {
     grossWeightKg?: true
     netWeightKg?: true
     uom?: true
+    average?: true
+    averageUnit?: true
     remarks?: true
     sourceLotId?: true
     sourceRollId?: true
@@ -51471,6 +51496,8 @@ export namespace Prisma {
     grossWeightKg?: true
     netWeightKg?: true
     uom?: true
+    average?: true
+    averageUnit?: true
     remarks?: true
     sourceLotId?: true
     sourceRollId?: true
@@ -51500,6 +51527,8 @@ export namespace Prisma {
     grossWeightKg?: true
     netWeightKg?: true
     uom?: true
+    average?: true
+    averageUnit?: true
     remarks?: true
     sourceLotId?: true
     sourceRollId?: true
@@ -51616,6 +51645,8 @@ export namespace Prisma {
     grossWeightKg: number | null
     netWeightKg: number | null
     uom: string
+    average: number | null
+    averageUnit: string | null
     remarks: string | null
     sourceLotId: string | null
     sourceRollId: string | null
@@ -51664,6 +51695,8 @@ export namespace Prisma {
     grossWeightKg?: boolean
     netWeightKg?: boolean
     uom?: boolean
+    average?: boolean
+    averageUnit?: boolean
     remarks?: boolean
     sourceLotId?: boolean
     sourceRollId?: boolean
@@ -51694,6 +51727,8 @@ export namespace Prisma {
     grossWeightKg?: boolean
     netWeightKg?: boolean
     uom?: boolean
+    average?: boolean
+    averageUnit?: boolean
     remarks?: boolean
     sourceLotId?: boolean
     sourceRollId?: boolean
@@ -51724,6 +51759,8 @@ export namespace Prisma {
     grossWeightKg?: boolean
     netWeightKg?: boolean
     uom?: boolean
+    average?: boolean
+    averageUnit?: boolean
     remarks?: boolean
     sourceLotId?: boolean
     sourceRollId?: boolean
@@ -51754,6 +51791,8 @@ export namespace Prisma {
     grossWeightKg?: boolean
     netWeightKg?: boolean
     uom?: boolean
+    average?: boolean
+    averageUnit?: boolean
     remarks?: boolean
     sourceLotId?: boolean
     sourceRollId?: boolean
@@ -51761,7 +51800,7 @@ export namespace Prisma {
     createdAt?: boolean
   }
 
-  export type ChallanItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "challanId" | "itemDescription" | "fabricCode" | "colour" | "shade" | "requiredColour" | "requiredQuantity" | "fabricProcessingStatus" | "garmentCategory" | "styleRef" | "size" | "unitType" | "rollNumber" | "lotNumber" | "bundleNumber" | "barcode" | "quantity" | "grossWeightKg" | "netWeightKg" | "uom" | "remarks" | "sourceLotId" | "sourceRollId" | "sourceBundleId" | "createdAt", ExtArgs["result"]["challanItem"]>
+  export type ChallanItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "challanId" | "itemDescription" | "fabricCode" | "colour" | "shade" | "requiredColour" | "requiredQuantity" | "fabricProcessingStatus" | "garmentCategory" | "styleRef" | "size" | "unitType" | "rollNumber" | "lotNumber" | "bundleNumber" | "barcode" | "quantity" | "grossWeightKg" | "netWeightKg" | "uom" | "average" | "averageUnit" | "remarks" | "sourceLotId" | "sourceRollId" | "sourceBundleId" | "createdAt", ExtArgs["result"]["challanItem"]>
   export type ChallanItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     challan?: boolean | ChallanDefaultArgs<ExtArgs>
   }
@@ -51799,6 +51838,8 @@ export namespace Prisma {
       grossWeightKg: number | null
       netWeightKg: number | null
       uom: string
+      average: number | null
+      averageUnit: string | null
       remarks: string | null
       sourceLotId: string | null
       sourceRollId: string | null
@@ -52249,6 +52290,8 @@ export namespace Prisma {
     readonly grossWeightKg: FieldRef<"ChallanItem", 'Float'>
     readonly netWeightKg: FieldRef<"ChallanItem", 'Float'>
     readonly uom: FieldRef<"ChallanItem", 'String'>
+    readonly average: FieldRef<"ChallanItem", 'Float'>
+    readonly averageUnit: FieldRef<"ChallanItem", 'String'>
     readonly remarks: FieldRef<"ChallanItem", 'String'>
     readonly sourceLotId: FieldRef<"ChallanItem", 'String'>
     readonly sourceRollId: FieldRef<"ChallanItem", 'String'>
@@ -94350,6 +94393,7 @@ export namespace Prisma {
     issuePcsQty: number | null
     byOrderName: string | null
     remarks: string | null
+    inchargeName: string | null
     destination: string | null
     fabricType: string | null
     createdAt: Date | null
@@ -94371,6 +94415,7 @@ export namespace Prisma {
     issuePcsQty: number | null
     byOrderName: string | null
     remarks: string | null
+    inchargeName: string | null
     destination: string | null
     fabricType: string | null
     createdAt: Date | null
@@ -94392,6 +94437,7 @@ export namespace Prisma {
     issuePcsQty: number
     byOrderName: number
     remarks: number
+    inchargeName: number
     destination: number
     fabricType: number
     createdAt: number
@@ -94429,6 +94475,7 @@ export namespace Prisma {
     issuePcsQty?: true
     byOrderName?: true
     remarks?: true
+    inchargeName?: true
     destination?: true
     fabricType?: true
     createdAt?: true
@@ -94450,6 +94497,7 @@ export namespace Prisma {
     issuePcsQty?: true
     byOrderName?: true
     remarks?: true
+    inchargeName?: true
     destination?: true
     fabricType?: true
     createdAt?: true
@@ -94471,6 +94519,7 @@ export namespace Prisma {
     issuePcsQty?: true
     byOrderName?: true
     remarks?: true
+    inchargeName?: true
     destination?: true
     fabricType?: true
     createdAt?: true
@@ -94579,6 +94628,7 @@ export namespace Prisma {
     issuePcsQty: number | null
     byOrderName: string | null
     remarks: string | null
+    inchargeName: string | null
     destination: string | null
     fabricType: string | null
     createdAt: Date
@@ -94619,6 +94669,7 @@ export namespace Prisma {
     issuePcsQty?: boolean
     byOrderName?: boolean
     remarks?: boolean
+    inchargeName?: boolean
     destination?: boolean
     fabricType?: boolean
     createdAt?: boolean
@@ -94640,6 +94691,7 @@ export namespace Prisma {
     issuePcsQty?: boolean
     byOrderName?: boolean
     remarks?: boolean
+    inchargeName?: boolean
     destination?: boolean
     fabricType?: boolean
     createdAt?: boolean
@@ -94661,6 +94713,7 @@ export namespace Prisma {
     issuePcsQty?: boolean
     byOrderName?: boolean
     remarks?: boolean
+    inchargeName?: boolean
     destination?: boolean
     fabricType?: boolean
     createdAt?: boolean
@@ -94682,13 +94735,14 @@ export namespace Prisma {
     issuePcsQty?: boolean
     byOrderName?: boolean
     remarks?: boolean
+    inchargeName?: boolean
     destination?: boolean
     fabricType?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type FabricOutwardOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sNo" | "date" | "challanNumber" | "challanId" | "designNumber" | "itemName" | "issueQty" | "unit" | "colour" | "avgPerPcs" | "issuePcsQty" | "byOrderName" | "remarks" | "destination" | "fabricType" | "createdAt" | "updatedAt", ExtArgs["result"]["fabricOutward"]>
+  export type FabricOutwardOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "sNo" | "date" | "challanNumber" | "challanId" | "designNumber" | "itemName" | "issueQty" | "unit" | "colour" | "avgPerPcs" | "issuePcsQty" | "byOrderName" | "remarks" | "inchargeName" | "destination" | "fabricType" | "createdAt" | "updatedAt", ExtArgs["result"]["fabricOutward"]>
 
   export type $FabricOutwardPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "FabricOutward"
@@ -94708,6 +94762,7 @@ export namespace Prisma {
       issuePcsQty: number | null
       byOrderName: string | null
       remarks: string | null
+      inchargeName: string | null
       destination: string | null
       fabricType: string | null
       createdAt: Date
@@ -95149,6 +95204,7 @@ export namespace Prisma {
     readonly issuePcsQty: FieldRef<"FabricOutward", 'Float'>
     readonly byOrderName: FieldRef<"FabricOutward", 'String'>
     readonly remarks: FieldRef<"FabricOutward", 'String'>
+    readonly inchargeName: FieldRef<"FabricOutward", 'String'>
     readonly destination: FieldRef<"FabricOutward", 'String'>
     readonly fabricType: FieldRef<"FabricOutward", 'String'>
     readonly createdAt: FieldRef<"FabricOutward", 'DateTime'>
@@ -105860,6 +105916,7 @@ export namespace Prisma {
     receivedById: 'receivedById',
     approvedById: 'approvedById',
     remarks: 'remarks',
+    inchargeName: 'inchargeName',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
     fabricIn: 'fabricIn',
@@ -105898,6 +105955,8 @@ export namespace Prisma {
     grossWeightKg: 'grossWeightKg',
     netWeightKg: 'netWeightKg',
     uom: 'uom',
+    average: 'average',
+    averageUnit: 'averageUnit',
     remarks: 'remarks',
     sourceLotId: 'sourceLotId',
     sourceRollId: 'sourceRollId',
@@ -106600,6 +106659,7 @@ export namespace Prisma {
     issuePcsQty: 'issuePcsQty',
     byOrderName: 'byOrderName',
     remarks: 'remarks',
+    inchargeName: 'inchargeName',
     destination: 'destination',
     fabricType: 'fabricType',
     createdAt: 'createdAt',
@@ -110125,6 +110185,7 @@ export namespace Prisma {
     receivedById?: StringNullableFilter<"Challan"> | string | null
     approvedById?: StringNullableFilter<"Challan"> | string | null
     remarks?: StringNullableFilter<"Challan"> | string | null
+    inchargeName?: StringNullableFilter<"Challan"> | string | null
     createdAt?: DateTimeFilter<"Challan"> | Date | string
     updatedAt?: DateTimeFilter<"Challan"> | Date | string
     fabricIn?: FloatNullableFilter<"Challan"> | number | null
@@ -110177,6 +110238,7 @@ export namespace Prisma {
     receivedById?: SortOrderInput | SortOrder
     approvedById?: SortOrderInput | SortOrder
     remarks?: SortOrderInput | SortOrder
+    inchargeName?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     fabricIn?: SortOrderInput | SortOrder
@@ -110213,10 +110275,11 @@ export namespace Prisma {
 
   export type ChallanWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    challanNumber?: string
+    fromDepartment_challanNumber?: ChallanFromDepartmentChallanNumberCompoundUniqueInput
     AND?: ChallanWhereInput | ChallanWhereInput[]
     OR?: ChallanWhereInput[]
     NOT?: ChallanWhereInput | ChallanWhereInput[]
+    challanNumber?: StringFilter<"Challan"> | string
     challanType?: StringFilter<"Challan"> | string
     programId?: StringFilter<"Challan"> | string
     parentChallanId?: StringNullableFilter<"Challan"> | string | null
@@ -110232,6 +110295,7 @@ export namespace Prisma {
     receivedById?: StringNullableFilter<"Challan"> | string | null
     approvedById?: StringNullableFilter<"Challan"> | string | null
     remarks?: StringNullableFilter<"Challan"> | string | null
+    inchargeName?: StringNullableFilter<"Challan"> | string | null
     createdAt?: DateTimeFilter<"Challan"> | Date | string
     updatedAt?: DateTimeFilter<"Challan"> | Date | string
     fabricIn?: FloatNullableFilter<"Challan"> | number | null
@@ -110264,7 +110328,7 @@ export namespace Prisma {
     workItemsInbound?: DepartmentWorkItemListRelationFilter
     workTransfers?: DepartmentWorkTransferListRelationFilter
     deadlineAlerts?: DeadlineAlertListRelationFilter
-  }, "id" | "challanNumber">
+  }, "id" | "fromDepartment_challanNumber">
 
   export type ChallanOrderByWithAggregationInput = {
     id?: SortOrder
@@ -110284,6 +110348,7 @@ export namespace Prisma {
     receivedById?: SortOrderInput | SortOrder
     approvedById?: SortOrderInput | SortOrder
     remarks?: SortOrderInput | SortOrder
+    inchargeName?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     fabricIn?: SortOrderInput | SortOrder
@@ -110323,6 +110388,7 @@ export namespace Prisma {
     receivedById?: StringNullableWithAggregatesFilter<"Challan"> | string | null
     approvedById?: StringNullableWithAggregatesFilter<"Challan"> | string | null
     remarks?: StringNullableWithAggregatesFilter<"Challan"> | string | null
+    inchargeName?: StringNullableWithAggregatesFilter<"Challan"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Challan"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Challan"> | Date | string
     fabricIn?: FloatNullableWithAggregatesFilter<"Challan"> | number | null
@@ -110361,6 +110427,8 @@ export namespace Prisma {
     grossWeightKg?: FloatNullableFilter<"ChallanItem"> | number | null
     netWeightKg?: FloatNullableFilter<"ChallanItem"> | number | null
     uom?: StringFilter<"ChallanItem"> | string
+    average?: FloatNullableFilter<"ChallanItem"> | number | null
+    averageUnit?: StringNullableFilter<"ChallanItem"> | string | null
     remarks?: StringNullableFilter<"ChallanItem"> | string | null
     sourceLotId?: StringNullableFilter<"ChallanItem"> | string | null
     sourceRollId?: StringNullableFilter<"ChallanItem"> | string | null
@@ -110391,6 +110459,8 @@ export namespace Prisma {
     grossWeightKg?: SortOrderInput | SortOrder
     netWeightKg?: SortOrderInput | SortOrder
     uom?: SortOrder
+    average?: SortOrderInput | SortOrder
+    averageUnit?: SortOrderInput | SortOrder
     remarks?: SortOrderInput | SortOrder
     sourceLotId?: SortOrderInput | SortOrder
     sourceRollId?: SortOrderInput | SortOrder
@@ -110424,6 +110494,8 @@ export namespace Prisma {
     grossWeightKg?: FloatNullableFilter<"ChallanItem"> | number | null
     netWeightKg?: FloatNullableFilter<"ChallanItem"> | number | null
     uom?: StringFilter<"ChallanItem"> | string
+    average?: FloatNullableFilter<"ChallanItem"> | number | null
+    averageUnit?: StringNullableFilter<"ChallanItem"> | string | null
     remarks?: StringNullableFilter<"ChallanItem"> | string | null
     sourceLotId?: StringNullableFilter<"ChallanItem"> | string | null
     sourceRollId?: StringNullableFilter<"ChallanItem"> | string | null
@@ -110454,6 +110526,8 @@ export namespace Prisma {
     grossWeightKg?: SortOrderInput | SortOrder
     netWeightKg?: SortOrderInput | SortOrder
     uom?: SortOrder
+    average?: SortOrderInput | SortOrder
+    averageUnit?: SortOrderInput | SortOrder
     remarks?: SortOrderInput | SortOrder
     sourceLotId?: SortOrderInput | SortOrder
     sourceRollId?: SortOrderInput | SortOrder
@@ -110491,6 +110565,8 @@ export namespace Prisma {
     grossWeightKg?: FloatNullableWithAggregatesFilter<"ChallanItem"> | number | null
     netWeightKg?: FloatNullableWithAggregatesFilter<"ChallanItem"> | number | null
     uom?: StringWithAggregatesFilter<"ChallanItem"> | string
+    average?: FloatNullableWithAggregatesFilter<"ChallanItem"> | number | null
+    averageUnit?: StringNullableWithAggregatesFilter<"ChallanItem"> | string | null
     remarks?: StringNullableWithAggregatesFilter<"ChallanItem"> | string | null
     sourceLotId?: StringNullableWithAggregatesFilter<"ChallanItem"> | string | null
     sourceRollId?: StringNullableWithAggregatesFilter<"ChallanItem"> | string | null
@@ -114181,6 +114257,7 @@ export namespace Prisma {
     issuePcsQty?: FloatNullableFilter<"FabricOutward"> | number | null
     byOrderName?: StringNullableFilter<"FabricOutward"> | string | null
     remarks?: StringNullableFilter<"FabricOutward"> | string | null
+    inchargeName?: StringNullableFilter<"FabricOutward"> | string | null
     destination?: StringNullableFilter<"FabricOutward"> | string | null
     fabricType?: StringNullableFilter<"FabricOutward"> | string | null
     createdAt?: DateTimeFilter<"FabricOutward"> | Date | string
@@ -114202,6 +114279,7 @@ export namespace Prisma {
     issuePcsQty?: SortOrderInput | SortOrder
     byOrderName?: SortOrderInput | SortOrder
     remarks?: SortOrderInput | SortOrder
+    inchargeName?: SortOrderInput | SortOrder
     destination?: SortOrderInput | SortOrder
     fabricType?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -114226,6 +114304,7 @@ export namespace Prisma {
     issuePcsQty?: FloatNullableFilter<"FabricOutward"> | number | null
     byOrderName?: StringNullableFilter<"FabricOutward"> | string | null
     remarks?: StringNullableFilter<"FabricOutward"> | string | null
+    inchargeName?: StringNullableFilter<"FabricOutward"> | string | null
     destination?: StringNullableFilter<"FabricOutward"> | string | null
     fabricType?: StringNullableFilter<"FabricOutward"> | string | null
     createdAt?: DateTimeFilter<"FabricOutward"> | Date | string
@@ -114247,6 +114326,7 @@ export namespace Prisma {
     issuePcsQty?: SortOrderInput | SortOrder
     byOrderName?: SortOrderInput | SortOrder
     remarks?: SortOrderInput | SortOrder
+    inchargeName?: SortOrderInput | SortOrder
     destination?: SortOrderInput | SortOrder
     fabricType?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -114276,6 +114356,7 @@ export namespace Prisma {
     issuePcsQty?: FloatNullableWithAggregatesFilter<"FabricOutward"> | number | null
     byOrderName?: StringNullableWithAggregatesFilter<"FabricOutward"> | string | null
     remarks?: StringNullableWithAggregatesFilter<"FabricOutward"> | string | null
+    inchargeName?: StringNullableWithAggregatesFilter<"FabricOutward"> | string | null
     destination?: StringNullableWithAggregatesFilter<"FabricOutward"> | string | null
     fabricType?: StringNullableWithAggregatesFilter<"FabricOutward"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"FabricOutward"> | Date | string
@@ -118635,6 +118716,7 @@ export namespace Prisma {
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -118687,6 +118769,7 @@ export namespace Prisma {
     receivedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -118723,6 +118806,7 @@ export namespace Prisma {
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -118775,6 +118859,7 @@ export namespace Prisma {
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -118819,6 +118904,7 @@ export namespace Prisma {
     receivedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -118842,6 +118928,7 @@ export namespace Prisma {
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -118873,6 +118960,7 @@ export namespace Prisma {
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -118907,6 +118995,8 @@ export namespace Prisma {
     grossWeightKg?: number | null
     netWeightKg?: number | null
     uom: string
+    average?: number | null
+    averageUnit?: string | null
     remarks?: string | null
     sourceLotId?: string | null
     sourceRollId?: string | null
@@ -118937,6 +119027,8 @@ export namespace Prisma {
     grossWeightKg?: number | null
     netWeightKg?: number | null
     uom: string
+    average?: number | null
+    averageUnit?: string | null
     remarks?: string | null
     sourceLotId?: string | null
     sourceRollId?: string | null
@@ -118965,6 +119057,8 @@ export namespace Prisma {
     grossWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
     netWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
     uom?: StringFieldUpdateOperationsInput | string
+    average?: NullableFloatFieldUpdateOperationsInput | number | null
+    averageUnit?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
     sourceRollId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -118995,6 +119089,8 @@ export namespace Prisma {
     grossWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
     netWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
     uom?: StringFieldUpdateOperationsInput | string
+    average?: NullableFloatFieldUpdateOperationsInput | number | null
+    averageUnit?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
     sourceRollId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -119024,6 +119120,8 @@ export namespace Prisma {
     grossWeightKg?: number | null
     netWeightKg?: number | null
     uom: string
+    average?: number | null
+    averageUnit?: string | null
     remarks?: string | null
     sourceLotId?: string | null
     sourceRollId?: string | null
@@ -119052,6 +119150,8 @@ export namespace Prisma {
     grossWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
     netWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
     uom?: StringFieldUpdateOperationsInput | string
+    average?: NullableFloatFieldUpdateOperationsInput | number | null
+    averageUnit?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
     sourceRollId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -119081,6 +119181,8 @@ export namespace Prisma {
     grossWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
     netWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
     uom?: StringFieldUpdateOperationsInput | string
+    average?: NullableFloatFieldUpdateOperationsInput | number | null
+    averageUnit?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
     sourceRollId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -123192,6 +123294,7 @@ export namespace Prisma {
     issuePcsQty?: number | null
     byOrderName?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     destination?: string | null
     fabricType?: string | null
     createdAt?: Date | string
@@ -123213,6 +123316,7 @@ export namespace Prisma {
     issuePcsQty?: number | null
     byOrderName?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     destination?: string | null
     fabricType?: string | null
     createdAt?: Date | string
@@ -123234,6 +123338,7 @@ export namespace Prisma {
     issuePcsQty?: NullableFloatFieldUpdateOperationsInput | number | null
     byOrderName?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     destination?: NullableStringFieldUpdateOperationsInput | string | null
     fabricType?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -123255,6 +123360,7 @@ export namespace Prisma {
     issuePcsQty?: NullableFloatFieldUpdateOperationsInput | number | null
     byOrderName?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     destination?: NullableStringFieldUpdateOperationsInput | string | null
     fabricType?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -123276,6 +123382,7 @@ export namespace Prisma {
     issuePcsQty?: number | null
     byOrderName?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     destination?: string | null
     fabricType?: string | null
     createdAt?: Date | string
@@ -123297,6 +123404,7 @@ export namespace Prisma {
     issuePcsQty?: NullableFloatFieldUpdateOperationsInput | number | null
     byOrderName?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     destination?: NullableStringFieldUpdateOperationsInput | string | null
     fabricType?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -123318,6 +123426,7 @@ export namespace Prisma {
     issuePcsQty?: NullableFloatFieldUpdateOperationsInput | number | null
     byOrderName?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     destination?: NullableStringFieldUpdateOperationsInput | string | null
     fabricType?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -126792,6 +126901,11 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type ChallanFromDepartmentChallanNumberCompoundUniqueInput = {
+    fromDepartment: string
+    challanNumber: string
+  }
+
   export type ChallanCountOrderByAggregateInput = {
     id?: SortOrder
     challanNumber?: SortOrder
@@ -126810,6 +126924,7 @@ export namespace Prisma {
     receivedById?: SortOrder
     approvedById?: SortOrder
     remarks?: SortOrder
+    inchargeName?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     fabricIn?: SortOrder
@@ -126847,6 +126962,7 @@ export namespace Prisma {
     receivedById?: SortOrder
     approvedById?: SortOrder
     remarks?: SortOrder
+    inchargeName?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     fabricIn?: SortOrder
@@ -126878,6 +126994,7 @@ export namespace Prisma {
     receivedById?: SortOrder
     approvedById?: SortOrder
     remarks?: SortOrder
+    inchargeName?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     fabricIn?: SortOrder
@@ -126924,6 +127041,8 @@ export namespace Prisma {
     grossWeightKg?: SortOrder
     netWeightKg?: SortOrder
     uom?: SortOrder
+    average?: SortOrder
+    averageUnit?: SortOrder
     remarks?: SortOrder
     sourceLotId?: SortOrder
     sourceRollId?: SortOrder
@@ -126936,6 +127055,7 @@ export namespace Prisma {
     quantity?: SortOrder
     grossWeightKg?: SortOrder
     netWeightKg?: SortOrder
+    average?: SortOrder
   }
 
   export type ChallanItemMaxOrderByAggregateInput = {
@@ -126960,6 +127080,8 @@ export namespace Prisma {
     grossWeightKg?: SortOrder
     netWeightKg?: SortOrder
     uom?: SortOrder
+    average?: SortOrder
+    averageUnit?: SortOrder
     remarks?: SortOrder
     sourceLotId?: SortOrder
     sourceRollId?: SortOrder
@@ -126989,6 +127111,8 @@ export namespace Prisma {
     grossWeightKg?: SortOrder
     netWeightKg?: SortOrder
     uom?: SortOrder
+    average?: SortOrder
+    averageUnit?: SortOrder
     remarks?: SortOrder
     sourceLotId?: SortOrder
     sourceRollId?: SortOrder
@@ -127001,6 +127125,7 @@ export namespace Prisma {
     quantity?: SortOrder
     grossWeightKg?: SortOrder
     netWeightKg?: SortOrder
+    average?: SortOrder
   }
 
   export type ProductionTransactionCountOrderByAggregateInput = {
@@ -129456,6 +129581,7 @@ export namespace Prisma {
     issuePcsQty?: SortOrder
     byOrderName?: SortOrder
     remarks?: SortOrder
+    inchargeName?: SortOrder
     destination?: SortOrder
     fabricType?: SortOrder
     createdAt?: SortOrder
@@ -129484,6 +129610,7 @@ export namespace Prisma {
     issuePcsQty?: SortOrder
     byOrderName?: SortOrder
     remarks?: SortOrder
+    inchargeName?: SortOrder
     destination?: SortOrder
     fabricType?: SortOrder
     createdAt?: SortOrder
@@ -129505,6 +129632,7 @@ export namespace Prisma {
     issuePcsQty?: SortOrder
     byOrderName?: SortOrder
     remarks?: SortOrder
+    inchargeName?: SortOrder
     destination?: SortOrder
     fabricType?: SortOrder
     createdAt?: SortOrder
@@ -138600,6 +138728,7 @@ export namespace Prisma {
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -138650,6 +138779,7 @@ export namespace Prisma {
     receivedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -138696,6 +138826,7 @@ export namespace Prisma {
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -138746,6 +138877,7 @@ export namespace Prisma {
     receivedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -138792,6 +138924,7 @@ export namespace Prisma {
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -138842,6 +138975,7 @@ export namespace Prisma {
     issuedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -138888,6 +139022,7 @@ export namespace Prisma {
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -138938,6 +139073,7 @@ export namespace Prisma {
     issuedById?: string | null
     receivedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -140758,6 +140894,7 @@ export namespace Prisma {
     receivedById?: StringNullableFilter<"Challan"> | string | null
     approvedById?: StringNullableFilter<"Challan"> | string | null
     remarks?: StringNullableFilter<"Challan"> | string | null
+    inchargeName?: StringNullableFilter<"Challan"> | string | null
     createdAt?: DateTimeFilter<"Challan"> | Date | string
     updatedAt?: DateTimeFilter<"Challan"> | Date | string
     fabricIn?: FloatNullableFilter<"Challan"> | number | null
@@ -142482,6 +142619,7 @@ export namespace Prisma {
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -142532,6 +142670,7 @@ export namespace Prisma {
     receivedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -142578,6 +142717,7 @@ export namespace Prisma {
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -142628,6 +142768,7 @@ export namespace Prisma {
     receivedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -145307,6 +145448,7 @@ export namespace Prisma {
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -145357,6 +145499,7 @@ export namespace Prisma {
     receivedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -150733,6 +150876,7 @@ export namespace Prisma {
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -150784,6 +150928,7 @@ export namespace Prisma {
     receivedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -150824,6 +150969,7 @@ export namespace Prisma {
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -150874,6 +151020,7 @@ export namespace Prisma {
     receivedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -151425,6 +151572,8 @@ export namespace Prisma {
     grossWeightKg?: number | null
     netWeightKg?: number | null
     uom: string
+    average?: number | null
+    averageUnit?: string | null
     remarks?: string | null
     sourceLotId?: string | null
     sourceRollId?: string | null
@@ -151453,6 +151602,8 @@ export namespace Prisma {
     grossWeightKg?: number | null
     netWeightKg?: number | null
     uom: string
+    average?: number | null
+    averageUnit?: string | null
     remarks?: string | null
     sourceLotId?: string | null
     sourceRollId?: string | null
@@ -152318,6 +152469,7 @@ export namespace Prisma {
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -152369,6 +152521,7 @@ export namespace Prisma {
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -152981,6 +153134,8 @@ export namespace Prisma {
     grossWeightKg?: FloatNullableFilter<"ChallanItem"> | number | null
     netWeightKg?: FloatNullableFilter<"ChallanItem"> | number | null
     uom?: StringFilter<"ChallanItem"> | string
+    average?: FloatNullableFilter<"ChallanItem"> | number | null
+    averageUnit?: StringNullableFilter<"ChallanItem"> | string | null
     remarks?: StringNullableFilter<"ChallanItem"> | string | null
     sourceLotId?: StringNullableFilter<"ChallanItem"> | string | null
     sourceRollId?: StringNullableFilter<"ChallanItem"> | string | null
@@ -153174,6 +153329,7 @@ export namespace Prisma {
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -153225,6 +153381,7 @@ export namespace Prisma {
     receivedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -153276,6 +153433,7 @@ export namespace Prisma {
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -153327,6 +153485,7 @@ export namespace Prisma {
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -153525,6 +153684,7 @@ export namespace Prisma {
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -153576,6 +153736,7 @@ export namespace Prisma {
     receivedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -153901,6 +154062,7 @@ export namespace Prisma {
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -153952,6 +154114,7 @@ export namespace Prisma {
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -154098,6 +154261,7 @@ export namespace Prisma {
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -154149,6 +154313,7 @@ export namespace Prisma {
     receivedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -154365,6 +154530,7 @@ export namespace Prisma {
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -154416,6 +154582,7 @@ export namespace Prisma {
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -154690,6 +154857,7 @@ export namespace Prisma {
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -154741,6 +154909,7 @@ export namespace Prisma {
     receivedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -154897,6 +155066,7 @@ export namespace Prisma {
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -154948,6 +155118,7 @@ export namespace Prisma {
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -156305,6 +156476,7 @@ export namespace Prisma {
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -156356,6 +156528,7 @@ export namespace Prisma {
     receivedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -156789,6 +156962,7 @@ export namespace Prisma {
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -156840,6 +157014,7 @@ export namespace Prisma {
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -158546,6 +158721,7 @@ export namespace Prisma {
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -158597,6 +158773,7 @@ export namespace Prisma {
     receivedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -159065,6 +159242,7 @@ export namespace Prisma {
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -159116,6 +159294,7 @@ export namespace Prisma {
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -164529,6 +164708,7 @@ export namespace Prisma {
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -164580,6 +164760,7 @@ export namespace Prisma {
     receivedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -164967,6 +165148,7 @@ export namespace Prisma {
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -165018,6 +165200,7 @@ export namespace Prisma {
     receivedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -165238,6 +165421,7 @@ export namespace Prisma {
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -165289,6 +165473,7 @@ export namespace Prisma {
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -165684,6 +165869,7 @@ export namespace Prisma {
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -165735,6 +165921,7 @@ export namespace Prisma {
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -165857,6 +166044,7 @@ export namespace Prisma {
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -165908,6 +166096,7 @@ export namespace Prisma {
     receivedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -166157,6 +166346,7 @@ export namespace Prisma {
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -166208,6 +166398,7 @@ export namespace Prisma {
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -166517,6 +166708,7 @@ export namespace Prisma {
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -166568,6 +166760,7 @@ export namespace Prisma {
     receivedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -167313,6 +167506,7 @@ export namespace Prisma {
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -167364,6 +167558,7 @@ export namespace Prisma {
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -167845,6 +168040,7 @@ export namespace Prisma {
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -167896,6 +168092,7 @@ export namespace Prisma {
     receivedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -168204,6 +168401,7 @@ export namespace Prisma {
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -168255,6 +168453,7 @@ export namespace Prisma {
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -170493,6 +170692,7 @@ export namespace Prisma {
     receivedDate?: Date | string | null
     completedDate?: Date | string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -170544,6 +170744,7 @@ export namespace Prisma {
     receivedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -170786,6 +170987,7 @@ export namespace Prisma {
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -170837,6 +171039,7 @@ export namespace Prisma {
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -172352,6 +172555,7 @@ export namespace Prisma {
     receivedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -172382,6 +172586,7 @@ export namespace Prisma {
     receivedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -172412,6 +172617,7 @@ export namespace Prisma {
     issuedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -172442,6 +172648,7 @@ export namespace Prisma {
     issuedById?: string | null
     receivedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -173589,6 +173796,7 @@ export namespace Prisma {
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -173639,6 +173847,7 @@ export namespace Prisma {
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -173682,6 +173891,7 @@ export namespace Prisma {
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -173705,6 +173915,7 @@ export namespace Prisma {
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -173755,6 +173966,7 @@ export namespace Prisma {
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -173798,6 +174010,7 @@ export namespace Prisma {
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -173821,6 +174034,7 @@ export namespace Prisma {
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -173871,6 +174085,7 @@ export namespace Prisma {
     issuedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -173914,6 +174129,7 @@ export namespace Prisma {
     issuedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -173937,6 +174153,7 @@ export namespace Prisma {
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -173987,6 +174204,7 @@ export namespace Prisma {
     issuedById?: NullableStringFieldUpdateOperationsInput | string | null
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -174030,6 +174248,7 @@ export namespace Prisma {
     issuedById?: NullableStringFieldUpdateOperationsInput | string | null
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -176034,6 +176253,7 @@ export namespace Prisma {
     receivedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -176064,6 +176284,7 @@ export namespace Prisma {
     receivedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -176190,6 +176411,7 @@ export namespace Prisma {
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -176240,6 +176462,7 @@ export namespace Prisma {
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -176283,6 +176506,7 @@ export namespace Prisma {
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -176306,6 +176530,7 @@ export namespace Prisma {
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -176356,6 +176581,7 @@ export namespace Prisma {
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -176399,6 +176625,7 @@ export namespace Prisma {
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -177889,6 +178116,7 @@ export namespace Prisma {
     receivedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -178460,6 +178688,7 @@ export namespace Prisma {
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -178510,6 +178739,7 @@ export namespace Prisma {
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -178553,6 +178783,7 @@ export namespace Prisma {
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -179645,6 +179876,7 @@ export namespace Prisma {
     receivedById?: string | null
     approvedById?: string | null
     remarks?: string | null
+    inchargeName?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     fabricIn?: number | null
@@ -179679,6 +179911,8 @@ export namespace Prisma {
     grossWeightKg?: number | null
     netWeightKg?: number | null
     uom: string
+    average?: number | null
+    averageUnit?: string | null
     remarks?: string | null
     sourceLotId?: string | null
     sourceRollId?: string | null
@@ -179954,6 +180188,7 @@ export namespace Prisma {
     receivedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -180004,6 +180239,7 @@ export namespace Prisma {
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -180047,6 +180283,7 @@ export namespace Prisma {
     receivedById?: NullableStringFieldUpdateOperationsInput | string | null
     approvedById?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
+    inchargeName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     fabricIn?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -180081,6 +180318,8 @@ export namespace Prisma {
     grossWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
     netWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
     uom?: StringFieldUpdateOperationsInput | string
+    average?: NullableFloatFieldUpdateOperationsInput | number | null
+    averageUnit?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
     sourceRollId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -180109,6 +180348,8 @@ export namespace Prisma {
     grossWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
     netWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
     uom?: StringFieldUpdateOperationsInput | string
+    average?: NullableFloatFieldUpdateOperationsInput | number | null
+    averageUnit?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
     sourceRollId?: NullableStringFieldUpdateOperationsInput | string | null
@@ -180137,6 +180378,8 @@ export namespace Prisma {
     grossWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
     netWeightKg?: NullableFloatFieldUpdateOperationsInput | number | null
     uom?: StringFieldUpdateOperationsInput | string
+    average?: NullableFloatFieldUpdateOperationsInput | number | null
+    averageUnit?: NullableStringFieldUpdateOperationsInput | string | null
     remarks?: NullableStringFieldUpdateOperationsInput | string | null
     sourceLotId?: NullableStringFieldUpdateOperationsInput | string | null
     sourceRollId?: NullableStringFieldUpdateOperationsInput | string | null

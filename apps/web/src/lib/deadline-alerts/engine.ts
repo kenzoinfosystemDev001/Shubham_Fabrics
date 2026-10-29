@@ -1,4 +1,4 @@
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import type { AuthenticatedUser } from '@/lib/auth/require-user';
 import { userBelongsToDepartment, type DepartmentKey } from '@/lib/auth/department-access';
 import { DEADLINE_ALERTS, alertConfigFor, enabledAlertDepartments, type DepartmentAlertConfig } from './config';

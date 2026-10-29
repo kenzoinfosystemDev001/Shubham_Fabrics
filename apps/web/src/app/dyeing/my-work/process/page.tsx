@@ -217,7 +217,7 @@ function ProcessEditor({ order, onClose, onSaved }: { order: any; onClose: () =>
   const locked = order.status === 'SENT_TO_QC1';
   const currentStep = order.status === 'PARTIALLY_DYED' ? 'IN_DYEING' : order.status === 'PARTIALLY_SENT_TO_QC1' ? 'READY_FOR_QC1' : order.status;
   const [status, setStatus] = useState(currentStep);
-  const [dyedQuantity, setDyedQuantity] = useState(String(order.dyedQuantity ?? 0));
+  const [dyedQuantity, setDyedQuantity] = useState(order.dyedQuantity ? String(order.dyedQuantity) : '');
   const [dyedColor, setDyedColor] = useState(order.dyedColor || '');
   const [reviewNote, setReviewNote] = useState('');
   const [batchNumber, setBatchNumber] = useState(order.batchNumber || '');
@@ -241,7 +241,7 @@ function ProcessEditor({ order, onClose, onSaved }: { order: any; onClose: () =>
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...(partlySent ? {} : { status }),
-          dyedQuantity,
+          dyedQuantity: dyedQuantity || '0',
           dyedColor,
           colorReviewNote: reviewNote,
           batchNumber,

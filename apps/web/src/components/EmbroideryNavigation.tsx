@@ -235,7 +235,7 @@ export function EmbroideryNavigation() {
             <UserCircle className="w-8 h-8 text-brand-700" />
             <div className="flex-1 min-w-0">
               <span className="text-xs font-semibold text-neutral-900 truncate block drop-shadow-xs">
-                {currentUser.fullName || (isAdmin ? 'System Administrator' : 'Embroidery Incharge')}
+                {(currentUser.fullName && currentUser.fullName.trim().toLowerCase() !== 'embroidery department' ? currentUser.fullName : '') || (isAdmin ? 'System Administrator' : 'Embroidery Incharge')}
               </span>
               <span className="text-[10px] text-brand-700 font-bold tracking-wide block truncate drop-shadow-xs">
                 Embroidery Department

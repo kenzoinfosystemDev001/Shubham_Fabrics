@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import * as XLSX from 'xlsx';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
 import { apiErrorResponse } from '@/lib/api-errors';
 

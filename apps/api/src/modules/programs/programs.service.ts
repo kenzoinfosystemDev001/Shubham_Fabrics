@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma.service';
-import { CreateProgramInput } from '@subham/validation';
-import { ProgramStatus } from '@subham/types';
+import { CreateProgramInput } from '@shubham/validation';
+import { ProgramStatus } from '@shubham/types';
 
 @Injectable()
 export class ProgramsService {

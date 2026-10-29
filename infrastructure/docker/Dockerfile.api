@@ -8,12 +8,12 @@ COPY package*.json ./
 COPY packages/ packages/
 COPY apps/api/ apps/api/
 RUN npm install
-RUN npm run build --workspace=@subham/types
-RUN npm run build --workspace=@subham/validation
-RUN npm run build --workspace=@subham/config
-RUN npm run generate --workspace=@subham/database
-RUN npm run build --workspace=@subham/database
-RUN npm run build --workspace=@subham/api
+RUN npm run build --workspace=@shubham/types
+RUN npm run build --workspace=@shubham/validation
+RUN npm run build --workspace=@shubham/config
+RUN npm run generate --workspace=@shubham/database
+RUN npm run build --workspace=@shubham/database
+RUN npm run build --workspace=@shubham/api
 
 FROM node:24-alpine AS runner
 WORKDIR /app

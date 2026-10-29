@@ -22,7 +22,7 @@ export function QCWashingNavigation() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>({
     fullName: 'Washing QC Inspector',
-    username: 'qcwashing',
+    username: 'qc3',
     role: 'QC3_INSPECTOR',
     departmentCode: 'QC3',
   });
@@ -244,7 +244,7 @@ export function QCWashingNavigation() {
             <UserCircle className="w-8 h-8 text-brand-700" />
             <div className="flex-1 min-w-0">
               <span className="text-xs font-semibold text-neutral-900 truncate block drop-shadow-xs">
-                {currentUser.fullName || (isAdmin ? 'System Administrator' : 'Washing QC Inspector')}
+                {(currentUser.fullName && currentUser.fullName.trim().toLowerCase() !== 'washing qc' ? currentUser.fullName : '') || (isAdmin ? 'System Administrator' : 'Washing QC Inspector')}
               </span>
               <span className="text-[10px] text-brand-700 font-bold tracking-wide block truncate drop-shadow-xs">
                 Washing QC

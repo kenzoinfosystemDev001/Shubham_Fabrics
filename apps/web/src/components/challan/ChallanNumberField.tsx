@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { Hash } from 'lucide-react';
 
 interface ChallanNumberFieldProps {
   value: string;
@@ -42,7 +41,6 @@ export function ChallanNumberField({
         {label} <span className="text-danger-600">*</span>
       </label>
       <div className="relative">
-        <Hash className="w-3.5 h-3.5 text-neutral-500 absolute left-2.5 top-1/2 -translate-y-1/2" />
         <input
           id={inputId}
           type="text"
@@ -50,11 +48,11 @@ export function ChallanNumberField({
           disabled={disabled}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="Enter challan number"
+          placeholder=""
           autoComplete="off"
           aria-invalid={Boolean(error)}
           aria-describedby={error ? `${inputId}-error` : undefined}
-          className={`w-full pl-8 pr-3 ${compact ? 'py-1.5' : 'py-2'} text-xs font-mono font-bold text-neutral-900 border rounded-lg bg-white focus:outline-hidden focus:ring-2 focus:ring-brand-500 focus:border-transparent transition disabled:bg-neutral-100 ${
+          className={`w-full px-3 ${compact ? 'py-1.5' : 'py-2'} text-xs font-mono font-bold text-neutral-900 border rounded-lg bg-white focus:outline-hidden focus:ring-2 focus:ring-brand-500 focus:border-transparent transition disabled:bg-neutral-100 ${
             error ? 'border-danger-500' : 'border-neutral-300'
           }`}
         />

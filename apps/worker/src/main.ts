@@ -1,7 +1,7 @@
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 
 async function runWorker() {
-  console.log('--- Subham Fabrics MES Background Worker Initialized ---');
+  console.log('--- Shubham Fabrics MES Background Worker Initialized ---');
   console.log(`[Worker] Connected to database: ${new Date().toISOString()}`);
 
   // Periodic Reconciliation Loop (Simulated queue processor)

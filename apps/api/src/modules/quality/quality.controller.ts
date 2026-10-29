@@ -1,11 +1,11 @@
 import { Controller, Post, Get, Body, Query, UseGuards } from '@nestjs/common';
 import { QualityService } from './quality.service';
-import { QualityInspectionSchema } from '@subham/validation';
+import { QualityInspectionSchema } from '@shubham/validation';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { UserRole } from '@subham/types';
+import { UserRole } from '@shubham/types';
 
 @Controller('quality')
 @UseGuards(JwtAuthGuard, RolesGuard)

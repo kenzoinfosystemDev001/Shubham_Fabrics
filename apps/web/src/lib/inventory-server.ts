@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { apiErrorResponse } from '@/lib/api-errors';
 import { PROGRAM_SELECT, TX, USER_SELECT, WORKFLOWS, WorkRequestError, guarded, syncWorkItems, textOf, workflowHandlers } from '@/lib/work-items-server';
 import {

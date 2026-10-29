@@ -24,6 +24,12 @@ export function fmtDate(value: string | Date | null | undefined, withTime = fals
     : d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
+/** The challan a work line came in on, as typed on that challan (e.g. "Challan 100"); '' when unknown. */
+export function challanRef(item: any) {
+  const n = item?.inboundChallan?.challanNumber;
+  return n ? `Challan ${n}` : '';
+}
+
 export function sheetRef(program: any) {
   return program?.programSerialNo || program?.programNumber || '—';
 }

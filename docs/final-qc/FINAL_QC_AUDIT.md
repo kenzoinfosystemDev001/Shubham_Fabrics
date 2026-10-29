@@ -14,7 +14,7 @@ Shubham Fabrics MES operates an enterprise multi-department apparel manufacturin
 $$\text{Finishing} \longrightarrow \text{Steam Press} \longrightarrow \mathbf{Final\ QC\ (FINAL\_CHECK)} \longrightarrow \text{Packing} \longrightarrow \text{Finished Goods} \longrightarrow \text{Dispatch}$$
 
 ### Key Findings from Codebase Audit:
-1. **Department Identity**: The department code is `DepartmentCode.FINAL_CHECK` in `@subham/types` and `packages/config`.
+1. **Department Identity**: The department code is `DepartmentCode.FINAL_CHECK` in `@shubham/types` and `packages/config`.
 2. **Upstream Source**:
    - Primary upstream: `STEAM_PRESS` (Steam Press Department), which issues handover Challans with `toDepartment: 'FINAL_CHECK'`.
    - Alternative configured upstream: `FINISHING`, which also supports direct handover to `FINAL_CHECK` if Steam Press is bypassed for specific unpressed styles.

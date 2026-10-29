@@ -4,7 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Subham Fabrics MES theme tokens (RGB channels). See tailwind.config.js for usage rules. */
+/* Shubham Fabrics MES theme tokens (RGB channels). See tailwind.config.js for usage rules. */
 :root {
   --brand-50: 247 241 252; /* #F7F1FC */
   --brand-100: 239 226 248; /* #EFE2F8 */

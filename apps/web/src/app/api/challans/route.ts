@@ -1,8 +1,9 @@
 
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { syncInboundChallansToDyeingOrders } from '@/lib/dyeing-sync';
 import { requireUser } from '@/lib/auth/require-user';
+import { canStoreChallanAverage, canWriteColumns } from '@/lib/challan-item-average';
 import { userBelongsToDepartment } from '@/lib/auth/department-access';
 import { workflowIssuing } from '@/lib/work-items-server';
 import {
@@ -142,6 +143,14 @@ export async function GET(request: Request) {
       { status: 500 }
     );
   }
+}
+
+/** A line's optional Average: null when blank, undefined when it is not a number of zero or more. */
+function averageOf(item: any): number | null | undefined {
+  const raw = item?.average;
+  if (raw === undefined || raw === null || String(raw).trim() === '') return null;
+  const value = Number(raw);
+  return Number.isFinite(value) && value >= 0 ? value : undefined;
 }
 
 function parseSafeDate(val: any, fallback?: Date | null): Date | null {
@@ -351,13 +360,13 @@ export async function POST(request: Request) {
     }
 
     // 4. The typed challan number must not be used by another challan (any letter case).
-    await assertChallanNumbersAvailable(prisma, [{ value: challanNumber }]);
+    await assertChallanNumbersAvailable(prisma, fromDept, [{ value: challanNumber }]);
 
     // 5. Auto-Detection of Fabric / Pieces In from Previous Department
     let detectedFabricIn: number | null = null;
     let detectedFromDept: string | null = body.detectedFromDepartment || null;
     let detectedFromChallanId: string | null = body.detectedFromChallanId || body.parentChallanId || null;
-    let detectedUnit: string = body.fabricUnit || body.uom || 'MTR';
+    let detectedUnit: string | null = unitOf(body.fabricUnit) || unitOf(body.uom) || null;
 
     if (body.parentChallanId) {
       const parent = await prisma.challan.findUnique({
@@ -411,6 +420,12 @@ export async function POST(request: Request) {
       if (!Number.isFinite(qty) || qty <= 0) {
         return NextResponse.json({ error: `Item ${index + 1}: enter a quantity greater than zero.` }, { status: 400 });
       }
+      if (averageOf(item) === undefined) {
+        return NextResponse.json({ error: `Item ${index + 1}: Average must be a number of zero or more.` }, { status: 400 });
+      }
+      if (averageOf(item) !== null && !unitOf(item?.averageUnit)) {
+        return NextResponse.json({ error: `Item ${index + 1}: choose MTR or PCS for the Average.` }, { status: 400 });
+      }
     }
     const itemUnit = headerUnitOf(itemUnits); // MTR | PCS | MIXED | null (no lines)
     const isMixed = itemUnit === MIXED_UNIT;
@@ -420,9 +435,13 @@ export async function POST(request: Request) {
       (body.challanType === 'STORE_TO_DYEING' || body.challanType === 'STORE_TO_EMBROIDERY');
 
     const defectivePieces = Number(body.defectivePieces || 0);
+    // No unit is ever assumed: it comes from the lines, the request, or the predecessor challan.
     const fabricUnit = isMixed
       ? MIXED_UNIT
-      : (isFabricStoreIssue && itemUnit) || body.fabricUnit || detectedUnit || body.uom || 'MTR';
+      : (isFabricStoreIssue && itemUnit) || unitOf(body.fabricUnit) || detectedUnit || unitOf(body.uom) || itemUnit;
+    if (!fabricUnit) {
+      return NextResponse.json({ error: 'Choose MTR or PCS for the challan quantity.' }, { status: 400 });
+    }
     // The defective quantity is in the unit chosen for it (the tracking unit), never the MIXED header.
     const defectiveUnit = defectivePieces > 0
       ? unitOf(body.defectiveUnit) || unitOf(body.fabricUnit) || unitOf(fabricUnit) || null
@@ -480,6 +499,14 @@ export async function POST(request: Request) {
     // 6. Transactional challan creation
     const isDyeingToQc1Challan = fromDept === 'DYEING' && toDept === 'QC1';
     const isStoreOutward = (fromDept === 'STORE' || fromDept.includes('FABRIC')) && toDept !== 'STORE';
+    // A line's Average is saved once the database and the loaded client both have the column;
+    // until then the challan is still issued, just without it.
+    const storeAverage = await canStoreChallanAverage();
+    // The incharge's name as typed on the form. Saved in its own column once it exists; until then it
+    // is kept as an "Incharge:" note in the remarks (hidden from displayed remarks, read by inchargeNameOf).
+    const inchargeName = typeof body.inchargeName === 'string' ? body.inchargeName.trim().slice(0, 100) : '';
+    const storeInchargeColumn = inchargeName ? await canWriteColumns('Challan', ['inchargeName']) : false;
+
     const created = await prisma.$transaction(async (tx) => {
       const challan = await tx.challan.create({
         data: {
@@ -503,17 +530,14 @@ export async function POST(request: Request) {
           defectReason,
           detectedFromChallanId,
           detectedFromDepartment: detectedFromDept,
+          ...(storeInchargeColumn ? { inchargeName } : {}),
           remarks:
+            // What the user typed only: the defect, its shelf and the in/out quantities have their own fields.
             [
               body.remarks,
-              defectivePieces > 0
-                ? `[DEFECT ISOLATION: ${defectivePieces} ${defectiveUnit} cut & routed to ${defectiveShelfLocation} (Reason: ${defectReason}). Net Out: ${outText}]`
-                : null,
-              detectedFromDept && !isMixed
-                ? `[Auto-detected from ${detectedFromDept}: In ${fabricIn} ${fabricUnit}]`
-                : null,
               body.vehicleNumber ? `Vehicle: ${body.vehicleNumber}` : null,
               body.driverName ? `Driver: ${body.driverName}` : null,
+              inchargeName && !storeInchargeColumn ? `Incharge: ${inchargeName}` : null,
             ]
               .filter(Boolean)
               .join(' | ') || null,
@@ -554,7 +578,7 @@ export async function POST(request: Request) {
                 body.itemDescription || 'Production Material Lot',
               unitType: 'ROLL',
               quantity: Number(body.quantity || 1),
-              uom: body.uom || 'PCS',
+              uom: unitOf(body.uom) || fabricUnit,
               remarks: body.remarks || null,
             },
           ];
@@ -589,6 +613,10 @@ export async function POST(request: Request) {
               : null,
             size: item.size || null,
             rollNumber: item.rollNumber || null,
+            // Only written when entered, so challans without an Average never touch the column.
+            ...(storeAverage && averageOf(item) !== null
+              ? { average: averageOf(item), averageUnit: unitOf(item.averageUnit) }
+              : {}),
             remarks: itemRemarks || null,
           },
         });

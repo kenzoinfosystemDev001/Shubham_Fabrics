@@ -1,17 +1,27 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
-import { destructiveAdminActionsDisabled, requireUser } from '@/lib/auth/require-user';
+import { prisma } from '@shubham/database';
+import { requireUser } from '@/lib/auth/require-user';
 
 import { STOCK_REFERENCE, STORE_STOCK_DEPARTMENT } from '@/lib/fabric-stock-ledger';
 
 export const dynamic = 'force-dynamic';
 
+/** The phrase the admin types on the Admin page; without it nothing is deleted. */
+const CONFIRM_PHRASE = 'DELETE ALL';
+
+/**
+ * Deletes every challan. Admin only, and only with the typed confirmation phrase (unlike the
+ * production-sheet and full-data wipes, this one is not behind ALLOW_DESTRUCTIVE_ADMIN_ACTIONS).
+ */
 export async function DELETE(request: Request) {
   const { user: authUser, response: authResponse } = await requireUser(request, { admin: true });
   if (!authUser) return authResponse;
-  const disabledResponse = destructiveAdminActionsDisabled();
-  if (disabledResponse) return disabledResponse;
+  const body = await request.json().catch(() => null);
+  if (body?.confirm !== CONFIRM_PHRASE) {
+    return NextResponse.json({ error: `Type "${CONFIRM_PHRASE}" to confirm deleting every challan.` }, { status: 400 });
+  }
   try {
+    const challanCount = await prisma.challan.count();
     await prisma.$transaction(
       async (tx) => {
         // 1. Break genealogy hierarchy (child -> parent)
@@ -54,6 +64,18 @@ export async function DELETE(request: Request) {
 
         // 7. Permanently delete ALL Challans from PostgreSQL
         await tx.challan.deleteMany({});
+
+        // Who wiped the challans and when (kept: only 'Challan' entries were cleared above).
+        await tx.auditLog.create({
+          data: {
+            actorId: authUser.id,
+            action: 'ALL_CHALLANS_DELETED',
+            entity: 'System',
+            entityId: 'challans',
+            beforeState: JSON.stringify({ challanCount }),
+            afterState: JSON.stringify({ challanCount: 0 }),
+          },
+        });
       },
       { maxWait: 20000, timeout: 60000 }
     );

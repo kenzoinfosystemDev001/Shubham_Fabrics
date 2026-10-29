@@ -17,6 +17,7 @@ import {
   WorkStatusBadge,
   fetchJson,
   fmtDate,
+  challanRef,
   fmtQty,
 } from '@/components/workflow/WorkflowUi';
 import { availableToProcess, readyToTransfer, receivedBasis } from '@/lib/work-items.mjs';
@@ -172,7 +173,7 @@ function ReceivedContent({ flow, only }: { flow: WorkflowView; only?: 'defective
                         <Link href={`/programs/${i.program?.id}`} className="font-mono text-xs font-semibold text-neutral-900 hover:underline">
                           {i.program?.programNumber || '—'}
                         </Link>
-                        <span className="block font-mono text-[11px] text-neutral-500">{i.itemNumber}</span>
+                        <span className="block font-mono text-[11px] text-neutral-500">{challanRef(i)}</span>
                       </td>
                       <td className="py-3 px-3">
                         {i.inboundChallan ? (

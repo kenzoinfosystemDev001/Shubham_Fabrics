@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
 import {
   FabricStockError,
@@ -31,7 +31,7 @@ export async function PATCH(
     const billDate = new Date(body.billDate);
     const receivingDate = new Date(body.receivingDate);
     const billQty = Number(body.billQty);
-    const unit = String(body.unit || 'MTR').toUpperCase();
+    const unit = String(body.unit || '').toUpperCase();
 
     if (!itemName || !billNo || !body.billDate || !body.receivingDate) {
       return NextResponse.json(
@@ -50,7 +50,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'billQty must be a positive number' }, { status: 400 });
     }
     if (!['MTR', 'PCS'].includes(unit)) {
-      return NextResponse.json({ error: 'unit must be MTR or PCS' }, { status: 400 });
+      return NextResponse.json({ error: 'Select MTR or PCS' }, { status: 400 });
     }
     const { details, problems } = inwardLineDetails(body);
     if (problems.length) {

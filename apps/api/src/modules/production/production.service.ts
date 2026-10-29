@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma.service';
-import { RecordProductionAccountingInput } from '@subham/validation';
-import { validateProductionBalance } from '@subham/types';
+import { RecordProductionAccountingInput } from '@shubham/validation';
+import { validateProductionBalance } from '@shubham/types';
 
 @Injectable()
 export class ProductionService {

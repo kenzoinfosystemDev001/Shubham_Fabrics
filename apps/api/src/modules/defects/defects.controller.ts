@@ -8,7 +8,7 @@ import {
   CreateDefectRecordSchema,
   CreateReworkTransactionSchema,
   CreateRecutRequestSchema,
-} from '@subham/validation';
+} from '@shubham/validation';
 
 @Controller('defects')
 @UseGuards(JwtAuthGuard, PermissionsGuard)

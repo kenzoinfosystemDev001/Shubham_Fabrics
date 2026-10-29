@@ -18,7 +18,7 @@ import {
   CartonStatus,
   DispatchStatus,
   QCResultStatus,
-} from '@subham/types';
+} from '@shubham/types';
 
 // ==========================================
 // 1. AUTH & RBAC VALIDATION

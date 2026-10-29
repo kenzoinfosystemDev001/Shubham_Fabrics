@@ -12,12 +12,12 @@
     "build:ordered": "npm run build --workspace=packages/types && npm run build --workspace=packages/config && npm run build --workspace=packages/validation && npm run build --workspace=packages/database && npm run build --workspace=apps/api",
     "build:render": "npx prisma generate --schema=packages/database/prisma/schema.prisma && npm run build:ordered",
     "start:api": "node apps/api/dist/main.js",
-    "dev:api": "npm run dev --workspace=@subham/api",
-    "dev:web": "npm run dev --workspace=@subham/web",
-    "dev:worker": "npm run dev --workspace=@subham/worker",
+    "dev:api": "npm run dev --workspace=@shubham/api",
+    "dev:web": "npm run dev --workspace=@shubham/web",
+    "dev:worker": "npm run dev --workspace=@shubham/worker",
     "lint": "npm run lint --workspaces --if-present",
-    "db:generate": "npm run generate --workspace=@subham/database",
-    "db:push": "npm run push --workspace=@subham/database",
+    "db:generate": "npm run generate --workspace=@shubham/database",
+    "db:push": "npm run push --workspace=@shubham/database",
     "db:seed": "node scripts/setup-core-users.js"
   },
   "keywords": [
@@ -28,6 +28,6 @@
     "traceability",
     "challan"
   ],
-  "author": "Subham Fabrics Engineering",
+  "author": "Shubham Fabrics Engineering",
   "license": "UNLICENSED"
 }

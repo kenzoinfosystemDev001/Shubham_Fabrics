@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { challanTotalsByUnit, unitOf } from '@/lib/challan-units.mjs';
 
 export const dynamic = 'force-dynamic';

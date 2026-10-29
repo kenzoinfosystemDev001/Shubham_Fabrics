@@ -5,7 +5,7 @@
 To ensure that all raw fabric received from dye-houses or fabric mills is rigorously accounted for by weight, length, roll number, and quality grading before being accepted into store inventory or issued to the cutting section.
 
 ### 2. Scope
-Applies to the Raw Material Store, Dyeing Unit, and Fabric Quality Gate (Dyeing QC) within Subham Fabrics.
+Applies to the Raw Material Store, Dyeing Unit, and Fabric Quality Gate (Dyeing QC) within Shubham Fabrics.
 
 ### 3. Step-by-Step Procedure
 1. **Physical Unloading & Gate Pass Verification**:

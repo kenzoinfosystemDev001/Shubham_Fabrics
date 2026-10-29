@@ -26,7 +26,7 @@ export default function QC1Dashboard() {
       setError('');
       const res = await fetch('/api/qc1/dashboard');
       if (!res.ok) {
-        throw new Error('Failed to load QC1 dashboard data');
+        throw new Error('Failed to load Dyeing QC dashboard data');
       }
       const json = await res.json();
       setData(json.data);

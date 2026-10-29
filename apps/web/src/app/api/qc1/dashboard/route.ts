@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
 import { addTotals, formatTotals, totalsByUnit, unitOf } from '@/lib/challan-units.mjs';
 
@@ -177,7 +177,7 @@ export async function GET(request: Request) {
       rejectQuantity: tx.rejectQuantity,
       reworkQuantity: tx.reworkQuantity,
       unitOfMeasure: tx.unitOfMeasure,
-      inspector: tx.operator?.fullName || tx.operator?.username || 'QC1 Inspector',
+      inspector: tx.operator?.fullName || tx.operator?.username || 'Dyeing QC Inspector',
       notes: tx.notes,
       recordedAt: tx.recordedAt,
     }));
@@ -211,7 +211,7 @@ export async function GET(request: Request) {
   } catch (error: any) {
     console.error('Error fetching QC1 dashboard metrics:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to fetch QC1 dashboard metrics.' },
+      { error: error.message || 'Failed to fetch Dyeing QC dashboard metrics.' },
       { status: 500 }
     );
   }

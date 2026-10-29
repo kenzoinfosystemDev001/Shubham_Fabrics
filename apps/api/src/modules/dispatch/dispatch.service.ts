@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma.service';
-import { CreateDispatchOrderInput } from '@subham/validation';
-import { DispatchStatus, CartonStatus, DepartmentCode, StockLedgerEntryType } from '@subham/types';
+import { CreateDispatchOrderInput } from '@shubham/validation';
+import { DispatchStatus, CartonStatus, DepartmentCode, StockLedgerEntryType } from '@shubham/types';
 
 @Injectable()
 export class DispatchService {
