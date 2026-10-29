@@ -21,11 +21,11 @@ import { formatTotals } from '@/lib/challan-units.mjs';
 import { departmentName } from '@/lib/workflow-views';
 import { getCurrentUser, isAdminUser } from '@/lib/rbac';
 
-// HOLD page shared by every department (Programming to Inventory). Quantities stay in each line's own unit.
+// HOLD page shared by the production departments (Dyeing to Inventory). Quantities stay in each line's own unit.
 
 /** Department codes in floor order, for the administrator's department filter. */
 const HOLD_DEPARTMENT_CODES = [
-  'PROGRAMMING', 'STORE', 'DYEING', 'QC1', 'EMBROIDERY', 'THREAD_CUTTING', 'QC2', 'WASHING', 'QC3',
+  'DYEING', 'QC1', 'EMBROIDERY', 'THREAD_CUTTING', 'QC2', 'WASHING', 'QC3',
   'RECUTTING', 'STITCHING', 'FINISHING', 'STEAM_PRESS', 'FINAL_CHECK', 'INVENTORY',
 ];
 

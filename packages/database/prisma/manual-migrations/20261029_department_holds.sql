@@ -1,4 +1,4 @@
--- HOLD records in every department, Programming to Inventory (Packing): the quantity of a received line a
+-- HOLD records in the production departments, Dyeing to Inventory (Packing): the quantity of a received line a
 -- department keeps back, with its reason, and the history of releases. Forwarding is read from the existing
 -- transfer records, so no existing table changes.
 -- Additive only: two new tables. Re-runnable: every statement is skipped when its object already exists.

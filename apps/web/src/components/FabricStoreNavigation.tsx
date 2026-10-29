@@ -244,15 +244,6 @@ export function FabricStoreNavigation() {
             )}
           </div>
 
-          {/* HOLD: fabric kept back from forwarding */}
-          <Link
-            href="/fabric-store/hold"
-            onClick={() => setMobileOpen(false)}
-            className={linkClass('/fabric-store/hold', true)}
-          >
-            <span>HOLD</span>
-          </Link>
-
           {/* 3. Floor Board */}
           <Link
             href="/fabric-store/floor-board"

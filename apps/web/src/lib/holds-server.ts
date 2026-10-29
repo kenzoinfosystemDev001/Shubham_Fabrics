@@ -19,17 +19,16 @@ import {
 } from '@/lib/holds.mjs';
 import { departmentName } from '@/lib/workflow-views';
 
-// HOLD in every department, Programming to Inventory (Packing). Each department holds back part of a line it
-// already tracks; the line's received / forwarded figures come from the existing records, never from the HOLD:
-// - Programming: a Production Sheet's quantity per unit, forwarded on Programming -> Store challans.
-// - Fabric Store: what Programming's challans for a Production Sheet brought in, per unit, less Store's issues.
+// HOLD in the production departments, Dyeing to Inventory (Packing); Programming and Fabric Store have none.
+// Each department holds back part of a line it already tracks; the line's received / forwarded figures come
+// from the existing records, never from the HOLD:
 // - Dyeing: a dyeing order (one Store -> Dyeing challan line), less what was sent to Dyeing QC.
 // - Dyeing QC: an incoming challan's lines of one unit, less its PASS / rework challans and shrinkage.
 // - Embroidery to Inventory: a work item (DepartmentWorkItem), less its transfers (Recutting: allocations;
 //   Inventory: sent for packing) and defective quantity.
 
 type Unit = 'MTR' | 'PCS';
-type SourceType = 'PROGRAM' | 'STORE_PROGRAM' | 'DYEING_ORDER' | 'QC1_CHALLAN' | 'WORK_ITEM';
+type SourceType = 'DYEING_ORDER' | 'QC1_CHALLAN' | 'WORK_ITEM';
 
 /** One forwarding of a line (a challan, allocation or packing), shown in a HOLD's history. */
 export interface ForwardEntry {
@@ -66,8 +65,6 @@ export interface HoldLine {
 
 /** Departments with a HOLD page, in floor order: page, where held quantity is forwarded from, received column. */
 export const HOLD_DEPARTMENTS: Record<string, { page: string; forward: string; receivedLabel: string }> = {
-  PROGRAMMING: { page: '/programming/hold', forward: '/my-work/issue-challan', receivedLabel: 'Production Sheet Qty' },
-  STORE: { page: '/fabric-store/hold', forward: '/fabric-store/my-work/issue-challan', receivedLabel: 'Total Received' },
   DYEING: { page: '/dyeing/hold', forward: '/dyeing/my-work/issue-challan', receivedLabel: 'Total Received' },
   QC1: { page: '/qc1/hold', forward: '/qc1/my-work', receivedLabel: 'Total Received' },
   EMBROIDERY: { page: '/embroidery/hold', forward: '/embroidery/my-work/issue-challan', receivedLabel: 'Total Received' },
@@ -308,144 +305,10 @@ async function qc1Lines(ids?: string[]): Promise<HoldLine[]> {
   return lines;
 }
 
-/** Programming -> Store challans per Production Sheet, and every challan Store issued for those sheets. */
-async function programChallans(programIds: string[] | undefined) {
-  const store = codesOf('STORE');
-  const programming = codesOf('PROGRAMMING');
-  const select = {
-    id: true,
-    programId: true,
-    challanNumber: true,
-    status: true,
-    createdAt: true,
-    fabricUnit: true,
-    items: { select: { quantity: true, uom: true, fabricCode: true, itemDescription: true, colour: true, size: true, unitQuantity: true, unitQuantityUom: true } },
-    issuedBy: { select: { fullName: true, username: true } },
-  } as const;
-  const toStore = await prisma.challan.findMany({
-    where: { fromDepartment: { in: programming }, toDepartment: { in: store }, status: { notIn: DEAD_CHALLAN }, ...(programIds ? { programId: { in: programIds } } : {}) },
-    select,
-    orderBy: { createdAt: 'asc' },
-  });
-  const sheetIds = programIds || Array.from(new Set(toStore.map((c) => c.programId)));
-  const fromStore = sheetIds.length
-    ? await prisma.challan.findMany({
-        where: { fromDepartment: { in: store }, toDepartment: { notIn: store }, status: { notIn: DEAD_CHALLAN }, programId: { in: sheetIds } },
-        select,
-        orderBy: { createdAt: 'asc' },
-      })
-    : [];
-  return { toStore, fromStore };
-}
-
-type ChallanRow = Awaited<ReturnType<typeof programChallans>>['toStore'][number];
-const forwardEntriesOf = (challans: ChallanRow[], unit: string): ForwardEntry[] =>
-  challans
-    .map((c) => ({ at: c.createdAt, quantity: totalsByUnit(c.items, c.fabricUnit)[unit] || 0, unit, reference: `Challan ${c.challanNumber}`, by: userName(c.issuedBy) }))
-    .filter((e) => e.quantity > 0);
-const sumOf = (entries: ForwardEntry[]) => round(entries.reduce((s, e) => s + e.quantity, 0));
-
-async function storeLines(programIds?: string[]): Promise<HoldLine[]> {
-  const { toStore, fromStore } = await programChallans(programIds);
-  const sheetIds = Array.from(new Set(toStore.map((c) => c.programId)));
-  const programs = await prisma.program.findMany({ where: { id: { in: sheetIds } }, select: PROGRAM_FIELDS });
-  const lines: HoldLine[] = [];
-  for (const p of programs) {
-    const inbound = toStore.filter((c) => c.programId === p.id);
-    const received = inbound.filter((c) => !NOT_YET_RECEIVED.includes(c.status));
-    const outbound = fromStore.filter((c) => c.programId === p.id);
-    const units = Array.from(new Set(inbound.flatMap((c) => Object.keys(totalsByUnit(c.items, c.fabricUnit)))));
-    for (const unit of units) {
-      const unitItems = inbound.flatMap((c) => c.items.filter((i) => (unitOf(i.uom) || unitOf(c.fabricUnit) || 'MTR') === unit));
-      const forwardLog = forwardEntriesOf(outbound, unit);
-      lines.push({
-        key: `STORE_PROGRAM:${p.id}:${unit}`,
-        sourceType: 'STORE_PROGRAM',
-        sourceId: p.id,
-        departmentCode: 'STORE',
-        unit,
-        ...programRefs(p),
-        challanId: inbound[0]?.id || null,
-        challanNumber: joined(inbound.map((c) => c.challanNumber)),
-        challanRequired: true,
-        fabricName: joined(unitItems.map((i) => i.fabricCode || i.itemDescription)) || p.fabricName || 'Fabric',
-        colour: joined(unitItems.map((i) => i.colour)) || p.fabricColor || null,
-        size: joined(unitItems.map((i) => sizeText(i))),
-        received: round(received.reduce((s, c) => s + (totalsByUnit(c.items, c.fabricUnit)[unit] || 0), 0)),
-        forwarded: sumOf(forwardLog),
-        writtenOff: 0,
-        forwardLog,
-        forwardPath: `${HOLD_DEPARTMENTS.STORE.forward}?programId=${p.id}`,
-      });
-    }
-  }
-  return lines;
-}
-
-/** A Production Sheet's planned quantity per unit: its item rows, else its colour / target quantity. Rows without a unit are skipped. */
-function plannedByUnit(p: { metadataJson: string | null; colorQuantity: number | null; targetQuantity: number; quantityMeasurement: string | null }) {
-  let items: any[] = [];
-  try {
-    const meta = p.metadataJson ? JSON.parse(p.metadataJson) : null;
-    if (Array.isArray(meta?.items)) items = meta.items;
-  } catch {}
-  const planned: Record<string, number> = {};
-  const rows = items.filter((it) => unitOf(it?.unit) && Number(it?.measurement) > 0);
-  if (rows.length) {
-    for (const it of rows) planned[unitOf(it.unit) as string] = round((planned[unitOf(it.unit) as string] || 0) + Number(it.measurement));
-  } else if (unitOf(p.quantityMeasurement) && Number(p.colorQuantity || p.targetQuantity) > 0) {
-    planned[unitOf(p.quantityMeasurement) as string] = round(Number(p.colorQuantity || p.targetQuantity));
-  }
-  return { planned, colours: joined(items.map((it) => it?.color)) };
-}
-
-async function programmingLines(ids?: string[]): Promise<HoldLine[]> {
-  const programs = await prisma.program.findMany({
-    where: ids ? { id: { in: ids } } : { status: { notIn: ['COMPLETED', 'CANCELLED'] } },
-    select: { ...PROGRAM_FIELDS, metadataJson: true, colorQuantity: true, targetQuantity: true, quantityMeasurement: true },
-    orderBy: { createdAt: 'desc' },
-    take: ids ? undefined : LIST_LIMIT,
-  });
-  const { toStore } = await programChallans(programs.map((p) => p.id));
-  const lines: HoldLine[] = [];
-  for (const p of programs) {
-    const { planned, colours } = plannedByUnit(p);
-    const issued = toStore.filter((c) => c.programId === p.id);
-    for (const unit of Object.keys(planned)) {
-      const forwardLog = forwardEntriesOf(issued, unit);
-      lines.push({
-        key: `PROGRAM:${p.id}:${unit}`,
-        sourceType: 'PROGRAM',
-        sourceId: p.id,
-        departmentCode: 'PROGRAMMING',
-        unit,
-        ...programRefs(p),
-        challanId: issued[0]?.id || null,
-        challanNumber: joined(issued.map((c) => c.challanNumber)),
-        // Programming holds a Production Sheet before any challan is issued for it.
-        challanRequired: false,
-        fabricName: p.fabricName || 'Fabric',
-        colour: colours || p.fabricColor || null,
-        size: null,
-        received: planned[unit],
-        forwarded: sumOf(forwardLog),
-        writtenOff: 0,
-        forwardLog,
-        forwardPath: `${HOLD_DEPARTMENTS.PROGRAMMING.forward}?programId=${p.id}`,
-      });
-    }
-  }
-  return lines;
-}
-
 /** Lines of a department: the given sources (any state), or every line that may still hold quantity. */
 export async function loadLines(code: string, sourceIds?: string[]): Promise<HoldLine[]> {
   if (sourceIds && sourceIds.length === 0) return [];
   switch (code) {
-    case 'PROGRAMMING':
-      return programmingLines(sourceIds);
-    case 'STORE':
-      return storeLines(sourceIds);
     case 'DYEING':
       return dyeingLines(sourceIds);
     case 'QC1':
