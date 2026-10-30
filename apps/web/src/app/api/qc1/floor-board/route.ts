@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
+import { inchargeNameOf } from '@/lib/challan-remarks.mjs';
 import { formatTotals, totalsByUnit, unitOf } from '@/lib/challan-units.mjs';
 
 export const dynamic = 'force-dynamic';
@@ -28,6 +29,8 @@ export async function GET(request: Request) {
             deliveryDate: true,
             priority: true,
             wilcomDesignNumber: true,
+            designNumber: true,
+            designName: true,
           },
         },
         items: true,
@@ -85,6 +88,7 @@ export async function GET(request: Request) {
         productionSheetNumber: c.program?.programSerialNo || c.program?.programNumber || '—',
         programNumber: c.program?.programNumber || '—',
         wilcomDesignNumber: c.program?.wilcomDesignNumber || null,
+        designNumber: c.program?.designNumber || c.program?.designName || c.program?.wilcomDesignNumber || null,
         clientName: c.program?.clientName || c.program?.buyerName || 'Standard Client',
         fabric: primaryItem?.itemDescription || c.program?.fabricName || 'Fabric',
         fabricType: primaryItem?.fabricCode || c.program?.fabricType || null,
@@ -94,6 +98,7 @@ export async function GET(request: Request) {
         quantityInspected: latestProdLog ? latestProdLog.inputQuantity : (latestInspection?.sampleSize || 0),
         quantityPassed: latestProdLog ? latestProdLog.goodQuantity : 0,
         quantityFailed: latestProdLog ? latestProdLog.rejectQuantity : 0,
+        quantityShrinkage: latestProdLog ? latestProdLog.wasteQuantity || 0 : 0,
         quantityRework: latestProdLog ? latestProdLog.reworkQuantity : 0,
         quantityHold: latestProdLog ? latestProdLog.balanceQuantity : 0,
         uom: primaryItem?.uom || 'MTR',
@@ -101,7 +106,7 @@ export async function GET(request: Request) {
         status: c.status,
         issuedDate: c.issuedDate,
         receivedDate: c.receivedDate,
-        dyeingIncharge: c.issuedBy?.fullName || c.issuedBy?.username || 'Dyeing Floor',
+        dyeingIncharge: inchargeNameOf(c) || c.issuedBy?.username || 'Dyeing Floor',
         inspector: latestInspection?.inspector?.fullName || latestInspection?.inspector?.username || null,
         deliveryDate: c.program?.deliveryDate || null,
         barcode: primaryItem?.barcode || c.challanNumber,
@@ -130,7 +135,7 @@ export async function GET(request: Request) {
   } catch (error: any) {
     console.error('Error fetching QC1 floorboard data:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to fetch QC1 floorboard data.' },
+      { error: error.message || 'Failed to fetch Dyeing QC floorboard data.' },
       { status: 500 }
     );
   }

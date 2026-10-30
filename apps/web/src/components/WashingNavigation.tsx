@@ -220,6 +220,10 @@ export function WashingNavigation() {
               <span>Washing History</span>
             </Link>
 
+            {/* HOLD: fabric kept back from forwarding */}
+            <Link href="/washing/hold" onClick={() => setMobileOpen(false)} className={linkClass('/washing/hold', true)}>
+              <span>HOLD</span>
+            </Link>
             {/* 4. Floor Board */}
             <Link href="/washing/floor-board" onClick={() => setMobileOpen(false)} className={linkClass('/washing/floor-board', true)}>
               <span>Floor Board</span>

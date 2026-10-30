@@ -27,6 +27,7 @@ const NAV_ITEMS = [
   { label: 'Outgoing Challans', href: '/final-check/my-work/outgoing' },
   { label: 'Inspection History', href: '/final-check/history' },
   { label: 'Defective Shelf', href: '/final-check/my-work/defective' },
+  { label: 'HOLD', href: '/final-check/hold' },
   { label: 'Floor Board', href: '/final-check/floor-board' },
 ];
 
@@ -189,7 +190,7 @@ export function FinalCheckNavigation() {
             <UserCircle className="h-8 w-8 shrink-0 text-brand-700" />
             <div className="min-w-0 flex-1">
               <span className="block truncate text-xs font-semibold text-neutral-900">
-                {currentUser.fullName || (isAdmin ? 'System Administrator' : 'Final QC Inspector')}
+                {(currentUser.fullName && currentUser.fullName.trim().toLowerCase() !== 'final qc department' ? currentUser.fullName : '') || (isAdmin ? 'System Administrator' : 'Final QC Inspector')}
               </span>
               <span className="block truncate text-[10px] font-bold tracking-wide text-brand-700">
                 Final QC Department

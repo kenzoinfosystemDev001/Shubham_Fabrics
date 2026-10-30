@@ -8,8 +8,9 @@ These commands were run locally on 2026-10-30 on branch `feature/production-fixe
 |---|---|
 | `npx tsc --noEmit -p apps/web` | Pass (0 errors) |
 | `NEXT_DIST_DIR=.next-verify npx next build` (apps/web) | Pass (exit 0) |
-| `node --test scripts/test-production-fixes.mjs` | Pass: 55 of 55 (45 existing, 10 new) |
-| `node --test scripts/test-final-check-rules.mjs` | 7 tests pass. The file fails as a whole with `ERR_REQUIRE_ESM`, identical before this change. One assertion was updated: it asserted the old "one sheet per challan" rule this change replaces, and now asserts the new rule plus the incoming-challan checks. |
+| `node --test scripts/test-production-fixes.mjs` | Pass: 55 of 55 (45 existing, 10 new), before merging `main`. `main` has since deleted the `scripts/test-*` files under the repository's no-test-files rule, so they are no longer in the branch. |
+| `node --test scripts/test-final-check-rules.mjs` | 7 tests pass, before merging `main`. The file fails as a whole with `ERR_REQUIRE_ESM`, identical before this change. One assertion was updated: it asserted the old "one sheet per challan" rule this change replaces. The file is deleted on `main`. |
+| After merging `main` (2026-10-30): type-check, production build, and a one-off check of the per-line Dyeing QC rules (pass, shrinkage, rework), sheet totals, incoming-challan refusal, and a line split across rows | All pass. The check script was not committed. |
 | `node --test scripts/test-inventory-department.mjs` | 4 pass, 1 file-level `ERR_REQUIRE_ESM`. Identical before this change. |
 | `node --test scripts/test-deadline-alerts.mjs` | File-level `ERR_REQUIRE_ESM`. Identical before this change. |
 | `node scripts/test-finishing-workflow.js`, `node scripts/test-steam-press-workflow.js` | Not runnable: they need `DATABASE_URL`, and the only database is production. |

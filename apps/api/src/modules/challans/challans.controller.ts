@@ -1,10 +1,10 @@
 import { Controller, Get, Post, Patch, Param, Body, Query, UseGuards } from '@nestjs/common';
 import { ChallansService } from './challans.service';
-import { CreateChallanSchema } from '@subham/validation';
+import { CreateChallanSchema } from '@shubham/validation';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { ChallanStatus, DepartmentCode } from '@subham/types';
+import { ChallanStatus, DepartmentCode } from '@shubham/types';
 
 @Controller('challans')
 @UseGuards(JwtAuthGuard, RolesGuard)

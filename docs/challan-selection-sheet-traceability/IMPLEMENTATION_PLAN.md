@@ -29,7 +29,7 @@ Details of the migration:
 | `lib/recutting-server.ts` | The same changes for Recutting → Stitching. |
 | `lib/dyeing-sync.ts` | Each `DyeingOrder` takes its line's sheet. |
 | `api/challans` (POST) | Fabric Store challan creation, described below this table. |
-| `api/qc1/challans/[id]/inspect` | Inspection per line (`byLine`). The pass, rework and reject challans carry one line per inspected line, each with its own fabric, colour and sheet, and record `LINE_BREAKDOWN` parameters. |
+| `api/qc1/challans/[id]/inspect` | Inspection per line (`byLine`: pass, shrinkage, rework, hold). The pass and rework challans carry one line per inspected line, each with its own fabric, colour and sheet. Shrinkage is saved on the line it was measured on, never spread across lines. `LINE_BREAKDOWN` parameters are recorded. |
 | `api/challans/[id]`, `api/challans`, `api/qc1/challans`, issue-screen lists | Challan lines are returned with their sheet (and on the detail page, their source challan). |
 
 `api/challans` (POST) changes:

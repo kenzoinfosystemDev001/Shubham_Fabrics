@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma.service';
-import { CreateBundleInput } from '@subham/validation';
-import { BundleStatus, DepartmentCode } from '@subham/types';
+import { CreateBundleInput } from '@shubham/validation';
+import { BundleStatus, DepartmentCode } from '@shubham/types';
 
 @Injectable()
 export class BundlesService {

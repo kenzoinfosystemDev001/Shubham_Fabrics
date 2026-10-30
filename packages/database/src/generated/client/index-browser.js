@@ -593,6 +593,7 @@ exports.Prisma.ChallanScalarFieldEnum = {
   receivedById: 'receivedById',
   approvedById: 'approvedById',
   remarks: 'remarks',
+  inchargeName: 'inchargeName',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   fabricIn: 'fabricIn',
@@ -628,6 +629,10 @@ exports.Prisma.ChallanItemScalarFieldEnum = {
   grossWeightKg: 'grossWeightKg',
   netWeightKg: 'netWeightKg',
   uom: 'uom',
+  average: 'average',
+  averageUnit: 'averageUnit',
+  unitQuantity: 'unitQuantity',
+  unitQuantityUom: 'unitQuantityUom',
   remarks: 'remarks',
   sourceLotId: 'sourceLotId',
   sourceRollId: 'sourceRollId',
@@ -635,6 +640,24 @@ exports.Prisma.ChallanItemScalarFieldEnum = {
   programId: 'programId',
   sourceChallanItemId: 'sourceChallanItemId',
   createdAt: 'createdAt'
+};
+
+exports.Prisma.ShrinkageRecordScalarFieldEnum = {
+  id: 'id',
+  challanId: 'challanId',
+  challanItemId: 'challanItemId',
+  programId: 'programId',
+  originalQty: 'originalQty',
+  originalUnit: 'originalUnit',
+  shrinkageQty: 'shrinkageQty',
+  shrinkageUnit: 'shrinkageUnit',
+  remainingQty: 'remainingQty',
+  remarks: 'remarks',
+  source: 'source',
+  createdById: 'createdById',
+  updatedById: 'updatedById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.ProductionTransactionScalarFieldEnum = {
@@ -1057,6 +1080,8 @@ exports.Prisma.DyeingOrderScalarFieldEnum = {
   sentToQc1Quantity: 'sentToQc1Quantity',
   uom: 'uom',
   receivedQuantity: 'receivedQuantity',
+  receivedUnitQuantity: 'receivedUnitQuantity',
+  receivedUnitQuantityUom: 'receivedUnitQuantityUom',
   receivedAt: 'receivedAt',
   receivedById: 'receivedById',
   receiptRemarks: 'receiptRemarks',
@@ -1107,6 +1132,8 @@ exports.Prisma.DepartmentWorkItemScalarFieldEnum = {
   uom: 'uom',
   expectedQuantity: 'expectedQuantity',
   receivedQuantity: 'receivedQuantity',
+  receivedUnitQuantity: 'receivedUnitQuantity',
+  receivedUnitQuantityUom: 'receivedUnitQuantityUom',
   processedQuantity: 'processedQuantity',
   transferredQuantity: 'transferredQuantity',
   garmentCategory: 'garmentCategory',
@@ -1194,6 +1221,11 @@ exports.Prisma.FabricInwardScalarFieldEnum = {
   unit: 'unit',
   colour: 'colour',
   supplierName: 'supplierName',
+  billerStateCity: 'billerStateCity',
+  pricePerUnit: 'pricePerUnit',
+  boxThanQty: 'boxThanQty',
+  hsnCode: 'hsnCode',
+  taxPercent: 'taxPercent',
   remarks: 'remarks',
   rollNumber: 'rollNumber',
   rollKey: 'rollKey',
@@ -1225,6 +1257,7 @@ exports.Prisma.FabricOutwardScalarFieldEnum = {
   issuePcsQty: 'issuePcsQty',
   byOrderName: 'byOrderName',
   remarks: 'remarks',
+  inchargeName: 'inchargeName',
   destination: 'destination',
   fabricType: 'fabricType',
   createdAt: 'createdAt',
@@ -1372,6 +1405,71 @@ exports.Prisma.ManualMigrationScalarFieldEnum = {
   appliedAt: 'appliedAt'
 };
 
+exports.Prisma.FabricPhotoScalarFieldEnum = {
+  id: 'id',
+  programId: 'programId',
+  workItemId: 'workItemId',
+  departmentCode: 'departmentCode',
+  fabricName: 'fabricName',
+  colour: 'colour',
+  imageData: 'imageData',
+  mimeType: 'mimeType',
+  fileName: 'fileName',
+  fileSize: 'fileSize',
+  fileHash: 'fileHash',
+  uploadedById: 'uploadedById',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.DepartmentHoldScalarFieldEnum = {
+  id: 'id',
+  holdNumber: 'holdNumber',
+  departmentCode: 'departmentCode',
+  sourceType: 'sourceType',
+  sourceId: 'sourceId',
+  sourceKey: 'sourceKey',
+  activeKey: 'activeKey',
+  programId: 'programId',
+  challanId: 'challanId',
+  challanNumber: 'challanNumber',
+  designNumber: 'designNumber',
+  serialNumber: 'serialNumber',
+  productionSheetNumber: 'productionSheetNumber',
+  fabricName: 'fabricName',
+  colour: 'colour',
+  size: 'size',
+  unit: 'unit',
+  receivedQuantity: 'receivedQuantity',
+  forwardedQuantity: 'forwardedQuantity',
+  forwardedAtHold: 'forwardedAtHold',
+  holdQuantity: 'holdQuantity',
+  releasedQuantity: 'releasedQuantity',
+  remainingQuantity: 'remainingQuantity',
+  reason: 'reason',
+  reasonOther: 'reasonOther',
+  remarks: 'remarks',
+  status: 'status',
+  heldById: 'heldById',
+  heldByName: 'heldByName',
+  heldAt: 'heldAt',
+  closedAt: 'closedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.DepartmentHoldEventScalarFieldEnum = {
+  id: 'id',
+  holdId: 'holdId',
+  action: 'action',
+  quantity: 'quantity',
+  remainingAfter: 'remainingAfter',
+  unit: 'unit',
+  remarks: 'remarks',
+  actorId: 'actorId',
+  actorName: 'actorName',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1501,6 +1599,7 @@ exports.Prisma.ModelName = {
   AuditLog: 'AuditLog',
   Challan: 'Challan',
   ChallanItem: 'ChallanItem',
+  ShrinkageRecord: 'ShrinkageRecord',
   ProductionTransaction: 'ProductionTransaction',
   QualityInspection: 'QualityInspection',
   DefectLog: 'DefectLog',
@@ -1542,7 +1641,10 @@ exports.Prisma.ModelName = {
   PackingAllocation: 'PackingAllocation',
   GarmentImage: 'GarmentImage',
   StockImport: 'StockImport',
-  ManualMigration: 'ManualMigration'
+  ManualMigration: 'ManualMigration',
+  FabricPhoto: 'FabricPhoto',
+  DepartmentHold: 'DepartmentHold',
+  DepartmentHoldEvent: 'DepartmentHoldEvent'
 };
 
 /**

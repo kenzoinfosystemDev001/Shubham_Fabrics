@@ -14,7 +14,10 @@ import {
   GarmentCategory,
   printWilcomForm, 
   downloadWilcomFormHtml,
-  extractRootWilcomPhoto
+  extractRootWilcomPhoto,
+  filterWilcomEntriesByCategory,
+  inheritedWilcomPhoto,
+  wilcomCategoryFor
 } from '@/lib/download-wilcom';
 import { FileText } from 'lucide-react';
 import { useProgramDocument } from '@/hooks/useProgramDocument';
@@ -82,7 +85,7 @@ export function WilcomPrintModal({
 
     return entries.map((e: any) => ({
       ...e,
-      photoUrl: e.photoUrl || e.photo || e.imageUrl || e.image || rootWilcomPhoto || '',
+      photoUrl: e.photoUrl || e.photo || e.imageUrl || e.image || inheritedWilcomPhoto(e, rootWilcomPhoto) || '',
     }));
   };
 
@@ -94,22 +97,17 @@ export function WilcomPrintModal({
     }
   }, [program, rootWilcomPhoto]);
 
+  // An added style's sheet (CUSTOM_...) opens on the category its designs are saved under.
+  const initialFilter = wilcomCategoryFor(initialCategory, meta);
   useEffect(() => {
-    if (initialCategory) {
-      setFilterCategory(initialCategory);
+    if (initialFilter) {
+      setFilterCategory(initialFilter);
     }
-  }, [initialCategory]);
+  }, [initialFilter]);
 
   if (!isOpen || !program) return null;
 
-  const normFilter = String(filterCategory || 'ALL').trim().toUpperCase();
-  const filtered = (normFilter === 'ALL' || !normFilter)
-    ? entries
-    : entries.filter((e) => {
-        const cat = String(e.category || '').trim().toUpperCase();
-        return cat === normFilter || cat.includes(normFilter) || normFilter.includes(cat);
-      });
-  const filteredEntries = filtered.length > 0 ? filtered : entries;
+  const filteredEntries = filterWilcomEntriesByCategory(entries, filterCategory, meta);
 
   const handlePrint = () => {
     const activePhoto = entries.find((e) => e.photoUrl)?.photoUrl || entries[0]?.photoUrl || rootWilcomPhoto;
@@ -160,16 +158,6 @@ export function WilcomPrintModal({
               >
                 <FileText className="w-3.5 h-3.5 text-brand-700" />
                 <span>View Sheet</span>
-              </button>
-            )}
-            {onViewChallan && (
-              <button
-                type="button"
-                onClick={onViewChallan}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent-50 hover:bg-accent-100 text-accent-800 rounded-lg text-xs font-bold border border-accent-200 transition cursor-pointer"
-              >
-                <FileText className="w-3.5 h-3.5 text-accent-800" />
-                <span>View Challan</span>
               </button>
             )}
             <button

@@ -25,10 +25,11 @@ import {
   Building,
   RefreshCw,
   Upload,
-  X
+  X,
+  Pencil
 } from 'lucide-react';
 import { api } from '@/lib/api';
-import { getCurrentUser, canViewClientCode } from '@/lib/rbac';
+import { getCurrentUser, canViewClientCode, isAdminUser, isProgrammingUser } from '@/lib/rbac';
 import { ProductionSheetPrintModal } from '@/components/production-sheet/ProductionSheetPrintModal';
 import { DocumentActionButtons } from '@/components/common/DocumentActionButtons';
 import { ProductionSheetView } from '@/components/production-sheet/ProductionSheetView';
@@ -38,12 +39,14 @@ import {
   extractSubStylesAndGrid,
   GarmentCategory,
   productionSheetCategoriesForViewer,
+  widthInInches,
 } from '@/lib/download-production-sheet';
 import { WilcomPrintModal } from '@/components/wilcom/WilcomPrintModal';
 import { 
   printWilcomForm, 
   downloadWilcomFormHtml,
-  extractRootWilcomPhoto
+  extractRootWilcomPhoto,
+  inheritedWilcomPhoto
 } from '@/lib/download-wilcom';
 import { ChallanListTable } from '@/components/challan/ChallanListTable';
 import { 
@@ -201,7 +204,7 @@ export default function ProgramDetailPage() {
         measurement: program.colorQuantity || program.targetQuantity || 1,
         unit: program.quantityMeasurement || 'PCS',
         fabricAverage: program.fabricAverage || 1.25,
-        fabricWidth: program.fabricWidthInches ? `${program.fabricWidthInches} Inches` : (program.fabricWidth || '58 Inches'),
+        fabricWidth: widthInInches(program.fabricWidth || program.fabricWidthInches),
         specialMaterial: program.specialMaterial || 'None',
         remarks: program.comments || '',
       },
@@ -251,9 +254,9 @@ export default function ProgramDetailPage() {
       },
     ];
   } else {
-    wilcomEntries = wilcomEntries.map((e: any, idx: number) => ({
+    wilcomEntries = wilcomEntries.map((e: any) => ({
       ...e,
-      photoUrl: e.photoUrl || e.photo || e.imageUrl || e.image || (idx === 0 ? rootWilcomPhoto : '') || '',
+      photoUrl: e.photoUrl || e.photo || e.imageUrl || e.image || inheritedWilcomPhoto(e, rootWilcomPhoto) || '',
     }));
   }
 
@@ -358,6 +361,17 @@ export default function ProgramDetailPage() {
             challan={challans?.[0]}
             size="sm"
           />
+
+          {/* Always editable, also after challans are issued (to correct mistakes); the sheet keeps its status. */}
+          {(isProgrammingUser(currentUser) || isAdminUser(currentUser)) && (
+            <Link
+              href={`/my-work/create-production-sheet?edit=${encodeURIComponent(program.id)}`}
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-neutral-50 text-neutral-900 text-xs font-semibold rounded-md border border-neutral-300 shadow-xs transition"
+            >
+              <Pencil className="w-3.5 h-3.5" />
+              <span>Edit</span>
+            </Link>
+          )}
 
           {isDraft && (
             <button
@@ -504,7 +518,7 @@ export default function ProgramDetailPage() {
             <span className="text-neutral-500 block text-[10px] font-semibold uppercase tracking-wider">Client</span>
             <span className="font-bold text-neutral-900 text-sm">{program.clientName || program.buyerName || 'Standard Client'}</span>
             {isClientCodeVisible && (
-              <span className="inline-flex items-center gap-1 mt-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-accent-50 text-accent-800 border border-accent-200 block w-fit">
+              <span className="inline-flex items-center gap-1 mt-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-accent-50 text-accent-800 border border-accent-200 w-fit">
                 <span>Code:</span>
                 <span>{program.clientCode}</span>
               </span>
@@ -768,7 +782,7 @@ export default function ProgramDetailPage() {
               </div>
               <div>
                 <span className="text-neutral-500 block text-[11px]">Fabric Width</span>
-                <span className="font-mono text-neutral-900">{program.fabricWidthInches || '58'} Inches</span>
+                <span className="font-mono text-neutral-900">{widthInInches(program.fabricWidth || program.fabricWidthInches) || '—'}</span>
               </div>
               <div>
                 <span className="text-neutral-500 block text-[11px]">Fabric Color</span>
@@ -803,7 +817,8 @@ export default function ProgramDetailPage() {
                   {program.fabricDyeingRequired ? 'Dyeing Department' : 'Embroidery Department'}
                 </span>
               </div>
-            </div>          </div>
+            </div>
+          </div>
 
           {/* PRODUCTION SHEET SPECIFICATION & BREAKDOWN */}
           <div className="bg-white border-2 border-neutral-200 rounded-lg p-5 shadow-xs space-y-4 md:col-span-2 text-neutral-900">

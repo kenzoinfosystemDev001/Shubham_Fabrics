@@ -22,6 +22,7 @@ import {
   sheetRef,
 } from '@/components/workflow/WorkflowUi';
 import { CategoryBadge } from '@/components/recutting/RecuttingUi';
+import { AverageField, QuantityUnitField, averageError, quantityPairError, type QtyUnit } from '@/components/challan/AverageField';
 import { CATEGORY_LABEL, GARMENT_CATEGORIES, categoryName, readyForStitching } from '@/lib/recutting.mjs';
 import { distinct, incomingChallanOptions } from '@/lib/challan-sheets.mjs';
 import { IncomingChallanPicker, SheetBreakdown } from '@/components/challan/IncomingChallanPicker';
@@ -42,10 +43,18 @@ interface Row {
   key: string;
   allocationId: string;
   quantity: string;
+  /** Unit of the Size: the allocation's cut unit unless the other one is chosen (then the line sends all still to send). */
+  sizeUnit: QtyUnit;
+  /** Optional Average of the entry, with its own MTR / PCS (never pre-selected). */
+  average: string;
+  averageUnit: QtyUnit;
+  /** Required Unit quantity of the entry, with its own MTR / PCS. */
+  unitQuantity: string;
+  unitQuantityUom: QtyUnit;
   remarks: string;
 }
 
-const newRow = (): Row => ({ key: Math.random().toString(36).slice(2), allocationId: '', quantity: '', remarks: '' });
+const newRow = (): Row => ({ key: Math.random().toString(36).slice(2), allocationId: '', quantity: '', sizeUnit: '', average: '', averageUnit: '', unitQuantity: '', unitQuantityUom: '', remarks: '' });
 
 function StitchingChallanContent() {
   const params = useSearchParams();
@@ -114,13 +123,14 @@ function StitchingChallanContent() {
   const updateRow = (key: string, patch: Partial<Row>) => setRows((rs) => rs.map((r) => (r.key === key ? { ...r, ...patch } : r)));
   const choose = (key: string, allocationId: string) => {
     const a = byId(allocationId);
-    updateRow(key, { allocationId, quantity: a ? String(readyForStitching(a)) : '' });
+    updateRow(key, { allocationId, quantity: a ? String(readyForStitching(a)) : '', sizeUnit: a?.cutUom === 'MTR' || a?.cutUom === 'PCS' ? a.cutUom : '' });
   };
 
   const filled = rows.filter((r) => r.allocationId);
   const totals = filled.reduce<Record<string, number>>((acc, r) => {
     const a = byId(r.allocationId);
-    if (a) acc[a.cutUom] = (acc[a.cutUom] || 0) + (Number(r.quantity) || 0);
+    const unit = r.sizeUnit || a?.cutUom;
+    if (a && unit) acc[unit] = (acc[unit] || 0) + (Number(r.quantity) || 0);
     return acc;
   }, {});
   const allocationRefs = filled.map((r) => byId(r.allocationId)?.allocationNumber).filter(Boolean);
@@ -145,11 +155,9 @@ function StitchingChallanContent() {
     if (!hasSource) return setError('Select the incoming challan this challan is issued from.');
     if (!challanNumber.trim()) return setNumberError('Challan Number is required.');
     if (filled.length === 0) return setError('Add at least one item.');
-    const over = filled.find((r) => {
-      const a = byId(r.allocationId);
-      return a && Number(r.quantity) > readyForStitching(a);
-    });
-    if (over) return setError(`Requested quantity exceeds the available balance of ${byId(over.allocationId)?.allocationNumber}.`);
+    const entryError = (r: Row) => averageError(r.average, r.averageUnit) || quantityPairError(r.unitQuantity, r.unitQuantityUom, 'Unit quantity', true);
+    const bad = filled.findIndex((r) => entryError(r));
+    if (bad >= 0) return setError(`Item ${bad + 1}: ${entryError(filled[bad])}.`);
     setSubmitting(true);
     try {
       const body = await fetchJson('/api/recutting/stitching-challans', {
@@ -161,7 +169,15 @@ function StitchingChallanContent() {
           issuedDate: challanDate,
           remarks,
           sourceChallanIds: sourceIds,
-          lines: filled.map((r) => ({ allocationId: r.allocationId, quantity: r.quantity, remarks: r.remarks })),
+          lines: filled.map((r) => ({
+            allocationId: r.allocationId,
+            quantity: r.quantity,
+            uom: r.sizeUnit || undefined,
+            ...(r.average.trim() !== '' ? { average: r.average, averageUnit: r.averageUnit } : {}),
+            unitQuantity: r.unitQuantity,
+            unitQuantityUom: r.unitQuantityUom,
+            remarks: r.remarks,
+          })),
         }),
       });
       setIssued(body.data);
@@ -258,19 +274,21 @@ function StitchingChallanContent() {
                     <th className="py-3 px-3">Fabric</th>
                     <th className="py-3 px-3">Dyed / Undyed</th>
                     <th className="py-3 px-3 text-right">Ready</th>
-                    <th className="py-3 px-3 min-w-[130px] text-right">Stitching Qty</th>
-                    <th className="py-3 px-3">Unit</th>
+                    <th className="py-3 px-3 min-w-[220px]">Size</th>
+                    <th className="py-3 px-3 min-w-[200px]">Average</th>
+                    <th className="py-3 px-3 min-w-[200px]">Unit</th>
                     <th className="py-3 px-3 min-w-[140px]">Remarks</th>
                     <th className="py-3 px-3"><span className="sr-only">Remove</span></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-neutral-100">
-                  {!hasSource && <EmptyRow colSpan={12} text="Select an incoming challan above to add its cut allocations" />}
+                  {!hasSource && <EmptyRow colSpan={14} text="Select an incoming challan above to add its cut allocations" />}
                   {hasSource &&
                     rows.map((r) => {
                       const a = byId(r.allocationId);
                       const taken = new Set(rows.filter((x) => x.key !== r.key).map((x) => x.allocationId));
-                      const over = a && Number(r.quantity) > readyForStitching(a);
+                      const otherUnit = Boolean(a && r.sizeUnit && r.sizeUnit !== a.cutUom);
+                      const over = a && !otherUnit && Number(r.quantity) > readyForStitching(a);
                       return (
                         <tr key={r.key}>
                           <td className="py-2.5 px-4">
@@ -291,20 +309,41 @@ function StitchingChallanContent() {
                           <td className="py-2.5 px-3">{a ? <FabricStatusBadge status={a.workItem?.fabricProcessingStatus} /> : '—'}</td>
                           <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">{a ? fmtQty(readyForStitching(a), a.cutUom) : '—'}</td>
                           <td className="py-2.5 px-3">
-                            <input
-                              type="number"
-                              min="0.001"
-                              step="any"
-                              max={a ? readyForStitching(a) : undefined}
+                            <QuantityUnitField
+                              label="Size"
                               value={r.quantity}
-                              onChange={(e) => updateRow(r.key, { quantity: e.target.value })}
-                              disabled={!a}
+                              unit={r.sizeUnit}
+                              onValue={(quantity) => updateRow(r.key, { quantity })}
+                              onUnit={(sizeUnit) =>
+                                // Back in the cut unit the quantity is checked against the cut balance again; start from it.
+                                updateRow(r.key, sizeUnit === a?.cutUom ? { sizeUnit, quantity: String(readyForStitching(a)) } : { sizeUnit, quantity: '' })
+                              }
                               required={Boolean(a)}
-                              className={`${FIELD} text-right tabular-nums ${over ? 'border-danger-500' : ''}`}
-                              aria-label="Quantity to stitch"
+                              disabled={!a}
+                              min="0.001"
+                              max={a && !otherUnit ? readyForStitching(a) : undefined}
+                              inputClassName={`${FIELD} text-right ${over ? 'border-danger-500' : ''}`}
+                            />
+                            {otherUnit && a && (
+                              <span className="block mt-1 text-[11px] text-neutral-600 max-w-[220px]">
+                                Cut in {a.cutUom}: this line sends all {fmtQty(readyForStitching(a), a.cutUom)} still to send of {a.allocationNumber}. Enter the {r.sizeUnit} Stitching receives; units are never converted.
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-2.5 px-3">
+                            <AverageField average={r.average} averageUnit={r.averageUnit} onChange={(patch) => updateRow(r.key, patch)} disabled={!a} />
+                          </td>
+                          <td className="py-2.5 px-3">
+                            <QuantityUnitField
+                              label="Unit quantity"
+                              value={r.unitQuantity}
+                              unit={r.unitQuantityUom}
+                              onValue={(unitQuantity) => updateRow(r.key, { unitQuantity })}
+                              onUnit={(unitQuantityUom) => updateRow(r.key, { unitQuantityUom })}
+                              required={Boolean(a)}
+                              disabled={!a}
                             />
                           </td>
-                          <td className="py-2.5 px-3 text-xs font-semibold">{a?.cutUom || '—'}</td>
                           <td className="py-2.5 px-3">
                             <input value={r.remarks} onChange={(e) => updateRow(r.key, { remarks: e.target.value })} maxLength={300} className={FIELD} aria-label="Remarks" />
                           </td>

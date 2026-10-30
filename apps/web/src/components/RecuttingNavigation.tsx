@@ -174,9 +174,9 @@ export function RecuttingNavigation() {
         <nav className="flex-1 px-3 space-y-1 overflow-y-auto pt-2">
           {/* 1. Dashboard */}
           <Link
-            href="C:/Users/PiyushSharma/AppData/Local/Programs/Git/recutting"
+            href="/recutting"
             onClick={() => setMobileOpen(false)}
-            className={linkClass('C:/Users/PiyushSharma/AppData/Local/Programs/Git/recutting', true)}
+            className={linkClass('/recutting', true)}
           >
             <span>Dashboard</span>
           </Link>
@@ -185,7 +185,7 @@ export function RecuttingNavigation() {
           <div>
             <div
               className={`px-3 py-2.5 text-xs font-semibold ${
-                pathname.startsWith('C:/Users/PiyushSharma/AppData/Local/Programs/Git/recutting/my-work') ? 'text-neutral-900' : 'text-neutral-700'
+                pathname.startsWith('/recutting/my-work') ? 'text-neutral-900' : 'text-neutral-700'
               }`}
             >
               My Work
@@ -221,18 +221,26 @@ export function RecuttingNavigation() {
 
           {/* 3. Recutting History */}
           <Link
-            href="C:/Users/PiyushSharma/AppData/Local/Programs/Git/recutting/history"
+            href="/recutting/history"
             onClick={() => setMobileOpen(false)}
-            className={linkClass('C:/Users/PiyushSharma/AppData/Local/Programs/Git/recutting/history', true)}
+            className={linkClass('/recutting/history', true)}
           >
             <span>Recutting History</span>
           </Link>
 
+          {/* HOLD: fabric kept back from forwarding */}
+          <Link
+            href="/recutting/hold"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/recutting/hold', true)}
+          >
+            <span>HOLD</span>
+          </Link>
           {/* 4. Floor Board */}
           <Link
-            href="C:/Users/PiyushSharma/AppData/Local/Programs/Git/recutting/floor-board"
+            href="/recutting/floor-board"
             onClick={() => setMobileOpen(false)}
-            className={linkClass('C:/Users/PiyushSharma/AppData/Local/Programs/Git/recutting/floor-board', true)}
+            className={linkClass('/recutting/floor-board', true)}
           >
             <span>Floor Board</span>
           </Link>
@@ -244,7 +252,7 @@ export function RecuttingNavigation() {
             <UserCircle className="w-8 h-8 text-danger-600" />
             <div className="flex-1 min-w-0">
               <span className="text-xs font-semibold text-neutral-900 truncate block drop-shadow-xs">
-                {currentUser.fullName || (isAdmin ? 'System Administrator' : 'Recutting Supervisor')}
+                {(currentUser.fullName && currentUser.fullName.trim().toLowerCase() !== 'recutting department' ? currentUser.fullName : '') || (isAdmin ? 'System Administrator' : 'Recutting Supervisor')}
               </span>
               <span className="text-[10px] text-danger-600 font-bold tracking-wide block truncate drop-shadow-xs">
                 Recutting Department

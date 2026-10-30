@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { MIXED_UNIT, addTotals, challanTotalsByUnit, unitOf } from '@/lib/challan-units.mjs';
 
 type Totals = Record<string, number>;

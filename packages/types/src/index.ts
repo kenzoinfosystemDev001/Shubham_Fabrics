@@ -1,4 +1,4 @@
-// Subham Fabrics MES - Domain Models and Types
+// Shubham Fabrics MES - Domain Models and Types
 
 export enum UserRole {
   SUPER_ADMIN = 'SUPER_ADMIN',

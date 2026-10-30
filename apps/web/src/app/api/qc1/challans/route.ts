@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
+import { inchargeNameOf } from '@/lib/challan-remarks.mjs';
 import { formatTotals, totalsByUnit, unitOf } from '@/lib/challan-units.mjs';
 import { ITEMS_WITH_SHEET } from '@/lib/challan-sheets.mjs';
 
@@ -140,6 +141,7 @@ export async function GET(request: Request) {
           pending: Math.max(0, sent - inspected),
           passed: log ? log.goodQuantity : 0,
           failed: log ? log.rejectQuantity : 0,
+          shrinkage: log ? log.wasteQuantity || 0 : 0,
           rework: log ? log.reworkQuantity : 0,
           hold: log ? log.balanceQuantity : 0,
         };
@@ -167,7 +169,7 @@ export async function GET(request: Request) {
         completedDate: c.completedDate,
         createdAt: c.createdAt,
         remarks: c.remarks,
-        dyeingIncharge: c.issuedBy?.fullName || c.issuedBy?.username || 'Dyeing Incharge',
+        dyeingIncharge: inchargeNameOf(c) || c.issuedBy?.username || 'Dyeing Incharge',
         receivedBy: c.receivedBy?.fullName || c.receivedBy?.username || null,
         programId: c.programId,
         productionSheetNumber: c.program?.programSerialNo || c.program?.programNumber || '—',
@@ -182,6 +184,7 @@ export async function GET(request: Request) {
         pendingInspectionQuantity: pendingInspectionQty,
         passedQuantity: latestProdLog ? latestProdLog.goodQuantity : 0,
         failedQuantity: latestProdLog ? latestProdLog.rejectQuantity : 0,
+        shrinkageQuantity: latestProdLog ? latestProdLog.wasteQuantity || 0 : 0,
         reworkQuantity: latestProdLog ? latestProdLog.reworkQuantity : 0,
         holdQuantity: latestProdLog ? latestProdLog.balanceQuantity : 0,
         uom: first.unit,
@@ -201,7 +204,7 @@ export async function GET(request: Request) {
   } catch (error: any) {
     console.error('Error fetching QC1 challans:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to fetch QC1 challans' },
+      { error: error.message || 'Failed to fetch Dyeing QC challans' },
       { status: 500 }
     );
   }

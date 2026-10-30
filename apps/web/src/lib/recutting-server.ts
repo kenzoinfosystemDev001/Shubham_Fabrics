@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { assertChallanNumbersAvailable, challanNumberErrorResponse, requireChallanNumber } from '@/lib/challan-number-server';
 import {
   LINES_WITH_SHEET,
@@ -18,6 +18,7 @@ import {
 } from '@/lib/work-items-server';
 import { OPEN_WORK_STATUSES, receivedBasis } from '@/lib/work-items.mjs';
 import { MIXED_UNIT } from '@/lib/challan-units.mjs';
+import { lineExtrasOf, lineExtrasWriter } from '@/lib/challan-item-average';
 import {
   CATEGORY_LABEL,
   GARMENT_CATEGORIES,
@@ -31,6 +32,7 @@ import {
   validateAllocationRows,
   validateCancel,
   validateCut,
+  stitchingLineUse,
   validateStitchingLines,
 } from '@/lib/recutting.mjs';
 
@@ -86,7 +88,7 @@ async function earlierResponse(key: string | null, endpoint: string) {
 const isUniqueViolation = (e: unknown) => (e as { code?: string } | null)?.code === 'P2002';
 
 /** Keeps the line's allocated total (processedQuantity) and status in step with its allocations. */
-async function syncItem(tx: any, itemId: string) {
+export async function syncItem(tx: any, itemId: string) {
   const item = await tx.departmentWorkItem.findUnique({ where: { id: itemId }, include: { allocations: true } });
   if (!item) return;
   const status = recuttingItemStatus(item, item.allocations);
@@ -171,7 +173,7 @@ const createAllocations = (request: Request, itemId: string) =>
             where: { id: item.id, processedQuantity: item.processedQuantity, updatedAt: item.updatedAt },
             data: { processedQuantity: round(item.processedQuantity + check.total), startedAt: item.startedAt ?? new Date() },
           });
-          if (res.count !== 1) throw new WorkRequestError(`${item.itemNumber} was allocated by someone else just now. Refresh and try again.`, 409);
+          if (res.count !== 1) throw new WorkRequestError(`${item.fabricName} was allocated by someone else just now. Refresh and try again.`, 409);
           const latest = await tx.workItemAllocation.findFirst({
             where: { allocationNumber: { startsWith: `RCA-${year}-` } },
             orderBy: { allocationNumber: 'desc' },
@@ -404,9 +406,10 @@ const listStitchingChallans = (request: Request) =>
   }, 'Failed to load Stitching challans.');
 
 /**
- * POST stitching-challans  { idempotencyKey, challanNumber, issuedDate?, remarks?, sourceChallanIds, lines: [{ allocationId, quantity, remarks? }] }
+ * POST stitching-challans  { idempotencyKey, challanNumber, issuedDate?, remarks?, sourceChallanIds, lines: [{ allocationId, quantity, uom?, average?, averageUnit?, unitQuantity?, unitQuantityUom?, remarks? }] }
  * sourceChallanIds: the incoming challans selected; every allocation's line must come from one of them.
- * Issues only cut quantity not yet sent, category/style-wise, in the allocation's cut unit.
+ * Issues only cut quantity not yet sent, category/style-wise. A line is in the allocation's cut unit unless
+ * `uom` names the other one; such a line carries all the allocation still has to send (stitchingLineUse).
  */
 const issueStitchingChallan = (request: Request) =>
   guarded(request, cfg, async (user) => {
@@ -425,7 +428,7 @@ const issueStitchingChallan = (request: Request) =>
     let challanNumber = '';
     try {
       challanNumber = requireChallanNumber(body.challanNumber);
-      const lines: Array<{ allocationId: string; quantity: unknown; remarks?: unknown }> = Array.isArray(body.lines) ? body.lines : [];
+      const lines: Array<{ allocationId: string; quantity: unknown; uom?: unknown; average?: unknown; averageUnit?: unknown; unitQuantity?: unknown; unitQuantityUom?: unknown; remarks?: unknown }> = Array.isArray(body.lines) ? body.lines : [];
       const allocations = await prisma.workItemAllocation.findMany({
         where: { id: { in: lines.map((l) => l.allocationId) } },
         include: {
@@ -450,10 +453,14 @@ const issueStitchingChallan = (request: Request) =>
       // The selected incoming challans are required: an allocation of any other challan's line is refused.
       const check = validateStitchingLines(lines, byId, Array.isArray(body.sourceChallanIds) ? body.sourceChallanIds : []);
       if (!check.ok) throw new WorkRequestError(check.error);
-      await assertChallanNumbersAvailable(prisma, [{ value: challanNumber }]);
+      await assertChallanNumbersAvailable(prisma, cfg.code, [{ value: challanNumber }]);
       const issuedDate = body.issuedDate ? new Date(String(body.issuedDate)) : new Date();
       if (Number.isNaN(issuedDate.getTime())) throw new WorkRequestError('Challan date is not a valid date.');
-      const prepared = lines.map((l) => ({ a: byId.get(l.allocationId)!, quantity: round(Number(l.quantity)), remarks: textOf(l.remarks, 300) }));
+      const prepared = lines.map((l, index) => {
+        const a = byId.get(l.allocationId)!;
+        return { a, quantity: round(Number(l.quantity)), ...stitchingLineUse(a, l), extras: lineExtrasOf(l, index, (m) => new WorkRequestError(m)), remarks: textOf(l.remarks, 300) };
+      });
+      const extrasOf = await lineExtrasWriter(prepared.map((p) => p.extras));
       const total = round(prepared.reduce((s, p) => s + p.quantity, 0));
       // Header parent: the first selected incoming challan used; every line also records its own source line.
       const usedSources = new Set(prepared.map((p) => p.a.workItem.inboundChallanId));
@@ -480,8 +487,9 @@ const issueStitchingChallan = (request: Request) =>
             remarks: textOf(body.remarks),
           },
         });
-        for (const { a, quantity, remarks } of prepared) {
-          const after = round(a.transferredQuantity + quantity);
+        for (const { a, quantity, unit, consumes, extras, remarks } of prepared) {
+          // The allocation's balance moves in its cut unit; the challan line keeps the unit it was sent in.
+          const after = round(a.transferredQuantity + consumes);
           // Guards on the sent and cut totals mean the same cut quantity is never issued twice.
           const moved = await tx.workItemAllocation.updateMany({
             where: { id: a.id, status: { not: 'CANCELLED' }, transferredQuantity: a.transferredQuantity, cutQuantity: a.cutQuantity },
@@ -500,13 +508,15 @@ const issueStitchingChallan = (request: Request) =>
               styleRef: a.otherName && !a.styleRef ? a.otherName : a.styleRef,
               programId: w.programId,
               sourceChallanItemId: w.inboundChallanItemId,
-              unitType: a.cutUom === 'PCS' ? 'PCS' : 'ROLL',
+              unitType: unit === 'PCS' ? 'PCS' : 'ROLL',
               quantity,
-              uom: a.cutUom,
+              uom: unit,
+              ...extrasOf(extras),
               remarks: [
                 `Category: ${categoryName(a)}`,
                 a.styleRef ? `Style: ${a.styleRef}` : null,
                 `Allocation: ${a.allocationNumber}`,
+                unit !== a.cutUom ? `Cut ${consumes} ${a.cutUom}, sent as ${quantity} ${unit}` : null,
                 `Incoming: ${w.inboundChallan.challanNumber}`,
                 `Status: ${w.fabricProcessingStatus === 'DYED' ? 'Dyed' : 'Undyed'}`,
                 remarks,
@@ -522,7 +532,7 @@ const issueStitchingChallan = (request: Request) =>
               challanId: challan.id,
               challanItemId: ci.id,
               quantity,
-              uom: a.cutUom,
+              uom: unit,
               fabricProcessingStatus: w.fabricProcessingStatus,
               kind: 'PASS',
               createdById: user.id,
@@ -535,11 +545,11 @@ const issueStitchingChallan = (request: Request) =>
               departmentCode: cfg.code,
               operationName: 'RECUTTING_TO_STITCHING',
               operatorId: user.id,
-              inputQuantity: quantity,
-              goodQuantity: quantity,
+              inputQuantity: consumes,
+              goodQuantity: consumes,
               balanceQuantity: round(a.cutQuantity - after),
               unitOfMeasure: a.cutUom,
-              notes: `${a.allocationNumber} (${categoryName(a)}${a.styleRef ? ` ${a.styleRef}` : ''}): ${quantity} ${a.cutUom} to Stitching on ${challanNumber}`,
+              notes: `${a.allocationNumber} (${categoryName(a)}${a.styleRef ? ` ${a.styleRef}` : ''}): ${consumes} ${a.cutUom}${unit !== a.cutUom ? ` (sent as ${quantity} ${unit})` : ''} to Stitching on ${challanNumber}`,
             },
           });
         }
@@ -554,7 +564,7 @@ const issueStitchingChallan = (request: Request) =>
             toStatus: 'ISSUED',
             action: 'ISSUE',
             actorId: user.id,
-            metadata: JSON.stringify(prepared.map((p) => ({ allocation: p.a.allocationNumber, category: p.a.category, style: p.a.styleRef, quantity: p.quantity, uom: p.a.cutUom }))),
+            metadata: JSON.stringify(prepared.map((p) => ({ allocation: p.a.allocationNumber, category: p.a.category, style: p.a.styleRef, quantity: p.quantity, uom: p.unit, cutUsed: p.consumes, cutUom: p.a.cutUom }))),
           },
         });
         await tx.auditLog.create({

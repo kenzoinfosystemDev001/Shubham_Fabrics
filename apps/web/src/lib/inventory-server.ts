@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { apiErrorResponse } from '@/lib/api-errors';
 import { PROGRAM_SELECT, TX, USER_SELECT, WORKFLOWS, WorkRequestError, guarded, syncWorkItems, textOf, workflowHandlers } from '@/lib/work-items-server';
 import {
@@ -184,8 +184,14 @@ function challanView(c: any, imageOf: ImageMap) {
     issuedBy: c.issuedBy,
     receivedBy: c.receivedBy,
     events: c.events,
+    // The challan's own lines (MTR and PCS as sent), for the receiving table.
+    items: c.items || [],
     lines: (c.workItemsInbound || []).map((w: any) => ({
       id: w.id,
+      inboundChallanItemId: w.inboundChallanItemId,
+      fabricName: w.fabricName,
+      receivedUnitQuantity: w.receivedUnitQuantity,
+      receivedUnitQuantityUom: w.receivedUnitQuantityUom,
       itemNumber: w.itemNumber,
       status: w.status,
       inventoryStatus: inventoryStatus(w),

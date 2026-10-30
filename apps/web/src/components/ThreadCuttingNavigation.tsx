@@ -222,6 +222,14 @@ export function ThreadCuttingNavigation() {
             <span>Thread Cutting History</span>
           </Link>
 
+          {/* HOLD: fabric kept back from forwarding */}
+          <Link
+            href="/thread-cutting/hold"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/thread-cutting/hold', true)}
+          >
+            <span>HOLD</span>
+          </Link>
           {/* 4. Floor Board */}
           <Link
             href="/thread-cutting/floor-board"

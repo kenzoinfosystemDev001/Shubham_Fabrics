@@ -41,6 +41,16 @@ const MIGRATIONS = [
   '20261026_stock_imports.sql',
   '20261026_grn_unit.sql',
   '20261026_mtr_pcs_per_item.sql',
+  '20261027_inward_bill_details.sql',
+  '20261028_challan_item_average.sql',
+  '20261028_qc_station_usernames.sql',
+  '20261028_challan_number_per_department.sql',
+  '20261028_incharge_name.sql',
+  '20261028_shrinkage.sql',
+  '20261028_fabric_photos.sql',
+  '20261029_challan_item_unit_quantity.sql',
+  '20261029_department_holds.sql',
+  '20261029_received_unit_quantity.sql',
   '20261030_challan_item_sheet_source.sql',
 ];
 

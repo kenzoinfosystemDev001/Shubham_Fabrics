@@ -32,10 +32,12 @@ import {
   Trash2,
 } from 'lucide-react';
 import { DepartmentStockView } from '@/components/DepartmentStockView';
+import { ReceiveChallanConfirm } from '@/components/challan/ReceiptLines';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { 
   downloadProductionSheetHtml, 
-  printProductionSheet 
+  printProductionSheet,
+  widthInInches,
 } from '@/lib/download-production-sheet';
 import { 
   downloadChallanHtml, 
@@ -45,26 +47,32 @@ import { TransferDocuments } from '@/components/common/TransferDocuments';
 import { ChallanNumberField, challanNumberClientError } from '@/components/challan/ChallanNumberField';
 import { formatTotals } from '@/lib/challan-units.mjs';
 
-type Qc1ChallanNumberField = 'passChallanNumber' | 'reworkChallanNumber' | 'rejectChallanNumber';
+type Qc1ChallanNumberField = 'passChallanNumber' | 'reworkChallanNumber';
 const EMPTY_QC1_CHALLAN_NUMBERS: Record<Qc1ChallanNumberField, string> = {
   passChallanNumber: '',
   reworkChallanNumber: '',
-  rejectChallanNumber: '',
 };
 
 /** One challan line's inspection quantities (each line is inspected in its own unit). */
-type UnitQty = { quantityInspected: string; quantityPassed: string; quantityFailed: string; quantityRework: string; quantityHold: string };
+type UnitQty = { quantityInspected: string; quantityPassed: string; quantityShrinkage: string; quantityRework: string; quantityHold: string };
 const pickUnitQty = (f: UnitQty): UnitQty => ({
   quantityInspected: f.quantityInspected,
   quantityPassed: f.quantityPassed,
-  quantityFailed: f.quantityFailed,
+  quantityShrinkage: f.quantityShrinkage,
   quantityRework: f.quantityRework,
   quantityHold: f.quantityHold,
 });
 
+/** Inspected quantity less shrinkage (what passes or goes to rework), as form text. */
+const afterShrinkage = (inspected: string, shrinkage: string) =>
+  blankZero(Math.max(0, Math.round((Number(inspected || 0) - Number(shrinkage || 0)) * 1000) / 1000));
+
+/** A quantity as form text: 0 is an empty field. */
+const blankZero = (n: number) => (n ? String(n) : '');
+
 /**
  * The lines of a Dyeing -> QC1 challan as inspected: each keeps its fabric, colour, unit and Production
- * Sheet, so its outcome stays with it on the challans QC1 issues.
+ * Sheet, so its outcome stays with it on the challans Dyeing QC issues.
  */
 function inspectLinesOf(challan: any): Array<{ key: string; unit: string; sent: number; label: string }> {
   const items: any[] = Array.isArray(challan?.items) ? challan.items : [];
@@ -74,23 +82,23 @@ function inspectLinesOf(challan: any): Array<{ key: string; unit: string; sent: 
     const sheet = item.program?.programSerialNo || item.program?.programNumber || challan?.productionSheetNumber || '';
     const what = [item.fabricCode || item.itemDescription, item.colour].filter(Boolean).join(' — ');
     const qty = Number(item.quantity) || 0;
-    return { key: item.id, unit, sent: qty, label: String(index + 1) + '. ' + (sheet ? sheet + ' · ' : '') + (what || 'Line') + ' (' + qty + ' ' + unit + ')' };
+    return { key: item.id, unit, sent: qty, label: `${index + 1}. ${sheet ? `${sheet} · ` : ''}${what || 'Line'} (${qty} ${unit})` };
   });
 }
 
+/** An inspection outcome per unit, e.g. "120 MTR · 10 PCS". */
 /** Unit of a challan's defective quantity (its own unit; older challans used the header unit). */
 const defectUnitOf = (c: any): string =>
   [c?.defectiveUnit, c?.fabricUnit, c?.items?.[0]?.uom].map((u) => String(u || '').toUpperCase()).find((u) => u === 'MTR' || u === 'PCS') || 'MTR';
 
-const outcomeText = (result: any, key: 'passed' | 'rework' | 'failed') =>
+const outcomeText = (result: any, key: 'passed' | 'rework' | 'shrinkage') =>
   formatTotals(Object.fromEntries((result?.byUnit || []).map((r: any) => [r.unit, r[key]])));
 
 /** Challans the QC1 inspect route will create for these quantities (mirrors the server rule). */
-function qc1NeededChallanNumbers(form: { result: string; quantityPassed: string; quantityRework: string; quantityFailed: string }) {
+function qc1NeededChallanNumbers(form: { result: string; quantityPassed: string; quantityRework: string }) {
   const needed: Array<{ field: Qc1ChallanNumberField; label: string }> = [];
   if (form.result === 'PASS' && Number(form.quantityPassed || 0) > 0) needed.push({ field: 'passChallanNumber', label: 'Embroidery challan number' });
   if (Number(form.quantityRework || 0) > 0) needed.push({ field: 'reworkChallanNumber', label: 'Rework challan number' });
-  if (Number(form.quantityFailed || 0) > 0) needed.push({ field: 'rejectChallanNumber', label: 'Defective shelf challan number' });
   return needed;
 }
 
@@ -165,16 +173,17 @@ export default function QC1MyWorkPage() {
   const [inspectionForm, setInspectionForm] = useState({
     quantityInspected: '',
     quantityPassed: '',
-    quantityFailed: '',
+    quantityShrinkage: '',
     quantityRework: '',
-    quantityHold: '0',
-    result: 'PASS' as 'PASS' | 'REWORK' | 'REJECT',
+    quantityHold: '',
+    result: 'PASS' as 'PASS' | 'REWORK',
     observedColor: '',
     defectType: 'SHADE_VARIATION',
     defectRemarks: '',
     reworkReason: '',
     holdReason: '',
     remarks: '',
+    inchargeName: '',
   });
   // Each challan line (fabric, colour, Production Sheet) is inspected on its own, in its own unit. The
   // breakdown inputs edit `inspectLine`; the other lines' entries are kept in lineQuantities.
@@ -191,13 +200,13 @@ export default function QC1MyWorkPage() {
     setInspectLine(key);
     setInspectionForm({ ...inspectionForm, ...all[key] });
   };
-  // A decision applies to every line: all of each line's inspected quantity takes that outcome.
-  const applyDecisionToOtherLines = (result: 'PASS' | 'REWORK' | 'REJECT') =>
+  // A decision applies to every line: each line's inspected quantity less its shrinkage takes that outcome.
+  const applyDecisionToOtherLines = (result: 'PASS' | 'REWORK') =>
     setLineQuantities((prev) =>
       Object.fromEntries(
         Object.entries(prev).map(([unit, q]) => {
-          const total = q.quantityInspected || '0';
-          return [unit, { ...q, quantityPassed: result === 'PASS' ? total : '0', quantityRework: result === 'REWORK' ? total : '0', quantityFailed: result === 'REJECT' ? total : '0', quantityHold: '0' }];
+          const total = afterShrinkage(q.quantityInspected, q.quantityShrinkage);
+          return [unit, { ...q, quantityPassed: result === 'PASS' ? total : '', quantityRework: result === 'REWORK' ? total : '', quantityHold: '' }];
         })
       )
     );
@@ -207,7 +216,6 @@ export default function QC1MyWorkPage() {
     result: inspectionForm.result,
     quantityPassed: anyUnitHas('quantityPassed'),
     quantityRework: anyUnitHas('quantityRework'),
-    quantityFailed: anyUnitHas('quantityFailed'),
   };
 
   const [submittingInspection, setSubmittingInspection] = useState(false);
@@ -247,7 +255,7 @@ export default function QC1MyWorkPage() {
 
       const res = await fetch(`/api/qc1/challans?${params.toString()}`);
       if (!res.ok) {
-        throw new Error('Failed to load QC1 incoming challans.');
+        throw new Error('Failed to load Dyeing QC incoming challans.');
       }
       const json = await res.json();
       const list = json.data || [];
@@ -288,8 +296,11 @@ export default function QC1MyWorkPage() {
     loadChallans();
   };
 
-  // Receive Material Handler
+  // Receive Material: the challan's fabrics with MTR and PCS are shown first, then received.
+  const [confirmReceive, setConfirmReceive] = useState<QC1Challan | null>(null);
+  const [receiveError, setReceiveError] = useState<string | null>(null);
   const handleReceiveChallan = async (challan: QC1Challan) => {
+    setReceiveError(null);
     try {
       setReceivingId(challan.id);
       const res = await fetch(`/api/qc1/challans/${challan.id}/receive`, {
@@ -297,16 +308,17 @@ export default function QC1MyWorkPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           receiverId: currentUser?.id,
-          notes: 'Received at QC1 inspection table',
+          notes: 'Received at Dyeing QC inspection table',
         }),
       });
       const json = await res.json();
       if (!res.ok) {
         throw new Error(json.error || 'Failed to receive Challan.');
       }
+      setConfirmReceive(null);
       await loadChallans();
     } catch (err: any) {
-      alert(err.message || 'Error receiving Challan');
+      setReceiveError(err.message || 'Error receiving Challan');
     } finally {
       setReceivingId(null);
     }
@@ -324,9 +336,9 @@ export default function QC1MyWorkPage() {
     const startQty = (sent: number): UnitQty => ({
       quantityInspected: String(sent),
       quantityPassed: String(sent),
-      quantityFailed: '0',
-      quantityRework: '0',
-      quantityHold: '0',
+      quantityShrinkage: '',
+      quantityRework: '',
+      quantityHold: '',
     });
     setLineQuantities(Object.fromEntries(units.map((u) => [u.key, startQty(u.sent || 0)])));
     setInspectLine(units[0].key);
@@ -339,6 +351,7 @@ export default function QC1MyWorkPage() {
       reworkReason: '',
       holdReason: '',
       remarks: '',
+      inchargeName: '',
     });
   };
 
@@ -352,14 +365,14 @@ export default function QC1MyWorkPage() {
 
     // Frontend validation guard, per line (meters and pieces are never added together)
     const quantities = allLineQuantities();
-    const byLine: Record<string, { quantityInspected: number; quantityPassed: number; quantityFailed: number; quantityRework: number; quantityHold: number }> = {};
+    const byLine: Record<string, { quantityInspected: number; quantityPassed: number; quantityShrinkage: number; quantityRework: number; quantityHold: number }> = {};
     for (const { key, unit, sent, label } of inspectLines) {
       const q = quantities[key];
       if (!q) continue;
       const row = {
         quantityInspected: Number(q.quantityInspected || 0),
         quantityPassed: Number(q.quantityPassed || 0),
-        quantityFailed: Number(q.quantityFailed || 0),
+        quantityShrinkage: Number(q.quantityShrinkage || 0),
         quantityRework: Number(q.quantityRework || 0),
         quantityHold: Number(q.quantityHold || 0),
       };
@@ -374,10 +387,10 @@ export default function QC1MyWorkPage() {
         setSubmittingInspection(false);
         return;
       }
-      const sumCategories = row.quantityPassed + row.quantityFailed + row.quantityRework;
+      const sumCategories = row.quantityPassed + row.quantityShrinkage + row.quantityRework;
       if (sumCategories > row.quantityInspected + 0.001) {
         setInspectionError(
-          `${label}: Passed (${row.quantityPassed}) + Failed (${row.quantityFailed}) + Rework (${row.quantityRework}) = ${sumCategories} ${unit}, which exceeds Quantity Inspected (${row.quantityInspected} ${unit}).`
+          `${label}: Passed (${row.quantityPassed}) + Shrinkage (${row.quantityShrinkage}) + Rework (${row.quantityRework}) = ${sumCategories} ${unit}, which exceeds Quantity Inspected (${row.quantityInspected} ${unit}).`
         );
         setSubmittingInspection(false);
         return;
@@ -391,25 +404,18 @@ export default function QC1MyWorkPage() {
     }
     const units = Object.values(byLine);
     const qPassed = units.some((r) => r.quantityPassed > 0) ? 1 : 0;
-    const qFailed = units.some((r) => r.quantityFailed > 0) ? 1 : 0;
     const qRework = units.some((r) => r.quantityRework > 0) ? 1 : 0;
 
     // Rule 4: Mandatory remarks for all decisions
     const effectiveRemarks = (inspectionForm.remarks || inspectionForm.defectRemarks || inspectionForm.reworkReason).trim();
     if (!effectiveRemarks) {
-      setInspectionError('A remark from the QC Incharge is strictly required for every decision (PASS, REWORK, or REJECT).');
+      setInspectionError('A remark from the QC Incharge is strictly required for every decision (PASS or REWORK).');
       setSubmittingInspection(false);
       return;
     }
 
     if (inspectionForm.result === 'PASS' && qPassed <= 0) {
       setInspectionError('Result is set to PASS, but Passed Quantity is 0. Please enter the quantity approved for Embroidery.');
-      setSubmittingInspection(false);
-      return;
-    }
-
-    if (inspectionForm.result === 'REJECT' && qFailed <= 0) {
-      setInspectionError('Result is set to REJECT, but Rejected quantity is 0. Please enter the defective quantity for the Fabric Store Defective Shelf.');
       setSubmittingInspection(false);
       return;
     }
@@ -446,15 +452,16 @@ export default function QC1MyWorkPage() {
         reworkReason: inspectionForm.reworkReason,
         holdReason: inspectionForm.holdReason,
         remarks: inspectionForm.remarks,
+        inchargeName: inspectionForm.inchargeName,
         inspectorId: currentUser?.id,
         ...typedNumbers,
-        // One defect count per line that has failed or rework quantity.
+        // One defect count per line that has rework quantity (shrinkage is not a defect).
         defects: units
-          .filter((r) => r.quantityFailed + r.quantityRework > 0)
+          .filter((r) => r.quantityRework > 0)
           .map((r) => ({
             defectType: inspectionForm.defectType,
-            count: Math.round(r.quantityFailed + r.quantityRework),
-            severity: inspectionForm.result === 'REJECT' ? 'CRITICAL' : 'MAJOR',
+            count: Math.round(r.quantityRework),
+            severity: 'MAJOR',
           })),
       };
 
@@ -469,7 +476,7 @@ export default function QC1MyWorkPage() {
         if (resJson.field && resJson.field in EMPTY_QC1_CHALLAN_NUMBERS) {
           setChallanNumberErrors({ [resJson.field as Qc1ChallanNumberField]: resJson.error });
         }
-        throw new Error(resJson.error || 'Failed to record QC1 inspection.');
+        throw new Error(resJson.error || 'Failed to record Dyeing QC inspection.');
       }
 
       setInspectionSuccess(resJson.data);
@@ -639,8 +646,8 @@ export default function QC1MyWorkPage() {
                       className="bg-neutral-50 border border-neutral-200 rounded-lg px-2.5 py-1.5 text-xs text-neutral-900 focus:outline-none focus:ring-1 focus:ring-brand-500/40"
                     >
                       <option value="ALL">All Statuses</option>
-                      <option value="ISSUED">Sent to QC1 (Pending Receipt)</option>
-                      <option value="RECEIVED">Received by QC1</option>
+                      <option value="ISSUED">Sent to Dyeing QC (Pending Receipt)</option>
+                      <option value="RECEIVED">Received by Dyeing QC</option>
                       <option value="UNDER_INSPECTION">Under Inspection</option>
                       <option value="QC_APPROVED">Passed (QC Approved)</option>
                       <option value="QC_REJECTED">Failed (Rejected)</option>
@@ -670,7 +677,7 @@ export default function QC1MyWorkPage() {
           <div>
             <h2 className="text-sm font-bold text-neutral-900 flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-accent-700" />
-              <span>Incoming Material for QC1 Inspection</span>
+              <span>Incoming Material for Dyeing QC Inspection</span>
             </h2>
           </div>
 
@@ -693,7 +700,7 @@ export default function QC1MyWorkPage() {
           <div className="bg-white border border-neutral-200/90 rounded-xl p-12 text-center space-y-3 shadow-xs">
             <CheckCircle2 className="w-12 h-12 text-neutral-700 mx-auto" />
             <h3 className="text-base font-bold text-neutral-900">
-              No material currently waiting for QC1 inspection.
+              No material currently waiting for Dyeing QC inspection.
             </h3>
             <div className="pt-2">
               <Link
@@ -722,7 +729,7 @@ export default function QC1MyWorkPage() {
                     <th className="py-3 px-4 text-right">Pending QC</th>
                     <th className="py-3 px-4">Priority</th>
                     <th className="py-3 px-4">Dyeing Incharge</th>
-                    <th className="py-3 px-4">QC1 Status</th>
+                    <th className="py-3 px-4">Dyeing QC Status</th>
                     <th className="py-3 px-4 text-right">Actions</th>
                   </tr>
                 </thead>
@@ -742,7 +749,7 @@ export default function QC1MyWorkPage() {
                         <td className="py-3 px-4">
                           <button
                             onClick={() => setSelectedSheetForModal(challan.program)}
-                            className="font-mono font-bold text-neutral-900 hover:text-accent-800 text-left block flex items-center gap-1 group"
+                            className="font-mono font-bold text-neutral-900 hover:text-accent-800 text-left flex items-center gap-1 group"
                           >
                             <span>{challan.productionSheetNumber}</span>
                             <ExternalLink className="w-3 h-3 text-neutral-500 group-hover:text-accent-800 opacity-0 group-hover:opacity-100 transition" />
@@ -833,7 +840,7 @@ export default function QC1MyWorkPage() {
                         <td className="py-3 px-4">
                           {isIssued && (
                             <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-accent-100 text-accent-800">
-                              Sent to QC1
+                              Sent to Dyeing QC
                             </span>
                           )}
                           {isReceived && (
@@ -877,7 +884,10 @@ export default function QC1MyWorkPage() {
                             {/* RECEIVE MATERIAL BUTTON (If status === 'ISSUED') */}
                             {isIssued && (
                               <button
-                                onClick={() => handleReceiveChallan(challan)}
+                                onClick={() => {
+                                  setReceiveError(null);
+                                  setConfirmReceive(challan);
+                                }}
                                 disabled={receivingId === challan.id}
                                 className="flex items-center gap-1 px-2.5 py-1 bg-brand-700 hover:bg-brand-800 text-white rounded text-xs font-semibold shadow-xs transition cursor-pointer"
                               >
@@ -968,7 +978,7 @@ export default function QC1MyWorkPage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="p-4 bg-danger-50/70 border border-danger-200 rounded-xl space-y-1">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-danger-800">
-                  Total QC1 Defective Cut
+                  Total Dyeing QC Defective Cut
                 </span>
                 <div className="text-2xl font-mono font-bold text-danger-900">
                   {formatTotals(qc1Defects.reduce<Record<string, number>>((acc, c) => { const u = defectUnitOf(c); acc[u] = (acc[u] || 0) + (Number(c.defectivePieces) || 0); return acc; }, {}))}
@@ -1180,7 +1190,7 @@ export default function QC1MyWorkPage() {
                     <div>
                       <span className="text-neutral-500 text-[10px] block">Fabric Width</span>
                       <span className="font-medium text-neutral-900">
-                        {selectedSheetForModal.fabricWidth || (selectedSheetForModal.fabricWidthInches ? `${selectedSheetForModal.fabricWidthInches} Inches` : '—')}
+                        {widthInInches(selectedSheetForModal.fabricWidth || selectedSheetForModal.fabricWidthInches) || '—'}
                       </span>
                     </div>
                     <div>
@@ -1300,7 +1310,7 @@ export default function QC1MyWorkPage() {
         )}
 
         {/* ========================================================================= */}
-        {/* MODAL 2: DYEING → QC1 CHALLAN DOCUMENT (VIEW, PRINT, DOWNLOAD)            */}
+        {/* MODAL 2: DYEING → DYEING QC CHALLAN DOCUMENT (VIEW, PRINT, DOWNLOAD)            */}
         {/* ========================================================================= */}
         {selectedChallanForView && (
           <div className="fixed inset-0 z-50 bg-neutral-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
@@ -1311,7 +1321,7 @@ export default function QC1MyWorkPage() {
                   <FileText className="w-5 h-5 text-accent-700" />
                   <div>
                     <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-700 block leading-tight">
-                      DYEING → QC1 CHALLAN
+                      DYEING → DYEING QC CHALLAN
                     </span>
                     <span className="font-mono text-sm font-bold">
                       {selectedChallanForView.challanNumber}
@@ -1360,7 +1370,7 @@ export default function QC1MyWorkPage() {
                         SHUBHAM FABRICS INDIA PVT. LTD.
                       </span>
                       <h2 className="text-lg font-serif font-black text-neutral-900 tracking-wide mt-0.5">
-                        DYEING → QC1 CHALLAN
+                        DYEING → DYEING QC CHALLAN
                       </h2>
                       <p className="text-[11px] text-neutral-500">
                         Inter-department manufacturing transfer &amp; quality check dispatch slip
@@ -1389,7 +1399,7 @@ export default function QC1MyWorkPage() {
 
                   <div>
                     <span className="text-neutral-500 block text-[10px] font-bold uppercase">To Department</span>
-                    <span className="font-bold text-accent-800 text-sm">QC1</span>
+                    <span className="font-bold text-accent-800 text-sm">Dyeing QC</span>
                     <span className="text-[10px] text-neutral-500 block">Quality Inspection</span>
                   </div>
 
@@ -1474,7 +1484,7 @@ export default function QC1MyWorkPage() {
                     <span className="text-[10px] text-neutral-500">Authorized Issuer: {selectedChallanForView.dyeingIncharge}</span>
                   </div>
                   <div className="border-t border-dashed border-neutral-300 pt-2 text-center">
-                    <span className="font-bold text-neutral-900 block">QC1 Quality Department</span>
+                    <span className="font-bold text-neutral-900 block">Dyeing QC Department</span>
                     <span className="text-[10px] text-neutral-500">
                       Receiver / Quality Inspector Stamp &amp; Signature
                     </span>
@@ -1514,7 +1524,7 @@ export default function QC1MyWorkPage() {
                 <div className="sticky top-0 bg-white text-neutral-900 p-4 sm:p-5 flex items-center justify-between z-10">
                   <div>
                     <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-700 block">
-                      QC1 · QUALITY INSPECTION ENTRY
+                      DYEING QC · QUALITY INSPECTION ENTRY
                     </span>
                     <h3 className="text-base font-bold">
                       Inspect Lot: {selectedChallanForInspect.challanNumber}
@@ -1536,7 +1546,7 @@ export default function QC1MyWorkPage() {
                     <div className="p-4 bg-accent-50 border border-accent-300 rounded-xl space-y-3">
                       <div className="flex items-center gap-2 text-accent-800 font-bold text-sm">
                         <CheckCircle2 className="w-5 h-5 text-accent-700" />
-                        <span>QC1 Inspection Successfully Recorded!</span>
+                        <span>Dyeing QC Inspection Successfully Recorded!</span>
                       </div>
                       <p className="text-accent-800 text-xs">
                         Inspection Outcome: <strong className="uppercase">{inspectionSuccess.inspection?.status}</strong>.
@@ -1548,7 +1558,7 @@ export default function QC1MyWorkPage() {
                         <div className="p-3 bg-accent-100/70 border border-accent-300 rounded-lg text-accent-800 text-xs">
                           <span className="font-bold flex items-center gap-1.5 text-accent-800">
                             <CheckCircle2 className="w-4 h-4 text-accent-800" />
-                            Material Passed QC1 Inspection → Dispatched to Next Department
+                            Material Passed Dyeing QC Inspection → Dispatched to Next Department
                           </span>
                           <p className="text-[11px] text-accent-800 mt-0.5">
                             Passed Yardage: <strong>{outcomeText(inspectionSuccess, 'passed')}</strong>. The lot is approved for downstream manufacturing (Cutting Floor).
@@ -1587,29 +1597,16 @@ export default function QC1MyWorkPage() {
                         </div>
                       )}
 
-                      {/* REJECT ROUTING CONFIRMATION (TO STORE DEFECTIVE SHELF) */}
-                      {inspectionSuccess.rejectReturnChallan && (
-                        <div className="p-3 bg-danger-50 border border-danger-300 rounded-lg text-danger-900 text-xs">
+                      {/* SHRINKAGE RECORDED (no challan: it is kept on the Shrinkage screen) */}
+                      {(inspectionSuccess.byUnit || []).some((r: any) => r.shrinkage > 0) && (
+                        <div className="p-3 bg-brand-50 border border-brand-300 rounded-lg text-brand-900 text-xs">
                           <div className="flex items-center justify-between">
-                            <span className="font-bold flex items-center gap-1.5 text-danger-900">
-                              <ShieldAlert className="w-4 h-4 text-danger-700" />
-                              Defective Return Challan Generated → Dispatched to Fabric Store (Defective Shelf)
-                            </span>
-                            <Link
-                              href={`/challans/${inspectionSuccess.rejectReturnChallan.id}`}
-                              target="_blank"
-                              className="text-[11px] underline font-bold text-danger-800 hover:text-danger-900 flex items-center gap-1"
-                            >
-                              <span>Print Challan</span>
+                            <span className="font-bold">Shrinkage Recorded: {outcomeText(inspectionSuccess, 'shrinkage')}</span>
+                            <Link href="/qc1/shrinkage" className="text-[11px] underline font-bold flex items-center gap-1">
+                              <span>Open Shrinkage</span>
                               <ExternalLink className="w-3 h-3" />
                             </Link>
                           </div>
-                          <span className="font-mono font-bold text-sm text-danger-900 block mt-1">
-                            {inspectionSuccess.rejectReturnChallan.challanNumber}
-                          </span>
-                          <p className="text-[11px] text-danger-700 mt-0.5">
-                            Defective Yardage: <strong>{outcomeText(inspectionSuccess, 'failed')}</strong>. This material is officially transferred to the <strong>defective shelf in the Fabric Store</strong>.
-                          </p>
                         </div>
                       )}
 
@@ -1725,11 +1722,11 @@ export default function QC1MyWorkPage() {
                             <span className="text-accent-800 font-semibold flex items-center gap-2">
                               <span>Dyeing Process Shrinkage:</span>
                               <span className="font-mono font-bold text-accent-800">
-                                {selectedChallanForInspect.remarks.match(/Shrinkage:\s*([^\s·|]+)\s*MTR/i)?.[0] || 'Reported'}
+                                {selectedChallanForInspect.remarks.match(/Shrinkage:\s*([^\s·|]+)\s*(?:MTR|PCS)/i)?.[0] || 'Reported'}
                               </span>
                             </span>
                             <span className="text-[10px] text-accent-800 bg-accent-100/90 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
-                              Verified in Net Meters ({selectedChallanForInspect.sentText ?? `${selectedChallanForInspect.totalSentQuantity} ${selectedChallanForInspect.uom}`})
+                              Verified net quantity ({selectedChallanForInspect.sentText ?? `${selectedChallanForInspect.totalSentQuantity} ${selectedChallanForInspect.uom}`})
                             </span>
                           </div>
                         )}
@@ -1777,9 +1774,8 @@ export default function QC1MyWorkPage() {
                                 setInspectionForm({
                                   ...inspectionForm,
                                   quantityInspected: val,
-                                  quantityPassed: inspectionForm.result === 'PASS' ? val : '0',
-                                  quantityFailed: inspectionForm.result === 'REJECT' ? val : '0',
-                                  quantityRework: inspectionForm.result === 'REWORK' ? val : '0',
+                                  quantityPassed: inspectionForm.result === 'PASS' ? afterShrinkage(val, inspectionForm.quantityShrinkage) : '',
+                                  quantityRework: inspectionForm.result === 'REWORK' ? afterShrinkage(val, inspectionForm.quantityShrinkage) : '',
                                 });
                               }}
                               className="w-full px-3 py-2 border border-neutral-300 rounded-lg font-mono font-bold text-sm text-neutral-900 focus:ring-1 focus:ring-brand-500/40 focus:outline-none"
@@ -1789,7 +1785,7 @@ export default function QC1MyWorkPage() {
 
                           {/* Passed Quantity */}
                           <div>
-                            <label className="block text-[11px] font-bold text-accent-800 mb-1 flex items-center justify-between">
+                            <label className="text-[11px] font-bold text-accent-800 mb-1 flex items-center justify-between">
                               <span>Passed Qty</span>
                               <span className="text-[9px] text-accent-800 bg-accent-100 px-1 py-0.2 rounded">Embroidery</span>
                             </label>
@@ -1807,7 +1803,7 @@ export default function QC1MyWorkPage() {
 
                           {/* Rework Quantity */}
                           <div>
-                            <label className="block text-[11px] font-bold text-brand-800 mb-1 flex items-center justify-between">
+                            <label className="text-[11px] font-bold text-brand-800 mb-1 flex items-center justify-between">
                               <span>Rework Qty</span>
                               <span className="text-[9px] text-brand-700 bg-brand-100 px-1 py-0.2 rounded">To Dyeing</span>
                             </label>
@@ -1823,21 +1819,30 @@ export default function QC1MyWorkPage() {
                             />
                           </div>
 
-                          {/* Rejected Quantity */}
+                          {/* Shrinkage: fabric lost in dyeing; saved as this line's shrinkage record */}
                           <div>
-                            <label className="block text-[11px] font-bold text-danger-800 mb-1 flex items-center justify-between">
-                              <span>Rejected Qty</span>
-                              <span className="text-[9px] text-danger-700 bg-danger-100 px-1 py-0.2 rounded">Defective Shelf</span>
+                            <label className="text-[11px] font-bold text-brand-800 mb-1 flex items-center justify-between">
+                              <span>Shrinkage</span>
+                              <span className="text-[9px] text-brand-800 bg-brand-100 px-1 py-0.2 rounded">{activeLineUnit}</span>
                             </label>
                             <input
                               type="number"
                               step="any"
                               min="0"
-                              value={inspectionForm.quantityFailed}
-                              onChange={(e) =>
-                                setInspectionForm({ ...inspectionForm, quantityFailed: e.target.value })
-                              }
-                              className="w-full px-3 py-2 border border-danger-300 rounded-lg font-mono font-bold text-sm text-danger-900 bg-danger-50/20 focus:ring-1 focus:ring-danger-500 focus:outline-none"
+                              id="qc1-shrinkage-input"
+                              max={inspectionForm.quantityInspected || activeLineSent}
+                              value={inspectionForm.quantityShrinkage}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                const rest = afterShrinkage(inspectionForm.quantityInspected, val);
+                                setInspectionForm({
+                                  ...inspectionForm,
+                                  quantityShrinkage: val,
+                                  quantityPassed: inspectionForm.result === 'PASS' ? rest : inspectionForm.quantityPassed,
+                                  quantityRework: inspectionForm.result === 'REWORK' ? rest : inspectionForm.quantityRework,
+                                });
+                              }}
+                              className="w-full px-3 py-2 border border-brand-300 rounded-lg font-mono font-bold text-sm text-brand-900 bg-brand-50/20 focus:ring-1 focus:ring-brand-500 focus:outline-none"
                             />
                           </div>
                         </div>
@@ -1861,7 +1866,7 @@ export default function QC1MyWorkPage() {
                         </div>
                       </div>
 
-                      {/* SECTION 3: THREE DECISION PATHWAYS (PASS / REWORK / REJECT) AS PER HANDWRITTEN DIAGRAM */}
+                      {/* SECTION 3: DECISION (PASS / REWORK); lost fabric is entered as Shrinkage above */}
                       <div className="space-y-3 pt-2 border-t border-neutral-200">
                         <label className="block text-xs font-bold text-neutral-900 uppercase tracking-wide">
                           Inspection Decision
@@ -1872,15 +1877,14 @@ export default function QC1MyWorkPage() {
                           <button
                             type="button"
                             onClick={() => {
-                              const total = inspectionForm.quantityInspected || '0';
+                              const total = afterShrinkage(inspectionForm.quantityInspected, inspectionForm.quantityShrinkage);
                               applyDecisionToOtherLines('PASS');
                               setInspectionForm({
                                 ...inspectionForm,
                                 result: 'PASS',
                                 quantityPassed: total,
-                                quantityFailed: '0',
-                                quantityRework: '0',
-                                quantityHold: '0',
+                                quantityRework: '',
+                                quantityHold: '',
                               });
                             }}
                             className={`p-4 rounded-xl border-2 text-left transition flex flex-col justify-between ${
@@ -1893,15 +1897,9 @@ export default function QC1MyWorkPage() {
                               <div className="flex items-center justify-between mb-1">
                                 <span className="text-sm font-black tracking-wide flex items-center gap-1.5 text-accent-800">
                                   <CheckCircle2 className="w-4 h-4 text-accent-700 shrink-0" />
-                                  1. PASS
+                                  PASS
                                 </span>
                               </div>
-                              <p className="text-xs text-accent-800 font-semibold mt-1">
-                                Dispatches to Embroidery Department
-                              </p>
-                              <span className="text-[10px] text-accent-800 block mt-0.5">
-                                Generates QC1 → Embroidery Dispatch Challan
-                              </span>
                             </div>
                           </button>
 
@@ -1909,15 +1907,14 @@ export default function QC1MyWorkPage() {
                           <button
                             type="button"
                             onClick={() => {
-                              const total = inspectionForm.quantityInspected || '0';
+                              const total = afterShrinkage(inspectionForm.quantityInspected, inspectionForm.quantityShrinkage);
                               applyDecisionToOtherLines('REWORK');
                               setInspectionForm({
                                 ...inspectionForm,
                                 result: 'REWORK',
                                 quantityRework: total,
-                                quantityPassed: '0',
-                                quantityFailed: '0',
-                                quantityHold: '0',
+                                quantityPassed: '',
+                                quantityHold: '',
                               });
                             }}
                             className={`p-4 rounded-xl border-2 text-left transition flex flex-col justify-between ${
@@ -1930,60 +1927,33 @@ export default function QC1MyWorkPage() {
                               <div className="flex items-center justify-between mb-1">
                                 <span className="text-sm font-black tracking-wide flex items-center gap-1.5 text-brand-800">
                                   <RotateCcw className="w-4 h-4 text-brand-600 shrink-0" />
-                                  2. REWORK
+                                  REWORK
                                 </span>
                               </div>
-                              <p className="text-xs text-brand-900 font-semibold mt-1">
-                                Returns material to Dyeing
-                              </p>
-                              <span className="text-[10px] text-brand-700 block mt-0.5">
-                                Must re-undergo QC1 inspection before reaching Embroidery
-                              </span>
                             </div>
                           </button>
 
-                          {/* 3. REJECT */}
+                          {/* 3. SHRINKAGE: not a separate outcome; it goes to the Shrinkage field above */}
                           <button
                             type="button"
-                            onClick={() => {
-                              const total = inspectionForm.quantityInspected || '0';
-                              applyDecisionToOtherLines('REJECT');
-                              setInspectionForm({
-                                ...inspectionForm,
-                                result: 'REJECT',
-                                quantityFailed: total,
-                                quantityPassed: '0',
-                                quantityRework: '0',
-                                quantityHold: '0',
-                              });
-                            }}
+                            onClick={() => document.getElementById('qc1-shrinkage-input')?.focus()}
                             className={`p-4 rounded-xl border-2 text-left transition flex flex-col justify-between ${
-                              inspectionForm.result === 'REJECT'
-                                ? 'border-danger-500 bg-danger-50/80 text-danger-900 font-bold shadow-xs ring-2 ring-danger-500/30'
+                              Number(inspectionForm.quantityShrinkage || 0) > 0
+                                ? 'border-brand-500 bg-brand-50/80 text-brand-900 font-bold shadow-xs ring-2 ring-brand-500/30'
                                 : 'border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-700'
                             }`}
                           >
-                            <div>
-                              <div className="flex items-center justify-between mb-1">
-                                <span className="text-sm font-black tracking-wide flex items-center gap-1.5 text-danger-800">
-                                  <ShieldAlert className="w-4 h-4 text-danger-600 shrink-0" />
-                                  3. REJECT
-                                </span>
-                              </div>
-                              <p className="text-xs text-danger-900 font-semibold mt-1">
-                                Fabric Store Defective Shelf
-                              </p>
-                              <span className="text-[10px] text-danger-700 block mt-0.5">
-                                Barred from Embroidery approved stock
-                              </span>
-                            </div>
+                            <span className="text-sm font-black tracking-wide flex items-center gap-1.5 text-brand-800">
+                              <Droplet className="w-4 h-4 text-brand-600 shrink-0" />
+                              SHRINKAGE
+                            </span>
                           </button>
                         </div>
                       </div>
 
                       {/* MANUAL CHALLAN NUMBERS FOR GENERATED CHALLANS */}
                       {qc1NeededChallanNumbers(numbersForm).length > 0 && (
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
                           {qc1NeededChallanNumbers(numbersForm).map(({ field, label }) => (
                             <ChallanNumberField
                               key={field}
@@ -2020,14 +1990,15 @@ export default function QC1MyWorkPage() {
                       {/* QC1 - INCHARGE (NAME / CONTACT) AS PER HANDWRITTEN SPEC */}
                       <div className="pt-3 border-t border-neutral-200">
                         <label className="block text-xs font-bold text-neutral-700 mb-1.5">
-                          QC1 - Incharge (Name / Contact)
+                          Dyeing QC - Incharge (Name / Contact)
                         </label>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                           <input
                             type="text"
-                            value={currentUser?.fullName || currentUser?.username || ''}
-                            onChange={(e) => {}}
-                            placeholder=""
+                            value={inspectionForm.inchargeName}
+                            onChange={(e) => setInspectionForm({ ...inspectionForm, inchargeName: e.target.value })}
+                            placeholder="Incharge name"
+                            maxLength={100}
                             className="w-full text-xs font-medium border border-neutral-300 rounded-lg px-3 py-2 bg-white"
                           />
                           <input
@@ -2072,6 +2043,16 @@ export default function QC1MyWorkPage() {
           </div>
         )}
       </main>
+
+      {confirmReceive && (
+        <ReceiveChallanConfirm
+          challan={confirmReceive}
+          busy={receivingId === confirmReceive.id}
+          error={receiveError}
+          onConfirm={() => handleReceiveChallan(confirmReceive)}
+          onClose={() => setConfirmReceive(null)}
+        />
+      )}
 
       {/* ACCOMPANYING PRODUCTION SHEET PREVIEW & PRINT MODAL */}
       {selectedSheetForModal && (

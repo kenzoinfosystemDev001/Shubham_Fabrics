@@ -76,6 +76,41 @@ export async function compressImageForUpload(file: File, maxDim = 1600, quality 
 }
 
 /**
+ * The Wilcom category a production sheet's designs are saved under.
+ * Added styles have internal ids (CUSTOM_...); their designs are stored under the style's name.
+ */
+export function wilcomCategoryFor(category: GarmentCategory | 'ALL', meta?: any): string {
+  const cat = String(category || 'ALL').trim().toUpperCase();
+  if (cat === 'ALL' || cat === 'TOP' || cat === 'BOTTOM' || cat === 'DUPATTA') return cat;
+  const styleName = String(meta?.components?.[category]?.styleName || '').trim().toUpperCase();
+  return styleName || cat;
+}
+
+/**
+ * Only the designs of one production sheet; another sheet's designs never stand in for a sheet that has none.
+ */
+export function filterWilcomEntriesByCategory<T extends { category?: string }>(
+  entries: T[],
+  category: GarmentCategory | 'ALL',
+  meta?: any
+): T[] {
+  const id = String(category || 'ALL').trim().toUpperCase();
+  const name = wilcomCategoryFor(category, meta);
+  if (id === 'ALL') return entries;
+  return entries.filter((e) => {
+    const cat = String(e.category || '').trim().toUpperCase();
+    return cat === id || cat === name;
+  });
+}
+
+/**
+ * The root Wilcom photo is the TOP sheet's legacy artwork; another sheet's design never borrows it.
+ */
+export function inheritedWilcomPhoto(entry: { category?: string } | null | undefined, rootPhoto: string): string {
+  return String(entry?.category || 'TOP').trim().toUpperCase() === 'TOP' ? rootPhoto : '';
+}
+
+/**
  * Resolves the primary Wilcom photo from any known field or nested structure.
  */
 export function extractRootWilcomPhoto(program: any, meta?: any): string {
@@ -228,11 +263,12 @@ export async function prepareWilcomImages(program: any) {
       meta = meta || {};
       meta.wilcomEntries = await Promise.all(
         entries.map(async (entry: any) => {
-          const rawPhoto = entry.photoUrl || entry.photo || entry.imageUrl || entry.image || fallbackPhoto || '';
+          const ownFallback = inheritedWilcomPhoto(entry, fallbackPhoto);
+          const rawPhoto = entry.photoUrl || entry.photo || entry.imageUrl || entry.image || ownFallback || '';
           const embedded = rawPhoto ? await embedImage(rawPhoto, 'Wilcom entry photo') : '';
           return {
             ...entry,
-            photoUrl: embedded || rawPhoto || fallbackPhoto,
+            photoUrl: embedded || rawPhoto || ownFallback,
           };
         })
       );
@@ -252,6 +288,16 @@ export async function prepareWilcomImages(program: any) {
 /**
  * Generate authentic Wilcom Embroidery Specification Form document HTML
  */
+/** Escapes typed text before it goes into the printed HTML. */
+function escapeHtmlText(value: unknown): string {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 export function generateWilcomFormHtml(program: any, filterCategory: GarmentCategory | 'ALL' = 'ALL'): string {
   const serialNo = program.programSerialNo || program.programNumber || '—';
   const designNo = program.designNumber || program.designName || program.wilcomDesignNumber || '—';
@@ -273,12 +319,12 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
   if (Array.isArray(program.wilcomEntries) && program.wilcomEntries.length > 0) {
     wilcomEntries = program.wilcomEntries.map((e: any) => ({
       ...e,
-      photoUrl: e.photoUrl || e.photo || e.imageUrl || e.image || rootWilcomPhoto || '',
+      photoUrl: e.photoUrl || e.photo || e.imageUrl || e.image || inheritedWilcomPhoto(e, rootWilcomPhoto) || '',
     }));
   } else if (Array.isArray(meta?.wilcomEntries) && meta.wilcomEntries.length > 0) {
     wilcomEntries = meta.wilcomEntries.map((e: any) => ({
       ...e,
-      photoUrl: e.photoUrl || e.photo || e.imageUrl || e.image || rootWilcomPhoto || '',
+      photoUrl: e.photoUrl || e.photo || e.imageUrl || e.image || inheritedWilcomPhoto(e, rootWilcomPhoto) || '',
     }));
   }
 
@@ -295,344 +341,95 @@ export function generateWilcomFormHtml(program: any, filterCategory: GarmentCate
       },
     ];
   } else {
-    // Ensure any entry missing a photo inherits rootWilcomPhoto
+    // A TOP entry missing a photo inherits rootWilcomPhoto
     wilcomEntries = wilcomEntries.map((e) => ({
       ...e,
-      photoUrl: e.photoUrl || rootWilcomPhoto || '',
+      photoUrl: e.photoUrl || inheritedWilcomPhoto(e, rootWilcomPhoto) || '',
     }));
   }
 
-  const normFilter = String(filterCategory || 'ALL').trim().toUpperCase();
-  const filtered = (normFilter === 'ALL' || !normFilter)
-    ? wilcomEntries
-    : wilcomEntries.filter((e) => {
-        const cat = String(e.category || '').trim().toUpperCase();
-        return cat === normFilter || cat.includes(normFilter) || normFilter.includes(cat);
-      });
+  const finalEntries = filterWilcomEntriesByCategory(wilcomEntries, filterCategory, meta);
+  const categoryLabel = wilcomCategoryFor(filterCategory, meta);
+  const categoryPrefix = categoryLabel === 'ALL' ? '' : categoryLabel + ' ';
 
-  const finalEntries = filtered.length > 0 ? filtered : wilcomEntries;
+  const esc = escapeHtmlText;
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wilcom ${filterCategory === 'ALL' ? '' : filterCategory + ' '}Sheet - ${serialNo}</title>
+  <title>Wilcom ${esc(categoryPrefix)}Sheet - ${esc(serialNo)}</title>
   <style>
-    @page {
-      size: A4 portrait;
-      margin: 10mm;
-    }
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
-    }
-    body {
-      background-color: #f1eff4;
-      color: #000000;
-      font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
-      padding: 16px;
-      font-size: 12px;
-    }
-    .no-print-bar {
-      max-width: 200mm;
-      margin: 0 auto 12px auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #25232a;
-      color: #ffffff;
-      padding: 8px 16px;
-      border-radius: 6px;
-      font-size: 12px;
-    }
-    .btn {
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 14px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: 700;
-      border: none;
-    }
-    .btn-primary { background: #8e55c4; color: #ffffff; }
-    .btn-outline { background: #43404a; color: #ffffff; }
-    .card-wrapper {
-      max-width: 200mm;
-      min-height: 275mm;
-      margin: 0 auto;
-      background: #ffffff;
-      border: 2px solid #000000;
-      padding: 20px;
-    }
-    .header-box {
-      border-bottom: 2px solid #000000;
-      padding-bottom: 12px;
-      margin-bottom: 16px;
-      text-align: center;
-    }
-    .company-title {
-      font-size: 18px;
-      font-weight: 900;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-    .doc-title {
-      font-size: 16px;
-      font-weight: 900;
-      letter-spacing: 0.15em;
-      color: #7442a6;
-      margin-top: 4px;
-      text-transform: uppercase;
-    }
-    .meta-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      border: 1.5px solid #000;
-      padding: 10px;
-      margin-bottom: 16px;
-      background: #f8f7fa;
-    }
-    .meta-item { display: flex; flex-direction: column; }
-    .meta-label { font-size: 10px; font-weight: 900; text-transform: uppercase; color: #57545e; }
-    .meta-val {
-      min-width: 0;
-      font-size: 12px;
-      font-weight: 800;
-      color: #000;
-      line-height: 1.25;
-      overflow-wrap: anywhere;
-      word-break: break-word;
-    }
-    .entries-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .wilcom-card {
-      border: 1.5px solid #000000;
-      border-radius: 4px;
-      padding: 12px;
-      background: #ffffff;
-      page-break-inside: avoid;
-    }
-    .card-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 8px;
-      border-bottom: 1px solid #d3ced8;
-      padding-bottom: 8px;
-      margin-bottom: 10px;
-    }
-    .cat-badge {
-      font-size: 11px;
-      font-weight: 900;
-      padding: 3px 8px;
-      border-radius: 3px;
-      color: #ffffff;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      background: #43404a;
-    }
-    .cat-TOP { background: #25232a; }
-    .cat-BOTTOM { background: #25232a; }
-    .cat-DUPATTA { background: #25232a; }
-    .wilcom-no {
-      max-width: 58%;
-      font-size: 12px;
-      font-weight: 900;
-      font-family: monospace;
-      line-height: 1.25;
-      letter-spacing: 0.02em;
-      color: #000000;
-      text-align: right;
-      white-space: normal;
-      overflow-wrap: anywhere;
-      word-break: break-word;
-    }
-    .card-body {
-      display: grid;
-      grid-template-columns: 160px 1fr;
-      gap: 14px;
-      align-items: start;
-    }
-    .photo-box {
-      width: 160px;
-      height: 160px;
-      border: 1.5px solid #d3ced8;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #f8f7fa;
-      overflow: hidden;
-    }
-    .photo-box img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
-    }
-    .info-list {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .info-row {
-      display: flex;
-      gap: 6px;
-      min-width: 0;
-      flex-wrap: wrap;
-    }
-    .info-key {
-      font-weight: 800;
-      min-width: 90px;
-      color: #43404a;
-    }
-    .info-val {
-      min-width: 0;
-      font-weight: 600;
-      color: #000000;
-      overflow-wrap: anywhere;
-      word-break: break-word;
-    }
+    @page { size: A4 portrait; margin: 12mm; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    body { background: #f1eff4; color: #1c1a20; font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; font-size: 12px; padding: 16px; }
+    .toolbar { max-width: 186mm; margin: 0 auto 12px; display: flex; justify-content: flex-end; gap: 8px; }
+    .btn { cursor: pointer; padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; border: 1px solid #d3ced8; background: #fff; color: #1c1a20; }
+    .btn-primary { background: #7442a6; border-color: #7442a6; color: #fff; }
+    .sheet { max-width: 186mm; margin: 0 auto; background: #fff; padding: 24px; border-radius: 8px; }
+    .head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; padding-bottom: 14px; border-bottom: 2px solid #1c1a20; }
+    .company { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: #57545e; }
+    .title { font-size: 24px; font-weight: 800; margin-top: 2px; }
+    .ids { display: flex; gap: 24px; text-align: right; }
+    .id-label { font-size: 10px; color: #6b6872; }
+    .id-value { font-size: 15px; font-weight: 800; }
+    .designs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 18px; }
+    .design { border: 1px solid #d3ced8; border-radius: 8px; padding: 10px; page-break-inside: avoid; }
+    .photo { height: 240px; display: flex; align-items: center; justify-content: center; background: #faf9fb; border-radius: 6px; overflow: hidden; }
+    .photo img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+    .no-photo { color: #8f8a96; font-weight: 700; }
+    .design-foot { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-top: 8px; }
+    .style-name { font-size: 14px; font-weight: 800; }
+    .wilcom-no { font-size: 11px; color: #57545e; font-family: monospace; text-align: right; overflow-wrap: anywhere; }
+    .empty { margin-top: 18px; padding: 32px; text-align: center; border: 1.5px dashed #b3adb9; border-radius: 8px; color: #6b6872; font-weight: 700; }
+    .signs { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 48px; }
+    .sign { border-top: 1px solid #1c1a20; padding-top: 6px; text-align: center; font-size: 11px; font-weight: 700; }
     @media print {
-      body { background: transparent; padding: 0; }
-      .no-print-bar { display: none !important; }
-      .card-wrapper { border: 2px solid #000; min-height: 280mm; width: 100%; }
-      .photo-box { border: 1.5px solid #000 !important; background: #fff !important; }
-      .photo-box img { display: block !important; max-width: 100% !important; max-height: 100% !important; }
+      body { background: #fff; padding: 0; }
+      .toolbar { display: none !important; }
+      .sheet { max-width: none; padding: 0; border-radius: 0; }
     }
   </style>
 </head>
 <body>
-  <div class="no-print-bar">
-    <div>
-      <strong>Wilcom ${filterCategory === 'ALL' ? '' : filterCategory + ' '}Embroidery Sheet</strong> &middot; Design ${designNo} &middot; Serial No. ${serialNo}
-    </div>
-    <div style="display: flex; gap: 8px;">
-      <button class="btn btn-primary" onclick="window.print()">
-        Print Wilcom ${filterCategory === 'ALL' ? '' : filterCategory + ' '}Sheet (A4)
-      </button>
-      <button class="btn btn-primary" style="background: #8e55c4;" onclick="window.downloadSelf()">
-        Download Wilcom ${filterCategory === 'ALL' ? '' : filterCategory + ' '}Sheet
-      </button>
-      <button class="btn btn-outline" onclick="window.close()">
-        Close
-      </button>
-    </div>
-  </div>
-
-  <div class="card-wrapper" id="wilcom-document">
-    <div class="header-box">
-      <div class="company-title">SHUBHAM FABRICS INDIA PVT. LTD.</div>
-      <div class="doc-title">WILCOM ${filterCategory === 'ALL' ? '' : filterCategory + ' '}EMBROIDERY SPECIFICATION SHEET</div>
-    </div>
-
-    <div class="meta-grid">
-      <div class="meta-item">
-        <span class="meta-label">DESIGN NO:</span>
-        <span class="meta-val font-mono" style="font-size: 14px;">${designNo || '—'}</span>
+  <div class="sheet" id="wilcom-document">
+    <div class="head">
+      <div>
+        <div class="company">SHUBHAM FABRICS INDIA PVT. LTD.</div>
+        <div class="title">Wilcom ${esc(categoryPrefix)}Sheet</div>
       </div>
-      <div class="meta-item">
-        <span class="meta-label">SERIAL NO:</span>
-        <span class="meta-val font-mono" style="font-size: 14px;">${serialNo || '—'}</span>
-      </div>
-      <div class="meta-item">
-        <span class="meta-label">MAIN STYLE:</span>
-        <span class="meta-val" style="font-size: 13px; font-weight: 800;">${mainStyle || '—'}</span>
-      </div>
-      <div class="meta-item">
-        <span class="meta-label">STYLE:</span>
-        <span class="meta-val" style="font-size: 13px; font-weight: 800;">${subStyle || '—'}</span>
+      <div class="ids">
+        <div><div class="id-label">Design No.</div><div class="id-value">${esc(designNo || '—')}</div></div>
+        <div><div class="id-label">Serial No.</div><div class="id-value">${esc(serialNo || '—')}</div></div>
       </div>
     </div>
 
     ${finalEntries.length === 0 ? `
-      <div style="padding: 40px; text-align: center; border: 2px dashed #8f8a96; border-radius: 6px; color: #6b6872; font-weight: 700;">
-        No Wilcom embroidery designs recorded for ${filterCategory === 'ALL' ? 'this production order' : filterCategory}.
-      </div>
+      <div class="empty">No Wilcom designs for ${esc(categoryLabel === 'ALL' ? 'this production sheet' : categoryLabel)}.</div>
     ` : `
-      <div class="entries-grid">
+      <div class="designs">
         ${finalEntries.map((entry, idx) => `
-          <div class="wilcom-card">
-            <div class="card-head">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span class="cat-badge cat-${entry.category}">WILCOM ${entry.category}</span>
-                <span style="font-weight: 800; font-size: 13px;">${entry.styleName || `Design #${idx + 1}`}</span>
-              </div>
-              <div class="wilcom-no">
-                ${entry.wilcomDesignNumber || 'N/A'}
-              </div>
+          <div class="design">
+            <div class="photo">
+              ${entry.photoUrl
+                ? `<img src="${esc(entry.photoUrl)}" alt="${esc(entry.styleName || `Design ${idx + 1}`)}" />`
+                : `<span class="no-photo">No picture</span>`}
             </div>
-            <div class="card-body">
-              <div class="photo-box">
-                ${entry.photoUrl ? `
-                  <img src="${entry.photoUrl}" alt="${entry.wilcomDesignNumber || 'Wilcom Artwork'}" />
-                ` : `
-                  <span style="font-size: 11px; font-weight: 700; color: #8f8a96; text-align: center; padding: 12px;">
-                    No Artwork Photo
-                  </span>
-                `}
-              </div>
-              <div class="info-list">
-                <div class="info-row">
-                  <span class="info-key">Design No:</span>
-                  <span class="info-val font-mono" style="font-weight: 900; font-size: 13px;">${designNo || '—'}</span>
-                </div>
-                <div class="info-row">
-                  <span class="info-key">Serial No:</span>
-                  <span class="info-val font-mono" style="font-weight: 900; font-size: 13px;">${serialNo || '—'}</span>
-                </div>
-                <div class="info-row">
-                  <span class="info-key">Main Style:</span>
-                  <span class="info-val" style="font-weight: 800;">${mainStyle || '—'}</span>
-                </div>
-                <div class="info-row">
-                  <span class="info-key">Style:</span>
-                  <span class="info-val" style="font-weight: 800;">${entry.styleName || subStyle || '—'}</span>
-                </div>
-              </div>
+            <div class="design-foot">
+              <span class="style-name">${esc(entry.styleName || `Design ${idx + 1}`)}</span>
+              <span class="wilcom-no">${esc(entry.wilcomDesignNumber || '')}</span>
             </div>
           </div>
         `).join('')}
       </div>
     `}
 
-    <!-- DUAL AUTHORIZATION SIGNATURES -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 32px; padding-top: 16px; border-top: 1.5px solid #000;">
-      <div style="text-align: center;">
-        <div style="border-bottom: 1.5px solid #000; width: 80%; margin: 0 auto 8px auto; height: 32px;"></div>
-        <div style="font-size: 10px; font-weight: 900; text-transform: uppercase; color: #000;">PREPARED BY (WILCOM / CAD DESIGNER)</div>
-      </div>
-      <div style="text-align: center;">
-        <div style="border-bottom: 1.5px solid #000; width: 80%; margin: 0 auto 8px auto; height: 32px;"></div>
-        <div style="font-size: 10px; font-weight: 900; text-transform: uppercase; color: #000;">VERIFIED BY (EMBROIDERY / FLOOR MASTER)</div>
-      </div>
+    <div class="signs">
+      <div class="sign">Prepared by</div>
+      <div class="sign">Verified by</div>
     </div>
   </div>
-
-  <script>
-    window.downloadSelf = function() {
-      var blob = new Blob([document.documentElement.outerHTML], { type: 'text/html;charset=utf-8' });
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement('a');
-      a.href = url;
-      a.download = "Wilcom_Form_${filterCategory}_${designNo}_${serialNo}.html";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
-    };
-  </script>
 </body>
 </html>`;
 }
@@ -650,7 +447,12 @@ export async function downloadWilcomFormHtml(program: any, filterCategory: Garme
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Wilcom_${filterCategory}_Sheet_${serialNo}.html`;
+    let meta: any = null;
+    try {
+      meta = typeof preparedProgram.metadataJson === 'string' ? JSON.parse(preparedProgram.metadataJson) : preparedProgram.metadataJson;
+    } catch {}
+    const categoryLabel = wilcomCategoryFor(filterCategory, meta).replace(/[^a-z0-9_-]+/gi, '_');
+    a.download = `Wilcom_${categoryLabel}_Sheet_${serialNo}.html`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

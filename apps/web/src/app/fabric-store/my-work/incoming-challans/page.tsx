@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { departmentName } from '@/lib/workflow-views';
 import Link from 'next/link';
 import { 
   RefreshCw, 
@@ -22,6 +23,7 @@ import {
 } from 'lucide-react';
 import { TransferDocuments } from '@/components/common/TransferDocuments';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
+import { ReceiveChallanConfirm } from '@/components/challan/ReceiptLines';
 import { formatTotals, totalsByUnit } from '@/lib/challan-units.mjs';
 
 export default function IncomingChallansPage() {
@@ -89,7 +91,11 @@ export default function IncomingChallansPage() {
     loadChallans();
   }, []);
 
+  // Receive: the challan's fabrics with MTR and PCS are shown first, then received.
+  const [confirmReceive, setConfirmReceive] = useState<any | null>(null);
+  const [receiveError, setReceiveError] = useState<string | null>(null);
   const handleMarkReceived = async (challanId: string) => {
+    setReceiveError(null);
     try {
       setActionInProgress(challanId);
       const res = await fetch(`/api/challans/${challanId}`, {
@@ -98,10 +104,15 @@ export default function IncomingChallansPage() {
         body: JSON.stringify({ status: 'RECEIVED' }),
       });
       if (res.ok) {
+        setConfirmReceive(null);
         await loadChallans();
+      } else {
+        const body = await res.json().catch(() => ({}));
+        setReceiveError(body.error || 'Failed to receive the challan.');
       }
     } catch (err) {
       console.error('Failed to mark challan received:', err);
+      setReceiveError('Failed to receive the challan.');
     } finally {
       setActionInProgress(null);
     }
@@ -202,7 +213,7 @@ export default function IncomingChallansPage() {
                               PROGRAMMING
                             </span>
                           ) : (
-                            <span className="font-semibold text-neutral-900">{ch.fromDepartment}</span>
+                            <span className="font-semibold text-neutral-900">{departmentName(ch.fromDepartment)}</span>
                           )}
                         </td>
 
@@ -279,7 +290,10 @@ export default function IncomingChallansPage() {
                               <button
                                 type="button"
                                 disabled={actionInProgress === ch.id}
-                                onClick={() => handleMarkReceived(ch.id)}
+                                onClick={() => {
+                                  setReceiveError(null);
+                                  setConfirmReceive(ch);
+                                }}
                                 className="inline-flex items-center gap-1 text-[11px] font-bold text-accent-800 hover:text-accent-800 bg-accent-50 hover:bg-accent-100 border border-accent-200 px-2 py-1 rounded transition cursor-pointer"
                                 title="Mark as received in Fabric Store"
                               >
@@ -353,6 +367,15 @@ export default function IncomingChallansPage() {
       </main>
 
       {/* Production Sheet Print & Download Modal */}
+      {confirmReceive && (
+        <ReceiveChallanConfirm
+          challan={confirmReceive}
+          busy={actionInProgress === confirmReceive.id}
+          error={receiveError}
+          onConfirm={() => handleMarkReceived(confirmReceive.id)}
+          onClose={() => setConfirmReceive(null)}
+        />
+      )}
       <ProductionSheetPrintModal
         program={selectedSheetModal}
         isOpen={!!selectedSheetModal}

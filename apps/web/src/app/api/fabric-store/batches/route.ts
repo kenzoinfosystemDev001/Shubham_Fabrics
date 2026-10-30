@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
 
 export const dynamic = 'force-dynamic';
@@ -64,6 +64,11 @@ export async function POST(request: Request) {
     if (!fabricType || !fabricDescription) {
       return NextResponse.json({ error: 'fabricType and fabricDescription are required' }, { status: 400 });
     }
+    // A batch is stocked in meters or in pieces, chosen explicitly (never assumed, never converted).
+    const unit = String(body.unit || '').toUpperCase();
+    if (unit !== 'MTR' && unit !== 'PCS') {
+      return NextResponse.json({ error: 'Choose MTR or PCS for the batch.' }, { status: 400 });
+    }
 
     // Resolve actor
     const actor = { id: authUser.id };
@@ -77,6 +82,7 @@ export async function POST(request: Request) {
         fabricDescription,
         colorCode,
         colorName,
+        unit,
         programId: programId || null,
         supplierId: supplierId || null,
         createdById: actor.id,

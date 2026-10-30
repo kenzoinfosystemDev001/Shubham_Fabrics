@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
 import { cleanFabricName, normalizeFabricStockType } from '@/lib/fabric-stock';
 import {
@@ -55,8 +55,9 @@ export async function GET(request: Request) {
     const defectiveStockByUnit: Record<string, number> = {};
     for (const record of defectiveRecords) {
       if (record.challanId && returnChallanIds.has(record.challanId)) continue;
-      // Older records have no unit; they took their challan's unit, or were counted as pieces.
-      const unit = unitOf(record.uom) || unitOf(record.challan?.defectiveUnit) || unitOf(record.challan?.fabricUnit) || 'PCS';
+      // Older records have no unit; they take their challan's unit. When nothing records it, the
+      // quantity is reported under UNKNOWN for review rather than guessed as pieces.
+      const unit = unitOf(record.uom) || unitOf(record.challan?.defectiveUnit) || unitOf(record.challan?.fabricUnit) || 'UNKNOWN';
       addTotals(defectiveStockByUnit, { [unit]: Number(record.quantity) || 0 });
     }
     for (const challan of defectiveReturnChallans) {
@@ -64,7 +65,7 @@ export async function GET(request: Request) {
       const unit = unitOf(challan.defectiveUnit) || unitOf(challan.fabricUnit);
       addTotals(
         defectiveStockByUnit,
-        Number(challan.defectivePieces) > 0 ? { [unit || 'PCS']: Number(challan.defectivePieces) } : totalsByUnit(challan.items, challan.fabricUnit),
+        Number(challan.defectivePieces) > 0 ? { [unit || 'UNKNOWN']: Number(challan.defectivePieces) } : totalsByUnit(challan.items, challan.fabricUnit),
       );
     }
     const defectiveTotal = defectiveStockByUnit.PCS || 0;
@@ -100,7 +101,7 @@ export async function GET(request: Request) {
         itemName: cleanFabricName(outw.itemName) || outw.itemName,
         colour: outw.colour,
         quantity: Number(outw.issueQty),
-        unit: String(outw.unit || 'MTR').toUpperCase(),
+        unit: String(outw.unit).toUpperCase(),
         fabricType: normalizeFabricStockType(outw.fabricType),
       });
     }

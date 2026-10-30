@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { inchargeNameOf, userChallanRemarks } from '@/lib/challan-remarks.mjs';
 import { 
   Printer, 
   Download, 
@@ -13,13 +14,14 @@ import {
   printChallan,
   ChallanItem
 } from '@/lib/download-challan';
-import { generateCode128SvgBars } from '@/lib/barcode';
+import { downloadBarcodePng, generateCode128SvgBars } from '@/lib/barcode';
 import { getCurrentUser, canViewClientCode } from '@/lib/rbac';
 import { extractRootWilcomPhoto } from '@/lib/download-wilcom';
+import { departmentName } from '@/lib/workflow-views';
 import { useProgramDocument } from '@/hooks/useProgramDocument';
 import { FinishedGarmentList, useGarmentImages } from '@/components/workflow/FinishedGarments';
 import { isFinishedGoodsChallan } from '@/lib/finished-garments.mjs';
-import { challanTotalsByUnit, formatTotals, unitOf } from '@/lib/challan-units.mjs';
+import { averageText, challanTotalsByUnit, formatTotals, isProgrammingToRecutting, unitOf, unitQuantityText } from '@/lib/challan-units.mjs';
 import { lineSheetId, sheetBreakdown, sheetLabel } from '@/lib/challan-sheets.mjs';
 
 interface ChallanPrintModalProps {
@@ -80,7 +82,7 @@ export function ChallanPrintModal({
     STORE: 'FABRIC STORE',
     FABRIC_STORE: 'FABRIC STORE',
     DYEING: 'DYEING DEPARTMENT',
-    QC1: 'QC1 (QUALITY CHECK 1)',
+    QC1: 'DYEING QC',
     EMBROIDERY: 'EMBROIDERY DEPARTMENT',
     THREAD_CUTTING: 'THREAD CUTTING DEPARTMENT',
     CUTTING: 'CUTTING DEPARTMENT',
@@ -109,12 +111,18 @@ export function ChallanPrintModal({
     const id = lineSheetId(it, challan);
     return `[${sheetLabel(sheets.sheets.find((s: any) => s.programId === id)?.program)}] `;
   };
+  // Store → Dyeing lines carry the colour Dyeing must achieve next to the current (base) colour.
+  const hasDyeColour = items.some((i: any) => String(i.requiredColour || '').trim());
+  // Programming to Recutting: Size | Average | Unit | Remarks, each of the first three a quantity with its own unit;
+  // later challans: Size | Unit (of the Size) | Average | Remarks.
+  const toRecuttingLayout = isProgrammingToRecutting(fromDept);
   // Each line keeps its unit: totals are per unit, never MTR + PCS.
   const unitTotals = challanTotalsByUnit(challan);
   const totalUnits = Object.keys(unitTotals);
   const singleUnit = totalUnits.length === 1 ? totalUnits[0] : null;
   const totalQtyText = singleUnit ? String(unitTotals[singleUnit]) : formatTotals(unitTotals);
-  const uom = singleUnit || unitOf(challan.fabricUnit) || unitOf(items[0]?.uom) || 'PCS';
+  // Shown exactly as recorded; a challan with no recorded unit shows none rather than a guess.
+  const uom = singleUnit || unitOf(challan.fabricUnit) || unitOf(items[0]?.uom) || '';
   const totalUnitLabel = singleUnit || '';
 
   const defectivePieces = challan.defectivePieces ?? 0;
@@ -147,10 +155,10 @@ export function ChallanPrintModal({
             </div>
             <div>
               <div className="text-[10px] font-bold uppercase tracking-wider text-neutral-700">
-                Department Transfer Challan Form
+                Challan
               </div>
               <h2 className="text-base font-bold text-neutral-900 font-mono">
-                {challanNo} &middot; {fromDept} &rarr; {toDept}
+                {challanNo} &middot; {departmentName(fromDept)} &rarr; {departmentName(toDept)}
               </h2>
             </div>
           </div>
@@ -196,6 +204,14 @@ export function ChallanPrintModal({
             </button>
             <button
               type="button"
+              onClick={() => void downloadBarcodePng(challanNo, `barcode-${String(challanNo).replace(/[^a-zA-Z0-9_-]/g, '_')}.png`)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-neutral-50 text-neutral-800 rounded-lg text-xs font-semibold ring-1 ring-neutral-300 transition cursor-pointer"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Download Barcode</span>
+            </button>
+            <button
+              type="button"
               onClick={onClose}
               className="p-1.5 text-neutral-500 hover:text-neutral-600 rounded-lg hover:bg-neutral-200/60 transition cursor-pointer"
             >
@@ -210,226 +226,147 @@ export function ChallanPrintModal({
           </div>
         )}
 
-        {/* MODAL BODY */}
+        {/* MODAL BODY: the challan, as it prints */}
         <div className="p-4 sm:p-6 overflow-y-auto bg-neutral-100 flex-1">
-          <div className="max-w-[760px] mx-auto bg-white p-6 sm:p-8 rounded shadow-sm border-2 border-neutral-200 text-neutral-900 font-sans space-y-3">
-            
-            {/* Header: Company Title, Transfer Challan, and Code-128 SVG Barcode */}
-            <div className="flex items-start justify-between border-b-2 border-neutral-200 pb-3 gap-4">
+          <div className="max-w-[760px] mx-auto bg-white p-6 sm:p-9 rounded-xl ring-1 ring-neutral-200 text-neutral-900 space-y-7">
+            {/* Heading */}
+            <div className="flex items-start justify-between gap-6">
               <div>
-                <div className="text-[11px] font-black tracking-wider uppercase text-neutral-900">
-                  SHUBHAM FABRICS INDIA PVT. LTD.
-                </div>
-                <h1 className="text-lg font-black tracking-widest uppercase text-neutral-900 mt-0.5">
-                  DEPARTMENT TRANSFER CHALLAN
-                </h1>
-                <div className="inline-block mt-1 px-2 py-0.5 bg-neutral-100 border border-neutral-300 text-[10px] font-bold font-mono rounded text-neutral-900">
-                  {fromLabel} &rarr; {toLabel}
-                </div>
+                <p className="text-xs font-semibold tracking-[0.18em] text-neutral-500">SHUBHAM FABRICS INDIA PVT. LTD.</p>
+                <h1 className="mt-1 text-3xl font-bold">Challan</h1>
               </div>
-
-              {/* Barcode Block */}
-              <div className="flex flex-col items-end text-right">
-                <div className="bg-white p-1 border border-neutral-300 rounded mb-1">
-                  <svg
-                    viewBox={`0 0 ${barW} ${barH}`}
-                    width="150"
-                    height="36"
-                    dangerouslySetInnerHTML={{ __html: svgBars }}
-                  />
-                </div>
-                <div className="font-mono text-xs font-black tracking-wider text-neutral-900">{challanNo}</div>
-                <div className="text-[10px] font-bold text-neutral-600">DESIGN: {designNo}</div>
+              <div className="text-right shrink-0">
+                <svg viewBox={`0 0 ${barW} ${barH}`} width="160" height="38" className="ml-auto" dangerouslySetInnerHTML={{ __html: svgBars }} />
+                <p className="mt-1.5 text-lg font-bold font-mono">{challanNo}</p>
+                <p className="text-sm text-neutral-500">{dateStr}</p>
               </div>
             </div>
 
-            {/* Metadata Grid (Only Actual Filled Details) */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 border-[1.5px] border-neutral-200 p-2.5 bg-neutral-50 text-xs">
+            {/* From → To */}
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4 rounded-xl bg-neutral-50 ring-1 ring-neutral-200 px-5 py-4">
               <div>
-                <span className="text-[9px] font-black text-neutral-500 uppercase block">CHALLAN NO</span>
-                <span className="font-mono font-bold text-neutral-900">{challanNo}</span>
+                <p className="text-xs font-medium text-neutral-500">From</p>
+                <p className="text-base font-semibold">{departmentName(fromDept)}</p>
               </div>
-              <div>
-                <span className="text-[9px] font-black text-neutral-500 uppercase block">DISPATCH DATE</span>
-                <span className="font-bold text-neutral-900">{dateStr}</span>
-              </div>
-              <div>
-                <span className="text-[9px] font-black text-neutral-500 uppercase block">FROM STATION</span>
-                <span className="font-bold text-neutral-900">{fromLabel}</span>
-              </div>
-              <div>
-                <span className="text-[9px] font-black text-neutral-500 uppercase block">TO STATION</span>
-                <span className="font-bold text-neutral-900">{toLabel}</span>
+              <span className="text-lg text-brand-600" aria-hidden="true">&rarr;</span>
+              <div className="text-right">
+                <p className="text-xs font-medium text-neutral-500">To</p>
+                <p className="text-base font-semibold">{departmentName(toDept)}</p>
               </div>
             </div>
 
-            {/* Production Order Details */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 border-[1.5px] border-neutral-200 p-2.5 bg-white text-xs">
+            {/* Production sheet */}
+            {challan.program && (
               <div>
-                <span className="text-[9px] font-black text-neutral-500 uppercase block">PRODUCTION SHEET #</span>
-                <span className="font-mono font-bold text-neutral-900">{programSerial}</span>
-              </div>
-              <div>
-                <span className="text-[9px] font-black text-neutral-500 uppercase block">DESIGN NO</span>
-                <span className="font-mono font-bold text-neutral-900">{designNo}</span>
-              </div>
-              <div>
-                <span className="text-[9px] font-black text-neutral-500 uppercase block">STYLE / PATTERN</span>
-                <span className="font-bold text-neutral-900">{styleCode}{pattern && pattern !== '—' ? ` (${pattern})` : ''}</span>
-              </div>
-              <div>
-                <span className="text-[9px] font-black text-neutral-500 uppercase block">FABRIC</span>
-                <span className="font-bold text-neutral-900">{fabricName}</span>
-              </div>
-            </div>
-
-            {artworkPhoto && (
-              <div className="border-[1.5px] border-neutral-200 p-2.5 bg-white">
-                <div className="text-[9px] font-black text-neutral-500 uppercase mb-2">Wilcom Artwork Reference</div>
-                <img src={artworkPhoto} alt={`Wilcom artwork for design ${designNo}`} className="max-h-40 max-w-full object-contain" />
-              </div>
-            )}
-
-            {/* Client / Status if present */}
-            {clientName && clientName !== 'Standard Client' && (
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 border-[1.5px] border-neutral-200 p-2.5 bg-neutral-50 text-xs">
-                <div className="col-span-2">
-                  <span className="text-[9px] font-black text-neutral-500 uppercase block">BUYER / CLIENT</span>
-                  <span className="font-bold text-neutral-900">
-                    {clientName}
-                    {canSeeClientCode && clientCode && (
-                      <span className="ml-1 text-[10px] font-mono text-accent-800">({clientCode})</span>
-                    )}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-[9px] font-black text-neutral-500 uppercase block">PRIORITY</span>
-                  <span className="font-bold text-neutral-900">{priority}</span>
-                </div>
-                <div>
-                  <span className="text-[9px] font-black text-neutral-500 uppercase block">STATUS</span>
-                  <span className="font-bold text-neutral-900">{status}</span>
+                <h2 className="text-sm font-semibold mb-2">Production Sheet</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-3 rounded-xl ring-1 ring-neutral-200 overflow-hidden divide-y sm:divide-y-0 sm:divide-x divide-neutral-200">
+                  {[
+                    { label: 'Design No.', value: prog.designNumber || prog.designName || prog.mainStyle },
+                    { label: 'Serial No.', value: programSerial },
+                    { label: 'Incharge', value: inchargeNameOf(challan) || issuerName },
+                  ].map((field) => (
+                    <div key={field.label} className="px-4 py-3 min-w-0">
+                      <p className="text-xs font-medium text-neutral-500">{field.label}</p>
+                      <p className="mt-0.5 text-sm font-semibold truncate">{field.value || '—'}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
 
-            {/* Defective cut alert only if defective pieces exist */}
-            {defectivePieces > 0 && (
-              <div className="border-[1.5px] border-danger-200 bg-danger-50 p-2 text-xs font-bold text-danger-900 rounded">
-                DEFECTIVE CUT (TO SHELF): {defectivePieces} {fabricUnit} [Location: {defectiveShelf}]
-                {defectReason ? ` &middot; Reason: ${defectReason}` : ''}
-              </div>
-            )}
-
-            {/* Finished garments */}
-            {finishedGoods && (
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-neutral-700">
-                  <span>FINISHED GARMENTS</span>
-                  <span className="normal-case font-semibold">Production Sheet {programSerial} is printed with this challan</span>
-                </div>
-                <div className="border-[1.5px] border-neutral-200 rounded">
+            {/* Items */}
+            {finishedGoods ? (
+              <div>
+                <h2 className="text-sm font-semibold mb-2">Garments</h2>
+                <div className="rounded-xl ring-1 ring-neutral-200">
                   <FinishedGarmentList items={items} programId={challan.programId || prog.id} images={garmentImages} />
                 </div>
               </div>
-            )}
-
-            {/* Items Table */}
-            {!finishedGoods && (
-            <div className="space-y-1">
-              <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-neutral-700">
-                <span>ITEMS / MATERIALS</span>
-                <span className="font-mono text-xs text-neutral-900">
-                  Total: {totalQtyText} {totalUnitLabel}
-                </span>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse border-[1.5px] border-neutral-200 text-xs text-left">
-                  <thead>
-                    <tr className="bg-neutral-100">
-                      <th className="border-[1.5px] border-neutral-200 p-1.5 font-black text-center w-8">#</th>
-                      <th className="border-[1.5px] border-neutral-200 p-1.5 font-black">ITEM DESCRIPTION</th>
-                      <th className="border-[1.5px] border-neutral-200 p-1.5 font-black w-28">COLOR / SHADE</th>
-                      <th className="border-[1.5px] border-neutral-200 p-1.5 font-black w-24">ROLL / LOT #</th>
-                      <th className="border-[1.5px] border-neutral-200 p-1.5 font-black text-right w-20">QUANTITY</th>
-                      <th className="border-[1.5px] border-neutral-200 p-1.5 font-black text-center w-14">UOM</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {items.length > 0 ? (
-                      items.map((it, idx) => (
-                        <tr key={it.id || idx}>
-                          <td className="border-[1.5px] border-neutral-200 p-1 text-center font-bold font-mono">{idx + 1}</td>
-                          <td className="border-[1.5px] border-neutral-200 p-1 font-bold">{sheetPrefix(it)}{it.itemDescription || fabricName || styleCode || 'Fabric Lot'}</td>
-                          <td className="border-[1.5px] border-neutral-200 p-1">{it.colour || prog.fabricColor || 'Standard'}</td>
-                          <td className="border-[1.5px] border-neutral-200 p-1 font-mono">{it.rollNumber || it.lotNumber || '—'}</td>
-                          <td className="border-[1.5px] border-neutral-200 p-1 text-right font-mono font-bold">{it.quantity || 0}</td>
-                          <td className="border-[1.5px] border-neutral-200 p-1 text-center">{it.uom || uom}</td>
-                        </tr>
-                      ))
-                    ) : (
+            ) : (
+              <div>
+                <h2 className="text-sm font-semibold mb-2">Items</h2>
+                <div className="rounded-xl ring-1 ring-neutral-200 overflow-x-auto">
+                  <table className="w-full text-left text-sm min-w-[520px]">
+                    <thead className="bg-neutral-50 text-xs text-neutral-500">
                       <tr>
-                        <td className="border-[1.5px] border-neutral-200 p-1 text-center font-mono">1</td>
-                        <td className="border-[1.5px] border-neutral-200 p-1 font-bold">{fabricName || styleCode || 'Production Material'}</td>
-                        <td className="border-[1.5px] border-neutral-200 p-1">{prog.fabricColor || 'Standard'}</td>
-                        <td className="border-[1.5px] border-neutral-200 p-1 font-mono">—</td>
-                        <td className="border-[1.5px] border-neutral-200 p-1 text-right font-mono font-bold">{totalQtyText}</td>
-                        <td className="border-[1.5px] border-neutral-200 p-1 text-center">{totalUnitLabel}</td>
+                        <th className="py-2.5 pl-4 pr-3 font-medium">Fabric</th>
+                        <th className="py-2.5 px-3 font-medium">{hasDyeColour ? 'Base Colour' : 'Colour'}</th>
+                        {hasDyeColour && <th className="py-2.5 px-3 font-medium">Dye Colour</th>}
+                        <th className="py-2.5 px-3 font-medium text-right">Size</th>
+                        {toRecuttingLayout && <th className="py-2.5 px-3 font-medium text-right">Average</th>}
+                        <th className="py-2.5 px-3 font-medium">Unit</th>
+                        {!toRecuttingLayout && <th className="py-2.5 px-3 font-medium text-right">Average</th>}
+                        <th className="py-2.5 pl-3 pr-4 font-medium">Remarks</th>
                       </tr>
-                    )}
-                    {sheets.multiSheet &&
-                      sheets.sheets.map((s: any) => (
-                        <tr key={s.programId || 'none'}>
-                          <td colSpan={4} className="border-[1.5px] border-neutral-200 p-1 text-right text-[10px] font-bold">
-                            SHEET {sheetLabel(s.program)} ({s.lines.length} LINE{s.lines.length === 1 ? '' : 'S'}):
+                    </thead>
+                    <tbody className="divide-y divide-neutral-100">
+                      {items.map((it: any, idx: number) => (
+                        <tr key={it.id || idx}>
+                          <td className="py-3 pl-4 pr-3 font-medium">{sheetPrefix(it)}{it.fabricCode || it.itemDescription || '—'}</td>
+                          <td className="py-3 px-3">{it.colour || '—'}</td>
+                          {hasDyeColour && <td className="py-3 px-3 font-semibold text-brand-800">{it.requiredColour || '—'}</td>}
+                          <td className="py-3 px-3 text-right tabular-nums font-semibold whitespace-nowrap">{it.quantity}{toRecuttingLayout && it.uom ? ` ${it.uom}` : ''}</td>
+                          {toRecuttingLayout && <td className="py-3 px-3 text-right tabular-nums">{averageText(it)}</td>}
+                          <td className="py-3 px-3 whitespace-nowrap">{toRecuttingLayout ? unitQuantityText(it) : it.uom || '—'}</td>
+                          {!toRecuttingLayout && <td className="py-3 px-3 text-right tabular-nums">{averageText(it)}</td>}
+                          <td className="py-3 pl-3 pr-4 text-neutral-600">
+                            {[it.rollNumber ? `Roll ${it.rollNumber}` : null, userChallanRemarks(it.remarks)].filter(Boolean).join(' · ') || '—'}
                           </td>
-                          <td colSpan={2} className="border-[1.5px] border-neutral-200 p-1 text-right font-mono font-bold">{formatTotals(s.totals)}</td>
                         </tr>
                       ))}
-                    <tr className="bg-neutral-50 font-black">
-                      <td colSpan={4} className="border-[1.5px] border-neutral-200 p-1 text-right text-[10px] uppercase font-black">
-                        TOTAL QUANTITY:
-                      </td>
-                      <td className="border-[1.5px] border-neutral-200 p-1 text-right font-mono text-sm font-black">
-                        {totalQtyText}
-                      </td>
-                      <td className="border-[1.5px] border-neutral-200 p-1 text-center font-black">{totalUnitLabel}</td>
-                    </tr>
-                  </tbody>
-                </table>
+                      {items.length === 0 && (
+                        <tr>
+                          <td colSpan={hasDyeColour ? 7 : 6} className="py-6 text-center text-neutral-500">No items on this challan.</td>
+                        </tr>
+                      )}
+                      {sheets.multiSheet &&
+                        sheets.sheets.map((s: any) => (
+                          <tr key={s.programId || 'none'} className="bg-neutral-50/70">
+                            <td colSpan={2} className="py-2 pl-4 pr-3 text-xs font-semibold text-neutral-600">
+                              Sheet {sheetLabel(s.program)} ({s.lines.length} line{s.lines.length === 1 ? '' : 's'})
+                            </td>
+                            <td colSpan={hasDyeColour ? 5 : 4} className="py-2 px-3 text-xs font-semibold tabular-nums">{formatTotals(s.totals)}</td>
+                          </tr>
+                        ))}
+                    </tbody>
+                    {items.length > 0 && (
+                      <tfoot className="bg-neutral-50 border-t border-neutral-200">
+                        <tr>
+                          <td colSpan={2} className="py-3 pl-4 pr-3 font-semibold">Total</td>
+                          <td colSpan={hasDyeColour ? 5 : 4} className="py-3 px-3 font-bold tabular-nums">{formatTotals(unitTotals)}</td>
+                        </tr>
+                      </tfoot>
+                    )}
+                  </table>
+                </div>
+                {defectivePieces > 0 && (
+                  <p className="mt-3 text-sm text-danger-700">
+                    Defective: <strong>{defectivePieces} {fabricUnit}</strong>
+                    {defectReason ? ` — ${defectReason}` : ''}
+                  </p>
+                )}
               </div>
-            </div>
             )}
 
-
-            {/* Dual Custody Signatures Bar */}
-            <div className="grid grid-cols-2 gap-8 pt-8 border-t border-neutral-200 text-xs">
-              <div className="text-center space-y-4">
-                <div className="border-b border-neutral-200 w-3/4 mx-auto pb-1" />
-                <div>
-                  <span className="font-black uppercase tracking-wider block text-[10px] text-neutral-900">
-                    DISPATCHED BY
-                  </span>
-                  <span className="text-[10px] text-neutral-600 block">{issuerName} ({fromLabel})</span>
-                </div>
+            {userChallanRemarks(challan.remarks) && (
+              <div>
+                <h2 className="text-sm font-semibold mb-1">Remarks</h2>
+                <p className="text-sm text-neutral-700">{userChallanRemarks(challan.remarks)}</p>
               </div>
-              <div className="text-center space-y-4">
-                <div className="border-b border-neutral-200 w-3/4 mx-auto pb-1" />
-                <div>
-                  <span className="font-black uppercase tracking-wider block text-[10px] text-neutral-900">
-                    RECEIVED BY
-                  </span>
-                  <span className="text-[10px] text-neutral-600 block">Station Incharge ({toLabel})</span>
+            )}
+
+            {/* Signatures */}
+            <div className="grid grid-cols-2 gap-10 pt-10">
+              {[
+                { label: 'Issued by', dept: departmentName(fromDept) },
+                { label: 'Received by', dept: departmentName(toDept) },
+              ].map((sign) => (
+                <div key={sign.label} className="border-t border-neutral-300 pt-2 text-center">
+                  <p className="text-sm font-semibold">{sign.label}</p>
+                  <p className="text-xs text-neutral-500">{sign.dept}</p>
                 </div>
-              </div>
+              ))}
             </div>
-
-            {/* Footer */}
-            <div className="pt-2 border-t border-neutral-200 flex justify-between text-[9px] font-mono text-neutral-500">
-              <span>SHUBHAM FABRICS INDIA PVT. LTD.</span>
-              <span>CHALLAN NO: {challanNo}</span>
-            </div>
-
           </div>
         </div>
 

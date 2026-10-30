@@ -1,11 +1,11 @@
 import { Controller, Post, Get, Body, Req, UseGuards, BadRequestException } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginSchema, CreateUserSchema } from '@subham/validation';
+import { LoginSchema, CreateUserSchema } from '@shubham/validation';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { UserRole } from '@subham/types';
+import { UserRole } from '@shubham/types';
 import { Request } from 'express';
 
 @Controller('auth')

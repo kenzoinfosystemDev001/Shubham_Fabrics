@@ -18,6 +18,9 @@ import {
   printProductionSheet,
   downloadProductionSheetHtml,
   productionSheetCategoriesForViewer,
+  sumSubStyleRowQuantities,
+  getSubStyleUnits,
+  getTotalPcsAverage,
 } from '@/lib/download-production-sheet';
 import { useProgramDocument } from '@/hooks/useProgramDocument';
 
@@ -56,6 +59,8 @@ export function ProductionSheetView({
     topName,
     pattern,
     noteText,
+    noteQtyMtr,
+    noteQtyPcs,
     remarksText,
     totalMtrAverage,
     fabricName,
@@ -63,6 +68,8 @@ export function ProductionSheetView({
   } = extractSubStylesAndGrid(program, activeCategory);
 
   const subStyleColumns = subStylesWithAverages.map((s) => s.name);
+  const averageUnits = getSubStyleUnits(subStylesWithAverages);
+  const totalPcsAverage = getTotalPcsAverage(subStylesWithAverages);
 
   // 14 rows total to match the physical factory sheet
   const TOTAL_GRID_ROWS = 14;
@@ -74,6 +81,7 @@ export function ProductionSheetView({
     subStyles?: string[];
     size?: string;
     sizes: Record<string, string>;
+    measurement?: string;
   }[] = [];
 
   for (let i = 0; i < TOTAL_GRID_ROWS; i++) {
@@ -93,6 +101,7 @@ export function ProductionSheetView({
         subStyles: itemSubStyles,
         size: item.size || item.sizes?.['SIZE'] || '',
         sizes: item.sizes || {},
+        measurement: item.measurement || '',
       });
     } else {
       gridRows.push({
@@ -206,21 +215,51 @@ export function ProductionSheetView({
                     {s.name}
                   </th>
                 ))}
-                <th className="border-[1.5px] border-neutral-200 p-1.5 font-black text-[11px] uppercase tracking-wider bg-neutral-100">
-                  TOTAL MTR
-                </th>
+                {averageUnits.hasMtr && (
+                  <th className="border-[1.5px] border-neutral-200 p-1.5 font-black text-[11px] uppercase tracking-wider bg-neutral-100">
+                    TOTAL MTR
+                  </th>
+                )}
+                {averageUnits.hasPcs && (
+                  <th className="border-[1.5px] border-neutral-200 p-1.5 font-black text-[11px] uppercase tracking-wider bg-neutral-100">
+                    TOTAL PCS
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody>
               <tr className="h-7 font-bold text-xs">
                 {subStylesWithAverages.map((s, idx) => (
-                  <td key={idx} className="border-[1.5px] border-neutral-200 p-1">
-                    {s.average ? Number(s.average).toFixed(2) : '—'}
+                  <td key={idx} className="border-[1.5px] border-neutral-200 p-1 align-top">
+                    {s.unit === 'PCS'
+                      ? (sumSubStyleRowQuantities(s.rows) !== null ? `${sumSubStyleRowQuantities(s.rows)} PCS` : '—')
+                      : (s.average ? Number(s.average).toFixed(2) : '—')}
+                    {Array.isArray(s.rows) && s.rows.some((row) => String(row.part).trim() || String(row.mtr).trim()) && (
+                      <div className="mt-1 space-y-0.5 text-[10px] font-semibold text-neutral-600">
+                        {s.rows.map((row, rIdx) => (
+                          <div key={rIdx} className="flex justify-between gap-2">
+                            <span className="text-left">{row.part || '—'}</span>
+                            <span>
+                              {String(row.mtr).trim()
+                                ? (s.unit === 'PCS' ? `${Number(row.mtr)} PCS` : Number(row.mtr).toFixed(2))
+                                : '—'}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </td>
                 ))}
-                <td className="border-[1.5px] border-neutral-200 p-1 font-black bg-neutral-100 text-brand-900">
-                  {totalMtrAverage > 0 ? totalMtrAverage.toFixed(2) : '—'}
-                </td>
+                {averageUnits.hasMtr && (
+                  <td className="border-[1.5px] border-neutral-200 p-1 font-black bg-neutral-100 text-brand-900">
+                    {totalMtrAverage > 0 ? totalMtrAverage.toFixed(2) : '—'}
+                  </td>
+                )}
+                {averageUnits.hasPcs && (
+                  <td className="border-[1.5px] border-neutral-200 p-1 font-black bg-neutral-100 text-brand-900">
+                    {totalPcsAverage > 0 ? totalPcsAverage : '—'}
+                  </td>
+                )}
               </tr>
             </tbody>
           </table>
@@ -248,6 +287,7 @@ export function ProductionSheetView({
                   SUB STYLE
                 </th>
                 <th rowSpan={2} className="border-[1.5px] border-neutral-200 p-1.5 font-black w-24 uppercase">SIZE</th>
+                <th rowSpan={2} className="border-[1.5px] border-neutral-200 p-1.5 font-black w-24 uppercase">MEASUREMENT</th>
               </tr>
               <tr className="bg-neutral-50">
                 <th className="border-[1.5px] border-neutral-200 p-1 font-black w-20 bg-neutral-100">MTR</th>
@@ -312,6 +352,9 @@ export function ProductionSheetView({
                         </div>
                       )}
                     </td>
+                    <td className="border-[1.5px] border-neutral-200 p-1 font-bold text-center">
+                      {row.measurement || ''}
+                    </td>
                   </tr>
                 );
               })}
@@ -327,7 +370,7 @@ export function ProductionSheetView({
                 <td className="border-[1.5px] border-neutral-200 p-1 font-black text-brand-600 text-center">
                   {totalPcs > 0 ? totalPcs : '—'}
                 </td>
-                <td colSpan={2} className="border-[1.5px] border-neutral-200 p-1 text-right text-[10px] pr-3">
+                <td colSpan={3} className="border-[1.5px] border-neutral-200 p-1 text-right text-[10px] pr-3">
                   <span className="font-black not-italic text-neutral-900">
                     TOTAL MEASUREMENT: {totalMeasurement !== null ? formatSizeExpressionTotal(totalMeasurement) : '—'}
                   </span>
@@ -370,12 +413,22 @@ export function ProductionSheetView({
       )}
 
       {/* NOTES & REMARKS */}
-      {(noteText || remarksText) && (
+      {(noteText || noteQtyMtr || noteQtyPcs || remarksText) && (
         <div className="p-3 bg-accent-50/70 border border-accent-300 rounded-lg text-xs space-y-1 text-accent-800">
           {noteText && (
             <div>
               <span className="font-bold">NOTE: </span>
               <span>{noteText}</span>
+            </div>
+          )}
+          {(noteQtyMtr || noteQtyPcs) && (
+            <div className="flex flex-wrap gap-x-4">
+              {noteQtyMtr && (
+                <span><span className="font-bold">QTY (MTR): </span>{noteQtyMtr}</span>
+              )}
+              {noteQtyPcs && (
+                <span><span className="font-bold">QTY (PCS): </span>{noteQtyPcs}</span>
+              )}
             </div>
           )}
           {remarksText && (

@@ -30,7 +30,7 @@ The Stitching Department is responsible for receiving precision-cut and separate
 | **`ProductionTransaction`** | Full schema (`departmentCode`, `operationName`, `inputQuantity`, `goodQuantity`, `reworkQuantity`, `rejectQuantity`, `wasteQuantity`, `unitOfMeasure`, `operatorId`). | Standard MES operation log. Stitching operations persist with `departmentCode: 'STITCHING'` and `operationName: 'GARMENT_STITCHING'`. |
 | **`DefectRecord`** | Full schema (`challanId`, `programId`, `departmentCode`, `defectCode`, `itemDescription`, `severity`, `quantity`, `reason`, `detectedById`, `status`). | Rejection and defect audit logging. Reject pieces in stitching automatically create `DefectRecord` with `departmentCode: 'STITCHING'`. |
 | **`Department`** | Fully seeded with `code: 'STITCHING'`, `name: 'Stitching Department'`, `sequenceOrder: 11`. | Foreign key references for `fromDeptRel` and `toDeptRel`. Next department resolved dynamically from `STANDARD_FACTORY_ROUTE`. |
-| **`UserRole` & `Role`** | `STITCHING_SUPERVISOR` enum exists in `@subham/types`. | Core user `stitching` seeded with PIN `1234` and `STITCHING_SUPERVISOR` role. |
+| **`UserRole` & `Role`** | `STITCHING_SUPERVISOR` enum exists in `@shubham/types`. | Core user `stitching` seeded with PIN `1234` and `STITCHING_SUPERVISOR` role. |
 
 ---
 

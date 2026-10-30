@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
 import { dyeingErrorResponse, USER_NAME_SELECT } from '@/lib/dyeing-server';
 import { issueDyeingQcChallan } from '@/lib/dyeing-qc-issue';

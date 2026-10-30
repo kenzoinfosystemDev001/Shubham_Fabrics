@@ -7,6 +7,44 @@ export const QUANTITY_UNITS = /** @type {const} */ (['MTR', 'PCS']);
 /** Header unit of a challan whose lines carry more than one unit; its header quantities stay empty. */
 export const MIXED_UNIT = 'MIXED';
 
+// Challans from Programming to Recutting list their Items as Size | Average | Unit | Remarks, each of Size,
+// Average and Unit a quantity with its own MTR / PCS; challans issued after Recutting (Stitching onward) keep
+// Size | Unit | Average | Remarks, where Unit is the unit of the Size.
+const AFTER_RECUTTING = new Set(['STITCHING', 'FINISHING', 'STEAM_PRESS', 'FINAL_CHECK', 'INVENTORY', 'PACKING']);
+
+/** Whether a challan from this department uses the Programming-to-Recutting Items layout. */
+export function isProgrammingToRecutting(fromDepartment) {
+  return !AFTER_RECUTTING.has(String(fromDepartment || '').toUpperCase());
+}
+
+const pairText = (value, unit) =>
+  value === undefined || value === null || String(value) === '' ? '—' : `${value}${unit ? ` ${unit}` : ''}`;
+
+/** A challan line's Average with its own unit, e.g. "2.5 MTR"; "—" when none was entered. */
+export function averageText(item) {
+  return pairText(item?.average, item?.averageUnit);
+}
+
+/** A challan line's Unit quantity with its own unit, e.g. "40 PCS"; "—" when none was entered. */
+export function unitQuantityText(item) {
+  return pairText(item?.unitQuantity, item?.unitQuantityUom);
+}
+
+/**
+ * An optional quantity entered with its own MTR / PCS (a line's Average or Unit quantity). Blank gives
+ * { value: null, unit: null }; an entered value needs a unit. Never converted to the line's own unit.
+ * @returns {{ value: number | null, unit: 'MTR' | 'PCS' | null } | { error: string }}
+ */
+export function quantityPairOf(rawValue, rawUnit, label) {
+  const raw = rawValue === undefined || rawValue === null ? '' : String(rawValue).trim();
+  if (raw === '') return { value: null, unit: null };
+  const value = Number(raw);
+  if (!Number.isFinite(value) || value < 0) return { error: `${label} must be 0 or more.` };
+  const unit = unitOf(rawUnit);
+  if (!unit) return { error: `choose MTR or PCS for the ${label}.` };
+  return { value, unit };
+}
+
 /** "MTR" / "PCS" for any spelling (m, meters, pieces ...); null when it is neither. */
 export function unitOf(raw) {
   return normalizeStockUnit(raw);
@@ -63,4 +101,39 @@ export function formatTotals(totals, empty = '0') {
     .concat(Object.keys(totals || {}).filter((u) => !QUANTITY_UNITS.includes(/** @type {any} */ (u)) && Number(totals[u]) > 0))
     .map((u) => `${Number(totals[u]).toLocaleString('en-IN', { maximumFractionDigits: u === 'PCS' ? 0 : 2 })} ${u}`);
   return parts.length ? parts.join(' · ') : empty;
+}
+
+/**
+ * What a challan line carries in meters and in pieces, for receiving screens: its quantity (the figure stock moves
+ * by) in its own unit, and its Unit quantity when that is in the other unit. A unit the line does not carry is
+ * null. The two are never added or converted.
+ * @returns {{ MTR: number | null, PCS: number | null }}
+ */
+export function lineQuantitiesByUnit(line) {
+  const out = /** @type {{ MTR: number | null, PCS: number | null }} */ ({ MTR: null, PCS: null });
+  const unit = unitOf(line?.uom);
+  if (unit === 'MTR' || unit === 'PCS') out[unit] = round(Number(line?.quantity) || 0);
+  const other = unitOf(line?.unitQuantityUom);
+  if ((other === 'MTR' || other === 'PCS') && out[other] === null && line?.unitQuantity !== null && line?.unitQuantity !== undefined) {
+    out[other] = round(Number(line.unitQuantity) || 0);
+  }
+  return out;
+}
+
+/** The unit of a line's second quantity (its Unit quantity in the other unit), or null when it has none. */
+export function secondUnitOf(line) {
+  const unit = unitOf(line?.uom);
+  const other = unitOf(line?.unitQuantityUom);
+  return other && other !== unit && (other === 'MTR' || other === 'PCS') && line?.unitQuantity !== null && line?.unitQuantity !== undefined ? other : null;
+}
+
+/** Total MTR and total PCS over lines, each added on its own (see lineQuantitiesByUnit). */
+export function linesTotalsMtrPcs(lines) {
+  const totals = { MTR: 0, PCS: 0 };
+  for (const line of lines || []) {
+    const q = lineQuantitiesByUnit(line);
+    totals.MTR = round(totals.MTR + (q.MTR || 0));
+    totals.PCS = round(totals.PCS + (q.PCS || 0));
+  }
+  return totals;
 }

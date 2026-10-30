@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { canViewClientCode, getSessionUser } from '@/lib/auth/require-user';
 import { requireDepartment } from '@/lib/auth/department-access';
 import { unitOf } from '@/lib/challan-units.mjs';
@@ -39,6 +39,9 @@ async function getFabricAvailability(
     sufficient: availableMeters >= requiredMeters,
   };
 }
+
+/** Another save landed first; the editor must reload rather than overwrite it. */
+class SheetConflictError extends Error {}
 
 function parseSafeDate(val: any, fallback?: Date | null): Date | null {
   if (!val) return fallback !== undefined ? fallback : null;
@@ -131,13 +134,31 @@ export async function POST(request: Request) {
       // Strict stock gating will be re-enabled later once stock management is maintained.
     }
 
-    // Check if updating an existing program by ID
+    // Editing a submitted sheet: only by its own ID, and only from the version the editor loaded (a newer save
+    // by someone else is never overwritten). A sheet with challans issued stays editable to correct mistakes; its
+    // status is kept (the form cannot send it back to Draft) and its challans and stock are not changed.
     let existing: any = null;
+    let keepStatus: string | null = null;
     if (data.id) {
       existing = await prisma.program.findUnique({
         where: { id: data.id },
-        select: { id: true, programNumber: true },
+        select: { id: true, programNumber: true, updatedAt: true, metadataJson: true, status: true, targetQuantity: true, designNumber: true },
       });
+      if (!existing) {
+        return NextResponse.json({ error: 'This production sheet no longer exists.' }, { status: 404 });
+      }
+      const issued = await prisma.challan.findFirst({
+        where: { programId: existing.id, status: { notIn: ['DRAFT', 'CANCELLED'] } },
+        select: { challanNumber: true },
+        orderBy: { createdAt: 'asc' },
+      });
+      if (issued) keepStatus = existing.status;
+      if (data.expectedUpdatedAt && new Date(data.expectedUpdatedAt).getTime() !== new Date(existing.updatedAt).getTime()) {
+        return NextResponse.json(
+          { error: 'Someone else saved this production sheet after you opened it. Reload the sheet to see their changes, then make your edit again.' },
+          { status: 409 },
+        );
+      }
     }
 
     // Determine unique programNumber
@@ -145,13 +166,16 @@ export async function POST(request: Request) {
     if (existing) {
       programNumber = existing.programNumber;
     } else if (programNumber) {
-      // Check if user-provided programNumber already exists
+      // A new sheet never takes over another sheet's number.
       const conflict = await prisma.program.findUnique({
         where: { programNumber },
         select: { id: true },
       });
       if (conflict) {
-        existing = conflict;
+        return NextResponse.json(
+          { error: `Production sheet ${programNumber} already exists. Use a different serial number, or open that sheet and edit it.` },
+          { status: 409 },
+        );
       }
     } else if (data.programSerialNo) {
       // If user typed a serial number, see if it can be used as programNumber
@@ -228,6 +252,10 @@ export async function POST(request: Request) {
     // Prepare metadata with items & sub styles with averages
     const metadataObj: any = {};
     try {
+      // An edit keeps every saved detail the form does not send.
+      if (existing?.metadataJson) Object.assign(metadataObj, JSON.parse(existing.metadataJson));
+    } catch {}
+    try {
       if (typeof data.metadataJson === 'string') {
         Object.assign(metadataObj, JSON.parse(data.metadataJson));
       } else if (data.metadataJson && typeof data.metadataJson === 'object') {
@@ -256,11 +284,30 @@ export async function POST(request: Request) {
     metadataObj.swatches = Array.isArray(data.swatches) ? data.swatches : [];
 
     // Store multi-component sheets (TOP, BOTTOM, DUPATTA), forwarded list, and Wilcom design entries
-    if (data.components && typeof data.components === 'object') {
-      metadataObj.components = data.components;
+    const submittedComponents = data.components && typeof data.components === 'object' ? data.components : null;
+    if (submittedComponents) {
+      metadataObj.components = submittedComponents;
     }
     if (Array.isArray(data.forwardedComponents)) {
-      metadataObj.forwardedComponents = data.forwardedComponents;
+      // Only enabled sheets can be forwarded; sheets kept back are saved unchanged and not forwarded.
+      const forwarded: string[] = data.forwardedComponents.filter((key: any) =>
+        typeof key === 'string' &&
+        (!submittedComponents || (key in submittedComponents && submittedComponents[key]?.enabled !== false))
+      );
+      if (forwarded.length === 0) {
+        return NextResponse.json(
+          { error: 'Select at least one enabled Production Sheet to forward to the next department.' },
+          { status: 400 },
+        );
+      }
+      metadataObj.forwardedComponents = forwarded;
+      if (submittedComponents) {
+        for (const key of Object.keys(submittedComponents)) {
+          if (submittedComponents[key] && typeof submittedComponents[key] === 'object') {
+            submittedComponents[key].forwarded = forwarded.includes(key);
+          }
+        }
+      }
     }
     // Resolve wilcom photo and design number across all entries and root fields
     const submittedWilcomEntries = Array.isArray(data.wilcomEntries)
@@ -285,9 +332,10 @@ export async function POST(request: Request) {
     metadataObj.wilcomDesignNumber = resolvedWilcomNumber;
 
     if (submittedWilcomEntries.length > 0) {
+      // Each production sheet keeps its own artwork; only a TOP design falls back to the root Wilcom photo.
       metadataObj.wilcomEntries = submittedWilcomEntries.map((entry: any) => ({
         ...entry,
-        photoUrl: entry.photoUrl || resolvedWilcomPhoto || '',
+        photoUrl: entry.photoUrl || (String(entry.category || 'TOP').trim().toUpperCase() === 'TOP' ? resolvedWilcomPhoto : '') || '',
       }));
     } else if (resolvedWilcomNumber || resolvedWilcomPhoto) {
       metadataObj.wilcomEntries = [
@@ -318,7 +366,7 @@ export async function POST(request: Request) {
       styleCode: data.mainStyle || data.styleCode || data.topName || '',
       productCategory: data.productCategory || 'GARMENT',
       targetQuantity: targetQty,
-      status: targetStatus,
+      status: keepStatus || targetStatus,
       remarks: data.note || data.comments || data.remarks || null,
       createdById: actorId,
 
@@ -370,9 +418,34 @@ export async function POST(request: Request) {
       let created;
       if (existing) {
         const { createdById: _author, ...updateData } = programData;
-        created = await tx.program.update({
-          where: { id: existing.id },
+        // Guarded on the loaded version, so two editors saving at once cannot both win.
+        const guarded = await tx.program.updateMany({
+          where: { id: existing.id, updatedAt: existing.updatedAt },
           data: updateData,
+        });
+        if (guarded.count !== 1) {
+          throw new SheetConflictError('Someone else saved this production sheet at the same moment. Reload the sheet and make your edit again.');
+        }
+        created = await tx.program.findUniqueOrThrow({ where: { id: existing.id } });
+        await tx.auditLog.create({
+          data: {
+            actorId,
+            action: 'PRODUCTION_SHEET_EDITED',
+            entity: 'Program',
+            entityId: existing.id,
+            beforeState: JSON.stringify({
+              status: existing.status,
+              designNumber: existing.designNumber,
+              targetQuantity: existing.targetQuantity,
+              metadataJson: existing.metadataJson,
+            }),
+            afterState: JSON.stringify({
+              status: updateData.status,
+              designNumber: updateData.designNumber,
+              targetQuantity: updateData.targetQuantity,
+              metadataJson: updateData.metadataJson,
+            }),
+          },
         });
         await tx.programFabric.deleteMany({ where: { programId: existing.id } });
         await tx.programColour.deleteMany({ where: { programId: existing.id } });
@@ -494,8 +567,11 @@ export async function POST(request: Request) {
       sanitizedProgram.clientCode = metadataObj.clientCode || null;
     }
 
-    return NextResponse.json(sanitizedProgram, { status: 201 });
+    return NextResponse.json(sanitizedProgram, { status: existing ? 200 : 201 });
   } catch (error: any) {
+    if (error instanceof SheetConflictError) {
+      return NextResponse.json({ error: error.message }, { status: 409 });
+    }
     console.error('Error creating production sheet:', error);
     return NextResponse.json({ error: error.message || 'Failed to create production sheet' }, { status: 500 });
   }

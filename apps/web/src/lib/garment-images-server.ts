@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
-import type { Prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
+import type { Prisma } from '@shubham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
 import { requireUser, type AuthenticatedUser } from '@/lib/auth/require-user';
 import { apiErrorResponse } from '@/lib/api-errors';

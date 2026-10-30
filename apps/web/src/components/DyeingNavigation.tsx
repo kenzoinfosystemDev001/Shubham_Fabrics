@@ -220,6 +220,14 @@ export function DyeingNavigation() {
             <span>Dyeing History</span>
           </Link>
 
+          {/* HOLD: fabric kept back from forwarding */}
+          <Link
+            href="/dyeing/hold"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/dyeing/hold', true)}
+          >
+            <span>HOLD</span>
+          </Link>
           {/* 4. Floor Board */}
           <Link
             href="/dyeing/floor-board"
@@ -236,7 +244,7 @@ export function DyeingNavigation() {
             <UserCircle className="w-8 h-8 text-brand-700" />
             <div className="flex-1 min-w-0">
               <span className="text-xs font-semibold text-neutral-900 truncate block drop-shadow-xs">
-                {currentUser.fullName || (isAdmin ? 'System Administrator' : 'Dyeing Incharge')}
+                {(currentUser.fullName && currentUser.fullName.trim().toLowerCase() !== 'dyeing department' ? currentUser.fullName : '') || (isAdmin ? 'System Administrator' : 'Dyeing Incharge')}
               </span>
               <span className="text-[10px] text-brand-700 font-bold tracking-wide block truncate drop-shadow-xs">
                 Dyeing Department

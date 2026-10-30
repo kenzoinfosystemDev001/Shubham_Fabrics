@@ -1,6 +1,5 @@
 // Fabric Store stock rules: stock buckets per fabric, type, colour and unit, issue resolution,
-// and ledger reconciliation. Pure, no database or framework imports, so
-// scripts/test-production-fixes.mjs can run them with node:test.
+// and ledger reconciliation. Pure, no database or framework imports.
 //
 // Meters (MTR) and pieces (PCS) are separate stock. Nothing here converts or adds one to the other.
 
@@ -63,6 +62,51 @@ export function stockKey({ fabric, type, colour, unit }) {
 
 export function roundQty(value) {
   return Math.round((Number(value) || 0) * 1000) / 1000;
+}
+
+/**
+ * Quantities kept per unit ({ MTR, PCS }); meters and pieces are never added together. A unit that is
+ * neither (e.g. an old "ROLL" line) keeps its own key rather than being counted as meters or pieces.
+ */
+/** @returns {Record<string, number>} */
+export function unitTotals() {
+  return { MTR: 0, PCS: 0 };
+}
+
+/**
+ * @param {Record<string, number>} totals
+ * @param {unknown} unit
+ * @param {unknown} quantity
+ * @returns {Record<string, number>}
+ */
+export function addToUnitTotals(totals, unit, quantity) {
+  const key = normalizeStockUnit(unit) || String(unit || '').trim().toUpperCase() || 'MTR';
+  totals[key] = roundQty((totals[key] || 0) + (Number(quantity) || 0));
+  return totals;
+}
+
+/**
+ * Totals of challan lines per unit. `single` is the one unit and its quantity when every line uses the
+ * same unit (null for a mixed challan), so screens can keep a plain "Total: 120 MTR" where it applies.
+ * @param {Array<{ quantity?: unknown, uom?: unknown }> | null | undefined} items
+ * @param {string} [fallbackUnit]
+ * @returns {{ totals: Record<string, number>, single: { quantity: number, unit: string } | null, label: string }}
+ */
+export function lineTotals(items, fallbackUnit = 'MTR') {
+  const totals = {};
+  for (const item of items || []) addToUnitTotals(totals, item?.uom || fallbackUnit, item?.quantity);
+  const units = Object.keys(totals);
+  const single = units.length <= 1 ? { quantity: totals[units[0]] || 0, unit: units[0] || fallbackUnit } : null;
+  return { totals, single, label: formatUnitTotals(totals) };
+}
+
+/** "120.5 MTR · 45 PCS"; units with nothing are left out; "0" when there is nothing at all. */
+/** @param {Record<string, number> | null | undefined} totals */
+export function formatUnitTotals(totals, empty = '0') {
+  const parts = Object.entries(totals || {})
+    .filter(([, q]) => Math.abs(Number(q) || 0) > 0)
+    .map(([unit, q]) => `${roundQty(q).toLocaleString('en-IN', { maximumFractionDigits: 3 })} ${unit}`);
+  return parts.length ? parts.join(' · ') : empty;
 }
 
 // ---------------------------------------------------------------------------

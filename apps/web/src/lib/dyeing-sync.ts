@@ -1,4 +1,4 @@
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { mapChallanItemsToDyeingLines } from '@/lib/dyeing-instructions.mjs';
 import { lineSheetId } from '@/lib/challan-sheets.mjs';
 
@@ -92,7 +92,7 @@ export async function syncInboundChallansToDyeingOrders() {
                     inchargeId: incharge?.id ?? null,
                     inchargeName: incharge?.fullName || incharge?.username || null,
                     processRemarks: isRework
-                      ? `QC1 rework return on challan ${challan.challanNumber}${challan.remarks ? `: ${challan.remarks}` : ''}`
+                      ? `Dyeing QC rework return on challan ${challan.challanNumber}${challan.remarks ? `: ${challan.remarks}` : ''}`
                       : null,
                   },
                 }),

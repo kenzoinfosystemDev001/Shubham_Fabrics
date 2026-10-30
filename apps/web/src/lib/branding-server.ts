@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { requireUser } from './auth/require-user';
 import { cloudinaryTransformUrl, destroyCloudinaryImage, uploadImageToCloudinary } from './cloudinary';
 import { MAX_ALT_TEXT_LENGTH, MAX_DEPARTMENT_IMAGE_BYTES, validateDepartmentImage } from './department-images';

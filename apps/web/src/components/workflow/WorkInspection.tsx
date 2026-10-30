@@ -22,11 +22,13 @@ import {
   fetchJson,
   fmtDate,
   fmtQty,
+  challanRef,
   sheetRef,
 } from '@/components/workflow/WorkflowUi';
 import { availableToProcess, pendingReject, pendingRework, readyToTransfer, receivedBasis } from '@/lib/work-items.mjs';
 import { departmentName, transferPath, workPath, type WorkflowView } from '@/lib/workflow-views';
 import { GarmentTag } from '@/components/recutting/RecuttingUi';
+import { FabricPhotos } from '@/components/workflow/FabricPhotos';
 
 const HELD = 'RECEIVED,IN_PROGRESS,COMPLETED,PARTIALLY_TRANSFERRED';
 const FILTERS = [
@@ -160,7 +162,7 @@ function InspectionContent({ flow }: { flow: WorkflowView }) {
                   <tr key={i.id} className={`hover:bg-neutral-50/60 ${openId === i.id ? 'bg-brand-50/40' : ''}`}>
                     <td className="py-3 px-4">
                       <span className="font-mono text-xs font-semibold text-neutral-900">{sheetRef(i.program)}</span>
-                      <span className="block font-mono text-[11px] text-neutral-500">{i.itemNumber}</span>
+                      <span className="block font-mono text-[11px] text-neutral-500">{challanRef(i)}</span>
                     </td>
                     <td className="py-3 px-3 text-xs">
                       <span className="font-mono text-brand-800">{i.inboundChallan?.challanNumber || '—'}</span>
@@ -234,6 +236,7 @@ function InspectionDrawer({ flow, item, onClose, onSaved }: { flow: WorkflowView
   const [remarks, setRemarks] = useState('');
   // Blank until the inspector records each one.
   const [checks, setChecks] = useState<Record<string, string>>({});
+  const [editingBatch, setEditingBatch] = useState<string | null>(null);
   const [submissionKey] = useState(newSubmissionKey);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -267,7 +270,7 @@ function InspectionDrawer({ flow, item, onClose, onSaved }: { flow: WorkflowView
           ...(flow.checkpoints ? { checkpoints: checks } : {}),
         }),
       });
-      onSaved(body.data, `${item.itemNumber}: inspection of ${fmtQty(n(inspected), item.uom)} recorded.`);
+      onSaved(body.data, `${item.fabricName}: inspection of ${fmtQty(n(inspected), item.uom)} recorded.`);
     } catch (err: any) {
       setError(err.message);
       setSaving(false);
@@ -285,7 +288,6 @@ function InspectionDrawer({ flow, item, onClose, onSaved }: { flow: WorkflowView
               <FabricStatusBadge status={item.fabricProcessingStatus} />
             </h3>
             <p className="text-xs text-neutral-500 font-mono">
-              {item.itemNumber} ·{' '}
               <Link href={`/programs/${item.program?.id}`} className="hover:underline">{sheetRef(item.program)}</Link> ·{' '}
               <Link href={`/challans/${item.inboundChallan?.id}`} className="hover:underline">{item.inboundChallan?.challanNumber || '—'}</Link>
             </p>
@@ -324,6 +326,9 @@ function InspectionDrawer({ flow, item, onClose, onSaved }: { flow: WorkflowView
               </>
             )}
           </dl>
+
+          {/* Fabric photos: Threadcut QC sees Embroidery's and uploads its own. */}
+          <FabricPhotos workItemId={item.id} />
 
           {open <= 0 ? (
             <Notice kind="success">All received material on this line has been inspected.</Notice>
@@ -396,8 +401,18 @@ function InspectionDrawer({ flow, item, onClose, onSaved }: { flow: WorkflowView
                   <li key={x.id} className="border border-neutral-200 rounded-lg p-2.5">
                     <div className="flex justify-between gap-3">
                       <span className="font-semibold tabular-nums">Inspected {fmtQty(x.inspectedQuantity, x.uom)}</span>
-                      <span className="text-neutral-500">{fmtDate(x.createdAt, true)} · {x.inspector?.fullName || '—'}</span>
+                      <span className="text-neutral-500">
+                        {fmtDate(x.createdAt, true)} · {x.inspector?.fullName || '—'}
+                        {editingBatch !== x.id && (
+                          <button type="button" onClick={() => setEditingBatch(x.id)} className="ml-2 font-semibold text-brand-700 hover:underline">
+                            Edit
+                          </button>
+                        )}
+                      </span>
                     </div>
+                    {editingBatch === x.id && (
+                      <InspectionBatchEditor flow={flow} batch={x} onCancel={() => setEditingBatch(null)} onSaved={onSaved} />
+                    )}
                     <p className="mt-1 tabular-nums text-neutral-700">
                       Pass {fmtQty(x.passQuantity, x.uom)} · <span className="text-danger-700">Reject {fmtQty(x.rejectQuantity, x.uom)}</span> · Rework {fmtQty(x.reworkQuantity, x.uom)}
                     </p>
@@ -422,6 +437,61 @@ function InspectionDrawer({ flow, item, onClose, onSaved }: { flow: WorkflowView
           )}
         </div>
       </form>
+    </div>
+  );
+}
+
+/** Corrects one recorded inspection batch (PATCH <api>/inspections/:id); the server keeps already-sent quantities safe. */
+function InspectionBatchEditor({ flow, batch, onCancel, onSaved }: { flow: WorkflowView; batch: any; onCancel: () => void; onSaved: (item: any, message: string) => void }) {
+  const [pass, setPass] = useState(String(batch.passQuantity));
+  const [reject, setReject] = useState(String(batch.rejectQuantity));
+  const [rework, setRework] = useState(String(batch.reworkQuantity));
+  const [rejectReason, setRejectReason] = useState(batch.rejectReason || '');
+  const [reworkReason, setReworkReason] = useState(batch.reworkReason || '');
+  const [remarks, setRemarks] = useState(batch.remarks || '');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const total = round((Number(pass) || 0) + (Number(reject) || 0) + (Number(rework) || 0));
+
+  const save = async () => {
+    setSaving(true);
+    setError(null);
+    try {
+      const body = await fetchJson(`${flow.api}/inspections/${batch.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ inspectedQuantity: total, passQuantity: pass, rejectQuantity: reject, reworkQuantity: rework, rejectReason, reworkReason, remarks }),
+      });
+      onSaved(body.data, body.message);
+    } catch (err: any) {
+      setError(err.message);
+      setSaving(false);
+    }
+  };
+
+  const qty = (label: string, value: string, set: (v: string) => void) => (
+    <label className="block">
+      <span className="text-[11px] font-semibold text-neutral-600">{label}</span>
+      <input type="number" min="0" step="any" value={value} onChange={(e) => set(e.target.value)} className={`${FIELD} mt-0.5 text-right tabular-nums`} />
+    </label>
+  );
+
+  return (
+    <div className="mt-2 pt-2 border-t border-neutral-100 space-y-2">
+      {error && <Notice kind="error">{error}</Notice>}
+      <div className="grid grid-cols-3 gap-2">
+        {qty('Pass', pass, setPass)}
+        {qty('Reject', reject, setReject)}
+        {qty('Rework', rework, setRework)}
+      </div>
+      <p className="text-[11px] text-neutral-500 tabular-nums">Inspected becomes {fmtQty(total, batch.uom)} (was {fmtQty(batch.inspectedQuantity, batch.uom)}).</p>
+      {Number(reject) > 0 && <input value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} placeholder="Defect reason" maxLength={300} className={FIELD} />}
+      {Number(rework) > 0 && <input value={reworkReason} onChange={(e) => setReworkReason(e.target.value)} placeholder="Rework reason" maxLength={300} className={FIELD} />}
+      <input value={remarks} onChange={(e) => setRemarks(e.target.value)} placeholder="Remarks" maxLength={500} className={FIELD} />
+      <div className="flex justify-end gap-2">
+        <button type="button" onClick={onCancel} className={BTN_QUIET}>Cancel</button>
+        <button type="button" onClick={save} disabled={saving || total <= 0} className={BTN_PRIMARY}>{saving ? 'Saving…' : 'Save Correction'}</button>
+      </div>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { Suspense, useEffect, useState } from 'react';
+import { userChallanRemarks } from '@/lib/challan-remarks.mjs';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { PackageCheck } from 'lucide-react';
@@ -38,6 +39,7 @@ import {
 } from '@/components/inventory/InventoryUi';
 import { RecordsBrowser } from '@/components/inventory/InventoryRecords';
 import { departmentName } from '@/lib/workflow-views';
+import { ReceiptLinesTable, receivedByUnit } from '@/components/challan/ReceiptLines';
 
 function Tabs<T extends string>({ value, onChange, tabs }: { value: T; onChange: (v: T) => void; tabs: Array<{ id: T; label: string }> }) {
   return (
@@ -292,7 +294,7 @@ function IncomingChallans() {
                     </button>
                   </div>
                 </div>
-                {c.remarks && <p className="text-[11px] text-neutral-600">Remarks: {c.remarks}</p>}
+                {userChallanRemarks(c.remarks) && <p className="text-[11px] text-neutral-600">Remarks: {userChallanRemarks(c.remarks)}</p>}
                 <div className="flex flex-wrap gap-3">
                   {c.lines.map((l: any) => (
                     <div key={l.id} className="flex items-center gap-2.5 border border-neutral-200 rounded-xl p-2 pr-3">
@@ -363,13 +365,24 @@ function ReceiveDialog({ challan, onClose, onDone }: { challan: any; onClose: ()
 
   return (
     <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center bg-neutral-900/50 p-3 overflow-y-auto" role="dialog" aria-modal="true" aria-label="Receive finished garments">
-      <div className="bg-white rounded-2xl shadow-xl border border-neutral-200 w-full max-w-4xl">
+      <div className="bg-white rounded-2xl shadow-xl border border-neutral-200 w-full max-w-6xl">
         <div className="px-5 py-4 border-b border-neutral-200">
           <h3 className="text-sm font-bold text-neutral-900">Receive Finished Garments</h3>
           <p className="text-xs text-neutral-500 font-mono">{challan.challanNumber} · {sheetRef(challan.program)} · from {departmentName(challan.fromDepartment)}</p>
         </div>
         <div className="p-5 space-y-4">
           {error && <Notice kind="error">{error}</Notice>}
+          {/* What the challan carries, MTR and PCS apart; garments are received below in whole pieces. */}
+          <ReceiptLinesTable
+            challan={challan}
+            rows={challan.lines.map((l: any) => ({
+              key: l.id,
+              line: (challan.items || []).find((i: any) => i.id === l.inboundChallanItemId) || { quantity: l.dispatchedQuantity, uom: l.uom },
+              fabricName: l.garment,
+              colour: l.colour,
+              received: receivedByUnit(l),
+            }))}
+          />
           <div className="overflow-x-auto border border-neutral-200 rounded-xl">
             <table className="w-full text-left text-sm">
               <thead className={THEAD}>

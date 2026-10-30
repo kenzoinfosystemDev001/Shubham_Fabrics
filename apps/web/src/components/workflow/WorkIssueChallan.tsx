@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Plus, Send, Trash2 } from 'lucide-react';
 import { ChallanNumberField, newSubmissionKey } from '@/components/challan/ChallanNumberField';
+import { AverageField, QuantityUnitField, averageError, quantityPairError, type QtyUnit } from '@/components/challan/AverageField';
 import {
   BTN_PRIMARY,
   BTN_SECONDARY,
@@ -19,6 +20,7 @@ import {
   fetchJson,
   fmtDate,
   fmtQty,
+  challanRef,
   sheetRef,
 } from '@/components/workflow/WorkflowUi';
 import { TRANSFERABLE_STATUSES, availableFor } from '@/lib/work-items.mjs';
@@ -42,10 +44,20 @@ interface Row {
   key: string;
   itemId: string;
   quantity: string;
+  /** Optional Average of the entry, with its own MTR / PCS (never pre-selected). */
+  average: string;
+  averageUnit: QtyUnit;
+  /** Unit quantity of the entry, with its own MTR / PCS (Programming to Recutting; required there). */
+  unitQuantity: string;
+  unitQuantityUom: QtyUnit;
   remarks: string;
 }
 
-const newRow = (): Row => ({ key: Math.random().toString(36).slice(2), itemId: '', quantity: '', remarks: '' });
+const newRow = (): Row => ({ key: Math.random().toString(36).slice(2), itemId: '', quantity: '', average: '', averageUnit: '', unitQuantity: '', unitQuantityUom: '', remarks: '' });
+
+// Challans from Programming to Recutting share one Items layout: Size | Average | Unit | Remarks, each of the
+// first three a quantity with its own MTR / PCS (the Size keeps the line's own unit: it is what moves).
+const ENTRY_AVERAGE_FLOWS = new Set(['EMBROIDERY', 'THREAD_CUTTING', 'QC2', 'WASHING', 'QC3']);
 
 function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: TransferKind }) {
   const params = useSearchParams();
@@ -143,6 +155,7 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
   // Finished garments (Finishing onward): rows choose a garment (all its lines and pieces), not a line.
   const finished = Boolean(flow.finishedGoods);
   const canAddImages = finished && flow.code === 'FINISHING' && kind === 'PASS';
+  const showAverage = !finished && ENTRY_AVERAGE_FLOWS.has(flow.code);
   const garments = useMemo(() => (finished ? groupGarments(sheetItems) : []), [finished, sheetItems]);
   const garmentByKey = (key: string) => garments.find((g) => g.key === key);
   const { images, reload: reloadImages } = useGarmentImages(
@@ -152,7 +165,7 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
   const updateRow = (key: string, patch: Partial<Row>) => setRows((rs) => rs.map((r) => (r.key === key ? { ...r, ...patch } : r)));
   const chooseItem = (key: string, itemId: string) => {
     const i = itemById(itemId);
-    updateRow(key, { itemId, quantity: i ? String(available(i)) : '' });
+    updateRow(key, { itemId, quantity: i && available(i) ? String(available(i)) : '' });
   };
 
   const filled = rows.filter((r) => r.itemId);
@@ -193,8 +206,16 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
     if (!hasSource) return setError('Select the incoming challan this challan is issued from.');
     if (!challanNumber.trim()) return setNumberError('Challan Number is required.');
     if (filled.length === 0) return setError(finished ? 'Add at least one finished garment.' : 'Add at least one item.');
-    const over = chosenLines.find((l) => l.quantity > available(l.item));
-    if (over) return setError(`Requested quantity exceeds the available balance of ${over.item.itemNumber}.`);
+    // A line may be on several rows; together they may not exceed what it has available.
+    const usedByItem = new Map<string, number>();
+    for (const l of chosenLines) usedByItem.set(l.item.id, (usedByItem.get(l.item.id) || 0) + l.quantity);
+    const over = chosenLines.find((l) => (usedByItem.get(l.item.id) || 0) > available(l.item) + 0.0005);
+    if (over) return setError(`Requested quantity exceeds the available balance of ${over.item.fabricName}${over.item.colour ? ` (${over.item.colour})` : ''}.`);
+    if (showAverage) {
+      const entryError = (r: Row) => averageError(r.average, r.averageUnit) || quantityPairError(r.unitQuantity, r.unitQuantityUom, 'Unit quantity', true);
+      const bad = filled.findIndex((r) => entryError(r));
+      if (bad >= 0) return setError(`Item ${bad + 1}: ${entryError(filled[bad])}.`);
+    }
     if (withoutImage.length > 0) return setError(`Add the image of ${withoutImage.map((g) => g!.name).join(', ')} before issuing the challan.`);
     setSubmitting(true);
     try {
@@ -212,7 +233,13 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
           // Finished garments send no quantity: the server sends every available piece of each line.
           lines: finished
             ? filled.flatMap((r) => (garmentByKey(r.itemId)?.items || []).map((i: any) => ({ workItemId: i.id, remarks: r.remarks })))
-            : filled.map((r) => ({ workItemId: r.itemId, quantity: r.quantity, remarks: r.remarks })),
+            : filled.map((r) => ({
+                workItemId: r.itemId,
+                quantity: r.quantity,
+                ...(showAverage && r.average.trim() !== '' ? { average: r.average, averageUnit: r.averageUnit } : {}),
+                ...(showAverage ? { unitQuantity: r.unitQuantity, unitQuantityUom: r.unitQuantityUom } : {}),
+                remarks: r.remarks,
+              })),
         }),
       });
       setIssued(body.data);
@@ -245,7 +272,7 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
         {error && <Notice kind="error" onClose={() => setError(null)}>{error}</Notice>}
         {unitBlocked.length > 0 && (
           <Notice kind="error">
-            {unitBlocked.map((i) => i.itemNumber).join(', ')} {unitBlocked.length === 1 ? 'is' : 'are'} recorded in{' '}
+            {unitBlocked.map((i) => [i.fabricName, challanRef(i)].filter(Boolean).join(' · ')).join(', ')} {unitBlocked.length === 1 ? 'is' : 'are'} recorded in{' '}
             {Array.from(new Set(unitBlocked.map((i) => i.uom))).join(' / ')}. {dest} receives finished garments in {flow.passUnit} only, so{' '}
             {unitBlocked.length === 1 ? 'it is' : 'they are'} not listed here; meters are never converted to pieces.
           </Notice>
@@ -384,14 +411,15 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
                     {kind !== 'PASS' && <th className="py-3 px-3">Reason</th>}
                     <th className="py-3 px-3">Incoming</th>
                     <th className="py-3 px-3 text-right">{AVAILABLE_LABEL[kind]}</th>
-                    <th className="py-3 px-3 min-w-[130px] text-right">Transfer Qty</th>
-                    <th className="py-3 px-3">Unit</th>
+                    <th className={`py-3 px-3 ${showAverage ? 'min-w-[220px]' : 'min-w-[130px] text-right'}`}>{showAverage ? 'Size' : 'Transfer Qty'}</th>
+                    {showAverage && <th className="py-3 px-3 min-w-[200px]">Average</th>}
+                    <th className={`py-3 px-3 ${showAverage ? 'min-w-[200px]' : ''}`}>Unit</th>
                     <th className="py-3 px-3 min-w-[140px]">Remarks</th>
                     <th className="py-3 px-3"><span className="sr-only">Remove</span></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-neutral-100">
-                  {!hasSource && <EmptyRow colSpan={kind === 'PASS' ? 11 : 12} text="Select an incoming challan above to add its lines" />}
+                  {!hasSource && <EmptyRow colSpan={(kind === 'PASS' ? 11 : 12) + (showAverage ? 1 : 0)} text="Select an incoming challan above to add its lines" />}
                   {hasSource &&
                     rows.map((r) => {
                       const i = itemById(r.itemId);
@@ -404,7 +432,7 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
                               <option value="">Choose a ready line</option>
                               {sheetItems.filter((x) => !taken.has(x.id)).map((x) => (
                                 <option key={x.id} value={x.id}>
-                                  {sheetRef(x.program)} · {x.itemNumber} · {x.garmentCategory ? `${x.garmentCategory}${x.styleRef ? ` ${x.styleRef}` : ''} · ` : ''}{x.fabricName} · {x.colour || '—'} · {x.fabricProcessingStatus === 'DYED' ? 'Dyed' : 'Undyed'}
+                                  {sheetRef(x.program)} · {challanRef(x) ? `${challanRef(x)} · ` : ''}{x.garmentCategory ? `${x.garmentCategory}${x.styleRef ? ` ${x.styleRef}` : ''} · ` : ''}{x.fabricName} · {x.colour || '—'} · {x.fabricProcessingStatus === 'DYED' ? 'Dyed' : 'Undyed'}
                                 </option>
                               ))}
                             </select>
@@ -417,20 +445,54 @@ function IssueChallanContent({ flow, kind }: { flow: WorkflowView; kind: Transfe
                           <td className="py-2.5 px-3 font-mono text-xs text-neutral-600">{i?.inboundChallan?.challanNumber || '—'}</td>
                           <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">{i ? fmtQty(available(i), i.uom) : '—'}</td>
                           <td className="py-2.5 px-3">
-                            <input
-                              type="number"
-                              min="0.001"
-                              step="any"
-                              max={i ? available(i) : undefined}
-                              value={r.quantity}
-                              onChange={(e) => updateRow(r.key, { quantity: e.target.value })}
-                              disabled={!i}
-                              required={Boolean(i)}
-                              className={`${FIELD} text-right tabular-nums ${over ? 'border-danger-500' : ''}`}
-                              aria-label="Quantity to transfer"
-                            />
+                            {showAverage ? (
+                              <QuantityUnitField
+                                label="Size"
+                                value={r.quantity}
+                                unit={i?.uom === 'MTR' || i?.uom === 'PCS' ? i.uom : ''}
+                                onValue={(quantity) => updateRow(r.key, { quantity })}
+                                required={Boolean(i)}
+                                disabled={!i}
+                                min="0.001"
+                                max={i ? available(i) : undefined}
+                                lockedTitle={i ? `This line is recorded in ${i.uom}; meters and pieces are never converted` : undefined}
+                                inputClassName={`${FIELD} text-right ${over ? 'border-danger-500' : ''}`}
+                              />
+                            ) : (
+                              <input
+                                type="number"
+                                min="0.001"
+                                step="any"
+                                max={i ? available(i) : undefined}
+                                value={r.quantity}
+                                onChange={(e) => updateRow(r.key, { quantity: e.target.value })}
+                                disabled={!i}
+                                required={Boolean(i)}
+                                className={`${FIELD} text-right tabular-nums ${over ? 'border-danger-500' : ''}`}
+                                aria-label="Quantity to transfer"
+                              />
+                            )}
                           </td>
-                          <td className="py-2.5 px-3 text-xs font-semibold">{i?.uom || '—'}</td>
+                          {showAverage && (
+                            <td className="py-2.5 px-3">
+                              <AverageField average={r.average} averageUnit={r.averageUnit} onChange={(patch) => updateRow(r.key, patch)} disabled={!i} />
+                            </td>
+                          )}
+                          {showAverage ? (
+                            <td className="py-2.5 px-3">
+                              <QuantityUnitField
+                                label="Unit quantity"
+                                value={r.unitQuantity}
+                                unit={r.unitQuantityUom}
+                                onValue={(unitQuantity) => updateRow(r.key, { unitQuantity })}
+                                onUnit={(unitQuantityUom) => updateRow(r.key, { unitQuantityUom })}
+                                required={Boolean(i)}
+                                disabled={!i}
+                              />
+                            </td>
+                          ) : (
+                            <td className="py-2.5 px-3 text-xs font-semibold">{i?.uom || '—'}</td>
+                          )}
                           <td className="py-2.5 px-3">
                             <input value={r.remarks} onChange={(e) => updateRow(r.key, { remarks: e.target.value })} maxLength={300} className={FIELD} aria-label="Remarks" />
                           </td>

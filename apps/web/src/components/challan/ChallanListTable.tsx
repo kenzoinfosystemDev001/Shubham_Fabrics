@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { departmentName } from '@/lib/workflow-views';
 import Link from 'next/link';
 import { 
   FileText, 
@@ -74,11 +75,11 @@ export function ChallanListTable({
                     <td className="p-2.5">
                       <div className="flex items-center gap-1.5 text-xs font-bold text-neutral-900">
                         <span className="px-1.5 py-0.5 rounded bg-neutral-100 border border-neutral-200 text-[10px]">
-                          {challan.fromDepartment}
+                          {departmentName(challan.fromDepartment)}
                         </span>
                         <ArrowRight className="w-3 h-3 text-neutral-500" />
                         <span className="px-1.5 py-0.5 rounded bg-accent-50 border border-accent-200 text-accent-800 text-[10px]">
-                          {challan.toDepartment}
+                          {departmentName(challan.toDepartment)}
                         </span>
                       </div>
                     </td>

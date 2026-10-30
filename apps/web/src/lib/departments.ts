@@ -20,7 +20,7 @@ export const MES_DEPARTMENTS: readonly MesDepartment[] = [
   { code: 'THREAD_CUTTING', name: 'Thread Cutting Department', shortName: 'Thread Cutting', stationId: 'cutting' },
   { code: 'QC2', name: 'Threadcut QC', shortName: 'Threadcut QC', stationId: 'qc2' },
   { code: 'WASHING', name: 'Washing Department', shortName: 'Washing', stationId: 'washing' },
-  { code: 'QC3', name: 'Washing QC', shortName: 'Washing QC', stationId: 'qcwashing', stationAliases: ['qc3', 'qc_washing'] },
+  { code: 'QC3', name: 'Washing QC', shortName: 'Washing QC', stationId: 'qc3', stationAliases: ['qcwashing', 'qc_washing'] },
   { code: 'RECUTTING', name: 'Recutting Department', shortName: 'Recutting', stationId: 'recutting', stationAliases: ['recutting_incharge', 'recutting_supervisor'] },
   { code: 'STITCHING', name: 'Stitching Department', shortName: 'Stitching', stationId: 'stitching' },
   { code: 'FINISHING', name: 'Finishing Department', shortName: 'Finishing', stationId: 'finishing' },

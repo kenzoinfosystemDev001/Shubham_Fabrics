@@ -7,7 +7,7 @@ From the repository root:
 ```powershell
 node --test scripts/test-final-check-rules.mjs
 npx tsc --noEmit -p apps/web/tsconfig.json
-npm run build --workspace=@subham/web
+npm run build --workspace=@shubham/web
 ```
 
 The production build runs workspace prebuild scripts and may refresh generated Prisma client files. Inspect `git status` and the diff after building; retain only intentional generated changes.

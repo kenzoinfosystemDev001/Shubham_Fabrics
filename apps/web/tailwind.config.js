@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 
-// Subham Fabrics MES design tokens.
+// Shubham Fabrics MES design tokens.
 // The palette is intentionally closed: only these colors exist as Tailwind
 // utilities, so off-brand classes (indigo, emerald, slate...) generate nothing.
 // Values live as RGB channels in src/app/globals.css (:root) so opacity

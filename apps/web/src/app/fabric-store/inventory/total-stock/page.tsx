@@ -348,7 +348,11 @@ function TotalStockContent() {
               {Object.entries(defectiveStockByUnit).map(([unit, quantity]) => (
                 <span key={unit} className="mr-2">
                   {fmt(quantity)}
-                  <span className="text-xs font-semibold text-neutral-500 ml-1">{unit}</span>
+                  {unit === 'UNKNOWN' ? (
+                    <span className="text-xs font-semibold text-danger-600 ml-1" title="Older defect records with no MTR/PCS recorded">unit unknown — review</span>
+                  ) : (
+                    <span className="text-xs font-semibold text-neutral-500 ml-1">{unit}</span>
+                  )}
                 </span>
               ))}
             </p>

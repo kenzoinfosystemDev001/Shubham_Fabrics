@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import type { Prisma, PrismaClient } from '@subham/database';
+import type { Prisma, PrismaClient } from '@shubham/database';
 import {
   duplicateChallanNumberMessage,
   validateChallanNumber,
@@ -33,16 +33,18 @@ export function requireChallanNumberSet(
 }
 
 /**
- * Rejects numbers already used by any challan, ignoring letter case. The unique index on
- * Challan.challanNumber still guards the race between two concurrent requests.
+ * Challan numbers are unique per issuing department: rejects a number this department has already
+ * used (ignoring letter case); another department may use the same number. The unique index on
+ * (fromDepartment, challanNumber) still guards the race between two concurrent requests.
  */
 export async function assertChallanNumbersAvailable(
   db: Db,
+  fromDepartment: string,
   values: Array<{ value: string; field?: string }>,
 ): Promise<void> {
   for (const { value, field } of values) {
     const existing = await db.challan.findFirst({
-      where: { challanNumber: { equals: value, mode: 'insensitive' } },
+      where: { fromDepartment, challanNumber: { equals: value, mode: 'insensitive' } },
       select: { id: true },
     });
     if (existing) throw new ChallanNumberError(duplicateChallanNumberMessage(value), 409, field);

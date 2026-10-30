@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import bcrypt from 'bcryptjs';
 import { buildSessionUser } from '@/lib/auth/session-user';
 import { setSessionCookies } from '@/lib/auth/require-user';

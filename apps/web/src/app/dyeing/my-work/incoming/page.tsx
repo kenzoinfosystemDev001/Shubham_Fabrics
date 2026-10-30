@@ -1,6 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { departmentName } from '@/lib/workflow-views';
+import { lineQuantitiesByUnit, linesTotalsMtrPcs } from '@/lib/challan-units.mjs';
+import { ReceiptLinesTable, initialReceiptValues, receiptUnits, receivedByUnit, type ReceiptRow, type ReceiptValues } from '@/components/challan/ReceiptLines';
 import Link from 'next/link';
 import { ChevronDown, ChevronRight, PackageCheck, Search, X } from 'lucide-react';
 import {
@@ -30,12 +33,21 @@ const VIEWS: Array<{ id: View; label: string }> = [
   { id: 'all', label: 'All' },
 ];
 
-/** Totals per unit, e.g. "120 MTR · 40 PCS". */
-function totalsByUnit(orders: any[], pick: (o: any) => number) {
-  const totals: Record<string, number> = {};
-  for (const o of orders) totals[o.uom] = (totals[o.uom] || 0) + (pick(o) || 0);
-  return Object.entries(totals).map(([u, q]) => fmtQty(q, u)).join(' · ') || '—';
+/** A challan's dyeing orders as receiving rows: each order with the challan line it came from. */
+function receiptRows(challan: any, orders: any[]): ReceiptRow[] {
+  return orders.map((o) => {
+    const line = (challan.items || []).find((i: any) => i.id === o.inboundChallanItemId);
+    return {
+      key: o.id,
+      line: line || { quantity: o.requiredQuantity, uom: o.uom },
+      fabricName: o.fabricName,
+      colour: [line?.colour, o.targetColor ? `dye to ${o.targetColor}` : null].filter(Boolean).join(' · ') || null,
+      received: receivedByUnit(o),
+    };
+  });
 }
+
+const qtyOrDash = (q: number | null | undefined, u: string) => (q === null || q === undefined ? '—' : fmtQty(q, u));
 
 export default function DyeingIncomingChallansPage() {
   const [view, setView] = useState<View>('pending');
@@ -126,7 +138,7 @@ export default function DyeingIncomingChallansPage() {
                   <th className="py-3 px-3">Production Sheet</th>
                   <th className="py-3 px-3">Design</th>
                   <th className="py-3 px-3">Delivery</th>
-                  <th className="py-3 px-3 text-right">Expected</th>
+                  <th className="py-3 px-3 text-right">Sent (MTR / PCS)</th>
                   <th className="py-3 px-3">Status</th>
                   <th className="py-3 px-3 text-right">
                     <span className="sr-only">Actions</span>
@@ -162,7 +174,7 @@ export default function DyeingIncomingChallansPage() {
                         </td>
                         <td className="py-3 px-3 text-xs text-neutral-600 whitespace-nowrap">{fmtDate(ch.issuedDate || ch.createdAt)}</td>
                         <td className="py-3 px-3 text-xs text-neutral-700 whitespace-nowrap">
-                          {ch.fromDepartment} to {ch.toDepartment}
+                          {departmentName(ch.fromDepartment)} to {departmentName(ch.toDepartment)}
                         </td>
                         <td className="py-3 px-3"><PriorityBadge priority={ch.priority} /></td>
                         <td className="py-3 px-3">
@@ -177,7 +189,15 @@ export default function DyeingIncomingChallansPage() {
                         <td className="py-3 px-3 text-xs text-neutral-700">{ch.program?.designNumber || ch.program?.wilcomDesignNumber || '—'}</td>
                         <td className="py-3 px-3 text-xs whitespace-nowrap"><DeadlineText program={ch.program} /></td>
                         <td className="py-3 px-3 text-right text-xs font-semibold tabular-nums whitespace-nowrap">
-                          {totalsByUnit(orders, (o) => o.requiredQuantity)}
+                          {(() => {
+                            const t = linesTotalsMtrPcs(receiptRows(ch, orders).map((r) => r.line));
+                            return (
+                              <>
+                                {fmtQty(t.MTR, 'MTR')}
+                                <span className="block">{fmtQty(t.PCS, 'PCS')}</span>
+                              </>
+                            );
+                          })()}
                         </td>
                         <td className="py-3 px-3">
                           {awaiting.length > 0 ? (
@@ -217,23 +237,29 @@ export default function DyeingIncomingChallansPage() {
                                       <th className="py-2.5 px-3">Fabric</th>
                                       <th className="py-2.5 px-3">Colour</th>
                                       <th className="py-2.5 px-3">Required Dye Colour</th>
-                                      <th className="py-2.5 px-3 text-right">Expected</th>
-                                      <th className="py-2.5 px-3 text-right">Received</th>
+                                      <th className="py-2.5 px-3 text-right">Sent MTR</th>
+                                      <th className="py-2.5 px-3 text-right">Sent PCS</th>
+                                      <th className="py-2.5 px-3 text-right">Received MTR</th>
+                                      <th className="py-2.5 px-3 text-right">Received PCS</th>
                                       <th className="py-2.5 px-3">Status</th>
                                     </tr>
                                   </thead>
                                   <tbody className="divide-y divide-neutral-100">
                                     {orders.map((o) => {
                                       const item = (ch.items || []).find((i: any) => i.id === o.inboundChallanItemId);
+                                      const sent = lineQuantitiesByUnit(item || { quantity: o.requiredQuantity, uom: o.uom });
+                                      const got = receivedByUnit(o);
                                       return (
                                         <tr key={o.id}>
                                           <td className="py-2.5 px-3 font-mono text-neutral-600">{o.orderNumber}</td>
                                           <td className="py-2.5 px-3 font-semibold text-neutral-900">{o.fabricName}</td>
                                           <td className="py-2.5 px-3">{item?.colour || '—'}</td>
                                           <td className="py-2.5 px-3 font-semibold text-brand-900">{o.targetColor || '—'}</td>
-                                          <td className="py-2.5 px-3 text-right tabular-nums">{fmtQty(o.requiredQuantity, o.uom)}</td>
+                                          <td className="py-2.5 px-3 text-right tabular-nums">{qtyOrDash(sent.MTR, 'MTR')}</td>
+                                          <td className="py-2.5 px-3 text-right tabular-nums">{qtyOrDash(sent.PCS, 'PCS')}</td>
+                                          <td className="py-2.5 px-3 text-right tabular-nums">{qtyOrDash(got?.MTR, 'MTR')}</td>
                                           <td className="py-2.5 px-3 text-right tabular-nums">
-                                            {o.status === 'AWAITING_RECEIPT' ? '—' : fmtQty(o.receivedQuantity ?? o.requiredQuantity, o.uom)}
+                                            {qtyOrDash(got?.PCS, 'PCS')}
                                             {o.receiptRemarks && <span className="block text-[11px] text-danger-700">{o.receiptRemarks}</span>}
                                           </td>
                                           <td className="py-2.5 px-3"><StatusBadge status={o.status} /></td>
@@ -273,9 +299,9 @@ export default function DyeingIncomingChallansPage() {
 
 function ReceiveDialog({ challan, onClose, onDone }: { challan: any; onClose: () => void; onDone: (message: string) => void }) {
   const lines: any[] = (challan.dyeingInboundOrders || []).filter((o: any) => o.status === 'AWAITING_RECEIPT');
-  const [values, setValues] = useState<Record<string, { qty: string; remarks: string }>>(() =>
-    Object.fromEntries(lines.map((o) => [o.id, { qty: String(o.requiredQuantity), remarks: '' }])),
-  );
+  const rows = receiptRows(challan, lines);
+  const [values, setValues] = useState<ReceiptValues>(() => initialReceiptValues(rows));
+  const [lineRemarks, setLineRemarks] = useState<Record<string, string>>({});
   const [remarks, setRemarks] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -290,7 +316,15 @@ function ReceiveDialog({ challan, onClose, onDone }: { challan: any; onClose: ()
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           remarks,
-          lines: lines.map((o) => ({ orderId: o.id, receivedQuantity: values[o.id].qty, remarks: values[o.id].remarks })),
+          lines: rows.map((r) => {
+            const { main, second } = receiptUnits(r.line);
+            return {
+              orderId: r.key,
+              receivedQuantity: main ? values[r.key]?.[main] ?? '' : '',
+              receivedUnitQuantity: second ? values[r.key]?.[second] ?? '' : undefined,
+              remarks: lineRemarks[r.key] || '',
+            };
+          }),
         }),
       });
       onDone(body.message);
@@ -302,11 +336,13 @@ function ReceiveDialog({ challan, onClose, onDone }: { challan: any; onClose: ()
 
   return (
     <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center bg-neutral-900/50 p-3 overflow-y-auto" role="dialog" aria-modal="true">
-      <form onSubmit={submit} className="bg-white rounded-2xl shadow-xl border border-neutral-200 w-full max-w-3xl">
+      <form onSubmit={submit} className="bg-white rounded-2xl shadow-xl border border-neutral-200 w-full max-w-7xl">
         <div className="px-5 py-4 border-b border-neutral-200 flex items-center justify-between">
           <div>
             <h3 className="text-sm font-bold text-neutral-900">Receive Fabric</h3>
-            <p className="text-xs text-neutral-500 font-mono">{challan.challanNumber} · {sheetRef(challan.program)}</p>
+            <p className="text-xs text-neutral-500 font-mono">
+              {challan.challanNumber} · {sheetRef(challan.program)} · from {departmentName(challan.fromDepartment)}
+            </p>
           </div>
           <button type="button" onClick={onClose} className="p-1.5 text-neutral-500 hover:bg-neutral-100 rounded-lg" aria-label="Close">
             <X className="w-4 h-4" />
@@ -315,61 +351,23 @@ function ReceiveDialog({ challan, onClose, onDone }: { challan: any; onClose: ()
 
         <div className="p-5 space-y-4">
           {error && <Notice kind="error">{error}</Notice>}
-          <div className="overflow-x-auto border border-neutral-200 rounded-xl">
-            <table className="w-full text-left text-sm">
-              <thead className={THEAD}>
-                <tr>
-                  <th className="py-2.5 px-3">Fabric</th>
-                  <th className="py-2.5 px-3">Required Colour</th>
-                  <th className="py-2.5 px-3 text-right">Expected</th>
-                  <th className="py-2.5 px-3 w-36">Received</th>
-                  <th className="py-2.5 px-3">Remarks</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-neutral-100">
-                {lines.map((o) => {
-                  const v = values[o.id];
-                  const diff = Math.round(((Number(v.qty) || 0) - o.requiredQuantity) * 1000) / 1000;
-                  return (
-                    <tr key={o.id}>
-                      <td className="py-2.5 px-3 font-semibold text-neutral-900">{o.fabricName}</td>
-                      <td className="py-2.5 px-3 text-brand-900">{o.targetColor || '—'}</td>
-                      <td className="py-2.5 px-3 text-right tabular-nums text-neutral-600">{fmtQty(o.requiredQuantity, o.uom)}</td>
-                      <td className="py-2.5 px-3">
-                        <div className="flex items-center gap-1.5">
-                          <input
-                            type="number"
-                            min="0"
-                            step="any"
-                            required
-                            value={v.qty}
-                            onChange={(e) => setValues({ ...values, [o.id]: { ...v, qty: e.target.value } })}
-                            className={`${FIELD} text-right tabular-nums`}
-                            aria-label={`Received quantity for ${o.fabricName}`}
-                          />
-                          <span className="text-xs text-neutral-500">{o.uom}</span>
-                        </div>
-                        {v.qty !== '' && diff !== 0 && (
-                          <span className={`block mt-1 text-[11px] font-semibold ${diff < 0 ? 'text-danger-700' : 'text-brand-800'}`}>
-                            {diff < 0 ? `Short ${fmtQty(-diff, o.uom)}` : `Excess ${fmtQty(diff, o.uom)}`}
-                          </span>
-                        )}
-                      </td>
-                      <td className="py-2.5 px-3">
-                        <input
-                          value={v.remarks}
-                          onChange={(e) => setValues({ ...values, [o.id]: { ...v, remarks: e.target.value } })}
-                          maxLength={300}
-                          className={FIELD}
-                          aria-label={`Remarks for ${o.fabricName}`}
-                        />
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <p className="text-xs text-neutral-600">Check every fabric and colour below. Meters and pieces are received separately and never added together.</p>
+          <ReceiptLinesTable
+            challan={challan}
+            rows={rows}
+            values={values}
+            onChange={(key, unit, value) => setValues((v) => ({ ...v, [key]: { ...v[key], [unit]: value } }))}
+            extraHeader="Receipt Remarks"
+            extraCell={(r) => (
+              <input
+                value={lineRemarks[r.key] || ''}
+                onChange={(e) => setLineRemarks((m) => ({ ...m, [r.key]: e.target.value }))}
+                maxLength={300}
+                className={FIELD}
+                aria-label={`Remarks for ${r.fabricName}`}
+              />
+            )}
+          />
           <label className="block">
             <span className="text-xs font-semibold text-neutral-600">Challan remarks</span>
             <input value={remarks} onChange={(e) => setRemarks(e.target.value)} maxLength={500} className={`${FIELD} mt-1`} />
@@ -380,8 +378,8 @@ function ReceiveDialog({ challan, onClose, onDone }: { challan: any; onClose: ()
           <button type="button" onClick={onClose} className={BTN_QUIET}>
             Cancel
           </button>
-          <button type="submit" disabled={saving} className={BTN_PRIMARY}>
-            {saving ? 'Saving…' : 'Confirm Receipt'}
+          <button type="submit" disabled={saving || rows.length === 0} className={BTN_PRIMARY}>
+            {saving ? 'Saving…' : 'Receive Challan'}
           </button>
         </div>
       </form>

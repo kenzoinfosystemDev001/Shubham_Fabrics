@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { departmentName } from '@/lib/workflow-views';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { 
@@ -427,9 +428,9 @@ export default function ProgrammingDashboardPage() {
                       </td>
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-1 text-[11px] font-semibold">
-                          <span className="text-neutral-900">{ch.fromDepartment}</span>
+                          <span className="text-neutral-900">{departmentName(ch.fromDepartment)}</span>
                           <span className="text-neutral-500">→</span>
-                          <span className="text-brand-900">{ch.toDepartment}</span>
+                          <span className="text-brand-900">{departmentName(ch.toDepartment)}</span>
                         </div>
                       </td>
                       <td className="py-3 px-4 font-mono text-neutral-900 font-medium">

@@ -20,6 +20,7 @@ import {
   fetchJson,
   fmtDate,
   fmtQty,
+  challanRef,
   sheetRef,
 } from '@/components/workflow/WorkflowUi';
 import { WORK_STATUS, qcStatusLabel, receivedBasis, workStatusLabel } from '@/lib/work-items.mjs';
@@ -124,7 +125,6 @@ function HistoryContent({ flow }: { flow: WorkflowView }) {
         `${slug}-inspections.csv`,
         rows.map((x) => ({
           Date: x.createdAt,
-          Ref: x.workItem?.itemNumber || '',
           'Production Sheet': sheetRef(x.workItem?.program),
           Design: x.workItem?.program?.designNumber || '',
           'Incoming Challan': x.workItem?.inboundChallan?.challanNumber || '',
@@ -146,7 +146,6 @@ function HistoryContent({ flow }: { flow: WorkflowView }) {
       downloadCsv(
         `${slug}-lines.csv`,
         rows.map((i) => ({
-          Ref: i.itemNumber,
           'Production Sheet': sheetRef(i.program),
           Design: i.program?.designNumber || '',
           'Incoming Challan': i.inboundChallan?.challanNumber || '',
@@ -379,7 +378,7 @@ function HistoryContent({ flow }: { flow: WorkflowView }) {
                     <tr key={i.id} className="hover:bg-neutral-50/60 align-top">
                       <td className="py-3 px-4">
                         <span className="font-mono text-xs font-semibold">{sheetRef(i.program)}</span>
-                        <span className="block font-mono text-[11px] text-neutral-500">{i.itemNumber}</span>
+                        <span className="block font-mono text-[11px] text-neutral-500">{challanRef(i)}</span>
                         <span className="block text-[11px] text-neutral-500">{i.program?.designNumber || ''}</span>
                       </td>
                       <td className="py-3 px-3 text-xs">
@@ -465,7 +464,7 @@ function HistoryContent({ flow }: { flow: WorkflowView }) {
                       <td className="py-3 px-4 text-xs text-neutral-600 whitespace-nowrap">{fmtDate(x.createdAt, true)}</td>
                       <td className="py-3 px-3">
                         <span className="font-mono text-xs font-semibold">{sheetRef(x.workItem?.program)}</span>
-                        <span className="block font-mono text-[11px] text-neutral-500">{x.workItem?.itemNumber}</span>
+                        <span className="block font-mono text-[11px] text-neutral-500">{challanRef(x.workItem)}</span>
                       </td>
                       <td className="py-3 px-3 font-mono text-xs text-brand-800">
                         {x.workItem?.inboundChallan ? (

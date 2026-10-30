@@ -57,7 +57,7 @@ export function ChallanNumberInput({
         onChange={(e) => onChange(e.target.value)}
         aria-invalid={Boolean(error)}
         aria-describedby={error ? errorId : undefined}
-        placeholder="Enter challan number"
+        placeholder=""
         className={`w-full px-3 py-2 rounded-lg text-xs font-mono font-bold focus:outline-none focus:ring-2 transition ${
           dark
             ? 'bg-slate-950 text-white placeholder:text-slate-500'

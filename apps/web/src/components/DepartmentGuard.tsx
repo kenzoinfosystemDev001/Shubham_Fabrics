@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { checkRouteAccess, getCurrentUser, isAdminUser, getUserStationHome, MESUser } from '@/lib/rbac';
 import { ShieldAlert } from 'lucide-react';
+import { api } from '@/lib/api';
 
 interface GuardProps {
   children: React.ReactNode;
@@ -76,8 +77,12 @@ export function getDepartmentRoot(scope: DepartmentScope): string {
 export function DepartmentGuard({ children }: GuardProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const [authorized, setAuthorized] = useState(false);
-  const [denialReason, setDenialReason] = useState<string | null>(null);
+  const [denialReason] = useState<string | null>(null);
+  // Access is decided while rendering (after mount, when the stored session can be read), never in a
+  // later effect: a page this session may not see is not shown, not even for one frame, including
+  // when Back / Forward restores it from the router or browser history cache.
+  const [mounted, setMounted] = useState(false);
+  const [, setRecheck] = useState(0);
 
   // 1. Synchronize active department context in sessionStorage
   useEffect(() => {
@@ -89,41 +94,40 @@ export function DepartmentGuard({ children }: GuardProps) {
     }
   }, [pathname]);
 
-  // 2. Strict Department Navigation & Route Authorization Check
+  // 2. Route authorization, checked on every render. It is re-checked when the browser restores a page
+  //    from its back/forward cache, and when another tab signs in or out.
   useEffect(() => {
-    const user = getCurrentUser();
-    if (pathname === '/') {
-      router.replace('/login');
-      return;
-    }
+    setMounted(true);
+    const recheck = () => setRecheck((n) => n + 1);
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) recheck();
+    };
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === null || event.key === 'subham_mes_user') recheck();
+    };
+    window.addEventListener('pageshow', onPageShow);
+    window.addEventListener('storage', onStorage);
+    return () => {
+      window.removeEventListener('pageshow', onPageShow);
+      window.removeEventListener('storage', onStorage);
+    };
+  }, []);
 
-    if (!user) {
-      if (pathname === '/login' || pathname === '/signup') {
-        setAuthorized(true);
-        setDenialReason(null);
-        return;
-      }
-      router.replace('/login');
-      return;
-    }
+  const isAuthPage = pathname === '/login' || pathname === '/signup';
+  const access = mounted && !isAuthPage && pathname !== '/' ? checkRouteAccess(pathname, getCurrentUser()) : null;
+  // The site root opens the signed-in user's own station (the login page would end their session).
+  const redirectTarget = !mounted
+    ? null
+    : pathname === '/'
+      ? getUserStationHome(getCurrentUser())
+      : access && !access.allowed
+        ? access.redirectTarget
+        : null;
+  const authorized = isAuthPage || Boolean(access?.allowed);
 
-    // Allow user to land on /login or /signup if they navigated or pressed back to it
-    if (pathname === '/login' || pathname === '/signup') {
-      setAuthorized(true);
-      setDenialReason(null);
-      return;
-    }
-
-    const check = checkRouteAccess(pathname, user);
-
-    if (!check.allowed) {
-      router.replace(check.redirectTarget);
-      return;
-    } else {
-      setAuthorized(true);
-      setDenialReason(null);
-    }
-  }, [pathname, router]);
+  useEffect(() => {
+    if (redirectTarget) router.replace(redirectTarget);
+  }, [redirectTarget, router]);
 
   // 3. Intercept browser back/forward buttons (popstate)
   // RULE: Going back only stays within that individual department, or at last exits to /login.
@@ -132,6 +136,8 @@ export function DepartmentGuard({ children }: GuardProps) {
     if (typeof window === 'undefined') return;
 
     const handlePopState = () => {
+      // Administrators work across every department, so Back may return to any of them or the Admin Console.
+      if (isAdminUser(getCurrentUser())) return;
       const activeDept = sessionStorage.getItem('active_department') as DepartmentScope | null;
       const targetPath = window.location.pathname;
       const targetDept = getDepartmentScope(targetPath);
@@ -173,9 +179,9 @@ export function DepartmentGuard({ children }: GuardProps) {
   }, [pathname, router]);
 
   const handleSignOut = () => {
+    // Ends the server session too: the session cookie is httpOnly, so clearing it from the page cannot.
+    api.clearToken();
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('subham_mes_token');
-      localStorage.removeItem('subham_mes_user');
       sessionStorage.removeItem('active_department');
       sessionStorage.removeItem('active_department_root');
       document.cookie = 'subham_mes_token=; path=/; max-age=0';

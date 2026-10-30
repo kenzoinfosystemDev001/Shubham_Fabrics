@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { departmentKeyFor, requireDepartment, type DepartmentKey } from '@/lib/auth/department-access';
 import type { AuthenticatedUser } from '@/lib/auth/require-user';
 import { apiErrorResponse } from '@/lib/api-errors';
@@ -29,7 +29,8 @@ import {
 import { INVENTORY_UNIT, LEDGER, garmentLabel } from '@/lib/inventory.mjs';
 import { garmentName } from '@/lib/finished-garments.mjs';
 import { ITEMS_WITH_SHEET, lineSheetId } from '@/lib/challan-sheets.mjs';
-import { MIXED_UNIT } from '@/lib/challan-units.mjs';
+import { MIXED_UNIT, secondUnitOf } from '@/lib/challan-units.mjs';
+import { lineExtrasOf, lineExtrasWriter } from '@/lib/challan-item-average';
 
 /** How a department receives and passes on work. Add an entry to bring a new department online. */
 export interface WorkflowConfig {
@@ -302,7 +303,7 @@ export const WORK_ITEM_INCLUDE = {
   inspections: { orderBy: { createdAt: 'asc' as const }, include: { inspector: { select: USER_SELECT } } },
   allocations: { orderBy: { createdAt: 'asc' as const } },
   sourceAllocation: { select: { id: true, allocationNumber: true, category: true, otherName: true } },
-  sourceWorkItem: { select: { id: true, itemNumber: true, departmentCode: true } },
+  sourceWorkItem: { select: { id: true, itemNumber: true, departmentCode: true, inboundChallan: { select: { challanNumber: true } } } },
 };
 
 export function inboundWhere(cfg: WorkflowConfig) {
@@ -381,6 +382,33 @@ export async function syncWorkItems(cfg: WorkflowConfig) {
       }
     }
   }
+}
+
+/**
+ * The received quantity of a line's second unit (its Unit quantity in the other unit), checked apart from the
+ * main quantity: blank keeps the quantity sent, a line with no second unit records nothing. Strict receipt
+ * departments may not receive more than was sent.
+ */
+export function secondReceipt(
+  line: { unitQuantity: number | null; unitQuantityUom: string | null; uom: string } | null | undefined,
+  raw: unknown,
+  label: string,
+  strict: boolean,
+): { quantity: number | null; unit: string | null; discrepancy: string | null } {
+  const unit = secondUnitOf(line);
+  if (!line || !unit) {
+    if (raw !== undefined && raw !== null && String(raw).trim() !== '' && Number(raw) !== 0) {
+      throw new WorkRequestError(`${label}: this line was sent in one unit only; there is no second quantity to receive.`);
+    }
+    return { quantity: null, unit: null, discrepancy: null };
+  }
+  const sent = round(Number(line.unitQuantity) || 0);
+  const value = raw === undefined || raw === null || String(raw).trim() === '' ? sent : Number(raw);
+  if (!Number.isFinite(value) || value < 0) throw new WorkRequestError(`${label}: received ${unit} must be zero or more.`);
+  const quantity = round(value);
+  if (strict && quantity > sent) throw new WorkRequestError(`${label}: received ${quantity} ${unit} is more than the ${sent} ${unit} sent.`);
+  const diff = round(quantity - sent);
+  return { quantity, unit, discrepancy: diff < 0 ? `Short by ${-diff} ${unit}` : diff > 0 ? `Excess of ${diff} ${unit}` : null };
 }
 
 export async function guarded(request: Request, cfg: WorkflowConfig, fn: (user: AuthenticatedUser) => Promise<Response>, fallback: string) {
@@ -464,20 +492,25 @@ export function workflowHandlers(cfg: WorkflowConfig) {
       return NextResponse.json({ data });
     }, 'Failed to load incoming challans.');
 
-  /** POST challans/:id/receive  { lines: [{ workItemId, receivedQuantity, remarks? }], remarks? } */
+  /**
+   * POST challans/:id/receive  { lines: [{ workItemId, receivedQuantity, receivedUnitQuantity?, remarks? }], remarks? }
+   * receivedQuantity is in the line's own unit; receivedUnitQuantity is the line's second quantity (its Unit
+   * quantity in the other unit, MTR or PCS), recorded apart and never converted.
+   */
   const receiveChallan = (request: Request, challanId: string) =>
     guarded(request, cfg, async (user) => {
       const body = await request.json().catch(() => null);
-      const lines: Array<{ workItemId: string; receivedQuantity: unknown; remarks?: unknown }> = Array.isArray(body?.lines) ? body.lines : [];
+      const lines: Array<{ workItemId: string; receivedQuantity: unknown; receivedUnitQuantity?: unknown; remarks?: unknown }> = Array.isArray(body?.lines) ? body.lines : [];
       const challan = await prisma.challan.findFirst({
         where: { id: challanId, ...inboundWhere(cfg) },
         select: {
           id: true,
           challanNumber: true,
           status: true,
+          items: { select: { id: true, unitQuantity: true, unitQuantityUom: true, uom: true } },
           workItemsInbound: {
             where: dept,
-            select: { id: true, itemNumber: true, status: true, expectedQuantity: true, uom: true, fabricName: true, programId: true, garmentCategory: true, styleRef: true, colour: true },
+            select: { id: true, itemNumber: true, status: true, expectedQuantity: true, uom: true, fabricName: true, programId: true, garmentCategory: true, styleRef: true, colour: true, inboundChallanItemId: true },
           },
         },
       });
@@ -507,9 +540,10 @@ export function workflowHandlers(cfg: WorkflowConfig) {
         }
         if (cfg.garmentStock && !Number.isInteger(received)) throw new WorkRequestError(`Line ${index + 1}: received quantity must be a whole number of pieces.`);
         const diff = round(received - item.expectedQuantity);
+        const second = secondReceipt(challan.items.find((l) => l.id === item.inboundChallanItemId), line.receivedUnitQuantity, `Line ${index + 1} (${nameOf(item)})`, Boolean(cfg.strictReceipt));
         const note = textOf(line.remarks, 300);
         const discrepancy = diff < 0 ? `Short by ${-diff} ${item.uom}` : diff > 0 ? `Excess of ${diff} ${item.uom}` : null;
-        return { item, received, diff, remarks: [discrepancy, note].filter(Boolean).join(' · ') || null };
+        return { item, received, diff, second, remarks: [discrepancy, second.discrepancy, note].filter(Boolean).join(' · ') || null };
       });
 
       const now = new Date();
@@ -517,9 +551,17 @@ export function workflowHandlers(cfg: WorkflowConfig) {
         for (const r of receipts) {
           const res = await tx.departmentWorkItem.updateMany({
             where: { id: r.item.id, status: 'AWAITING_RECEIPT' },
-            data: { status: 'RECEIVED', receivedQuantity: r.received, receivedAt: now, receivedById: user.id, receiptRemarks: r.remarks },
+            data: {
+              status: 'RECEIVED',
+              receivedQuantity: r.received,
+              receivedUnitQuantity: r.second.quantity,
+              receivedUnitQuantityUom: r.second.unit,
+              receivedAt: now,
+              receivedById: user.id,
+              receiptRemarks: r.remarks,
+            },
           });
-          if (res.count !== 1) throw new WorkRequestError(`${r.item.itemNumber} was received by someone else just now.`, 409);
+          if (res.count !== 1) throw new WorkRequestError(`${r.item.fabricName} was received by someone else just now.`, 409);
           if (cfg.garmentStock) {
             // One receipt per line: the key makes a retried or concurrent receipt impossible to post twice.
             await tx.stockLedgerEntry.create({
@@ -553,7 +595,9 @@ export function workflowHandlers(cfg: WorkflowConfig) {
             action: 'RECEIVE',
             actorId: user.id,
             notes: textOf(body?.remarks),
-            metadata: JSON.stringify(receipts.map((r) => ({ item: r.item.itemNumber, expected: r.item.expectedQuantity, received: r.received, uom: r.item.uom, remarks: r.remarks }))),
+            metadata: JSON.stringify(
+              receipts.map((r) => ({ item: r.item.itemNumber, expected: r.item.expectedQuantity, received: r.received, uom: r.item.uom, receivedSecond: r.second.quantity, secondUom: r.second.unit, remarks: r.remarks })),
+            ),
           },
         });
         await tx.auditLog.create({
@@ -817,7 +861,7 @@ export function workflowHandlers(cfg: WorkflowConfig) {
               completedAt: fullyInspected ? item.completedAt ?? now : null,
             },
           });
-          if (res.count !== 1) throw new WorkRequestError(`${item.itemNumber} was inspected by someone else just now. Refresh and try again.`, 409);
+          if (res.count !== 1) throw new WorkRequestError(`${item.fabricName} was inspected by someone else just now. Refresh and try again.`, 409);
           await tx.workItemInspection.create({
             data: {
               workItemId: id,
@@ -928,7 +972,7 @@ export function workflowHandlers(cfg: WorkflowConfig) {
         program: { select: PROGRAM_SELECT },
         parentChallan: { select: { id: true, challanNumber: true } },
         issuedBy: { select: USER_SELECT },
-        workTransfers: { include: { workItem: { select: { id: true, itemNumber: true, inboundChallanId: true } } } },
+        workTransfers: { include: { workItem: { select: { id: true, itemNumber: true, fabricName: true, inboundChallanId: true, inboundChallan: { select: { challanNumber: true } } } } } },
       },
     });
 
@@ -966,7 +1010,7 @@ export function workflowHandlers(cfg: WorkflowConfig) {
     }, 'Failed to load outgoing challans.');
 
   /**
-   * POST transfer-challans  { idempotencyKey, kind?, challanNumber, issuedDate?, remarks?, sourceChallanIds, lines: [{ workItemId, quantity, remarks? }] }
+   * POST transfer-challans  { idempotencyKey, kind?, challanNumber, issuedDate?, remarks?, sourceChallanIds, lines: [{ workItemId, quantity, average?, averageUnit?, unitQuantity?, unitQuantityUom?, remarks? }] }
    * sourceChallanIds: the incoming challans selected; every line must come from one of them.
    * Moves only the quantities actually transferred, never more than processed (QC: of that outcome) and
    * not yet sent. kind (QC only): PASS -> next department, REJECT -> defective shelf, REWORK -> back for rework.
@@ -993,7 +1037,7 @@ export function workflowHandlers(cfg: WorkflowConfig) {
         const kind = kindOf(body.kind);
         const to = destinationOf(cfg, kind);
         challanNumber = requireChallanNumber(body.challanNumber);
-        let lines: Array<{ workItemId: string; quantity: unknown; remarks?: unknown }> = Array.isArray(body.lines) ? body.lines : [];
+        let lines: Array<{ workItemId: string; quantity: unknown; remarks?: unknown; average?: unknown; averageUnit?: unknown; unitQuantity?: unknown; unitQuantityUom?: unknown }> = Array.isArray(body.lines) ? body.lines : [];
         const items = await prisma.departmentWorkItem.findMany({
           where: { id: { in: lines.map((l) => l.workItemId) }, ...dept },
           include: {
@@ -1007,7 +1051,7 @@ export function workflowHandlers(cfg: WorkflowConfig) {
         if (cfg.finishedGoods) {
           lines = lines.map((l) => {
             const item = byId.get(l.workItemId);
-            if (item && !(availableFor(item, kind) > 0)) throw new WorkRequestError(`${garmentName(item)} (${item.itemNumber}) has nothing left to send.`);
+            if (item && !(availableFor(item, kind) > 0)) throw new WorkRequestError(`${garmentName(item)} has nothing left to send.`);
             return { ...l, quantity: item ? availableFor(item, kind) : 0 };
           });
         }
@@ -1021,16 +1065,17 @@ export function workflowHandlers(cfg: WorkflowConfig) {
         const reasonsOf = (item: (typeof items)[number]) =>
           Array.from(new Set(item.inspections.map((x) => (kind === 'REJECT' ? x.rejectReason : x.reworkReason)).filter(Boolean))).join('; ');
         const counter = kind === 'REJECT' ? 'rejectSentQuantity' : kind === 'REWORK' ? 'reworkSentQuantity' : 'transferredQuantity';
-        await assertChallanNumbersAvailable(prisma, [{ value: challanNumber }]);
+        await assertChallanNumbersAvailable(prisma, cfg.code, [{ value: challanNumber }]);
         const issuedDate = body.issuedDate ? new Date(String(body.issuedDate)) : new Date();
         // Optional; the existing options only. Blank keeps the line's own priority.
         const priority = body.priority ? String(body.priority).toUpperCase() : null;
         if (priority && !['LOW', 'NORMAL', 'HIGH', 'URGENT'].includes(priority)) throw new WorkRequestError('Choose a valid priority.');
         if (Number.isNaN(issuedDate.getTime())) throw new WorkRequestError('Challan date is not a valid date.');
-        const prepared = lines.map((l) => {
+        const prepared = lines.map((l, index) => {
           const item = byId.get(l.workItemId)!;
-          return { item, quantity: round(Number(l.quantity)), remarks: textOf(l.remarks, 300), reason: kind === 'PASS' ? '' : reasonsOf(item) };
+          return { item, quantity: round(Number(l.quantity)), extras: lineExtrasOf(l, index, (m) => new WorkRequestError(m)), remarks: textOf(l.remarks, 300), reason: kind === 'PASS' ? '' : reasonsOf(item) };
         });
+        const extrasOf = await lineExtrasWriter(prepared.map((p) => p.extras));
         const total = round(prepared.reduce((s, p) => s + p.quantity, 0));
         const reasons = Array.from(new Set(prepared.map((p) => p.reason).filter(Boolean))).join('; ');
         // Header parent: the first selected incoming challan used; every line also records its own source line.
@@ -1068,18 +1113,22 @@ export function workflowHandlers(cfg: WorkflowConfig) {
                   .join(' | ') || null,
             },
           });
+          // A work line sent on several entries is updated once per entry, from its running state.
+          const current = new Map<string, (typeof prepared)[number]['item']>();
           for (const p of prepared) {
-            const after = round(p.item[counter] + p.quantity);
-            const updated = { ...p.item, [counter]: after };
+            const was = current.get(p.item.id) ?? p.item;
+            const after = round(was[counter] + p.quantity);
+            const updated = { ...was, [counter]: after };
+            current.set(p.item.id, updated);
             const moved = await tx.departmentWorkItem.updateMany({
-              where: { id: p.item.id, [counter]: p.item[counter], processedQuantity: p.item.processedQuantity },
+              where: { id: p.item.id, [counter]: was[counter], processedQuantity: p.item.processedQuantity },
               data: {
                 [counter]: after,
-                status: cfg.qc ? qcStatusOf(updated) : statusAfterTransfer(p.item, after),
+                status: cfg.qc ? qcStatusOf(updated) : statusAfterTransfer(was, after),
                 lastTransferredAt: now,
               },
             });
-            if (moved.count !== 1) throw new WorkRequestError(`${p.item.itemNumber} changed while this challan was being issued. Refresh and try again.`, 409);
+            if (moved.count !== 1) throw new WorkRequestError(`${p.item.fabricName} changed while this challan was being issued. Refresh and try again.`, 409);
             const status = p.item.fabricProcessingStatus === 'DYED' ? 'Dyed' : 'Undyed';
             const ci = await tx.challanItem.create({
               data: {
@@ -1097,11 +1146,11 @@ export function workflowHandlers(cfg: WorkflowConfig) {
                 unitType: p.item.uom === 'PCS' ? 'PCS' : 'ROLL',
                 quantity: p.quantity,
                 uom: p.item.uom,
+                ...extrasOf(p.extras),
                 // "Status:" keeps the convention the stock rules already read.
                 remarks: [
                   `Status: ${status}`,
                   `Incoming: ${p.item.inboundChallan.challanNumber}`,
-                  `Ref: ${p.item.itemNumber}`,
                   p.item.sourceAllocation ? `Allocation: ${p.item.sourceAllocation.allocationNumber}` : null,
                   kind === 'REJECT' ? `Rejected at ${cfg.label}${p.reason ? `: ${p.reason}` : ''}` : null,
                   kind === 'REWORK' ? `Rework${p.reason ? `: ${p.reason}` : ''}` : null,
@@ -1412,6 +1461,90 @@ export function workflowHandlers(cfg: WorkflowConfig) {
       return NextResponse.json({ data });
     }, `Failed to load ${cfg.label} history.`);
 
+  /**
+   * PATCH inspections/:inspectionId  { inspectedQuantity?, passQuantity, rejectQuantity, reworkQuantity, rejectReason?, reworkReason?, remarks?, editReason? }
+   * Corrects one inspection batch. The line's inspected, passed, rejected and rework totals are recalculated from
+   * it; a correction can never go below what has already left on challans (passed, rejected or reworked) nor
+   * inspect more than was received, so routing and stock stay as they are.
+   */
+  const editInspection = (request: Request, inspectionId: string) =>
+    guarded(request, cfg, async (user) => {
+      if (!cfg.qc) throw new WorkRequestError(`${cfg.label} does not inspect.`, 404);
+      const body = await request.json().catch(() => null);
+      if (!body) throw new WorkRequestError('Invalid request.');
+      const batch = await prisma.workItemInspection.findUnique({ where: { id: inspectionId }, include: { workItem: true } });
+      if (!batch || batch.workItem.departmentCode !== cfg.code) throw new WorkRequestError('Inspection not found.', 404);
+      const item = batch.workItem;
+      const num = (v: unknown, fallback: number) => (v === undefined || v === null || v === '' ? fallback : Number(v));
+      const pass = round(num(body.passQuantity, batch.passQuantity));
+      const reject = round(num(body.rejectQuantity, batch.rejectQuantity));
+      const rework = round(num(body.reworkQuantity, batch.reworkQuantity));
+      const inspected = round(num(body.inspectedQuantity, pass + reject + rework));
+      for (const [label, v] of [['Inspected', inspected], ['PASS', pass], ['REJECT', reject], ['REWORK', rework]] as const) {
+        if (!Number.isFinite(v) || v < 0) throw new WorkRequestError(`${label} quantity must be zero or more.`);
+      }
+      if (inspected <= 0) throw new WorkRequestError('Inspected quantity must be greater than zero.');
+      if (round(pass + reject + rework) !== inspected) {
+        throw new WorkRequestError(`PASS + REJECT + REWORK (${round(pass + reject + rework)}) must equal the inspected quantity (${inspected} ${item.uom}).`);
+      }
+      const rejectReason = reject > 0 ? textOf(body.rejectReason ?? batch.rejectReason, 300) : null;
+      const reworkReason = rework > 0 ? textOf(body.reworkReason ?? batch.reworkReason, 300) : null;
+      if (reject > 0 && !rejectReason) throw new WorkRequestError('Enter the defect reason for the rejected quantity.');
+      if (rework > 0 && !reworkReason) throw new WorkRequestError('Enter the reason for the rework quantity.');
+
+      const after = {
+        ...item,
+        processedQuantity: round(item.processedQuantity - batch.inspectedQuantity + inspected),
+        passedQuantity: round(item.passedQuantity - batch.passQuantity + pass),
+        rejectedQuantity: round(item.rejectedQuantity - batch.rejectQuantity + reject),
+        reworkQuantity: round(item.reworkQuantity - batch.reworkQuantity + rework),
+      };
+      const received = receivedBasis(item);
+      if (after.processedQuantity > received) throw new WorkRequestError(`Only ${received} ${item.uom} was received; the line cannot be inspected beyond that.`);
+      if (after.passedQuantity < round(item.transferredQuantity)) {
+        throw new WorkRequestError(`${round(item.transferredQuantity)} ${item.uom} passed has already been sent on; PASS cannot go below that.`);
+      }
+      if (after.rejectedQuantity < round(item.rejectSentQuantity)) {
+        throw new WorkRequestError(`${round(item.rejectSentQuantity)} ${item.uom} rejected has already gone to the Defective Shelf; REJECT cannot go below that.`);
+      }
+      if (after.reworkQuantity < round(item.reworkSentQuantity)) {
+        throw new WorkRequestError(`${round(item.reworkSentQuantity)} ${item.uom} rework has already been returned; REWORK cannot go below that.`);
+      }
+      const status = qcStatusOf(after);
+      const remarks = body.remarks !== undefined ? textOf(body.remarks) : batch.remarks;
+
+      await prisma.$transaction(async (tx) => {
+        const res = await tx.departmentWorkItem.updateMany({
+          where: { id: item.id, updatedAt: item.updatedAt },
+          data: {
+            processedQuantity: after.processedQuantity,
+            passedQuantity: after.passedQuantity,
+            rejectedQuantity: after.rejectedQuantity,
+            reworkQuantity: after.reworkQuantity,
+            status,
+            completedAt: availableToProcess(after) <= 0 ? item.completedAt ?? new Date() : null,
+          },
+        });
+        if (res.count !== 1) throw new WorkRequestError(`${item.fabricName} changed while saving. Refresh and try again.`, 409);
+        await tx.workItemInspection.update({
+          where: { id: batch.id },
+          data: { inspectedQuantity: inspected, passQuantity: pass, rejectQuantity: reject, reworkQuantity: rework, rejectReason, reworkReason, remarks },
+        });
+        await tx.auditLog.create({
+          data: {
+            actorId: user.id,
+            action: `${cfg.code}_INSPECTION_EDITED`,
+            entity: 'WorkItemInspection',
+            entityId: batch.id,
+            beforeState: JSON.stringify({ inspected: batch.inspectedQuantity, pass: batch.passQuantity, reject: batch.rejectQuantity, rework: batch.reworkQuantity, rejectReason: batch.rejectReason, reworkReason: batch.reworkReason, remarks: batch.remarks }),
+            afterState: JSON.stringify({ inspected, pass, reject, rework, rejectReason, reworkReason, remarks, reason: textOf(body.editReason) }),
+          },
+        });
+      }, TX);
+      const data = await prisma.departmentWorkItem.findUnique({ where: { id: item.id }, include: WORK_ITEM_INCLUDE });
+      return NextResponse.json({ data, message: `Inspection corrected: ${inspected} ${item.uom} (PASS ${pass}, REJECT ${reject}, REWORK ${rework}).` });
+    }, 'Failed to correct the inspection.');
+
   return {
     listChallans,
     receiveChallan,
@@ -1420,6 +1553,7 @@ export function workflowHandlers(cfg: WorkflowConfig) {
     updateItem,
     correctFabricStatus,
     inspectItem,
+    editInspection,
     listTransferChallans,
     issueTransferChallan,
     dashboard,

@@ -18,7 +18,8 @@ export function buildDepartmentTrackingData(
 ) {
   const fabricIn = body.fabricIn == null ? incomingFallback : Number(body.fabricIn);
   const defectivePieces = body.defectivePieces == null ? 0 : Number(body.defectivePieces);
-  const fabricUnit = body.fabricUnit || 'PCS';
+  // Never assumed: a missing unit fails the MTR/PCS check below.
+  const fabricUnit = body.fabricUnit || '';
 
   if (!Number.isFinite(fabricIn) || fabricIn < 0) {
     return { error: 'Fabric in quantity must be a non-negative number.' } as const;
@@ -27,7 +28,7 @@ export function buildDepartmentTrackingData(
     return { error: 'Defective quantity must be between zero and the fabric in quantity.' } as const;
   }
   if (fabricUnit !== 'MTR' && fabricUnit !== 'PCS') {
-    return { error: 'Fabric unit must be MTR or PCS.' } as const;
+    return { error: 'Select MTR or PCS for the fabric quantity.' } as const;
   }
   if (outgoingQuantity + defectivePieces > fabricIn) {
     return { error: 'Outgoing quantity plus defective quantity cannot exceed the fabric in quantity.' } as const;

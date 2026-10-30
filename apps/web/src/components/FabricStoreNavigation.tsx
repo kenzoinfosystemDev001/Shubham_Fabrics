@@ -291,6 +291,15 @@ export function FabricStoreNavigation() {
             <span>Defective Shelf</span>
           </Link>
 
+          {/* Shrinkage (recorded by Dyeing QC; read-only here) */}
+          <Link
+            href="/fabric-store/shrinkage"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/fabric-store/shrinkage')}
+          >
+            <span>Shrinkage</span>
+          </Link>
+
           {/* 7. Total Stock (UNDYED & DYED) */}
           <div>
             <div>
@@ -335,7 +344,7 @@ export function FabricStoreNavigation() {
             <UserCircle className="w-8 h-8 text-brand-700" />
             <div className="flex-1 min-w-0">
               <span className="text-xs font-semibold text-neutral-900 truncate block drop-shadow-xs">
-                {currentUser.fullName || (isAdmin ? 'System Administrator' : 'Store Incharge')}
+                {(currentUser.fullName && currentUser.fullName.trim().toLowerCase() !== 'store department' ? currentUser.fullName : '') || (isAdmin ? 'System Administrator' : 'Store Incharge')}
               </span>
               <span className="text-[10px] text-brand-700 font-bold tracking-wide block truncate drop-shadow-xs">
                 Store Department

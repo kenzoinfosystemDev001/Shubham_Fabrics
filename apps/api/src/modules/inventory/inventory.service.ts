@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma.service';
-import { CreateStockLedgerEntryInput, RegisterFabricRollInput } from '@subham/validation';
-import { StockLedgerEntryType, DepartmentCode, FabricRollStatus } from '@subham/types';
+import { CreateStockLedgerEntryInput, RegisterFabricRollInput } from '@shubham/validation';
+import { StockLedgerEntryType, DepartmentCode, FabricRollStatus } from '@shubham/types';
 
 @Injectable()
 export class InventoryService {

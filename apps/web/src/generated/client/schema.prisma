@@ -1,4 +1,4 @@
-// Subham Fabrics MES - Enterprise PostgreSQL Schema (Neon Cloud)
+// Shubham Fabrics MES - Enterprise PostgreSQL Schema (Neon Cloud)
 
 generator client {
   provider      = "prisma-client-js"
@@ -35,6 +35,9 @@ model User {
   issuedChallans     Challan[]               @relation("ChallanIssuer")
   receivedChallans   Challan[]               @relation("ChallanReceiver")
   approvedChallans   Challan[]               @relation("ChallanApprover")
+  createdShrinkage   ShrinkageRecord[]       @relation("ShrinkageCreator")
+  updatedShrinkage   ShrinkageRecord[]       @relation("ShrinkageUpdater")
+  fabricPhotos       FabricPhoto[]           @relation("FabricPhotoUploader")
   productionRecords  ProductionTransaction[] @relation("OperatorProduction")
   inspections        QualityInspection[]     @relation("InspectorQuality")
   challanEvents      ChallanEvent[]
@@ -62,6 +65,8 @@ model User {
   workAllocations       WorkItemAllocation[]     @relation("AllocationCreator")
   packingAllocations    PackingAllocation[]      @relation("PackingAllocationCreator")
   garmentImagesUploaded GarmentImage[]           @relation("GarmentImageUploader")
+  holdsPlaced           DepartmentHold[]         @relation("HoldPlacer")
+  holdEvents            DepartmentHoldEvent[]    @relation("HoldEventActor")
 
   // Smart Deadline Alerts
   deadlineAlertDismissals    DeadlineAlertDismissal[]
@@ -468,6 +473,8 @@ model Program {
   routes             ProgramRoute[]
   challans           Challan[]
   challanItems       ChallanItem[]           @relation("ChallanItemProgram")
+  shrinkageRecords   ShrinkageRecord[]
+  fabricPhotos       FabricPhoto[]
   productionLogs     ProductionTransaction[]
   rolls              FabricRoll[]
   bundles            Bundle[]
@@ -484,6 +491,7 @@ model Program {
   deadlineAlerts      DeadlineAlert[]
   departmentWorkItems DepartmentWorkItem[]
   garmentImages       GarmentImage[]
+  departmentHolds     DepartmentHold[]
 
   @@index([programNumber])
   @@index([status])
@@ -703,7 +711,7 @@ model AuditLog {
 
 model Challan {
   id              String    @id @default(uuid())
-  challanNumber   String    @unique
+  challanNumber   String // unique per issuing department: see @@unique([fromDepartment, challanNumber])
   challanType     String // FABRIC_ISSUE, INTER_DEPARTMENT, etc.
   programId       String
   program         Program   @relation(fields: [programId], references: [id])
@@ -732,9 +740,10 @@ model Challan {
   approvedById String?
   approvedBy   User?   @relation("ChallanApprover", fields: [approvedById], references: [id])
 
-  remarks   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  remarks      String?
+  inchargeName String? // the issuing department incharge's name as typed on the form
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   // Fabric / Piece In & Out Auto-Detection Tracking across Departments
   fabricIn               Float?
@@ -763,6 +772,12 @@ model Challan {
 
   // Smart Deadline Alerts
   deadlineAlerts DeadlineAlert[]
+
+  shrinkageRecords ShrinkageRecord[]
+
+  // A department cannot reuse its own challan number; another department may use the same number.
+  @@unique([fromDepartment, challanNumber])
+  @@index([challanNumber])
 }
 
 model ChallanItem {
@@ -788,6 +803,10 @@ model ChallanItem {
   grossWeightKg          Float?
   netWeightKg            Float?
   uom                    String
+  average                Float? // Average entered with the line on the issuing form; null when not given
+  averageUnit            String? // MTR or PCS: the unit of `average` (chosen with it); null when no average
+  unitQuantity           Float? // Unit quantity entered with the line (Items: Size | Average | Unit); information only, stock moves by `quantity`
+  unitQuantityUom        String? // MTR or PCS: the unit of `unitQuantity` (chosen with it); null when none
   remarks                String?
 
   sourceLotId         String?
@@ -803,8 +822,40 @@ model ChallanItem {
   derivedItems        ChallanItem[] @relation("ChallanItemSource")
   createdAt           DateTime      @default(now())
 
+  shrinkage ShrinkageRecord?
+
   @@index([programId])
   @@index([sourceChallanItemId])
+}
+
+// Shrinkage of one dyed fabric line (a line of a Dyeing -> Dyeing QC challan), recorded by Dyeing QC and
+// shown read-only in the Fabric Store. One record per challan line. Information only: it never changes
+// Fabric Store stock.
+model ShrinkageRecord {
+  id            String      @id @default(uuid())
+  challanId     String
+  challan       Challan     @relation(fields: [challanId], references: [id], onDelete: Cascade)
+  challanItemId String      @unique
+  challanItem   ChallanItem @relation(fields: [challanItemId], references: [id], onDelete: Cascade)
+  programId     String
+  program       Program     @relation(fields: [programId], references: [id])
+  originalQty   Float // the line quantity received from Dyeing
+  originalUnit  String // MTR | PCS
+  shrinkageQty  Float
+  shrinkageUnit String // MTR | PCS
+  remainingQty  Float? // originalQty - shrinkageQty; null when the two units differ
+  remarks       String?
+  source        String      @default("MANUAL") // INSPECTION (entered with the Dyeing QC inspection) | MANUAL
+  createdById   String
+  createdBy     User        @relation("ShrinkageCreator", fields: [createdById], references: [id])
+  updatedById   String
+  updatedBy     User        @relation("ShrinkageUpdater", fields: [updatedById], references: [id])
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([programId])
+  @@index([challanId])
+  @@index([updatedAt])
 }
 
 model ProductionTransaction {
@@ -1438,7 +1489,7 @@ model FabricStockLedger {
   batchId         String
   batch           FabricBatch          @relation(fields: [batchId], references: [id])
   transactionType StockTransactionType
-  quantity        Decimal              @db.Decimal(10, 2) // meters moved
+  quantity        Decimal              @db.Decimal(10, 2) // amount moved, in batch.unit (MTR or PCS)
   referenceType   String // "GRN", "ISSUE_CHALLAN", "RETURN_CHALLAN", "QC_HOLD"
   referenceId     String // the relevant document ID
   fromLocationId  String?
@@ -1490,11 +1541,14 @@ model DyeingOrder {
   uom                 String @default("MTR")
 
   // Receipt: what physically arrived (null until received; legacy orders received before this existed).
-  receivedQuantity Float?
-  receivedAt       DateTime?
-  receivedById     String?
-  receivedBy       User?     @relation("DyeingReceiver", fields: [receivedById], references: [id])
-  receiptRemarks   String?
+  receivedQuantity        Float?
+  // The line's second quantity (its Unit quantity in the other unit) as received; never converted.
+  receivedUnitQuantity    Float?
+  receivedUnitQuantityUom String?
+  receivedAt              DateTime?
+  receivedById            String?
+  receivedBy              User?     @relation("DyeingReceiver", fields: [receivedById], references: [id])
+  receiptRemarks          String?
 
   expectedCompletionDate DateTime?
 
@@ -1569,32 +1623,36 @@ model DepartmentWorkItem {
   fabricProcessingStatus String // DYED | UNDYED, from the validated route
   fabricStatusSource     String  @default("ROUTE") // ROUTE | CORRECTED (admin correction, audited)
 
-  status              String               @default("AWAITING_RECEIPT") // AWAITING_RECEIPT, RECEIVED, IN_PROGRESS, COMPLETED, READY_FOR_TRANSFER, PARTIALLY_TRANSFERRED, TRANSFERRED
-  priority            String               @default("NORMAL")
-  uom                 String
-  expectedQuantity    Float
-  receivedQuantity    Float?
-  processedQuantity   Float                @default(0) // QC departments: inspected
-  transferredQuantity Float                @default(0) // QC departments: PASS sent onward
+  status                  String               @default("AWAITING_RECEIPT") // AWAITING_RECEIPT, RECEIVED, IN_PROGRESS, COMPLETED, READY_FOR_TRANSFER, PARTIALLY_TRANSFERRED, TRANSFERRED
+  priority                String               @default("NORMAL")
+  uom                     String
+  expectedQuantity        Float
+  receivedQuantity        Float?
+  // The line's second quantity (its Unit quantity in the other unit, MTR or PCS) as received; never converted.
+  receivedUnitQuantity    Float?
+  receivedUnitQuantityUom String?
+  processedQuantity       Float                @default(0) // QC departments: inspected
+  transferredQuantity     Float                @default(0) // QC departments: PASS sent onward
   // Garment lines (Stitching onward): category and style from the Recutting allocation.
-  garmentCategory     String? // TOP | BOTTOM | DUPATTA | OTHERS
-  styleRef            String?
-  sourceAllocationId  String?
-  sourceAllocation    WorkItemAllocation?  @relation("WorkItemSourceAllocation", fields: [sourceAllocationId], references: [id], onDelete: SetNull)
+  garmentCategory         String? // TOP | BOTTOM | DUPATTA | OTHERS
+  styleRef                String?
+  sourceAllocationId      String?
+  sourceAllocation        WorkItemAllocation?  @relation("WorkItemSourceAllocation", fields: [sourceAllocationId], references: [id], onDelete: SetNull)
   // The previous department's line this one was issued from (e.g. the Stitching line a Finishing line came from).
-  sourceWorkItemId    String?
-  sourceWorkItem      DepartmentWorkItem?  @relation("WorkItemSource", fields: [sourceWorkItemId], references: [id], onDelete: SetNull)
-  downstreamWorkItems DepartmentWorkItem[] @relation("WorkItemSource")
+  sourceWorkItemId        String?
+  sourceWorkItem          DepartmentWorkItem?  @relation("WorkItemSource", fields: [sourceWorkItemId], references: [id], onDelete: SetNull)
+  downstreamWorkItems     DepartmentWorkItem[] @relation("WorkItemSource")
+  fabricPhotos            FabricPhoto[]
   // Production departments that take work onto the floor (Stitching): taken in, and defective
   // (kept apart from good processedQuantity; recorded as DefectRecord).
-  takenQuantity       Float                @default(0)
-  defectQuantity      Float                @default(0)
+  takenQuantity           Float                @default(0)
+  defectQuantity          Float                @default(0)
   // QC departments only: inspection outcomes, and how much of each has left on a challan.
-  passedQuantity      Float                @default(0)
-  rejectedQuantity    Float                @default(0)
-  reworkQuantity      Float                @default(0)
-  rejectSentQuantity  Float                @default(0)
-  reworkSentQuantity  Float                @default(0)
+  passedQuantity          Float                @default(0)
+  rejectedQuantity        Float                @default(0)
+  reworkQuantity          Float                @default(0)
+  rejectSentQuantity      Float                @default(0)
+  reworkSentQuantity      Float                @default(0)
 
   receivedAt             DateTime?
   receivedById           String?
@@ -1708,7 +1766,12 @@ model FabricInward {
   billQty             Float // Quantity
   unit                String             @default("MTR") // "MTR" or "PCS"; never converted
   colour              String? // null on entries recorded before colour tracking
-  supplierName        String?
+  supplierName        String? // Party name
+  billerStateCity     String? // Biller state / city
+  pricePerUnit        Float? // per MTR or PCS, as billed
+  boxThanQty          Float? // boxes / thans received
+  hsnCode             String?
+  taxPercent          Float?
   remarks             String?
   // Roll / commercial details (Excel stock import; null on manual entries)
   rollNumber          String?
@@ -1747,6 +1810,7 @@ model FabricOutward {
   issuePcsQty   Float? // pcs quantity
   byOrderName   String? // by order name / client name
   remarks       String?
+  inchargeName  String? // the Fabric Store incharge's name as typed on the form
   destination   String? // "DYEING", "EMBROIDERY", "OTHER"
   fabricType    String? // "KORA", "DYED"
   createdAt     DateTime @default(now())
@@ -1961,4 +2025,97 @@ model ManualMigration {
   appliedAt DateTime @default(now())
 
   @@map("_manual_migrations")
+}
+
+// Fabric photo taken on a work line by Embroidery, Threadcut QC (QC2) or Stitching. Several per line are
+// allowed and none replaces another. Departments later on the route see the photos of the Production Sheets
+// they hold (lib/fabric-photos-server.ts). Bytes are kept in imageData, like GarmentImage.
+model FabricPhoto {
+  id             String             @id @default(uuid())
+  programId      String
+  program        Program            @relation(fields: [programId], references: [id], onDelete: Cascade)
+  workItemId     String
+  workItem       DepartmentWorkItem @relation(fields: [workItemId], references: [id], onDelete: Cascade)
+  departmentCode String // EMBROIDERY | QC2 | STITCHING: from the work line, never from the request
+  fabricName     String?
+  colour         String?
+  imageData      Bytes
+  mimeType       String
+  fileName       String
+  fileSize       Int
+  fileHash       String // sha256; the same file twice on one line is stored once
+  uploadedById   String
+  uploadedBy     User               @relation("FabricPhotoUploader", fields: [uploadedById], references: [id])
+  createdAt      DateTime           @default(now())
+
+  @@unique([workItemId, fileHash])
+  @@index([programId])
+  @@index([workItemId])
+}
+
+// Quantity a department (Dyeing to Inventory) keeps back (HOLD) from one line it received: a work item, a dyeing
+// order, or a Dyeing QC challan's MTR or PCS lines (lib/holds-server.ts).
+// Remaining on HOLD is never more than the line still has unforwarded, so forwarding through the normal
+// challan screens lowers it without a second deduction. One active HOLD per line (activeKey).
+model DepartmentHold {
+  id                    String                @id @default(uuid())
+  holdNumber            String                @unique // e.g. HLD-2026-0001
+  departmentCode        String
+  sourceType            String // DYEING_ORDER | QC1_CHALLAN | WORK_ITEM
+  sourceId              String
+  sourceKey             String // sourceType:sourceId:unit
+  activeKey             String?               @unique // departmentCode|sourceKey while the HOLD is open; null once closed
+  programId             String
+  program               Program               @relation(fields: [programId], references: [id], onDelete: Cascade)
+  // Identifiers as they were when the HOLD was placed (kept after release).
+  challanId             String?
+  challanNumber         String?
+  designNumber          String
+  serialNumber          String
+  productionSheetNumber String
+  fabricName            String
+  colour                String?
+  size                  String?
+  unit                  String // MTR | PCS, the line's own unit; never converted
+  receivedQuantity      Float
+  forwardedQuantity     Float // forwarded from the line, as last computed
+  forwardedAtHold       Float // forwarded from the line when the HOLD was placed
+  holdQuantity          Float
+  releasedQuantity      Float                 @default(0)
+  remainingQuantity     Float // still on HOLD, as last computed
+  reason                String // PRODUCTION_PENDING, QUALITY_ISSUE ... OTHER (lib/holds.mjs)
+  reasonOther           String? // the typed reason when reason is OTHER
+  remarks               String?
+  status                String                @default("ON_HOLD") // ON_HOLD, PARTIALLY_RELEASED, PARTIALLY_FORWARDED, RELEASED, FORWARDED, CLEARED
+  heldById              String?
+  heldBy                User?                 @relation("HoldPlacer", fields: [heldById], references: [id], onDelete: SetNull)
+  heldByName            String
+  heldAt                DateTime              @default(now())
+  closedAt              DateTime?
+  events                DepartmentHoldEvent[]
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+
+  @@index([departmentCode, status])
+  @@index([programId])
+  @@index([sourceKey])
+}
+
+// History of a HOLD: placed, released (in part or in full) and closed. Forwarding is read from the line's
+// own transfer records (challans, allocations, packing), so it is never recorded twice.
+model DepartmentHoldEvent {
+  id             String         @id @default(uuid())
+  holdId         String
+  hold           DepartmentHold @relation(fields: [holdId], references: [id], onDelete: Cascade)
+  action         String // HOLD | RELEASE | CLOSE
+  quantity       Float
+  remainingAfter Float
+  unit           String
+  remarks        String?
+  actorId        String?
+  actor          User?          @relation("HoldEventActor", fields: [actorId], references: [id], onDelete: SetNull)
+  actorName      String
+  createdAt      DateTime       @default(now())
+
+  @@index([holdId])
 }

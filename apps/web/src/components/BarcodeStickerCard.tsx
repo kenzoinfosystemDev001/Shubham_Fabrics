@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { departmentName } from '@/lib/workflow-views';
 import { 
   Download, 
   Printer, 
@@ -143,7 +144,7 @@ export default function BarcodeStickerCard({
         <div>
           <span className="text-[10px] uppercase font-bold text-neutral-500 block">Movement</span>
           <span className="text-xs font-mono font-bold text-neutral-700 block truncate">
-            {params.fromDepartment && params.toDepartment ? `${params.fromDepartment} → ${params.toDepartment}` : 'INTER-DEPT'}
+            {params.fromDepartment && params.toDepartment ? `${departmentName(params.fromDepartment)} → ${departmentName(params.toDepartment)}` : 'INTER-DEPT'}
           </span>
         </div>
         <div>

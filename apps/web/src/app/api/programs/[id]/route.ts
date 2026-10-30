@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { getSessionUser } from '@/lib/auth/require-user';
 import { requireDepartment } from '@/lib/auth/department-access';
 import { programSheetInclude, shapeProgramSheet } from '@/lib/program-sheet';
@@ -7,6 +7,11 @@ import { programSheetInclude, shapeProgramSheet } from '@/lib/program-sheet';
 import { syncChallanStock } from '@/lib/fabric-stock-ledger';
 
 export const dynamic = 'force-dynamic';
+
+/** A TOP design (or a legacy one with no category) is the only one that shares the root Wilcom photo. */
+function isTopWilcomEntry(entry: any): boolean {
+  return String(entry?.category || 'TOP').trim().toUpperCase() === 'TOP';
+}
 
 export async function GET(
   request: Request,
@@ -99,15 +104,14 @@ export async function DELETE(
             where: { OR: [{ programId: id }, { inboundChallanId: { in: challanIds } }] },
           });
 
-          // Unlink DyeingOrder references to these challans
+          // Unlink DyeingOrder references to these challans, clearing only the link that points at one
           await tx.dyeingOrder.updateMany({
-            where: {
-              OR: [
-                { inboundChallanId: { in: challanIds } },
-                { qc1ChallanId: { in: challanIds } },
-              ],
-            },
-            data: { inboundChallanId: null, qc1ChallanId: null },
+            where: { inboundChallanId: { in: challanIds } },
+            data: { inboundChallanId: null },
+          });
+          await tx.dyeingOrder.updateMany({
+            where: { qc1ChallanId: { in: challanIds } },
+            data: { qc1ChallanId: null },
           });
 
           // Delete production transactions linked to these challans
@@ -323,15 +327,16 @@ export async function PATCH(
       if (!resolvedPhoto) {
         resolvedPhoto = body.wilcomEntries.find((e: any) => e?.photoUrl)?.photoUrl || null;
       }
+      // Only a TOP design falls back to the root Wilcom photo; other sheets keep their own artwork.
       meta.wilcomEntries = body.wilcomEntries.map((e: any) => ({
         ...e,
-        photoUrl: e.photoUrl || resolvedPhoto || undefined,
+        photoUrl: e.photoUrl || (isTopWilcomEntry(e) ? resolvedPhoto : null) || undefined,
       }));
     } else if (body.wilcomDesignPhoto) {
       if (Array.isArray(meta.wilcomEntries) && meta.wilcomEntries.length > 0) {
         meta.wilcomEntries = meta.wilcomEntries.map((e: any) => ({
           ...e,
-          photoUrl: e.photoUrl || body.wilcomDesignPhoto,
+          photoUrl: e.photoUrl || (isTopWilcomEntry(e) ? body.wilcomDesignPhoto : undefined),
         }));
       } else {
         meta.wilcomEntries = [

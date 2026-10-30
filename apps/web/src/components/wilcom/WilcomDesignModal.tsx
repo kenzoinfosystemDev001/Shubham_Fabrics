@@ -32,12 +32,9 @@ export function WilcomDesignModal({
 }: WilcomDesignModalProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [category, setCategory] = useState<GarmentCategory>(activeCategory);
+  // Added styles have internal ids (CUSTOM_...); the user-facing category is the style's name.
   const [customCategory, setCustomCategory] = useState(
-    activeCategory === 'OTHER'
-      ? defaultStyleName
-      : !['TOP', 'BOTTOM', 'DUPATTA'].includes(activeCategory)
-        ? activeCategory
-        : ''
+    !['TOP', 'BOTTOM', 'DUPATTA'].includes(activeCategory) ? defaultStyleName : ''
   );
   const [isCustomCategory, setIsCustomCategory] = useState(
     activeCategory === 'OTHER' || !['TOP', 'BOTTOM', 'DUPATTA'].includes(activeCategory)
@@ -55,13 +52,7 @@ export function WilcomDesignModal({
       const isCustom = activeCategory === 'OTHER' || !['TOP', 'BOTTOM', 'DUPATTA'].includes(activeCategory);
       setIsCustomCategory(isCustom);
       setCategory(isCustom ? 'OTHER' : activeCategory);
-      if (activeCategory === 'OTHER') {
-        setCustomCategory(defaultStyleName);
-      } else if (!['TOP', 'BOTTOM', 'DUPATTA', 'OTHER'].includes(activeCategory)) {
-        setCustomCategory(activeCategory);
-      } else {
-        setCustomCategory('');
-      }
+      setCustomCategory(isCustom ? defaultStyleName : '');
       setStyleName('');
     }
   }, [isOpen, activeCategory, defaultStyleName, editingId]);
@@ -168,13 +159,7 @@ export function WilcomDesignModal({
     const isCustom = activeCategory === 'OTHER' || !['TOP', 'BOTTOM', 'DUPATTA'].includes(activeCategory);
     setIsCustomCategory(isCustom);
     setCategory(isCustom ? 'OTHER' : activeCategory);
-    setCustomCategory(
-      activeCategory === 'OTHER'
-        ? defaultStyleName
-        : !['TOP', 'BOTTOM', 'DUPATTA'].includes(activeCategory)
-          ? activeCategory
-          : ''
-    );
+    setCustomCategory(isCustom ? defaultStyleName : '');
     setStyleName('');
     setDesignNumber('');
     setPhotoUrl('');
@@ -227,7 +212,12 @@ export function WilcomDesignModal({
   };
 
   const categoryLabel = (c: string) => STANDARD_LABEL[c] || c;
-  const counts = wilcomEntries.reduce<Record<string, number>>((acc, e) => {
+  // Each production sheet has its own Wilcom designs; an added style's are stored under its name.
+  const sheetStyleName = !['TOP', 'BOTTOM', 'DUPATTA'].includes(activeCategory) ? defaultStyleName.trim().toUpperCase() : '';
+  const sheetEntries = wilcomEntries.filter((e) =>
+    e.category === activeCategory || (sheetStyleName !== '' && e.category === sheetStyleName)
+  );
+  const counts = sheetEntries.reduce<Record<string, number>>((acc, e) => {
     acc[e.category] = (acc[e.category] || 0) + 1;
     return acc;
   }, {});
@@ -259,7 +249,7 @@ export function WilcomDesignModal({
         </div>
         <div className="flex items-center gap-2">
           <span className="hidden sm:inline-flex px-3 py-1 rounded-full bg-neutral-100 text-xs font-semibold text-neutral-700 tabular-nums">
-            {wilcomEntries.length} {wilcomEntries.length === 1 ? 'design' : 'designs'}
+            {sheetEntries.length} {sheetEntries.length === 1 ? 'design' : 'designs'}
           </span>
           <button
             type="button"
@@ -426,12 +416,12 @@ export function WilcomDesignModal({
           <section className="lg:col-span-7 space-y-4">
             <h3 className="text-sm font-bold text-neutral-900 flex items-center gap-2">
               Attached Designs
-              <span className="text-[11px] font-semibold tabular-nums bg-neutral-100 text-neutral-600 px-2 py-0.5 rounded-full">{wilcomEntries.length}</span>
+              <span className="text-[11px] font-semibold tabular-nums bg-neutral-100 text-neutral-600 px-2 py-0.5 rounded-full">{sheetEntries.length}</span>
             </h3>
 
-            {wilcomEntries.length > 0 ? (
+            {sheetEntries.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {wilcomEntries.map((entry, idx) => {
+                {sheetEntries.map((entry, idx) => {
                   const editing = editingId === entry.id;
                   return (
                     <article
@@ -506,7 +496,7 @@ export function WilcomDesignModal({
       {/* FOOTER */}
       <footer className="px-4 sm:px-8 py-3.5 bg-white border-t border-neutral-200 flex items-center justify-between gap-4 shrink-0">
         <div className="flex flex-wrap items-center gap-1.5 text-xs text-neutral-600">
-          {wilcomEntries.length === 0 ? (
+          {sheetEntries.length === 0 ? (
             <span>No designs attached</span>
           ) : (
             Object.entries(counts).map(([cat, n]) => (

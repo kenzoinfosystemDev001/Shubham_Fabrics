@@ -1,5 +1,5 @@
 {
-  "name": "@subham/config",
+  "name": "@shubham/config",
   "version": "1.0.0",
   "description": "Shared configurations, constants and factory parameters",
   "main": "./dist/index.js",
@@ -9,7 +9,7 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
-    "@subham/types": "*"
+    "@shubham/types": "*"
   },
   "devDependencies": {
     "typescript": "^5.8.2"

@@ -1,4 +1,4 @@
-import type { Prisma } from '@subham/database';
+import type { Prisma } from '@shubham/database';
 import {
   addInward,
   addLegacyOutward,

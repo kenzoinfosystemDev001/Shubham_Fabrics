@@ -32,6 +32,7 @@ import {
 } from '@/lib/download-production-sheet';
 import { ProductionSheetPrintModal } from '@/components/ProductionSheetPrintModal';
 import { newSubmissionKey } from '@/components/challan/ChallanNumberField';
+import { quantityPairError } from '@/components/challan/AverageField';
 import { addTotals, formatTotals, totalsByUnit } from '@/lib/challan-units.mjs';
 import { SheetBreakdown } from '@/components/challan/IncomingChallanPicker';
 
@@ -212,9 +213,9 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
   const addSheet = (prog: any, current: string[] = sheetIds) => {
     if (!prog) return;
     if (current.includes(prog.id)) return activateSheet(prog);
-    const unit: 'MTR' | 'PCS' = prog.quantityMeasurement === 'PCS' ? 'PCS' : 'MTR';
     setSheetIds([...current, prog.id]);
-    setItemsBySheet((prev) => ({ ...prev, [prog.id]: prev[prog.id] || [{ ...createBlankChallanItem(challanContext), unit }] }));
+    // Line units are not pre-selected (the user chooses MTR or PCS per line).
+    setItemsBySheet((prev) => ({ ...prev, [prog.id]: prev[prog.id] || [createBlankChallanItem(challanContext)] }));
     if (current.length === 0) handleProgramSelect(prog);
     else activateSheet(prog);
   };
@@ -271,6 +272,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
     const targetQ = Number(prog.targetQuantity || prog.fabricIssuedToDyeing || 0);
     const initialUnit: 'MTR' | 'PCS' = prog.quantityMeasurement === 'PCS' ? 'PCS' : 'MTR';
     setAvailabilityUnit(initialUnit);
+    // Line units are not pre-selected: the programme's quantity unit describes pieces to make, not the fabric issued.
     setStoreTracking((prev) => ({
       ...prev,
       fabricIn: targetQ,
@@ -288,8 +290,8 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
     const selectedRow = nextItems.find(
       (item) => Number(item.measurement) > 0 || item.fabric.trim() || item.color.trim()
     ) || nextItems[0];
-    const nextUnit = selectedRow?.unit || 'MTR';
-    if (selectedProgramId && nextUnit !== availabilityUnit) {
+    const nextUnit = selectedRow?.unit;
+    if (selectedProgramId && nextUnit && nextUnit !== availabilityUnit) {
       setAvailabilityUnit(nextUnit);
       loadAvailability(selectedProgramId, nextUnit);
     }
@@ -343,6 +345,28 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
       setError(`Sheet ${sheetName(emptySheet.program)} has no items. Add its fabric lines or remove the sheet from this challan.`);
       return;
     }
+    // The lines of every sheet on the challan, in order.
+    const rowsWithDetails = sheetLines.flatMap((s) => s.rows);
+    if (rowsWithDetails.some((item) => !item.unit)) {
+      setError('Select MTR or PCS for every challan item.');
+      return;
+    }
+    if (rowsWithDetails.some((item) => String(item.average ?? '').trim() !== '' && !(Number(item.average) >= 0))) {
+      setError('Average must be a number of zero or more.');
+      return;
+    }
+    if (rowsWithDetails.some((item) => String(item.average ?? '').trim() !== '' && !item.averageUnit)) {
+      setError('Select MTR or PCS for every Average.');
+      return;
+    }
+    const unitQuantityErrorOf = (item: ChallanItemData) =>
+      quantityPairError(String(item.unitQuantity ?? ''), item.unitQuantityUnit || '', 'Unit quantity', true);
+    const badUnitQuantity = rowsWithDetails.findIndex((item) => unitQuantityErrorOf(item));
+    if (badUnitQuantity >= 0) {
+      const message = unitQuantityErrorOf(rowsWithDetails[badUnitQuantity])!;
+      setError(`Item #${badUnitQuantity + 1}: ${message[0].toUpperCase()}${message.slice(1)}.`);
+      return;
+    }
     // Every line carries its own Production Sheet.
     const validItems = sheetLines.flatMap((s) => s.rows.filter((item) => Number(item.measurement) > 0).map((item) => ({ ...item, sheet: s.program })));
 
@@ -351,7 +375,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
       return;
     }
     // Each line keeps its own unit; meters and pieces are totalled and stocked separately.
-    const lineUnit = (item: ChallanItemData): 'MTR' | 'PCS' => (item.unit === 'PCS' ? 'PCS' : 'MTR');
+    const lineUnit = (item: ChallanItemData): 'MTR' | 'PCS' => item.unit as 'MTR' | 'PCS';
     const issueTotals = totalsByUnit(validItems.map((item) => ({ quantity: Number(item.measurement), uom: lineUnit(item) })));
     const issueUnits = Object.keys(issueTotals) as Array<'MTR' | 'PCS'>;
     const singleUnit = issueUnits.length === 1 ? issueUnits[0] : null;
@@ -391,17 +415,12 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
         requiredDyeQuantity: destinationDepartment === 'DYEING' ? item.requiredDyeQuantity || null : null,
         fabricProcessingStatus: destinationDepartment === 'EMBROIDERY' ? 'Undyed' : undefined,
         rollNumber: item.rollNumber || null,
+        average: String(item.average ?? '').trim() === '' ? null : Number(item.average),
+        averageUnit: String(item.average ?? '').trim() === '' ? null : item.averageUnit || null,
+        unitQuantity: Number(item.unitQuantity),
+        unitQuantityUom: item.unitQuantityUnit || null,
         remarks: item.remarks || null,
       }));
-
-      const inchargeInfo = [
-        storeInchargeName ? `Store Incharge: ${storeInchargeName}` : null,
-        storeInchargeContact ? `Contact: ${storeInchargeContact}` : null,
-        designNumber ? `Design #: ${designNumber}` : null,
-        `Accounting: In: ${formatTotals(inTotals)} | Defective Cut: ${challanDefectiveQuantity} ${defectiveUnit} (${storeTracking.defectiveShelfLocation}) | Out to ${destinationDepartment}: ${formatTotals(issueTotals)}`,
-      ]
-        .filter(Boolean)
-        .join(' · ');
 
       const payload = {
         idempotencyKey: submissionKey,
@@ -422,7 +441,8 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
         fabricOut: singleUnit ? issueTotals[singleUnit] : undefined,
         fabricUnit: singleUnit || undefined,
         detectedFromDepartment: storeTracking.detectedFromDept || 'PROGRAMMING',
-        remarks: inchargeInfo,
+        // No system details in remarks: design, quantities and the defect are saved in their own fields.
+        inchargeName: storeInchargeName.trim() || undefined,
         items: challanItems,
       };
 
@@ -803,7 +823,7 @@ export function FabricStoreIssueChallanView({ fixedTarget }: FabricStoreIssueCha
                       setChallanNumberError(null);
                     }}
                     required
-                    placeholder="Enter challan number"
+                    placeholder=""
                     autoComplete="off"
                     aria-invalid={Boolean(challanNumberError)}
                     className={`w-full text-xs font-mono font-bold text-neutral-900 border rounded-lg px-3 py-2 bg-white focus:outline-hidden focus:ring-2 focus:ring-brand-500 focus:border-transparent transition ${

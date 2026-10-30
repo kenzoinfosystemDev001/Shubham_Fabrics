@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { describeDatabaseError } from '@/lib/api-errors';
 import { checkDatabaseSchema } from '@/lib/schema-check';
 

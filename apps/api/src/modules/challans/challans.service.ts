@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma.service';
-import { CreateChallanInput } from '@subham/validation';
-import { ChallanStatus, DepartmentCode } from '@subham/types';
+import { CreateChallanInput } from '@shubham/validation';
+import { ChallanStatus, DepartmentCode } from '@shubham/types';
 
 @Injectable()
 export class ChallansService {
@@ -129,8 +129,9 @@ export class ChallansService {
   }
 
   async create(data: CreateChallanInput, actorId: string) {
-    const existing = await this.prisma.challan.findUnique({
-      where: { challanNumber: data.challanNumber },
+    // Challan numbers are unique per issuing department.
+    const existing = await this.prisma.challan.findFirst({
+      where: { challanNumber: data.challanNumber, fromDepartment: data.fromDepartment },
     });
     if (existing) {
       throw new BadRequestException(`Challan number '${data.challanNumber}' already exists`);

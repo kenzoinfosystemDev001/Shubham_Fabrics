@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { inchargeNameOf, typedInchargeNameOf, userChallanRemarks } from '@/lib/challan-remarks.mjs';
+import { canWriteColumns } from '@/lib/challan-item-average';
+import { prisma } from '@shubham/database';
 import { requireDepartment } from '@/lib/auth/department-access';
 import {
   FabricStockError,
@@ -24,6 +26,14 @@ export async function GET(request: Request) {
     const rawFilter = searchParams.get('fabricType')?.toUpperCase(); // "UNDYED" | "KORA" | "DYED" | "ALL"
     const fabricType = (rawFilter === 'KORA' || rawFilter === 'UNDYED') ? 'UNDYED' : rawFilter;
     const search = searchParams.get('search');
+
+    // Manual outward rows do not record who entered them; every outward is issued by the Fabric Store,
+    // so they show the Fabric Store incharge (the store station account).
+    const storeAccount = await prisma.user.findFirst({
+      where: { username: { equals: 'store', mode: 'insensitive' } },
+      select: { fullName: true },
+    });
+    const storeIncharge = storeAccount?.fullName || 'Fabric Store Incharge';
 
     // 1. Fetch Inward entries for verified origin tracing
     const inwardEntries = await (prisma as any).fabricInward.findMany({
@@ -155,7 +165,8 @@ export async function GET(request: Request) {
             remarks: ch.remarks || `Issued to ${ch.toDepartment}`,
             destination: ch.toDepartment,
             sourceDepartment: ch.fromDepartment,
-            issuedBy: ch.createdBy?.fullName || ch.createdBy?.username || null,
+            issuedBy: inchargeNameOf(ch) || ch.createdBy?.username || null,
+            inchargeName: typedInchargeNameOf(ch) || null,
             fabricType: itemType,
             status: ch.status,
             verifiedInwardDetails: verifiedDetails,
@@ -196,7 +207,8 @@ export async function GET(request: Request) {
             remarks: ch.remarks || `Issued to ${ch.toDepartment}`,
             destination: ch.toDepartment,
             sourceDepartment: ch.fromDepartment,
-            issuedBy: ch.createdBy?.fullName || ch.createdBy?.username || null,
+            issuedBy: inchargeNameOf(ch) || ch.createdBy?.username || null,
+            inchargeName: typedInchargeNameOf(ch) || null,
             fabricType: defaultType,
             status: ch.status,
             verifiedInwardDetails: verifiedDetails,
@@ -230,10 +242,11 @@ export async function GET(request: Request) {
         avgPerPcs: item.avgPerPcs ? Number(item.avgPerPcs) : null,
         issuePcsQty: item.issuePcsQty ? Number(item.issuePcsQty) : null,
         byOrderName: item.byOrderName || '—',
-        remarks: item.remarks || '—',
+        remarks: userChallanRemarks(item.remarks) || '—',
         destination: item.destination || 'OUTWARD',
         sourceDepartment: 'STORE',
-        issuedBy: null,
+        issuedBy: inchargeNameOf(item) || storeIncharge,
+        inchargeName: typedInchargeNameOf(item) || null,
         fabricType: type,
         status: 'ISSUED',
         verifiedInwardDetails: verifiedDetails,
@@ -315,7 +328,7 @@ export async function POST(request: Request) {
       designNumber,
       itemName,
       issueQty,
-      unit = 'MTR',
+      unit = '',
       avgPerPcs,
       issuePcsQty,
       byOrderName,
@@ -338,8 +351,12 @@ export async function POST(request: Request) {
 
     const normalizedUnit = String(unit).toUpperCase();
     if (!['MTR', 'PCS'].includes(normalizedUnit)) {
-      return NextResponse.json({ error: 'unit must be MTR or PCS' }, { status: 400 });
+      return NextResponse.json({ error: 'Select MTR or PCS for the issue quantity' }, { status: 400 });
     }
+
+    // The Fabric Store incharge's name as typed on the form.
+    const inchargeName = typeof body.inchargeName === 'string' ? body.inchargeName.trim().slice(0, 100) : '';
+    const storeInchargeColumn = inchargeName ? await canWriteColumns('FabricOutward', ['inchargeName']) : false;
 
     // Deducts from the matching fabric, colour and unit; refused when stock would go negative.
     const outward = await prisma.$transaction(async (tx) => {
@@ -355,7 +372,12 @@ export async function POST(request: Request) {
         avgPerPcs: avgPerPcs ? parseFloat(avgPerPcs) : null,
         issuePcsQty: issuePcsQty ? parseFloat(issuePcsQty) : null,
         byOrderName: byOrderName ? String(byOrderName).trim() : null,
-        remarks: remarks ? String(remarks).trim() : null,
+        ...(inchargeName && storeInchargeColumn ? { inchargeName } : {}),
+        // Until the inchargeName column exists the typed name is kept as an "Incharge:" note.
+        remarks:
+          [remarks ? String(remarks).trim() : '', inchargeName && !storeInchargeColumn ? `Incharge: ${inchargeName}` : '']
+            .filter(Boolean)
+            .join(' | ') || null,
         destination: String(destination).toUpperCase(),
         fabricType: normalizedType,
       },

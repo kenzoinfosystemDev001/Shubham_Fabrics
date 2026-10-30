@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { userChallanRemarks } from '@/lib/challan-remarks.mjs';
 import Link from 'next/link';
 import { ChevronDown, ChevronRight, PackageCheck, Search, X } from 'lucide-react';
 import {
@@ -21,10 +22,13 @@ import {
   fetchJson,
   fmtDate,
   fmtQty,
+  challanRef,
   sheetRef,
 } from '@/components/workflow/WorkflowUi';
 import { departmentName, type WorkflowView } from '@/lib/workflow-views';
 import { GarmentTag } from '@/components/recutting/RecuttingUi';
+import { averageText, lineQuantitiesByUnit, linesTotalsMtrPcs, unitQuantityText } from '@/lib/challan-units.mjs';
+import { ReceiptLinesTable, initialReceiptValues, receiptUnits, receivedByUnit, type ReceiptRow, type ReceiptValues } from '@/components/challan/ReceiptLines';
 
 type View = 'pending' | 'received' | 'all';
 const VIEWS: Array<{ id: View; label: string }> = [
@@ -33,11 +37,26 @@ const VIEWS: Array<{ id: View; label: string }> = [
   { id: 'all', label: 'All' },
 ];
 
-/** Totals per unit, e.g. "120 MTR · 40 PCS". */
-function totalsByUnit(items: any[], pick: (i: any) => number) {
-  const totals: Record<string, number> = {};
-  for (const i of items) totals[i.uom] = (totals[i.uom] || 0) + (pick(i) || 0);
-  return Object.entries(totals).map(([u, q]) => fmtQty(q, u)).join(' · ') || '—';
+/** A challan's lines as receiving rows: each work line with the challan line it came from. */
+function receiptRows(challan: any, items: any[]): ReceiptRow[] {
+  return items.map((i) => ({
+    key: i.id,
+    line: (challan.items || []).find((l: any) => l.id === i.inboundChallanItemId) || { quantity: i.expectedQuantity, uom: i.uom },
+    fabricName: i.fabricName,
+    colour: i.colour,
+    received: receivedByUnit(i),
+  }));
+}
+
+/** Total MTR and total PCS sent on the challan, each on its own. */
+function MtrPcsTotals({ lines }: { lines: any[] }) {
+  const t = linesTotalsMtrPcs(lines);
+  return (
+    <span className="block whitespace-nowrap">
+      {fmtQty(t.MTR, 'MTR')}
+      <span className="block">{fmtQty(t.PCS, 'PCS')}</span>
+    </span>
+  );
 }
 
 /** "Dyed", "Undyed" or "Dyed + Undyed" for a challan's lines. */
@@ -141,7 +160,7 @@ export function WorkIncoming({ flow }: { flow: WorkflowView }) {
                   <th className="py-3 px-3">Dyed / Undyed</th>
                   <th className="py-3 px-3">Priority</th>
                   <th className="py-3 px-3">Delivery</th>
-                  <th className="py-3 px-3 text-right">Expected</th>
+                  <th className="py-3 px-3 text-right">Sent (MTR / PCS)</th>
                   <th className="py-3 px-3">Status</th>
                   <th className="py-3 px-3 text-right"><span className="sr-only">Actions</span></th>
                 </tr>
@@ -188,7 +207,7 @@ export function WorkIncoming({ flow }: { flow: WorkflowView }) {
                         <td className="py-3 px-3"><PriorityBadge priority={ch.priority} /></td>
                         <td className="py-3 px-3 text-xs whitespace-nowrap"><DeadlineText program={ch.program} /></td>
                         <td className="py-3 px-3 text-right text-xs font-semibold tabular-nums whitespace-nowrap">
-                          {totalsByUnit(items, (i) => i.expectedQuantity)}
+                          <MtrPcsTotals lines={ch.items?.length ? ch.items : items.map((i) => ({ quantity: i.expectedQuantity, uom: i.uom }))} />
                         </td>
                         <td className="py-3 px-3">
                           {awaiting.length > 0 ? (
@@ -224,36 +243,46 @@ export function WorkIncoming({ flow }: { flow: WorkflowView }) {
                                     Previous challan <span className="font-mono">{ch.parentChallan.challanNumber}</span>
                                   </p>
                                 )}
-                                {ch.remarks && <p className="text-[11px] text-neutral-700 max-w-[240px]">Remarks: {ch.remarks}</p>}
+                                {userChallanRemarks(ch.remarks) && <p className="text-[11px] text-neutral-700 max-w-[240px]">Remarks: {userChallanRemarks(ch.remarks)}</p>}
                               </div>
                               <div className="flex-1 overflow-x-auto">
                                 <table className="w-full text-left text-xs bg-white border border-neutral-200 rounded-xl overflow-hidden">
                                   <thead className={THEAD}>
                                     <tr>
-                                      <th className="py-2.5 px-3">{flow.label} Ref</th>
+                                      <th className="py-2.5 px-3">From</th>
                                       <th className="py-2.5 px-3">Fabric</th>
                                       <th className="py-2.5 px-3">Colour</th>
                                       <th className="py-2.5 px-3">Dyed / Undyed</th>
-                                      <th className="py-2.5 px-3 text-right">{flow.strictReceipt ? 'Dispatched' : 'Expected'}</th>
-                                      <th className="py-2.5 px-3 text-right">Received</th>
+                                      <th className="py-2.5 px-3 text-right">{flow.strictReceipt ? 'Dispatched' : 'Sent'} MTR</th>
+                                      <th className="py-2.5 px-3 text-right">{flow.strictReceipt ? 'Dispatched' : 'Sent'} PCS</th>
+                                      <th className="py-2.5 px-3 text-right">Received MTR</th>
+                                      <th className="py-2.5 px-3 text-right">Received PCS</th>
                                       {flow.strictReceipt && <th className="py-2.5 px-3 text-right">Pending Receipt</th>}
                                       <th className="py-2.5 px-3">Status</th>
                                     </tr>
                                   </thead>
                                   <tbody className="divide-y divide-neutral-100">
-                                    {items.map((i) => (
+                                    {items.map((i) => {
+                                      const sent = lineQuantitiesByUnit(receiptRows(ch, [i])[0].line);
+                                      const got = receivedByUnit(i);
+                                      const qty = (q: number | null | undefined, u: string) => (q === null || q === undefined ? '—' : fmtQty(q, u));
+                                      return (
                                       <tr key={i.id}>
                                         <td className="py-2.5 px-3 font-mono text-neutral-600">
-                                          {i.itemNumber}
-                                          {i.sourceWorkItem && <span className="block text-[11px] text-neutral-500">from {i.sourceWorkItem.itemNumber}</span>}
+                                          {i.sourceWorkItem ? <span className="block text-[11px]">{departmentName(i.sourceWorkItem.departmentCode)}{challanRef(i.sourceWorkItem) ? ` · ${challanRef(i.sourceWorkItem)}` : ''}</span> : !i.sourceAllocation && '—'}
                                           {i.sourceAllocation && <span className="block text-[11px] text-neutral-500">{i.sourceAllocation.allocationNumber}</span>}
                                         </td>
                                         <td className="py-2.5 px-3 font-semibold text-neutral-900">{i.fabricName}<GarmentTag item={i} /></td>
-                                        <td className="py-2.5 px-3">{i.colour || '—'}</td>
+                                        <td className="py-2.5 px-3">
+                                          {i.colour || '—'}
+                                          {senderNoteOf(ch, i) && <span className="block text-[11px] text-neutral-500 max-w-[260px]">{senderNoteOf(ch, i)}</span>}
+                                        </td>
                                         <td className="py-2.5 px-3"><FabricStatusBadge status={i.fabricProcessingStatus} /></td>
-                                        <td className="py-2.5 px-3 text-right tabular-nums">{fmtQty(i.expectedQuantity, i.uom)}</td>
+                                        <td className="py-2.5 px-3 text-right tabular-nums">{qty(sent.MTR, 'MTR')}</td>
+                                        <td className="py-2.5 px-3 text-right tabular-nums">{qty(sent.PCS, 'PCS')}</td>
+                                        <td className="py-2.5 px-3 text-right tabular-nums">{qty(got?.MTR, 'MTR')}</td>
                                         <td className="py-2.5 px-3 text-right tabular-nums">
-                                          {i.status === 'AWAITING_RECEIPT' ? '—' : fmtQty(i.receivedQuantity ?? i.expectedQuantity, i.uom)}
+                                          {qty(got?.PCS, 'PCS')}
                                           {i.receiptRemarks && <span className="block text-[11px] text-danger-700">{i.receiptRemarks}</span>}
                                         </td>
                                         {flow.strictReceipt && (
@@ -261,7 +290,8 @@ export function WorkIncoming({ flow }: { flow: WorkflowView }) {
                                         )}
                                         <td className="py-2.5 px-3"><WorkStatusBadge status={i.status} next={flow.next} qc={Boolean(flow.qc)} dispatch={flow.dispatchWords} /></td>
                                       </tr>
-                                    ))}
+                                      );
+                                    })}
                                   </tbody>
                                 </table>
                               </div>
@@ -294,12 +324,28 @@ export function WorkIncoming({ flow }: { flow: WorkflowView }) {
   );
 }
 
+/** The sender's Average, Unit quantity, Remarks and Roll # for the challan line a work item came from (the line itself is never edited). */
+function senderNoteOf(challan: any, item: any): string {
+  const line = (challan.items || []).find((l: any) => l.id === item.inboundChallanItemId);
+  if (!line) return '';
+  const average = averageText(line);
+  const unitQuantity = unitQuantityText(line);
+  return [
+    average !== '—' ? `Average ${average}` : null,
+    unitQuantity !== '—' ? `Unit ${unitQuantity}` : null,
+    line.rollNumber ? `Roll ${line.rollNumber}` : null,
+    userChallanRemarks(line.remarks) || null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+}
+
 function ReceiveDialog({ flow, challan, onClose, onDone }: { flow: WorkflowView; challan: any; onClose: () => void; onDone: (message: string) => void }) {
   const lines: any[] = (challan.workItemsInbound || []).filter((i: any) => i.status === 'AWAITING_RECEIPT');
-  const [values, setValues] = useState<Record<string, { qty: string; remarks: string }>>(() =>
-    // Strict receipt: the receiver counts and enters the actual quantity rather than confirming the dispatched one.
-    Object.fromEntries(lines.map((i) => [i.id, { qty: flow.strictReceipt ? '' : String(i.expectedQuantity), remarks: '' }])),
-  );
+  const rows = receiptRows(challan, lines);
+  // Strict receipt: the receiver counts and enters the actual quantity rather than confirming the dispatched one.
+  const [values, setValues] = useState<ReceiptValues>(() => initialReceiptValues(rows, Boolean(flow.strictReceipt)));
+  const [lineRemarks, setLineRemarks] = useState<Record<string, string>>({});
   const [remarks, setRemarks] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -314,7 +360,15 @@ function ReceiveDialog({ flow, challan, onClose, onDone }: { flow: WorkflowView;
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           remarks,
-          lines: lines.map((i) => ({ workItemId: i.id, receivedQuantity: values[i.id].qty, remarks: values[i.id].remarks })),
+          lines: rows.map((r) => {
+            const { main, second } = receiptUnits(r.line);
+            return {
+              workItemId: r.key,
+              receivedQuantity: main ? values[r.key]?.[main] ?? '' : '',
+              receivedUnitQuantity: second ? values[r.key]?.[second] ?? '' : undefined,
+              remarks: lineRemarks[r.key] || '',
+            };
+          }),
         }),
       });
       onDone(body.message);
@@ -326,7 +380,7 @@ function ReceiveDialog({ flow, challan, onClose, onDone }: { flow: WorkflowView;
 
   return (
     <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center bg-neutral-900/50 p-3 overflow-y-auto" role="dialog" aria-modal="true">
-      <form onSubmit={submit} className="bg-white rounded-2xl shadow-xl border border-neutral-200 w-full max-w-4xl">
+      <form onSubmit={submit} className="bg-white rounded-2xl shadow-xl border border-neutral-200 w-full max-w-7xl">
         <div className="px-5 py-4 border-b border-neutral-200 flex items-center justify-between">
           <div>
             <h3 className="text-sm font-bold text-neutral-900">Receive {flow.garments ? 'Garments' : flow.qc || flow.material ? 'Material' : 'Fabric'}</h3>
@@ -341,64 +395,23 @@ function ReceiveDialog({ flow, challan, onClose, onDone }: { flow: WorkflowView;
 
         <div className="p-5 space-y-4">
           {error && <Notice kind="error">{error}</Notice>}
-          <div className="overflow-x-auto border border-neutral-200 rounded-xl">
-            <table className="w-full text-left text-sm">
-              <thead className={THEAD}>
-                <tr>
-                  <th className="py-2.5 px-3">Fabric</th>
-                  <th className="py-2.5 px-3">Colour</th>
-                  <th className="py-2.5 px-3">Dyed / Undyed</th>
-                  <th className="py-2.5 px-3 text-right">{flow.strictReceipt ? 'Dispatched' : 'Expected'}</th>
-                  <th className="py-2.5 px-3 w-36">Received</th>
-                  <th className="py-2.5 px-3">Remarks</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-neutral-100">
-                {lines.map((i) => {
-                  const v = values[i.id];
-                  const diff = Math.round(((Number(v.qty) || 0) - i.expectedQuantity) * 1000) / 1000;
-                  return (
-                    <tr key={i.id}>
-                      <td className="py-2.5 px-3 font-semibold text-neutral-900">{i.fabricName}<GarmentTag item={i} /></td>
-                      <td className="py-2.5 px-3 text-neutral-700">{i.colour || '—'}</td>
-                      <td className="py-2.5 px-3"><FabricStatusBadge status={i.fabricProcessingStatus} /></td>
-                      <td className="py-2.5 px-3 text-right tabular-nums text-neutral-600">{fmtQty(i.expectedQuantity, i.uom)}</td>
-                      <td className="py-2.5 px-3">
-                        <div className="flex items-center gap-1.5">
-                          <input
-                            type="number"
-                            min="0"
-                            max={flow.strictReceipt ? i.expectedQuantity : undefined}
-                            step="any"
-                            required
-                            value={v.qty}
-                            onChange={(e) => setValues({ ...values, [i.id]: { ...v, qty: e.target.value } })}
-                            className={`${FIELD} text-right tabular-nums`}
-                            aria-label={`Received quantity for ${i.fabricName}`}
-                          />
-                          <span className="text-xs text-neutral-500">{i.uom}</span>
-                        </div>
-                        {v.qty !== '' && diff !== 0 && (
-                          <span className={`block mt-1 text-[11px] font-semibold ${diff < 0 ? 'text-danger-700' : 'text-brand-800'}`}>
-                            {diff < 0 ? `Short ${fmtQty(-diff, i.uom)}` : `Excess ${fmtQty(diff, i.uom)}`}
-                          </span>
-                        )}
-                      </td>
-                      <td className="py-2.5 px-3">
-                        <input
-                          value={v.remarks}
-                          onChange={(e) => setValues({ ...values, [i.id]: { ...v, remarks: e.target.value } })}
-                          maxLength={300}
-                          className={FIELD}
-                          aria-label={`Remarks for ${i.fabricName}`}
-                        />
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <p className="text-xs text-neutral-600">Check every fabric and colour below. Meters and pieces are received separately and never added together.</p>
+          <ReceiptLinesTable
+            challan={challan}
+            rows={rows}
+            values={values}
+            onChange={(key, unit, value) => setValues((v) => ({ ...v, [key]: { ...v[key], [unit]: value } }))}
+            extraHeader="Receipt Remarks"
+            extraCell={(r) => (
+              <input
+                value={lineRemarks[r.key] || ''}
+                onChange={(e) => setLineRemarks((m) => ({ ...m, [r.key]: e.target.value }))}
+                maxLength={300}
+                className={FIELD}
+                aria-label={`Remarks for ${r.fabricName}`}
+              />
+            )}
+          />
           <label className="block">
             <span className="text-xs font-semibold text-neutral-600">Challan remarks</span>
             <input value={remarks} onChange={(e) => setRemarks(e.target.value)} maxLength={500} className={`${FIELD} mt-1`} />
@@ -409,8 +422,8 @@ function ReceiveDialog({ flow, challan, onClose, onDone }: { flow: WorkflowView;
           <button type="button" onClick={onClose} className={BTN_QUIET}>
             Cancel
           </button>
-          <button type="submit" disabled={saving} className={BTN_PRIMARY}>
-            {saving ? 'Saving…' : 'Confirm Receipt'}
+          <button type="submit" disabled={saving || rows.length === 0} className={BTN_PRIMARY}>
+            {saving ? 'Saving…' : 'Receive Challan'}
           </button>
         </div>
       </form>

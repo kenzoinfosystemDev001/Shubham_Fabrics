@@ -1,4 +1,4 @@
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { DEADLINE_ALERTS, type AlertSource } from './config';
 
 /** A unit of department work that can carry a deadline, normalized across sources. */
@@ -128,7 +128,7 @@ async function departmentWorkItems(source: Extract<AlertSource, { kind: 'workIte
       ...sheetFields(item.program),
       challanId: item.inboundChallan?.id ?? null,
       challanNumber: item.inboundChallan?.challanNumber ?? null,
-      taskLabel: `${item.itemNumber} ${item.fabricName}`,
+      taskLabel: item.inboundChallan?.challanNumber ? `${item.fabricName} (Challan ${item.inboundChallan.challanNumber})` : item.fabricName,
       workStatus: item.status,
       isOpen: closedReason === null,
       closedReason,

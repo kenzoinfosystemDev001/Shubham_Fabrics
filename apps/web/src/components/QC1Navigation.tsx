@@ -86,7 +86,7 @@ export function QC1Navigation() {
           <button
             onClick={() => setMobileOpen(true)}
             className="p-1.5 rounded-lg text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 transition"
-            aria-label="Open QC1 Menu"
+            aria-label="Open Dyeing QC Menu"
           >
             <Menu className="w-6 h-6" />
           </button>
@@ -185,6 +185,14 @@ export function QC1Navigation() {
             <span>My Work</span>
           </Link>
 
+          {/* HOLD: fabric kept back from forwarding */}
+          <Link
+            href="/qc1/hold"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/qc1/hold', true)}
+          >
+            <span>HOLD</span>
+          </Link>
           {/* 3. Floor Board */}
           <Link
             href="/qc1/floor-board"
@@ -192,6 +200,15 @@ export function QC1Navigation() {
             className={linkClass('/qc1/floor-board', true)}
           >
             <span>Floor Board</span>
+          </Link>
+
+          {/* 4. Shrinkage */}
+          <Link
+            href="/qc1/shrinkage"
+            onClick={() => setMobileOpen(false)}
+            className={linkClass('/qc1/shrinkage')}
+          >
+            <span>Shrinkage</span>
           </Link>
         </nav>
 
@@ -201,7 +218,7 @@ export function QC1Navigation() {
             <UserCircle className="w-8 h-8 text-brand-700" />
             <div className="flex-1 min-w-0">
               <span className="text-xs font-semibold text-neutral-900 truncate block drop-shadow-xs">
-                {currentUser.fullName || (isAdmin ? 'System Administrator' : 'Dyeing QC Inspector')}
+                {(currentUser.fullName && currentUser.fullName.trim().toLowerCase() !== 'dyeing qc' ? currentUser.fullName : '') || (isAdmin ? 'System Administrator' : 'Dyeing QC Inspector')}
               </span>
               <span className="text-[10px] text-brand-700 font-bold tracking-wide block truncate drop-shadow-xs">
                 Dyeing QC

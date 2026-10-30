@@ -33,7 +33,7 @@ async function bootstrap() {
 
   // Swagger OpenAPI Documentation
   const config = new DocumentBuilder()
-    .setTitle('Subham Fabrics Manufacturing Execution System (MES) API')
+    .setTitle('Shubham Fabrics Manufacturing Execution System (MES) API')
     .setDescription(
       'Production-grade Garment & Textile Shop-Floor Execution, Traceability, Analytics & Control Tower Gateway',
     )
@@ -46,7 +46,7 @@ async function bootstrap() {
   const port = process.env.PORT || 3001;
   await app.listen(port);
   logger.log(`=======================================================`);
-  logger.log(`🚀 Subham Fabrics MES Backend running on: http://localhost:${port}/api`);
+  logger.log(`🚀 Shubham Fabrics MES Backend running on: http://localhost:${port}/api`);
   logger.log(`📖 Interactive Swagger Documentation: http://localhost:${port}/api/docs`);
   logger.log(`🛡️ Rate Limiting, Helmet Security & Idempotency Engine Active`);
   logger.log(`=======================================================`);

@@ -349,32 +349,34 @@ export function validateProductionUpdate(item, input) {
  */
 export function validateTransferLines(lines, itemsById, departmentCode, kind = 'PASS', sourceChallanIds = undefined) {
   if (!Array.isArray(lines) || lines.length === 0) return { ok: false, error: 'Add at least one item to transfer.' };
-  const seen = new Set();
+  // A work line may appear on several challan lines (entries of one fabric colour); together they may not
+  // exceed what it has available.
+  const sent = new Map();
   const units = [];
   for (const [index, line] of lines.entries()) {
     const n = index + 1;
     const item = itemsById.get(line.workItemId);
     if (!item || item.departmentCode !== departmentCode) return { ok: false, error: `Line ${n}: work item not found.` };
-    if (seen.has(line.workItemId)) return { ok: false, error: `Line ${n}: the same work item is listed twice.` };
-    seen.add(line.workItemId);
     // Each line keeps its own unit; meters and pieces are never added together.
     units.push(item.uom);
     const qc = isQcItem(item);
-    if (!qc && kind !== 'PASS') return { ok: false, error: `Line ${n}: ${item.itemNumber} has no inspection outcomes.` };
-    if (!qc && !TRANSFERABLE_STATUSES.includes(item.status)) return { ok: false, error: `Line ${n}: ${item.itemNumber} is not ready for transfer.` };
+    if (!qc && kind !== 'PASS') return { ok: false, error: `Line ${n}: ${item.fabricName} has no inspection outcomes.` };
+    if (!qc && !TRANSFERABLE_STATUSES.includes(item.status)) return { ok: false, error: `Line ${n}: ${item.fabricName} is not ready for transfer.` };
     const quantity = Number(line.quantity);
     if (!Number.isFinite(quantity) || quantity <= 0) return { ok: false, error: `Line ${n}: enter a quantity greater than zero.` };
     const available = availableFor(item, kind);
-    if (round(quantity) > available) {
+    const total = round((sent.get(line.workItemId) || 0) + quantity);
+    sent.set(line.workItemId, total);
+    if (total > available) {
       const what = kind === 'REJECT' ? 'rejected and not yet sent' : kind === 'REWORK' ? 'marked for rework and not yet returned' : qc ? 'passed and not yet transferred' : 'ready to transfer';
-      return { ok: false, error: `Line ${n}: only ${available} ${item.uom} of ${item.itemNumber} is ${what}.` };
+      return { ok: false, error: `Line ${n}: only ${available} ${item.uom} of ${item.fabricName} is ${what}.` };
     }
   }
   const items = lines.map((l) => itemsById.get(l.workItemId));
   /** @type {string[]} */
   let sources = [];
   if (sourceChallanIds !== undefined) {
-    const source = checkSourceSelection(sourceChallanIds, items.map((i) => ({ label: i.itemNumber, inboundChallanId: i.inboundChallanId })));
+    const source = checkSourceSelection(sourceChallanIds, items.map((i) => ({ label: i.fabricName || i.itemNumber, inboundChallanId: i.inboundChallanId })));
     if (!source.ok) return source;
     sources = source.ids;
   }

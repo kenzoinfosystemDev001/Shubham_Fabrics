@@ -21,12 +21,15 @@ import {
   fetchJson,
   fmtDate,
   fmtQty,
+  challanRef,
   sheetRef,
 } from '@/components/workflow/WorkflowUi';
 import { availableToProcess, awaitingTakeIn, inProduction, readyToTransfer, receivedBasis } from '@/lib/work-items.mjs';
 import { isAdminUser } from '@/lib/rbac';
 import { departmentName, type WorkflowView } from '@/lib/workflow-views';
 import { GarmentTag } from '@/components/recutting/RecuttingUi';
+import { FabricPhotos } from '@/components/workflow/FabricPhotos';
+import { HoldSection } from '@/components/hold/HoldSection';
 
 const WORKING = 'RECEIVED,IN_PROGRESS,COMPLETED,READY_FOR_TRANSFER,PARTIALLY_TRANSFERRED';
 
@@ -173,7 +176,7 @@ function ProcessContent({ flow }: { flow: WorkflowView }) {
                   <tr key={i.id} className={`hover:bg-neutral-50/60 ${editingId === i.id ? 'bg-brand-50/40' : ''}`}>
                     <td className="py-3 px-4">
                       <span className="font-mono text-xs font-semibold text-neutral-900">{sheetRef(i.program)}</span>
-                      <span className="block font-mono text-[11px] text-neutral-500">{i.itemNumber}</span>
+                      <span className="block font-mono text-[11px] text-neutral-500">{challanRef(i)}</span>
                     </td>
                     <td className="py-3 px-3 text-xs">
                       <span className="font-mono text-brand-800">{i.inboundChallan?.challanNumber || '—'}</span>
@@ -247,9 +250,10 @@ function ProcessEditor({
   const partlySent = item.transferredQuantity > 0;
   const locked = item.status === 'TRANSFERRED';
   const [status, setStatus] = useState(item.status === 'PARTIALLY_TRANSFERRED' ? 'READY_FOR_TRANSFER' : item.status);
-  const [processed, setProcessed] = useState(String(item.processedQuantity ?? 0));
-  const [taken, setTaken] = useState(String(item.takenQuantity ?? 0));
-  const [defect, setDefect] = useState(String(item.defectQuantity ?? 0));
+  // Saved quantities are shown; a quantity of 0 is shown as an empty field (sent as 0).
+  const [processed, setProcessed] = useState(item.processedQuantity ? String(item.processedQuantity) : '');
+  const [taken, setTaken] = useState(item.takenQuantity ? String(item.takenQuantity) : '');
+  const [defect, setDefect] = useState(item.defectQuantity ? String(item.defectQuantity) : '');
   const [defectReason, setDefectReason] = useState('');
   const newDefect = Math.round(((Number(defect) || 0) - (Number(item.defectQuantity) || 0)) * 1000) / 1000;
   const [expected, setExpected] = useState(item.expectedCompletionDate ? String(item.expectedCompletionDate).slice(0, 10) : '');
@@ -272,13 +276,13 @@ function ProcessEditor({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...(partlySent ? {} : { status }),
-          processedQuantity: processed,
-          ...(flow.production ? { takenQuantity: taken, defectQuantity: defect, defectReason } : {}),
+          processedQuantity: processed || '0',
+          ...(flow.production ? { takenQuantity: taken || '0', defectQuantity: defect || '0', defectReason } : {}),
           expectedCompletionDate: expected || null,
           remarks,
         }),
       });
-      onSaved(body.data, `${item.itemNumber} updated.`);
+      onSaved(body.data, `${item.fabricName} updated.`);
       onClose();
     } catch (err: any) {
       setError(err.message);
@@ -295,7 +299,7 @@ function ProcessEditor({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fabricProcessingStatus: other, reason }),
       });
-      onSaved(body.data, `${item.itemNumber} corrected to ${other === 'DYED' ? 'Dyed' : 'Undyed'}.`);
+      onSaved(body.data, `${item.fabricName} corrected to ${other === 'DYED' ? 'Dyed' : 'Undyed'}.`);
     } catch (err: any) {
       setError(err.message);
       setSaving(false);
@@ -313,7 +317,7 @@ function ProcessEditor({
             </h3>
             <GarmentTag item={item} />
             <p className="text-xs text-neutral-500 font-mono">
-              {item.itemNumber} · {sheetRef(item.program)} · {item.inboundChallan?.challanNumber || '—'}
+              {sheetRef(item.program)} · {challanRef(item) || '—'}
             </p>
             {/* Production Sheets, Wilcom sheets and the incoming challan of this line. */}
             <div className="mt-2">
@@ -343,7 +347,7 @@ function ProcessEditor({
                 {item.sourceWorkItem && (
                   <div>
                     <dt className="text-xs text-neutral-500">{departmentName(item.sourceWorkItem.departmentCode)} line</dt>
-                    <dd className="font-mono text-xs">{item.sourceWorkItem.itemNumber}</dd>
+                    <dd className="font-mono text-xs">{challanRef(item.sourceWorkItem) || '—'}</dd>
                   </div>
                 )}
               </>
@@ -355,6 +359,9 @@ function ProcessEditor({
             <div><dt className="text-xs text-neutral-500">Started</dt><dd>{fmtDate(item.startedAt, true)}</dd></div>
             <div><dt className="text-xs text-neutral-500">Completed</dt><dd>{fmtDate(item.completedAt, true)}</dd></div>
           </dl>
+
+          {/* Fabric photos: Embroidery and Stitching upload; every department sees the ones before it. */}
+          <FabricPhotos workItemId={item.id} />
 
           {locked ? (
             <Notice kind="success">This line has been fully transferred to {flow.next}.</Notice>
@@ -441,6 +448,7 @@ function ProcessEditor({
                   <input type="date" value={expected} onChange={(e) => setExpected(e.target.value)} className={`${FIELD} mt-1`} />
                 </label>
               </div>
+              <HoldSection department={flow.code} sourceId={item.id} holdPage={`${flow.base}/hold`} />
               <label className="block">
                 <span className="text-xs font-semibold text-neutral-600">Remarks / observations</span>
                 <textarea value={remarks} onChange={(e) => setRemarks(e.target.value)} maxLength={500} rows={2} className={`${FIELD} h-auto py-2 mt-1`} />

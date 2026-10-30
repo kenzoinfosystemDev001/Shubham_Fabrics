@@ -26,7 +26,7 @@ export default function QC1Dashboard() {
       setError('');
       const res = await fetch('/api/qc1/dashboard');
       if (!res.ok) {
-        throw new Error('Failed to load QC1 dashboard data');
+        throw new Error('Failed to load Dyeing QC dashboard data');
       }
       const json = await res.json();
       setData(json.data);
@@ -159,10 +159,10 @@ export default function QC1Dashboard() {
           ))}
         </section>
 
-        {/* QUANTITIES (MTR) */}
+        {/* QUANTITIES (each in its own unit) */}
         <section className={panel}>
           <div className={panelHeader}>
-            <h2 className="text-sm font-bold text-neutral-900">Quantities (MTR)</h2>
+            <h2 className="text-sm font-bold text-neutral-900">Quantities</h2>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
             {quantityStats.map((s) => (

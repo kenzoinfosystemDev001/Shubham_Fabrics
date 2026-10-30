@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@subham/database';
+import { prisma } from '@shubham/database';
 import { DEPARTMENT_NAV_BG_RECORD } from '@/lib/nav-bg';
 
 export const dynamic = 'force-dynamic';

@@ -1,4 +1,4 @@
-# Production Readiness Audit — Subham Fabrics MES
+# Production Readiness Audit — Shubham Fabrics MES
 
 **Date:** 2026-10-23  **Branch:** `feature/packing-inventory-department`  **Scope:** all departments + cross-cutting (auth, DB, infra, CI)
 **Verdict:** **Not production ready.** The app works on the happy path. It has no real authentication, and quantity accounting can be corrupted by double-clicks, retries, or direct API calls.
@@ -234,7 +234,7 @@ These repeat in almost every department. Fix them once, centrally, and most per-
   - No auth, no size or MIME limit, and the client picks the folder.
   - A base64 fallback is stored in DB text columns.
   - GET exposes the Cloudinary configuration.
-- `scripts/setup-core-users.js` resets core users to known PINs. `scripts/patch-rbac.ps1` hardcodes another developer's path.
+- `scripts/setup-core-users.js` resets core users to known PINs.
 - `public/sw.js` caches authenticated HTML: clear it on logout for shared floor devices. There are no security headers (CSP/HSTS).
 - `apps/web` typechecks clean (0 errors).
 

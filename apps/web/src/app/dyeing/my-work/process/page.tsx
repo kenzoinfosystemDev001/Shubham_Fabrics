@@ -23,6 +23,7 @@ import {
   sheetRef,
 } from '@/components/dyeing/DyeingUi';
 import { availableForQc, isColorMismatch, receivedBasis, remainingToDye } from '@/lib/dyeing-workflow.mjs';
+import { HoldSection } from '@/components/hold/HoldSection';
 
 const WORKING = 'RECEIVED,IN_DYEING,PARTIALLY_DYED,DYED,READY_FOR_QC1,PARTIALLY_SENT_TO_QC1';
 const FILTERS = [
@@ -217,7 +218,7 @@ function ProcessEditor({ order, onClose, onSaved }: { order: any; onClose: () =>
   const locked = order.status === 'SENT_TO_QC1';
   const currentStep = order.status === 'PARTIALLY_DYED' ? 'IN_DYEING' : order.status === 'PARTIALLY_SENT_TO_QC1' ? 'READY_FOR_QC1' : order.status;
   const [status, setStatus] = useState(currentStep);
-  const [dyedQuantity, setDyedQuantity] = useState(String(order.dyedQuantity ?? 0));
+  const [dyedQuantity, setDyedQuantity] = useState(order.dyedQuantity ? String(order.dyedQuantity) : '');
   const [dyedColor, setDyedColor] = useState(order.dyedColor || '');
   const [reviewNote, setReviewNote] = useState('');
   const [batchNumber, setBatchNumber] = useState(order.batchNumber || '');
@@ -241,7 +242,7 @@ function ProcessEditor({ order, onClose, onSaved }: { order: any; onClose: () =>
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...(partlySent ? {} : { status }),
-          dyedQuantity,
+          dyedQuantity: dyedQuantity || '0',
           dyedColor,
           colorReviewNote: reviewNote,
           batchNumber,
@@ -351,6 +352,8 @@ function ProcessEditor({ order, onClose, onSaved }: { order: any; onClose: () =>
                   )}
                 </div>
               )}
+
+              <HoldSection department="DYEING" sourceId={order.id} holdPage="/dyeing/hold" />
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <label className="block">
